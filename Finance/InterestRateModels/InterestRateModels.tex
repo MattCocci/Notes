@@ -1,0 +1,78 @@
+\documentclass[a4paper,12pt]{scrartcl}
+
+\author{Matthew Cocci}
+\title{Interest Rate Models}
+\date{}
+\usepackage{enumitem} %Has to do with enumeration	
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm} %allows for labeling of theorems
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{blindtext}
+\usepackage{graphicx}
+%\numberwithin{equation}{section} 
+%, This labels the equations in relation to the sections rather than other equations
+%\numberwithin{equation}{subsection} %This labels relative to subsections
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+\setkomafont{disposition}{\normalfont\bfseries}
+
+
+\begin{document} \begin{center}
+   \LARGE
+   \textbf{Interest Rate Models}
+\end{center}
+
+\section{Vasicek Model}
+
+The classic short rate model is the Vasicek Model, adapted from the
+Ornstein-Uhlenbeck process:
+   \[ dr(t) = \lambda(\mu - r(t))\; dt + \sigma \; dW(t) \]
+There also exists an even simpler model, the Ho-Lee Model, written
+   \[ dr(t) = g(t) \; dt + \sigma \; dW(t) \]
+Both are part of an even more general class of models called the 
+\emph{general Gaussian Markov Process} specified by
+\begin{equation}
+   \label{general}
+   dr(t) = \left[g(t) + h(t)r(t)\right]\; dt + \sigma(t) \; dW(t) 
+\end{equation}
+where $g$, $h$, and $\sigma$ are all deterministic functions of time.
+It has solution
+   \[ r(t) = e^{H(t)} r(0) + \int^t_0 e^{H(t)-H(s)} g(s)\; ds +
+      \int^t_0 e^{H(t)-H(s)} \sigma(s) \; dW(s) \]
+   \[ H(t) = \int^t_0 h(s) \; ds \]
+
+\paragraph{Vasicek Model with Time-Varying $\mu$}
+
+Again, this is a special case of Equation \ref{general}, and it's
+solution simplifies to
+   \[ r(t) = e^{-\lambda t} r(0) + \lambda \int^t_0 e^{-\lambda (t-s)}
+      \mu(s) \; ds + \sigma \int^t_0 e^{-\lambda (t-s)} dW(s).\]
+
+Supposing that we want to simulate, we set
+   \[ r(t_{i+1}) = e^{-\lambda(t_{i+1}-t_i)} r(t_i) +
+      \lambda \int^{t_{i+1}}_{t_i} e^{-\lambda(t_{i+1}-s)} \mu(s) \; ds
+      + \frac{\sigma^2}{2\lambda} \left(1-e^{-2\lambda(t_{i+1}-t_i)}
+      \right) Z_{i+1} \]
+
+\paragraph{Ho-Lee with Time-Varying Non-Constant $g(t)$} This is also
+a special case of Equation \ref{general}, and---at any time $t$---the
+short rate is given by
+   \[ r(t) = r(0) + \int^t_0 g(s) \; ds + \sigma W(t).\]
+It's integral is given by 
+   \[ \int^T_0 r(u) \; du = r(0)T + \int^T_0 \int^u_0 g(s) \; ds \; du
+      + \sigma \int^T_0 W(u) \; du \]
+This integral has mean and variance
+   \[ m = r(0)T + \int^T_0 \int^u_0 g(s) \; ds \; du,
+      \qquad s^2 = \frac{1}{3}\sigma^2 T^3 \]
+   
+
+\section{Forward Rate Models: Continuous Rates}
+
+
+
+\end{document}
+

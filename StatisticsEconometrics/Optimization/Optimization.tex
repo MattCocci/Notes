@@ -1,0 +1,233 @@
+\documentclass[a4paper,12pt]{scrartcl}
+
+\author{Matthew Cocci}
+\title{Linear and Discrete Optimization}
+\date{}
+\usepackage{enumitem} %Has to do with enumeration	
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm} %allows for labeling of theorems
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{blindtext}
+\usepackage{graphicx}
+\usepackage{hyperref} % For internal/external linking. 
+				 % [hidelinks] removes boxes
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    filecolor=black,
+    urlcolor=black,
+}
+% \usepackage{url} % allows for url display, non-clickable
+%\numberwithin{equation}{section} 
+   % This labels the equations in relation to the sections 
+      % rather than other equations
+%\numberwithin{equation}{subsection} %This labels relative to subsections
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+\setkomafont{disposition}{\normalfont\bfseries}
+\usepackage{appendix}
+\usepackage{subfigure} % For plotting multiple figures at once
+\usepackage{verbatim}
+
+\begin{document}
+\maketitle
+
+%\tableofcontents %adds it here
+
+\section{Introduction to Linear Optimization}
+
+\subsection{Definition of a Linear Program}
+
+Linear optimization, also known as \emph{linear programming}, 
+consists of a linear \emph{objective function} and \emph{linear 
+inequalities}:
+\begin{align*}
+   \max \; \;& c_1 x_1 + \cdots + c_n x_n \\
+   \text{s.t.} \; \;&a_{11} x_1 + \cdots + a_{1n} x_n \leq b_n \\
+   & \qquad\qquad \vdots \\
+   &a_{m1} x_1 + \cdots + a_{mn} x_n \leq b_m 
+\end{align*}
+So we want to find the values of the \emph{variables}
+$x_1, \ldots, x_n \in \mathbb{R}$ such that
+the objective function is maximized while still satisfying the 
+linear inequalities. Using more convenient matrix notation,
+our linear program above can be rewritten more compactly as
+\begin{equation}
+   \label{lp}
+   \max \{ c^T x \; : \; x \in \mathbb{R}^n , \; Ax \leq b \} 
+\end{equation}
+If we want to find the minimum instead of the max, we can easily
+use the fact that the minimum of some set $S$ ($\min S$) is equivalent
+to $-\max S$.
+
+\subsection{Feasability, Optimality, Boundedness}
+
+We call a solution $x \in \mathbb{R}^n$ \emph{feasible} if $x$
+satisfies all the linear inequalities.  We call a linear program
+feasible if it has a feasible solution.
+\\
+\\
+A feasible solution $s \in \mathbb{R}^n$ is an \emph{optimal} solution
+of a linear program if $c^T x \geq c^T y $ for all $y\in \mathbb{R}^n$.
+\\
+\\
+A linear program is \emph{bounded} if there exists a constant $M\in
+\mathbb{R}$ such that $c^T x \leq \mathbb{R}$ for all feasible 
+$x \in \mathbb{R}^n$.
+
+\subsection{Linear Algebra Defintions}
+
+Recall that for $A \in \mathbb{R}^{m\times n}$, the \emph{kernel}
+of $A$, the \emph{image} of $A$, and the \emph{rowspace}
+of $A$ are defined
+\begin{align*}
+   \text{ker}(A) &= \{ x \in \mathbb{R}^n \; | \; Ax =0 \} \subset
+      \mathbb{R}^n\\
+   \text{im}(A) &= \{ A x \; | \; x\in \mathbb{R}^n \} \subset
+      \mathbb{R}^m\\
+   \text{rowspace}(A) &= \{ y \in \mathbb{R}^n \; | \; \exists \lambda
+   \in \mathbb{R}^m \text{ s.t. } A^T \lambda = y \}
+\end{align*}
+Note, the rowspace is just the set of all linear combinations of the
+rows of $A$.
+\\
+\\
+{\sl Result:}
+With these definitions in hand, we can show that a solution to the 
+linear program in Equation \ref{lp} is feasible and unbounded if
+$b \in \text{im}(A)$ and if $c \in \text{ker} A \setminus \{ 0 \}$. 
+\begin{proof}
+   First, $b \in \text{im}(A)$ proves feasibility. It also implies that
+   $\exists\; x^* \in \mathbb{R}^n$ such that $A x^* = b$. This
+   and the fact that $c \in \text{ker}(A)\setminus \{0\}$
+   allows us to write
+   \begin{align*}
+      A(x^* + \lambda c) &= Ax^* + \lambda A c \\
+      &= b + 0 = b
+   \end{align*}
+   which proves $x^* + \lambda c$ is a feasible solution, satisfying
+   all of the linear inequalities.
+   \\\\
+   So to finish up the unboundedness proof, we suppose the opposite:
+   that the linear program is bounded:
+      \[ c^T y \leq M \qquad \forall y \in \mathbb{R}^n \]
+   Since $x^* + \lambda c$ is feasible, then it should also be bounded:
+   \begin{align*}
+      \Rightarrow \quad c^T (x^* + \lambda c ) &\leq M\\
+      c^T x^* + \lambda c^T c \leq M 
+   \end{align*}
+   Now since $c \neq 0$, we know that $c^T c$ will be greater than
+   0. Now let's rearrange and choose 
+      \[ \lambda \geq \frac{M - c^T x^*}{c^T c} \]
+   in which case $c^T ( x^* + \lambda c) > M$.
+\end{proof}
+
+
+
+\newpage
+\section{The Geometry of Linear Programming}
+
+\subsection{General Definitions}
+
+{\sl Polyhedron:}
+A set $P$ of vectors in $\mathbb{R}^n$ is a polyhedron
+if $P=\{ x\in \mathbb{R}^n \; | \; Ax \leq b \}$ for some matrix $A$
+and some vector $b$.  By our definition of a linear program in 
+Equation \ref{lp}, we see that the set of feasible solutions is 
+a polyhedron.\footnote{Just one quick note for generality: The empty
+set, $\emptyset$, is also a polyhedron as $\emptyset = \{ x \in 
+\mathbb{R}^n \; |\; \mathbf{0}^T x \leq -1 \}$, 
+satisfying the definition of a polyhedron.} 
+\\
+\\
+{\sl Half space:} This is defined as $\{ x \in \mathbb{R}^n
+   \; | \; a^T x \leq \beta \}$, where $a \in \mathbb{R}^n \setminus 
+   \mathbf{0}$.
+\\\\
+{\sl Hyperplane:} This is defined as $\{ x \in \mathbb{R}^n
+   \; | \; a^T x = \beta \}$, where $a \in \mathbb{R}^n \setminus 
+   \mathbf{0}$.
+\\\\
+{\sl Valid:} An inequality $a^T x \leq \beta$ is valid for a 
+   polyhedron, $P$, if each $x^* \in P$ satisfies $a^T x^* \leq 
+   \beta$.
+\\\\
+{\sl Active:} An inequality $a^T x \leq \beta$ is active 
+   at $x^* \in \mathbb{R}^n$ if $a^T x^* = \beta$. 
+
+
+\subsection{Vertices}
+
+We'll offer three equivalent definitions, each of which offers some
+different intuition or an additional operational advantage:
+\begin{enumerate}
+   \item A point $x^* \in P$ is a \emph{vertex} of $P$ if 
+      there exists an inequality $a^T x \leq \beta$ such that
+      \begin{enumerate}
+	 \item $a^T x \leq \beta$ is valid for $P$.
+	 \item $a^T x \leq \beta$ is active at $x^*$ and not active
+	    at any other point in $P$.
+      \end{enumerate}
+   \item There's also an equivalent definition which says $x^* \in P$
+      is a vertex if and only if there exists a vector $c \in 
+      \mathbb{R}^n$ such that $x^*$ is the unique optimal solution of
+      the linear program $\max \{ c^T x \; | \; x \in P \}$.
+   \item Suppose we have $x^* \in P = \{ x \in \mathbb{R}^n \; | \;
+      Ax \leq b \}$ as a vertex of $P$. 
+      Then this vertex satisfies a smaller number of active contraints
+      (relative to all of the constraints that define the linear 
+      program and $P$). Therefore, we express those active constraints 
+      that we want to enforce with $\bar{A}x \leq \bar{b}$. 
+      
+      Now since $x^*$ is a vertex satisfying those
+      certain active constraints, that means $x^*$ is the unique 
+      solution of $\bar{A} x = \bar{b}$. That's equivalent to the 
+      statement that $\text{rank}(\bar{A}) = n$, which is equivalent 
+      to the columns of $\bar{A}$ being linearly independent.
+
+      So if we suspect that $x^*$ is a vertex of our linear program, 
+      then we examine the subsystem, $\bar{A} x \leq \bar{b}$, 
+      of our LP that $x^*$ satisfies with equality, and we look 
+      at the rank of $\bar{A}$. If $x^*$ really is a vertex of $P$,
+      the the rank of $\bar{A}$ equals $n$ and the columns will 
+      be linearly independent.
+      
+\end{enumerate}
+
+
+   
+
+
+\end{document}
+
+
+
+%%%% INCLUDING FIGURES %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+   % H indicates here 
+   %\begin{figure}[h!]
+   %   \centering
+   %   \includegraphics[scale=1]{file.pdf}
+   %\end{figure}
+
+%   \begin{figure}[h!]
+%      \centering
+%      \mbox{
+%	 \subfigure{
+%	    \includegraphics[scale=1]{file1.pdf}
+%	 }\quad
+%	 \subfigure{
+%	    \includegraphics[scale=1]{file2.pdf} 
+%	 }
+%      }
+%   \end{figure}
+ 
+
+%%%%% Including Code %%%%%%%%%%%%%%%%%%%%%5
+% \verbatiminput{file.ext}    % Includes verbatim text from the file
+% \texttt{text}	  % includes text in courier, or code-like, font

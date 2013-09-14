@@ -1,0 +1,569 @@
+
+
+----------------------------------------------------------------
+-------- Simple Terminal Stuff ---------------------------------
+----------------------------------------------------------------
+
+
+	----- Basics ------------------------------------------------
+
+	ctrl-z 	stops foreground process
+	ctrl-c 	kills foreground process
+	; 			allows multiple commands on the same line
+	*			wildcard; expands into all the filenames in 
+					directory, when used alone can also be used 
+					within path names	when used with other 
+					characters, it will expand * into all files 
+					whose names include the character pattern
+					surrounding the *
+	? 			wildcard; identical to *, EXCEPT it can only expand 
+					into EXACTLY one char
+
+
+	----- Input, Output, Pipes ----------------------------------
+	
+	< 		redirects input from file into a program
+	> 		redirects output from a program into a file
+	>>		redirects output from a program and append on to the
+				end of a file
+	
+	cmd1 | cmd2		pipes output from cmd1 as input to cmd2
+
+
+	----- Various Useful Terminal Commands ----------------------
+
+	echo				repeats whatever comes after
+	jobs
+	fg					bring ctrl + z'd jobs back to foreground
+	bg
+	chmod
+	su					enter sudo mode
+	which prgm 		finds where a program (like prgm) lives on a 
+							filesystem
+	alias				example: ..="cd .." will make .. execute cd ..;
+							Can put alias statements in the .bashrc in
+							the home directory to make aliasing happen
+							automatically
+	ls -l				give a detailed list of files
+	ls -a				show all files, even hidden files
+	ps					displays which processes are currently running
+
+
+
+	----- tar, archives, compression ----------------------------
+		
+	tar 	combines a directory structure into a single file, 
+				a "tarball"
+			used for distributing file heirarchies
+			also supports compression with "gzip" and "bzip2"
+	
+	-c 	creates a new archive file
+	-x 	extract files from archive
+	-t 	list files in an archive
+	-f 	specify archive file to create or extract from;
+				automatically uses * if -x or -t and no -f 
+				specified; tar reads from standard input in 
+				(aka stdin)
+	-z 	compress with gzip
+	-j 	compress with bzip2
+
+	Examples of use:
+		create: 			tar -cvf archive.tar file1 file2 ...
+		extract:			tar -xvf archive.tar
+		list contents:	tar -tvf archive.tar
+	
+	Compression
+		gzip
+		bzip2
+		7z
+
+	Compression Example	
+		7z a archive.7z files
+
+
+
+
+----------------------------------------------------------------
+-------- Shell Scripting ---------------------------------------
+----------------------------------------------------------------
+
+	To run a script: 
+		sh script.sh
+		source script.sh
+		sript.sh		
+			--after changing file permission to x w/ chmod
+	
+
+	The Script Header:
+	#!/bin/sh		or
+	#!/bin/bash		#! must start each shell script file to 
+							signify that it is a script file; the 
+							/bin/sh or /bin/bash specifies the way to 
+							the interpreter for the script; use sh for 
+							generic script; bash for bash-specific 
+							scripts; we could use #!/bin/perl for perl 
+							scripts
+
+	#					the comment symbol
+	strings			the basic unit for shell scripting
+	read input		when used in a script, prompts the user for 
+							input that can then be referenced as a 
+							variable later
+
+
+
+	----- Variables and Assignment ------------------------------
+	=					assignment operator
+	$varname			after assignment of a string to varname, this
+							outputs the value assigned to variable
+	Single quotes	prevents the shell from performing variable 
+							substitution (which you'll need for $ signs
+							because $var for unassigned variable, var, 
+							will output the empty string, while '$var'
+							outputs $var)
+	Double quotes	still allows variable substitution, and allows
+							spaces to be used in variable assignment
+	$()				put commands inside the () and the shell will 
+							replace that with the text output of the 
+							commands; works inside double quotes, not 
+							single quotes
+
+
+
+	----- Reserved Variables ------------------------------------
+	Already used by system/terminal; changing could lead to 
+		problems
+
+	HOME		reserved variable for the home directory; ~ gets 
+					expands to this
+	PS1		reserved variable for the appearance of the command 
+					prompt string
+	PATH		reserved variable for the directories in which the 
+					shell looks for commands
+
+
+	----- Arguments ---------------------------------------------
+	Allow users to pass dynamic info to script and specify how to 
+		behave
+	
+	Example: 	sh script.sh arg1 arg2 
+
+	$0		used to reference the name of the script
+	$n		where n=1,...,9 references the first nine arguments;
+				use ${m} where m>=10
+	$* 	gives one string with all arguments passed to script
+	$# 	gives the number of arguments passed to the script
+
+
+
+
+	----- Functions ---------------------------------------------
+	Heavy duty version of alias; two ways to do it:
+		fun_name (){ body }
+		function fun_name { body }
+
+	$*, $n, ${m} 	used within body to access function argments,
+							just like references within scripts
+	local loc_var	placed within body; makes loc_var a local 
+							variable within the fn
+
+
+
+
+	----- Conditionals ------------------------------------------
+	All programs return an exit status from 0-255 when they 
+		terminate
+	
+	$?					The exit status gets stored as this special 
+							variables
+	0					This exit status signals a successful/clean 
+							exit;	anything other values indicate 
+							failure
+	true/false		Recall, bash treats all variables as strings, 
+							so no built-in true/false; instead, 0 
+							signifies true; anything else signals 
+							false
+	exit code		within a script, returns statuscode "code"
+	return code		within a function, returns statuscode "code"
+
+
+	BASIC SYNTAX:
+		if condition1
+		then
+			commands1
+		elif condition2
+		then
+			commands2
+		elif condition3
+		then
+			commands3
+		...
+		else 
+			# This else-statement is optional
+			final commands
+		fi
+
+
+
+	----- Condition Tests ---------------------------------------
+	Basic Form: 	[ condtion ]  
+						#spaces after & before "[" and "]" required
+	
+	[ str1 = str2 ]	tests equality
+	[ str1 != str2 ]	tests inequality
+	[ -z str ]			tests whether str is empty
+	[ -n str ]			tests whether the string is non-null
+	[ str1 \< str2 ]	tests (alphabetically) if str1 < str2
+								where the \ is an escape character
+
+
+
+	----- File Test Operations ----------------------------------
+	
+	[ -x file ]
+
+	-x	 	tests whether:
+	--------------------------------
+	-e 	file exists
+	-d 	file is a directory
+	-r		file has read permissions
+	-O		you own the file
+
+
+
+
+	----- for Loops ---------------------------------------------
+
+	Basic form:
+		for i in list
+			# list is a series of strings separated by spaces,
+				# tabs, or newline characters
+			# i is then a variable that can be used
+		do 
+			commands
+		done
+
+	
+	Over quoted strings (for i in "a b" c "d e f"):		
+		groupings by quotes (" ") preserved
+
+	Over arguments	passed to script:
+		if we use $* (all args) as the list, groupings not 
+			preserved
+		if we loop over "$@" (quotes neceessary), groupings in
+			arguments passed to script are preserved
+
+
+
+
+	----- while Loops -------------------------------------------
+	
+	Basic Form:
+		while [ condition ]
+		do 
+			body
+		done
+
+
+
+	while-read-loops: Can be used to iterate over each line 
+		in a file
+
+	Example:		while read var
+					do 
+						body
+					done < iterate.txt
+
+	Ctrl+D		terminates a while-read-loop
+	<				can be used to supply input to a while-read-loop,
+						feeding in each line of iterate.txt
+	break			can break a while loop
+	continue		will cause the script to move to the next 
+						while-loop iteration without executing what 
+						comes below the continue appearance
+
+
+	
+	----- case Statement ----------------------------------------
+	allows a script to choose one of multiple different blocks
+		of code depending on whether the value matches a specific 
+		pattern
+	an alternative, usually more succinct, to if/else/elif statments
+
+
+	Basic Form:
+		case value in 
+		pattern1)
+			block1 ;;
+		pattern2)
+			block2 ;;
+		...
+		*) 			#In case value doesn't match any pattern above
+			bock3 ;;
+		esac
+
+
+
+
+	----- Arithmetic --------------------------------------------
+	
+	$(( ))	Any expression placed inside will be interpreted as
+					an arithmetic expression, and the result will be 
+					output
+	
+	[ num1 -lt num2 ]		tests if num1 <  num2
+	[ num1 -gt num2 ]		tests if num1 >  num2
+	[ num1 -le num2 ]		tests if num1 <= num2
+	[ num1 -ge num2 ]		tests if num1 >= num2
+	[ num1 -lt num2 ]		tests if num1 <  num2
+	[ num1 -eq num2 ]		tests if num1 =  num2
+	[ num1 -ne num2 ]		tests if num1 != num2
+
+
+
+
+
+----------------------------------------------------------------
+-------- Regular Expressions -----------------------------------
+----------------------------------------------------------------
+
+	grep		used to search for lines of text that contain
+					a specific string, searches for lines of text
+					that contain a specific string
+	egrep		equivalent to grep -E, which provides extended 
+					regex support for grep
+
+
+	Basic form: egrep -x 'expression' directory
+
+	-x 	Description
+	-------------------
+	-i		ignore case
+	-o		print only portion of the line that matches the regex
+	-w		only matches lines that contain an entire word that 
+				matches the expression (so 'john' wouldn't match
+				'johnny' with this option)
+	-c		replaces normal egrep output with number that reports
+				the number of lines containing matching strings
+				
+
+	Regexes
+	------------------
+	.		Matches exactly one character (any type), like ? in 
+				the shell
+	*		Greedy matcher; matches zero to infinity of the 
+				preceding character,	so 'x*' matches '', 'x',
+				'xx', etc.
+	.*		Matches anything
+	()		Can group characters together, so '(chars)*' checks
+				for zero to infinity of 'chars'
+	+		Greedy matcher; matches 1 to infinity of the preceding
+				character; so a little tougher than *
+	? 		Greedy matcher; matches 0 or 1 of the preceding 
+				character
+
+	Greedy matching: tries to match the largest possible string
+		that fits the expression, even if that spans multiple
+		words and you only want one word
+	
+
+	Regex Character Classes
+	-----------------------
+	[x]		If "x" is a string of characters, this bracket 
+					notation (denoting a "character class") specifies
+					a range of characters from which any character 
+					inside the brackets is considered a	match
+	[^x]		If "x" is a string of characters, then the ^ 
+					negates, so that any character NOT within the 
+					brackets (i.e. the character class) will be 
+					considered a match
+	[a-z]		Matches an lowercase letter
+	[e-x]		Matches any letter between 'e' and 'x'
+	[A-Za-z]	Matches any letter
+	[0-9]		Matches any digit
+	[A-Za-z0-9]		Matches any alphanumeric character
+	\w			Also matches an alphanumeric character
+	\W			Matches an NON-alphanumeric character
+	\b			will match a word boundary, use this on either
+					side of the expression you're after
+	'^x'		will only match lines that BEGIN with 'x'
+	'x$'		will only match lines that END with 'x'
+	'x{n}'	denotes that the expression 'x' should appear 'n'
+					times to register a match
+	'x{m,n}'	denotes that the expression 'x' should appear
+					between 'm' and 'n' times to register a match
+
+
+	Disjunction, |
+	------------------
+	'regex1 | regex2'		Allows the text to match the regex
+									to the left OR the right of |
+
+
+	Escape Character
+	------------------
+	'\[\?\]'		Allows you to escape special characters we've 
+						seen, so we could find the expression 
+						'[?]' here, even though [, ?, and ] stand
+						for certain wildcards in the regex language
+								
+
+	Shorter Regex Overview
+	----------------------
+		.		Any character
+		?		Zero or one
+		+		One or more
+		*		zero or more
+		|		Disjunction (or)
+		[]		Character class
+		^		Beginning of line
+		$		End of line
+		\		Escape character
+		{}		Number of Instances
+		\w		[a-zA-Z0-9]
+		\W		[^a-zA-Z0-9]
+		\b		Word boundaries
+
+
+
+
+
+----------------------------------------------------------------
+-------- Version Control ---------------------------------------
+----------------------------------------------------------------
+
+
+	----- diff ----------
+	Format:		diff file1 file2
+	Notes:		Tells you the difference between
+						file1 and file2, including what
+						lines the differences occur on
+	
+	----- patch ---------
+	Format:		patch file_to_update diff_output
+	Notes:		You feed the output of diff to this command
+						and patch will try to update the file
+	Advantage:	Only the diff output needs to be sent,
+						not the entire file
+	
+
+			
+
+	----- git ---------------------------------------------------
+		
+		-- init ----------
+		Format:		git init
+		Notes:		Creates a repository in the current directory
+		
+		-- status --------
+		Format: 		git status
+		Notes:		
+
+
+		-- clone ---------
+		Format: 		git clone repo_location
+		Notes:		Creates a local copy of central repository	
+							at repo_location which contains all files
+							and a revision history
+	
+		-- commit --------
+		Format:		git commit -m "log message"
+		Notes:		Sends all changes made to the user's
+						local repository with a commit log message
+		
+		-- add -----------
+		Format:		git add
+		Notes:		specify which files to include in next commit,	
+							including ANY files you have made changes 
+							to, NOT just new files
+		
+		-- push ----------
+		Format:		git push
+		Notes:		used to send all changes made to the user's
+							copy of the files to the remote central
+							repository
+		
+		-- pull ----------
+		Format:		git pull
+		Notes:  		Used to retrieve updates from central repository
+							and merge them with local repository
+
+		
+
+
+
+----------------------------------------------------------------
+-------- Encryption --------------------------------------------
+----------------------------------------------------------------
+
+	----- Terminology --------------
+	encrypt			transforms a message into something unreadable
+	plaintext		a message
+	cipher			an algorithm to encode the plaintext message
+	ciphertext		the unreadable message/information	
+	key				allows the user to revert the ciphertext back
+							to plaintext
+	decrypt			the act of converting back to something 	
+							readable
+	Subsitiution 	Where you replace each letter in plaintext
+		ciphers			with another letter
+	Shared key		This type of encryption uses the same key for
+		ciphers			both encryption and decryption; the Caeser	
+							cipher falls under this classification
+	Public key		Uses a pair of keys: a public key for 
+		Encryption		encryption and a private key for decryption;
+						So anyone with the public key can encrypt	
+							plaintext into ciphertext and anyone with
+							the private key can decrypt ciphertext 
+							into plaintext;
+						So you can send people your
+							public key so they can encrypt files and
+							you don't have to worry that they can
+							decrypt files since they don't have the 
+							private key;
+						No private keys EVER have to be shared
+							
+
+
+	----- Translate (tr) -----------
+		
+		tr SET1 SET2
+		
+		-Used for substitution ciphers
+		-Replaces each letter in SET1 with the letter specified
+			in SET2
+		-Can do Caeser cipher by setting SET1 as [a-z] and
+			SET2 as [d-za-c], where the Caeser cipher just shifts
+			letters by a specified amount
+		-Can decrypt by switching SET1 and SET2
+
+
+	----- gpg ----------------------
+	
+	
+		gpg --symmetric some_file
+		
+			-Will generate some_file.gpg, which contains the 
+				ciphertext
+			-You'll be prompted to enter a passphrase
+
+
+
+		gpg --decrypt somefile.gpg
+		
+			-This will decrypt your file
+			-You'll be prmpoed to enter your passphrase
+		
+
+
+
+
+
+
+
+
+
+
+
+
+

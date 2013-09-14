@@ -1,0 +1,333 @@
+\documentclass[a4paper,11pt]{scrartcl}
+\title{Stochastic Processes: Discrete Space, Continuous Time}
+\author{Matthew Cocci}
+%\date{} % Activate to display a given date or no date (if empty),
+         % otherwise the current date is printed 
+\usepackage{enumitem} %Has to do with enumeration	
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm} %allows for labeling of theorems
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{blindtext}
+%\numberwithin{equation}{section} %, This labels the equations in relation to the sections rather than other equations
+%\numberwithin{equation}{subsection} %This labels relative to subsections
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+\setkomafont{disposition}{\normalfont\bfseries}
+
+
+
+
+\begin{document}
+\maketitle
+
+\section{Basic Infrastructure}
+
+Let $X = \{ X_t \}$ be a process that can assume only discrete values.  
+We will, however, let $t$ vary continuously.  The process is therefore 
+defined by
+	\[ T = ( \tau_1, \tau_2, \ldots) \]
+	\[ J = ( j_1, j_2, j_3, \ldots) \]
+where $J$ is a sequence of discrete values (either finite or countably 
+infinite) that the process can assume, and $T$ is a sequence of jump 
+times--times when the process transitions from one particular to 
+$j_i \in J$ to another $j_k \in J$.
+
+For each $j \in J$, there is an accompanying variable $F_j$ that 
+describes how long the process, starting at $j$ will jump.  So we define,
+for the first jump
+	\[ F_j(t) = P( \tau_1 \leq t | X_0 = j )\]
+
+Second, We will also need to describe the \textbf{transition 
+probabilities}.  
+Specifically, we need the probability that, when the process jumps from 
+$j$, it moves to $k$.  And given that it's pretty stupid to define a 
+probability that the position will jump from itself \emph{to} itself, 
+we're not even going to consider $Q_{j,j}$. 
+(We'll see why this helps in a minute.)  So here are a few useful facts:
+	\[ \sum_{k \in J} Q_{jk} = 1 \]
+	\[ Q_{jj} = 0. \]
+
+Because of how we defined $F_j$ and $Q_{j,k}$ (and since we let $Q_{j,j} 
+= 0$), we can assume independence between \emph{when} the process jumps 
+and \emph{where} to define
+	\[ P(\tau_1 < t, X_{\tau_1}=k\;|\; X_0 =j) = F_j(t)Q_{jk}. \]
+This is the probability that process, which started at $j$, had its 
+first jump to value $k$ at by time $t$.
+
+Employing the full force of the Markov assumption and stationarity, we 
+also recognize that
+  \[ P(\tau_1 < s; X_{\tau_1}=k; \tau_2 - \tau_1 < t; X_{\tau_2} = l\;| 
+     \; X_0 = j) = F_j(s)Q_{jk}F_k(t)Q_{kl}. \]
+
+In fact, what we really want to know is a similar, but somewhat 
+different, value: the probability that the process, $X$, is 
+at a specific 
+value, $k$, at some time $t$, given that it started at $j$.  
+Mathematically, we express this is as
+	\[ P_{jk}(t) = P(X_t = k | X_0 = j). \]
+Now we defined this value, given that the process started at 
+$j$ \emph{at time 0}. But if we employ the Markov and stationarity 
+assumptions, then we can shift this probability through time. This means,
+	\[ P(X_t = k | X_s = j) = P_{jk}(t-s). \]
+
+\subsection{Definitions}
+
+Just to make things a little more precise, I define the following 
+terms for the stochastic process $X_t$.
+
+\paragraph{Definition} The process $X_t$ has the \textbf{Markov Property}
+if, for all $s_i \leq t$, we have that
+   \[ P(X_t = k \; | \; X_{s_1} = j_1, \ldots, X_{s_n} = j_n, 
+      X_{s} = j) = P(X_t = k \; | \; X_s = j) \]
+In words, the process is Markov if only the last observed value matters.
+
+\paragraph{Definition} The process $X_t$ is stationary if, for all
+$s \leq t$, we have that
+   \[ P(X_t = k \; | \; X_s = j) = P(X_{t-s} = k \; | \; X_0 = j) 
+      \]
+This allows us to shift the process through time.
+	
+
+\section{The Exponential Distribution}
+
+Given our stationarity assumption, we've put a pretty tight constraint 
+on the jump-time distribution. Specifically, stationarity tells us 
+that we need
+   \[ P_j(\tau_1 > t+s \;|\; \tau_1 > s) = P_j(\tau_1 > t) \]
+where $P_j = P(\ldots|X_0 = j)$. Then, after applying Bayes' Rule on 
+to get the left hand side, our requirement becomes
+  \[ \frac{1 - F_j(t+s)}{1 - F_j(s)} = 1 - F_j(t). \]
+A standard distribution which obeys this constraint is the exponential
+distribution.  So we'll assume that 	
+  \[ f_j(t) = q_j e^{-q_j t}, \;\; t \geq 0 \]
+  \[ F_j(t) = 1 - e^{-q_j t} \]
+where $q_j$ is a paramter specific to the starting point $X_0 =j$.  In 
+practice, it makes sense that the time until a jump could differ for 
+different starting points of the process.
+
+\section{Chapman-Kolmogorov Equations}
+
+Second, as a result of our Markov and stationarity assumptions, we get 
+the Chapman-Kolmogorov Equatios
+     \[ P_{jk}(t+s) = \sum_{l \in J} P_{jl}(t) P_{lk}(s). \]
+So if take some intermediate time $t \in (0,s)$, to find the probability 
+of going from $j$ to $k$ in time $t+s$, we need only sum over all the 
+possible ways of getting from $j$ to $k$ via any position $l$ at the 
+intermediate time $t$.  
+
+\section{Backward and Forward Equations}
+
+So why define all this? Well, they allow us to compute two very 
+useful systems of differential
+equations for asset pricing: the backward and the forward equations.  
+First, the \textbf{backward equation}.
+\begin{equation}
+	P'_{jk}(t) = \sum_{\ell \in J} q_{j\ell}P_{\ell k}(t) 
+\end{equation}
+and the \textbf{forward equation}
+\begin{equation}
+	P'_{jk}(t) = \sum_{\ell \in J} q_{\ell k} P_{j\ell}(t) 
+\end{equation}
+where the define that $q_{mn}$ coefficient as 
+	\[ q_{mn} = P'_{mn}(0) \]
+	\[ \Rightarrow q_{mn} = \begin{cases} -q_m & m=n \\ 
+	   q_m  Q_{mn} &  m \neq n \end{cases} \]
+recalling that $q_m$ is the coefficient on the exponential distribution 
+and density functions. 
+
+\subsection{Proof of the Backward Equation}
+
+To prove the backward equation, we set up the following formula which 
+we will then explain
+  \[ P_{jk}(t) = \delta_{jk} e^{-q_j t} + \int_0^t  q_j e^{-q_j s} 
+      \left( \sum_{\ell \neq j} Q_{j\ell}P_{\ell k}(t-s) \right) ds. \]
+Wow, what a bear of an equation.  Let's break it down component by 
+component to figure out what the hell it means.
+
+\begin{itemize}
+   \item{ $\delta_{jk}$, \textbf{Kronecker Delta Symbol}: The variable 
+      is defined as follows:
+	 \[ \delta_{jk} = \begin{cases} 1 & j=k \\ 0 & j \neq k 
+	    \end{cases} \]
+      So once we put this together into $\delta_{jk} e^{-q_j t}$, 
+      we see that in the case where $j=k$, we get  
+	 \[ \delta_{jj} e^{-q_j t} = e^{-q_j t} = 1-F_j(t) \]
+      which represents the probability that the process hasn't jumped 
+      yet at time $t$, i.e. that $\tau_1 > t$. Otherwise, it's
+      zero.
+	}
+   
+   \item{Next, we consider the integral.  Let's consider the first term 
+	 in the integral, along with the differenital
+	      \[ q_j e^{-q_j s}ds = f_j(s)ds\]
+	 which is roughly the probability that the first jump occurs 
+	 between time $s$ and $s + ds$.  
+
+	 With that in mind, we can consider the probability that the 
+	 process jumps from $j$ to some $\ell$ between time $s$ 
+	 and $s+ds$:
+	    \[ q_j e^{-q_j s}Q_{j\ell} ds. \]
+	 But recall, we want the probability that we get to $k$, 
+	 not to $\ell$.  And given that we jumped at $s$, an intervening 
+	 time between $0$ and $t$, we have $t-s$ units of time to get 
+	 there.  So including the probability of getting to $k$, we get
+	    \[ q_j e^{-q_j s}Q_{jl}P_{lk}(t-s) ds \]
+	 which, in total, is the approximate probability for 
+	    \begin{enumerate}
+	       
+	       \item{Jumping at time $s$: $q_j e^{-q_j s}$.}
+	       
+	       \item{Given a jump, jumping from $j$ to $l$ at time $s$: 
+		     $Q_{j\ell}$. }
+	       
+	       \item{Then somehow getting from $\ell$ to $k$ in the time 
+		     remaining in the interval of interest, $[0,t]$, in	
+		     any number of ways.  (This is the term $P_{\ell k}
+		     (t-s)$, which will be the right-hand side version
+		     of the variable on the left-hand side that we will 
+		     use to solve a differential equation.)}
+	    \end{enumerate}
+			
+	 \emph{But}, and here's the key, that was specific to jumping 
+	 \emph{at time} $s$ and \emph{to} $\ell$ in the interim 
+	 when going 
+	 from $j$ to $k$.  But $s$ and $\ell$ are not unique.  
+	 There's any 
+	 number of times that we could jump from $j$ to $\ell$.  So we 
+	 integrate over the different possible times, $s$.  
+		
+	 Second, there's any number of intermediate steps steps that we 
+	 could take between $j$ and $k$.  So we should use the
+	 Chapman-Kolmogorov Equation to sum over 
+	 \emph{all possible} intermediate steps, $\ell$, hence the sum 
+	 inside the integral.  
+	}
+\end{itemize}
+Awesome. Now that we have a good representation for the process, we can 
+solve it to get a differential equation, the backward equation, which 
+we are after.
+
+\begin{proof}
+
+First step, let's replace $t-s$ by $s$ in the integral, changing the 
+variables---note that we can do this because $t$ is a constant, not a 
+variable here. It's harmless enough and we can factor out a term to get:
+   \[ P_{jk}(t) = \delta_{jk} e^{-q_j t} + \int_{t-0}^{t-t}  
+      q_j e^{-q_j (t-s)} \left( \sum_{\ell \neq j} Q_{j\ell}P_{\ell 
+      k}(s) \right)(-1)ds. \]
+   \[\Rightarrow  P_{jk}(t) = e^{-q_j t}\left[ \delta_{jk} + q_j  
+      \int_0^t  e^{q_j s} \left( \sum_{\ell\neq j} Q_{j\ell}P_{\ell k}(s)
+      \right) ds. \right] \]
+And by more technical arguments involving the boundedness of the 
+integral, it just so happens that $P_{jk}(t)$ is a continuous function.
+So we can differentiate with respect to $t$, using the product rule, 
+then use the fundamental 
+theorem of calculus on the integral to finally get
+   \[ P'_{jk}(t) = -q_j P_{jk}(t) +q_j\sum_{\ell \neq j} 
+      Q_{j\ell}P_{\ell k}(t) \]
+
+Finally, to get the equation in it's final form, we note that 
+   \[ X_0 = j \Rightarrow   P_{jk}(0) = \delta_{jk}\]
+allowing us to write
+   \[ P'_{jk}(0) = -q_j\delta_{jk} + q_j \sum_{\ell\neq j} 
+      Q_{j\ell}\delta{\ell k} \]
+   \[ P'_{jk}(0) = -q_j\delta_{jk} + q_j Q_{jk}. \]
+Therefore we define $q_{jj} = -q_j$ and $q_{jk} = q_j Q_{jk}$ whenever 
+$j \neq k$ to write the final form of the backward equation:
+   \[ P'_{jk}(t) = \sum_{\ell \in S} q_{j\ell}P_{\ell k}(t). \]
+\end{proof}
+Phew. Now just another 10 pages to prove Forward Equation.
+
+\subsection{Proof of the Forward Equation}
+
+Kidding! This is substantially easier.  
+
+\begin{proof} 
+Recall the Chapman-Kolmogorov equation:
+     \[ P_{jk}(t+s) = \sum_{\ell\in J} P_{j\ell}(t) P_{\ell k}(s) \]
+Well, let's differentiate both sides with respect to $s$ to get
+     \[ P'_{jk}(t+s) = \sum_{\ell \in J}P_{j\ell}(t) P'_{\ell k}(s) \]
+and set $s = 0$, using our definition of $q_{jk}$ just defined to get 
+the forward equation:
+     \[ P'_{jk}(t) = \sum_{\ell \in J} q_{\ell k} P_{j\ell}(t). \]
+\end{proof}
+
+\section{Poisson Process}
+
+This is a very special case of the birth-and-death process
+with the restriction that the process can only jump one unit at a 
+time, and in one direction. Specifically, we define the transition
+probabilities
+   \[ Q_{jk} = \begin{cases} 1 & k = j+1 \\ 0 & o.w. \end{cases} \]
+In addition, the inter-jump times---$\tau_1$, $\tau_2 - \tau_1$, etc.---
+are exponentially distributed with parameter $\lambda > 0$.
+   \[ F_j(t) = P(\tau_1 \leq t \; | \; X_0 = j) = 1- e^{-\lambda t}.\]
+Namely, we want to show---using the Forward or Backward Equation---that
+   \[P_{jk}(t) = \begin{cases} \frac{(\lambda t)^{k-j}}{(k-j)!} \;
+      e^{-\lambda t} & k \geq j, \; t > 0 \\ 0 & k < j \end{cases} \]
+
+\begin{proof}
+We're going to use the Forward Equation, which states
+   \[P'_{jk}(t) = \sum_{\ell \in J} q_{\ell k} P_{j\ell}(t). \]
+
+But first, the probability $P_{jj}(t)$ is really easy, as it represents
+the probability that the process didn't jump yet. So
+   \[ P_{jj}(t) = P(\tau_1 > t) = 1 - F_j(t) = e^{-\lambda t} \]
+
+
+Next, because of the way we structured the Poisson Process, 
+things are going
+to simplify \emph{considerably}. Specifically, if we look at that
+coefficient $q_{ k}$, we really only have two cases:
+   \begin{enumerate}
+      \item{$k = j$ implies, by our definition of the coefficient
+	 \[ q_{jj} = - q_j = -\lambda.\] }
+      \item{$k = j +1 $, which implies
+	 \[ q_{j,j+1} = q_j Q_{jk} = \lambda \cdot 1 = \lambda.\] }
+   \end{enumerate}
+So we can rewrite the entire forward equation as 
+   \[ P'_{jk}(t) = \sum_{\ell \in J} q_{\ell k} P_{j\ell}(t). \]
+   \[ = q_{kk} P_{jk}(t) + q_{k-1,k} P_{j,k-1}(t) \]
+   \[ =\lambda P_{j,k-1}(t) - \lambda P_{jk}(t) .\]
+This we can solve like a traditional ODE:
+   \[ P'_{jk}(t) = \lambda P_{j,k-1}(t) - \lambda P_{jk}(t) \]
+   \[ e^{\lambda t} \left( P'_{jk}(t) + \lambda P_{jk}(t)\right) = 
+       \lambda P_{j,k-1}(t) \]
+   \[ \left(e^{\lambda t}  P_{jk}(t) \right)' = \lambda e^{\lambda t} 
+      P_{j,k-1}(t) \]
+   \[ e^{\lambda t}P_{jk}(t)-P_{jk}(0) = \int^t_0 \lambda e^{\lambda s} 
+      P_{j,k-1}(s) ds \]
+and recognizing that $P_{jk}(0)$ is just $\delta_{jk}$, we can
+rewrite this as
+   \[P_{jk}(t)=e^{-\lambda t}\delta_{jk} +  \int^t_0 
+      \lambda e^{\lambda (s-t)} P_{j,k-1}(s) ds \]
+Then, we can use the fact that $P_{jj}(t) = e^{-\lambda t}$ to plug into
+the equation just stated, and we can start solving inductively to get
+the general expression we wanted:
+   \[ P_{jk}(t) = \begin{cases} \frac{(\lambda t)^{k-j}}{(k-j)!} \;
+      e^{-\lambda t} & k \geq j, \; t > 0 \\ 0 & k < j \end{cases} \]
+\end{proof}
+
+
+
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+

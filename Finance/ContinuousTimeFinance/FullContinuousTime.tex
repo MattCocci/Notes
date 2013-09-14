@@ -1,0 +1,677 @@
+\documentclass[a4paper,12pt]{scrartcl}
+\title{Continuous Time Finance}
+\author{Matthew Cocci}
+%\date{} % Activate to display a given date or no date (if empty),
+         % otherwise the current date is printed 
+\usepackage{enumitem} %Has to do with enumeration	
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm} %allows for labeling of theorems
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{blindtext}
+%\numberwithin{equation}{section} %, This labels the equations in relation to the sections rather than other equations
+%\numberwithin{equation}{subsection} %This labels relative to subsections
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+\setkomafont{disposition}{\normalfont\bfseries}
+
+
+
+
+\begin{document}
+\maketitle
+
+\section{Random Walk}
+
+We will start with an approximation of Brownian Motion, the 
+\textbf{random walk}, denoted by $W_n$.  This random walk will be the
+driving force behind the random variable $X_t$, which is approximated by
+by $X^n_t$, to be defined below.  This second random variable is 
+similar to its driver, the random walk, but it provides a little more
+flexibility on the time and value dimensions as we shall see.
+
+\subsection{The Random Walk, $W_n$}
+So to begin, the random walk is a stochastic process, defined and denoted
+as follows:
+   \[ \{ W_n | n \in \mathbb{N} \} \]
+   \[ W_n = \xi_1 + \xi_2 + \cdots + \xi_n \]
+   \[ W_0 =  0 \]
+where the $\xi_i$ have distribution
+   \[ P(\xi_i = 1) = p \]
+   \[ P(\xi_i = -1) = 1-p. \]  
+
+\subsection{Generalized Process, $X_t$}
+To handle time, we will pick a $T \in (0, \infty)$, and partition our 
+time interval into $n$ equal segments
+   \[ \Delta t = \frac{T}{n} \;\; \Rightarrow t_i = i \Delta t.\]
+In addition, the random variable, $X_t$, will be will approximated by
+the random variable $X^n_t$, which depends on how finely we partition 
+our time interval.  Eventually, we will let $n$ tend to infinity, so 
+that $X^n_t \rightarrow X_t$. But before we get there, a little more 
+about $X^n_t$. 
+
+We will restrict the approximation $X^n_t$ to movements of 
+only $\Delta x$, a constant, between time $t_{i-1}$ to time $t_i$. 
+Eventually, as our time increments become small, $\Delta x$ will 
+shrink too.
+
+Therefore, at each time $t_i =  i \Delta  t $, we can define the process
+as a function of the underlying, driving random walk:
+\begin{equation}
+   \label{bm1}
+   X^n_{t_i} = \Delta x W_i = \Delta x (\xi_1 + \cdots + \xi_i),
+      \qquad i \in 0,1,\ldots,n.
+\end{equation}
+At intermediate times, $t \in [t_{i-1},t_i]$, we will define $X^n_t$ as
+the linear interpolation between $X^n_{t_{i-1}}$ and  $X^n_{t_{i}}$:
+\[ X^n_{t_{i}} = \frac{t_i - t}{\Delta t} X^n_{t_{i-1}} + 
+   \frac{t- t_{i -1}} {\Delta t} X^n_{t_{i}} \] 
+allowing $X_t^n$ to be defined for all $t \in [0,T]$.
+
+\section{The Limiting Case}
+
+Ideally, we want to let $n$ tend to infinity, so that $\Delta t 
+\rightarrow 0$ and so that $X^n_t \rightarrow X_t$.  But for this process
+$X^n$ to converge to something and be useful, we're going to need the
+first and second moments, and hence $EX^n_T$ and $Var(X^n_T)$ to be 
+bounded.
+
+From Equation \ref{bm1}, we see that
+   \[ EX^n_T  = \Delta x \cdot n \cdot E\xi_i = \Delta x \cdot n(2p-1) \]
+   \[Var(X^n_T) = (\Delta x)^2 \cdot n \cdot Var(\xi_i) = 
+      (\Delta x)^2 \cdot n \cdot 4p(1-p). \]
+And using the fact that $n = \frac{T}{\Delta t}$, we can rewrite the
+expectation and the variance as 
+\begin{equation} 
+   \label{exp}
+   EX^n_T = T \cdot \frac{ \Delta x}{\Delta t} (2p-1) 
+\end{equation}
+\begin{equation}
+   \label{var}
+   Var(X^n_T) = T \cdot \frac{(\Delta x)^2 }{\Delta t} \cdot 4p(1-p).
+\end{equation}
+Our goal is to \emph{keep these finite} for all fixed $t$. So let's 
+force the things we have control over in the variance term.
+Specifically, to prevent the variance from being 0 (and our process 
+deterministic) and to prevent the process from blowing up to infinity, 
+we choose $\Delta x$ so that 
+\begin{equation}
+   \label{diff}
+   \frac{(\Delta x)^2}{\Delta t} = 2D 
+\end{equation}
+for some positive constant $D$, which we will call the \textbf{diffusion
+coefficient}. This is the only logical and feasible way to keep it
+bounded.
+
+This forces our hand with the expectation, because it will blow up to
+infinity as $\Delta x \rightarrow 0$, which we see by plugging 
+\ref{diff} into equation \ref{exp}, which gives 
+   \[ EX^n_T = T \cdot \frac{ 2D}{\Delta x} (2p-1). \]
+Now since we want the expectation bounded, we choose the parameter $p$
+so that 
+   \[ \frac{2p - 1}{\Delta x} = \frac{c}{2D} \]
+\begin{equation}
+   \label{p}
+   \Rightarrow p = \frac{1}{2} + \frac{c}{2D} 
+\end{equation}
+for some constant $c$, which we call the \textbf{drift coefficient}. 
+
+So if we take equations \ref{exp} and \ref{p}, we find
+   \[ EX^n_T = cT \]
+while taking equations \ref{var}, \ref{diff}, and \ref{p} gives us
+   \[ Var(X^n_T)= 2DT \left( 1 - \frac{c^2}{D^2} (\Delta x)^2 \right).\]
+
+\paragraph{Final Result} So now let's take the limit of the mean and 
+variance expressions, noting that $\Delta x$ goes to $0$ as 
+$n\rightarrow \infty$:
+   \[ \lim_{n\rightarrow \infty} EX^n_T = cT  \]
+   \[ \lim_{n\rightarrow \infty} Var(X^n_T)= 2DT  \]
+both of which are bounded! 
+
+Finally, we can apply the Central Limit Theorem to conclude that, 
+   \[\lim_{n \rightarrow \infty} \frac{X^n_T - 
+      EX^n_T}{\sqrt{Var(X^n_T)}} \rightarrow Z \]
+where $Z$ is the standard normal random variable. 
+
+\section{Brownian Motion} 
+
+Now we can take the limiting case to define our result. So for any fixed 
+$ T \in (0,\infty)$, we can define the limit of $X^n_T$ as $X_T$, which
+is a normally distributed random variable defined by parameters
+   \[ \mu_T = cT \]
+   \[ \sigma_T = \sqrt{2DT}.\]
+If we do this for each time $T \in (0,\infty)$, we obtain a 
+continuous process 
+   \[ \{ X_T \; |\; T \geq 0 \}  \]
+   \[p(x,T) = \frac{1}{\sqrt{4\pi DT}} \;
+      e^{\frac{-(x - cT)^2}{4DT}}, \;\; x \in \mathbb{R}.\]
+
+\paragraph{Definition} If we set the parameters at $c = 0$ and $D = 1/2$,
+we get as the corresponding process \textbf{Brownian Motion}, also 
+called the \textbf{Wiener Process}, denoted by $\{ W_t\;|\; t\geq 0\}$:
+
+\section{Properties of Brownian Motion}
+
+Brownian Motion, as just defined, satisfies certain properties:
+\begin{enumerate}
+   \item[i.]{$W_0 = 0$ with probability 1.}
+   \item[ii.]{$W_t$ is a continuous function of $t$ with probability 1.}
+   \item[iii.]{For all $u < s < t$, the increments $W_t - W_s$ and
+      $W_s - W_u$ are independent.}
+   \item[iv.]{For all $s <t$, $W_t - W_s$ is normally distributed with
+      mean $0$ and variance $t-s$.  The pdf is
+      \[ p(x,t-s) =  \frac{1}{\sqrt{2\pi (t-s)}} \; 
+	 e^{-\frac{x^2}{2(t-s)}}.\]
+      }
+\end{enumerate}
+
+\subsection{Brownian Motion Starting at $y$}
+
+Let $W^y_t$ denote Brownian motion starting at $y$, rather than $0$. 
+Much remains the same, but let's run through just to be clear.
+\begin{enumerate}
+   \item[i.]{$W^y_0 = y$, since it has a non-zero starting point.}
+   \item[ii.]{Doesn't change.}
+   \item[iii.]{Non-overlapping increments remain independent, and an
+      increment like $W_t - W_s$ will have 
+      expectation $0$, and variance $t - s$.}
+   \item[iv.]{ $W^y_t$ is normally distributed with density function
+      \[ f(x,t|y) = \frac{1}{\sqrt{2\pi t}} e^{-\frac{(x-y)^2}{2t}}.\]
+      }
+\end{enumerate}
+
+\subsection{Additional Properties}
+
+Before we prove the following results, let's just state them quickly:
+\begin{enumerate}
+   \item{The process $W_t$ is \textbf{nowhere differentiable}.}
+   \item{$W_t$ is not of \textbf{bounded first order variation}.}
+   \item{The function $W_t$ has \textbf{bounded quadratic
+      variation}.}
+   \item{$(dW_t)^2 = dt$.}
+\end{enumerate}
+Now we can prove these statements. Many of the properties of the Wiener
+Process, the It\={o} Integral, and Stochastic Differential Equations 
+will follow from these results. So let's get to the proofs.
+
+\subsubsection{$W_t$ is Nowhere Differentiable}
+      \begin{proof}
+	 We'll want to show that 
+	    \[\lim_{h \rightarrow 0} P\left( \left\lvert 
+	       \frac{W_{t+h} - W_t}{h} \right\rvert \geq n \right) =1 \]
+	 which would imply $W_t$ cannot be differentiated.
+
+	 So let's rewrite, using the properties that result from the
+	 definition of the Wiener Process:
+	    \[ P\left( \left\lvert \frac{W_{t+h} - W_t}{h} 
+	       \right\rvert \geq n \right) = P(|W_h| \geq n|h|) \]
+	 \begin{equation}
+	    \label{jfk}
+	     = 1 - P(|W_h| < n|h|) 
+	 \end{equation}
+	 As $h$ goes to zero, the second term in Equation \ref{jfk} also
+	 goes zero, so the probability as a whole tends to unity.  To 
+	 see this, assume that $h>0$ (without loss of generality) and
+	 carry out the rest of the proof:
+	 \[ 1- P(|W_h| < nh) = 1- \frac{1}{\sqrt{2\pi h}} \int^{nh}_{-nh}
+	    e^{-\frac{x^2}{2t}} dx \]
+	 With an eye towards using the Squeeze Theorem, we can set up
+	 the inequality
+	    \[   1- \frac{1}{\sqrt{2\pi h}} \int^{nh}_{-nh}
+	       e^{-\frac{x^2}{2t}} dx \geq 1 - \frac{1}{\sqrt{2\pi h}} 
+	       \int^{nh}_{-nh} 1 dx \]
+	    \[ \Rightarrow  1- \frac{1}{\sqrt{2\pi h}} \int^{nh}_{-nh}
+	       e^{-\frac{x^2}{2t}} dx \geq 1 -\frac{2hn}{ \sqrt{2\pi h}} 
+	       = 1 - \sqrt{\frac{2hn}{\pi}} \]
+	 and taking the limit of both sides of the inequality,
+	 \[ \lim_{h\rightarrow 0}\left[1 - P(|W_h| \leq nh) \right] \geq 
+	    \lim_{h\rightarrow 0} \left[ 1-\sqrt{\frac{2hn}{\pi}}\right] 
+	    = 1 \]
+	 \[ \Rightarrow \lim_{h\rightarrow 0} 1 - P(|W_h| \leq nh)
+	    \geq 1.\]
+	 \end{proof}
+      
+
+\subsubsection{$W_t$ is not of Bounded First Order Variation}
+
+      \paragraph{Definition} A function $f: [0,T] \rightarrow \mathbb{R}$
+      has \textbf{bounded variation} if 
+	 \[ BV(f) = \lim_{||\Delta|| \rightarrow 0}\sum_{i=1}^n|f(t_i)- 
+	    f(t_{i-1})| \]
+      exists and is finite, where 
+	 \[ \Delta = (t_0, t_1, \ldots , t_n = T) \]
+      is any partition of the interval $[0,T]$ and 
+	 \[ || \Delta || = \max_{i = 1, \ldots, n} |t_i - t_{i-1}|. \]
+
+      \begin{proof}
+	 To prove that the function $t \mapsto W_t$ does not have bounded
+	 variation, we can compute something related instead, given that
+	 $\Delta = (t_0, \ldots, t_n)$ is a partition of $[0,T]$:
+	    \[E\left[\sum^n_{i=1} |W_{t_i} - W_{t_{i-1}}|\right] = 
+	       \sum^n_{i=1} E(|W_{t_i} - W_{t_{i-1}}|) .\]
+	 For if this is not bounded, then $BV(W_t)$ is surely not 
+	 bounded. So let's compute the expectation for a single time
+	 interval
+	 \[E(|W_{t_i} - W_{t_{i-1}}|) = \int^{+\infty}_{-\infty}
+	    |x| \frac{1}{\sqrt{2\pi \Delta t}} e^{-\frac{x^2}{2\Delta t}}
+	    dx \]
+	 where $\Delta t = t_i - t_{i-1}$. Using the symmetry of the 
+	 normal distribution, and then changing variables by letting
+	 $u = \frac{x^2}{2\Delta t}$ and $du=\frac{x}{\Delta t}dx$, 
+	 we get
+	    \[ E(|W_{t_i} - W_{t_{i-1}}|) = 2 \int^{+\infty}_{0}
+	       x\frac{1}{\sqrt{2\pi \Delta t}} e^{-\frac{x^2}{2\Delta t}}
+	       dx \] 
+	    \[ = \int^{+\infty}_{0} \sqrt{\frac{2 \Delta t}{\pi}}
+	       e^{-u} du = \left[ -\sqrt{\frac{2 \Delta t}{\pi}} e^{-u}
+	       \right]^{+\infty}_{0} \] 
+	    \[ = \sqrt{\frac{2}{\pi} (t_i - t_{i-1})}
+	       = c\sqrt{t_i-t_{i-1}}  \]
+	 So for the expectation, we get
+	    \[ E\left[\sum^n_{i=1} |W_{t_i} - W_{t_{i-1}}|\right] 
+	       = c \sum_{i=1}^n \sqrt{t_i - t_{i-1}}.\]
+	 Recalling that $t_i = i \cdot (\frac{T}{n})$, we can simplify
+	    \[ E\left[\sum^n_{i=1} |W_{t_i} - W_{t_{i-1}}|\right]  =
+	       c \sum_{i=1}^n \sqrt{\frac{T}{n}} =cn\sqrt{\frac{T}{n}} =
+	       c\sqrt{nT}.\]
+	 Therefore,
+	    \[ \lim_{||\Delta|| \rightarrow 0} E\left[\sum^n_{i=1} 
+	       |W_{t_i}-W_{t_{i-1}}|\right]=\lim_{n\rightarrow \infty}
+	       c\sqrt{nT} = \infty \]
+	 And since 
+	    \[E\left[\sum^n_{i=1}|W_{t_i}-W_{t_{i-1}}|\right] \leq
+	       \sum^n_{i=1} |W_{t_{i-1}} - W_{t_i}| \]
+	 we see that $BV(W_t)$ diverges to infinity with probability 1.
+      \end{proof}
+
+\subsubsection{$W_t$ has Bounded Quadratic Variation} 
+
+      I'll omit the proof because it's rather 
+      straightforward to show that the following converges to 0:
+      \[ \lim_{||\Delta || \rightarrow 0} E\left[ \left(\sum_{i=1}^n 
+	 \lvert W_{t_i} - W_{t_{i-1}} \rvert^2 -T\right)^2 \right]=0.\] 
+
+      \paragraph{Definition} A function $f: [0,t] \rightarrow \mathbb{R}$
+      has \textbf{bounded quadratic variation} if 
+	 \[ BV^2(f) = \lim_{||\Delta|| \rightarrow 0} \sum^n_{i=1} 
+	    \left\lvert f(t_i) - f(t_{i-1}) \right\rvert^2 < \infty.\]
+      
+      In fact, for Brownian Motion, with probability 1:
+	 \[BV^2(W_t) = T.\]
+
+\subsubsection{Slogan of It\={o} Calculus}
+      
+      Finally, that last property says that
+      \[ (dW_t)^2 = dt \]
+      and we can show that $(dW_t)^p = 0$ for all $p>2$.
+
+\section{Application to Stock Process}
+
+Assume that $W_t$ is the value of a stock at time $t$, and that $\phi_t$
+is the number of shares held at time $t$.  So the change in the value
+of our portfolio between time $t_{i-1}$ and $t_i$ is
+   \[ \phi_{t_i} \left( W_{t_i} - W_{t_{i-1}} \right). \]
+So the change in the value of the portfolio over the time interval
+$[0,T]$ is the \textbf{Martingale Transform}:
+   \[ \sum^n_{i=1}  \phi_{t_i} \left( W_{t_i} - W_{t_{i-1}} \right). \]
+If we take the time intervals to be infinitesimal, then we get
+   \[ \int_0^T \phi_t \; dW_t \]
+which follows the form of the \textbf{Riemann-Stieltjes Integral}, which
+we can make sense of, provided that $W_t$ has bounded second order 
+variation (and we just showed it does).
+
+
+\section{Riemann-Stieltjes Integral}
+
+We'll want to review a few properties of the Riemann and
+Riemann-Stieltjes integrals before we define a similar animal, the 
+It\={o} Integral.
+
+\paragraph{Theorem} (Riemann's Theorem) Let $f$ be a function such that
+the probability of choosing a point of discontinuity is 0.  Let $P$
+be a partition of the interval $[a,b]$:
+   \[ P = \{ t_1 = a, t_2, \ldots, t_{n-1}, t_n = b \}. \]
+And define $||\Delta||$ as follows
+   \[ ||\Delta|| = max\{ |t_i - t_{i-1}| \; | i = 1, \ldots, n \}.\]
+Define the Riemann sum
+   \[ RS(f, P) = \sum^n_{i=1} f(\xi_i) (t_i - t_{i-1}), \;\; \xi_i \in
+      (t_{i-1}, t_i).\]
+Then the following expression exists and is independent of the choice
+of $\xi_i$ within the respective intervals.
+   \[ \lim_{||\Delta||\rightarrow 0} RS(f,P) = \int^b_a f(x) dx \]
+
+\paragraph{Definition} We can further generalize the Riemann Integral
+into the \textbf{Riemann-Stieltjes Integral}, which is again a limit
+of sums.  The sums are defined
+   \[ RSS(f,P,\phi) = \sum^n_{i=1} f(\xi_i) (\phi(t_i) - \phi(t_{i-1}))
+      , \;\; \xi_i \in (t_{i-1}, t_i).\]
+where $\phi$ is a \emph{non-decreasing} function, and where $P$ and 
+$\xi_i$ have their usual meaning. This leads to
+   \[ \lim_{||\Delta||\rightarrow 0} RSS(f,P,\phi) = 
+      \int^b_a f(t)\; d\phi(t).\]
+
+\paragraph{Theorem} If $\phi$ is differentiable, then
+   \[ \int_a^b f(t)\; d\phi(t) = \int^b_a f(t) \phi'(t) \;dt.\]
+
+\section{Stochastic Integrals}
+
+Why did we go through these steps? Well, unsurprisingly, a 
+\textbf{stochastic integral} is very much like a Riemann-Stieltjes
+integral.  However, when $X_t$ and $\phi_t$ are stochastic processes,
+the resulting integral
+   \[ \int^b_a \phi_t\; dX_t \]
+is a random variable.
+
+We will like working with integrals because they allow us to solve
+stochastic differential equations. Moreover, integrals are more
+well-behaved than derivaves, so they will tend to smooth out bumps. For
+that reason, we'll often try to convert from differential equations
+to integral equations below.
+
+\section{The It\={o} Integral}
+
+The ultimate representation that we want for the \textbf{It\={o}
+Integral}, 
+   \[ \int_0^T \phi_t \;dW_t, \]
+is the result of the limit of specific sums, which must first be defined.
+
+\subsection{It\={o} Sums}
+
+So let us define \textbf{It\={o}'s Sums}, for stochastic processes
+$\phi_t$ and $W_t$ as
+   \[ IS(\phi,\Delta)=\sum^n_{i=1} \phi_{t_{i-1}}(W_{t_i}-W_{t_{i-1}}).\]
+where $\Delta = (t_0, t_1,\ldots,t_n)$ is some partition of the time 
+inteval, $[0,T]$. Note, the It\={o} Integral 
+is a bit more general in that we
+could substitute any stochastic process, $X_t$, in for $W_t$.  But 
+the Wiener Process has some nice properties, so we'll stick to it.
+
+\paragraph{Note} Very important is the subscript on $\phi$.  Notice that
+we evaluate at the \emph{left} endpoint of our chopped-up time 
+intervals: $t_{i-1}$.  This turns out to make a difference, because it
+means that the process, $\phi$, doesn't overlap the difference in the 
+Brownian Motion terms, allowing us to assert independence.
+
+Moreover, when we do this, if $W_t$ (or $X_t$ more generally) is a 
+Martingale, then the resulting It\={o} Sum will be as well. There's 
+even an added benefit in that the choice of the left endpoint
+imposes what looks like a ``previsibility condition''---which will
+be very useful for stock prices and portfolio determination.
+
+\subsection{It\={o}'s Integral}
+
+We define the \textbf{It\={o} Integral} as the limit of of It\={o}
+Sums:
+   \[ \lim_{||\Delta|| \rightarrow 0}IS(\phi,\Delta) =  
+      \lim_{||\Delta|| \rightarrow 0} \sum^n_{i=1} \phi_{t_{i-1}}(W_{t_i}
+      -W_{t_{i-1}})= \int_0^T \phi_t \;dW_t \]
+
+\paragraph{Theorem 4.3.7} If $\phi_s$ is adapted to $W_s$ (definition
+below), then 
+   \[ \int_a^t \phi_s \; (dW_s)^2 = \int_a^t \phi_s \; ds.\]
+In addition, for $n>2$,
+   \[ \int_a^t \phi_s \; (dW_s)^2 = 0. \]
+
+
+\subsection{Properties of the It\={o} Integral}
+
+Given processes $\phi_s$ and $\psi_s$ which are adapted (either to 
+$X_s$ or $W_s$), we obtain the following results:
+\begin{enumerate}
+   \item{$\int_a^t dX_s = X_t - X_a$.}
+   \item{$\int_a^t (\phi_s + \psi_s)\; dX_s = \int_a^t \phi_s \; dX_s + 
+      \int_a^t \psi_s \; dX_s$.}
+   \item{$E\left[\int_a^t \phi_s \;dW_s \right] = 0$.}
+   \item{$E\left[\left(\int_a^t \phi_s \;dW_s\right)^2 \right] = 
+      E\left[\int_a^t \phi^2_s \;dW_s \right]$.}
+\end{enumerate}
+
+
+
+
+\subsection{Existence Conditions}
+
+For the limit to exist---and, therefore, the It\={o} Integral---we must
+satisfy certain conditions.
+\begin{enumerate}[]
+   \item[(i)]{$\phi_t$ is \emph{adapted} to $W_t$.}
+   \item[(ii)]{$\phi_t$ is \emph{square-integrable}.} 
+\end{enumerate}
+
+\paragraph{Definition} We say that a process, $\phi_t$ is 
+\textbf{adapted} to $W_t$ if, for any $s > t$, $\phi_t$ is independent
+of $W_s - W_t$.
+
+\paragraph{Definition} We say that a random variable process, $\phi_t$ is
+\textbf{square-integrable} if, for any $T>0$,
+   \[E \left[ \int^T_0 |\phi_t|^2 \; dt \right] < \infty.\]
+This is equivalent to checking that the first and second moments are
+finite.  
+And as a side note, you can take the expectation operater inside the 
+integral because $|\phi_t|^2$ is a positive random variable.
+
+\subsection{Mode of Convergence}
+
+If $\phi_t$ satisfies the two conditions above, then the sequence of 
+sums $IS(\phi, \Delta)$ will converge as $||\Delta||\rightarrow 0$ to a 
+random variable, denoted by the It\={o} integral of $\phi_t$ against
+$W_t$. What's more, it so happens that the It\={o} Sums converge to 
+the It\={o} Integral in mean square.
+
+\paragraph{Definition} We say that a sequence of random variables, 
+$\{ X_n | n \in \mathbb{N} \}$ converges to a random variable $X$ in 
+\textbf{mean-square} if
+   \[\lim_{n \rightarrow \infty} E\left[ |X_n - X|^2 \right] = 0, \]
+which, as can be seen upon expanding, checks that $EX_n \rightarrow
+EX$ and $Var(X_n) \rightarrow Var(X)$---i.e. that the the two random 
+variables are the same. 
+In the case of the It\={o} Integral, this means that 
+   \[\lim_{||\Delta||\rightarrow 0} E \left[ \left\lvert IS(\phi, \Delta)
+      - \int_0^T \phi_t dW_t \right\rvert^2 \right] = 0.\]
+
+\subsection{Useful Examples}
+
+\begin{enumerate} 
+   \item{In the derivation of the following result, 
+      one uses the property of 
+      convergence in mean square to obtain:
+      \[ \int_0^T W_t \; dW_t = \frac{1}{2} W_T^2 - \frac{1}{2} T \]}
+   \item{Follows because it's a telescoping sum:
+      \[ \int_a^b dX_t = X_b - X_a  \]
+      \[ \int_0^T dW_t = W_T - W_0 = W_T \]}
+   \item{This next result follows from the fact that $M_t = \int_0^T
+      \phi_s dW_s$ is a martingale:
+      \[ E\left[\int_0^T \phi_t \; dW_t\right] = 0 \]}
+   \item{The second order variation comes into play here: 
+      \[ E\left[\left(\int_0^T \phi_t \; dW_t\right)^2\right] = 
+      E\left[\int_0^T \phi^2_t \; dW_t\right] \]}
+\end{enumerate}
+   
+
+
+
+\section{Stochastic Differential Equations}
+
+Our models for stock prices will be solutions to \textbf{stochastic
+differential equations}, which are expressions of the form
+\begin{equation}
+   \label{sde}
+   dX_t = a(X_t,t)\;dt + b(X_t,t)\;dW_t. 
+\end{equation}
+A stochastic process $X_t$ that solves this SDE will be of the form 
+   \[ X_t - X_a = \int_a^t dX_s = \int_a^t a(X_s,s)\;ds + b(X_s,s)\;W_s
+      \]
+Now as a word of caution, such equations don't always have solutions, and
+if they do, there's no guarantee that the solution is unique, unless
+we put some assumptions on the coefficients.  Respectively, the 
+coefficients $a(x,s)$ and $b(x,s)$ are functions for the \emph{drift}
+coefficient and the \emph{diffusion} coefficient.
+
+\subsection{It\={o}'s Lemma}
+
+\paragraph{Lemma} Let $f: \mathbb{R}\times [0,\infty) \rightarrow 
+\mathbb{R}$ be a function that is twice differentiable in $x$, and
+once differentiable in $t$. Also, let $X_t$ be a soltuion to the equation
+   \[ dX_t = a(X_t,t)\; dt + b(X_t,t)\; dW_t.\]
+Then $f(X_t,t)$ is a stochastic precess that satisfies the SDE
+   \[ df(X_t,t) = \left[f_t(X_t,t) + a(X_t,t) \cdot f_x(X_t,t)
+      + \frac{1}{2}\; b^2(X_t,t)\cdot f_{xx}(X_t,t)\right]\;dt \]
+   \[ \qquad + b(X_t,t)\cdot f_x(X_t,t)\;dW_t. \]
+
+\subsection{Solving SDE Problems}
+
+Stochastic diffeernital equations offer two possibilities:
+   \begin{enumerate}
+      \item{Solving stochastic differential equations that are given 
+	 by finding a function for the variable $X_t$ of interest.}
+      \item{Solving stochastic integrals by transforming the problem
+	 into an SDE and solving an easier expression}
+   \end{enumerate}
+We'll consider both of those now---albeit in the reverse order from
+how they were stated.
+
+\subsubsection{Solving Stochastic Integrals with SDE's}
+
+Suppose that you're given a stochastic integral, $\int \phi_t dW_t$,
+to compute. How can you simplify?
+\begin{enumerate}
+   \item{The ultimate goal is to find a function $f(x)$ such that 
+      \[\phi_t dW_t = d(f(\phi_t)).\]
+      If we have that function $f$, we can use the properties of the
+      It\={o} Integral to compute easily
+      \[ \int^b_a \phi_t\; dW_t =  \int^b_a d(f(\phi_t)) = 
+	 f(\phi_b) - f(\phi_a).\]
+	 }
+   \item{But first, we have to find the SDE that this corresponds to. 
+      Since we're applying It\={o}'s Lemma by finding $d(f(\phi_t))$, we
+      should really find the parameters such that
+      \begin{equation}
+	 \label{implicit}
+	 d\phi_t = a(\phi_t, t)\;dt + b(\phi_t, t) \; dW_t.
+      \end{equation}
+      Since we know $\phi$ and we $dt$ and $dW_t$ are already in there,
+      this amounts to finding the values $a(\phi_t, t)$ and $b(\phi_t,t)$
+      that make Equation \ref{implicit} hold.
+	 } 
+   \item{Once we have $a(\phi_t, t)$, $b(\phi_t, t)$, and a suitable 
+      guess for $f(x)$, we can apply It\={o}'s Lemma.  Hopefully,
+      the original integral, $\int \phi_t dW_t$, is in the derived 
+      equation, and everything else is simple enough for us to solve.}
+\end{enumerate}
+
+
+\paragraph{Example 1} We hope to solve $\int^t_a W_s dW_s$. I will 
+solve this problem in steps mirroring the numbered steps listed above.
+\begin{enumerate}
+   \item{Since our integral looks somewhat like $\int f(x) dx$, an
+      educated guess would be the equation $f(x) = \frac{1}{2} x^2$, 
+      which is the integral of the traditional calculus problem.
+      }
+   \item{Next, we realize that $\phi_t = W_t$ in our problem, and 
+      so set up the corresponding, implicit SDE:
+      \[ dW_t = a(W_t, t) dt + b(W_t, t) dW_t.\]
+      The only values for $a$ and $b$ that make this hold are $a=0$
+      and $b=1$.
+      }
+   \item{Next, we apply It\={o}'s Lemma, which simplifies to
+	 \[d(f(W_t)) = \frac{1}{2}\; dt + W_t \; dW_t. \]
+      From there, we can shift around to get our original problem
+	 \[W_t \; dW_t= d(f(W_t)) -\frac{1}{2}\; dt \]
+      and integrate to solve the SDE:
+	 \[ \int^t_a W_t \; dW_t =\int^t_a d(f(W_t))-\frac{1}{2}\;dt\]
+	 \[ \int^t_a W_t \; dW_t=\;\frac{1}{2}\;W^2_t-\frac{1}{2}\;W^2_a
+	    - \frac{1}{2}\;(t-a).\]
+      }
+\end{enumerate}
+
+\paragraph{Example 2} We hope to solve $\int^t_a W^2_s\;dW_s$. I will 
+solve this problem in steps mirroring the numbered steps listed above.
+\begin{enumerate}
+   \item{Since our integral looks somewhat like $\int f^2 dx$, an
+      educated guess would be the equation $f(x) = \frac{1}{3} x^3$, 
+      which is the integral of the traditional calculus problem.
+      }
+   \item{Need help with this.}
+   
+\end{enumerate}
+
+\subsubsection{Solving SDE's with Integrals}
+
+The general method involves finding a suitable function to use in 
+applying It{o}'s Lemma. Then solve this easier problem.
+
+
+\subsection{Geometric Brownian Motion}
+
+The basic stochastic differential equation representation is
+   \[ dX_t = \mu X_t \; dt + \sigma X_t \;dW_t \]
+We start by considering a function we can use in order to apply 
+It\={o}'s Lemma:
+   \[ f(x) = \ln(x) \]
+   \[ f_t = 0, \;\; f_x = \frac{1}{x}, \;\; f_{xx} = -\frac{1}{x^2} \]
+Using the Lemma, we ccan write
+   \[ d(\ln(X_t)) = \left[ 0 + \mu X_t \cdot \frac{1}{X_t} - 
+      \frac{1}{2} \; \sigma^2 X_t^2 \cdot \frac{1}{X_t^2} \right]\; dt 
+      + \sigma \frac{1}{X_t} X_t\; dW_t \]
+   \[ d(\ln(X_t)) = \left( \mu - \frac{1}{2}\sigma^2 \right) dt
+      + \sigma dW_t \]
+We can now solve this easily for $X_t$ since all terms on the righthand
+side are known, and independentof $X_t$:
+   \[ \int^t_0 d(\ln(X_s)) \; ds =  \int^t_0 \left( \mu - 
+      \frac{1}{2}\sigma^2 \right) ds + \sigma dW_s \]
+   \[ \ln(X_t) - ln(X_0) = \left( \mu - 
+      \frac{1}{2}\sigma^2 \right) t - 0 + \sigma W_t - \sigma W_0 \]
+   \[ \ln(X_t) = ln(X_0) + \left( \mu - 
+      \frac{1}{2}\sigma^2 \right) t +  \sigma W_t \]
+   \[X_t = X_0 \; e^{\left( \mu - 
+      \frac{1}{2}\sigma^2 \right) t +  \sigma W_t} \]
+
+\subsection{Ornstein-Uhlenbeck Process}
+
+This process is defined by the SDE
+   \[ dX_t = \mu X_t \; dt + \sigma \;dW_t \]
+This case differs from geometric Brownian motion in that there is no
+$X_t$ in front of $dW_t$.
+
+For this case, choose $f(x,t) = xe^{-\mu t}$.  Applying It\={o}'s Lemma
+gives us
+   \[d(X_t e^{-\mu t})=\left(-X_t\;\mu e^{-\mu t} + X_t \mu e^{-\mu t}
+      \right) + \sigma e^{-\mu t} dW_t \]
+   \[ d(X_t e^{-\mu t})= \sigma e^{-\mu t} dW_t \]
+Integrating this expression yields
+   \[ \int^t_0 d(X_s e^{-\mu s}) = \int^t_0 \sigma e^{-\mu t} dW_t \]
+   \[ X_t e^{-\mu t} - X_0 e^{-\mu 0} = \int^t_0 \sigma e^{-\mu t} dW_t
+      \]
+   \[ X_t = X_0 e^{\mu t} + \int^t_0 \sigma e^{-\mu (t-s)} dW_t
+      \]
+
+\subsection{Cox-Ingersoll-Ross Model}
+
+This model, which exhhibits mean reversion and volatility that grows
+with $r_t$ is defined
+   \[ dr_t = a(b-r_t) \; dt + \sigma \sqrt{r_t} \; dW_t.\]
+
+\subsection{Vasicek Model}
+
+This interest rate model has mean reversion, where $b$ is the mean. It's
+defined by the following SDE:
+   \[ dr_t = a(b-r_t) \; dt + \sigma \; dW_t.\]
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
