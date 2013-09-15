@@ -1,0 +1,194 @@
+
+\newpage
+\section{Classifications of States}
+
+In order to decide whether there is a limiting matrix for a given 
+Markov Chain, we introduce some terminology to allow us to answer that
+question.
+
+\subsection{Definitions}
+
+Here are a few important concepts:
+\begin{enumerate}
+   \item{State $j$ is \textbf{accessible} from state $i$ if 
+      ${}_nQ^{(i,j)}>-$ for some $n$.}
+   \item{If $i$ and $j$ are accessible to \emph{each other}, we say that
+      $i$ and $j$ \textbf{communicate}.}
+   \item{The notion of ``communicate'' actually forms an equivalence
+      class, so we say that two states which communicate are in the 
+      same \textbf{class}.}
+   \item{A Markov Chain with only one class is said to be 
+      \textbf{irreducible}. In that case, all possible, non-trivial 
+      states communicate with each other.}
+   \item{If we let $f_i$ represent the probability of starting in
+      $i$ and returning to $i$ at some later point, we say that
+      \begin{enumerate}
+	 \item{$i$ is a \textbf{recurrent state} if $f_i = 1$. In 
+	    a finite, irreducible chain, all states are recurrent.}
+	 \item{$i$ is a \textbf{transient state} if $f_i < 1$. In 
+	    a finite state Markov Chain, it's impossible for all
+	    states to be transient.}
+      \end{enumerate}
+      }
+   \item{If we let $T$ be the time it takes to return to some recurrent 
+      state ``$i$'', then 
+      \begin{enumerate}
+	 \item{If $ET$ is finite, we call our Markov Chain 
+	    \textbf{positive
+	    recurrent}. In a finite state Markov Chain, then all 
+	    recurrent states are positive.}
+	 \item{If $ET$ is infinite, we call our Markov Chain \textbf{null
+	    recurrent}. We won't really deal with this, since we'll 
+	    mostly consider finite state Markov Chains, which are 
+	    all positive recurrent, as just stated.}
+      \end{enumerate}
+      }
+   \item{A state $i$ is said to be \textbf{periodic} with period $d$ if
+      ${}_kQ^{(i,j)}=0$ whenever $k$ is not divisible by $d$---where
+      $d$ is the largest integer with this property. A period 1
+      state is called \textbf{aperiodic}, or \textbf{non-periodic}. 
+      Periodicity is a class property.}
+   \item{An \textbf{ergodic state} is non-periodic, positive recurrent.
+      Note that this is a condition for stationarity.}
+
+\end{enumerate}
+
+
+\subsection{Big Result}
+\paragraph{Theorem} For a \emph{irreducible}, \emph{ergodic} Markov
+Chain, there exists a limiting distribution
+   \[ \lim_{k\rightarrow \infty} {}_kQ^{(i,j)} = \pi_j \]
+where $\pi_j$ is a unique solution to the following system of equations,
+given in both traditional notation and in matrix notation
+   \[ \begin{cases} \pi_j = \sum^r_{i=1} \pi_i Q^{(i,j)} & 
+      \mathbf{\Pi}^T = \mathbf{\Pi}^T \cdot \mathbf{Q} \\ 
+      1 = \sum^r_{i=1} \pi_i  & \Sigma \; \pi_i = 1 \end{cases} \]
+Note that the limit is independent of the starting point $i$. In a 
+sense, it represents the long-run probabilities of being in either state.
+
+\paragraph{Example} Here's an example for a $2 \times 2$ matrix:
+\[ \begin{pmatrix} \pi_0 & \pi_1 \end{pmatrix}  
+   \begin{pmatrix} \alpha & 1-\alpha \\ \beta & 1-\beta \end{pmatrix}
+   = \begin{pmatrix} \pi_0 & \pi_1 \end{pmatrix}  \]
+Solving this with the following equations
+   \[ \pi_0 = \alpha \pi_0 + \beta \pi_1 \]
+   \[ 1 = \pi_0 + \pi_0 \]
+will give the following result
+   \[ \pi_0 = \frac{\beta}{1-\alpha + \beta}, \;\;
+      \pi_1 = \frac{1-\alpha}{1-\alpha + \beta} \]
+
+\subsection{Gambler's Ruin}
+
+Here, the probability of moving right on any given play is $p$ and
+the probability of moving left is $q$.  We can only move left or 
+right a finite amount of steps. Namely, we stop at $N$ on the right
+and $0$ on the left. 
+
+We'll want to know $P_i$, which is the probability that our 
+wealth reaches $N$ before it reaches $0$, given that we started
+at position $i$---an integer in the inteval $(0,N)$. To do so, 
+we set up the recursive equation
+   \[ P_i = p \cdot P_{i+1} + q \cdot P_{i-1} \]
+which says that the probability of winning starting with $i$ can be 
+broken up into two separate cases:
+\begin{enumerate}
+   \item{You win with probability $p$, in which case your chances of
+      winning are $P_{i+1}$.}
+   \item{You lose with probability $q$, in which case, your chances of
+      winning are $P_{i-1}$.}
+\end{enumerate}
+Solving, the following expression
+   \[p\cdot P_i+q\cdot P_i = P_i = p \cdot P_{i+1} + q \cdot P_{i-1} \]
+   \[ \Rightarrow P_{i+1} - P_i = \frac{q}{p}(P_i - P_{i-1}) \]
+we can get a recursive definition by subbing in for $i$:
+   \[ P_2 - P_1 = \frac{q}{p} (P_1 - 0), \qquad 
+      P_3 - P_2 = \frac{q}{p}\left(\frac{q}{p} P_1\right), \ldots \]
+   \[ \Rightarrow P_{i+1} - P_i = \left(\frac{q}{p}\right)^{i} P_1, 
+      \;\;\; 1\leq i\leq N-1 \]
+Then, we can add up all the terms in this telescoping sum to get get 
+lots of stuff to cancel and become:
+   \[ P_i - P_1 = P_1 \left[ \sum_{i=1}^{N-1} \left(\frac{q}{p}\right)^i
+      \right], \qquad or \qquad 
+      P_i = P_1 \left[ \sum_{i=1}^{N-1} \left(\frac{q}{p}\right)^i
+      \right] \]
+which can be rewritten, using the fact that $P_N = 1$ along with 
+some other simplifications, to give
+   \[ P_i = \begin{cases} \frac{i}{N} & p=q=\frac{1}{2} \\
+      \frac{1-\left( q/p \right)^i}{1-\left(q/p\right)^N} 
+      & p \neq q \end{cases}
+      \]
+
+\paragraph{Intuition} When $N\rightarrow \infty$ like in the case of a
+casino, for all practical purposes, you can't win.  You can only
+win if $p > q$.
+
+\subsection{Checking the Efficacy of a Drug}
+
+Suppose there are two drugs, each with cure rate $P_1$ and $P_2$ 
+respectively. But these are unknown population values, and 
+we wish to establish a test to see if $P_1 > P_2$ or vice versa.
+So we define, where $j$ indexes the trial
+or observation pairs
+   \[ X_j = \begin{cases} 1 & cured\;by\; Drug\; 1 
+	 \\ 0 & not \; cured \end{cases}
+      \qquad 
+      Y_j = \begin{cases} 1 & cured\;by\; Drug\; 2 
+	 \\ 0 & not \; cured \end{cases}
+      \]
+Then, we define the discrepancy between the two total cures
+   \[ M = (X_1 + X_2 + \cdots + X_n) - (Y_1 + Y_2 + \cdots + Y_n) \]
+We will then decide if a drug is better be testing
+   \[ M > T_M \Rightarrow P_1 > P_2 \]
+   \[ M < T_{-M} \Rightarrow P_1 < P_2 \]
+where $T_M$ and $T_{-M}$ are some threshold values.
+
+To determine whether the test is good---i.e. that it doesn't give
+false signals---let's compute $p$, the probability that the sum $M$
+moves up, given that it moves \emph{either} up or down, while $q$
+is the analagous value for down.
+   \[ p = \frac{P_1(1-P_2)}{P_1(1-P_2) + (1-P_1) P_2 }, 
+      \qquad q = 1-p \]
+Now we can easily find the probability that the test will assert that
+$P_2>P_1$---it's a problem completely analagous to the Gambler's ruin
+problem.
+So if we take $i = M$ and $N = 2M$ in the Gambler's Ruin problem, 
+we get that 
+   \[ P( Test \; says \; P_2 > P_1) = 1 - \frac{1 - (q/p)^M}{1 - 
+      (q/p)^{2M}} \]
+Thus we can choose \emph{hypothetical} values for $P_1$ and $P_2$, find
+the values $p$ and $q$, then compute the probability that the test
+will render a certain result, given our choice of $M$. This allows
+us to calibrate the test given our desired values for Type I and 
+Type II errors.
+
+
+\section{Cash Flows and Actuarial Present Values}
+
+The big result is the following equation, which gives the actuarial 
+present value of cash flows at transitions. Let 
+${}_{\ell + 1}C^{(i,j)}$ denote the cash flow at time $\ell+1$ if the 
+subject is in state $i$ at time $\ell$ and state $j$ at time $\ell + 1$.
+Next, let ${}_kv_n$ denote the value at time $n$ of one unit to be
+paid $k$ periods in the future at time $n+k$.
+\[APV_{s@n}(\mathbf{C^{(i,j)}} = \sum_{k=0}^{\infty} 
+   \left[ {}_kQ_n^{(i,j)} Q_{n+k}^{(i,j)} \right] \left[
+   {}_{n+k+1}C^{(i,j)} \right] \left[{}_{k+1}v_n\right]	 \]
+
+
+
+
+
+
+
+
+\section{Miscellaneous}
+
+\paragraph{Definition} We can \textbf{exponentially smooth} probabilities
+when we work up our transition probabilities matrix:
+   \[ Q_n = \alpha T_n + (1-\alpha) Q_{n-1}.\]
+
+
+\end{document}
+
+
+
