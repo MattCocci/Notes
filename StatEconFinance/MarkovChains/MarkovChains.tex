@@ -261,7 +261,7 @@ At least one such distribution exists for each stochastic
 matrix, $\mathbf{Q}$.\footnote{Use Brouwer's fixed point theorem.}
 \\
 \\
-Importantly, if $X_0$ is a stationary distribution,
+Importantly, if the distribution of $X_0$ is a stationary distribution,
 then $X_t$ will have this same distribution for all $t$.
 As a result stationary distributions have a natural
 interpretation of \emph{stochastic steady states}.
@@ -342,6 +342,110 @@ time goes to infinity.  Therefore, if we consider many
 Markov chains with the same stochastic matrix, $\mathbf{Q}$,
 the long-run cross-sectional averages for a population will
 equal time-series averages for individual chains.
+
+
+
+\newpage
+\section{Application: Page Rank}
+
+Suppose we have a set of web-pages, $j \in \{1, 2, \dots,n \}$.
+We want to find the fanking $r_j$ for each page, $j$. To do 
+so, we'll set the ranking as
+    \[ r_j = \sum_{i \in L_j} \frac{r_i}{\ell_i} \]
+where $L_j$ is the set of pages linking to page $j$, and
+where $\ell_i$ is the total number of outbound links from 
+page $i$. 
+\\
+\\
+But we can think of this another way.  Specifically, imagine
+a jabroni on some webpage $i$ who is clicking links randomly
+and with equal probability.  So what's his probability of 
+landing on page $j$?  Well clearly, we can define this whole
+``ranking'' business in terms of Markov Chains and transition
+probabilities:
+    \[ r_j = \sum_{\text{all $i$}} Q_{ij} r_i, \qquad
+	\text{ where  } Q_{ij} = \frac{1\{i \rightarrow j\}}{\ell_i}
+    \]
+where $1\{i \rightarrow j\}$ is an indicator function that 
+equals 1 if page $i$ links to page $j$, zero otherwise.
+So $Q_{ij}$ is, as above, the transition probability for
+moving from state--or in this case ``page''--$i$ to 
+$j$.\footnote{We drop the superscript, since we'll assume 
+we're in the homeogeneous case.}
+\\
+\\
+Awesome, now let's write the ranking in vector and matrix 
+notation so we can describe the problem for all pages,
+$j \in \{1, \ldots, n\}$:
+    \[ \mathbf{r} = \mathbf{r} \mathbf{Q} \]
+where $\mathbf{r}$ is the vector of rankings and $\mathbf{Q}$
+is the transition matrix.  Well that looks familiar.  
+Specifically, $r$ is the stationary distribution of the
+stochastic matrix $\mathbf{Q}$---and we know how to solve for
+that!
+
+
+\newpage
+\section{Tauchen's Approximation Method}
+
+\subsection{AR(1) Approximiation}
+Often, we will approximate some continuous model with a 
+discrete model that utilizes Markov Chains. Specifically, the
+discrete model takes the form:
+\begin{equation}
+    y_{t+1} = \rho y_t + \varepsilon_{t+1} \qquad 
+	\varepsilon_{t+1} \sim \text{N}(0, \sigma_\varepsilon^2)
+\end{equation}
+Now the variance of the stationary probability distribution 
+of the stochastic process $\{y_t\}$ (which we hope to specify
+as a Markov Chain) can be easily shown to be
+    \[ \sigma_y^2 = \frac{\sigma^2_\varepsilon}{1-\rho^2} \]
+
+\subsection{Constructing the State Space}
+To discretize an otherwise continuous process, we choose
+\begin{itemize}
+    \item $n$, the number of states for the discrete 
+	approximation that $y_t$ can be in.
+    \item $m$, an integer that parameterizes the width of
+	the space of values $y_t$ can take on.
+\end{itemize}
+From there, we create a space $\{x_1, \ldots, x_n\}$ and
+transition matrix $\mathbf{Q}$ defined
+by the parameters $n$ and $m$ such that
+\begin{enumerate}
+    \item $\{ x_1, x_n \} = \{ -m \sigma_y, \; m \sigma_y \}$.
+	So we see how $m$ controls the width of the space.
+    \item $x_{i+1} = x_i + s$ where
+	\[ s = \frac{x_n - x_1}{n-1} \]
+    \item $Q_{ij}$ represents the probability of transition
+	from state $x_i$ to state $x_j$. 
+\end{enumerate}
+
+\subsection{Defining the Transition Probabilities}
+
+We've essentially divided the values $y_t$ can take into buckets
+that run from $[x_i, x_{i+1}]$.  So if we say that $y_t$
+is in state $i$, we really mean that $y_t$ is in that bucket.
+There are, of course, $n-1$ equal width buckets.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
