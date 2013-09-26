@@ -1,0 +1,265 @@
+=================================================================
+======= GIT NOTES ===============================================
+=================================================================
+
+
+Notes based on: www.atlassian.com/git/tutorial/
+
+
+-- Overview --
+
+    git init		    Adds a .git folder to the current 
+				direcctory transforming that 
+				directory into a git repository
+    git init dir	    Adds a .git folder to the 
+				directory "dir",
+    git init --bare dir	    Adds an empty Git repository that
+				does NOT have a working dir so
+				you can't edit files and commit
+				changes in that repo.
+				ALWAYS use for central repos,
+    git clone repoloc	    Clones the repo located at repoloc 
+				to your local machine
+    git clone repoloc dir   Clone the repo at repoloc to the
+				directory "dir"
+    git add <file>	    Stages file for next commit, new or
+				old files
+    git add <dir>	    Stages all filse in <dir> for the
+				next commit
+    git add -p		    Staging session that lets you choose
+				portions of a file to add. There
+				are other commands you'll need,
+				so look this up more
+    git commit -m "msg"	    Commits staged snapshot to local 
+				project repo and history with a
+				message. Git will never change  
+				them unless you ask.
+    git commit -a	    Commit modifications for all files 
+				in working directory that are 
+				tracked (so have been added with
+				git add at some point), even if
+				those files aren't currently 
+				staged
+    git status		    Lists which files are staged, 
+				unstaged, and untracked
+    .gitignore		    Plaintext file that lists files 
+				git should NOT show in a call of
+				git status; wildcards allowed, 
+				each file on separate line
+    git log		    Display entire commit history
+    git log -n <limit>	    Displays only <limit> commits
+    git log --oneline	    Condense each commit to single line
+    git log --stat	    Include which files were altered and
+				the relative number of files 
+				altered and lines add/deleted
+				to each
+    git log -p		    Display patch repping each commit;
+				most detailed
+    git log --author="<x>"  Search for commits by particular
+				author
+    git log --grep="<x>"    Search for a commit message that
+				includes a string/regex
+    git log <since>..<until>	
+    git log <file>	    Only display commits including
+				specified file
+    git log --graph --decorate --oneline
+
+				
+
+-- Checking Out --
+
+    This section talks about checkouts, which let you revert
+    the state of your working dir (or a file in your working dir) 
+    to a previous state/commit.
+
+
+    git log			    Tells you the names/codes for
+					each commit which you can
+					reference when you checkout
+    git checkout master		    Return to master branch
+    git checkout <commit>	    Update all files in working dir
+					to match a specified commit
+					EXACTLY
+    git checkout <commit> <file>    Checkout a previous version
+					of a file; turns file 
+					residing in the working dir 
+					into an exact copy of the 
+					one from <commit> and adds
+					it to staging area
+    git checkout HEAD <file>	    If you checkout a single file as
+					above, make changes, but 
+					don't like it, you run this
+					to checkout and revert to
+					the most recent version
+    
+    NOTE: Checkouts are read only so checking out a file and 
+	making changes won't go back and overwrite the files in 
+	the commit that you checked out. It's an easy way to
+	experiment with previously written code.
+    NOTE: HEAD is Git's way of referring to the current snapshot.
+    NOTE: The HEAD usually points to the master or some local
+	branch; HOWEVER, when you check out a previous commit, 
+	HEAD no longer pointsto a branch--it points directly to
+	a commit. This is called a "detached HEAD" state.
+
+
+-- Undoing Changes and Commits --
+
+    git revert <commit>	    Generate a new commit that undoes all 
+				changes introduced in <commit>, then
+				apply to current branch. So 
+				"git revert HEAD" would undo changes
+				introduced in the most recent commit
+    git reset <file>	    Remove speified file from staging area,
+				but leave working dir unchanged.
+				This unstages without overwriting 
+				any changes.
+    git reset		    Reset staging area to match most recent
+				commit, but leave working dir 
+				unchanged. Unstages all files
+				without overwriting any changes
+    git reset --hard	    Unstage changees AND set working dir
+				to match most recent commit. 
+				OBLITERATES all uncommited changes,
+				rewriting changes in the working dir
+    git reset <commit>	    Move branch tip back to <commit> and 
+				reset the staging area to match, but
+				LEAVE ALONE all changes in the 
+				working dir so you can recommit a
+				bigger batch of files/changes
+    git reset --hard <com>  Move branchtip back to <com> commit and
+				reset BOTH the staging area and
+				working dir to match. Obliterates
+				all uncommited changes and commits
+				after <com> as well.
+    git clean -n	    Shows you which files will be removed
+				without actually doing it
+    git clean -f <path>	    Removes untracked files from working
+				directory. 
+			    NOT undoable. 
+			    -f for "force" which you need to use. 
+			    <path> optional
+			    Does not remove files specified in
+				.gitignore
+    git clean -df	    Remove untracked files AND untracked
+				dirs from current directory
+    git clean -xf	    Remove untracked files AND files
+				in .gitignore from current dir
+ 
+
+
+    KEY: Use "revert" to undo public commits, "reset" to undo 
+	local changes.
+
+
+    NOTE: git revert <commit> undoes an entire commit from proj 
+	history by finding the commit you want to go back to and 
+	restoring it with a NEW commit (doesn't erase bad commit 
+	from history)			
+    NOTE: git reset is REALLY FUCKING DANGEROUS. You should only
+	use it to undo LOCAL changes in the staging area and
+	working directory. NEVER reset snapshots that have been 
+	shared with other people or Linus Torvalds will
+	bludgeon you with a fine Rawlings ashwood bat.
+				
+				
+
+-- Git Branches --				
+
+    Branch: an independent line of deveopment
+
+
+    git branch		    List all branches in your repo
+    git branch <branch>	    Create new branch called <branch>,
+				although it does NOT checkout
+				the new branch
+    git branch -d <branch>  Delete specified branch; only
+				works if no unmerged changes; 
+				use after you finish and merge
+				code back into main branch
+    git branch -D <branch>  Force delete branch even if unmerged    
+				changes
+    git branch -m <branch>  Rename the current branch as <branch>
+
+
+    git checkout <existing-br>	    Check out the specified branch
+					making <existing-br> the 
+					current branch, updating
+					working dir to match
+    git checkout -b <new-br>	    Create and checkout <new-br>
+    git checkout -b <new-br> <existing-br>
+				    Create and checkout <new-br>,
+					breaking it off of 
+					<existing-br>, not the 
+					current branch.
+
+
+
+
+
+    NOTE: Branches are just pointers to commits. There's no
+	huge copy-over of files
+    NOTE: You can switch working on multiple feature branches by 
+	switching between them with checkout.
+
+
+
+-- Configuration --
+
+    git config --global user.name <name>	
+	- Define author name for all commits by the current user
+
+    git config --global user.email <email>
+	- Define the author email to be used for all commits
+	    by current user
+
+    git config --global alias.<alias-name> <git-command>
+	-- Creates a shortcut for a command
+
+    git config --system core.editor <editor>
+	-- Sets the default editor, for example I would set
+	    <editor> as vim
+
+    git config --global --edit
+	Opens the global configuration file for editing
+
+
+    <repo>/.git/config	    Houses repository specific settings
+    ~/.gitconfig	    Houses user-specific settings, where
+				options set with the --global
+				flag are stored
+
+
+    NOTE: things done with the global flag will be set for all 
+	git projects and repos employed by the current user; 
+	without the global flag, the configuration would only 
+	apply to the current repository you are working with
+
+
+
+	
+-- Terminology --
+
+    Staging Area	Buffer between working directory and
+			    local resository
+    Local repository	Buffer between user contributions and
+			    central repository
+
+
+-- Sample Usage--
+    ssh @			SSH into server that will hold 
+				    your project repo
+    cd repopath			Navigate to the place you'd like
+				    to store your repo
+    git init --bare proj.git	Initialize the central repo as
+				    a bare repo 
+    git clone repoloc dir	Clone the repo located at repoloc
+				    to local "dir" directory
+    git add hello.py		Add hello.py to staging area
+    git commit			Commits hello.py to local repo
+    HEAD			Reference for current commit/snapshot,  
+				    whether branch of spec commit
+    HEAD~x			Ref to commit that came x commits
+				    before the current commit
+
+
