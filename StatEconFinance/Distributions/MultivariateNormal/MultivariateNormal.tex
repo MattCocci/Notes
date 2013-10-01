@@ -11,6 +11,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{blindtext}
 \usepackage{graphicx}
+%\usepackage{hyperref}
 %\numberwithin{equation}{section} 
 %, This labels the equations in relation to the sections rather than other equations
 %\numberwithin{equation}{subsection} %This labels relative to subsections
@@ -39,9 +40,9 @@ limited to only one dimension, and we would like to generalize to
 higher dimensions. In the next-simplest
 2-dimensional case, we'd like a distribution
 that actually looks like a bell---where potentional values can
-range over the real plane, $\mathbb{R}$, where the density is
+range over the real plane, $\mathbb{R}^2$, with the density
 clustered around some mean before tapering off in all directions, 
-as seen below.
+as below.
 \begin{figure}[h!]
    \centering
    \includegraphics[scale=0.40]{multivariate.pdf}
@@ -52,6 +53,40 @@ which are independent, implying $\sigma = I_2$, the identity matrix.
 It's easy to see that any vertical cuts parallel to $xz$ or $yz$ planes
 will yield a traditional normal random variable. This of course 
 generalizes to higher dimensions, although we can't display it so nicely.
+\\
+\\
+This generalization will give us the 
+\emph{Multivariate Normal (MVN) Distribution}. 
+This turns out to be an extremely useful distribution. Let's highlight
+a few applications here: 
+\begin{enumerate}
+    \item The MVN distribution has applications in Bayesian multivariate 
+	regressions (i.e. Bayesian regressions with more than one 
+	``independent,'' ``predictor,'' or ``$X$'' variable). 
+	In such applications, we hope to find the posterior distribution
+	of the $\beta$ regression vector, and it's common to assume
+	a MVN prior on $\beta$ that results in an MVN posterior for
+	$p(\beta|y)$.
+    \item Next, we often use the MVN distribution to describe
+	\emph{recurrence relations}, where we try to 
+	forecast an MVN RV one period into the future, given
+	current information about the RV, like it's current value
+	and distribution. One example would include jointly forecasting 
+	height \emph{and} weight in the future given current height
+	and weight.
+    \item Finally, the MVN distribution forms the basis for 
+	VARs, which are used to forecast different economic variables 
+	one period into the future, expressing each future variable
+	as a function of lags of itself and other economic variables.
+	However, VARs are too broad and interesting a subject to 
+	elicit only a cursory summary in this note.  I'll write
+	a more extensive summary of them elsewhere.
+\end{enumerate}
+
+
+\tableofcontents
+
+\vskip 1in
 
 \section{Notation}
 
@@ -75,7 +110,6 @@ Constants, vectors of constants, and matrices of constants will not be
 in boldface.
 
 \newpage
-
 \section{Definition}
 
 A random vector $\mathbf{X}$ has a \emph{multivariate normal} 
@@ -114,7 +148,7 @@ It's fairly common to consider linear transformations and functions
 of a multivariate normally distributed random variable.  For instance,
 we might have an economic or statistical model with a recurrence 
 relation to describe the dynamics of some process:
-\[ \mathbf{X}_{t+1} = A \mathbf{X}_{t} + \mathbf{V}_{t+1} \]
+\[ \mathbf{X}_{t+1} = A \mathbf{X}_{t} + \mathbf{V}_{t} \]
 where $\mathbf{V}_t$ is some innovation or random noise vector.
 Therefore, it would be useful to be able to derive the distributions
 of \emph{functions} or \emph{linear transformation} of multivariate 
@@ -233,10 +267,166 @@ of some convenient properties:
 	$X_1 | X_2$ is normal, and vice versa.
 \end{enumerate}
 
+\newpage 
+\section{Linear Gaussian Recurrences}
+
+So far, we've only looked at the properties of a multivariate
+normal RV at one point in time. This is already useful for 
+cross-section regressions, but it would 
+it would also be relevant to explore
+the MVN RV in in the context of time series and stochastic 
+processes. For that, we turn
+to \emph{recurrence relations}, which will conveniently characterize
+a discrete-time, continuous space stochastic process, 
+$\{\mathbf{X}_t\}$.
+
+\subsection{Single Lag, Order 1 Markov Chains}
+
+Suppose we know that the stochastic process $\{\mathbf{X}_t\}$
+evolves according to the following recurrence relation,
+where $\mathbf{Z}_t$ is independent of $\mathbf{X}_t$: 
+\begin{equation}
+    \mathbf{X}_{t+1} = A \mathbf{X}_t + B \mathbf{Z}_t
+    \qquad \mathbf{Z}_t \sim \text{N}_d(0, \; I_d) 
+\end{equation}
+Because $\mathbf{Z}_t$ is Gaussian, this implies that 
+$\mathbf{X}_{t+1}$ will \emph{also} be Gaussian for reasons we saw  
+in Section 3 above. So let's define
+\begin{equation}
+    \mathbf{X}_t \sim \text{N}_d(\mu_t, \; \Sigma_t)
+\end{equation}
+{\sl Forward Mean}: 
+Now our task is to compute $\mu_{t+1}$ and $\Sigma_{t+1}$
+given the parameters $\mu_t$ and $\Sigma_t$.  Let's start with the
+mean:
+\begin{align*}
+    \mu_{t+1} = E\mathbf{X}_{t+1} &= E\left[A\mathbf{X}_t +
+	B \mathbf{Z}_t\right] \\
+    &= AE[\mathbf{X}_t] + BE[\mathbf{Z}_t] \\
+    \Rightarrow \quad \mu_{t+1} &= A\mu_t
+\end{align*}
+{\sl Forward Covariance Matrix}:
+Now, let's compute the covariance matrix, rewriting the recurrence 
+relation somewhat suggestively:
+\begin{align*}
+    \mathbf{X}_{t+1} &= A \mathbf{X}_t + B \mathbf{Z}_t \\
+    \Leftrightarrow \qquad 
+	\mathbf{X}_{t+1} - \mu_{t+1} &= 
+	A (\mathbf{X}_t - \mu_t) + B \mathbf{Z}_t \\
+\end{align*}
+Now, we move to the computation of $\Sigma_{t+1}$, which simplifies
+nicely (omitting the explicit simplification and derivation process):
+\begin{align*}
+    \Sigma_{t+1} &= E\left\{ \left[\mathbf{X}_{t+1} - \mu_{t+1} \right]
+    \left[\mathbf{X}_{t+1} - \mu_{t+1} \right]^T \right\} \\
+    &= E\left\{ \left[A (\mathbf{X}_t - \mu_t) + B \mathbf{Z}_t\right]
+	\left[A (\mathbf{X}_t - \mu_t) + B \mathbf{Z}_t\right]^T
+	\right\} \\
+    &= A\Sigma_t A^T + BB^T
+\end{align*}
+This is an example of a \emph{forward equation} because the 
+distribution of $\mathbf{X}_{t+1}$ is determined entirely by 
+the distribution of $\mathbf{X}_t$ and the recurren relation.
+\\
+\\
+Finally, note that in some cases, the noise vector won't necessarily
+be of dimension $d$.  It might have dimension $m<d$, in which 
+case $B$ will have dimension $d\times m$. You can think of 
+$m$ correlated shocks being distributed over $d$ separate variables.
 
 
+\newpage
+\subsection{Multiple Lag, Higher Order Markov Chains}
+
+Let's generalize a bit.  Suppose we want a particular RV,
+$\mathbf{X}_{t+1}$, in a stochastic process, $\{\mathbf{X}_t\}$, to
+depend upon more than one lag, say ``$k$'' lags. Namely, suppose that
+\begin{equation}
+    \label{recgen}
+    \mathbf{X}_{t+1} = A_0 \mathbf{X}_t + A_1 \mathbf{X}_{t-1}
+    + \cdots + A_{k-1}\mathbf{X}_{t-k+1} + B \mathbf{Z}_t
+\end{equation}
+We can use a \emph{state space expansion} to augment the matrices 
+and write Equation \ref{recgen}'s more general recurrence relation 
+as follows:
+\begin{align*}
+    \tilde{\mathbf{X}}_{t+1} &= \tilde{A}_t
+	\tilde{\mathbf{X}}_t + \tilde{B}_t \mathbf{Z}_t \\
+    \Leftrightarrow \qquad
+    \begin{pmatrix} \mathbf{X}_{t+1} \\
+	\mathbf{X}_{t} \\ \vdots \\ \mathbf{X}_{t-k+2} \end{pmatrix}
+	&= 
+	\begin{pmatrix} A_0 & A_1 & \cdots & & A_{k-1} \\
+			1 & 0 & \cdots & & 0 \\
+			0 & 1 & \cdots & & 0 \\
+			\vdots & & \ddots & & \vdots \\
+			0 & \cdots & & 1 & 0 
+	\end{pmatrix} 
+	\begin{pmatrix} \mathbf{X}_{t} \\
+	\mathbf{X}_{t-1} \\ \vdots \\ \mathbf{X}_{t-k+1} \end{pmatrix}
+	+ \begin{pmatrix} B \\ 0 \\ \vdots \\ 0 \end{pmatrix}
+	\mathbf{Z}_t
+\end{align*}
+Note that $\mathbf{Z}_t$ needs no augmenting because it is memoryless.
+\\
+\\
+{\sl Forward Moments}: Using the results from the previous 
+subsection, we immediately know that if the stochastic process
+$\{\mathbf{X}_t\}$ satisifes Equation \ref{recgen},
+$E\tilde{\mathbf{X}}_t = \tilde{\mu}_t$, and 
+Cov$(\tilde{\mathbf{X}}_t) = \tilde{\Sigma}_t$, then
+\begin{align*}
+    \tilde{\mu}_{t+1} &= \tilde{A}\tilde{\mu}_t \\
+    \tilde{\Sigma}_{t+1} &= \tilde{A} \tilde{\Sigma}_t\tilde{A}^T +
+	\tilde{B} \tilde{B}^T
+\end{align*}
+And if we want to find the covariance matrix $\Sigma_{t+1}$ for 
+$\mathbf{X}_{t+1}$, then we can just find the $kd \times kd$ 
+covariance matrix $\tilde{\Sigma}_{t+1}$ and look at the top left 
+$d\times d$ block.
+\\
+\\
+{\sl State Space Expansion}: Note what we did here.  We had a
+stochastic process $\{\mathbf{X}_{t}\}$ that was not a Markov 
+Chain---future values depended upon more than one lag of 
+$\mathbf{X}_t$, violating the Markov Property.  However, 
+\emph{state space expansion} allowed us to form a new stochastic
+process $\{\tilde{\mathbf{X}}_t\}$ that was a Markov Chain, obeying
+the Markov property.  Therefore, anytime a stochastic process 
+does not display the Markov Property, blame that on the size of 
+the state space.
+\\
+\\
+Also note, state space expansion brings us to the sitaution we
+mentioned in the previous subsection where the noise matrix,
+$\tilde{B}$, has fewer sources of noise than state variables.
+
+
+\newpage
+\appendix
+\section{Cholesky Decomposition}
+
+Recall the motivation: we want to find a matrix $A$ such that
+$AA^T = \Sigma$. This will be useful when we want to transform
+a standard MVN RV into a general one via
+\begin{equation}
+    \mathbf{X} = \mu + A\mathbf{Z}, \qquad \mathbf{X}\sim 
+	\text{MVN}(\mu, AA^T)
+\end{equation}
 
 
 
 \end{document}
+
+
+
+
+
+
+
+
+
+
+
+
 
