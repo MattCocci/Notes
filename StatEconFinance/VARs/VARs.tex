@@ -1,0 +1,357 @@
+\documentclass[a4paper,12pt]{scrartcl}
+
+\author{Matthew Cocci}
+\title{Vector Autoregressions \\ (VARs)}
+\date{}
+\usepackage{enumitem} %Has to do with enumeration	
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm} %allows for labeling of theorems
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{blindtext}
+\usepackage{graphicx}
+%\usepackage[hidelinks]{hyperref} % For internal/external linking. 
+				 % [hidelinks] removes boxes
+% \usepackage{url} % allows for url display, non-clickable
+%\numberwithin{equation}{section} 
+   % This labels the equations in relation to the sections 
+      % rather than other equations
+%\numberwithin{equation}{subsection} %This labels relative to subsections
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+\setkomafont{disposition}{\normalfont\bfseries}
+\usepackage{appendix}
+\usepackage{subfigure} % For plotting multiple figures at once
+\usepackage{verbatim} % for including verbatim code from a file
+\usepackage{natbib} % for bibliographies
+
+\begin{document}
+\maketitle
+
+% \tableofcontents %adds it here
+
+\section{Intuition}
+
+Let's build up to the intuition of VARs by starting of its
+relatives, the zero-mean AR(1):
+    \[ y_t = \varphi y_{t-1} + \varepsilon_t \]
+The AR(1) tries to predict \emph{this} period's value 
+of some variable, $y$, given the \emph{last} value
+of that variable. But we don't need to stop with just
+last period's lags.  We can include as many as we want:
+    \[ y_t = \varphi_1 y_{t-1} + \varphi_2 y_{t-2} + \cdots
+	+ \varphi_p y_{t-p} + \varepsilon_t \]
+This gives us the AR(p) model, with $p$ lags. But again,
+we don't need to stop there. Suppose that we include
+the lagged values of \emph{other} variables that might
+help predict $y$, like say $x$:
+\begin{equation}
+    \label{ary}
+     y_t = a_1 y_{t-1}  + \cdots +
+	a_p y_{t-p} + b_1 x_{t-1} +  \cdots
+	+ b_p x_{t-p} + \varepsilon_t 
+\end{equation}
+And presumably, if $x$ helps predict $y$, why not use 
+$y$ to predict $x$? So let's write
+\begin{equation}
+    \label{arx}
+    x_t = c_1 x_{t-1}  + \cdots +
+	c_p x_{t-p} + d_1 y_{t-1} +  \cdots
+	+ d_p y_{t-p} + \eta_t 
+\end{equation}
+As you can see, we can simplify this a lot. In fact,
+we might toss Equations \ref{ary} and \ref{arx} into
+matrices and vectors to simplify notation.  This
+will be particularly useful when we have lots and
+lots of variables, parameters, and lags. So we might
+have
+\begin{equation}
+    \begin{pmatrix} x_t \\ y_t \end{pmatrix} = 
+	\begin{pmatrix} c_1 & d_1 & \cdots & c_p & d_p \\
+	    b_1 & a_1 & \cdots & b_p & a_p \\
+	\end{pmatrix}
+	\begin{pmatrix} x_{t-1} \\ y_{t-1} \\
+	    \vdots \\ 
+	    x_{t-p} \\ y_{t-p} \\
+	\end{pmatrix}  
+	+ \begin{pmatrix} \varepsilon_t \\ \eta_t
+	 \end{pmatrix}
+\end{equation}
+And viola. We have a bona fide \emph{vector autoregression}, 
+or VAR. 
+
+We arrived at it through successive generalizations
+of \emph{very} simple intuitive ideas. So if you know
+time series, and if you know linear algebra, you're home.
+You know this stuff already. And had you done this 40 years
+ago and pushed the technique and consequences
+to their natural implications, you would've gotten a Nobel 
+Prize. 
+
+
+\newpage
+\section{Definition and Notation}
+
+Now, we'll generalize to non-zero mean process, and 
+we'll fix our notation, which was rather
+sloppy above.  Specifically, we'll let $y_t$ denote
+an $n\times 1$ vector of observables that we
+want to predict.  
+\\
+\\
+Now define the VAR(p) model as follows:
+\begin{align}
+    \label{varp}
+    y_t &= \phi_0 + \phi_1 y_{t-1} + \cdots + 
+	\phi_p y_{t-p} + u_{t} 
+	\qquad u_t \sim \text{N}_n(0, \Sigma)
+\end{align}
+where $\phi_0$ is $n\times 1$ and where $\Sigma$ and
+$\phi_i$ ($i = 1, \ldots, p$) are $n\times n$.
+So clearly, $y_t$ can be quite a complicated linear
+function of it's previous lags and it's components.
+\\
+\\
+Next, let's write Equation \ref{varp} in more
+compact, matrix notation.  Specifically, concatenate
+the $\phi_i$ column vectors horizontally, and stack the lags 
+of $y$ into one big column vector:
+\begin{align} 
+    y_t &= \underbrace{\begin{pmatrix} \phi_0 & \phi_1 & \cdots 
+	& \phi_p \end{pmatrix}}_{\Phi}
+	\underbrace{\begin{pmatrix} 
+	    1 \\ y_{t-1} \\ \vdots \\ y_{t-p}
+	\end{pmatrix}}_{x_t} + u_t \qquad u_t \sim \text{N}_n(0, \Sigma) 
+	 \notag \\
+    \Leftrightarrow \qquad y_t &= \Phi x_t + u_t 
+    \label{varvec}
+\end{align} 
+where $\Phi$ is $n\times (np +1)$ and $x_t$ is 
+$(np+1) \times 1$.
+
+
+\section{OLS Estimator}
+
+Now that we have the model, let's find the OLS for 
+the parameters in $\Phi$. To do so, we'll take one element (or
+component) of the vector $y_t$ at a time, so one row of $y_t$
+and $\Phi$ at a time. So let's minimize the sum of
+squared errors for row/component $i$: 
+\begin{equation}
+    \min_{\Phi^{(i)}} \sum^T_{i=1} 
+	\left(y_t^{(i)} - \Phi^{(i)} x_t\right)^2
+\end{equation}
+Now this estimator looks just like standard multivariate OLS 
+regression:
+\begin{align*}
+    0 &= \frac{d}{d\Phi^{(i)}}\left\{ \sum^T_{i=1} 
+	\left(y_t^{(i)} - \Phi^{(i)} x_t\right)^2\right\} 
+	= -2 \sum^T_{i=1} x'_t
+	\left(y_t^{(i)} - \Phi^{(i)} x_t\right) \\
+    \Rightarrow \quad \hat{\Phi}^{(i)}  &= 
+	\frac{\sum^T_{i=1} x'_t y_t^{(i)} }{\sum^T_{i=1} x'_t x_t}
+	= (X' X)^{-1} X' Y^{(i)}
+\end{align*}
+where 
+
+
+
+
+
+
+\newpage
+\section{Likelihood Function}
+
+Now that we have an easy representation of the our
+VAR(p) model, we move to the likelihood function.
+By our definition,  $y_t$, conditional on $x_t$ 
+(the lags $y_{t-1}, \ldots, y_{t-p}$), happens
+to be normally distributed:
+\begin{align}
+    p(y_t \; | \; x_t, \Phi, \Sigma) &\sim
+	\text{N}_{n}(\Phi x_t, \; \Sigma) \notag \\
+    \Rightarrow \quad p(y_t \; | \; x_t, \Phi, \Sigma) 
+	&\propto |\Sigma|^{-1/2} 
+	\exp\left\{ -\frac{1}{2} \left(y_t - \Phi x_t
+	\right)' \Sigma^{-1} (y_t - \Phi x_t)\right\}
+\end{align}
+Now we use the trick from the trace section in the 
+appendix to rewrite the previous line
+\begin{align}
+    \Rightarrow \quad p(y_t \; | \; x_t, \Phi, \Sigma) 
+	&\propto |\Sigma|^{-1/2} 
+	\exp\left\{ -\frac{1}{2} \text{tr} \left[ \Sigma^{-1}  
+	(y_t - \Phi x_t)\left(y_t - \Phi x_t\right)'
+	\right]\right\}
+\end{align}
+
+
+
+
+
+\newpage
+\section{Joint Density Function}
+
+Now, we construct the \emph{joint density function} for
+the entire series, $Y_{1:T}$, where 
+    \[ Y_{t_0:t_1} = (y_{t_0}, \ldots, y_{t_1}) \]
+Therefore, conditional on a presample $y_{-p+1}, \ldots, y_0$, 
+the jdf is written
+\begin{align}
+    p(Y_{1:T} \; | \; Y_{-p+1:0}, \Phi, \Sigma)
+	&= \prod_{t=1}^T p(y_t \; | \; Y_{-p+1:t-1}, \Phi, \Sigma) 
+	\label{jump1} \\
+    &= \prod_{t=1}^T p(y_t \; | \; Y_{t-p:t-1}, \Phi, \Sigma) 
+	\label{jump2} \\
+    &\propto \prod_{t=1}^T
+	|\Sigma|^{-\frac{1}{2}} 
+	\exp\left\{ -\frac{1}{2} \text{tr} \left[ \Sigma^{-1}  
+	(y_t - \Phi x_t)\left(y_t - \Phi x_t\right)'
+	\right]\right\} \notag
+\end{align}
+where we could jump from Equation \ref{jump1} to \ref{jump2}
+since the density of $y_t$ depends only on the previous
+$p$ lags, not the entire history up until $t$. 
+And given that the trace of a sum of two matrices is the
+sum of the traces, we can simplify the jdf
+\begin{align}
+    p(Y_{1:T} \; | \; Y_{-p+1:0}, \Phi, \Sigma)
+	&\propto 
+	|\Sigma|^{-\frac{T}{2}} 
+	\exp\left\{ -\frac{1}{2} \text{tr} \left[ \Sigma^{-1}  
+	\sum^T_{t=1} (y_t - \Phi x_t)\left(y_t - \Phi x_t\right)'
+	\right]\right\} \notag \\
+    &\propto 
+	|\Sigma|^{-\frac{T}{2}} 
+	\exp\left\{ -\frac{1}{2} \text{tr} \left[ \Sigma^{-1}  
+	(Y - X\Phi)'(
+	\right]\right\} \notag
+\end{align}
+where we define
+    \[ Y = \begin{pmatrix} y'_1 \\ \vdots \\ y'_T \end{pmatrix} \qquad
+     X = \begin{pmatrix} x'_1 \\ \vdots \\ x'_T \end{pmatrix} \]
+
+
+
+
+
+
+
+\newpage
+\appendix
+\section{Trace}
+
+{\sl Definition}: If $A$ is an $n\times n$ matrix, then 
+\begin{equation}
+    \text{tr}[A] = \sum^n_{i=1} a_{ii} 
+\end{equation}
+which is the sum of diagnoal elements.
+\\
+\\
+{\sl Trace Fact}: If $X$ is $m\times n$ and $Y$
+is $n\times m$, then
+\begin{equation}
+    \label{tr}
+    \text{tr}[XY] = \text{tr}[YX]
+\end{equation}
+This isn't dificult to prove, just tedious. 
+\\
+\\
+{\sl Useful Trick}: Suppose that $a$ is an 
+$n\times 1$ vector and $B$ is a symmetric
+positive definite $n\times n$ matrix. Then 
+    \[ a' B a \text{ is a scalar} \]
+Then, since the trace of a scalar is just eqal
+to that scalar, we can rewrite
+\begin{align*}
+    a' B a &= tr\left[a' B a \right] \\
+    &= tr\left[a' (B a) \right] 
+\end{align*}
+Now if we use Equation \ref{tr}, taking $X = a'$ and
+$Y = Ba$, we can carry on from the simplification
+above to write
+\begin{align*}
+    a' B a &= tr\left[a' (B a) \right]  
+	= tr\left[(B a) a' \right]  \\
+	&= tr\left[B a a' \right]
+\end{align*}
+
+
+\newpage
+\section{Kronecker Product and Vec Operator}
+
+\subsection{Definitions}
+Suppose we have two matrices, $A$ which is $m \times n$ and $B$
+which is $p\times q$. Then the {\sl Kronecker Product} of $A$ and $B$ is 
+    \[ A \otimes B = \begin{pmatrix} a_{11} B & \cdots & a_{1n} B \\
+			    \vdots & \ddots & \vdots \\
+			    a_{m1} B & \cdots & a_{mn}B \end{pmatrix}
+    \]
+which implies that the new matrix is $(mp) \times (nq)$. 
+\\
+\\
+Next, the {\sl vec operator} takes any matrix $A$ that is $m \times n$
+and stacks to columns on top of each other (left to right) to 
+form a column vector of length $mn$.  Supposing that $a_i$ are column
+vectors to simplify notation:
+\begin{align*}
+    \text{if } A &= \begin{pmatrix} a_1 & \cdots & a_n \end{pmatrix}
+	\qquad a_i \in \mathbb{R}^{n\times 1} \\
+    \text{then } \mathbf{vec} A &= 
+	\begin{pmatrix} a_1 \\ \vdots \\ a_n \end{pmatrix}
+\end{align*}
+
+
+\subsection{Properties with Proofs, Kronecker Product}
+
+\paragraph{Property 1} Let $A$ be $m\times n$, $B$ be $p \times q$,
+$C$ be $n\times r$, and $D$ be $q \times s$. Then
+\begin{equation}
+    (A \otimes B)(C \otimes D) = AC \otimes BD
+\end{equation}
+\begin{proof} We start by writing:
+
+\begin{align*}
+    (A \otimes B)(C \otimes D) = 
+    \begin{pmatrix} a_{11} B & \cdots & a_{1n} B \\
+	\vdots & \ddots & \vdots \\
+	a_{m1} B & \cdots & a_{mn}B \end{pmatrix}
+    \begin{pmatrix} c_{11} D & \cdots & c_{1r} D \\
+	\vdots & \ddots & \vdots \\
+	c_{n1} D & \cdots & c_{nr}D \end{pmatrix}
+\end{align*}
+Since the matrix $D$ has the same number of rows as $B$ has columns,
+we can carry out the multiplication to get
+
+\end{proof}
+
+%%%% INCLUDING FIGURES %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+   % H indicates here 
+   %\begin{figure}[h!]
+   %   \centering
+   %   \includegraphics[scale=1]{file.pdf}
+   %\end{figure}
+
+%   \begin{figure}[h!]
+%      \centering
+%      \mbox{
+%	 \subfigure{
+%	    \includegraphics[scale=1]{file1.pdf}
+%	 }\quad
+%	 \subfigure{
+%	    \includegraphics[scale=1]{file2.pdf} 
+%	 }
+%      }
+%   \end{figure}
+ 
+
+%%%%% Including Code %%%%%%%%%%%%%%%%%%%%%5
+% \verbatiminput{file.ext}    % Includes verbatim text from the file
+% \texttt{text}	  % includes text in courier, or code-like, font
+
+\end{document}
+
