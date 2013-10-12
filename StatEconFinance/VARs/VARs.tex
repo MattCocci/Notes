@@ -381,15 +381,15 @@ How about some proofs?
 
 
 \newpage
-\subsection{Proofs of Property}
+\subsection{Proof of Property 4}
 
 Of all the properties, this one strikes me the most of 
 ``Now what the hell?''  There is zero intuition for this that
 I can see, so let's try to derive it.
 \begin{equation}
     \label{vecder}
-    \left[A'BCD'\right] = \text{vec}(A)' (D \otimes B)		 
-	\text{vec}(C)
+    \text{tr}\left[A'BCD'\right] 
+	= \text{vec}(A)' (D \otimes B) \text{vec}(C)
 \end{equation}
 
 \begin{proof} We know that the matrix that results from 
@@ -438,47 +438,42 @@ column of $Y$ is the dot product of each
 successive row of $C$ with the $i$th column of $D'$
 (or the $i$th row of $D$).
 Mathematically, 
-\begin{align*}
+\begin{align}
     \text{tr}[E] &= 
 	\sum^q_{i=1} e_{ii} 
-	= \sum^q_{i=1} x_{i\cdot} y_{\cdot i} \\
+	= \sum^q_{i=1} x_{i\cdot} y_{\cdot i} \notag \\
     &= \sum^q_{i=1} a'_{\cdot i} 
 	\begin{pmatrix} b_{\cdot 1} & \cdots & b_{\cdot n}
 	\end{pmatrix}
 	\begin{pmatrix} c_{1\cdot} \\ \vdots \\ c_{n \cdot}
 	\end{pmatrix} 
-	d'_{i \cdot}
-\end{align*}
+	d'_{i \cdot} \label{fullrep} \\
+    &= \sum^q_{i=1} a'_{\cdot i} 
+	BC
+	d'_{i \cdot} \label{simprep} 
+\end{align}
 where $a'_{\cdot i}$ is the $i$th column of $A$,
-transposed, and $d'{i \cdot}$ is the $i$th row of $D$,
+transposed, and $d'_{i \cdot}$ is the $i$th row of $D$,
 transposed.
 
 \newpage
 Alright, where did that get us? Well, let's look at 
-that last expression. If we group the last 
-three components (with $b$'s and $c$'s and
-$d$'s in them) into some abstract term $z_i$, 
-we notice that we multiply some $z_i$ by $a'_{\cdot i}$,
-add to the sum, increment $i$, multiply the next $z_i$ by 
-the next $a'_{\cdot i}$, add to the sum, increment $i$, and so 
-on. Mathematically:
+that last expression. Let's suppress the three
+components to the write of $a'_{\cdot i}$---those nasty
+vectors and matrices with $b$'s, $c$'s, and $d$'s in
+them. We'll do so by just grouping those three
+terms into a ``back-box'' term called ``$z_i$,'' which
+we'll postpone computing for now.  This let's us
+write
 \begin{align}
     \text{tr}[E] 
-    &= \sum^q_{i=1} a'_{\cdot i} 
-	\begin{pmatrix} b_{\cdot 1} & \cdots & b_{\cdot n}
-	\end{pmatrix}
-	\begin{pmatrix} c_{1\cdot} \\ \vdots \\ c_{n \cdot}
-	\end{pmatrix} 
-	d'_{i \cdot} \notag \\
     &= \sum^q_{i=1} a'_{\cdot i}  z_i \label{goback}
 \end{align}
 where $z_i$ is of size $m\times 1$.
 \\
 \\
-But wouldn't it be nice if we could write that as 
-a dot product---a product of scalars.  
-We could use simple matrix notation to 
-and just write
+But hey, that's a regular old dot product, so let's
+rewrite it as such with simple matrix notation:
 \begin{align}
     \text{tr}[E] 
 	&= \sum^q_{i=1} a'_{\cdot i}  z_i \notag \\
@@ -486,41 +481,105 @@ and just write
 	    & \cdots & a'_{\cdot q} \end{pmatrix}
 	    \begin{pmatrix} z_{1}  
 	    \\ \vdots \\ z_{q} \end{pmatrix}
-	= \text{vec} (A)'
-	    \begin{pmatrix} z_{1}  
-	    \\ \vdots \\ z_{q} \end{pmatrix}
-	    \label{zrep}
+	= \text{vec}(A)' \; Z
+    \label{zrep}
 \end{align}
-So clearly you noticed what that guy on the left is! It's 
-the transpose of the columns of $A$ lined up
-alongside to each other.  In other words, this is
-vec$(A)'\;$!! 
-Whew, so now we at least have \emph{something}
+Now hopefully you were able to make the jump to 
+Equation \ref{zrep} yourself once you saw what
+we were doing.
+And now we at least have \emph{something}
 from Equation \ref{vecder}.
-Now let's try to pin down that $z_i$ terms that
+Now let's try to pin down those $z_i$ terms that
 helped us get here.
 \\
 \\
-Equation \ref{zrep} prompts us to think
-a bit differently. Namely, imagine the
-big column vector of $z$'s in Equation \ref{zrep}.
-Since each $z_i$ term is, itself, a vector
-of size $m\times 1$, let's go to a more
-granular level.  Namely, if $z^*_{ij}$ represents
-the $j$ component of $z_i$, then we can write
+Now, let's pin down that $Z$ matrix and show
+that, in fact, 
+\begin{equation}
+    Z = (D\otimes B) \text{vec}(C)
+\end{equation}
+We do so by first using Equations 
+\ref{simprep}, \ref{goback}, and \ref{zrep} to infer the
+following: 
+\begin{align}
+    Z &= \begin{pmatrix} z_1 \\ \vdots \\ z_q 
+	\end{pmatrix} = 
+	\begin{pmatrix} BCd'_{1\cdot} \\ \vdots \\ BCd'_{q\cdot} 
+	\end{pmatrix} \label{bigz} 
+\end{align}
+Next, let's consider the $j$th row of the last vector, then
+rewrite $C$, expanding it into a different but equivalent
+representation---a row of column vectors all lined up:
 \begin{align*}
-    z_i = \begin{pmatrix}
-	z^*_{i1} \\ \vdots \\ z^*_{im} \end{pmatrix}
-	&= 
-	\begin{pmatrix} b_{\cdot 1} & \cdots & b_{\cdot n}
-	\end{pmatrix}
-	\begin{pmatrix} c_{1\cdot} \\ \vdots \\ c_{n \cdot}
-	\end{pmatrix} 
-	d'_{i \cdot} \notag \\
-    &= 	\begin{pmatrix} c_{1\cdot} \\ \vdots \\ c_{n \cdot}
-	\end{pmatrix} 
-	d'_{i \cdot} \notag \\
+    BCd'_{j\cdot} &= B 
+	\begin{pmatrix} c_{\cdot 1} & \cdots & c_{\cdot p}
+	\end{pmatrix} d'_{j \cdot} \notag \\
+    \text{expanding $d'_{j \cdot}$} \quad 
+	&= B 
+	\begin{pmatrix} c_{\cdot 1} & \cdots & c_{\cdot p}
+	\end{pmatrix}  
+	\begin{pmatrix} d_{j 1} \\ \vdots \\ d_{j p}
+	\end{pmatrix}  
 \end{align*}
+Now distribute $B$ and dot product with the $d'_{j\cdot}$:
+\begin{align}
+    BCd'_{j\cdot} &= 
+	\begin{pmatrix} Bc_{\cdot 1} d_{j 1} + \cdots 
+	    + Bc_{\cdot p} d_{j p}
+	\end{pmatrix}   \notag \\
+    \text{Since the $d_{jm}$ are scalars} \quad &= 
+	\begin{pmatrix}  d_{j 1} Bc_{\cdot 1} + \cdots 
+	    +  d_{j p}Bc_{\cdot p}
+	\end{pmatrix}   \notag 
+\end{align}
+Amost there, I promise.
+
+\newpage
+Now stack these $BCd'_{j\cdot}$ terms
+to get $Z$ as in Equation \ref{bigz}:
+\begin{align}
+    Z &= \begin{pmatrix} z_1 \\ \vdots \\ z_q 
+	\end{pmatrix} = 
+	\begin{pmatrix} BCd'_{1\cdot} \\ \vdots \\ BCd'_{q\cdot} 
+	\end{pmatrix} 
+    = \begin{pmatrix} 
+	    d_{1 1} Bc_{\cdot 1} + \cdots 
+	    +  d_{1 p}Bc_{\cdot p} \\ 
+	    \vdots \\
+	    d_{q 1} Bc_{\cdot 1} + \cdots 
+	    +  d_{q p}Bc_{\cdot p}  
+	\end{pmatrix} 
+\end{align}
+Finally, take out the expanded $C$ term from
+each row and rewrite the sums in each row
+as a result of matrix multiplication
+\begin{align}
+    Z &=\begin{pmatrix} 
+	    d_{1 1} Bc_{\cdot 1} + \cdots 
+	    +  d_{1 p}Bc_{\cdot p} \\ 
+	    \vdots \\
+	    d_{q 1} Bc_{\cdot 1} + \cdots 
+	    +  d_{q p}Bc_{\cdot p} 
+	\end{pmatrix} 
+    = \begin{pmatrix} 
+	    d_{1 1} B & \cdots 
+	    &  d_{1 p}B \\ 
+	    \vdots & \ddots & \vdots \\
+	    d_{q 1} B & \cdots 
+	    &  d_{q p}B 
+	\end{pmatrix} 
+    \begin{pmatrix}
+	c_{\cdot 1} \\ \vdots \\ c_{\cdot p}
+    \end{pmatrix}
+\end{align}
+Or in other words, if you look at the
+last line closely
+\begin{align*}
+    Z = (D\otimes B) \text{vec}(C)
+\end{align*}
+QED (drops mic).
+
+
     
 
 
