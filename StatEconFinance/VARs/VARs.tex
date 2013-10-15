@@ -121,15 +121,15 @@ the $\phi_i$ column vectors horizontally, and stack the lags
 of $y$ into one big column vector:
 \begin{align} 
     y_t &= \underbrace{\begin{pmatrix} \phi_0 & \phi_1 & \cdots 
-	& \phi_p \end{pmatrix}}_{\Phi}
+	& \phi_p \end{pmatrix}}_{\Phi'}
 	\underbrace{\begin{pmatrix} 
 	    1 \\ y_{t-1} \\ \vdots \\ y_{t-p}
 	\end{pmatrix}}_{x_t} + u_t \qquad u_t \sim \text{N}_n(0, \Sigma) 
 	 \notag \\
-    \Leftrightarrow \qquad y_t &= \Phi x_t + u_t 
+    \Leftrightarrow \qquad y_t &= \Phi' x_t + u_t 
     \label{varvec}
 \end{align} 
-where $\Phi$ is $n\times (np +1)$ and $x_t$ is 
+where $\Phi$ is $(np +1) \times n$ and $x_t$ is 
 $(np+1) \times 1$.
 
 
@@ -139,21 +139,21 @@ Now that we have the model, let's find the OLS for
 the parameters in $\Phi$. To do so, we'll take one element (or
 component) of the vector $y_t$ at a time, so one row of $y_t$
 and $\Phi$ at a time. So let's minimize the sum of
-squared errors for row/component $i$: 
+squared errors for column/component $i$: 
 \begin{equation}
-    \min_{\Phi^{(i)}} \sum^T_{i=1} 
-	\left(y_t^{(i)} - \Phi^{(i)} x_t\right)^2
+    \min_{\Phi'_{\cdot i}} \sum^T_{i=1} 
+	\left(y_t^{(i)} - \Phi'_{\cdot i} x_t \right)^2
 \end{equation}
 Now this estimator looks just like standard multivariate OLS 
 regression, resulting in the ``the normal equation'':
 \begin{align*}
-    0 &= \frac{d}{d\Phi^{(i)}}\left\{ \sum^T_{i=1} 
-	\left(y_t^{(i)} - \Phi^{(i)} x_t\right)^2\right\} 
+    0 &= \frac{d}{d\Phi'_{\cdot i}}\left\{ \sum^T_{i=1} 
+	\left(y_t^{(i)} - \Phi'_{\cdot i} x_t \right)^2\right\} 
 	= -2 \sum^T_{i=1} x'_t
-	\left(y_t^{(i)} - \Phi^{(i)} x_t\right) \\
-    \Rightarrow \quad \hat{\Phi}^{(i)}  &= 
+	\left(y_t^{(i)} - \Phi'_{\cdot i} x_t\right) \\
+    \Rightarrow \quad \hat{\Phi}_{\cdot i}   &= 
 	\frac{\sum^T_{t=1} x'_t y_t^{(i)} }{\sum^T_{t=1} x'_t x_t}
-	= \left[(X' X)^{-1} X' Y^{(i)}\right]'
+	= (X' X)^{-1} X' Y^{(i)}
 \end{align*}
 where $X$ is $T \times (np+1)$ and $Y^{(i)}$ is $T \times 1$
 where
@@ -163,13 +163,13 @@ where
 	\qquad Y^{(i)} = \begin{pmatrix} y_1^{(i)}  \\
 	\vdots \\ y_T^{(i)} \end{pmatrix} 
 \end{equation}
-So now we have the estimator for each \emph{row}
+So now we have the estimator for each \emph{column}
 of $\Phi$, which allows us to write
 \begin{equation}
     \label{normaleqn}
-    \hat{\Phi} = \begin{pmatrix} \hat{\Phi}^{(1)} \\ \vdots \\
-	\hat{\Phi}^{(n)} \end{pmatrix}  
-	= \left[(X' X)^{-1} X' Y\right]'
+    \hat{\Phi} = \begin{pmatrix} \hat{\Phi}_{\cdot 1} & \cdots &
+	\hat{\Phi}_{\cdot n} \end{pmatrix}  
+	= (X' X)^{-1} X' Y
 \end{equation}
 where $X$ is as above and $Y$ is $T \times n$, which is 
 a matix with $y'_t$ stacked on top of each other for
@@ -191,21 +191,12 @@ both of which are written below:
     \sum^m_{i=1} (y_i - \mu)^2 &= \sum^m_{i=1} (y_i - \hat{\mu})^2
 	+ m(\hat{\mu}-\mu)^2 \notag \\
     (Y - X\Phi)'(Y - X\Phi) &= \hat{S} + (\Phi - \hat{\Phi})'
-	X'X(\Phi - \hat{\Phi})' \label{sumsq}
+	X'X(\Phi - \hat{\Phi}) \label{sumsq}
 \end{align}
 where anything with ``$\;\hat{\;}\;$'' denotes the sample
 estimate/analog.
 
 
-
-
-
-
-
-
-
-
-\newpage
 \section{Likelihood Function}
 
 Now that we have an easy representation of the our
@@ -218,8 +209,8 @@ to be normally distributed:
 	\text{N}_{n}(\Phi x_t, \; \Sigma) \notag \\
     \Rightarrow \quad p(y_t \; | \; x_t, \Phi, \Sigma) 
 	&\propto |\Sigma|^{-1/2} 
-	\exp\left\{ -\frac{1}{2} \left(y_t - \Phi x_t
-	\right)' \Sigma^{-1} (y_t - \Phi x_t)\right\}
+	\exp\left\{ -\frac{1}{2} \left(y_t - \Phi' x_t
+	\right)' \Sigma^{-1} (y_t - \Phi' x_t)\right\}
 \end{align}
 Now we use the trick from the trace section in the 
 appendix to rewrite the previous line
@@ -227,11 +218,9 @@ appendix to rewrite the previous line
     \Rightarrow \quad p(y_t \; | \; x_t, \Phi, \Sigma) 
 	&\propto |\Sigma|^{-1/2} 
 	\exp\left\{ -\frac{1}{2} \text{tr} \left[ \Sigma^{-1}  
-	(y_t - \Phi x_t)\left(y_t - \Phi x_t\right)'
+	(y_t - \Phi' x_t)\left(y_t - \Phi' x_t\right)'
 	\right]\right\}
 \end{align}
-
-
 
 
 
@@ -245,18 +234,18 @@ Therefore, conditional on a presample $y_{-p+1}, \ldots, y_0$,
 the jdf is written
 \begin{align}
     p(Y_{1:T} \; | \; Y_{-p+1:0}, \Phi, \Sigma)
-	&= \prod_{t=1}^T p(y_t \; | \; Y_{-p+1:t-1}, \Phi, \Sigma) 
+	&= \prod_{t=1}^T p(y_t \; | \; Y_{-p+1:t-1}, \Phi, 
+	\Sigma) 
+	= \prod_{t=1}^T p(y_t \; | \; Y_{t-p:t-1}, \Phi, \Sigma) 
 	\label{jump1} \\
-    &= \prod_{t=1}^T p(y_t \; | \; Y_{t-p:t-1}, \Phi, \Sigma) 
-	\label{jump2} \\
     &\propto \prod_{t=1}^T
 	|\Sigma|^{-\frac{1}{2}} 
 	\exp\left\{ -\frac{1}{2} \text{tr} \left[ \Sigma^{-1}  
-	(y_t - \Phi x_t)\left(y_t - \Phi x_t\right)'
+	(y_t - \Phi' x_t)\left(y_t - \Phi' x_t\right)'
 	\right]\right\} \notag
 \end{align}
-where we could jump from Equation \ref{jump1} to \ref{jump2}
-since the density of $y_t$ depends only on the previous
+where we could make the jump in Equation \ref{jump1}  
+because the density of $y_t$ depends only on the previous
 $p$ lags, not the entire history up until $t$. 
 And given that the trace of a sum of two matrices is the
 sum of the traces, we can simplify the jdf
@@ -265,17 +254,84 @@ sum of the traces, we can simplify the jdf
 	&\propto 
 	|\Sigma|^{-\frac{T}{2}} 
 	\exp\left\{ -\frac{1}{2} \text{tr} \left[ \Sigma^{-1}  
-	\sum^T_{t=1} (y_t - \Phi x_t)\left(y_t - \Phi x_t\right)'
+	\sum^T_{t=1} (y_t - \Phi' x_t)\left(y_t -\Phi' x_t\right)'
 	\right]\right\} \notag \\
     &\propto 
 	|\Sigma|^{-\frac{T}{2}} 
 	\exp\left\{ -\frac{1}{2} \text{tr} \left[ \Sigma^{-1}  
-	(Y - X\Phi)'(Y-X\Phi)\right]\right\} \notag
+	(Y - X\Phi)'(Y-X\Phi)\right]\right\} \label{jdf}
 \end{align}
 where $X$ and $Y$ are defined as above in Equation \ref{xy}
-and the subsequent conclusion to the section.
+and the subsequent section discussion.
+\\
+\\
+Now, we use a few tricks to rewrite the jdf representation
+in Equation \ref{jdf}. Namely, we'll want to take care
+of the nastiness in the trace operator, so let's simplify 
+that straight away (letting $\hat{\beta} = 
+\text{vec}(\hat{\Phi})$, a vector of coefficients):
+\begin{align*}
+    \text{By Eqn \ref{sumsq}:} \qquad 
+	\text{tr} & \left[\Sigma^{-1} 
+	(Y - X\Phi)'(Y-X\Phi)\right] = 
+	\text{tr} \left[\Sigma^{-1} \left\{
+	\hat{S} + (\Phi - \hat{\Phi})'
+	X'X(\Phi - \hat{\Phi}) \right\}\right]  \\
+    &\qquad\qquad= \text{tr} \left[\Sigma^{-1} 
+	\hat{S} \right] + \text{tr} \left[ \Sigma^{-1}
+	(\Phi - \hat{\Phi})'X'X(\Phi - \hat{\Phi}) \right] \\
+    \text{By Eqn \ref{tr}} \qquad \quad
+	&\qquad\qquad= \text{tr} \left[\Sigma^{-1}
+	\hat{S} \right] + \text{tr} \left[ 
+	(\Phi - \hat{\Phi})'X'X(\Phi - \hat{\Phi})
+	\Sigma^{-1} \right] \\
+    \text{By Eqn \ref{vecder}} \qquad \quad
+	&\qquad\qquad= \text{tr} \left[\Sigma^{-1}
+	\hat{S} \right] + 
+	(\beta - \hat{\beta})'
+	\left[\Sigma^{-1} \otimes (X'X)\right] 
+	(\beta - \hat{\beta}) \\
+    \text{By Kronecker Prop. 3}  
+	&\qquad\qquad= \text{tr} \left[\Sigma^{-1}
+	\hat{S} \right] + 
+	(\beta - \hat{\beta})'
+	\left[\Sigma \otimes (X'X)^{-1}\right]^{-1} 
+	(\beta - \hat{\beta}) 
+\end{align*}
+Now substitute this back into the jdf to get
+\begin{align}
+    p(Y_{1:T} \; | \; Y_{-p+1:0}, \Phi, \Sigma)
+    \propto 
+	&\;|\Sigma|^{-\frac{T}{2}} 
+	\exp\left\{ -\frac{1}{2} \text{tr} \left[\Sigma^{-1}
+	\hat{S} \right] \right\} \notag \\
+    &\times
+	\exp\left\{ -\frac{1}{2} 
+	(\beta - \hat{\beta})'
+	\left[\Sigma \otimes (X'X)^{-1}\right]^{-1} 
+	(\beta - \hat{\beta}) 
+	\right\}  \label{bjdf}
+\end{align}
 
 
+\newpage
+\section{Bayesian Analysis}
+
+So we saw above how to arrive at a new representation
+for the jdf in Equation \ref{bjdf}, and in this section 
+we'll see why that was useful.
+
+\subsection{Flat Prior, $\Sigma$ Given}
+
+This is perhaps the easiest case, where we want to find
+the distributions for $\Phi$ assuming a flat prior for
+$\Phi$ and that $\Sigma$ is given. This gives us
+a posterior of
+\begin{align*}
+    p(\Phi \; | \; Y, \Sigma) &\propto p( Y \; | \; \Phi, \Sigma)
+	p(\Phi \; | \; \Sigma) \propto p(Y \; |\; \Phi, \Sigma)\\
+    &\propto 	
+\end{align*}
 
 
 
@@ -287,7 +343,7 @@ and the subsequent conclusion to the section.
 \begin{equation}
     \text{tr}[A] = \sum^n_{i=1} a_{ii} 
 \end{equation}
-which is the sum of diagnoal elements.
+which is the sum of diagonal elements.
 \\
 \\
 {\sl Trace Fact}: If $X$ is $m\times n$ and $Y$
