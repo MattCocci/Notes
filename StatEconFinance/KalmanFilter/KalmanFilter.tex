@@ -53,32 +53,242 @@ Filter:
 \section{Normal Example}
 
 Suppose we want to measure some variable $x$. We will 
-assume a prior that is multivariate normal such that
+assume a \emph{prior} that is multivariate normal such that
     \[ x \sim \text{N}(\hat{x}, \Sigma) \]
 Next, we ``measure'' $x$ by matching it to an observable in
-a measurement equation:
+a \emph{measurement equation}:
     \[ y = G x + v \qquad v\sim \text{N}(0, R) \]
 where $R$ is positive definite, while $G$ and $R$ are both 
-$2 \times 2$. 
+$2 \times 2$. This forms the \emph{likelihood}.
 \\
 \\
 We then ``filter'' out the noise, updating our view of $x$ in
 light of the data in the filtering step using Bayes' Rule:
+\begin{align}
+    p(x \; | \; y) &= \frac{p(y \; | \; x) \cdot p(x)}{p(y)} 
+    \propto p(y \; | \; x) \cdot p(x) \label{xgiveny} \\
+    &\propto \exp\left\{-\frac{1}{2}
+	\left( y - Gx \right)' R \left(y-Gx\right)
+	\right\} \exp\left\{-\frac{1}{2}( x - \hat{x} )' \Sigma
+	(x-\hat{x})\right\} \notag
+\end{align}
+Now let's expand the term the lefthand exponential:
+\begin{align*}
+    A = \left( y - Gx \right)' R \left(y-Gx\right) &= 
+	\left( y' - x'G' \right) R \left(y-Gx\right) \\
+    &= \left( y'R - x'G'R \right)  \left(y-Gx\right) \\
+    &= \left( y'Ry - y'R Gx - x'G'R y + x'G'R Gx\right)
+\end{align*}
+And now the same for the righthand exponential:
+\begin{align}
+     B = ( x - \hat{x} )' \Sigma (x-\hat{x}) 
+	&= ( x' - \hat{x}' ) \Sigma (x-\hat{x}) \notag\\
+    &=  (x'\Sigma - \hat{x}'\Sigma)   (x-\hat{x}) \notag \\
+    &=  x'\Sigma x - x'\Sigma \hat{x} - \hat{x}'\Sigma x
+	+ \hat{x}'\Sigma \hat{x} \label{B}
+\end{align}
+Adding the two exponentials, we get:
+\begin{align*}
+    C = A + B &= x' \left( \Sigma + G'RG\right) x 
+	- x' (\Sigma \hat{x} + G'Ry)
+	- (\hat{x}' \Sigma + y' RG) x  \\
+	& \qquad + \hat{x}' \Sigma \hat{x} + y' R y 
+\end{align*}
+Now notice that Expression \ref{xgiveny} is the probability
+distribution of $x$ \emph{conditional} on $y$ and pretty
+much anything else that isn't $x$.  And because of the
+wonderful properties of the exponential function and the
+black-hole nature of the proportionality constant, we'll be
+able to simplify things nicely (and we'll worry that the
+distribution $p(x\;|\;y)$ integrates to one later on).  
 
-
-
-
+Specifically, in the expression for $C$, the two terms
+in the second row \emph{don't} depend upon $x$. Therefore,
+letting $C(x)$ be the portion of $C$ that depends upon
+$x$, and letting $C(\lnot x)$ bet the additive terms which
+don't depend upon $x$, we can simplify
+\begin{align*}
+    p(x\; | \; y) &\propto \exp\left\{ -\frac{1}{2}
+	C \right\} = \exp\left\{ -\frac{1}{2}
+	\left[C(x) + C(\lnot x) \right]\right\}  \\
+    &\propto \exp\left\{ -\frac{1}{2}
+	C(x)\right\} +  \exp\left\{ -\frac{1}{2} C(\lnot x) 
+	\right\}  \\
+    &\propto \exp\left\{ -\frac{1}{2}
+	C(x)\right\}
+\end{align*}
+We just absorb the portion not relevant to $p(x\;|\;y)$ into
+the proportionality constant.  This means our the work we
+did above to get $C$ simplifies our target expression to
+\begin{align}
+    p(x\;|\;y) &\propto \exp\left\{-\frac{1}{2} \left[
+	x' \left( \Sigma + G'RG\right) x 
+	- x' (\Sigma \hat{x} + G'Ry)
+	- (\hat{x}' \Sigma + y' RG) x  \right]\right\}
+	\label{tosimp}
+\end{align}
+Now this doesn't look too helpful, but with a little bit of 
+work, we can turn this into the probability distribution
+for a multivariate normal random variable. So let's do it.
+\\
+\\
+If we  take a second and compare that Expression \ref{tosimp}
+to Expression \ref{B}, it's becomes clear from inspection 
+that we must have 
+\begin{equation}
+    \label{notobvious}
+    (\Sigma \hat{x} + G'Ry) = \left( \Sigma + G'RG\right) Z
+\end{equation}
+To see this, 
+liken the lefthand side of Equation \ref{notobvious} to
+the result of the matrix multiplication $\Sigma \hat{x}$ in
+Equation \ref{B}. To get the righthand side, use the fact
+that we \emph{know} the Equation \ref{notobvious} analogue
+to Equation \ref{B}'s $\Sigma$: it's sandwiched between 
+$x$ and $x'$.  So all that's left to do is solve for $Z$.
+\\
+\\
+And so we solve Equation \ref{B} by using the Woodbury matrix
+identity, stated in the appendix:
+\begin{align*}
+    (\Sigma \hat{x} + G'Ry) &= \left( \Sigma + G'RG\right) Z \\
+    \Rightarrow \quad Z &=
+	\left( \Sigma + G'RG\right)^{-1} 
+	(\Sigma \hat{x} + G'Ry) \\
+    Z &= 
+	\left( \Sigma^{-1} - \Sigma^{-1} G'(R^{-1} 
+	+ G\Sigma^{-1}G')^{-1}
+	G\Sigma^{-1}\right) \left(\Sigma \hat{x} + G'Ry\right)
+\end{align*}
+Now do some heavy simplifying, using the result $(AB)^{-1} = 
+B^{-1} A^{-1}$ often and, typically, in reverse:
+\begin{align*}
+    Z &= 
+	\left( \Sigma^{-1} - \Sigma^{-1} G'(R^{-1} 
+	+ G\Sigma^{-1}G')^{-1}
+	G\Sigma^{-1}\right) \left(\Sigma \hat{x} + G'Ry \right)\\
+    &= \hat{x} 
+	+ \Sigma^{-1} G'Ry
+	- \left[\Sigma^{-1} G'(R^{-1} + G\Sigma^{-1}G')^{-1} 
+	    G\Sigma^{-1}\right] \Sigma \hat{x} \\
+    &\qquad - \left[\Sigma^{-1} G'(R^{-1} + G\Sigma^{-1}G')^{-1}
+	    G\Sigma^{-1}\right] G'Ry \\
+    &= \hat{x} 
+	+ \Sigma^{-1} G'Ry
+	- \left[\Sigma^{-1} G'(R^{-1} + G\Sigma^{-1}G')^{-1} 
+	    G\right]  \hat{x} \\
+	&\qquad - \left[\left(G'^{-1}\Sigma \right)^{-1}
+	    (R^{-1} + G\Sigma^{-1}G')^{-1}
+	    \left(\Sigma G^{-1}\right)^{-1}\right] G'Ry \\
+    &= \hat{x} 
+	+ \Sigma^{-1} G'Ry
+	- \left[ ( G'^{-1} \Sigma)^{-1} (R^{-1} 
+	    + G\Sigma^{-1}G')^{-1} G\right]  \hat{x} \\
+	&\qquad - \left[
+	    \left\{\left(\Sigma G^{-1}\right)
+	    (R^{-1} + G\Sigma^{-1}G')
+	    \left(G'^{-1}\Sigma \right)
+	    \right\}^{-1} \right] G'Ry \\
+    &= \hat{x} 
+	+ \Sigma^{-1} G'Ry
+	- \left[\left\{ (R^{-1} 
+	    + G\Sigma^{-1}G')
+	    ( G'^{-1} \Sigma) \right\}^{-1} G\right]  \hat{x} \\
+	&\qquad - \left[
+	    \left\{\left(\Sigma G^{-1}\right)
+	    R^{-1} + \left(\Sigma G^{-1}\right)G\Sigma^{-1}G'
+	    \left(G'^{-1}\Sigma \right)
+	    \right\}^{-1} \right] G'Ry \\
+    &= \hat{x} 
+	+ \Sigma^{-1} G'Ry
+	- \left[\left\{ R^{-1} G'^{-1} \Sigma
+	    + G\Sigma^{-1}G' G'^{-1} \Sigma
+	     \right\}^{-1} G\right]  \hat{x} \\
+	&\qquad - \left[
+	    \left\{ \Sigma G^{-1}
+	    R^{-1} + \Sigma 
+	    \right\}^{-1} \right] G'Ry \\
+    &= \hat{x} 
+	+ \Sigma^{-1} G'Ry
+	- \left[\left\{ R^{-1} G'^{-1} \Sigma
+	+ G \right\}^{-1} \left(G^{-1}\right)^{-1}
+	    \right]  \hat{x} \\
+	&\qquad - \left[
+	    \left\{ \Sigma G^{-1}
+	    R^{-1} + \Sigma 
+	    \right\}^{-1} \right] G'Ry \\
+    &= \hat{x} 
+	+ \Sigma^{-1} G'Ry
+	- \left[\left\{ G^{-1}\left(R^{-1} G'^{-1} \Sigma
+	+ G\right) \right\}^{-1}
+	    \right]  \hat{x} \\
+	&\qquad - \left[
+	    \left\{ \Sigma G^{-1}
+	    R^{-1} + \Sigma 
+	    \right\}^{-1} \right] G'Ry \\
+%    Z &= 
+%	\left( \Sigma^{-1} - \Sigma^{-1} G'
+%	\left[\left(\Sigma G^{-1}\right)
+%	(R^{-1} + G\Sigma^{-1}G') \right]^{-1} \right) 
+%	\left(\Sigma  \hat{x} + G'Ry\right)\\
+%    Z &= 
+%	\left( \Sigma^{-1} - \Sigma^{-1} G'
+%	\left[\left(\Sigma G^{-1}\right) R^{-1} +
+%	\left(\Sigma G^{-1}\right) 
+%	G\Sigma^{-1}G' \right]^{-1} \right) 
+%	\left(\Sigma  \hat{x} + G'Ry\right)\\
+%    Z &= 
+%	\left( \Sigma^{-1} - \Sigma^{-1} G'
+%	\left[\left(\Sigma G^{-1}\right) R^{-1} +
+%	G' \right]^{-1} \right) 
+%	\left(\Sigma  \hat{x} + G'Ry\right)\\
+%    Z &= 
+%	\left( \Sigma^{-1} - \left(G'^{-1}\Sigma\right)^{-1} 
+%	\left[\left(\Sigma G^{-1}\right) R^{-1} +
+%	G' \right]^{-1} \right) 
+%	\left(\Sigma  \hat{x} + G'Ry\right)\\
+%    Z &= 
+%	\left( \Sigma^{-1} - \left\{
+%	\left[\left(\Sigma G^{-1}\right) R^{-1} +
+%	G' \right] \left( G'^{-1}\Sigma\right)
+%	\right\}^{-1} \right) 
+%	\left(\Sigma  \hat{x} + G'Ry\right)\\
+%    Z &= 
+%	\left( \Sigma^{-1} - \left\{
+%	\left(\Sigma G^{-1}\right) R^{-1} 
+%	\left( G'^{-1}\Sigma\right)
+%	+ G' \left( G'^{-1}\Sigma\right) 
+%	\right\}^{-1} \right) 
+%	\left(\Sigma  \hat{x} + G'Ry\right)\\
+%    Z &= 
+%	\left( \Sigma^{-1} - \left\{
+%	\left(\Sigma G^{-1}\right) R^{-1} 
+%	\left( G'^{-1}\Sigma\right)
+%	+ \Sigma 
+%	\right\}^{-1} \right) 
+%	\left(\Sigma  \hat{x} + G'Ry\right)\\
+%    Z &= 
+%	\left( \Sigma^{-1} - \left\{
+%	\left(\Sigma G^{-1}\right) R^{-1} 
+%	\left( G'^{-1}\Sigma\right)
+%	+ \Sigma 
+%	\right\}^{-1} \right) 
+%	\left(\Sigma  \hat{x} + G'Ry\right)\\
+\end{align*}
 
 
 %%%% APPPENDIX %%%%%%%%%%%
 
-% \appendix
+\newpage
+\appendix
 
-%\cite{LabelInSourcesFile} 
-%\citep{LabelInSourcesFile} Cites in parens
-%\nocite{LabelInSourceFile} includes in refs w/o specific citation
-%\bibliographystyle{apalike} 
-%\bibliography{sources.bib} where sources.bib is file
+\section{Woodbury Matrix Identity}
+
+For matrices $A$, $U$, $C$, and $V$:
+\begin{equation}
+    (A+UCV)^{-1} = A^{-1} - A^{-1} U(C^{-1} + VA^{-1}U)^{-1}
+	VA^{-1}
+\end{equation}
 
 
 
