@@ -68,31 +68,34 @@ light of the data in the filtering step using Bayes' Rule:
     p(x \; | \; y) &= \frac{p(y \; | \; x) \cdot p(x)}{p(y)} 
     \propto p(y \; | \; x) \cdot p(x) \label{xgiveny} \\
     &\propto \exp\left\{-\frac{1}{2}
-	\left( y - Gx \right)' R \left(y-Gx\right)
-	\right\} \exp\left\{-\frac{1}{2}( x - \hat{x} )' \Sigma
-	(x-\hat{x})\right\} \notag
+	\left( y - Gx \right)' R^{-1} \left(y-Gx\right)
+	\right\} \exp\left\{-\frac{1}{2}( x - \hat{x} )' 
+	\Sigma^{-1} (x-\hat{x})\right\} \notag
 \end{align}
 Now let's expand the term the lefthand exponential:
 \begin{align*}
-    A = \left( y - Gx \right)' R \left(y-Gx\right) &= 
-	\left( y' - x'G' \right) R \left(y-Gx\right) \\
-    &= \left( y'R - x'G'R \right)  \left(y-Gx\right) \\
-    &= \left( y'Ry - y'R Gx - x'G'R y + x'G'R Gx\right)
+    A = \left( y - Gx \right)' R^{-1} \left(y-Gx\right) &= 
+	\left( y' - x'G' \right) R^{-1} \left(y-Gx\right) \\
+    &= \left( y'R^{-1} - x'G'R^{-1} \right)  \left(y-Gx\right) \\
+    &= \left( y'R^{-1}y - y'R^{-1} Gx - x'G'R^{-1} y 
+	+ x'G'R^{-1} Gx\right)
 \end{align*}
 And now the same for the righthand exponential:
 \begin{align}
-     B = ( x - \hat{x} )' \Sigma (x-\hat{x}) 
-	&= ( x' - \hat{x}' ) \Sigma (x-\hat{x}) \notag\\
-    &=  (x'\Sigma - \hat{x}'\Sigma)   (x-\hat{x}) \notag \\
-    &=  x'\Sigma x - x'\Sigma \hat{x} - \hat{x}'\Sigma x
-	+ \hat{x}'\Sigma \hat{x} \label{B}
+     B = ( x - \hat{x} )' \Sigma^{-1} (x-\hat{x}) 
+	&= ( x' - \hat{x}' ) \Sigma^{-1} (x-\hat{x}) \notag\\
+    &=  (x'\Sigma^{-1} - \hat{x}'\Sigma^{-1})   
+	(x-\hat{x}) \notag \\
+    &=  x'\Sigma^{-1} x - x'\Sigma^{-1} \hat{x} - 
+	\hat{x}'\Sigma^{-1} x
+	+ \hat{x}'\Sigma^{-1} \hat{x} \label{B}
 \end{align}
 Adding the two exponentials, we get:
 \begin{align*}
-    C = A + B &= x' \left( \Sigma + G'RG\right) x 
-	- x' (\Sigma \hat{x} + G'Ry)
-	- (\hat{x}' \Sigma + y' RG) x  \\
-	& \qquad + \hat{x}' \Sigma \hat{x} + y' R y 
+    C = A + B &= x' \left( \Sigma^{-1} + G'R^{-1}G\right) x 
+	- x' (\Sigma^{-1} \hat{x} + G'R^{-1}y)
+	- (\hat{x}' \Sigma^{-1} + y' R^{-1}G) x  \\
+	& \qquad + \hat{x}' \Sigma^{-1} \hat{x} + y' R^{-1} y 
 \end{align*}
 Now notice that Expression \ref{xgiveny} is the probability
 distribution of $x$ \emph{conditional} on $y$ and pretty
@@ -122,9 +125,9 @@ the proportionality constant.  This means our the work we
 did above to get $C$ simplifies our target expression to
 \begin{align}
     p(x\;|\;y) &\propto \exp\left\{-\frac{1}{2} \left[
-	x' \left( \Sigma + G'RG\right) x 
-	- x' (\Sigma \hat{x} + G'Ry)
-	- (\hat{x}' \Sigma + y' RG) x  \right]\right\}
+	x' \left( \Sigma^{-1} + G'R^{-1}G\right) x 
+	- x' (\Sigma^{-1} \hat{x} + G'R^{-1}y)
+	- (\hat{x}' \Sigma^{-1} + y' R^{-1}G) x  \right]\right\}
 	\label{tosimp}
 \end{align}
 Now this doesn't look too helpful, but with a little bit of 
@@ -132,148 +135,121 @@ work, we can turn this into the probability distribution
 for a multivariate normal random variable. So let's do it.
 \\
 \\
-If we  take a second and compare that Expression \ref{tosimp}
+\\
+First, the variance of the 
+normal distribution corresponding to $p(x\;|\;y)$ can
+be derived by examining Equation \ref{tosimp} and likening
+it to Equation \ref{B} (which has the contents of the 
+exponential in the prior distribution of $x$).  
+Namely, the inverse of the new variance,
+which we'll denote as $\Sigma_F$ will be sandwiched in 
+between $x'$ and $x$ in Equation \ref{tosimp}, just as it 
+was sandwiched between $x'$ and $x$ in Equation \ref{B}.
+We use this fact, along with the 
+the Woodbury matrix identity, stated in 
+the appendix, to derive:
+\begin{align*}
+    \Sigma_{F} &= \left( \Sigma^{-1} + G'R^{-1}G\right)^{-1} \\
+    \text{Woodbury Identity} \Rightarrow
+	\qquad &=  \Sigma - \Sigma G'(R 
+	    + G\Sigma G')^{-1}
+	    G\Sigma
+\end{align*}
+Next, we want to get the mean of the distribution of 
+$p(x|y)$.  Again, once we
+take a second and compare Expression \ref{tosimp}
 to Expression \ref{B}, it's becomes clear from inspection 
 that we must have 
 \begin{equation}
     \label{notobvious}
-    (\Sigma \hat{x} + G'Ry) = \left( \Sigma + G'RG\right) Z
+    (\Sigma^{-1} \hat{x} + G'R^{-1}y) 
+	= \left( \Sigma^{-1} + G'R^{-1}G\right) Z
 \end{equation}
 To see this, 
 liken the lefthand side of Equation \ref{notobvious} to
-the result of the matrix multiplication $\Sigma \hat{x}$ in
+the result of the matrix multiplication $\Sigma^{-1}\hat{x}$ in
 Equation \ref{B}. To get the righthand side, use the fact
 that we \emph{know} the Equation \ref{notobvious} analogue
-to Equation \ref{B}'s $\Sigma$: it's sandwiched between 
-$x$ and $x'$.  So all that's left to do is solve for $Z$.
+to Equation \ref{B}'s $\Sigma^{-1}$, which we just derived.
 \\
 \\
+So all that's left to do is solve for $Z$ in Equation
+\ref{notobvious}.
 And so we solve Equation \ref{B} by using the Woodbury matrix
-identity, stated in the appendix:
+identity representation from above:
 \begin{align*}
-    (\Sigma \hat{x} + G'Ry) &= \left( \Sigma + G'RG\right) Z \\
+    (\Sigma^{-1} \hat{x} + G'R^{-1}y) &= 
+	\left( \Sigma^{-1} + G'R^{-1}G\right) Z \\
     \Rightarrow \quad Z &=
-	\left( \Sigma + G'RG\right)^{-1} 
-	(\Sigma \hat{x} + G'Ry) \\
+	\left( \Sigma^{-1} + G'R^{-1}G\right)^{-1} 
+	(\Sigma^{-1} \hat{x} + G'R^{-1}y) \\
     Z &= 
-	\left( \Sigma^{-1} - \Sigma^{-1} G'(R^{-1} 
-	+ G\Sigma^{-1}G')^{-1}
-	G\Sigma^{-1}\right) \left(\Sigma \hat{x} + G'Ry\right)
+	\left( \Sigma - \Sigma G'(R 
+	+ G\Sigma G')^{-1}
+	G\Sigma\right) \left(\Sigma^{-1} \hat{x} 
+	+ G'R^{-1}y\right)
 \end{align*}
-Now do some heavy simplifying, using the result $(AB)^{-1} = 
-B^{-1} A^{-1}$ often and, typically, in reverse:
+Now let's simplify this representation a bit, particularly
+using the trick $(AB)^{-1} = B^{-1}A^{-1}$ and
+especially in reverse:
 \begin{align*}
     Z &= 
-	\left( \Sigma^{-1} - \Sigma^{-1} G'(R^{-1} 
-	+ G\Sigma^{-1}G')^{-1}
-	G\Sigma^{-1}\right) \left(\Sigma \hat{x} + G'Ry \right)\\
-    &= \hat{x} 
-	+ \Sigma^{-1} G'Ry
-	- \left[\Sigma^{-1} G'(R^{-1} + G\Sigma^{-1}G')^{-1} 
-	    G\Sigma^{-1}\right] \Sigma \hat{x} \\
-    &\qquad - \left[\Sigma^{-1} G'(R^{-1} + G\Sigma^{-1}G')^{-1}
-	    G\Sigma^{-1}\right] G'Ry \\
-    &= \hat{x} 
-	+ \Sigma^{-1} G'Ry
-	- \left[\Sigma^{-1} G'(R^{-1} + G\Sigma^{-1}G')^{-1} 
-	    G\right]  \hat{x} \\
-	&\qquad - \left[\left(G'^{-1}\Sigma \right)^{-1}
-	    (R^{-1} + G\Sigma^{-1}G')^{-1}
-	    \left(\Sigma G^{-1}\right)^{-1}\right] G'Ry \\
-    &= \hat{x} 
-	+ \Sigma^{-1} G'Ry
-	- \left[ ( G'^{-1} \Sigma)^{-1} (R^{-1} 
-	    + G\Sigma^{-1}G')^{-1} G\right]  \hat{x} \\
-	&\qquad - \left[
-	    \left\{\left(\Sigma G^{-1}\right)
-	    (R^{-1} + G\Sigma^{-1}G')
-	    \left(G'^{-1}\Sigma \right)
-	    \right\}^{-1} \right] G'Ry \\
-    &= \hat{x} 
-	+ \Sigma^{-1} G'Ry
-	- \left[\left\{ (R^{-1} 
-	    + G\Sigma^{-1}G')
-	    ( G'^{-1} \Sigma) \right\}^{-1} G\right]  \hat{x} \\
-	&\qquad - \left[
-	    \left\{\left(\Sigma G^{-1}\right)
-	    R^{-1} + \left(\Sigma G^{-1}\right)G\Sigma^{-1}G'
-	    \left(G'^{-1}\Sigma \right)
-	    \right\}^{-1} \right] G'Ry \\
-    &= \hat{x} 
-	+ \Sigma^{-1} G'Ry
-	- \left[\left\{ R^{-1} G'^{-1} \Sigma
-	    + G\Sigma^{-1}G' G'^{-1} \Sigma
-	     \right\}^{-1} G\right]  \hat{x} \\
-	&\qquad - \left[
-	    \left\{ \Sigma G^{-1}
-	    R^{-1} + \Sigma 
-	    \right\}^{-1} \right] G'Ry \\
-    &= \hat{x} 
-	+ \Sigma^{-1} G'Ry
-	- \left[\left\{ R^{-1} G'^{-1} \Sigma
-	+ G \right\}^{-1} \left(G^{-1}\right)^{-1}
-	    \right]  \hat{x} \\
-	&\qquad - \left[
-	    \left\{ \Sigma G^{-1}
-	    R^{-1} + \Sigma 
-	    \right\}^{-1} \right] G'Ry \\
-    &= \hat{x} 
-	+ \Sigma^{-1} G'Ry
-	- \left[\left\{ G^{-1}\left(R^{-1} G'^{-1} \Sigma
-	+ G\right) \right\}^{-1}
-	    \right]  \hat{x} \\
-	&\qquad - \left[
-	    \left\{ \Sigma G^{-1}
-	    R^{-1} + \Sigma 
-	    \right\}^{-1} \right] G'Ry \\
-%    Z &= 
-%	\left( \Sigma^{-1} - \Sigma^{-1} G'
-%	\left[\left(\Sigma G^{-1}\right)
-%	(R^{-1} + G\Sigma^{-1}G') \right]^{-1} \right) 
-%	\left(\Sigma  \hat{x} + G'Ry\right)\\
-%    Z &= 
-%	\left( \Sigma^{-1} - \Sigma^{-1} G'
-%	\left[\left(\Sigma G^{-1}\right) R^{-1} +
-%	\left(\Sigma G^{-1}\right) 
-%	G\Sigma^{-1}G' \right]^{-1} \right) 
-%	\left(\Sigma  \hat{x} + G'Ry\right)\\
-%    Z &= 
-%	\left( \Sigma^{-1} - \Sigma^{-1} G'
-%	\left[\left(\Sigma G^{-1}\right) R^{-1} +
-%	G' \right]^{-1} \right) 
-%	\left(\Sigma  \hat{x} + G'Ry\right)\\
-%    Z &= 
-%	\left( \Sigma^{-1} - \left(G'^{-1}\Sigma\right)^{-1} 
-%	\left[\left(\Sigma G^{-1}\right) R^{-1} +
-%	G' \right]^{-1} \right) 
-%	\left(\Sigma  \hat{x} + G'Ry\right)\\
-%    Z &= 
-%	\left( \Sigma^{-1} - \left\{
-%	\left[\left(\Sigma G^{-1}\right) R^{-1} +
-%	G' \right] \left( G'^{-1}\Sigma\right)
-%	\right\}^{-1} \right) 
-%	\left(\Sigma  \hat{x} + G'Ry\right)\\
-%    Z &= 
-%	\left( \Sigma^{-1} - \left\{
-%	\left(\Sigma G^{-1}\right) R^{-1} 
-%	\left( G'^{-1}\Sigma\right)
-%	+ G' \left( G'^{-1}\Sigma\right) 
-%	\right\}^{-1} \right) 
-%	\left(\Sigma  \hat{x} + G'Ry\right)\\
-%    Z &= 
-%	\left( \Sigma^{-1} - \left\{
-%	\left(\Sigma G^{-1}\right) R^{-1} 
-%	\left( G'^{-1}\Sigma\right)
-%	+ \Sigma 
-%	\right\}^{-1} \right) 
-%	\left(\Sigma  \hat{x} + G'Ry\right)\\
-%    Z &= 
-%	\left( \Sigma^{-1} - \left\{
-%	\left(\Sigma G^{-1}\right) R^{-1} 
-%	\left( G'^{-1}\Sigma\right)
-%	+ \Sigma 
-%	\right\}^{-1} \right) 
-%	\left(\Sigma  \hat{x} + G'Ry\right)\\
+	\left( \Sigma - \Sigma G'(R 
+	+ G\Sigma G')^{-1}
+	G\Sigma\right) \left(\Sigma^{-1} \hat{x} 
+	+ G'R^{-1}y\right) \\
+     &= \Sigma \Sigma^{-1} \hat{x} 
+	+ \Sigma G'R^{-1}y 
+	- \Sigma G'(R + G\Sigma G')^{-1} G\Sigma
+	    \Sigma^{-1} \hat{x} \\
+	& \qquad - \Sigma G'(R + G\Sigma G')^{-1} G\Sigma
+	     G'R^{-1}y \\
+     &= \hat{x} 
+	+ \left( \Sigma G'R^{-1} 
+	 - \Sigma G'(R + G\Sigma G')^{-1} G\Sigma
+	     G'R^{-1}\right)y \\
+	&\qquad - \Sigma G'(R + G\Sigma G')^{-1} G
+	    \hat{x} \\
+     &= \hat{x} 
+	+ \left( \Sigma G'R^{-1} 
+	- (G'^{-1}\Sigma^{-1})^{-1} (R + G\Sigma G')^{-1} G\Sigma
+	     G'R^{-1}\right)y \\
+	&\qquad - \Sigma G'(R + G\Sigma G')^{-1} G
+	    \hat{x} \\
+     &= \hat{x} 
+	+ \left( \Sigma G'R^{-1} 
+	- \left\{(R + G\Sigma G')(G'^{-1}\Sigma^{-1}) 
+	    \right\}^{-1}  G\Sigma G'R^{-1}\right)y \\
+	&\qquad - \Sigma G'(R + G\Sigma G')^{-1} G
+	    \hat{x} \\
+     &= \hat{x} 
+	+ \left( \Sigma G'R^{-1} 
+	- \left\{RG'^{-1}\Sigma^{-1} 
+	    + G\Sigma G'G'^{-1}\Sigma^{-1} 
+	    \right\}^{-1}  G\Sigma G'R^{-1}\right)y \\
+	&\qquad - \Sigma G'(R + G\Sigma G')^{-1} G
+	    \hat{x} \\
+     &= \hat{x} 
+	+ \left( \Sigma G'R^{-1} 
+	- \left\{RG'^{-1}\Sigma^{-1} 
+	    + G\Sigma^{-1} 
+	    \right\}^{-1}  G\Sigma G'R^{-1}\right)y \\
+	&\qquad - \Sigma G'(R + G\Sigma G')^{-1} G
+	    \hat{x} \\
+     &= \hat{x} 
+	+ \left( \Sigma G'R^{-1} 
+	- \left\{G^{-1} \left(RG'^{-1}\Sigma^{-1} 
+	    + G\Sigma^{-1} \right)
+	    \right\}^{-1}  \Sigma G'R^{-1}\right)y \\
+	&\qquad - \Sigma G'(R + G\Sigma G')^{-1} G
+	    \hat{x} \\
+     &= \hat{x} 
+	+ \left( \Sigma G'R^{-1} 
+	- \left\{G^{-1} RG'^{-1}\Sigma^{-1} 
+	    + \Sigma^{-1} 
+	    \right\}^{-1}  \Sigma G'R^{-1}\right)y \\
+	&\qquad - \Sigma G'(R + G\Sigma G')^{-1} G
+	    \hat{x} \\
 \end{align*}
 
 
@@ -289,7 +265,42 @@ For matrices $A$, $U$, $C$, and $V$:
     (A+UCV)^{-1} = A^{-1} - A^{-1} U(C^{-1} + VA^{-1}U)^{-1}
 	VA^{-1}
 \end{equation}
-
+Now consider the special case we have above with the
+Kalman filter:
+\begin{equation}
+    \label{special}
+    (A + V'CV)^{-1} = A^{-1} - A^{-1} V'(C^{-1} + VA^{-1}V')^{-1}
+	VA^{-1}
+\end{equation}
+We'll use the trick $(AB)^{-1} = B^{-1} A^{-1}$ often, and
+typically in reverse, going from the right side of the equality
+to the left to simplify Equation \ref{special}.
+\begin{align*}
+    (A + V'CV)^{-1} &= A^{-1}-A^{-1} V'(C^{-1} + VA^{-1}V')^{-1}
+	VA^{-1} \\
+    &= A^{-1}- \left(V'^{-1} A\right)^{-1} 
+	(C^{-1} + VA^{-1}V')^{-1} VA^{-1} \\
+    &= A^{-1}- \left\{  (C^{-1} + VA^{-1}V')
+	\left(V'^{-1} A\right)\right\}^{-1} VA^{-1} \\
+    &= A^{-1}- \left\{C^{-1} \left(V'^{-1} A\right)
+	+ VA^{-1}V' \left(V'^{-1} A\right)\right\}^{-1}
+	 VA^{-1} \\
+    &= A^{-1}- \left\{C^{-1} \left(V'^{-1} A\right)
+	+ V\right\}^{-1}
+	 \left(AV^{-1}\right)^{-1} \\
+    &= A^{-1}- \left\{\left(AV^{-1}\right) 
+	\left[C^{-1} \left(V'^{-1} A\right)
+	+ V\right]\right\}^{-1} \\
+    &= A^{-1}- \left\{AV^{-1} 
+	C^{-1} \left(V'^{-1} A\right)
+	+ AV^{-1}V\right\}^{-1} \\
+    &= A^{-1}- \left\{AV^{-1} 
+	C^{-1} V'^{-1} A
+	+ A\right\}^{-1} \\
+    &= A^{-1}- \left\{AV^{-1} 
+	C^{-1} V'^{-1} A
+	+ A\right\}^{-1} \\
+\end{align*}
 
 
 
