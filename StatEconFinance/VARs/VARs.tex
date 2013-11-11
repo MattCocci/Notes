@@ -37,41 +37,43 @@
 
 Let's build up to the intuition of VARs by starting of its
 relatives, the zero-mean AR(1):
-    \[ y_t = \varphi y_{t-1} + \varepsilon_t \]
-The AR(1) tries to predict \emph{this} period's value 
-of some variable, $y$, given the \emph{last} value
-of that variable. But we don't need to stop with just
-last period's lags.  We can include as many as we want:
-    \[ y_t = \varphi_1 y_{t-1} + \varphi_2 y_{t-2} + \cdots
-	+ \varphi_p y_{t-p} + \varepsilon_t \]
-This gives us the AR(p) model, with $p$ lags. But again,
+    \[ x_t = \varphi x_{t-1} + \varepsilon_t \]
+The AR(1) forecasts \emph{this} period's value 
+of some variable, $x$, given the \emph{last} period. 
+But we don't need to stop with just
+last period's lags.  We can include arbitrarily many:
+    \[ x_t = a_1 x_{t-1} + a_2 x_{t-2} + \cdots
+	+ a_p x_{t-p} + \varepsilon_t \]
+This gives us the AR(p) model. But again,
 we don't need to stop there. Suppose that we include
 the lagged values of \emph{other} variables that might
-help predict $y$, like say $x$:
+help predict $x$, like say $y$:
 \begin{equation}
     \label{ary}
-     y_t = a_1 y_{t-1}  + \cdots +
-	a_p y_{t-p} + b_1 x_{t-1} +  \cdots
-	+ b_p x_{t-p} + \varepsilon_t 
+     x_t = a_1 x_{t-1}  + \cdots +
+	a_p x_{t-p} + b_1 y_{t-1} +  \cdots
+	+ b_p y_{t-p} + \varepsilon_t 
 \end{equation}
 And presumably, if $x$ helps predict $y$, why not use 
-$y$ to predict $x$? So let's write
+$y$ to forecast $x$? Perhaps they're jointly determined, 
+as we might expect in economic equilibrium or any situation
+with endogeneity. So let's write
 \begin{equation}
     \label{arx}
-    x_t = c_1 x_{t-1}  + \cdots +
-	c_p x_{t-p} + d_1 y_{t-1} +  \cdots
-	+ d_p y_{t-p} + \eta_t 
+    y_t = c_1 x_{t-1} +  \cdots + c_p x_{t-p} 
+	+ d_1 y_{t-1}  + \cdots +
+	d_p y_{t-p} + \eta_t 
 \end{equation}
-As you can see, we can simplify this a lot. In fact,
+As you can guess, we can simplify this a lot. In fact,
 we might toss Equations \ref{ary} and \ref{arx} into
 matrices and vectors to simplify notation.  This
 will be particularly useful when we have lots and
 lots of variables, parameters, and lags. So we might
-have
+write
 \begin{equation}
     \begin{pmatrix} x_t \\ y_t \end{pmatrix} = 
-	\begin{pmatrix} c_1 & d_1 & \cdots & c_p & d_p \\
-	    b_1 & a_1 & \cdots & b_p & a_p \\
+	\begin{pmatrix} a_1 & b_1 & \cdots & a_p & b_p \\
+	    c_1 & d_1 & \cdots & c_p & d_p \\
 	\end{pmatrix}
 	\begin{pmatrix} x_{t-1} \\ y_{t-1} \\
 	    \vdots \\ 
@@ -84,12 +86,12 @@ And viola. We have a bona fide \emph{vector autoregression},
 or VAR. 
 
 We arrived at it through successive generalizations
-of \emph{very} simple intuitive ideas. So if you know
+of {very} natural intuitive ideas. So if you know
 time series, and if you know linear algebra, you're home.
 You know this stuff already. And had you done this 40 years
 ago and pushed the technique and consequences
-to their natural implications, you would've gotten a Nobel 
-Prize. 
+to their natural implications, you might have even won
+a Nobel Prize. 
 
 
 \newpage
@@ -112,7 +114,7 @@ Now define the VAR(p) model as follows:
 where $\phi_0$ is $n\times 1$ and where $\Sigma$ and
 $\phi_i$ ($i = 1, \ldots, p$) are $n\times n$.
 So clearly, $y_t$ can be quite a complicated linear
-function of it's previous lags and it's components.
+function of its previous lags and its components.
 \\
 \\
 Next, let's write Equation \ref{varp} in more
@@ -120,10 +122,10 @@ compact, matrix notation.  Specifically, concatenate
 the $\phi_i$ column vectors horizontally, and stack the lags 
 of $y$ into one big column vector:
 \begin{align} 
-    y_t &= \underbrace{\begin{pmatrix} \phi_0 & \phi_1 & \cdots 
-	& \phi_p \end{pmatrix}}_{\Phi'}
+    y_t &= \underbrace{\begin{pmatrix} \phi_1 & \cdots 
+	& \phi_p & \phi_0 \end{pmatrix}}_{\Phi'}
 	\underbrace{\begin{pmatrix} 
-	    1 \\ y_{t-1} \\ \vdots \\ y_{t-p}
+	     y_{t-1} \\ \vdots \\ y_{t-p} \\ 1
 	\end{pmatrix}}_{x_t} + u_t \qquad u_t \sim \text{N}_n(0, \Sigma) 
 	 \notag \\
     \Leftrightarrow \qquad y_t &= \Phi' x_t + u_t 
@@ -263,10 +265,11 @@ sum of the traces, we can simplify the jdf
 \end{align}
 where $X$ and $Y$ are defined as above in Equation \ref{xy}
 and the subsequent section discussion.
-\\
-\\
+
+\paragraph{Alternative Representation}
 Now, we use a few tricks to rewrite the jdf representation
-in Equation \ref{jdf}. Namely, we'll want to take care
+in Equation \ref{jdf}. (This will aid in posterior inference.)
+Namely, we'll want to take care
 of the nastiness in the trace operator, so let's simplify 
 that straight away (letting $\hat{\beta} = 
 \text{vec}(\hat{\Phi})$, a vector of coefficients):
@@ -321,18 +324,212 @@ So we saw above how to arrive at a new representation
 for the jdf in Equation \ref{bjdf}, and in this section 
 we'll see why that was useful.
 
-\subsection{Flat Prior, $\Sigma$ Given}
+\subsection{Flat Prior, Known Variance}
 
 This is perhaps the easiest case, where we want to find
 the distributions for $\Phi$ assuming a flat prior for
 $\Phi$ and that $\Sigma$ is given. This gives us
-a posterior of
+a posterior proportional to the likelihood, which we
+pull straight from equation \ref{bjdf}:
 \begin{align*}
     p(\Phi \; | \; Y, \Sigma) &\propto p( Y \; | \; \Phi, \Sigma)
-	p(\Phi \; | \; \Sigma) \propto p(Y \; |\; \Phi, \Sigma)\\
+	p(\Phi \; | \; \Sigma) \propto p(Y \; |\; \Phi, \Sigma) \\
     &\propto 	
+	\;|\Sigma|^{-\frac{T}{2}} 
+	\exp\left\{ -\frac{1}{2} \text{tr} \left[\Sigma^{-1}
+	\hat{S} \right] \right\} \notag 
+	\exp\left\{ -\frac{1}{2} 
+	(\beta - \hat{\beta})'
+	\left[\Sigma \otimes (X'X)^{-1}\right]^{-1} 
+	(\beta - \hat{\beta}) 
+	\right\} \notag
 \end{align*}
 
+\subsection{Minnesota Prior}
+
+The Minnesota Prior is a procedure to implement a prior
+using dummy observations ($X^*, Y^*$), which 
+are built from a small presample.  The fact that we
+use dummy observations to implement the prior implies
+that the parameters have a prior distribution
+conjugate to the likelihood function of the data.
+
+The dummy observiations we will use to implement the
+Minnesota prior center the distribution at a random walk.
+This implies that the coefficient on the first lag will 
+cluster near unity, while the other coefficients are 
+centered around
+zero---an approach favoring persistence in shocks to the 
+data series. The relative ``strength,'' ``tightness,'' or
+``influence'' of this prior can be dialed up or down as well
+via the approach.
+Finally, we will conclude the Minnesota prior implementation
+by considering different restrictions we might want to place
+on how coefficients relate to each other.\footnote{The 
+details here need not be followed exactly.  In particular,
+if the data series are detrended and seem stationary, a
+prior centered around a random walk would be a poor choice.
+In that case, this approach should be modififed to center
+all parameters at 0.  Similarly, the general guidelines
+described below can be easily modified to suit any assumed
+distribution for the parameters.}
+
+Now that we have the background, let's detail the procedure
+to form the dummy observations $( Y^*, X^*)$:
+\begin{enumerate}
+    \item First, estimate the mean vector, $\bar{y}$, and the
+	standard deviation vector, $\hat{s}$, based on
+	a short presample of the data from time 
+	$-\tau$ to 0 (given that we start at time 1.
+	\[ \bar{y} = \text{mean}\left(Y_{-\tau:0}\right)
+	    \qquad \hat{s} = \text{std}\left(Y_{-\tau:0}\right)
+	    \]
+    \item Next, we'll choose hyperparameters $\lambda_1$ and
+	$\lambda_2$, which control the tightness of our
+	parameters. We'll see below how they factor in.
+    \item Set up dummies for the \emph{first lag} on the $n$ 
+	components of the dependent variable vector, 
+	centering the prior around unity (a random walk):
+	\begin{align*}
+	    Y^*_{1:n} \quad &= \quad X^*_{1:n} \Phi + U \\
+	    \begin{pmatrix} \lambda_1 \hat{s}_1 
+		    & 0 & \cdots & 0 \\ 
+		0 & \lambda_1 \hat{s}_2 & \cdots & 0 \\ 
+		\vdots & \vdots & \ddots & \vdots \\
+		0 & 0 & \cdots & 
+		\lambda_1 \hat{s}_n \end{pmatrix} &= 
+	    \begin{pmatrix} \lambda_1 \hat{s}_1 & 0 & \cdots &
+		0 & 0 & \cdots & 0 \\
+		0 & \lambda_1 \hat{s}_2 & \cdots & 0 & 0 &
+		\cdots & 0 \\
+		\vdots & \vdots & \ddots & \vdots & \vdots & 
+		\ddots & \vdots \\
+		0 & 0 & \cdots & \lambda_1 \hat{s}_n & 
+		0 & \cdots &  0 
+	    \end{pmatrix} \Phi + 
+	    \begin{pmatrix}
+		u_{11} & \cdots & u_{1n} \\
+		u_{11} & \cdots & u_{1n} \\
+		\vdots  & \ddots & \vdots \\
+		u_{n1} & \cdots & u_{nn} \\
+	    \end{pmatrix}  \\
+	    & \qquad \qquad \qquad \qquad \qquad 
+	    \underbrace{\qquad\qquad}_{
+		\text{$n(p-1) +1$ columns of zeros}}
+	\end{align*}
+
+	Now let's take a moment to understand what this does.
+	We just specified $n$ observations above, each 
+	observation corresponding to a different row of the
+	relation we just wrote.  These $n$ ``dummy observations'' 
+	will simply be tacked onto our sample---appended to the
+	bottom of our sample vector and matrices, $X$ and $Y$. 
+	This allows us to estimate $\Phi$ via simple OLS (as 
+	above). 
+
+	But we know that adding these observations implement
+	a prior. Now just what kind of prior is that exactly?
+	Well, to find out, we upack the matrix relationship 
+	we wrote above, considering the generic $i$th row 
+	(and $i$th dummy observation) for generality. 
+	Letting $\phi_{ij}$ be the $ij$ entry of $\Phi$, we
+	find that the $i$th row imposes
+	\begin{align*}
+	    \lambda_1 \hat{s}_i &= \left(\lambda_1 
+	    \hat{s_i}\right) \phi_{ii} + u_{ii} 
+	    \qquad i=1,\ldots, n \\
+	    0 &= \left(\lambda_1 
+	    \hat{s_i}\right) \phi_{ji} + u_{ji} 
+	    \qquad \{ j \neq i \; | \; j = 1, \ldots, n\} \\
+	\text{Rearranging} \qquad & \\
+	    \phi_{ii} &= 1-\frac{u_{ii}}{\lambda_1 \hat{s_i}} 
+	    \quad \Rightarrow \quad \phi_{ii} \sim 
+	    \text{N}\left(1, \; \frac{\Sigma_{ii}}{
+	    \lambda_1^2 \hat{s}_i^2 }\right) 
+	    \qquad i = 1, \ldots, n \\
+	    \phi_{ji} &= -\frac{u_{ji}}{\lambda_1 \hat{s_i}} 
+	    \qquad \Rightarrow \quad \phi_{ji} \sim 
+	    \text{N}\left(0, \; \frac{\Sigma_{ji}}{
+	    \lambda_1^2 \hat{s}_i^2 }\right)
+	    \qquad \{ j \neq i \; | \; j = 1, \ldots, n\}
+	\end{align*}
+	Thus we can see how the parameter $\lambda_1$ (which
+	must be chosen and cannot be inferred) affects the 
+	prior ``tightness'' via the prior variance.
+
+    \item Now we set up dummies for the \emph{remaining lags},
+	all of which we will center at zero. So for the $\ell$th
+	lag (where $\ell = 2, \ldots, p$), we will set up the 
+	following: 
+	\begin{align*}
+	    Y^*_{a:b} &= 
+	    X^*_{a:b} \Phi + U \qquad 
+	    \text{where } \begin{cases} a = n(\ell-1) + 1 \\
+					b = n\ell
+			\end{cases} \\
+	    \begin{pmatrix} \mathbf{0} \end{pmatrix}_{n\times n}
+		&= \begin{pmatrix} 
+		    0 & \cdots & 0 & 
+		    \lambda_1 \hat{s}_1 \ell^{\lambda_2} & 0 & 
+		    \cdots & 0 & 0 & \cdots & 0 \\
+		    0 & \cdots & 0 & 0 
+		    & \lambda_1 \hat{s}_2 \ell^{\lambda_2} 
+		    & \cdots & 0 & 0 & \cdots & 0 \\
+		    \vdots & \ddots & \vdots & \vdots & \vdots & 
+		    \ddots & \vdots  & \vdots & \ddots & \vdots \\
+		    0 & \cdots & 0 & 0 & 0 & \cdots
+		    & \lambda_1 \hat{s}_n \ell^{\lambda_2} 
+		    & 0 & \cdots & 0 \\
+		\end{pmatrix} \Phi + U \\
+	    & \quad \underbrace{\qquad\qquad}_{n(\ell-1)
+		\text{ cols of zeros}} \qquad \qquad
+		\qquad \qquad \qquad \qquad \;
+		\underbrace{\qquad\qquad}_{n(p-\ell) + 1
+		\text{ cols of zeros}} 
+	\end{align*}
+	Similar to what we saw above, we find that this
+	setup (for all $\ell = 2, \ldots, p$) 
+	implies the following equations and, as a result,
+	the following prior:
+	\begin{align*}
+	    0 &= \left(\lambda_1 
+	    \hat{s_i}\ell^{\lambda_2}\right) \phi_{ji} + u_{ji} 
+	    \qquad 
+	    \begin{cases} \ell = 2, \ldots, p \\ 
+		j = n(\ell-1)+1, \ldots, \ell n\\
+		i = 1, \ldots, n \\
+	    \end{cases} \\
+	\Rightarrow \quad \phi_{ji} &\sim 
+	    \text{N}\left(0, \; \frac{\Sigma_{ji}}{
+	    \lambda_1^2 \hat{s}_i^2 \ell^{2\lambda_2} }\right)
+	\end{align*}
+	It's clear that, with $\lambda_1$ fixed from Step 3,
+	increasing $\lambda_2$ will increasingly tighten 
+	the prior on coefficients about 0. 
+	Moreover, this effect will grow with the number of
+	lags, placing a sensible ``high bar'' to yield
+	nonzero coefficients for deeper lags once we get to
+	the posterior. 
+	
+    \item Next, we set up the prior on the entries of the
+	covariance matrix $\Sigma$. We do so by adding
+	$\lambda_3$ entries of the following dummies:
+	\begin{align*}
+	    \begin{pmatrix} 
+		\hat{s}_1 &  \cdots & 0 \\
+		\vdots & \ddots & \vdots \\
+		0 & \cdots & \hat{s}_n \\
+	    \end{pmatrix} = \begin{pmatrix}\mathbf{0} 
+		\end{pmatrix}_{n \times (np+1)} \Phi + U
+	\end{align*}
+	By repeating these $\lambda_3$ dummies more or less
+	times (by changing $\lambda_3$), we change the tightness
+	of the prior on $\Sigma$. 
+
+    \item Finally, we 
+
+
+\end{enumerate}
 
 
 \newpage
