@@ -1,0 +1,157 @@
+\documentclass[a4paper,12pt]{scrartcl}
+
+\author{Matthew Cocci}
+\title{Bellman Equation}
+\date{\today}
+\usepackage{fullpage}
+\usepackage{enumitem} %Has to do with enumeration	
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm} %allows for labeling of theorems
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{blindtext}
+\usepackage{graphicx}
+\usepackage{hyperref} 
+\hypersetup{	
+    colorlinks,		% This colors the links themselves, not boxes
+    citecolor=black,	% Everything below changes the link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+%\numberwithin{equation}{section} 
+   % This labels the equations in relation to the sections 
+      % rather than other equations
+%\numberwithin{equation}{subsection} %This labels relative to subsections
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+\setkomafont{disposition}{\normalfont\bfseries}
+\usepackage{appendix}
+\usepackage{subfigure} % For plotting multiple figures at once
+\usepackage{verbatim} % for including verbatim code from a file
+\usepackage{natbib} % for bibliographies
+
+\begin{document}
+\maketitle
+
+%\tableofcontents %adds it here
+
+
+\section{Introduction}
+
+The shortest path problem has the following features:
+\begin{enumerate}
+
+    \item You want to get from point $1$ to $N$.
+
+    \item There are a number of possible nodes in between $1$ and $N$,
+	permitting a number of different possible paths you might take.
+
+    \item The paths from node to node have different costs.
+
+\end{enumerate}
+
+Therefore, we want a general solution to the problem that
+provides us with the \emph{least cost} path to travel from
+$1$ to $N$.
+
+
+\section{The Bellman Equation}
+
+Suppose that at every single node, $i \in \{1, \ldots, N\}$, we \emph{knew}
+the least-cost path to get from node $i$ to node $N$. Of course we don't,
+unless we're trivially already at node $N$, but just suspend disbelief for
+a second and suppose we do.
+
+Now since we know the least-cost paths, we know the ``best-case'' cost to
+get from node $i$ to $N$, for all $i$. Denote that ``best-case'' cost
+by $J(i)$. Now it makes sense that this function
+$J$, for each $i$, should also satisfy what's called the
+\emph{Bellman Equation}:
+\begin{equation}
+    \label{bellman}
+    J(i) = \min_{j \in F_i} \left\{ c(i, j) + J(j) \right\}
+\end{equation}
+In words, this equation says
+\begin{enumerate}
+    \item To find the best-case cost to go from $i$
+	to $N$, consider the set of nodes that you can reach from node $i$,
+	denoted $F_i$.
+
+    \item Next, consder the cost of jumping from node $i$ to node $j$,
+	denoted $c(i,j)$.
+
+    \item Finally, since you know the best-case cost,
+	$J(j)$ for $j \in F_i$, pick the minimum of $c(i,j)$ plus $J(j)$.
+\end{enumerate} 
+
+The best solution to our problem must, therefore, satisfy Equation
+\ref{bellman}.
+
+\section{Solving for $J$}
+
+We now detail the standard algorithm to find $J$.
+\begin{enumerate}
+    \item For some large $M$, set
+	\begin{equation}
+	    J_0(i) = \begin{cases} M & i \neq N \\ 
+				    0 & \text{otherwise}
+		    \end{cases}
+	\end{equation}
+
+    \item Next, set 
+	$J_{n+1}(i) = \min_{j \in F_i} \left\{ c(i,j) + J_n(j)\right\}$
+	for all $i$.
+
+    \item If $J_{n+1} \neq J_n$, increment $n$ and return to step 2.
+
+\end{enumerate}
+The solution thus propagates back from the destination node, $N$.
+
+
+
+
+%%%% APPPENDIX %%%%%%%%%%%
+
+% \appendix
+
+%\cite{LabelInSourcesFile} 
+%\citep{LabelInSourcesFile} Cites in parens
+%\nocite{LabelInSourceFile} includes in refs w/o specific citation
+%\bibliographystyle{apalike} 
+%\bibliography{sources.bib} where sources.bib is file
+
+
+
+
+\end{document}
+
+
+
+%%%% INCLUDING FIGURES %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+   % H indicates here 
+   %\begin{figure}[h!]
+   %   \centering
+   %   \includegraphics[scale=1]{file.pdf}
+   %\end{figure}
+
+%   \begin{figure}[h!]
+%      \centering
+%      \mbox{
+%	 \subfigure{
+%	    \includegraphics[scale=1]{file1.pdf}
+%	 }\quad
+%	 \subfigure{
+%	    \includegraphics[scale=1]{file2.pdf} 
+%	 }
+%      }
+%   \end{figure}
+ 
+
+%%%%% Including Code %%%%%%%%%%%%%%%%%%%%%5
+% \verbatiminput{file.ext}    % Includes verbatim text from the file
+% \texttt{text}	  % includes text in courier, or code-like, font

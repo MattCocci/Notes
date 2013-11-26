@@ -43,14 +43,14 @@ Filter:
     \item Observe the current measurement $y_t$.
     \item ``Filter'' out the noise and 
 	compute the filtering distribution: $p_t(x | y)$.
-    \item Compute the predictive distribution $p_{t+1}(x)$
-	from the filtering distribution and your model.
-    \item Increment $t$ by one, and go back to step 1, taking
+    \item Compute predictive distribution $p_{t+1}(x)$
+	from  filtering distribution and your model.
+    \item Increment $t$ and return to step 1, taking
 	the predictive distribution as your prior.
 
 \end{enumerate}
 
-\section{Normal Example}
+\section{Normal Example, Filtering Step}
 
 Suppose we want to measure some variable $x$. We will 
 assume a \emph{prior} that is multivariate normal such that
@@ -63,7 +63,13 @@ $2 \times 2$. This forms the \emph{likelihood}.
 \\
 \\
 We then ``filter'' out the noise, updating our view of $x$ in
-light of the data in the filtering step using Bayes' Rule:
+light of the data in the filtering step using Bayes' Rule.
+Note, this is called ``filtering'' because we don't use the prior
+and likelihood forecast into
+the future. We combine the prior with the likelihood to filter
+out noise and get closer to the true value of $x$ based on
+the data, summarzed in the posterior, or the
+\emph{filtering distribution}:
 \begin{align}
     p(x \; | \; y) &= \frac{p(y \; | \; x) \cdot p(x)}{p(y)} 
     \propto p(y \; | \; x) \cdot p(x) \label{xgiveny} \\
@@ -75,8 +81,8 @@ light of the data in the filtering step using Bayes' Rule:
 Now let's expand the term the lefthand exponential:
 \begin{align*}
     A = \left( y - Gx \right)' R^{-1} \left(y-Gx\right) &= 
-	\left( y' - x'G' \right) R^{-1} \left(y-Gx\right) \\
-    &= \left( y'R^{-1} - x'G'R^{-1} \right)  \left(y-Gx\right) \\
+	\left( y' - x'G' \right) R^{-1} \left(y-Gx\right) 
+    = \left( y'R^{-1} - x'G'R^{-1} \right)  \left(y-Gx\right) \\
     &= \left( y'R^{-1}y - y'R^{-1} Gx - x'G'R^{-1} y 
 	+ x'G'R^{-1} Gx\right)
 \end{align*}
@@ -103,7 +109,7 @@ much anything else that isn't $x$.  And because of the
 wonderful properties of the exponential function and the
 black-hole nature of the proportionality constant, we'll be
 able to simplify things nicely (and we'll worry that the
-distribution $p(x\;|\;y)$ integrates to one later on).  
+distribution $p(x|y)$ integrates to one later on).  
 
 Specifically, in the expression for $C$, the two terms
 in the second row \emph{don't} depend upon $x$. Therefore,
@@ -132,31 +138,39 @@ did above to get $C$ simplifies our target expression to
 \end{align}
 Now this doesn't look too helpful, but with a little bit of 
 work, we can turn this into the probability distribution
-for a multivariate normal random variable. So let's do it.
-\\
-\\
-\\
-First, the variance of the 
-normal distribution corresponding to $p(x\;|\;y)$ can
+for a multivariate normal random variable. 
+In fact, the rest of the section may look complicated, but
+keep in mind the big picture: the likelihood and prior
+were both multivariate normal, so 
+the posterior $p(x|y)$ is going to be normal. We just want
+to identify the mean vector and variance-covariance matrix;
+then we're home.
+
+\paragraph{Variance} So first, the {variance} of the 
+normal distribution corresponding to $p(x|y)$ can
 be derived by examining Equation \ref{tosimp} and likening
 it to Equation \ref{B} (which has the contents of the 
 exponential in the prior distribution of $x$).  
+
 Namely, the inverse of the new variance,
 which we'll denote as $\Sigma_F$ will be sandwiched in 
 between $x'$ and $x$ in Equation \ref{tosimp}, just as it 
 was sandwiched between $x'$ and $x$ in Equation \ref{B}.
 We use this fact, along with the 
-the Woodbury matrix identity, stated in 
-the appendix, to derive:
-\begin{align*}
-    \Sigma_{F} &= \left( \Sigma^{-1} + G'R^{-1}G\right)^{-1} \\
+the Woodbury matrix identity (stated in 
+the appendix) to derive:
+\begin{align}
+    \Sigma_{F} &= \left( \Sigma^{-1} + G'R^{-1}G\right)^{-1} 
+	\notag \\
     \text{Woodbury Identity} \Rightarrow
 	\qquad &=  \Sigma - \Sigma G'(R 
 	    + G\Sigma G')^{-1}
 	    G\Sigma
-\end{align*}
-Next, we want to get the mean of the distribution of 
-$p(x|y)$.  Again, once we
+	    \label{covar}
+\end{align}
+\paragraph{Mean} 
+Next, we want to get the {mean} of the distribution of 
+$p(x|y)$, which we'll denote by $\hat{x}_F$.  Again, once we
 take a second and compare Expression \ref{tosimp}
 to Expression \ref{B}, it's becomes clear from inspection 
 that we must have 
@@ -166,15 +180,18 @@ that we must have
 	= \left( \Sigma^{-1} + G'R^{-1}G\right) Z
 \end{equation}
 To see this, 
-liken the lefthand side of Equation \ref{notobvious} to
+liken the lefthand side of Equation \ref{notobvious} (which 
+itself comes from Expression \ref{tosimp}) to
 the result of the matrix multiplication $\Sigma^{-1}\hat{x}$ in
 Equation \ref{B}. To get the righthand side, use the fact
 that we \emph{know} the Equation \ref{notobvious} analogue
-to Equation \ref{B}'s $\Sigma^{-1}$, which we just derived.
+to Equation \ref{B}'s $\Sigma^{-1}$, which we just 
+derived and called $\Sigma_F$.
 \\
 \\
 So all that's left to do is solve for $Z$ in Equation
-\ref{notobvious}.
+\ref{notobvious}.  The result will turn out to be our mean
+vector for the posterior, $\hat{x}_F$.
 And so we solve Equation \ref{B} by using the Woodbury matrix
 identity representation from above:
 \begin{align*}
@@ -189,68 +206,120 @@ identity representation from above:
 	G\Sigma\right) \left(\Sigma^{-1} \hat{x} 
 	+ G'R^{-1}y\right)
 \end{align*}
-Now let's simplify this representation a bit, particularly
-using the trick $(AB)^{-1} = B^{-1}A^{-1}$ and
-especially in reverse:
+Now let's simplify $\hat{x}_F = Z$ a bit, 
+expanding out the multiplication:
 \begin{align*}
-    Z &= 
+    \hat{x}_F = Z &= 
 	\left( \Sigma - \Sigma G'(R 
 	+ G\Sigma G')^{-1}
 	G\Sigma\right) \left(\Sigma^{-1} \hat{x} 
 	+ G'R^{-1}y\right) \\
-     &= \Sigma \Sigma^{-1} \hat{x} 
-	+ \Sigma G'R^{-1}y 
-	- \Sigma G'(R + G\Sigma G')^{-1} G\Sigma
-	    \Sigma^{-1} \hat{x} \\
-	& \qquad - \Sigma G'(R + G\Sigma G')^{-1} G\Sigma
-	     G'R^{-1}y \\
-     &= \hat{x} 
-	+ \left( \Sigma G'R^{-1} 
-	 - \Sigma G'(R + G\Sigma G')^{-1} G\Sigma
-	     G'R^{-1}\right)y \\
-	&\qquad - \Sigma G'(R + G\Sigma G')^{-1} G
-	    \hat{x} \\
-     &= \hat{x} 
-	+ \left( \Sigma G'R^{-1} 
-	- (G'^{-1}\Sigma^{-1})^{-1} (R + G\Sigma G')^{-1} G\Sigma
-	     G'R^{-1}\right)y \\
-	&\qquad - \Sigma G'(R + G\Sigma G')^{-1} G
-	    \hat{x} \\
-     &= \hat{x} 
-	+ \left( \Sigma G'R^{-1} 
-	- \left\{(R + G\Sigma G')(G'^{-1}\Sigma^{-1}) 
-	    \right\}^{-1}  G\Sigma G'R^{-1}\right)y \\
-	&\qquad - \Sigma G'(R + G\Sigma G')^{-1} G
-	    \hat{x} \\
-     &= \hat{x} 
-	+ \left( \Sigma G'R^{-1} 
-	- \left\{RG'^{-1}\Sigma^{-1} 
-	    + G\Sigma G'G'^{-1}\Sigma^{-1} 
-	    \right\}^{-1}  G\Sigma G'R^{-1}\right)y \\
-	&\qquad - \Sigma G'(R + G\Sigma G')^{-1} G
-	    \hat{x} \\
-     &= \hat{x} 
-	+ \left( \Sigma G'R^{-1} 
-	- \left\{RG'^{-1}\Sigma^{-1} 
-	    + G\Sigma^{-1} 
-	    \right\}^{-1}  G\Sigma G'R^{-1}\right)y \\
-	&\qquad - \Sigma G'(R + G\Sigma G')^{-1} G
-	    \hat{x} \\
-     &= \hat{x} 
-	+ \left( \Sigma G'R^{-1} 
-	- \left\{G^{-1} \left(RG'^{-1}\Sigma^{-1} 
-	    + G\Sigma^{-1} \right)
-	    \right\}^{-1}  \Sigma G'R^{-1}\right)y \\
-	&\qquad - \Sigma G'(R + G\Sigma G')^{-1} G
-	    \hat{x} \\
-     &= \hat{x} 
-	+ \left( \Sigma G'R^{-1} 
-	- \left\{G^{-1} RG'^{-1}\Sigma^{-1} 
-	    + \Sigma^{-1} 
-	    \right\}^{-1}  \Sigma G'R^{-1}\right)y \\
-	&\qquad - \Sigma G'(R + G\Sigma G')^{-1} G
-	    \hat{x} \\
+    &= \hat{x} + \Sigma G' R^{-1} y - 
+	\left[\Sigma G' (R + G \Sigma G')^{-1} G \Sigma\right]
+	\left[ \Sigma^{-1} \hat{x} \right]  \\
+    &\qquad - \left[\Sigma G' (R+ G \Sigma G')^{-1}G\Sigma \right]
+	\left[G' R^{-1} y \right] \\
+    &= \hat{x} + \Sigma G' R^{-1} y - 
+	\left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+	\left( G \hat{x} \right)  \\
+    &\qquad - \Sigma G' (R+ G \Sigma G')^{-1}G\Sigma 
+	G' R^{-1} y  \\
+    &= \hat{x} 
+	- \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+	\left( G \hat{x} \right)  \\
+    &\qquad 
+	+ \Sigma G'  R^{-1} y 
+	- \Sigma G' (R+ G \Sigma G')^{-1}G\Sigma  
+	G' R^{-1} y \\
+    &= \hat{x} 
+	- \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+	\left( G \hat{x} \right)  \\
+    &\qquad 
+	+ \Sigma G'  \left\{ R^{-1}  
+	-  (R+ G \Sigma G')^{-1}G\Sigma  
+	G' R^{-1} \right\} y 
 \end{align*}
+Okay, now let's take a breather.  We'll make this a bit
+easier on ourselves, and just consider simplifying the guy
+in the brackets, $\{\}$:
+\begin{align*}
+    \left\{ R^{-1}  -  (R+ G \Sigma G')^{-1}G\Sigma  
+	G' R^{-1} \right\}   &=   
+	(R+ G \Sigma G')^{-1} (R+ G \Sigma G') R^{-1}  \\
+    &\qquad -  (R+ G \Sigma G')^{-1}G\Sigma  
+	G' R^{-1} \\
+    &=   (R+ G \Sigma G')^{-1} \left[ (R+ G \Sigma G') R^{-1}  
+	-  G\Sigma   G' R^{-1}\right] \\
+    &=   (R+ G \Sigma G')^{-1} \left[ RR^{-1} 
+	+ G \Sigma G'R^{-1} -  G\Sigma   G' R^{-1}\right] \\
+    &=   (R+ G \Sigma G')^{-1} \left[ I 
+	+ 0\right] \\
+    &=   (R+ G \Sigma G')^{-1} 
+\end{align*}
+Substituting back in above for the term in braces, 
+$\{\}$, we get the following expression
+for $Z = \hat{x}_F$:
+\begin{align}
+    \hat{x}_F = Z &= \hat{x} 
+	- \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+	\left( G \hat{x} \right)  
+	+ \Sigma G'  (R+ G \Sigma G')^{-1} y \notag \\
+    &= \hat{x} 
+	+ \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+	\left( y - G \hat{x} \right)  
+    \label{mean}
+\end{align}
+Putting together the expressions for the mean and variance
+(see Equations \ref{mean} and \ref{covar}, respectively)
+of the posterior estimate for $x|y$, we get that
+\begin{align}
+    x | y &\sim \text{N} \left(\hat{x}_F, \; \Sigma_F\right) \\
+    \notag\\
+    \text{where} \quad \hat{x}_F &= \hat{x} 
+	+ \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+	\left( y - G \hat{x} \right)  \notag \\
+    \Sigma_F &= \Sigma - \Sigma G'(R 
+	    + G\Sigma G')^{-1}
+	    G\Sigma \notag
+\end{align}
+\paragraph{Conclusion} Okay, so what did we just do? 
+\begin{enumerate} 
+    \item We took a Multivariate Normal (MVN) prior to 
+	summarize our beliefs about $x$. 
+    \item Knowing that we'll observe some data, $y$, that 
+	provides a ``noisy'' measure of $x$, we postulated a 
+	likelihood $p(y|x)$ that is also MVN. 
+    \item Then, using Bayes' Rule, we combine the information
+	contained in our prior $p(x)$ and the data (via
+	the likelihhod $p(y|x)$) to get a ``filtered'' 
+	distribution of $x$, $p(x|y)$, given the data and our
+	prior.
+\end{enumerate} 
+Why might this long, tortuous, painful process help us in
+economics?  Well, imagine that in our model, there's some 
+state for the level of output, denoted by $x$.  Now we'll have
+economic statistics, like measurements of GDP itself along 
+with other informative statistics such as unemployment 
+and investment, which might provide information about output.
+But of course, those statistics are imperfect and noisy.  The
+Kalman Filter gives us a way to combine those noise estimates
+in with our beliefs in a principled, sensible manner.
+
+
+\section{Normal Expample, Forecasting Step}
+
+Now let's make our model a little more dynamic and include
+forecasting in our method. To do so, we specify a model
+of how the state, $x$ evolves.  To make it easy on ourselves,
+let's assume everything's Gaussian (woohoo! that's easy):
+\begin{equation}
+    x_{t+1} = Ax_t + w_{t+1} \qquad w_t \sim \text{N}(0, Q)
+\end{equation}
+Now, we want to come up with a \emph{predictive distribution}
+
+
+
+
 
 
 %%%% APPPENDIX %%%%%%%%%%%
@@ -272,35 +341,6 @@ Kalman filter:
     (A + V'CV)^{-1} = A^{-1} - A^{-1} V'(C^{-1} + VA^{-1}V')^{-1}
 	VA^{-1}
 \end{equation}
-We'll use the trick $(AB)^{-1} = B^{-1} A^{-1}$ often, and
-typically in reverse, going from the right side of the equality
-to the left to simplify Equation \ref{special}.
-\begin{align*}
-    (A + V'CV)^{-1} &= A^{-1}-A^{-1} V'(C^{-1} + VA^{-1}V')^{-1}
-	VA^{-1} \\
-    &= A^{-1}- \left(V'^{-1} A\right)^{-1} 
-	(C^{-1} + VA^{-1}V')^{-1} VA^{-1} \\
-    &= A^{-1}- \left\{  (C^{-1} + VA^{-1}V')
-	\left(V'^{-1} A\right)\right\}^{-1} VA^{-1} \\
-    &= A^{-1}- \left\{C^{-1} \left(V'^{-1} A\right)
-	+ VA^{-1}V' \left(V'^{-1} A\right)\right\}^{-1}
-	 VA^{-1} \\
-    &= A^{-1}- \left\{C^{-1} \left(V'^{-1} A\right)
-	+ V\right\}^{-1}
-	 \left(AV^{-1}\right)^{-1} \\
-    &= A^{-1}- \left\{\left(AV^{-1}\right) 
-	\left[C^{-1} \left(V'^{-1} A\right)
-	+ V\right]\right\}^{-1} \\
-    &= A^{-1}- \left\{AV^{-1} 
-	C^{-1} \left(V'^{-1} A\right)
-	+ AV^{-1}V\right\}^{-1} \\
-    &= A^{-1}- \left\{AV^{-1} 
-	C^{-1} V'^{-1} A
-	+ A\right\}^{-1} \\
-    &= A^{-1}- \left\{AV^{-1} 
-	C^{-1} V'^{-1} A
-	+ A\right\}^{-1} \\
-\end{align*}
 
 
 
