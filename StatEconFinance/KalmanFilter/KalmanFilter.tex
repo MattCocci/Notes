@@ -1,4 +1,4 @@
-\documentclass[a4paper,12pt]{scrartcl}
+\documentclass[a4paper,12pt]{article}
 
 \author{Matthew Cocci}
 \title{Kalman Filter}
@@ -9,7 +9,7 @@
 \usepackage{amsthm} %allows for labeling of theorems
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{blindtext}
+%\usepackage{blindtext}
 \usepackage{graphicx}
 %\usepackage[hidelinks]{hyperref} % For internal/external linking. 
 				 % [hidelinks] removes boxes
@@ -22,11 +22,12 @@
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{prop}[thm]{Proposition}
 \newtheorem{cor}[thm]{Corollary}
-\setkomafont{disposition}{\normalfont\bfseries}
+%\setkomafont{disposition}{\normalfont\bfseries}
 \usepackage{appendix}
+\usepackage{fullpage}
 \usepackage{subfigure} % For plotting multiple figures at once
 \usepackage{verbatim} % for including verbatim code from a file
-\usepackage{natbib} % for bibliographies
+%\usepackage{natbib} % for bibliographies
 
 \begin{document}
 \maketitle
@@ -50,9 +51,9 @@ Filter:
 
 \end{enumerate}
 
-\section{Normal Example, Filtering Step}
+\section{Filtering Step}
 
-Suppose we want to measure some variable $x$. We will 
+Suppose we want to measure some latent state variable $x$. We will 
 assume a \emph{prior} that is multivariate normal such that
     \[ x \sim \text{N}(\hat{x}, \Sigma) \]
 Next, we ``measure'' $x$ by matching it to an observable in
@@ -65,10 +66,10 @@ $2 \times 2$. This forms the \emph{likelihood}.
 We then ``filter'' out the noise, updating our view of $x$ in
 light of the data in the filtering step using Bayes' Rule.
 Note, this is called ``filtering'' because we don't use the prior
-and likelihood forecast into
-the future. We combine the prior with the likelihood to filter
+and likelihood to forecast into
+the future. We combine the prior with the likelihood only to filter
 out noise and get closer to the true value of $x$ based on
-the data, summarzed in the posterior, or the
+the data, summarized in the posterior, or the
 \emph{filtering distribution}:
 \begin{align}
     p(x \; | \; y) &= \frac{p(y \; | \; x) \cdot p(x)}{p(y)} 
@@ -78,7 +79,7 @@ the data, summarzed in the posterior, or the
 	\right\} \exp\left\{-\frac{1}{2}( x - \hat{x} )' 
 	\Sigma^{-1} (x-\hat{x})\right\} \notag
 \end{align}
-Now let's expand the term the lefthand exponential:
+Now let's expand the term in the lefthand exponential:
 \begin{align*}
     A = \left( y - Gx \right)' R^{-1} \left(y-Gx\right) &= 
 	\left( y' - x'G' \right) R^{-1} \left(y-Gx\right) 
@@ -107,11 +108,11 @@ Now notice that Expression \ref{xgiveny} is the probability
 distribution of $x$ \emph{conditional} on $y$ and pretty
 much anything else that isn't $x$.  And because of the
 wonderful properties of the exponential function and the
-black-hole nature of the proportionality constant, we'll be
+black-hole powers of the proportionality constant, we'll be
 able to simplify things nicely (and we'll worry that the
 distribution $p(x|y)$ integrates to one later on).  
 
-Specifically, in the expression for $C$, the two terms
+So in the expression for $C$, the two terms
 in the second row \emph{don't} depend upon $x$. Therefore,
 letting $C(x)$ be the portion of $C$ that depends upon
 $x$, and letting $C(\lnot x)$ bet the additive terms which
@@ -126,7 +127,7 @@ don't depend upon $x$, we can simplify
     &\propto \exp\left\{ -\frac{1}{2}
 	C(x)\right\}
 \end{align*}
-We just absorb the portion not relevant to $p(x\;|\;y)$ into
+We just absorb the portion not relevant to $p(x|y)$ into
 the proportionality constant.  This means our the work we
 did above to get $C$ simplifies our target expression to
 \begin{align}
@@ -136,6 +137,7 @@ did above to get $C$ simplifies our target expression to
 	- (\hat{x}' \Sigma^{-1} + y' R^{-1}G) x  \right]\right\}
 	\label{tosimp}
 \end{align}
+\paragraph{Goal}
 Now this doesn't look too helpful, but with a little bit of 
 work, we can turn this into the probability distribution
 for a multivariate normal random variable. 
@@ -149,8 +151,8 @@ then we're home.
 \paragraph{Variance} So first, the {variance} of the 
 normal distribution corresponding to $p(x|y)$ can
 be derived by examining Equation \ref{tosimp} and likening
-it to Equation \ref{B} (which has the contents of the 
-exponential in the prior distribution of $x$).  
+it to Equation \ref{B} (which gives the contents of the 
+exponential in the prior MVN distribution of $x$).  
 
 Namely, the inverse of the new variance,
 which we'll denote as $\Sigma_F$ will be sandwiched in 
@@ -186,92 +188,32 @@ the result of the matrix multiplication $\Sigma^{-1}\hat{x}$ in
 Equation \ref{B}. To get the righthand side, use the fact
 that we \emph{know} the Equation \ref{notobvious} analogue
 to Equation \ref{B}'s $\Sigma^{-1}$, which we just 
-derived and called $\Sigma_F$.
+derived in the variance section and called $\Sigma_F$.
 \\
 \\
 So all that's left to do is solve for $Z$ in Equation
 \ref{notobvious}.  The result will turn out to be our mean
-vector for the posterior, $\hat{x}_F$.
-And so we solve Equation \ref{B} by using the Woodbury matrix
-identity representation from above:
-\begin{align*}
-    (\Sigma^{-1} \hat{x} + G'R^{-1}y) &= 
-	\left( \Sigma^{-1} + G'R^{-1}G\right) Z \\
-    \Rightarrow \quad Z &=
-	\left( \Sigma^{-1} + G'R^{-1}G\right)^{-1} 
-	(\Sigma^{-1} \hat{x} + G'R^{-1}y) \\
-    Z &= 
-	\left( \Sigma - \Sigma G'(R 
-	+ G\Sigma G')^{-1}
-	G\Sigma\right) \left(\Sigma^{-1} \hat{x} 
-	+ G'R^{-1}y\right)
-\end{align*}
-Now let's simplify $\hat{x}_F = Z$ a bit, 
-expanding out the multiplication:
-\begin{align*}
-    \hat{x}_F = Z &= 
-	\left( \Sigma - \Sigma G'(R 
-	+ G\Sigma G')^{-1}
-	G\Sigma\right) \left(\Sigma^{-1} \hat{x} 
-	+ G'R^{-1}y\right) \\
-    &= \hat{x} + \Sigma G' R^{-1} y - 
-	\left[\Sigma G' (R + G \Sigma G')^{-1} G \Sigma\right]
-	\left[ \Sigma^{-1} \hat{x} \right]  \\
-    &\qquad - \left[\Sigma G' (R+ G \Sigma G')^{-1}G\Sigma \right]
-	\left[G' R^{-1} y \right] \\
-    &= \hat{x} + \Sigma G' R^{-1} y - 
-	\left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
-	\left( G \hat{x} \right)  \\
-    &\qquad - \Sigma G' (R+ G \Sigma G')^{-1}G\Sigma 
-	G' R^{-1} y  \\
-    &= \hat{x} 
-	- \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
-	\left( G \hat{x} \right)  \\
-    &\qquad 
-	+ \Sigma G'  R^{-1} y 
-	- \Sigma G' (R+ G \Sigma G')^{-1}G\Sigma  
-	G' R^{-1} y \\
-    &= \hat{x} 
-	- \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
-	\left( G \hat{x} \right)  \\
-    &\qquad 
-	+ \Sigma G'  \left\{ R^{-1}  
-	-  (R+ G \Sigma G')^{-1}G\Sigma  
-	G' R^{-1} \right\} y 
-\end{align*}
-Okay, now let's take a breather.  We'll make this a bit
-easier on ourselves, and just consider simplifying the guy
-in the brackets, $\{\}$:
-\begin{align*}
-    \left\{ R^{-1}  -  (R+ G \Sigma G')^{-1}G\Sigma  
-	G' R^{-1} \right\}   &=   
-	(R+ G \Sigma G')^{-1} (R+ G \Sigma G') R^{-1}  \\
-    &\qquad -  (R+ G \Sigma G')^{-1}G\Sigma  
-	G' R^{-1} \\
-    &=   (R+ G \Sigma G')^{-1} \left[ (R+ G \Sigma G') R^{-1}  
-	-  G\Sigma   G' R^{-1}\right] \\
-    &=   (R+ G \Sigma G')^{-1} \left[ RR^{-1} 
-	+ G \Sigma G'R^{-1} -  G\Sigma   G' R^{-1}\right] \\
-    &=   (R+ G \Sigma G')^{-1} \left[ I 
-	+ 0\right] \\
-    &=   (R+ G \Sigma G')^{-1} 
-\end{align*}
-Substituting back in above for the term in braces, 
-$\{\}$, we get the following expression
-for $Z = \hat{x}_F$:
+vector for the posterior, $\hat{x}_F$:
 \begin{align}
-    \hat{x}_F = Z &= \hat{x} 
-	- \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
-	\left( G \hat{x} \right)  
-	+ \Sigma G'  (R+ G \Sigma G')^{-1} y \notag \\
-    &= \hat{x} 
-	+ \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
-	\left( y - G \hat{x} \right)  
     \label{mean}
+    \hat{x}_F = Z 
+        &= \hat{x} 
+        + \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+        \left( y - G \hat{x} \right)  
 \end{align}
+If you want to see the nasty linear algebra that gets you
+to this result, you can check out the appendix. Or you can 
+you just take this result as given and save yourself an
+hour of painstaking derivation and eye-crossing complications,
+unlike myself.\footnote{But if you \emph{do} look at the appendix,
+you might just give my semi-wasted hour some meaning, in which 
+case---thank you.}
+\\
+\\
 Putting together the expressions for the mean and variance
 (see Equations \ref{mean} and \ref{covar}, respectively)
-of the posterior estimate for $x|y$, we get that
+of the posterior estimate for $x|y$ (i.e. the ``filtering
+distribution''), we get that
 \begin{align}
     x | y &\sim \text{N} \left(\hat{x}_F, \; \Sigma_F\right) \\
     \notag\\
@@ -282,11 +224,19 @@ of the posterior estimate for $x|y$, we get that
 	    + G\Sigma G')^{-1}
 	    G\Sigma \notag
 \end{align}
+Notice that our new ``filtered'' mean is simply a 
+combination of our prior mean, $\hat{x}$, and 
+a transformation of the ``error'' between our
+observed value and the prior guess for that
+observable ($y - G\hat{x}$).
+
+\newpage
 \paragraph{Conclusion} Okay, so what did we just do? 
 \begin{enumerate} 
     \item We took a Multivariate Normal (MVN) prior to 
-	summarize our beliefs about $x$. 
-    \item Knowing that we'll observe some data, $y$, that 
+	summarize our beliefs about a latent, imperfectly 
+    observable state variable $x$. 
+    \item Knowing that we'll observe some data, $y$, which
 	provides a ``noisy'' measure of $x$, we postulated a 
 	likelihood $p(y|x)$ that is also MVN. 
     \item Then, using Bayes' Rule, we combine the information
@@ -297,16 +247,18 @@ of the posterior estimate for $x|y$, we get that
 \end{enumerate} 
 Why might this long, tortuous, painful process help us in
 economics?  Well, imagine that in our model, there's some 
-state for the level of output, denoted by $x$.  Now we'll have
-economic statistics, like measurements of GDP itself along 
-with other informative statistics such as unemployment 
-and investment, which might provide information about output.
-But of course, those statistics are imperfect and noisy.  The
-Kalman Filter gives us a way to combine those noise estimates
+state for the ``natural rate of unemployment,'' denoted by $x$.  
+Now of course, we can't observe that value.  But we'll have
+economic statistics, like measurements of unemployment itself along 
+with other informative statistics such as GDP
+and hours, which might provide information about the natural
+rate of unemployment.
+However, those statistics are imperfect and noisy.  The
+Kalman Filter gives us a way to combine those noisy estimates
 in with our beliefs in a principled, sensible manner.
 
 
-\section{Normal Expample, Forecasting Step}
+\section{Forecasting Step}
 
 Now let's make our model a little more dynamic and include
 forecasting in our method. To do so, we specify a model
@@ -342,7 +294,97 @@ Kalman filter:
 	VA^{-1}
 \end{equation}
 
+\section{Derivation of the Mean}
 
+Recall what we want to show.  For $\hat{x}_F \equiv Z$, we want
+to show that
+\begin{align*}
+    (\Sigma^{-1} \hat{x} + G'R^{-1}y) 
+	&= \left( \Sigma^{-1} + G'R^{-1}G\right) Z \\
+    \Rightarrow 
+    \hat{x}_F = Z 
+        &= \hat{x} 
+        + \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+        \left( y - G \hat{x} \right)  
+\end{align*}
+And so we solve this equation by using the Woodbury matrix
+identity representation from above:
+\begin{align*}
+    (\Sigma^{-1} \hat{x} + G'R^{-1}y) &= 
+	\left( \Sigma^{-1} + G'R^{-1}G\right) Z \\
+    \Rightarrow \quad Z &=
+	\left( \Sigma^{-1} + G'R^{-1}G\right)^{-1} 
+	(\Sigma^{-1} \hat{x} + G'R^{-1}y) \\
+    Z &= 
+	\left( \Sigma - \Sigma G'(R 
+	+ G\Sigma G')^{-1}
+	G\Sigma\right) \left(\Sigma^{-1} \hat{x} 
+	+ G'R^{-1}y\right)
+\end{align*}
+Now let's simplify $\hat{x}_F = Z$ a bit, 
+expanding out the multiplication:
+\begin{align*}
+    \hat{x}_F = Z &= 
+	\left( \Sigma - \Sigma G'(R 
+	+ G\Sigma G')^{-1}
+	G\Sigma\right) \left(\Sigma^{-1} \hat{x} 
+	+ G'R^{-1}y\right) \\
+    \text{FOIL} \quad &= \hat{x} + \Sigma G' R^{-1} y - 
+	\left[\Sigma G' (R + G \Sigma G')^{-1} G \Sigma\right]
+	\left[ \Sigma^{-1} \hat{x} \right]  \\
+    &\qquad - \left[\Sigma G' (R+ G \Sigma G')^{-1}G\Sigma \right]
+	\left[G' R^{-1} y \right] \\
+    \text{Simpify} \quad &= \hat{x} + \Sigma G' R^{-1} y - 
+	\left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+	\left( G \hat{x} \right)  \\
+    &\qquad - \Sigma G' (R+ G \Sigma G')^{-1}G\Sigma 
+	G' R^{-1} y  \\
+    \text{Change Order} \quad &= \hat{x} 
+	- \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+	\left( G \hat{x} \right)  \\
+    &\qquad 
+	+ \Sigma G'  R^{-1} y 
+	- \Sigma G' (R+ G \Sigma G')^{-1}G\Sigma  
+	G' R^{-1} y \\
+    \text{Regroup} \quad &= \hat{x} 
+	- \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+	\left( G \hat{x} \right)  \\
+    &\qquad 
+	+ \Sigma G'  \left\{ R^{-1}  
+	-  (R+ G \Sigma G')^{-1}G\Sigma  
+	G' R^{-1} \right\} y 
+\end{align*}
+Okay, now let's take a breather.  We'll make this a bit
+easier on ourselves, and just consider simplifying the guy
+in the brackets, $\{\}$ by using 
+$A^{-1} A = I$ with a very special choice of $A$:
+\begin{align*}
+    \left\{ R^{-1}  -  (R+ G \Sigma G')^{-1}G\Sigma  
+	G' R^{-1} \right\}   &=   
+	(R+ G \Sigma G')^{-1} (R+ G \Sigma G') R^{-1}  \\
+    &\qquad -  (R+ G \Sigma G')^{-1}G\Sigma  
+	G' R^{-1} \\
+    \text{Group} \quad &=   (R+ G \Sigma G')^{-1} \left[ (R+ G \Sigma G') R^{-1}  
+	-  G\Sigma   G' R^{-1}\right] \\
+    \text{Distribute} \quad &=   (R+ G \Sigma G')^{-1} \left[ RR^{-1} 
+	+ G \Sigma G'R^{-1} -  G\Sigma   G' R^{-1}\right] \\
+    \text{Simplify} \quad &=   (R+ G \Sigma G')^{-1} \left[ I 
+	+ 0\right] \\
+    &=   (R+ G \Sigma G')^{-1} 
+\end{align*}
+Substituting back in above for the term in braces, 
+$\{\}$, we get the following expression
+for $Z = \hat{x}_F$:
+\begin{align}
+    \hat{x}_F = Z &= \hat{x} 
+	- \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+	\left( G \hat{x} \right)  
+	+ \Sigma G'  (R+ G \Sigma G')^{-1} y \notag \\
+    &= \hat{x} 
+	+ \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+	\left( y - G \hat{x} \right)  
+    \label{mean}
+\end{align}
 
 \end{document}
 
