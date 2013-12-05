@@ -215,7 +215,8 @@ Putting together the expressions for the mean and variance
 of the posterior estimate for $x|y$ (i.e. the ``filtering
 distribution''), we get that
 \begin{align}
-    x | y &\sim \text{N} \left(\hat{x}_F, \; \Sigma_F\right) \\
+    x | y &\sim \text{N} \left(\hat{x}_F, \; \Sigma_F\right) 
+    \label{filtered} \\
     \notag\\
     \text{where} \quad \hat{x}_F &= \hat{x} 
 	+ \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
@@ -231,7 +232,7 @@ observed value and the prior guess for that
 observable ($y - G\hat{x}$).
 
 \newpage
-\paragraph{Conclusion} Okay, so what did we just do? 
+\paragraph{Recap} Okay, so what did we just do? 
 \begin{enumerate} 
     \item We took a Multivariate Normal (MVN) prior to 
 	summarize our beliefs about a latent, imperfectly 
@@ -260,14 +261,43 @@ in with our beliefs in a principled, sensible manner.
 
 \section{Forecasting Step}
 
-Now let's make our model a little more dynamic and include
-forecasting in our method. To do so, we specify a model
+Now let's make our model a little more dynamic and consider 
+forecasting ahead. To do so, we specify a model
 of how the state, $x$ evolves.  To make it easy on ourselves,
 let's assume everything's Gaussian (woohoo! that's easy):
 \begin{equation}
     x_{t+1} = Ax_t + w_{t+1} \qquad w_t \sim \text{N}(0, Q)
 \end{equation}
 Now, we want to come up with a \emph{predictive distribution}
+given current information (encapsulated in our filtering 
+distribution, $p(x|y)$) and our prior. Since we're assuming
+everything is normal, we need only pin down the
+mean and variance of the forecast, since linear combinations
+of Gaussian variables are Gaussian.  
+
+Of course, these kinds of things are well known for the 
+MVN, which has the nice properties
+\begin{align*}
+    E[AX] &= A E[X] = A \mu \\
+    \text{Var}(AX) &= A \text{Var}(X) A^T = A\Sigma A^T \\
+    \text{where} \quad X &\sim \text{N}(\mu, \Sigma)
+\end{align*}
+Now let's use these facts, along with the assumption
+that $x_t$ and $w_{t+1}$ are uncorrelated to derive:
+\begin{align*}
+    E[x_{t+1}] &= E\left[Ax_{F,\; t} + w_{t+1} \right] 
+                = AE\left[x_{F,\; t}\right] + E\left[w_{t+1} 
+                \right] \\
+        &= A \hat{x}_F + 0 = A \hat{x}_F
+\end{align*}
+where $x_{F, \; t}$ is the filtered value for $x$ at time
+$t$ with mean $\hat{x}_F$ and covariance matrix 
+$\Sigma_F$ as above in Equation \ref{filtered}.
+
+
+
+
+
 
 
 
@@ -383,7 +413,6 @@ for $Z = \hat{x}_F$:
     &= \hat{x} 
 	+ \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
 	\left( y - G \hat{x} \right)  
-    \label{mean}
 \end{align}
 
 \end{document}
