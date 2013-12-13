@@ -282,6 +282,12 @@ before we derive it:
 \newpage
 \subsection{Deriving P=E(MX)}
 
+We'll first consider the two-period case for simplicity and
+exposition. Then we'll extend to an infinite-horizon. We'll use 
+each at some point going forward.
+
+\subsubsection{Two-Period Case}
+
 Let's now figure out the price an investor assigns to a risky
 payoff.  It reduces to a utility maximization problem:
 \begin{align*}
@@ -301,13 +307,37 @@ fundamental pricing equation:
 \begin{align}
     P_t &= E_t\left[ 
 	\beta\frac{U'(C_{t+1})}{U'(C_{t})} X_{t+1} \right]
-	\label{fullpemx} \\\notag\\
-    P_t &= E_t\left[ M_{t+1} X_{t+1} \right] \notag
+    = E_t\left[ M_{t+1} X_{t+1} \right] 
+	\label{fullpemx} 
 \end{align}
 where $M_{t+1}$ is the \emph{stochastic discount factor}.
 Note that the price, $P_t$, is the \emph{marginal} price---what
 an investor would willingly pay at the margin for
 an extra piece of the asset.
+
+\subsubsection{Infinite-Period Case}
+
+Similarly, we set up an infinite-period, discrete-time 
+optimization problem:
+\begin{align}
+    \max_{\xi} \; & \; 
+	E_t \sum^\infty_{s=0} \beta^s U(C_{t+s})  \\
+    C_t &= a_t - \xi P_t \notag \\
+    C_{t+s} &= a_{t+s} + \xi X_{t+s} \notag \\  
+    \text{f.o.c.} \quad 0 &= -P_t U'(C_t) +  
+	E_t \sum^\infty_{s=1} \beta^s U'(C_{t+s}) X_{t+s}
+\end{align}
+This yields us a formula for the price:
+\begin{equation}
+    P_t =    
+    E_t \sum^\infty_{s=1} \beta^s \frac{U'(C_{t+s})}{U'(C_t)} 
+    X_{t+s}
+\end{equation}
+Lastly, in continuous time, the objective function has
+the following form:
+\begin{equation}
+    \int^\infty_{s=0} e^{-\delta s}  U(C_{t+s})\; ds  
+\end{equation}
 
 
 \newpage
@@ -360,14 +390,58 @@ in the other. Therefore, it has \emph{price zero},
     \text{i.e.} \quad 0 = E_t[M_{t+1} R^e_{t+1}]
 \end{equation}
 
+
 \subsubsection{Present Value}
 
+Suppose we let $\{D_t\}$ denote a stream of 
+dividends.\footnote{Don't take the term ``dividends'' \emph{too}
+    literally here. We really just mean future cashflow streams
+    to shareholders, in whatever form that may be 
+    (stock repurchases, liquidation of the firm, and so on).}
+What is the price of that stream of dividends? Apply
+the formula:
+\begin{equation}
+    \label{infprice}
+    P_t = E_t \sum^\infty_{j = 1} \beta^j 
+	\frac{U'(C_{t+j})}{U'(C_{t})} D_{t+j} 
+	= E_t \sum^\infty_{j = 1} M_{t, t+j} D_{t+j} 
+\end{equation}
+where $M_{t,t+j}$ is the stochastic discount factor
+from time $t$ to time $t+j$.
+\\
+\\
+Now let's tackle continuous time, which turns the
+sum into an integral:
+\begin{equation}
+    \label{contprice}
+    P_t = E_t \int^\infty_{s = 0}  e^{-\delta s} 
+	\frac{U'(C_{t+s})}{U'(C_{t})} D_{t+s} \; ds
+	\equiv E_t \int^\infty_{s = 0}   
+	\frac{\Lambda_{t+s}}{\Lambda_{t}} D_{t+s} \; ds
+\end{equation}
+where we define the $\Lambda$ terms which define the
+\emph{levels} of marginal utilities.
 
+\subsubsection{Relating Returns to Present Value}
 
-
-
-
-
+Returns are, in one sense, a ``first difference'' of 
+the price. To derive the returns in discrete time,
+group the terms in Equation \ref{infprice} a bit
+differently and rewrite
+\begin{align*}
+    P_t &= E_t \sum^\infty_{j = 1} M_{t, t+j} D_{t+j} 
+	= E_t\left[M_{t, t+1} D_{t+1}  + M_{t, t+1}
+	\sum^\infty_{j = 2} \frac{M_{t, t+j}}{M_{t, t+1}}
+	D_{t+j} \right] \\
+    &= E_t\left[M_{t, t+1} D_{t+1}  + M_{t, t+1}
+	P_{t+1} \right] \\
+    \Rightarrow \quad 1 &= E_t\left[ M_{t+1} \; 
+	\frac{(D_{t+1} + P_{t+1})}{P_t} \right] \\
+    1 &= E_t\left[ M_{t+1} 
+	R_{t+1} \right] 
+\end{align*}
+Now let's do the same thing, but for continuous time.
+In this case, our starting point is Equation \ref{contprice}
 
 
 
