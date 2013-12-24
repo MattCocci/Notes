@@ -34,14 +34,14 @@ This note will discuss the probability concepts associated
 with ``convergence,'' along with the applications and 
 results that these concepts permit.
 
-Namely, the first section dicussions convergence 
+The first section dicussions convergence 
 \emph{in probability} (also known as ``{weak convergence}'')
 before moving onto the stronger
 concept of \emph{almost sure convergence} (also known 
 as ``{strong convergence}'').  It concludes
-with convergence \emph{in distribution}.
+with convergence \emph{in distribution}. 
 
-Finally, the remainder of the note uses these concepts to
+The remainder of the note uses these concepts to
 define the famous \emph{Law of Large Numbers} (LLN), which
 gives the conditions under which sample moments converge
 to population moments as $n\rightarrow \infty$.
@@ -50,7 +50,8 @@ each use the concepts of weak convergence and strong
 convergence, respectively, discussed above and defined below.
 
 Beyond that, the \emph{Central Limit Theorem} (CLT) provides a
-refinement of the LLN, describing the \emph{rate at which}
+refinement of the LLN via the concept of convergence in 
+distribution.  The CLT describes the \emph{rate at which}
 sample moments converge to population moments as 
 $n\rightarrow\infty$. 
 
@@ -62,7 +63,7 @@ $n\rightarrow\infty$.
 
 A sequence $\{x_n\}$ has a limit $x$, written 
 \begin{equation}
-    \lim_{n\rightarrow\infty} x_n = n
+    \lim_{n\rightarrow\infty} x_n = x
 \end{equation}
 if $\forall \epsilon > 0$, there exists an $n_\epsilon < \infty$
 such that for all $n \geq n_\epsilon$,  
@@ -77,6 +78,7 @@ Random Variables---something non-deterministic, like an
 average $\bar{X}$? For that, 
 we turn to the topics of the next few subsections.
 
+\newpage
 \subsection{Convergence in Probability}
 
 Consider a sequence of random variables $\{ X_n \}$, 
@@ -166,23 +168,9 @@ to define the Weak LLN:
     \text{Pr}\left(\left\lvert X_n - \mathbb{E}X_n \right\rvert > 
 	\delta\right) \leq \frac{\text{Var}(X_n)}{\delta^2}
 \end{equation}
-Now for a proof of the inequality, which is refreshingly
+See the appendix for
+a proof of the inequality, which is refreshingly
 simple given how useful Chebyshev's Inequality is.
-\begin{proof} Assume that $X_n$ has finite variance, 
-    $\sigma^2$, and let $F_n(x)$ denote the distribution
-    of $X_n$. Then 
-    \begin{equation}
-        \label{chebyproof}
-        \text{Pr}\left(\left\lvert X_n - \mathbb{E}X_n 
-            \right\rvert > \delta\right)
-            = \text{Pr}\left(\left( X_n - \mathbb{E}X_n 
-            \right)^2 > \delta^2\right)
-    \end{equation}
-    Notice that the expression to the left of the $>$ sign
-    is simply the variance of $X_n$, which we denoted by
-    $\sigma^2$. So 
-\end{proof}
-
 
 
 \section{Related Concepts}
@@ -194,6 +182,74 @@ $\hat{\theta}_n$ converges \emph{In Probability} to $\theta$.
 \paragraph{Strongly Consistent} If convergence of $\hat{\theta}_n$
 to $\theta$ holds with probability 1.
 
+
+\newpage
+\appendix
+
+\section{Proof of Chebyshev's Inequality}
+
+Recall that we want to prove
+\begin{equation}
+    \text{Pr}\left(\left\lvert X_n - \mathbb{E}X_n \right\rvert > 
+	\delta\right) \leq \frac{\text{Var}(X_n)}{\delta^2}
+\end{equation}
+
+\begin{proof} Assume that $X$ has finite variance, 
+    $\sigma^2$, and let $f_X(x)$ denote the density function
+    for $X$. Then 
+    \begin{equation}
+        \label{chebyproof}
+        \text{Pr}\left(\left\lvert X - \mathbb{E}X 
+            \right\rvert > \delta\right)
+            = \text{Pr}\left(\left( X - \mathbb{E}X
+            \right)^2 > \delta^2\right)
+    \end{equation}
+    We now define a new variable $Z$, with density function
+    $f_Z(z)$:
+    \begin{equation}
+        \label{ident}
+         Z = \left(X - \mathbb{E}X\right)^2 
+    \end{equation}
+    Note that, by definition,
+    \begin{align*}
+        \mathbb{E}Z &= \mathbb{E}\left(X - \mathbb{E}X\right)^2 
+        = \text{Var}(X)
+    \end{align*}
+    Using this fact,
+    we now write out Equation \ref{chebyproof} more explicitly
+    in terms of the density function for $Z$:
+    \begin{align}
+        \text{Pr}\left(\left( X - \mathbb{E}X
+            \right)^2 > \delta^2\right) &=
+        \text{Pr}\left(Z > \delta^2\right) \notag \\
+            &= \int_{\delta^2}^\infty f_Z(z) \; dz
+            \label{almost}
+    \end{align}
+    Now because our support is $(\delta^2, \; \infty)$, it's 
+    clear that $z > \delta^2$ over that support. This allows
+    us to deduce
+        \[ z > \delta^2 \quad \Rightarrow \quad
+            1 \leq \frac{z}{\delta^2} \]
+    We can now use this inequality along with Equation
+    \ref{almost}:
+    \begin{align*}
+        \int_{\delta^2}^\infty 1 \cdot f_Z(z) \; dz
+            &\leq 
+            \int_{\delta^2}^\infty \frac{z}{\delta^2} \;
+                f_Z(z) \; dz \\
+        &\leq \frac{1}{\delta^2} \int_{\delta^2}^\infty  
+                z \cdot f_Z(z) \; dz \\
+        \text{From Eq. \ref{ident}} \qquad 
+            &\leq \frac{1}{\delta^2} 
+            \mathbb{E}Z =  \frac{\text{Var}(X)}{\delta^2} \\\\
+        \Rightarrow \quad
+        \text{Pr}\left(\left( X - \mathbb{E}X
+            \right)^2 > \delta^2\right) &\leq
+            \frac{\text{Var}(X)}{\delta^2} 
+    \end{align*}
+    which is exactly what we want.
+
+\end{proof}
 
 
 \end{document}

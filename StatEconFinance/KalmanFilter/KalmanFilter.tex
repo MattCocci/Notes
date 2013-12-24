@@ -155,14 +155,14 @@ it to Equation \ref{B} (which gives the contents of the
 exponential in the prior MVN distribution of $x$).  
 
 Namely, the inverse of the new variance,
-which we'll denote as $\Sigma_F$ will be sandwiched in 
+which we'll denote as $\Sigma^F$ will be sandwiched in 
 between $x'$ and $x$ in Equation \ref{tosimp}, just as it 
 was sandwiched between $x'$ and $x$ in Equation \ref{B}.
 We use this fact, along with the 
 the Woodbury matrix identity (stated in 
 the appendix) to derive:
 \begin{align}
-    \Sigma_{F} &= \left( \Sigma^{-1} + G'R^{-1}G\right)^{-1} 
+    \Sigma^{F} &= \left( \Sigma^{-1} + G'R^{-1}G\right)^{-1} 
 	\notag \\
     \text{Woodbury Identity} \Rightarrow
 	\qquad &=  \Sigma - \Sigma G'(R 
@@ -172,7 +172,7 @@ the appendix) to derive:
 \end{align}
 \paragraph{Mean} 
 Next, we want to get the {mean} of the distribution of 
-$p(x|y)$, which we'll denote by $\hat{x}_F$.  Again, once we
+$p(x|y)$, which we'll denote by $\hat{x}^F$.  Again, once we
 take a second and compare Expression \ref{tosimp}
 to Expression \ref{B}, it's becomes clear from inspection 
 that we must have 
@@ -188,7 +188,7 @@ the result of the matrix multiplication $\Sigma^{-1}\hat{x}$ in
 Equation \ref{B}. To get the righthand side, use the fact
 that we \emph{know} the Equation \ref{notobvious} analogue
 to Equation \ref{B}'s $\Sigma^{-1}$, which we just 
-derived in the variance section and called $\Sigma_F$.
+derived in the variance section and called $\Sigma^F$.
 \\
 \\
 So all that's left to do is solve for $Z$ in Equation
@@ -196,7 +196,7 @@ So all that's left to do is solve for $Z$ in Equation
 vector for the posterior, $\hat{x}_F$:
 \begin{align}
     \label{mean}
-    \hat{x}_F = Z 
+    \hat{x}^F = Z 
         &= \hat{x} 
         + \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
         \left( y - G \hat{x} \right)  
@@ -215,13 +215,13 @@ Putting together the expressions for the mean and variance
 of the posterior estimate for $x|y$ (i.e. the ``filtering
 distribution''), we get that
 \begin{align}
-    x | y &\sim \text{N} \left(\hat{x}_F, \; \Sigma_F\right) 
+    x | y &\sim \text{N} \left(\hat{x}^F, \; \Sigma^F\right) 
     \label{filtered} \\
     \notag\\
-    \text{where} \quad \hat{x}_F &= \hat{x} 
+    \text{where} \quad \hat{x}^F &= \hat{x} 
 	+ \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
 	\left( y - G \hat{x} \right)  \notag \\
-    \Sigma_F &= \Sigma - \Sigma G'(R 
+    \Sigma^F &= \Sigma - \Sigma G'(R 
 	    + G\Sigma G')^{-1}
 	    G\Sigma \notag
 \end{align}
@@ -263,36 +263,91 @@ in with our beliefs in a principled, sensible manner.
 
 Now let's make our model a little more dynamic and consider 
 forecasting ahead. To do so, we specify a model
-of how the state, $x$ evolves.  To make it easy on ourselves,
+of how the state, $x$, evolves.  To make it easy on ourselves,
 let's assume everything's Gaussian (woohoo! that's easy):
 \begin{equation}
     x_{t+1} = Ax_t + w_{t+1} \qquad w_t \sim \text{N}(0, Q)
 \end{equation}
 Now, we want to come up with a \emph{predictive distribution}
-given current information (encapsulated in our filtering 
-distribution, $p(x|y)$) and our prior. Since we're assuming
+given our prior and the current information encapsulated in 
+our filtering distribution, $p(x|y)$. Since we're assuming
 everything is normal, we need only pin down the
 mean and variance of the forecast, since linear combinations
 of Gaussian variables are Gaussian.  
 
-Of course, these kinds of things are well known for the 
-MVN, which has the nice properties
+Of course, these kinds of things are well known for  
+MVN random variables, which has the nice properties
 \begin{align*}
     E[AX] &= A E[X] = A \mu \\
-    \text{Var}(AX) &= A \text{Var}(X) A^T = A\Sigma A^T \\
+    \text{Var}(AX) &= A \text{Var}(X) A' = A\Sigma A' \\
     \text{where} \quad X &\sim \text{N}(\mu, \Sigma)
 \end{align*}
 Now let's use these facts, along with the assumption
-that $x_t$ and $w_{t+1}$ are uncorrelated to derive:
-\begin{align*}
-    E[x_{t+1}] &= E\left[Ax_{F,\; t} + w_{t+1} \right] 
-                = AE\left[x_{F,\; t}\right] + E\left[w_{t+1} 
-                \right] \\
-        &= A \hat{x}_F + 0 = A \hat{x}_F
-\end{align*}
-where $x_{F, \; t}$ is the filtered value for $x$ at time
-$t$ with mean $\hat{x}_F$ and covariance matrix 
-$\Sigma_F$ as above in Equation \ref{filtered}.
+that we're predicting $x_{t+1}$ by starting with a 
+\emph{filtered} $x_t$ (denoted $x^F_t$ which has the 
+distribution in Equation \ref{filtered}), and 
+assuming $x^F_t$ is uncorrelated with $w_{t+1}$:
+\begin{align}
+    E[x_{t+1}] &= E\left[A{x}^F_{t} + w_{t+1} \right] 
+        = AE\left[{x}^F_{t}\right] + E\left[w_{t+1} 
+            \right] \notag\\
+        &= A \hat{x}^F_{F} + 0 = A \hat{x}^{F} 
+            \label{intfore_mean}\\
+    \text{Var}({x}_{t+1}) &= 
+        \text{Var}(A{x}^F_{t} + w_{t+1}) 
+        = A\text{Var}\left({x}^F_{t}\right)A' 
+            +\text{Var}(w_{t+1})\notag \\
+        &= A\Sigma^F_t A' + Q \label{intfore_var}
+\end{align}
+where $\hat{x}^F_t$ and $\Sigma^F$ are as above in Equation 
+\ref{filtered}. This characterizes the distribution for the
+one step ahead forecasting distribution.
+
+\newpage
+Now, we can simplify what we have a bit more by defining 
+the \emph{Kalman Gain}:
+\begin{equation}
+    \label{kalgain}
+    K_\Sigma = A\Sigma G' (R + G\Sigma G')^{-1}
+\end{equation}
+We see the practical use of this by subbing in the full
+expressions for $\hat{x}^F$ and $\Sigma^F$ into Equations 
+\ref{intfore_mean} and \ref{intfore_var} above,
+and then simplifying our expressions for the
+mean and variance as a function of the Kalman Gain:
+\begin{align}
+    \hat{x}_{t+1} &= E[x_{t+1}] = 
+        A\left\{ \hat{x}^F_t
+	    + \left[\Sigma^F_t G' (R + G \Sigma G')^{-1}  \right]
+        \left( y - G \hat{x}^F_t \right) \right\} \notag \\
+        &= A\hat{x}^F_t + K_\Sigma (y - G \hat{x}^F_t) 
+        \label{foremean} \\
+    \Sigma_{t+1} &= \text{Var}(x_{t+1}) = 
+        A \left\{ \Sigma - \Sigma G'(R 
+	    + G\Sigma G')^{-1}
+        G\Sigma \right\} A' + Q \notag \\
+    &= A\Sigma A' - K_\Sigma G \Sigma A' + Q
+        \label{forevar}
+\end{align}
+{\sl Full Recursive Procedure}:
+Now we need to build up the recursive algorithm to forecast 
+further into the future. Let $t$ be the current time period, 
+and we proceed as follows:
+\begin{enumerate}
+    \item Start with a prior in the current period at 
+        time $t$, as given above
+        \[ p_{t}(x) \sim \text{N}\left(\hat{x}_t, \; 
+            \Sigma_t\right) \]
+    \item Observe the current measurement, $y_t$.
+    \item Update and filter out the noise as we did in
+        the Filtering Section to get, you guessed it,
+        the filtering distribution: $p_t(x | y) = 
+        \text{N}(\hat{x}^F_t, \Sigma^F_t)$.
+    \item Compute the predictive distribution 
+        $p_{t+1}(x) = \text{N}(\hat{x}_{t+1}, \Sigma_{t+1})$
+        from
+
+\end{enumerate}
 
 
 
