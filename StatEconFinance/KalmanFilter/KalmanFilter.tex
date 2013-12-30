@@ -266,6 +266,7 @@ forecasting ahead. To do so, we specify a model
 of how the state, $x$, evolves.  To make it easy on ourselves,
 let's assume everything's Gaussian (woohoo! that's easy):
 \begin{equation}
+    \label{lom}
     x_{t+1} = Ax_t + w_{t+1} \qquad w_t \sim \text{N}(0, Q)
 \end{equation}
 Now, we want to come up with a \emph{predictive distribution}
@@ -291,7 +292,7 @@ assuming $x^F_t$ is uncorrelated with $w_{t+1}$:
     E[x_{t+1}] &= E\left[A{x}^F_{t} + w_{t+1} \right] 
         = AE\left[{x}^F_{t}\right] + E\left[w_{t+1} 
             \right] \notag\\
-        &= A \hat{x}^F_{F} + 0 = A \hat{x}^{F} 
+        &= A \hat{x}^F_{t} + 0 = A \hat{x}^{F}_t
             \label{intfore_mean}\\
     \text{Var}({x}_{t+1}) &= 
         \text{Var}(A{x}^F_{t} + w_{t+1}) 
@@ -299,7 +300,7 @@ assuming $x^F_t$ is uncorrelated with $w_{t+1}$:
             +\text{Var}(w_{t+1})\notag \\
         &= A\Sigma^F_t A' + Q \label{intfore_var}
 \end{align}
-where $\hat{x}^F_t$ and $\Sigma^F$ are as above in Equation 
+where $\hat{x}^F_t$ and $\Sigma_t^F$ are as above in Equation 
 \ref{filtered}. This characterizes the distribution for the
 one step ahead forecasting distribution.
 
@@ -311,25 +312,28 @@ the \emph{Kalman Gain}:
     K_\Sigma = A\Sigma G' (R + G\Sigma G')^{-1}
 \end{equation}
 We see the practical use of this by subbing in the full
-expressions for $\hat{x}^F$ and $\Sigma^F$ into Equations 
+expressions for $\hat{x}_t^F$ and $\Sigma_t^F$ into Equations 
 \ref{intfore_mean} and \ref{intfore_var} above,
 and then simplifying our expressions for the
 mean and variance as a function of the Kalman Gain:
 \begin{align}
     \hat{x}_{t+1} &= E[x_{t+1}] = 
-        A\left\{ \hat{x}^F_t
-	    + \left[\Sigma^F_t G' (R + G \Sigma G')^{-1}  \right]
-        \left( y - G \hat{x}^F_t \right) \right\} \notag \\
-        &= A\hat{x}^F_t + K_\Sigma (y - G \hat{x}^F_t) 
+        A\left\{ \hat{x}_t
+	    + \left[\Sigma_t G' (R + G \Sigma_t G')^{-1}  \right]
+        \left( y - G \hat{x}_t \right) \right\} \notag \\
+        &= A\hat{x}_t + K_{\Sigma_t} (y - G \hat{x}_t) 
         \label{foremean} \\
     \Sigma_{t+1} &= \text{Var}(x_{t+1}) = 
-        A \left\{ \Sigma - \Sigma G'(R 
-	    + G\Sigma G')^{-1}
-        G\Sigma \right\} A' + Q \notag \\
-    &= A\Sigma A' - K_\Sigma G \Sigma A' + Q
+        A \left\{ \Sigma_t - \Sigma_t G'(R 
+	    + G\Sigma_t G')^{-1}
+        G\Sigma_t \right\} A' + Q \notag \\
+    &= A\Sigma_t A' - K_{\Sigma_t} G \Sigma_t A' + Q
         \label{forevar}
 \end{align}
-{\sl Full Recursive Procedure}:
+
+
+\section{Full Recursive Procedure}
+
 Now we need to build up the recursive algorithm to forecast 
 further into the future. Let $t$ be the current time period, 
 and we proceed as follows:
@@ -345,12 +349,43 @@ and we proceed as follows:
         \text{N}(\hat{x}^F_t, \Sigma^F_t)$.
     \item Compute the predictive distribution 
         $p_{t+1}(x) = \text{N}(\hat{x}_{t+1}, \Sigma_{t+1})$
-        from
-
+        from the filtering distribution, $p_t(x|y)$, and
+        the law of motion in Equation \ref{lom}.
+    \item Increment $t$. Return to step 1, taking
+        the predictive distribution, $p_{t+1}(x)$, as
+        the prior.
 \end{enumerate}
 
 
+\section{Convergence}
 
+Now since $x_{t}$ is random from the perspective
+of time $t-1$ (i.e. there is some irreducable uncertainty
+resulting from shocks at time $t$), we know that $\Sigma_t$
+will never be zero, unless $w_t$ in Equation \ref{lom} is 
+degenerate. However, we might ask whether $\Sigma_t$, our
+measure of uncertainty for our prediction $\hat{x}_t$
+of $x_t$, will ever converge to a \emph{constant} matrix over
+time. 
+
+Recall how $\Sigma_t$ evolves, as specified in Equation 
+\ref{forevar} (substituting in for the Kalman Gain, 
+$K_\Sigma$), which gives the non-linear difference equation:
+\begin{equation}
+    \label{sig_euler}
+    \Sigma_{t+1} = A\Sigma_t A' - K_{\Sigma_t} G \Sigma_t A' + Q
+\end{equation}
+If it were the case that $\Sigma_t$ converges to some fixed
+matrix, then there would be a fixed point, $\Sigma^*$, satisfying 
+Equation \ref{sig_euler} as follows:
+\begin{equation}
+    \label{riccati}
+    \Sigma^* =
+        A\Sigma^* A' - A\Sigma^* G' (R + G\Sigma^* G')^{-1} G \Sigma^* A' + Q
+\end{equation}
+This is known as the \emph{Discrete Time Algebraic Riccati Equation}.
+A sufficient condition for convergence is that all the eigenvalues of
+$A$, $\lambda_i$, satisfy $|\lambda_i|<1$. 
 
 
 
