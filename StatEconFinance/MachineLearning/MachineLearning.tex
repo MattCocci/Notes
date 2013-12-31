@@ -1,38 +1,133 @@
-\documentclass[a4paper,12pt]{scrartcl}
+\documentclass[12pt]{article}
 
 \author{Matthew Cocci}
 \title{Machine Learning}
 \date{}
-\usepackage{enumitem} %Has to do with enumeration	
-\usepackage{amsfonts}
+
+%% Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{fullpage}
+\usepackage{setspace}
+%\onehalfspacing
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\pagestyle{fancy} 
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt} 
+    %---Make the header bigger to avoid overlap
+
+%\renewcommand{\headrulewidth}{0.3pt} 
+    %---Width of the line
+
+%\setlength{\headsep}{0.2in}    
+    %---Distance from line to text
+            
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \usepackage{amsmath}
+\usepackage{amsfonts}
 \usepackage{amsthm} %allows for labeling of theorems
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{blindtext}
-\usepackage{graphicx}
-\usepackage{hyperref} % For internal/external linking. 
-				 % [hidelinks] removes boxes
-\hypersetup{
-    colorlinks=true,
-    linkcolor=black,
-    citecolor=black,
-    filecolor=black,
-    urlcolor=black,
-}
-% \usepackage{url} % allows for url display, non-clickable
-%\numberwithin{equation}{section} 
-   % This labels the equations in relation to the sections 
-      % rather than other equations
-%\numberwithin{equation}{subsection} %This labels relative to subsections
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{prop}[thm]{Proposition}
 \newtheorem{cor}[thm]{Corollary}
-\setkomafont{disposition}{\normalfont\bfseries}
+%\numberwithin{equation}{section} 
+    %---This labels the equations in relation to the sections 
+    %---rather than other equations
+%\numberwithin{equation}{subsection} 
+    %---This labels relative to subsections
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{graphicx}
+\usepackage{subfigure} 
+    %---For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %---Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref} 
+\hypersetup{	
+    colorlinks,		
+        %---This colors the links themselves, not boxes
+    citecolor=black,	
+        %---Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\usepackage{verbatim} 
+    %---For including verbatim code from files, no colors
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{RGB}{28,172,0}
+\definecolor{mylilas}{RGB}{170,55,241}
+\newcommand{\matlabcode}[1]{%
+    \lstset{language=Matlab,%
+        basicstyle=\footnotesize,%
+        breaklines=true,%
+        morekeywords={matlab2tikz},%
+        keywordstyle=\color{blue},%
+        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+        identifierstyle=\color{black},%
+        stringstyle=\color{mylilas},%
+        commentstyle=\color{mygreen},%
+        showstringspaces=false,%
+            %---Without this there will be a symbol in 
+            %---the places where there is a space
+        numbers=left,%
+        numberstyle={\tiny \color{black}},% 
+            %---Size of the numbers
+        numbersep=9pt,% 
+            %---Defines how far the numbers are from the text
+        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+            %---Some words to emphasise
+    }%
+    \lstinputlisting{#1}
+}
+    %---For including Matlab code from .m file with colors,
+    %---line numbering, etc. 
+
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\usepackage{enumitem} 
+    %---Has to do with enumeration	
 \usepackage{appendix}
-\usepackage{subfigure} % For plotting multiple figures at once
-\usepackage{verbatim}
+%\usepackage{natbib} 
+    %---For bibliographies
+\usepackage{pdfpages}
+    %---For including whole pdf pages as a page in doc
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%\newcommand{\nameofcmd}{Text to display}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
 
 \begin{document}
 \maketitle
@@ -70,31 +165,104 @@ learning problems:
 
 
 
-\section{Terminology}
+\section{Terminology and Notation}
 
 In order to calibrate an algorithm, we use a set of 
-\textbf{training examples} (the data), denoted 
-$(\mathbf{x}^{(1)}, y^{(1)}), 
-(\mathbf{x}^{(2)}, y^{(2)}), \ldots, (\mathbf{x}^{(m)}, y^{(m)})$, 
-where $(\mathbf{x}^{(i)}, y^{(i)})$ is the $i$th training example. Each 
+\emph{training examples} (the data), denoted 
+$(\mathbf{X}^{(1)}, Y^{(1)}), 
+(\mathbf{X}^{(2)}, Y^{(2)}), \ldots, (\mathbf{X}^{(m)}, Y^{(m)})$, 
+where $(\mathbf{X}^{(i)}, Y^{(i)})$ is the $i$th training example. Each 
 training example consists of a vector of $n$ \textbf{features} 
 (covariates)
-   \[ \mathbf{x}^{(i)} = \left(x_1^{(i)},x_2^{(i)},\ldots, 
-      x_n^{(i)}\right)^T\]
+   \[ \mathbf{X}^{(i)} = \left(X_1^{(i)},X_2^{(i)},\ldots, 
+      X_n^{(i)}\right)'\]
 We use these training examples to fit the parameters of
-a \textbf{hypothesis} (model), denoted $h_\theta(\mathbf{x})$. If we
+a \emph{hypothesis} (model), denoted $h_\theta(\mathbf{X})$. If we
 consider a simple linear model and that might look like 
-   \[ h_\theta(x) = \theta_0 + \theta_1 x\]
+   \[ h_\theta(X) = \theta_0 + \theta_1 X\]
 If we have a multivariate linear model, that would look like
 \begin{align*}
-   h_\theta(\mathbf{x}) &= \theta^T \mathbf{x}\\
-   \mathbf{x} &= (1, x_1, x_2, \ldots, x_n)^T \in \mathbb{R}^{n+1}, 
-      \qquad x_0 = 1\\
-   \theta &= (\theta_0, \theta_1, \theta_2, \ldots, \theta_n)^T
+   h_\theta(\mathbf{X}) &= \theta' \mathbf{X}\\
+   \mathbf{X} &= \left(1, X_1, X_2, \ldots, X_n\right)' \in \mathbb{R}^{n+1}, 
+      \qquad X_0 = 1\\
+   \theta &= \left(\theta_0, \theta_1, \theta_2, \ldots, \theta_n\right)'
    \in \mathbb{R}^{n+1}
 \end{align*}
+{\sl Note}: Above, everything is denoted in upper case letters 
+to denote random variables, but specific realizations will be 
+denoted by lowercase analogues.
 
 
+\section{Statistical Decision Theory}
+
+Now how do we make progress in Machine Learning? Where do
+the many results, which we'll detail below, come from?
+
+\subsection{Overview}
+
+Most of it reduces to specifying or assuming a particular
+joint distribution of the data, denoted $p(\mathbf{X}, Y)$, 
+then deriving an \emph{Hypothesis} or \emph{Model} that 
+best predicts the data.
+
+\paragraph{Note} Oftentimes, in practice, we
+jump right to models in the spirit of ``Here's our data,
+let's fit the model.'' \emph{However}, this type of thinking
+assumes that the joint distribution is well approximated
+by the model you have in mind. \emph{Don't forget that.}
+You can fit always specify a model, fit a model, then 
+make predictions, but if you want your predictions to be
+reasonable, make sure that you think about the joint
+distribution of the data, and make sure the model can 
+approximate that well.
+
+So once we have a model or hypothesis, we have to fit
+the model. We do so by specifying a \emph{Loss Function},
+which defines how exactly to penalize errors or misclassification
+by our model.  We'll choose the parameters of our model
+to minimize the error or misclassification among our 
+training set observations. 
+
+To make this more precise, denote the loss function as
+$L\left(Y, h_\theta(\mathbf{X})\right)$, which makes explicit the
+dependence of error/misclassification upon the model, 
+$h_\theta(X)$. 
+Define the {\sl Expected Prediction Error} (EPE) as  
+\begin{equation}
+    \text{EPE}(L) = E\left[ L\left(Y, h_\theta(\mathbf{X})\right)\right] =
+        \int L\left(y, h_\theta(x)\right) p(x, y) \; dx dy
+\end{equation}
+This makes clear that the EPE is a function of both the
+the model and the loss function. 
+
+Different models will naturally have different EPE's 
+given the same training set, but perhaps less obvious:
+different loss functions will lead to different fits
+and parameterizations given the same model. So fitting
+a model is a three step process:
+\begin{enumerate}
+    \item Specify a model to describe the joint
+        distribution of the data.
+    \item Specify a Loss Function that defines how
+        to penalize errors or misclassifications.
+    \item Fit the model by choosing the values of the
+        parameters that minimize the chosen Loss Function.
+\end{enumerate}
+
+\subsection{Quantitative Response}
+
+The \emph{squared error loss function} remains as a
+common loss function for quantitative responses:
+\begin{equation}
+    \label{sqerror}
+    L\left(Y, h_\theta(\mathbf{X})\right) = \left(Y - 
+        h_\theta(\mathbf{X})\right)^2 
+\end{equation}
+If we try to minimize the 
+
+
+
+\subsection{Categorical Response}
 
 
 \section{Gradient Descent}
