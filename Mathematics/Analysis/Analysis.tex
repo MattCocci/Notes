@@ -1,0 +1,284 @@
+\documentclass[12pt]{article}
+
+\author{Matthew Cocci}
+\title{\textbf{Analysis}}
+\date{\today}
+\usepackage{fullpage}
+\usepackage{enumitem} %Has to do with enumeration	
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{blindtext}
+\usepackage{graphicx}
+\usepackage{hyperref} 
+\hypersetup{	
+    colorlinks,		% This colors the links themselves, not boxes
+    citecolor=black,	% Everything below changes the link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+\usepackage{mathrsfs} %allows for labeling of theorems
+\usepackage{amsthm} %allows for labeling of theorems
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+\usepackage{appendix}
+\usepackage{subfigure} % For plotting multiple figures at once
+\usepackage{verbatim} % for including verbatim code from a file
+\usepackage{natbib} % for bibliographies
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents %adds it here
+
+\section{Riemann-Stieltjes Integral}
+
+This definition of the integral was made rigorous in the 1800s by Riemann, Darboux, and Stieltjes.  It's an intuitive way to define the area under a curve, and it works well with numerical integration (approximations). \emph{However}, it is incomplete in the sense that there are functions of interest that we cannot integrate in a Riemann sense but can in a Lebesgue sense. 
+
+Throughout this section, we'll stick to functions that are univariate from a compact interval to $\mathbb{R}$: 
+
+    \[ f: [a, b] \rightarrow \mathbb{R} \]
+
+    We'll begin by discussing \emph{partitions} of that interval $[a,b]$ into smaller pieces, from which we'll construct sums that approximate the area under the curve.  This will lead us to a definition of the Riemann Integral.  Then, we'll generalize and allow the \emph{weight} we place on the sub-intervals (when summing over the entire interval) to vary, which will give us the Riemann-Stieltjes integral. From there, we discuss the relationships between the approximating sums and the integral.
+
+\subsection{Operational Definitions}
+
+\begin{defn} A \emph{partition}, $P$, is an ordered tuple representing a finite sequence on the interval $[a,b]$,
+    \[ a = x_0 < x_1 < \cdots < x_n = b
+        \qquad \text{with} \quad \Delta x_i := x_i - x_{i-1}
+    \]
+\end{defn}
+
+\begin{defn} The \emph{norm} of a partition $P$, sometimes called ``mesh $P$'' represents
+    \[ || P || = \text{norm}(P) := \max_i |x_i - x_{i-1}| =
+        \max_i |\Delta x_i| \] 
+\end{defn}
+
+\begin{defn} $Q$ is a \emph{refinement} of $P$ if $Q \supset P$ where $Q$ and $P$ are both partitions of $[a,b]$. $Q$ the intervals \emph{finer}.
+\end{defn}
+
+\begin{defn} For two partitions, $P_1$ and $P_2$, their \emph{common refinement} is $P_1 \cup P_2$.
+\end{defn}
+
+\begin{defn} A \emph{tagged partition} is a couplet $(P,T)$, where $P$ is some partition $\{x_0, \ldots, x_n\}$ and $T$ is a set of evaluation points, $\{t_1, \ldots, t_n\}$, for the function $f$  such that
+    \[ x_{i-1} \leq t_i \leq x_i \]
+\end{defn}
+
+\begin{note} We will now generalize to allow weighting of the sub-intervals within the partition, defined for an \emph{increasing} function $\alpha: [a,b] \rightarrow \mathbb{R}$, where 
+    \[ \Delta \alpha_i = \alpha(x_i) - \alpha(x_{i-1}) > 0 \]
+This is the main difference between the plain Riemann sum and integral, versus the Riemann-Stieltjes (RS) sum and integral.  The latter retains the former as a special case by taking $\alpha(x) = x$.  Therefore, the RS version is just a generalization of Riemann, weighting the contribution of the sub-intervals to the total sum/integral by the function $\alpha$, \emph{not} by the length of the sub-interval.
+\end{note}
+
+\subsection{Darboux Sum and RS-Darboux Sum Definitions}
+
+We now define the various sums approximating the Riemann and RS integrals.
+
+\begin{defn} We define the upper and lower \emph{Darboux Sums}, respectively, as follows 
+    \begin{align*}
+        U(f,P) &:= \sum^n_{i=1} M_i(f)(x_i - x_{i-1}) 
+            \quad\text{where} \quad 
+            M_i(f) := \sup_{x \in [x_i, x_{i-1}]} f(x)\\
+        L(f,P) &:= \sum^n_{i=1} m_i(f)(x_i - x_{i-1})
+            \quad\text{where} \quad 
+            m_i(f) := \inf_{x \in [x_i, x_{i-1}]} f(x) 
+    \end{align*}
+\end{defn}
+
+\begin{defn} Given $f$ (bounded) and tagged partition $(P,T)$ we define the \emph{Riemann Sum} as 
+    \begin{equation}
+        S(f,P,T) := \sum^n_{i=1} f(t_i) (x_i - x_{i-1})
+    \end{equation}
+\end{defn}
+
+\begin{defn} 
+\label{RSD}
+We define the upper and lower \emph{RS-Darboux Sums}, respectively, as follows 
+    \begin{align*}
+        U_\alpha(f,P) &:= \sum^n_{i=1} M_i(f) \Delta \alpha_i
+            \quad\text{where} \quad 
+            M_i(f) := \sup_{x \in [x_i, x_{i-1}]} f(x) \\
+        L_\alpha(f,P) &:= \sum^n_{i=1} m_i(f)\Delta \alpha_i
+            \quad\text{where} \quad 
+            m_i(f) := \inf_{x \in [x_i, x_{i-1}]} f(x) 
+    \end{align*}
+\end{defn}
+
+\begin{defn} 
+\label{RSS}
+Given $f$ (bounded) and tagged partition $(P,T)$ we define the \emph{Riemann-Stieltjes Sum} as 
+    \begin{equation}
+        S_\alpha(f,P,T) := \sum^n_{i=1} f(t_i) \Delta \alpha_i
+    \end{equation}
+\end{defn}
+
+\subsection{Sum Relations}
+
+\begin{rem} Clearly, by Definitions \ref{RSD} and \ref{RSS}, for all $T$ associated with $P$
+    \[ L_\alpha(f,P) \leq S_\alpha(f,P,T) \leq U_\alpha(f,P) \]
+\end{rem}
+
+\begin{thm} 
+\label{sumineq}
+    If $Q \supset P$, i.e. if $Q$ refines $P$, then
+    \[ L_\alpha(f,P) \leq L_\alpha(f,Q) \leq U_\alpha(f,Q) 
+        \leq U_\alpha(f,P) \]
+\end{thm}
+\begin{proof} The proof proceeds by induction. Assume that $Q = P \cup \{x^*\}$, a single point. Then $x^*\in [x_{i-1}, x_i]$ for some interval, and it's easy show the relation from there.
+\end{proof}
+
+\begin{thm} 
+\label{pineq}
+    For all partitions $P_1, P_2$, 
+    \[ L_\alpha(f,P_1) \leq U_\alpha(f,P_2) \]
+\end{thm}
+\begin{proof} Let $Q = P_1 \cup P_2$. Then by Theorem \ref{sumineq}, 
+    \[ L_\alpha(f,P_1) \leq L_\alpha(f,Q) \leq U_\alpha(f,Q) 
+        \leq U_\alpha(f,P_2) \]
+\end{proof}
+
+
+\subsection{Riemann-Stieltjes Integral}
+
+\subsubsection{Definition and Characterization}
+
+\begin{defn} We define the upper and lower Riemann-Stieltjes integrals, respectively, in terms of the RS-Darboux Sums
+    \begin{align*} 
+        \overline{\int^b_a} f d\alpha &:= \inf_P U_\alpha(f,P) \\
+        \underline{\int^b_a} f d\alpha &:= \sup_P L_\alpha(f,P)
+    \end{align*}
+From Theorem \ref{pineq}, it's clear that $\underline{\int} f d\alpha \leq \overline{\int} f d\alpha$.
+\end{defn}
+
+\begin{defn} We say  $f$ is Riemann-Stieltjes integrable on $[a,b]$---i.e. $f \in \mathscr{R}_\alpha([a,b])$---if 
+    \[ \overline{\int^b_a} f d\alpha  =
+        \underline{\int^b_a} f d\alpha 
+        := {\int^b_a} f d\alpha
+        \]
+\end{defn}
+
+\begin{ex} A case where $f \not\in \mathscr{R}_\alpha([a,b])$ is where 
+    \[ f(x) = \begin{cases} 1 & $x$\text{ rational} \\
+            0 & $x$\text{ irrational} \end{cases}\]
+for $x\in[0,1]$. In this case, the upper integral is always 1, while the lower integral is always zero.
+\end{ex}
+
+\begin{thm}
+\emph{(Riemann's Condition)}
+\label{riemcond}
+$f \in \mathscr{R}_\alpha([a,b])$ if and only if there exists a partition $P$ such that the upper and lower RS-Darboux sums can be made arbitrarily close given that $P$, i.e.
+    \[  U_\alpha(f,P) - L_\alpha(f,P) \leq \varepsilon \]
+\end{thm}
+\begin{proof} First, the $\Leftarrow$ direction. Use Theorems \ref{sumineq} and \ref{pineq}. It's obvious. Next, for the $\Rightarrow$ direction. By the definition of the RS integral and the RS-Darboux sums, 
+\begin{equation}
+    \label{p1}
+    U_\alpha(f,P_1) < \int^b_a f d\alpha + \varepsilon/2 \qquad
+    L_\alpha(f,P_2) < \int^b_a f d\alpha + \varepsilon/2
+\end{equation}
+Taking the common refinement, and using Theorem \ref{sumineq}, we get that 
+\begin{align*}
+    U_\alpha(f,P_1 \cup P_2) - L_\alpha(f,P_1 \cup P_2) &\leq 
+    U_\alpha(f,P_1) - L_\alpha(f,P_2) \\
+    &= \left(U_\alpha(f,P_1) - \int^b_a f d\alpha\right) - 
+        \left(L_\alpha(f,P_2) - \int^b_a f d\alpha  \right) \\
+    \text{By Expression \ref{p1}}\qquad &\leq \varepsilon/2 + \varepsilon/2
+\end{align*}
+\end{proof}
+
+\begin{thm} The set of all continuous functions on $[a,b]$, denoted ${C}([a,b])$, is a subset of $\mathscr{R}([a,b])$.
+\end{thm}
+\begin{proof} 
+By Theorem \ref{riemcond}, we want to show that, for all $\epsilon>0$, there exists a partition $P$ such that 
+\begin{align*}
+    U_\alpha(f,P) - L_\alpha(f,P) < \epsilon  \\
+    \Leftrightarrow
+    \sum^n_{i=1} (M_i(f) - m_i(f)) \Delta\alpha_i < \epsilon 
+\end{align*}
+Now since $f$ is continuous on a compact interval, $[a,b]$, $f$ is \emph{uniformly continuous} on $[a,b]$. That means, given our $\epsilon$ from above, 
+    \[ \exists \; \delta >0 \quad \text{ s.t. } \quad
+        |x_{i} - x_{i-1}| < \delta \quad \Rightarrow \quad
+        |f(x_{i}) - f(x_{i-1})| < \frac{\epsilon}{\alpha(b)-\alpha(a)} \]
+So we can choose $P$ such that that $||P|| < \delta$.  This means that 
+\begin{align*}
+    \sum^n_{i=1} [M_i(f) - m_i(f)] \Delta\alpha_i &\leq
+    \sum^n_{i=1} \frac{\epsilon}{\alpha(b)-\alpha(a)} 
+        \Delta\alpha_i  
+    =\frac{\epsilon}{\alpha(b)-\alpha(a)}\sum^n_{i=1}  
+        \Delta\alpha_i \\
+    &=\frac{\epsilon}{\alpha(b)-\alpha(a)} \cdot [\alpha(b)-\alpha(a)] = \epsilon
+\end{align*}
+\end{proof}
+
+\subsubsection{Properties of $\mathscr{R}_\alpha([a,b])$}
+
+Now for some useful properties of the set of Riemann-Stieltjes integrable functions. Consider $f,g \in \mathscr{R}_\alpha([a,b])$
+and $c \in \mathbb{R}$.
+\begin{itemize}
+    \item \textbf{Linearity}: $f+g \in \mathscr{R}_\alpha([a,b])$
+        and $cf \in \mathscr{R}_\alpha([a,b])$, with 
+        \[ \int^b_a cf d\alpha = c \int^b_a f d\alpha  
+            \qquad \text{and} \qquad 
+            \int^b_a f+g d\alpha = \int^b_a f d\alpha + 
+            \int^b_a g d\alpha 
+        \]
+    \item \textbf{Subsets}: If $[c,d]\subset[a,b]$, then $f \in \mathscr{R}_\alpha([c,d])$.
+    \item \textbf{Splitting the Interval}: If $c \in [a,b]$, then 
+        \[ \int^b_a f d\alpha = \int^c_a f d\alpha 
+            + \int^b_c f d\alpha \]
+\end{itemize}
+
+
+%%%% APPPENDIX %%%%%%%%%%%
+
+% \appendix
+
+%\cite{LabelInSourcesFile} 
+%\citep{LabelInSourcesFile} Cites in parens
+%\nocite{LabelInSourceFile} includes in refs w/o specific citation
+%\bibliographystyle{apalike} 
+%\bibliography{sources.bib} where sources.bib is file
+
+
+
+
+\end{document}
+
+
+
+%%%% INCLUDING FIGURES %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+   % H indicates here 
+   %\begin{figure}[h!]
+   %   \centering
+   %   \includegraphics[scale=1]{file.pdf}
+   %\end{figure}
+
+%   \begin{figure}[h!]
+%      \centering
+%      \mbox{
+%	 \subfigure{
+%	    \includegraphics[scale=1]{file1.pdf}
+%	 }\quad
+%	 \subfigure{
+%	    \includegraphics[scale=1]{file2.pdf} 
+%	 }
+%      }
+%   \end{figure}
+ 
+
+%%%%% Including Code %%%%%%%%%%%%%%%%%%%%%5
+% \verbatiminput{file.ext}    % Includes verbatim text from the file
+% \texttt{text}	  % includes text in courier, or code-like, font
