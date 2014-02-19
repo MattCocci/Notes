@@ -141,7 +141,7 @@
 
 \tableofcontents %adds it here
 
-\section{Riemann-Stieltjes Integral}
+\section{The Riemann-Stieltjes Integral}
 
 This definition of the integral was made rigorous in the 1800s by Riemann, Darboux, and Stieltjes.  It's an intuitive way to define the area under a curve, and it works well with numerical integration (approximations). \emph{However}, it is incomplete in the sense that there are functions of interest that we cannot integrate in a Riemann sense but can in a Lebesgue sense. 
 
@@ -151,7 +151,7 @@ Throughout this section, we'll stick to functions that are univariate from a com
 
     We'll begin by discussing \emph{partitions} of that interval $[a,b]$ into smaller pieces, from which we'll construct sums that approximate the area under the curve.  This will lead us to a definition of the Riemann Integral.  Then, we'll generalize and allow the \emph{weight} we place on the sub-intervals (when summing over the entire interval) to vary, which will give us the Riemann-Stieltjes integral. From there, we discuss the relationships between the approximating sums and the integral.
 
-\subsection{Operational Definitions}
+\subsection{Partitions}
 
 \begin{defn} A \emph{partition}, $P$, is an ordered tuple representing a finite sequence on the interval $[a,b]$,
     \[ a = x_0 < x_1 < \cdots < x_n = b
@@ -179,7 +179,7 @@ Throughout this section, we'll stick to functions that are univariate from a com
 This is the main difference between the plain Riemann sum and integral, versus the Riemann-Stieltjes (RS) sum and integral.  The latter retains the former as a special case by taking $\alpha(x) = x$.  Therefore, the RS version is just a generalization of Riemann, weighting the contribution of the sub-intervals to the total sum/integral by the function $\alpha$, \emph{not} by the length of the sub-interval.
 \end{note}
 
-\subsection{Darboux Sum and RS-Darboux Sum Definitions}
+\subsection{Sum Definitions}
 
 We now define the various sums approximating the Riemann and RS integrals.
 
@@ -247,11 +247,10 @@ Given $f$ (bounded) and tagged partition $(P,T)$ we define the \emph{Riemann-Sti
 \end{proof}
 
 
-\subsection{Riemann-Stieltjes Integral}
+\subsection{Integrability and $\mathscr{R}_\alpha([a,b])$}
 
-\subsubsection{Definition and Characterization}
 
-\begin{defn} We define the upper and lower Riemann-Stieltjes integrals, respectively, in terms of the RS-Darboux Sums
+\begin{defn} We define \emph{the upper and lower Riemann-Stieltjes integrals}, respectively, in terms of the RS-Darboux Sums
     \begin{align*} 
         \overline{\int^b_a} f d\alpha &:= \inf_P U_\alpha(f,P) \\
         \underline{\int^b_a} f d\alpha &:= \sup_P L_\alpha(f,P)
@@ -259,7 +258,7 @@ Given $f$ (bounded) and tagged partition $(P,T)$ we define the \emph{Riemann-Sti
 From Theorem \ref{pineq}, it's clear that $\underline{\int} f d\alpha \leq \overline{\int} f d\alpha$.
 \end{defn}
 
-\begin{defn} We say  $f$ is Riemann-Stieltjes integrable on $[a,b]$---i.e. $f \in \mathscr{R}_\alpha([a,b])$---if 
+\begin{defn} We say  $f$ is \emph{Riemann-Stieltjes integrable} on $[a,b]$---i.e. $f \in \mathscr{R}_\alpha([a,b])$---if 
     \[ \overline{\int^b_a} f d\alpha  =
         \underline{\int^b_a} f d\alpha 
         := {\int^b_a} f d\alpha
@@ -314,11 +313,11 @@ So we can choose $P$ such that that $||P|| < \delta$.  This means that
         \Delta\alpha_i  
     =\frac{\epsilon}{\alpha(b)-\alpha(a)}\sum^n_{i=1}  
         \Delta\alpha_i \\
-    &=\frac{\epsilon}{\alpha(b)-\alpha(a)} \cdot [\alpha(b)-\alpha(a)] = \epsilon
+    &\leq\frac{\epsilon}{\alpha(b)-\alpha(a)} \cdot [\alpha(b)-\alpha(a)] = \epsilon
 \end{align*}
 \end{proof}
 
-\subsubsection{Properties of $\mathscr{R}_\alpha([a,b])$}
+\subsection{Properties of $\mathscr{R}_\alpha([a,b])$}
 
 Now for some useful properties of the set of Riemann-Stieltjes integrable functions. Consider $f,g \in \mathscr{R}_\alpha([a,b])$
 and $c \in \mathbb{R}$.
@@ -345,12 +344,70 @@ and $c \in \mathbb{R}$.
         \[ |f| \in \mathscr{R}_\alpha([a,b]) \qquad
             \left\lvert\int^b_a f d\alpha \right\rvert
             \leq \int^b_a |f| \; d\alpha \]
+    \item \textbf{Compositions}: Suppose that $f \in 
+        \mathscr{R}_\alpha([a,b])$ and
+        $g: \mathbb{R}\rightarrow\mathbb{R}$ is 
+        continuous. Then $g \circ f\in\mathscr{R}_\alpha([a,b])$
+        \begin{proof}
+            Let $m:=\inf_{[a,b]}f$ and $M:=\sup_{[a,b]}f$.
+            Then since $g$ is continuous on the on the compact 
+            interval $[m,M]$, $g$ is uniformly continuous.
+            As a result, for all $\epsilon>0$
+            there then exists $\delta>0$ such that 
+            \begin{equation}
+                \label{cont}
+                 |u- v| \leq \delta \quad \Rightarrow
+                    \quad |g(u) - g(v)| \leq \epsilon 
+            \end{equation}
+            We also know that because $f \in 
+            \mathscr{R}_\alpha([a,b])$, wich implies that
+            there exists a partion $P$ such that
+            \begin{equation}
+                 U_\alpha(f,P)- L_\alpha(f,P) \leq \epsilon\cdot
+                    \delta
+            \end{equation}
+            As a result, for any $i$, 
+            \begin{equation}
+                M_i(f) - m_i(f) < \delta \quad \Rightarrow \quad 
+                    M_i(g\circ f) - m_i(g\circ f) \leq \epsilon
+            \end{equation}
+            Now we're interested in showing Riemann 
+            integrability for $g\circ f$, which requires us
+            to show that the upper and lower RS-Darboux sums
+            are arbitrarily close. We will do so by breaking
+            the sums into two parts based on the following
+            characteristics of the original function $f$:
+            \begin{align*}
+                A = \{ i \; | \; M_i(f) - m_i(f)\leq\delta\}\\
+                B = \{ i \; | \; M_i(f) - m_i(f)>\delta\}
+            \end{align*}
+            Now let's work out the sums for $g\circ f$:
+            \begin{align*}
+                U_\alpha(g\circ f,P) - L_\alpha(g\circ f,P)
+                    &= \sum^n_{i=1} \left[
+                    M_i(g\circ f) - m_i(g\circ f)\right]
+                    \Delta\alpha_i \\
+                &= \sum_{i\in A}+
+                    \sum_{i\in B} \\
+                &\leq \delta \sum_{i: M_i(f) - m_i(f)\leq\delta} +
+                    \sum_{i: M_i(f) - m_i(f)>\delta} \\
+            \end{align*}
+
+            
+                
+        \end{proof}
+        
 \end{itemize}
 
 
 %%%% APPPENDIX %%%%%%%%%%%
 
-% \appendix
+\newpage
+\appendix
+\section{Additional Definitions}
+
+Modulus of Continuity
+
 
 %\cite{LabelInSourcesFile} 
 %\citep{LabelInSourcesFile} Cites in parens
