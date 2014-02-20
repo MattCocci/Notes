@@ -166,23 +166,51 @@ This will be our equivalent statement to prove, rather than Equation \ref{q1.top
 So first, we know that that the integral in Equation \ref{q1.toprove2} over the function $h$ exists (i.e. $h \in \mathscr{R}([a,b])$---where
     \[ h(x) = \left[\frac{f(x)}{M}\right]^n 
         \quad \text{with} \quad 
-        \begin{cases} h(x) = 1 & x=x^* \\ h(x) < 1 & x\neq x^* 
+        \begin{cases} h(x) = 1 & x=x^* \\ 0< h(x) < 1 & x\neq x^* 
         \end{cases}\]
 This integral exists because both $f(x)$ is continuous and $g(x) = \left(x/M\right)^n$ is continuous. And because $h = g \circ f$, a composition of continuous functions, $h \in \mathscr{R}_\alpha([a,b])$ by Theorem 51.12 in FoMA. 
 \\
+Now because $h \in \mathscr{R}_\alpha([a,b])$, we can write
+\begin{align*}
+    \int^b_a \left[\frac{f(x)}{M}\right]^n \; dx &=
+    \overline{\int^b_a} \left[\frac{f(x)}{M}\right]^n \; dx =
+    \inf_P U(h, P) \\
+    &= \sum^m_{i=1} M_i(h) \Delta x_i  
+\end{align*}
+But over all intervals, $M_i(h)$ will be greater than 0 (since $h(x)$ is positive), but less than or equal to one, as mentioned above. Thus, we can put bounds on the integral by putting bounds on the sum:
+\begin{align*}
+    \sum^m_{i=1} 0 \Delta x_i  &< 
+    \sum^m_{i=1} M_i(h) \Delta x_i  \leq
+    \sum^m_{i=1} 1 \Delta x_i  \\
+    \Leftrightarrow \qquad 
+    \epsilon  &\leq 
+    \sum^m_{i=1} M_i(h) \Delta x_i  
+    \leq  b-a  \\
+    \Rightarrow \qquad 
+    \epsilon  &\leq
+    \int^b_a h(x) \; dx   \leq
+    b-a  
+\end{align*}
+for some small, non-zero value $\epsilon$. The value isn't strictly crucial---only that it's non-zero.
 \\
-It's also clear that we must have
-\begin{equation}
-    \lim_{n\rightarrow\infty} h(x) =  
-    \lim_{n\rightarrow\infty}\left[\frac{f(x)}{M}\right]^n
-    = \begin{cases} 1 & x = x^* \\ 0 & x \neq x^*
-      \end{cases} 
-\end{equation}
-Finally, since $h$ is a continuous function in $\mathscr{R}_\alpha([a,b])$, we can use Theorem 52.5 in FoMA to assert that
-    \[ \int^b_a h \; dx = \lim_{||P||\rightarrow 0}
-        S(h,P,T) \]
-for any $T$. Choosing $T$ so that $x^*$ is one of the evaluation points in $T$, we can then
+\\
+Now using these inequalities, we can squeeze the limit in Equation \ref{q1.toprove2}:
+\begin{align*}
+    \epsilon^{1/n}  &\leq
+    \left[\int^b_a h(x) \; dx\right]^{1/n}   \leq
+    (b-a)^{1/n} \\
+    \lim_{n\rightarrow\infty} \epsilon^{1/n}  &\leq
+    \lim_{n\rightarrow\infty} \left[\int^b_a h(x) \; dx\right]^{1/n}   \leq
+    \lim_{n\rightarrow\infty} (b-a)^{1/n} \\
+    1  &\leq
+    \lim_{n\rightarrow\infty} \left[\int^b_a h(x) \; dx\right]^{1/n}   \leq 1 \\
+    \Rightarrow \qquad
+    1 &= \lim_{n\rightarrow\infty} \left[\int^b_a h(x) \; dx\right]^{1/n}
+\end{align*}
+which is what we wanted to prove.
 
+
+\newpage
 \item \textbf{Exercise 52.1, FoMA}: We want to prove, for $f \in \mathscr{R}([0,1])$ that
 \begin{equation}
     \label{q2.toprove}
@@ -221,6 +249,7 @@ Thus, we can assert, since $||P|| = 1/n$, which goes to zero as $n$ grows, that
 \end{align*}
 which is exactly what we wanted to show.
 
+\newpage
 \item Recall the Lipshitz Condition: A function $f$ is Lipshitz at $x$ if for some $C, \delta >0$
 \begin{equation}
     |x-y| \leq \delta \quad \Rightarrow \quad
@@ -232,47 +261,45 @@ We want to show that for $f: [0,1] \rightarrow \mathbb{R}$
     \left\lvert \int^1_0 f \; dx - \frac{1}{n} \sum^n_{k=1}
         f(k/n) \right\rvert \leq \frac{C}{n} \qquad \forall n
 \end{equation}
-Now let's consider the partition,
+Now let's define our partition, which we'll use throughout the problem:
 \begin{equation}
     P = \left\{ 0, \frac{1}{n},\frac{2}{n}, \ldots,\frac{n}{n}\right\}
     \qquad \Rightarrow \qquad
     \Delta x_i = \frac{1}{n}
 \end{equation}
-With this partition in mind, we can rewrite the integral
-\begin{align*}
-    \int^1_0 f \; dx &= \underline{\int}^1_0 f \; dx  \\
-    &= L(f, P) + \epsilon
-\end{align*}
-where $\epsilon\geq 0$, since 
-    \[ L(f, P) \leq \sup_Q L(f, Q) \]
-And so we can rewrite the lefthand side of Inequality \ref{q3.torwrite} as
-\begin{align*}
-    \left\lvert \int^1_0 f \; dx - \frac{1}{n} \sum^n_{k=1}
-        f(k/n) \right\rvert &= 
-    \left\lvert  \left[ L(f, P) + \epsilon\right]  - \frac{1}{n} \sum^n_{k=1}
-        f(k/n) \right\rvert \\
-    &\leq \left\lvert  L(f, P) - \frac{1}{n} \sum^n_{k=1}
-        f(k/n) \right\rvert \\
-    &\leq \left\lvert  \sum^n_{i=1} m_i(f)\Delta x_i  - \frac{1}{n} \sum^n_{k=1}
-        f(k/n) \right\rvert \\
-    &\leq \left\lvert  \frac{1}{n} \sum^n_{i=1} 
-        \left[ m_i(f) - f(k/n) \right] \right\rvert \\
-\end{align*}
-
-
-The integral is the lower sum at the same intervals as the sum on the right, plus some epsilon.
-
-Remove the epsilon to get the inequality.
-
-Use the lipshitz to bound.
-
-
-
-
-
-
-
-
+We next use the modulus of continuity result from HW1 that 
+\begin{equation}
+    \label{q3.hw1}
+    U(f,P) - L(f,P) \leq w_f\left(||P||\right) (b-a) 
+\end{equation}
+Given that $f$ is Lipshitz, we see
+    \[ w_f\left(||P||\right) = \sup_{|x-y|\leq ||P||}
+        |f(x) - f(y)| \leq C \cdot \frac{1}{n} \]
+Substituting into Equation \ref{q3.hw1} for this particular function, $f$:
+    \[ U(f,P) - L(f,P) \leq \frac{C}{n} \]
+Now clearly, we must have 
+\begin{equation}
+    \label{comb1}
+     L(f,P) \leq \int^1_0 f \; dx \leq U(f,P) 
+\end{equation}
+since the integral must lie between the upper and lower sums always.
+\\
+\\
+Next, the evaluation points $k/n$ for each interval must fall in between the sup and the inf on the interval, which implies (by our choice of partition)
+\begin{align}
+    \sum^n_{k=1} m_k(f) \frac{1}{n} 
+        &\leq \sum^n_{k=1} f\left(\frac{k}{n}
+        \right) \frac{1}{n} \leq 
+        \sum^n_{k=1} M_k(f) \frac{1}{n}  \notag \\
+    L(f,P) &\leq \frac{1}{n} \sum^n_{k=1} f\left(\frac{k}{n}
+        \right) \leq U(f,P) \label{comb2}
+\end{align}
+Now combining Inequalties \ref{comb1} and \ref{comb2}, it's clear that we must have
+    \[ \left\lvert \int^1_0 f \; dx -  
+        \frac{1}{n} \sum^n_{k=1} f\left(\frac{k}{n} \right) 
+        \right\rvert\leq 
+        U(f,P) - L(f,P) \leq \frac{C}{n} \]
+since both terms on the left lie in between the upper and lower sums.
 
 
 
