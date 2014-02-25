@@ -53,6 +53,7 @@
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage{lmodern}
 %\usepackage{blindtext}
 
 
@@ -145,7 +146,7 @@
 
 This definition of the integral was made rigorous in the 1800s by Riemann, Darboux, and Stieltjes.  It's an intuitive way to define the area under a curve, and it works well with numerical integration (approximations). \emph{However}, it is incomplete in the sense that there are functions of interest that we cannot integrate in a Riemann sense but can in a Lebesgue sense. 
 
-Throughout this section, we'll stick to functions that are univariate from a compact interval to $\mathbb{R}$: 
+Throughout this section, unless otherwise noted, we'll largely stick to bounded functions that are univariate from a compact interval to $\mathbb{R}$: 
 
     \[ f: [a, b] \rightarrow \mathbb{R} \]
 
@@ -247,7 +248,7 @@ Given $f$ (bounded) and tagged partition $(P,T)$ we define the \emph{Riemann-Sti
 \end{proof}
 
 
-\subsection{Integrability and $\mathscr{R}_\alpha([a,b])$}
+\subsection{Definition of $\mathscr{R}_\alpha([a,b])$}
 
 
 \begin{defn} We define \emph{the upper and lower Riemann-Stieltjes integrals}, respectively, in terms of the RS-Darboux Sums
@@ -255,7 +256,10 @@ Given $f$ (bounded) and tagged partition $(P,T)$ we define the \emph{Riemann-Sti
         \overline{\int^b_a} f d\alpha &:= \inf_P U_\alpha(f,P) \\
         \underline{\int^b_a} f d\alpha &:= \sup_P L_\alpha(f,P)
     \end{align*}
-From Theorem \ref{pineq}, it's clear that $\underline{\int} f d\alpha \leq \overline{\int} f d\alpha$.
+We can assert that the sup and inf exist because $f$ is bounded. From Theorem \ref{pineq}, it's clear that $\underline{\int} f d\alpha \leq \overline{\int} f d\alpha$.
+\\
+\\
+\emph{Note}: This means the value of the upper (lower) integral might not be \emph{in} the set of upper (lower) sums, just like a real number will not be in a sequence of approaching rationals. 
 \end{defn}
 
 \begin{defn} We say  $f$ is \emph{Riemann-Stieltjes integrable} on $[a,b]$---i.e. $f \in \mathscr{R}_\alpha([a,b])$---if 
@@ -265,7 +269,7 @@ From Theorem \ref{pineq}, it's clear that $\underline{\int} f d\alpha \leq \over
         \]
 \end{defn}
 
-\begin{ex} A case where $f \not\in \mathscr{R}_\alpha([a,b])$ is where 
+\begin{ex} A case where $f \notin \mathscr{R}_\alpha([a,b])$ is where 
     \[ f(x) = \begin{cases} 1 & $x$\text{ rational} \\
             0 & $x$\text{ irrational} \end{cases}\]
 for $x\in[0,1]$. In this case, the upper integral is always 1, while the lower integral is always zero.
@@ -281,17 +285,19 @@ $f \in \mathscr{R}_\alpha([a,b])$ if and only if there exists a partition $P$ su
 \begin{equation}
     \label{p1}
     U_\alpha(f,P_1) < \int^b_a f d\alpha + \varepsilon/2 \qquad
-    L_\alpha(f,P_2) < \int^b_a f d\alpha + \varepsilon/2
+    L_\alpha(f,P_2) > \int^b_a f d\alpha - \varepsilon/2
 \end{equation}
 Taking the common refinement, and using Theorem \ref{sumineq}, we get that 
 \begin{align*}
     U_\alpha(f,P_1 \cup P_2) - L_\alpha(f,P_1 \cup P_2) &\leq 
     U_\alpha(f,P_1) - L_\alpha(f,P_2) \\
-    &= \left(U_\alpha(f,P_1) - \int^b_a f d\alpha\right) - 
-        \left(L_\alpha(f,P_2) - \int^b_a f d\alpha  \right) \\
+    &= \left(\int^b_a f d\alpha + \varepsilon/2\right) - 
+        \left(\int^b_a f d\alpha -\varepsilon/2  \right) \\
     \text{By Expression \ref{p1}}\qquad &\leq \varepsilon/2 + \varepsilon/2
 \end{align*}
 \end{proof}
+
+\subsection{Properties of $\mathscr{R}_\alpha([a,b])$}
 
 \begin{thm} The set of all continuous functions on $[a,b]$, denoted ${C}([a,b])$, is a subset of $\mathscr{R}([a,b])$.
 \end{thm}
@@ -316,18 +322,15 @@ So we can choose $P$ such that that $||P|| < \delta$.  This means that
     &\leq\frac{\epsilon}{\alpha(b)-\alpha(a)} \cdot [\alpha(b)-\alpha(a)] = \epsilon
 \end{align*}
 \end{proof}
-
-\subsection{Properties of $\mathscr{R}_\alpha([a,b])$}
-
 Now for some useful properties of the set of Riemann-Stieltjes integrable functions. Consider $f,g \in \mathscr{R}_\alpha([a,b])$
 and $c \in \mathbb{R}$.
 \begin{itemize}
     \item \textbf{Linearity}: $f+g \in \mathscr{R}_\alpha([a,b])$
         and $cf \in \mathscr{R}_\alpha([a,b])$, with 
-        \[ \int^b_a cf d\alpha = c \int^b_a f d\alpha  
+        \[ \int^b_a cf \; d\alpha = c \int^b_a f\; d\alpha  
             \qquad \text{and} \qquad 
-            \int^b_a f+g d\alpha = \int^b_a f d\alpha + 
-            \int^b_a g d\alpha 
+            \int^b_a f+g\; d\alpha = \int^b_a f \;d\alpha + 
+            \int^b_a g\; d\alpha 
         \]
     \item \textbf{Subsets}: If $[c,d]\subset[a,b]$, then $f \in \mathscr{R}_\alpha([c,d])$.
     \item \textbf{Splitting the Interval}: If $c \in [a,b]$, then 
@@ -339,39 +342,45 @@ and $c \in \mathbb{R}$.
             \[ \int^b_a f d\alpha \geq 0 \qquad
                 \int^b_a g \; d\alpha \leq 
                 \int^b_a h \; d\alpha  \]
-    \item \textbf{Absolute Value Relations}: If we have
-        $f \in \mathscr{R}_\alpha([a,b])$, then both
-        \[ |f| \in \mathscr{R}_\alpha([a,b]) \qquad
-            \left\lvert\int^b_a f d\alpha \right\rvert
-            \leq \int^b_a |f| \; d\alpha \]
     \item \textbf{Compositions}: Suppose that $f \in 
         \mathscr{R}_\alpha([a,b])$ and
         $g: \mathbb{R}\rightarrow\mathbb{R}$ is 
         continuous. Then $g \circ f\in\mathscr{R}_\alpha([a,b])$
         \begin{proof}
-            Let $m:=\inf_{[a,b]}f$ and $M:=\sup_{[a,b]}f$.
+            Since $f$ is bounded, 
+            let $m:=\inf_{[a,b]}f$ and $M:=\sup_{[a,b]}f$.
             Then since $g$ is continuous on the on the compact 
             interval $[m,M]$, $g$ is uniformly continuous.
-            As a result, for all $\epsilon>0$
+            As a result, for all $\varepsilon>0$
             there then exists $\delta>0$ such that 
             \begin{equation}
                 \label{cont}
                  |u- v| \leq \delta \quad \Rightarrow
-                    \quad |g(u) - g(v)| \leq \epsilon 
+                    \quad |g(u) - g(v)| \leq \varepsilon
             \end{equation}
-            We also know that because $f \in 
-            \mathscr{R}_\alpha([a,b])$, wich implies that
-            there exists a partion $P$ such that
+            Finally, $g$ also happens to be bounded because it
+            continuous on a compact interval, thus $|g(x)| \leq K$
+            for some $K$ and all $x$.
+            \\
+            \\
+            Next, since we know that $f \in 
+            \mathscr{R}_\alpha([a,b])$, 
+            there exists a partition $P$ such that
             \begin{equation}
+                \label{forf}
                  U_\alpha(f,P)- L_\alpha(f,P) \leq \epsilon\cdot
                     \delta
             \end{equation}
-            As a result, for any $i$, 
+            And, considering the building blocks $M_i(f)$ and 
+            $m_i(f)$, by the uniform continuity of $g$, we
+            also have for any $i$, 
             \begin{equation}
+                \label{compcont}
                 M_i(f) - m_i(f) < \delta \quad \Rightarrow \quad 
                     M_i(g\circ f) - m_i(g\circ f) \leq \epsilon
             \end{equation}
-            Now we're interested in showing Riemann 
+            Now with everything finally spelled out, 
+            we're interested in showing Riemann 
             integrability for $g\circ f$, which requires us
             to show that the upper and lower RS-Darboux sums
             are arbitrarily close. We will do so by breaking
@@ -382,22 +391,91 @@ and $c \in \mathbb{R}$.
                 B = \{ i \; | \; M_i(f) - m_i(f)>\delta\}
             \end{align*}
             Now let's work out the sums for $g\circ f$:
-            \begin{align*}
+            \begin{align}
                 U_\alpha(g\circ f,P) - L_\alpha(g\circ f,P)
                     &= \sum^n_{i=1} \left[
                     M_i(g\circ f) - m_i(g\circ f)\right]
-                    \Delta\alpha_i \\
-                &= \sum_{i\in A}+
-                    \sum_{i\in B} \\
-                &\leq \delta \sum_{i: M_i(f) - m_i(f)\leq\delta} +
-                    \sum_{i: M_i(f) - m_i(f)>\delta} \\
+                    \Delta\alpha_i \notag\\
+                &= \sum_{i\in A} \quad + \quad
+                    \sum_{i\in B} \notag\\
+                \text{By Equation \ref{compcont}} \qquad
+                &\leq \varepsilon \sum_{i\in A} \Delta\alpha_i+
+                    K \sum_{i\in B} \Delta\alpha_i
+                    \label{final}
+            \end{align}
+            where the result from the sum for $B$ comes from $g$
+            being bounded.
+            \\
+            \\
+            Now let's consider the righthand term from the last
+            line, and relate it back to Expression \ref{forf}.
+            We know that by our definition of $B$:
+            \begin{align*}
+                \delta \sum_{i\in B} \Delta\alpha_i &\leq    
+                \sum_{i\in B} \left[M_i(f) - m_i(f) \right]
+                \Delta\alpha_i \leq \varepsilon\delta \\
+                &\Rightarrow \qquad \sum_{i\in B} \Delta\alpha_i
+                    \leq \epsilon
             \end{align*}
-
-            
                 
+        TO FINISH
+        \end{proof}
+    \item \textbf{Multiplication}: If we have 
+        $f,g\in\mathscr{R}_\alpha([a,b])$, then 
+        $fg\in\mathscr{R}_\alpha([a,b])$.
+        \begin{proof}
+            We know that $f - g$ and $f+g \in
+            \mathscr{R}_\alpha([a,b])$. We also know that 
+            $h(x) = x^2$ is continuous, so then we can say that
+            \[ fg = \frac{1}{4} \left[(f+g)^2 - (f-g)^2 \right]
+                \in\mathscr{R}_\alpha([a,b])
+                \]
+        \end{proof}
+    \item \textbf{Absolute Value Relations}: If we have
+        $f \in \mathscr{R}_\alpha([a,b])$, then both
+        \[ |f| \in \mathscr{R}_\alpha([a,b]) \qquad
+            \left\lvert\int^b_a f d\alpha \right\rvert
+            \leq \int^b_a |f| \; d\alpha \]
+        \begin{proof}
+            The first expression is clearly true because $g(x)=|x|$
+            is a continuous function, so $g\circ f = |f|$ is
+            RS integrable.
+            \\
+            \\
+            Next, let $c$ be either 1 or $-1$ such that 
+                \[ c\int^b_a f\; d\alpha = \left\lvert 
+                \int^b_a f\;d\alpha \right\rvert \]
+            Then we have that $cf \leq |f|$ and by the monotonicity
+            property, we have that
+            \begin{align*}
+                \int^b_a |f| \; d\alpha &\geq 
+                    \int^b_a cf \; d\alpha \\
+                \Rightarrow \qquad 
+                \int^b_a |f| \; d\alpha &\geq
+                    \int^b_a cf \; d\alpha =
+                    c \int^b_a f \; d\alpha = 
+                    \left\lvert
+                    \int^b_a f \; d\alpha \right\rvert 
+            \end{align*}
         \end{proof}
         
 \end{itemize}
+
+\newpage
+\subsection{Mean Value Theorem}
+
+\newpage
+\subsection{Convergence of Riemann-Stieltjes Sums, $S_\alpha(f,P,T)$}
+
+\newpage
+\subsection{Integration for Arbitrary Integrators, $\alpha$}
+
+\newpage
+\subsection{Integration by Parts}
+
+\newpage
+\section{To Do Yet}
+Finish up the proof for compositions
 
 
 %%%% APPPENDIX %%%%%%%%%%%
