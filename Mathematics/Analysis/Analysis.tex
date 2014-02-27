@@ -45,7 +45,7 @@
 \newtheorem{ex}[thm]{Example}
 
 \theoremstyle{remark}
-\newtheorem*{rem}{Remark}
+\newtheorem*{rmk}{Remark}
 \newtheorem*{note}{Note}
 
 
@@ -224,9 +224,9 @@ Given $f$ (bounded) and tagged partition $(P,T)$ we define the \emph{Riemann-Sti
 
 \subsection{Sum Relations}
 
-\begin{rem} Clearly, by Definitions \ref{RSD} and \ref{RSS}, for all $T$ associated with $P$
+\begin{rmk} Clearly, by Definitions \ref{RSD} and \ref{RSS}, for all $T$ associated with $P$
     \[ L_\alpha(f,P) \leq S_\alpha(f,P,T) \leq U_\alpha(f,P) \]
-\end{rem}
+\end{rmk}
 
 \begin{thm} 
 \label{sumineq}
@@ -464,14 +464,154 @@ and $c \in \mathbb{R}$.
 \newpage
 \subsection{Mean Value Theorem}
 
+The classical Mean-Value Theorem states that if $f$ is continous on $[a,b]$ with $\alpha$ increasing, there's some $c\in[a,b]$ such that 
+    \[ \int^b_a f\;d\alpha = f(c)[\alpha(b)-\alpha(a)] \]
+We'll prove a more general result that retains this as a special case.
+\begin{thm}
+\label{mvt}
+Suppose that $f,g\in\mathscr{R}_\alpha([a,b])$ and assume $g\geq0$. Then there exists a $\mu\in[m,M]$, i.e. in between the upper and lower bounds of $f$, such that 
+        \[ \int^b_a fg\;d\alpha = \mu \int^b_a g\;d\alpha \]
+Moreover, if $f$ is continous, then there exists a $c\in[a,b]$ such that $\mu = f(c)$.
+\end{thm}
+\begin{proof}
+Since $g\geq0$, we can conclude that 
+\begin{align*}
+    m &\leq f \leq M \\
+    mg &\leq fg \leq Mg \\
+    \Rightarrow \qquad m\int^b_a g\;d\alpha &\leq 
+        \int^b_a fg\;d\alpha \leq  M \int^b_a g\;d\alpha
+\end{align*}
+If we consider the case where $\int^b_a g\;d\alpha= 0$, then any old $\mu$ will work since we'll have that $\int^b_a fg\;d\alpha=0$. And if it's not 0, then we can set 
+\[ \mu = \frac{\int^b_a fg\;d\alpha}{\int^b_a g\;d\alpha} \]
+We know the numerator and denominator exist because both $f$ and $g$ were assumed integrable, so their product is as well.
+\end{proof}
+\begin{rmk}
+If we take $g(x)=1$, then we get the plain vanilla MVT we opened up the subsection with.  And in the case where $f$ is continuous, we know from the intermediate value theorem that there exists a $c$ such that $\mu=f(c)$. 
+\end{rmk}
+
+
 \newpage
 \subsection{Convergence of Riemann-Stieltjes Sums, $S_\alpha(f,P,T)$}
+
+Basic calculus makes us all think that we approximate a Riemann-Sieltjes integral by taking finer and finer partitions, which we use to weight the value of the function at an increasing number of points.  So it would be very nice and very convenient if Riemann-Stieltjes sums converged to the value of the integral whenever we construct just that sort of limiting sequnce. 
+
+\emph{However}, this will not always be the case.  That is, there will be some functions that are RS-integrable, which won't \emph{necessarily} converge if you take finer and finer partitions. The theorems in this section will illustrate when that will and won't apply. In certain cases, arbitrarily fine partitions might converge to different values, none of which must equal the value of the integral (if it even exists).
+
+\begin{thm}
+\label{weaker}
+Let $f$ be a bounded function on $[a,b]$. Then $f\in\mathscr{R}_\alpha([a,b])$ if and only if there exists a number $I$such that for every $\varepsilon>0$, there exists a corresponding partition $P$ such that for all $P^* \supset P$, we have that
+    \[ |S_\alpha(f,P*,T) - I | \leq \varepsilon \qquad \forall T\]
+And if $f\in\mathscr{R}_\alpha([a,b])$, then $I = \int^b_a f\;d\alpha$.
+\end{thm}
+\begin{rmk}
+We could have written a weaker theorem, leaving out the part about $P^*\supset P$, which is a special case of the above theorem.  But going forward, we'll want to consider the idea of taking finer and finer partitions. This will be particularly true when $\alpha$ might not be increasing.
+\end{rmk}
+\begin{proof}
+First, we prove the $\Rightarrow$ direction. Since $f\in\mathscr{R}_\alpha([a,b])$, we know that there's a partition $P$ such that
+    \[ U_\alpha(f,P) - L_\alpha(f,P)\varepsilon \qquad 
+    \forall \varepsilon \]
+Considering $P^*\supset P$, we also have
+\begin{align*}
+    L_\alpha(f,P^*)&\leq S_\alpha(f,P^*,T) \leq U_\alpha(f,P^*)\\
+    L_\alpha(f,P^*)&\leq \int^b_a f\;d\alpha \leq U_\alpha(f,P^*)
+\end{align*}
+Thus, we can conclude that 
+\begin{align*}
+    \left\lvert S_\alpha(f,P^*,T) - \int^b_a f\;d\alpha 
+    \right\rvert \leq \varepsilon \qquad \forall T
+\end{align*}
+It's clear that $I=\int^b_a f\;d\alpha$,
+\\
+\\
+Next, we want to show the $\Leftarrow$ direction. We begin by noting that given any $P$, there exists a $T_1$ and $T_2$ such that
+\begin{align}
+    S_\alpha(f,P,T_1) &\geq U_\alpha(f,P) - \varepsilon\notag\\
+    S_\alpha(f,P,T_2) &\leq L_\alpha(f,P) + \varepsilon
+    \label{proof1.17}
+\end{align}
+This works because given any partition, we can always choose a $T_1$ and $T_2$ to satisfy by taking $T_1$ ($T_2$) as the set of all $M_i$ ($m_i$). 
+\\
+\\
+So now, let's take $P^*$ to be the partition such that the RS sum is $\varepsilon$ close to $I$ for all $T$; isnote, this $P^*$ is taken to exist in this direction of the proof. Then we have from the inequalities from \ref{proof1.17} that
+\begin{align*}
+    U_\alpha(f,P) - L_\alpha(f,P) &\leq 
+        \left[ S_\alpha(f,P,T_1) + \varepsilon\right] -
+        \left[ S_\alpha(f,P,T_2) - \varepsilon\right] \\
+    &\leq \left[ S_\alpha(f,P,T_1) - I + \varepsilon\right] -
+        \left[ S_\alpha(f,P,T_2) - I - \varepsilon\right] \\
+    &\leq \left\lvert S_\alpha(f,P,T_1) - I \right\rvert+       
+        \left\lvert S_\alpha(f,P,T_2) - I \right\rvert
+        + \varepsilon + \varepsilon \\
+    \text{From Inequalities \ref{proof1.17}} \quad
+        &\leq 4\varepsilon
+\end{align*}
+Since the Upper and Lower sums can be made arbitrarily close, we then know that $f\in\mathscr{R}_\alpha([a,b])$.
+\end{proof}
+\begin{rmk}
+Before moving on, let's recap what the last theorem said in words---or at least what it didn't say.  It didn't say that if you keep taking smaller partitions, you will \emph{always} force your RS-Sum to converge to the value of an integral.  What it did say was twofold:
+\begin{enumerate}
+    \item First, if your function \emph{is} Riemann-Integrable, then and you can find \emph{some} partition (though it might not be true for all of them) where the RS-Sums given that partition and \emph{all finer} partitions get arbitrarily close to this integral that exists.
+    \item Next, suppose you know an $I$ that the sums get arbitrarily close to.  More specifically, that means if you're handed any $\varepsilon>0$, you can find a partition that gets the RS-Sums arbitrarily close to that $I$, no matter the $T$ tagging the partition $P$. Now we're not saying that the sums \emph{must} converge to some $I$ when you take finer partitions. (We only kind of have that if we consider the other direction of the proof where $f\in\mathscr{R}_\alpha([a,b])$ is assumed). Instead, we're just saying it's possible, and if $I$ \emph{does} exist, $f$ is RS integrable.
+\end{enumerate}
+Now we can move on to consider that thorny case of ever-shrinking paritions.
+\end{rmk}
+\begin{defn}
+\label{strongest}
+For a bounded function $f$ on $[a,b]$, we say 
+    \[ \lim_{||P||\rightarrow 0} S_\alpha(f,P,T) = I \]
+if for every $\varepsilon>0$, there exists a $\delta>0$ such that $||P||\leq\delta$ implies that
+    \[ |S_\alpha(f,P,T) - I | \leq \varepsilon \qquad \forall T \]
+    Now here's the big difference between this and what we've seen earlier: the sums might converge, but I never said anything about the equivalence of this statement to RS-integrability, like we had in Theorem \ref{weaker}.  In fact, we can't.
+\\
+\\
+There might be functions where this condition does \emph{not} hold (i.e. the limit does not exist), but still the function is integrable. (See the next example.) But we do have at least one direction intact, as shown in the next theorem.
+\end{defn}
+\begin{thm}
+\label{oneway}
+Suppose that $f$ is bounded on $[a,b]$. If $\lim_{||P||\rightarrow 0}$ exists, then $f\in\mathscr{R}_\alpha([a,b])$ and
+    \[ \int^b_a f\;d\alpha = \lim_{||P||\rightarrow 0} 
+    S_\alpha(f,P,T) \]
+\end{thm}
+\begin{proof}
+\end{proof}
+\begin{ex}
+Now we give an example of why the other direction in Theorem \ref{oneway} wouldn't work.  Consider
+\[ f(x) = \begin{cases} 0 & x \in [0, 1/2) \\ 1 & x \in [1/2, 1] 
+        \end{cases}  \qquad
+    \alpha(x) = \begin{cases} 0 & x \in [0,1/2] \\ 1& x\in(1/2, 1] 
+        \end{cases} \]
+Depending on whether the point $1/2$ is included in the partition, we can construct ever-finer partitions that make the RS-Sums converge to 0 sometimes, and to 1 at other times.
+\end{ex}
+\begin{rmk}
+Thus we have that the strongest statement is in Definition \ref{strongest}. If we can show the limit exists as $||P||\rightarrow 0$, then we can show that $f$ is integrable. If we can't use that, we should think a little harder and try to find a $P$ as in Theorem \ref{weaker} before concluding that $f$ isn't RS-integrable. However, if we're will to put some tougher conditions on our function $f$, we can get more powerful results, as in the next theorem.
+\end{rmk}
+\begin{thm}
+Let $f\in\mathscr{R}_\alpha([a,b])$. If either $f$ or $\alpha$ is continuous on $[a,b]$, then 
+    \[ \int^b_a f\;d\alpha = \lim_{||P||\rightarrow 0} 
+    S_\alpha(f,P,T) \]
+\end{thm}
+\begin{rmk}
+This previous definition is important, because if we just consider \emph{Riemann} integrability, then $\alpha(x) = x$, which is continuous. Thus, Riemann-integrability and the existence of the limit of Riemann sums are equivalent notions.
+\end{rmk}
+\begin{proof}
+    TO FINISH
+\end{proof}
+
+
+
+
+
+
+
 
 \newpage
 \subsection{Integration for Arbitrary Integrators, $\alpha$}
 
 \newpage
 \subsection{Integration by Parts}
+
+\newpage
+\subsection{Improper Integrals}
 
 \newpage
 \section{To Do Yet}
