@@ -142,6 +142,7 @@
 
 \tableofcontents %adds it here
 
+\newpage
 \section{The Riemann-Stieltjes Integral}
 
 This definition of the integral was made rigorous in the 1800s by Riemann, Darboux, and Stieltjes.  It's an intuitive way to define the area under a curve, and it works well with numerical integration (approximations). \emph{However}, it is incomplete in the sense that there are functions of interest that we cannot integrate in a Riemann sense but can in a Lebesgue sense. 
@@ -349,7 +350,7 @@ and $c \in \mathbb{R}$.
         \begin{proof}
             Since $f$ is bounded, 
             let $m:=\inf_{[a,b]}f$ and $M:=\sup_{[a,b]}f$.
-            Then since $g$ is continuous on the on the compact 
+            Then since $g$ is continuous on the compact 
             interval $[m,M]$, $g$ is uniformly continuous.
             As a result, for all $\varepsilon>0$
             there then exists $\delta>0$ such that 
@@ -373,11 +374,14 @@ and $c \in \mathbb{R}$.
             \end{equation}
             And, considering the building blocks $M_i(f)$ and 
             $m_i(f)$, by the uniform continuity of $g$, we
-            also have for any $i$, 
+            also have for any $i$, for all $\varepsilon$, there must
+            be a $\delta$ such that
             \begin{equation}
                 \label{compcont}
-                M_i(f) - m_i(f) < \delta \quad \Rightarrow \quad 
-                    M_i(g\circ f) - m_i(g\circ f) \leq \epsilon
+                M_i(f) - m_i(f) < 2K{\delta}
+                    \quad \Rightarrow \quad 
+                    M_i(g\circ f) - m_i(g\circ f) \leq 
+                    \frac{\varepsilon}{2[\alpha(b)-\alpha(a)]}
             \end{equation}
             Now with everything finally spelled out, 
             we're interested in showing Riemann 
@@ -387,8 +391,8 @@ and $c \in \mathbb{R}$.
             the sums into two parts based on the following
             characteristics of the original function $f$:
             \begin{align*}
-                A = \{ i \; | \; M_i(f) - m_i(f)\leq\delta\}\\
-                B = \{ i \; | \; M_i(f) - m_i(f)>\delta\}
+                A = \{ i \; | \; M_i(f) - m_i(f)\leq2K\delta\}\\
+                B = \{ i \; | \; M_i(f) - m_i(f)>2K\delta\}
             \end{align*}
             Now let's work out the sums for $g\circ f$:
             \begin{align}
@@ -399,7 +403,8 @@ and $c \in \mathbb{R}$.
                 &= \sum_{i\in A} \quad + \quad
                     \sum_{i\in B} \notag\\
                 \text{By Equation \ref{compcont}} \qquad
-                &\leq \varepsilon \sum_{i\in A} \Delta\alpha_i+
+                &\leq \frac{\varepsilon}{2[\alpha(b)-\alpha(a)} 
+                    \sum_{i\in A} \Delta\alpha_i+
                     K \sum_{i\in B} \Delta\alpha_i
                     \label{final}
             \end{align}
@@ -411,14 +416,25 @@ and $c \in \mathbb{R}$.
             line, and relate it back to Expression \ref{forf}.
             We know that by our definition of $B$:
             \begin{align*}
-                \delta \sum_{i\in B} \Delta\alpha_i &\leq    
+                {2K}{\delta} \sum_{i\in B} 
+                \Delta\alpha_i &\leq    
                 \sum_{i\in B} \left[M_i(f) - m_i(f) \right]
-                \Delta\alpha_i \leq \varepsilon\delta \\
+                \Delta\alpha_i \leq \varepsilon\cdot\delta \\
                 &\Rightarrow \qquad \sum_{i\in B} \Delta\alpha_i
-                    \leq \epsilon
+                \leq \frac{\epsilon}{2K}
             \end{align*}
-                
-        TO FINISH
+            Substituting this result back into Equation    
+            \ref{final}, we see that we must have
+            \begin{align*}
+                U_\alpha(g\circ f,P) - L_\alpha(g\circ f,P)
+                &\leq \frac{\varepsilon}{2[\alpha(b)-\alpha(a)}    
+                    [\alpha(b)-\alpha(a)]
+                    + K\frac{\varepsilon}{2K} \\
+                    &\leq \frac{\varepsilon}{2} + 
+                        \frac{\varepsilon}{2} = \varepsilon
+            \end{align*}
+            Thus, we have that $g\circ 
+            f\in\mathscr{R}_\alpha([a,b])$.
         \end{proof}
     \item \textbf{Multiplication}: If we have 
         $f,g\in\mathscr{R}_\alpha([a,b])$, then 
@@ -587,35 +603,255 @@ Thus we have that the strongest statement is in Definition \ref{strongest}. If w
 \end{rmk}
 \begin{thm}
 Let $f\in\mathscr{R}_\alpha([a,b])$. If either $f$ or $\alpha$ is continuous on $[a,b]$, then 
-    \[ \int^b_a f\;d\alpha = \lim_{||P||\rightarrow 0} 
-    S_\alpha(f,P,T) \]
+\begin{equation}
+    \label{limsum.toprove}
+    \int^b_a f\;d\alpha = \lim_{||P||\rightarrow 0} 
+    S_\alpha(f,P,T) 
+\end{equation}
 \end{thm}
 \begin{rmk}
-This previous definition is important, because if we just consider \emph{Riemann} integrability, then $\alpha(x) = x$, which is continuous. Thus, Riemann-integrability and the existence of the limit of Riemann sums are equivalent notions.
+This previous definition is important, because if we just consider \emph{Riemann} integrability, then $\alpha(x) = x$, which is continuous. Thus, Riemann-integrability and the existence of the limit of Riemann sums (as the partion intervals get smaller) are equivalent notions.
 \end{rmk}
-\begin{proof}
-    TO FINISH
+So our goal will be to show that, for all $\epsilon>0$,
+\begin{equation}
+    \label{contequiv.toshow}
+    \lim_{||P||\rightarrow 0}
+    \left\lvert \int^b_a f \; d\alpha - S_\alpha(f,P,T) \right\rvert
+        \leq \varepsilon
+\end{equation}
+when $f$ or $\alpha$ is continuous.
+
+\begin{proof}($f$ Continuous)
+First, suppose that $f$ is continuous. We'll use the Mean Value Theorem (taking $g=1$) to rewrite the integral in Equation \ref{contequiv.toshow} in terms of the partition $P$ that's used for the sum. This allows us to assert that for some $\mu \in [m,M]$, we have that
+    \[ \int^b_a f \; d\alpha = \mu \int^b_a d\alpha \]
+But this will also hold if we break up our interval into subintervals defined by the points in any partition, $P$:
+\begin{equation}
+    \label{contequiv}
+    \sum^n_{i=1} \int^{x_i}_{x_{i-1}} f \; d\alpha 
+        = \sum^n_{i=1} \mu_i \int^{x_i}_{x_{i-1}} d\alpha 
+        \qquad\qquad \mu_i \in [m_i, M_i] 
+\end{equation}
+Next, because $f$ is continuous, we can use the Intermediate Value Theorem to note that, for all $i$, there must be some $c_i \in [x_{i-1}, x_i]$ where $f(c_i) = \mu_i$. Substituting into Equation \ref{contequiv}, we get
+\begin{align*}
+    \sum^n_{i=1} \int^{x_i}_{x_{i-1}} f \; d\alpha 
+        &= \sum^n_{i=1} f(c_i) \int^{x_i}_{x_{i-1}} d\alpha 
+        \qquad\qquad c_i \in [x_{i-1}, x_{i}] \\
+        &= \sum^n_{i=1} f(c_i) \Delta\alpha_i
+\end{align*}
+Then, summing over $i$, we can define 
+\begin{align*}
+    \int^{b}_{a} f \; d\alpha 
+        &= \sum^n_{i=1} f(c_i) \Delta\alpha_i
+        \equiv S_\alpha(f,P,C)
+\end{align*}
+So now, we can replace the integral with this sum in the statement that we want to prove, Equation \ref{contequiv.toshow}:
+\begin{equation}
+    \label{contequiv.toshow2}
+    \lim_{||P||\rightarrow 0}
+    \left\lvert  S_\alpha(f,P,C)- S_\alpha(f,P,T) \right\rvert
+        \leq \varepsilon
+\end{equation}
+This is now our equivalent target statement to prove.
+\\
+\\
+Next, because $f$ is continuous on a compact interval, $f$ is uniformly continuous on $[a,b]$.  Thus for any $\varepsilon$, there exists a $\delta$ such that $||P||\leq\delta$ implies that $|f(x) - f(y)| \leq \varepsilon$, where $x$ and $y$ are both in the same interval.  
+\\
+\\
+So given $\epsilon>0$, let $\delta>0$ be such that 
+    \[ |x-y|\leq \delta \Rightarrow \quad |f(x)-f(y)| \leq 
+        \frac{\varepsilon}{\alpha(b)-\alpha(a)} \]
+Now if we take our partition such that $||P||\leq\delta$, we can write our sums as
+\begin{align*}
+    \left\lvert  S_\alpha(f,P,C)- S_\alpha(f,P,T) \right\rvert
+    &= \left\lvert  \sum^n_{i=1} \left[f(c_i) - f(t_i) \right]
+    \Delta\alpha_i\right\rvert  \\
+    &\leq \sum^n_{i=1} \left\lvert  f(c_i) - f(t_i) \right\rvert
+    \Delta\alpha_i  \\
+    &\leq \frac{\varepsilon}{\alpha(b)-\alpha(a)}
+        \sum^n_{i=1} \Delta\alpha_i =  \varepsilon 
+\end{align*}
 \end{proof}
-
-
-
-
-
-
-
+\begin{proof}($\alpha$ Continuous)
+Suppose $\varepsilon$ is given. Since $f\in\mathscr{R}_\alpha([a,b])$, we know that there exists a $P^*$ (with $\#P$, or $n+1$, subintervals) such that 
+\begin{equation}
+    \label{bases}
+    U_\alpha(f,P^*) < \int^b_a f\;d\alpha + \varepsilon
+        \qquad L_\alpha(f,P^*) > \int^b_a f\;d\alpha - \varepsilon
+\end{equation}
+To construct the proof from here, we'll want eventually to compare the any arbitrary RS-Sum $S_\alpha(f,P,T)$ to these specific upper and lower sums (using $P^*$) that we know something about---i.e. how close they are to the target integral. Then we'll take the limit for $P$ once we've established that relationship.
+\\
+\\
+Also, assume that $f(x)>0$ over $[a,b]$. We'll resolve this simplifying assumption later on, and it will help in the meantime.
+\\
+\\
+So since that interval is compact and $\alpha$ is continuous, we know that $\alpha$ is \emph{uniformly} continuous, implying that
+    \[ \exists \delta > 0 \quad \text{s.t.} \qquad 
+    w_\alpha(\delta) < \frac{\varepsilon}{\#P^*} \]
+where $n$ is the number of sub-intervals in $P^*$. And so 
+    \[ \forall P \qquad ||P||<\delta \quad \Rightarrow 
+        \quad \alpha(x_i) - \alpha(x_{i-1}) < w_\alpha(\delta)
+        <  \frac{\varepsilon}{\#P^*} \]
+Now, considering any such set $P$, let's also define the following sets, which group the indices for the subintervals of any $P$ into two categories:
+\begin{align*}
+    I_1 &:= \{i \; | \; [x_{i-1},x_i) \cap P^* = \emptyset \}\\
+    I_2 &:= \{i \; | \; [x_{i-1},x_i) \cap P^* \neq \emptyset \}
+\end{align*}
+And so $I_2$ contains all the indices where an subinterval of $P$ contain a point of $P^*$. $I_1$ has all the indices where an subinterval of $P$ is contained entirely within a subinterval of $P^*$.
+\\
+\\
+Having done all of groundwork from above, we can now write an expression for the upper sum relative to $P$:
+\begin{align}
+    U_\alpha(f,P) &= \sum^n_{i=1} M_i(f) \Delta\alpha_i \notag \\
+        &= \sum_{I\in I_1} M_i(f) \Delta\alpha_i 
+         + \sum_{I\in I_2} M_i(f) \Delta\alpha_i
+         \label{twosums}
+\end{align}
+But clearly, $I_2$ can only contain, at most, $\#P$ points since there are only $\#P$ points \emph{to contain}, so we must have that $\#I_2 \leq \#P$. Thus, the sum over $I_2$ simplifies:
+\begin{align}
+        \sum_{I\in I_2} M_i(f) \Delta\alpha_i 
+        &\leq \sum_{I\in I_2} M \frac{\varepsilon}{\#P} =    
+            M\varepsilon
+        \label{tocombine1}
+\end{align}
+where $M = \sup f(x)$ over the interval $[a,b]$.
+\\
+\\
+To deal with the sum over $I_1$, we get the result that 
+\begin{equation}
+    \label{tocombine2}
+    \sum_{I\in I_1} M_i(f) \Delta\alpha_i  \leq U_\alpha(f,P^*)
+\end{equation}
+This is true because in assuming $f(x)>0$ and restricting our sum to $I_1$, we throw out whole portions of the interval $[a,b]$ from the sum entirely. And on top of that, we threw out the very large intervals that span one or more of the points in the partition $P^*$.  So all that remains in our sum over $I_1$ are those tiny subintervals of $P$ that would fit entirely within a subinterval of $P^*$. And so we won't be able to make up for the parts we throw out by weighting parts of the interval $[a,b]$ with $M_i(f)$ from $P$ \emph{more than} we would in the case of $M_i(f)$ from $P^*$.
+\\
+\\
+Combining the representation for $U_\alpha(f,P)$ with the two sum representation of Equation \ref{twosums} and the results in Inequalities \ref{tocombine1} and \ref{tocombine2}, we get that
+\begin{equation}
+    U_\alpha(f,P) \leq U_\alpha(f,P^*) + M\varepsilon
+\end{equation}
+And because we had an expression for $U_\alpha(f,P^*)$ in Equation \ref{bases}, we can substitute in and get that
+\begin{equation}
+    \label{ass1}
+    U_\alpha(f,P) \leq \int^b_a f\;d\alpha  + (M+1)\varepsilon
+\end{equation}
+And by a similar argument, we also have that 
+\begin{equation}
+    \label{ass2}
+    L_\alpha(f,P) \geq \int^b_a f\;d\alpha  - (M+1)\varepsilon
+\end{equation}
+Now, at this point we have to dispense with the assumption that $f(x)>0$.  We do that by choosing a $k$ such that $f(x) + k >0$, where now $f$ can be any arbitrary function such that $\int^b_a f\;d\alpha$ as we assume in the theorem.  Then we're in the world we described above in choose our $P$. 
+\\
+\\
+And, since we're in that world, we get the inequality in the next line, which allows us to conclude a very useful result
+\begin{align*}
+    U(f,P) + k(\alpha(b)-\alpha(a))  
+        = U(f+k, P) &\leq \int^b_a (f+k)\; d\alpha 
+        + (M+1)\varepsilon \\
+    &\leq \int^b_a f\; d\alpha  + k(\alpha(b)-\alpha(a))
+        + (M+1)\varepsilon \\
+    \Rightarrow U(f,P) &\leq \int^b_a f\; d\alpha
+        + (M+1)\varepsilon 
+\end{align*}
+So we have our asses covered if $f(x)$ isn't always positive, and we can stick with the results in Inequalities \ref{ass1} and \ref{ass2}.
+\\
+\\
+And now we're almost done.  All that's left is to recognize that we can sandwich, for all $P$ such that $||P||\leq\delta$
+\begin{align*}
+    \int^b_a f\;d\alpha - (M+1)\varepsilon \leq
+    L_\alpha(f,P) \leq S_\alpha(f,P,T) &\leq U_\alpha(f,P) \leq
+   \int^b_a f\;d\alpha + (M+1)\varepsilon  \\
+        \Rightarrow \qquad \left\lvert S_\alpha(f,P,T) 
+        - \int^b_a f\;d\alpha\right\rvert &\leq 2(M+1)\varepsilon \end{align*}
+\end{proof}
 
 \newpage
 \subsection{Integration for Arbitrary Integrators, $\alpha$}
 
-\newpage
+By ``arbitrary'', we mean ``$\alpha$ not necessarily increasing'', which contrasts our operating assumption up until this point. 
+
+In order to make such a notion operational, we will need to dispense with our ``sandwiching'' approach, which uses $L_\alpha(f,P)\leq S_\alpha(f,P,T)\leq U_\alpha(f,P)$, as it no longer holds. In fact, we don't even get that if $P^*\supset P$, then $U_\alpha(f,P^*) \leq U_\alpha(f,P)$ (and the analogous case for the lower some). With that, we give a new definition of integrability:
+\begin{defn}
+Given any $f$ and $\alpha$ (not necesarily increasing) on $[a,b]$, we say that $f\in\mathscr{R}_\alpha([a,b])$ if and only if there exists an $I\in\mathbb{R}$ such that for all $\varepsilon>0$, there exists a $P$ where $P^*\supset P$ implies
+    \[ \left\lvert S_\alpha(f,P^*,T) - I \right\rvert \leq
+        \varepsilon \qquad \forall \; T \]
+This $I$ is denoted by $\int^b_a f\;d\alpha$. And despite this new definition, we still retail of the usual nice linearity properties discussed above in the increasing $\alpha$ case.
+\end{defn}
+The next subsection goes onto a very important topic when we consider arbitrary integrators---so important that I gave its own subsection, although it actually should fall under this current one.
+
 \subsection{Integration by Parts}
+
+\begin{thm}
+\emph{(Integration by Parts)} 
+Let $f$ and $\alpha$ (not necessarily increasing) be bounded on $[a,b]$. If $f\in\mathscr{R}_\alpha([a,b])$, then $\alpha\in\mathscr{R}_f([a,b])$ and 
+\begin{equation}
+    \label{intbyparts}
+    \int^b_a f\;d\alpha = f(b) \alpha(b) - f(a)\alpha(a) - 
+    \int^b_a \alpha \; df 
+\end{equation}
+This is a slightly more general case that the classic calculus version, which is a special case where $\alpha(x)=1$.
+\end{thm}
+\begin{proof}
+To start, we take $P^*$ as the partition such that 
+\begin{equation}
+    \label{ibpassump}
+    \left\lvert S_\alpha(f,P^*,T) - \int^b_a f\;d\alpha 
+    \right\rvert \leq \varepsilon 
+\end{equation}
+which we know exists, since the integrability of $f$ is assumed. 
+\\
+\\
+Now we want to show that for all $\varepsilon>0$, there exists a $P$ such that $Q\supset P$ implies that 
+    \[ \left\lvert S_f(\alpha,Q,T) -  f(b) \alpha(b) - 
+        f(a)\alpha(a) - \int^b_a f \; d\alpha \right\rvert \leq 
+        \varepsilon \qquad \forall \; T\]
+        So we rewrite the righthand side of Equation \ref{intbyparts}, recasting them as telescoping sums, also substituting in $S_f(\alpha,P^*,T)$ for the integral:\footnote{You might object and say ``Hey, you can't do that.  You don't know that there's an equivalent RS-Sum for the integral---particularly if you use that same $P^*$ we've been using all along.'' But I actually don't care whether this sum I'm substituting in is actually equivalent (yet). I'm just taking the righthand side of Equation \ref{intbyparts} as inspiration, and using the $P^*$ we've been using to write an RS-Sum. We'll see at the very end that it's a \emph{result} that this RS-Sum approximates the integral, not an assumption.}
+\begin{align}
+    f(b) \alpha(b) - f(a)\alpha(a) - S_f(\alpha,P^*,T)
+        &= \sum^n_{i=1} f(x_i) \alpha(x_i) - f(x_{i-1})
+        \alpha(x_{i-1}) \notag\\
+    &\quad - \sum^n_{i=1} \alpha(t_i) \left[f(x_i) - f(x_{i-1})
+        \right] \notag\\
+    &= \sum^n_{i=1} f(x_i) \left[\alpha(x_i) - \alpha(t_i) \right]
+        \notag\\
+    &\qquad \sum^n_{i=1} f(x_{i-1}) \left[\alpha(t_i) 
+    + \alpha(x_{i-1})\right]\label{righthandtwosums}
+\end{align}
+Now the righthand side kind of looks like a RS-Sum, so let's define a partition and set of tag points so it is. Define define a new partition, call it $P^{**}$, which will be the union of the old $P^*$ and the points $t_i$. So $P^{**} = P^*\cup T$. Next, define a new set of tagging points,
+    \[ T^{**} = \{ x_0, x_1, x_1, x_2, x_2,\ldots, x_n \} \]
+Now we can collapse the righthand side in Equation \ref{righthandtwosums} into a proper RS-Sum:
+\begin{align*}
+    f(b) \alpha(b) - f(a)\alpha(a) - S_f(\alpha,P,T)
+    &= S_\alpha(f, P^{**}, T^{**})
+\end{align*}
+Since $P^{**}\supset P^* \supset P$, it's clear that 
+\begin{align*}
+    \left\lvert S_\alpha(f,P^{**},T^{**}) - \int^b_a f\;d\alpha
+    \right\rvert \leq &\varepsilon  \\
+    \Leftrightarrow \quad 
+        \left\lvert f(b) \alpha(b) - f(a)\alpha(a) 
+        - S_f(\alpha,P^*,T) - 
+        \int^b_a f \; d\alpha \right\rvert &\leq 
+        \varepsilon \qquad \forall \; T
+\end{align*}
+which is exactly what we wanted to prove, since we can take $P^*$ as our partition. 
+\end{proof}
+\begin{cor}
+The big result from integration by parts is that 
+$f\in\mathscr{R}_\alpha([a,b])$ if and only if $\alpha\in\mathscr{R}_f([a,b])$
+\end{cor}
+\begin{cor}
+If $f\in\mathscr{R}_{\alpha_1}([a,b]) \cap \mathscr{R}_{\alpha_2}([a,b])$, then $f\in\mathscr{R}_{\alpha_1 + \alpha_2}([a,b])$ and 
+    \[ \int^b_a f\;d(\alpha_1 + \alpha_2) = 
+    \int^b_a f\;d\alpha_1 + \int^b_a f\;d\alpha_2 \]
+\end{cor}
+
+\newpage
+\subsection{Functions of Bounded Variation}
+
+TONIGHT
 
 \newpage
 \subsection{Improper Integrals}
 
-\newpage
-\section{To Do Yet}
-Finish up the proof for compositions
 
 
 %%%% APPPENDIX %%%%%%%%%%%
@@ -624,7 +860,17 @@ Finish up the proof for compositions
 \appendix
 \section{Additional Definitions}
 
-Modulus of Continuity
+\subsection{Modulus of Continuity}
+
+\begin{defn} We define the modulus of continuity of the function $f$, $w_f(\delta)$ as 
+\begin{equation}
+    w_f(\delta) \equiv \sup_{x,y\leq\delta} |f(x)-f(y)|
+\end{equation}
+\end{defn}
+It's a useful definition because of it's close relation to uniform continuity.
+It's clear that if $f$ is uniformly continuous, then $w_f\left(||P||\right)\rightarrow0$ as as $||P||\rightarrow0$.
+
+
 
 
 %\cite{LabelInSourcesFile} 
