@@ -53,6 +53,7 @@
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage{lmodern}
 %\usepackage{blindtext}
 
 
@@ -164,11 +165,62 @@ Now clearly, sicne $m_i(|f'|)$ is the minimum over the $i$th subinterval, we hav
     m_i(|f'|) \Delta x_i  \leq |f'(c_i)| \Delta x_i \quad \forall \; i
     \quad \Rightarrow \quad L(|f'|,P) \leq V^b_a(f)
 \end{align*}
-Next, we know that the since $f'$ is Riemann integral, we must also have $|f'| \in \mathscr{R}_\alpha([a,b])$ as well. And so we can say that
-    \[ \int^b_a f\;d\alpha = \sup_P \]
-TIGHTEN THIS UP
+Next, for any partition $P$, we can write
+\begin{align}
+    \label{q1.sum}
+    \sum^n_{i=1} |f(x_i) - f(x_{i-1})| &= 
+        \sum^n_{i=1} \left\lvert \int^{x_i}_{x_{i-1}} df 
+        \right\rvert 
+\end{align}
+Now we know that these integrals within the sum exist from a theorem we proved in class. Specifically, $f'$ is bounded since $f'\in BV([a,b])$ (and we're working on a closed interval, not with improperly Riemann integrable functions). Bounded variation implies bounded. Next, we also know that $f$ is differentiable, which implies it is also continuous. Thus, we can apply the theorem we proved (Theorem 54.3 in FoMA) to assert that $f\in BV([a,b])$. Finally, since our integrator, $f$, is of bounded variation and our function equals $1$ everywhere (which is continuous), we know that the integrals in the sum exist.
 
+Now back to the sum in Equation \ref{q1.sum}. Since $f'$ is differentiable, we can imply another theorem to express the sum in yet another form:
+\begin{align*}
+    \sum^n_{i=1} |f(x_i) - f(x_{i-1})| = 
+        \sum^n_{i=1} \left\lvert \int^{x_i}_{x_{i-1}} df 
+        \right\rvert = 
+        \sum^n_{i=1} \left\lvert \int^{x_i}_{x_{i-1}} f'(x) \; dx
+        \right\rvert 
+\end{align*}
+Applying some rules we know about absolute value with integrals, we can further say that:
+\begin{align*}
+    \sum^n_{i=1} |f(x_i) - f(x_{i-1})| &= 
+        \sum^n_{i=1} \left\lvert \int^{x_i}_{x_{i-1}} f'(x) \; dx
+        \right\rvert \\
+    &\leq \sum^n_{i=1} \int^{x_i}_{x_{i-1}} \left\lvert f'(x) \;
+        \right\rvert dx  = \int^{b}_{a} \left\lvert f'(x) 
+        \right\rvert \; dx  
+\end{align*}
+Now since this holds for all $P$, we know that this must also hold if we take the sup of the lefthand side over $P$. Thus
+\[
+    V_a^b(f) = \sup_P
+    \sum^n_{i=1} |f(x_i) - f(x_{i-1})|  
+    \leq 
+    \int^{b}_{a} \left\lvert f'(x) \;
+    \right\rvert dx  
+\]
+Thus, we have established that 
+\begin{align}
+    L_\alpha(|f'|,P) \leq V_a^b(f) \leq \int^b_a |f'|\;d\alpha
+    \label{q1.cond}
+\end{align}
+\textbf{Conclusion}: This allows us to conclude
+\begin{itemize}
+    \item $V_a^b(f)  = \int^b_a |f'|\;d\alpha$. We can do this because Relation \ref{q1.cond} holds for all $P$.  And so, for any $\varepsilon>0$, there exists a $P$ such that 
+\[ 
+    \left\lvert L_\alpha(|f'|,P) - \int^b_a |f'|\;dx 
+    \right\rvert \leq \varepsilon 
+\]
+And so for any $\varepsilon>0$, by \ref{q1.cond}, we must also have
+\[ 
+    \left\lvert V_a^b(f)  - \int^b_a |f'|\;dx 
+    \right\rvert \leq \varepsilon 
+\]
 
+\item Next, we can also conclude that $f\in BV([a,b])$ because $|f'|\in\mathscr{R}_\alpha([a,b])$, which is over a closed interval $[a,b]$; therefore, the integral must be finite. And because $V_a^b(f)= \int^b_a |f'|\;dx$, we know that $V_a^b(f)$ must be finite as well.
+\end{itemize}
+
+\newpage
 \item Given $\alpha, \beta >0$ we have
 \begin{align*}
     f_{\alpha, \beta}(x) = 
@@ -180,32 +232,139 @@ TIGHTEN THIS UP
 We want to show that $f_{\alpha,\beta}\in BV([0,1])$ if and only if $\alpha>\beta$.
 \\
 \\
-Suppose that $\beta\geq\alpha$ and that 
+Recall the definition for the total variation:
+\[
+    V_a^b(f) = \sup_P \sum^n_{i=1} |f(x_{i}) - f(x_{i-1})|
+\]
+Also recall that over an increasing interval, the total variation equals $f(b)-f(a)$ (absolute value if decreasing). This means we should try to pin down those points between which $f_{\alpha, \beta}(x)$ is increasing or decreasing. Then, we know that the total variation of the intervals will just be the difference between $f_{\alpha,\beta}$ evaluated at the beginning and the end of the interval.
 
-Start by taking the derivative:
-\begin{align*}
-    f'_{\alpha, \beta}(x) = 
-        \begin{cases} 
-            \alpha x^{\alpha-1}\sin(x^{-\beta}) -
-            \beta x^{\alpha-\beta-1}\cos(x^{-\beta}) & 
-            x\in(0,1] \\
-            0 & x=0
-        \end{cases}
-\end{align*}
-Choose the partition that would give the sup
-        
+Conveniently, the peaks and troughs come at regular intervals for the sine function, and we will use these points to define the intervals between which the function is increasing or decreasing:
+\[ 
+    \text{Peaks and Troughs of sin at} \quad
+    \left\{ \frac{(2k+1)\pi}{2} \right\}^\infty_{k=0} 
+\]
+Then, for our function $f_{\alpha,\beta}$, we have the peaks and troughs at 
+\[ 
+    \text{Peaks and Troughs of $f_{\alpha,\beta}$ at} \quad
+    \left\{ \left(\frac{(2k+1)\pi}{2}\right)^{-1/\beta} 
+    \right\}^\infty_{k=0}  =
+    \left\{ \left(\frac{2}{(2k+1)\pi}\right)^{1/\beta} 
+    \right\}^\infty_{k=0} 
+\]
+Note that the multiplicative factor $x^\alpha$ won't change the locations of the peaks and troughs, just the magnitude. 
 
+And so using the points defined above as our partition of the interval, we get the total variation:
+\begin{align}
+    V_a^b(f) &= \sup_P \sum^n_{i=1} |f(x_i) - f(x_{i-1})|\notag\\
+        &\leq \sum^n_{k=0} 
+        \left(\frac{2}{(2k+1)\pi}\right)^{\alpha/\beta}
+        \cdot 2
+        \label{q2.pain}
+\end{align}
+This inequality is obtained by setting one of the leading $x_i^\alpha$ or $x_{i-1}^\alpha$ equal to the other. Then, after factoring that term out, we use the fact that the maximum gap from peak to trough of the sine function is 2 to bound the sum.
+
+Finally, given above is a harmonic series like
+\[
+    \sum^n_{i=1} \frac{1}{n^p}
+\]
+which only converges if and only if $p>1$. Thus the sum in Inequality \ref{q2.pain} converges if and only if $\alpha>\beta$.
+
+\newpage
 \item We suppose that $f\in BV([a,b])$ and want to show that
     \[ \sup_{x\in[0,1]} |f(x)| \leq \int^1_0 |f(x)|\;dx
         + V^1_0(f) \]
-We start with the fact that since $f\in BV([a,b])$ and since, $\alpha(x)=x$, We start by writing
+    So suppose that this is not true.  That is, suppose there's an $x_1\in[0,1]$ such that
 \begin{align*}
-    f(x) = 
+    |f(x_1)| &> \int^1_0 |f(x)|\;dx + V_1^0(f)  
 \end{align*}
+Then it's also true if we replace the term inside the integral with a constant equal to the smallest value of $|f|$ (since we're dealing with absolute values):
+\begin{align*}
+    |f(x_1)| &> \int^1_0 \inf_{t\in[0,1]} |f(t)|\;dx + V_1^0(f)  
+        = \inf_{t\in[0,1]} |f(t)| \int^1_0 \;dx + V_1^0(f)  \\
+    \Rightarrow \quad
+        |f(x_1)| &> 
+        \inf_{t\in[0,1]} |f(t)| + V_1^0(f) 
+\end{align*}
+Since it's a strict inequality, that means there exists an $\varepsilon>0$ such that
+\begin{align}
+    \label{q3.eps}
+    |f(x_1)|  - \inf_{t\in[0,1]} |f(t)| - V_1^0(f) = \varepsilon  
+\end{align}
+Now let's use this $\varepsilon$ to choose another point, $x_2\in[0,1]$, such that
+\[ 
+    |f(x_2)| - \inf_{t\in[0,1]} |f(t)|  < \varepsilon
+\]
+Next, substitute into the previous equation Equation \ref{q3.eps}'s representation of $\varepsilon$: 
+\begin{align}
+    |f(x_2)| - \inf_{t\in[0,1]} |f(t)| &< 
+        |f(x_1)|  - \inf_{t\in[0,1]} |f(t)| - V_1^0(f) \notag \\
+    \Rightarrow \quad
+        V_0^1(f) &< |f(x_1)| - |f(x_2)| 
+        \label{q3.almost}
+\end{align}
+But if we apply the properties of the absolute value again, we note that
+\begin{align*}
+    |f(x_1)| - |f(x_2)| \quad \leq \quad
+        \left\lvert\; |f(x_1)| - |f(x_2)|\; \right\rvert 
+        \quad\leq\quad 
+        \left\lvert\; f(x_1) - f(x_2)\; \right\rvert 
+\end{align*}
+Substituting this result into Inequality \ref{q3.almost}, we get that
+\begin{align}
+        V_0^1(f) &<
+        \left\lvert\; f(x_1) - f(x_2)\; \right\rvert 
+\end{align}
+However, this leads to a contradiction since we assumed that $V_1^0(f)$ maximized the variation over the interval $[0,1]$.  But this last line tells us that if we choose a partition spanning $x_1$ to $x_2$ (or vice versa; the ordering doesn't matter), we can construct a higher value for the total variation. Thus, we must have 
+\[ 
+    |f(x)| \leq \int^1_0 |f(x)|\;dx
+    + V^1_0(f) \quad \forall\; x
+    \qquad \Rightarrow \qquad
+    \sup_{x\in[0,1]} |f(x)| \leq \int^1_0 |f(x)|\;dx
+    + V^1_0(f) 
+\]
 
-\item 54.4: Any var is less than total var, but greater than if you have the abs value
 
-54.6: Riemann integrable, flip around; then max is riemann integrable; flip again
+\item 
+\begin{enumerate} 
+\item \textbf{Exercise 54.4}: We want to show that $\alpha\in BV([a,b]) \Rightarrow |\alpha|\in BV([a,b])$. We do that by noting for any partition $P$, 
+\[ 
+    \sum^n_{i=1} \left\lvert \;|\alpha(x_{i})| - |\alpha(x_{i-1})|
+    \;\right\rvert 
+\]
+But, we also know by a property of $|\cdot|$ that we will have
+\[ 
+    \left\lvert \;|\alpha(x_{i})| - |\alpha(x_{i-1})|\;
+    \right\rvert \leq 
+    \left\lvert \;\alpha(x_{i}) - \alpha(x_{i-1})\;
+    \right\rvert  \qquad \forall\; i
+\]
+So this allows us to write
+\[ 
+    \sum^n_{i=1} \left\lvert \;|\alpha(x_{i})| - |\alpha(x_{i-1})|
+    \;\right\rvert 
+    \leq 
+    \sum^n_{i=1} 
+    \left\lvert \;\alpha(x_{i}) - \alpha(x_{i-1})\;
+    \right\rvert  \qquad \forall \; P
+\]
+And since this holds for all $P$, this must also hold when we consider the total variation of $\alpha$.  Thus, it is bounded by $V_a^b(\alpha)$, implying
+\[ 
+    V_a^b(|\alpha|) = \sup_P
+    \sum^n_{i=1} \left\lvert \;|\alpha(x_{i})| - |\alpha(x_{i-1})|
+    \;\right\rvert 
+    \leq 
+    \sum^n_{i=1} 
+    \left\lvert \;\alpha(x_{i}) - \alpha(x_{i-1})\;
+    \right\rvert \leq V_a^b(\alpha) < \infty
+\]
+\[ 
+    \Rightarrow |\alpha|\in BV([a,b])
+\]
+
+\item 
+    \textbf{Exercise 54.6}: Next, we want to show that if $\alpha, \beta \in BV([a,b])$, then $\max\{\alpha, \beta\} \in BV([a,b])$ and $\min\{\alpha, \beta\} \in BV([a,b])$.
+
+\end{enumerate} 
 
 \item We can use the function from question 2:
     \[ 
@@ -250,11 +409,84 @@ Subbing this into Equation \ref{q6.ibp}, we get that
             + f(a)\int^{c^*}_a d\alpha
 \end{align*}
 Letting $c=c^*$ gives us exactly what we want.
+
+
+\item 
+\textbf{Exercise 56.4}: Let $g$ be continuous on $[a,b]$ and suppose $f$ is increasing on $[a,b]$.
+\begin{enumerate}
+\item First, we want to show that there exists a $c$ in $[a,b]$ such that 
+\begin{align}
+    \label{q6.2.toprove}
+    \int^b_a f(x)g(x)\;dx = f(a) \cdot \int^c_a g(x)\;dx
+        + f(b) \cdot \int^b_c g(x)\;dx
+\end{align}
+We do so by noting that $g(x)$ is continuous, which implies $g\in\mathscr{R}([a,b])$. With that, we can use the Fundamental Theorem of Calculus to define the function
+\begin{align*}
+    G(x) = \int^x_a f(t)\;dt \qquad
+\end{align*}
+By the Theorem, we know both $G$ is continuous on $[a,b]$, and we know that $G$ is differentiable, wherever $g$ is continuous (which is everywhere on $[a,b]$). And because of that 
+\begin{align*}
+    G'(x) = g(x) \qquad \forall \; x\in[a,b] 
+\end{align*}
+Next, we also know by another theorem (55.7 in FoMA) that when $\alpha$ is continuous and differentiable on $[a,b]$, we have (taking $f(x)=1$ in the theorem)
+\[ 
+    \int^b_a d\alpha = \int^b_a \alpha' \; dx 
+\]
+Now by what we said above, it's clear that $G$ is differentiable and continuous on $[a,b]$, so we know that 
+\begin{align}
+    \int^b_a dG &= \int^b_a G'(x) \;dx\notag\\
+    &= \int^b_a g(x) \;dx
+    \label{q6.bigresult}
+\end{align}
+And so, we substitute this result from Equation \ref{q6.bigresult} into Equation \ref{q6.2.toprove}, rewriting it in a more familiar form:
+\begin{align*}
+    \int^b_a f(x)g(x)\;dx &= f(a) \cdot \int^c_a g(x)\;dx
+        + f(b) \int^b_c g(x)\;dx\\
+    \Leftrightarrow
+    \int^b_a f(x)\;dG 
+    &= f(a) \cdot \int^c_a dG
+        + f(b) \cdot \int^b_c dG
+\end{align*}
+And now this is exactly what we had in the first part of this question, except $\alpha$ is $G$ instead. And, as in the first part, we know that $f$ is increasing and $\alpha=G$ is increasing.  So there must be a $c$ such that the statement holds.
+
+\item Next, we want to prove Bonnet's Theorem, which says that if $f$ is non-negative, in addition to our previous assumptions, then there exists a $c\in[a,b]$ such that
+\[
+    \int^b_a f(x)g(x)\;dx = f(b)\cdot\int^b_c g(x)\;dx
+\]
+    
+    
+\end{enumerate}
+
+
 \end{enumerate}
 
 
 
-    
+\newpage    
+\item  
+\begin{enumerate}
+\item
+We want to show that for $f', g'\in\mathscr{R}([a,b])$
+\begin{equation}
+    \int^b_a f'g = f(b)g(b) - f(a)g(a) - \int^b_a f g'
+\end{equation}
+We use a result similar to what we used above. Namely, since $f'$ exists, $f$ is continuous since differentiability implies continuity. Then, since $f'\in\mathscr{R}_\alpha([a,b])$ by assumption, we know we can represent the integral on the left by
+\[ 
+    \int^b_a f' g = \int^b_a g \; df 
+\]
+And if we expand out the integrl on the right of the last line by using the traditional integration by parts, we get that
+\begin{align*}
+    \int^b_a f' g &= \int^b_a g \; df \\
+    &= f(b)g(b) - f(a)g(a) - \int^b_a f\;dg
+\end{align*}
+But, since we know that $g$ is continuous and differentiable (for the same reasons as $f$ given above) and that $g'\in\mathscr{R}_\alpha([a,b])$, we can rewrite the last line by taking the derivative of the integrator $g$ to get
+\begin{align*}
+    \int^b_a f' g &= 
+     f(b)g(b) - f(a)g(a) - \int^b_a fg'
+\end{align*}
+which is exactly what we wanted to prove.
+
+\end{enumerate}
         
         
 
