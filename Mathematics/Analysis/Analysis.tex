@@ -1240,6 +1240,14 @@ We say that $X\subset\mathbb{R}$ is \emph{measure zero} (or \emph{negligible}) i
 \]
 \end{defn}
 
+\begin{defn} 
+We say that the statement or condition $P(x)$ for $x$ in an interval $I$ holds \emph{almost everywhere} (a.e.) if 
+\[
+    \{ x \in I \; | \; P(x) \text{ is false} \} 
+    \;\; \text{is measure zero}
+\]
+\end{defn}
+
 \begin{prop}
 Finite sets are of measure zero, and a countable union of measure zero sets is itself measure zero.
 \end{prop}
@@ -1308,7 +1316,47 @@ And by our choice of $n^*$, we know that $\left(\frac{2}{3}\right)^{n^*} < \vare
 And so $C$ is of measure zero.
 \end{ex}
 
+\begin{thm}
+Any closed interval $[a,b]$ is of measure zero.
+\end{thm}
+\begin{proof}
+    Suppose that we have some closed interval $I = [a,b]$ that is measure zero. Then given any $\varepsilon>0$, there must be an open cover 
+\[  
+    \{I_n\}_{n=1}^\infty \supset I 
+    \quad \text{s.t.} \quad
+    \sum^\infty_{i=1} |I_n|<\varepsilon
+\]
+Now since $I$ is compact, there must by a finite subcover $\{I_{n_i}\}^k_{i=1} \supset I$ with $\sum^k_{i=1} |J_{n_i}| <\varepsilon$.
+\\
+\\
+But this leads to a contradiction because, via induction, we can show that the finite sum of the lengths of the intervals must be greater than $b-a$.
+\end{proof}
 
+\begin{note}
+Continuous a.e. $\neq$ a continuous function a.e. For example, the function $f=\chi_{\mathbb{Q} \cap [a,b]}$ equals the function $g(x)=0$ almost everywhere. \emph{However}, $f$ is discontinuous everywhere.
+\end{note}
+
+\subsection{Oscillation}
+
+\begin{defn} 
+For a bounded function $f:[a,b]\rightarrow\mathbb{R}$ and nonempty $I\subset[a,b]$, we define the the \emph{oscillation of $f$ on $I$}, denoted $\Omega_f(I)$, as
+\[
+    \Omega_f(I) := \sup_I f - \inf_I f 
+    = \sup_{x,y\in I} |f(x)-f(y)|
+\]
+We define the oscillation at a particular point $x\in I$ as 
+\[
+\Omega_f(x) = \inf_{I\ni \; x} \Omega_f(I)
+\]
+\end{defn}
+
+\begin{prop}
+$f$ is continuous at $x$ if and only if $\Omega_f(x)=0$.
+\end{prop}
+
+\begin{prop}
+    Note that we can write $U(f,P)-L(f,P) = \sum^n_{i=1} \Omega_f([x_{i-1}, x_i]) \Delta x_i$.
+\end{prop}
 
 \subsection{Lebesgue's Theorem}
 
@@ -1317,6 +1365,86 @@ Let $f$ be bounded. Then $f\in\mathscr{R}([a,b])$ if and only if $f$ is continuo
 \end{thm}
 
 
+\newpage
+\section{General Theory of Measure Integration}
+
+We've seen in the section about sequences of functions that we can't always exchange the limit and the integral sign. In particular, there are sequences $\{f_n\}\rightarrow f$ such that each $f_n \in \mathscr{R}_\alpha([a,b])$, but $f \not\in \mathscr{R}_\alpha([a,b])$.
+
+This stems from a deficiency in Riemann integrals arising from the relatively reigid structure of intervals---the sets over which we integrate. So this chapter will be about replacing integrals with more general ``measurable sets.'' 
+
+So we'll want a generalized notion of ``measure'' for subsets $A\subset\mathbb{R}$, which we'll denote $m(A)$. The function $m(\cdot)$ will be how to weight subsets of the real line.
+
+\subsection{Desired Structure and Limitations}
+
+If we're constructing a general theory from scratch, there's a number of desireable features that we would like:
+\begin{enumerate}
+    \item If $A$ is in an interval, $m(A) = |A|$, the length of the interval.
+    \item Translation invariance: $m(A+x) = m(A)$.
+    \item Countable additivity: If $A_1, \ldots, A_n$ disjoint, then $m(\cup A_n) = \sum m(A_n)$. 
+    \item If $A_1 \subset A_2$, $m(A_1) < m(A_2)$.
+\end{enumerate}
+
+\begin{rmk}
+This wishlist is incompatible if our number system consists exclusively of rationls. This is because $m(\{p\}) = 0$, for all single rationals $p\in\mathbb{Q}$. Then $m(\mathbb{Q})=\sum m(\{p_n\}) = 0$. So the measure of all sets is zero, giving us no useful theory.
+
+We also can't make it work if we define $m(\{p\})=c>0$, because then $m(\mathbb{Q})=\infty$. This normally wouldn't be a problem, but then $m([0,1]\cap \mathbb{Q}) = \infty \neq 1$. 
+\end{rmk}
+
+\begin{rmk}
+    It also turns out that you can't satisfy the wishlist if you try to define a measure for the powerset,$\mathscr{P}(\mathbb{R})$. We'll need to consider a proper subset of $\mathscr{P}(\mathbb{R})$.
+\end{rmk}
+
+\subsection{$\sigma$-Algebras and Measurable Spaces}
+
+\begin{defn} 
+(Algebra of Sets)
+Let $X$ be any set, and let $\mathscr{A}$ be a collection of subsets of $X$ (so $\mathscr{A}\subset\mathscr{P}(\mathbb{R})$). We say that $\mathscr{A}$ is an \emph{algebra} if 
+\begin{enumerate}
+    \item $A\in\mathscr{A}\Rightarrow A^c\in\mathscr{A}$
+    \item $A,B\in\mathscr{A} \Rightarrow A\cup B\in\mathscr{A}$
+\end{enumerate}
+Implications of our definition:
+\begin{itemize}
+    \item Since $A\cap B = (A^c \cup B^c)^c$, we then know that $A,B\in\mathscr{A}\Rightarrow A\cap B\in \mathscr{A}$.
+    \item Since $A, A^c \in \mathscr{A}$ and so are intersections, then $\emptyset = A\cap A^c \in \mathscr{A}$.
+    \item The trivial set---the simplest algebra---is $\{\emptyset, X\}$.
+\end{itemize}
+\end{defn}
+
+\begin{defn} 
+($\sigma$-algebra)
+An algebra $\mathscr{A}$ is a \emph{$\sigma$-algebra} if it's closed under countable unions,  i.e. whenever $\{A_n\}^\infty_{n=1}$ is a sequence in $\mathscr{A}$, then $\bigcup^\infty_{n=1} A_n \in \mathscr{A}$. As a consequence, in a $\sigma$-algebra, $\bigcap^\infty_{n=1} A_n \in \mathscr{A}$ as well.
+\end{defn}
+
+\begin{ex}
+There exist algebras which are not $\sigma$-algebras. Take $X=\mathbb{Z}$. Then take $\mathscr{A} = \{A\subset \mathbb{Z} \; |\; \text{either $A$ or $A^c$ finite}\}$. 
+\end{ex}
+
+\begin{defn} 
+Let $X$ be a set and $U$ be a $\sigma$-algebra on $X$. Then the couplet $(X, U)$ is called a \emph{measurable space}.
+\end{defn}
+
+\subsection{Measure Spaces}
+
+\begin{defn} 
+A \emph{measure} on a measurable space $(X,U)$ is a set function $\mu: U \rightarrow [0,\infty)$.
+\end{defn}
+
+\begin{defn} 
+    A \emph{non-negative measure} is a measure that satisfies ``countable additivity'' for all sequences $\{A_n\}_{n=1}^\infty$ in $\mu$. That means $\mu\left(\bigcap^\infty_{n=1}A_n\right) = \sum^n_{n=1} \mu(A_n)$, where the $A_i$ are pairwise disjoint.
+\end{defn}
+
+\begin{defn} 
+The triplet $(X,U,\mu)$ is called a \emph{measure space}. They have the following properties:
+\begin{enumerate}
+    \item $\mu(\emptyset)=0$. To prove this, write for any non-empty set $A=A\cup\emptyset\cup\emptyset\cdots$. Then use countable addivity.
+    \item Finite additivity, which follows from countable additivity and a similar argument as 1).
+\end{enumerate}
+\end{defn}
+
+\begin{ex}
+    Take $X=\mathbb{Z}$ and $U=\mathscr{P}(\mathbb{Z})$. Then if we take a measure $\mu(A) = \#A = \text{card}\left( A \right)$, simple reasoning shows that $(X,U,\mu)$ is a measure space.
+\end{ex}
 
 
 %%%% APPPENDIX %%%%%%%%%%%
@@ -1371,7 +1499,6 @@ Now it's clear that at each stage, the subinterval we choose (after removing the
     \lim_{n\rightarrow\infty} a_n = a
 \]
 Now clearly, $a_n\in C$ for all $n$ since the endpoints are ``sticky'' in $C$.  On top of that, $a\neq c_n$ for all $n$, since we chose the subsintervals explicity not to contain $c_n$ for all $n$.  But this is a contradiction since $a$ is a limit point of $\{a_n\}\subset C$, and the closed set $C$ should contain its limit points. And so $C$ is uncountable.
-
 \end{proof}
 
 
