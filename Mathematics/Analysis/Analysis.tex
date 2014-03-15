@@ -62,7 +62,7 @@
 \usepackage{graphicx}
 \usepackage{subfigure} 
     %---For plotting multiple figures at once
-%\graphicspath{ {Directory/} }
+\graphicspath{ {Figures/} }
     %---Set a directory for where to look for figures
 
 
@@ -300,7 +300,9 @@ Taking the common refinement, and using Theorem \ref{sumineq}, we get that
 
 \subsection{Properties of $\mathscr{R}_\alpha([a,b])$}
 
-\begin{thm} The set of all continuous functions on $[a,b]$, denoted ${C}([a,b])$, is a subset of $\mathscr{R}([a,b])$.
+\begin{thm} 
+    \label{contthm}    
+The set of all continuous functions on $[a,b]$, denoted ${C}([a,b])$, is a subset of $\mathscr{R}([a,b])$.
 \end{thm}
 \begin{proof} 
 By Theorem \ref{riemcond}, we want to show that, for all $\epsilon>0$, there exists a partition $P$ such that 
@@ -1155,8 +1157,45 @@ TO DO
 \newpage
 \subsection{Improper Integrals}
 
+\begin{defn}
+(Cauchy Principal Value) Sometimes we want to consider integrating a function over the real line, we take 
+\[
+    \lim_{b\rightarrow\infty}
+    \left(\lim_{a\rightarrow-\infty} \int^b_a f\;d\alpha
+    \right) \neq 
+    \left(\lim_{a\rightarrow\infty} \int^a_{-a} f\;d\alpha
+    \right)
+\]
+where the second term is the \emph{Cauchy Principle Value}. It may sometimes exist, while the integral on the left does not. 
+\end{defn}
 
-TO DO
+\begin{ex}
+For the simplest example, take $f(x)=x$. If evaluated in the usual sense, we get $\infty-\infty$, which makes no sense. However, if we evaluate as on the righthand side above, we get a Cauchy Principle Value of $0$.
+\end{ex}
+
+\begin{ex}
+Now we have an example of a function that is continuous, non-negative everywhere, and $f\not\rightarrow 0$, but $f\in\mathscr{R}([a,\infty))$ nonetheless.
+To construct such a function, set up
+\[
+    f(x) =
+    \begin{cases}
+        1 & x\in\mathbb{Z} \\
+        / & [x - 1/x^2, x] \\
+        \text{\textbackslash} & [x, x + 1/x^2] \\
+        0 & \text{otherwise}
+    \end{cases}
+\]
+where $/$ and \textbackslash denote increasingly linear and decreasingly linear, respectively. An example is below
+\begin{figure}[h!]
+   \centering
+   \includegraphics[scale=0.45]{TriangleFunction.pdf}
+\end{figure}
+\end{ex}
+
+\begin{ex}
+Suppose that in addition to the conditions we had above, we also want $f$ to be unbounded. To deal with that, make the triangles higher, but shrink the base faster.
+\end{ex}
+
 
 \newpage
 \section{Sequences of Functions}
@@ -1342,6 +1381,7 @@ A function $f$ is Lipshitz at $x$ if, for some $C$ and $\delta>0$, we have that
     |x-y|\leq \delta \quad \Rightarrow \quad 
         |f(x) - f(y)|\leq C|x-y|
 \end{align*}
+This is a \emph{stronger} definition of uniform continuity in that Lipschitz implies uniformly continuous, but uniformly continuous does not imply Lipschitz.
 
 \subsection{Cantor Set}
 
@@ -1374,6 +1414,68 @@ Now clearly, $a_n\in C$ for all $n$ since the endpoints are ``sticky'' in $C$.  
 
 \end{proof}
 
+
+\newpage
+\section{Quizzes}
+
+\subsection{Quiz 1}
+
+\subsubsection{Question 1}
+
+Suppose that $f: [0,1]\rightarrow \mathbb{R}$ is bounded on $[0,1]$ and continuous on $(0,1)$. Without using Lebesgue's theorem, we want to show that $f\in\mathscr{R}([0,1])$.
+\begin{proof}
+Normally, we would use Theorem \ref{contthm}, but that requires continuity on $[0,1]$, and we only have it on $(0,1)$.
+\\
+\\
+As a result, we use a standard analysis trick: bounding the parts that aren't well behaved, and using nice properties where the function \emph{is} well behaved.
+\\
+\\
+And so to prove this, we want to show that there exists a $P$ such that $U(f,P)-L(f,P)<\varepsilon$ for any $\varepsilon>0$. Since $f$ is bounded, let $M = \sup_I |f(x)|$. Then, given $\varepsilon$, we set our partition so that $[x_0, x_1] = [0, \varepsilon/8M]$ and $[x_{n-1}, x_n] = [1-\varepsilon/8m, 1]$. This guarantees the contribution of this slice of the interval will be small.
+\\
+\\
+Then, we know that the remaining portion from $[\varepsilon/8m, 1-\varepsilon/8m]$ will be continuous by assumption, so we can assert the nice property that there exists a partition for which the upper and lower sums over this interval will be $\varepsilon/2$ close.
+\end{proof}
+
+\subsubsection{Question 2}
+
+Next, suppose that $f$ is improperly Riemann integrable on $[0,1]$. (Meaning that it blows up at some point, but it's okay). Define $F(x):=\int^x_0 f(t)\;dt$ and show that $F$ is uniformly continuous on $[0,1]$. Then, given an example where $F$ is not Lipschitz.
+
+\begin{proof}
+Proof by contradiction: Assume that $F$ is not uniformly continuos on $[0,1]$. Then there exists an $\varepsilon>0$ such that
+\[
+    |F(y) - F(x)| > \varepsilon \qquad
+    \forall \; \delta >0 \quad \text{ s.t. } \quad 
+    |x-y|< \delta
+\]
+But we can rewrite this as 
+\[
+    \left\lvert\int^y_x f(t)\;dt\right\rvert > \varepsilon \qquad
+    \forall \; \delta >0 \quad \text{ s.t. } \quad 
+    |x-y|< \delta
+\]
+Then the integral is bounded from below for all $\delta$, leading to problems.
+\\
+\\
+As an example of a function $f$ where $F$ is not Lipschitz, take $f(x) = 1/\sqrt{x}$. It's improperly integrable, but blows up at zero, so that you can't say it's Lipschitz.
+    
+\end{proof}
+
+\newpage
+\section{Homework Checklist}
+
+Because the TA is very\dots particular:
+\begin{itemize}
+    \item No contractions.
+    \item Be careful about the word ``clearly.'' Use sparingly.
+    \item Be explicit in notation. $M_i(\cdot)$ is not explicit.
+    \item Check that equations are equations and not inequalities.
+    \item Symmetry: $h(x) = \max\{f, 0\}$ isn't symmetric in arguments to the functions.
+    \item Don't use the word ``formally.'' 
+    \item Don't use $\forall$ or $\exists$ or s.t. or WLOG because reasons.
+    \item Define variables and expressions \emph{always}. Say what $P$ is, even if it's clear that $P$ is a partition.
+    \item Explain \emph{why} something is without loss of generality. Don't just say it.
+    \item Don't use an em-dash.
+\end{itemize}
 
 
 
