@@ -35,7 +35,7 @@
 \usepackage{mathrsfs}
 \usepackage{amsthm} %allows for labeling of theorems
 \theoremstyle{plain}
-\newtheorem{thm}{Theorem}[section]
+\newtheorem{thm}{Theorem}[subsection]
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{prop}[thm]{Proposition}
 \newtheorem{cor}[thm]{Corollary}
@@ -1150,7 +1150,7 @@ Suppose that we have $\varphi: [a,b] \rightarrow [\varphi(a), \varphi(b)]$, a di
 \]
 \end{thm}
 \begin{proof}
-TO DO
+   to do 
 \end{proof}
 
 
@@ -1269,6 +1269,8 @@ Let $\alpha\in BV([a,b])$ and $\{f_n\}_{n=1}^\infty\subset \mathscr{R}_\alpha([a
 \newpage
 \section{Measure Zero and Lebesgue's Theorem}
 
+This section tackles Lebesgue's Theorem, which provides a necessary and sufficient condition for $f\in\mathscr{R}_\alpha([a,b])$, using the concept of measure zero, which will develop in the next subsection.
+
 \subsection{Measure Zero}
 
 \begin{defn}
@@ -1280,14 +1282,15 @@ We say that $X\subset\mathbb{R}$ is \emph{measure zero} (or \emph{negligible}) i
 \end{defn}
 
 \begin{defn} 
-We say that the statement or condition $P(x)$ for $x$ in an interval $I$ holds \emph{almost everywhere} (a.e.) if 
+We say that the statement, proposition, or condition $P(x)$ for $x$ on an interval $I$ holds \emph{almost everywhere} (a.e.) if 
 \[
-    \{ x \in I \; | \; P(x) \text{ is false} \} 
+    \{ x \in I \; | \; P(x) \text{ is false or fails} \} 
     \;\; \text{is measure zero}
 \]
 \end{defn}
 
 \begin{prop}
+\label{countunion}
 Finite sets are of measure zero, and a countable union of measure zero sets is itself measure zero.
 \end{prop}
 \begin{proof}
@@ -1310,12 +1313,12 @@ and that the double union on the left is countable as the countable union of cou
     \]
 \end{proof}
 \begin{cor}
-    Any countable set is measure zero, in which case $\mathbb{Q}$ is measure zero as well.
+Any countable set is measure zero, in which case $\mathbb{Q}$ is measure zero as well.
 \end{cor}
 
 
 \begin{ex}
-The Cantor Set\footnote{See appendix for construction.} is an uncountable set of measure zero. We know its uncountable from the proof in the appendix; now we want to show measure zero.
+The Cantor Set\footnote{See appendix for construction.} is an uncountable set that is measure zero. We know its uncountable from the proof in the appendix; now we want to show measure zero.
 \\
 \\
 Recall that we constructed $C$ as 
@@ -1352,11 +1355,11 @@ And by our choice of $n^*$, we know that $\left(\frac{2}{3}\right)^{n^*} < \vare
     \frac{\varepsilon}{2}
     = \varepsilon
 \end{align*}
-And so $C$ is of measure zero.
+And so $C$ is measure zero.
 \end{ex}
 
 \begin{thm}
-Any closed interval $[a,b]$ is of measure zero.
+Any closed interval $[a,b]$ is not measure zero.
 \end{thm}
 \begin{proof}
     Suppose that we have some closed interval $I = [a,b]$ that is measure zero. Then given any $\varepsilon>0$, there must be an open cover 
@@ -1372,7 +1375,7 @@ But this leads to a contradiction because, via induction, we can show that the f
 \end{proof}
 
 \begin{note}
-Continuous a.e. $\neq$ a continuous function a.e. For example, the function $f=\chi_{\mathbb{Q} \cap [a,b]}$ equals the function $g(x)=0$ almost everywhere. \emph{However}, $f$ is discontinuous everywhere.
+Continuous a.e. $\neq$ a continuous function a.e. For example, the function $f=\chi_{\mathbb{Q} \cap [a,b]}$ equals the function $g(x)=0$ almost everywhere. \emph{However}, $f$ is discontinuous everywhere. 
 \end{note}
 
 \subsection{Lebesgue's Theorem}
@@ -1383,10 +1386,11 @@ For a bounded function $f:[a,b]\rightarrow\mathbb{R}$ and nonempty $I\subset[a,b
     \Omega_f(I) := \sup_I f - \inf_I f 
     = \sup_{x,y\in I} |f(x)-f(y)|
 \]
-We define the oscillation at a particular point $x\in I$ as 
+We define the oscillation at a particular point $x\in I$ (open) as 
 \[
 \Omega_f(x) = \inf_{I\ni \; x} \Omega_f(I)
 \]
+And just to be explicit, the infimum is taken over the set of \emph{open} intervals containing $x$.
 \end{defn}
 
 \begin{prop}
@@ -1395,10 +1399,52 @@ $f$ is continuous at $x$ if and only if $\Omega_f(x)=0$.
 \end{prop}
 
 \begin{prop}
-Note that we can write $U(f,P)-L(f,P) = \sum^n_{i=1} \Omega_f([x_{i-1}, x_i]) \Delta x_i$.
+\label{rewriteuml}
+Tying the concept back to integration, we can write 
+\[
+    U(f,P)-L(f,P) 
+    = \sum^n_{k=1} \Omega_f(I_k) \; |I_k|
+\]
+where $I_k = [x_{k-1}, x_k]$.
 \end{prop}
 
+\begin{lem}
+    \label{leblem}
+Let $f$ be a bounded function on a closed interval, $J$. If $\Omega_f(x) < \varepsilon$ for every $x$ in $J$, then there exists a partition $P$ of $J$ such that 
+\[
+    U(f,P)- L(f,P) < \varepsilon |J|
+\]
+\end{lem}
+
+\begin{proof}
+For each $x\in J$, then there's an open interval $I_x \ni x$ such that $\Omega_f(I_x)<\varepsilon$ by assumption and the definition of $\Omega_f(x)$. Thus we can say 
+\[
+    \bigcup_{x\in J} I_x \supset J
+\]
+But since $J$ is closed (and thus compact), there's a finite subcover $\{I_1, \ldots, I_n\}$. Let $P=\{x_0, x_1, \ldots, x_n\}$ be the set of endpoints of the intervals $\{I_1\cap J, \ldots, I_n\cap J\}$. Then $\Omega_f([x_{i-1},x_i])<\varepsilon$ for all $i$, and by Proposition \ref{rewriteuml}, we can write
+ 
+\[
+    U(f,P)- L(f,P) = \sum^n_{i=1} \Omega_f([x_{i-1}, x_i]) \Delta 
+    x_i < \varepsilon |J|
+\]
+\end{proof}
+
+\begin{lem}
+\label{leblem2}
+Suppose that $f$ is bounded on $[a,b]$ and that $\varepsilon>0$. Then the set $A = \{x \in [a,b] \; | \; \Omega_f(x) < \varepsilon \}$ is open in $[a,b]$.
+\end{lem}
+
+\begin{proof}
+To see this, note that $x\in A$ implies there's an open set $I\ni x$ such that $\Omega_f(I)<\varepsilon$, by the definition of $\Omega_f(x)$ and $A$.  Now since $I$ is open and $x\in I$, $x$ is interior to $I$. That means there exists a $\delta>0$ such that $(x-\delta, x+\delta)\subset I$. 
+
+Given this $\delta$, we then have that $|y-x|<\delta$ implies $\Omega_f(y) \leq \Omega_f(I) < \varepsilon$ because $y\in I$ (clearly), and $\Omega_f(y)$ is the minimum over all intervals containing $y$. 
+
+Thus, $y \in A$, and $A$ is open because you can construct an open ball, $B_\eta(x)$ that is entirely in $A$, as we just did.
+
+\end{proof}
+
 \begin{thm}
+\emph{\textbf{(Lebesgue's Theorem)}}
 Let $f$ be bounded. Then $f\in\mathscr{R}([a,b])$ if and only if $f$ is continuous ``almost everywhere''--i.e. if the set of points at which $f$ is discontinuous is measure zero or ``negligible.''
 \end{thm}
 
@@ -1410,25 +1456,120 @@ Recall from Proposition \ref{osccts} that if $f$ is discontinuous at $x$, then t
     X &= \{x \; | \; \text{$f$ discts at $x$} \} \\
         &= \bigcup_{\delta>0} \{x \; | \; \Omega_f(x)\geq \delta \} 
 \end{align*}
-(*) Now the next step is a big deal, because the set $X$ could potentially be uncountable, but we're going to write it as a countable union of sets: 
+($*$) Now the next step is a big deal, because the union above is an \emph{uncountable} union over the uncountable set of $\delta>0$. But with the following trick, we're going to write this uncountable union as a \emph{countable} union instead: 
 \begin{align*}
     X &= \bigcup_{\delta>0} \{x \; | \; \Omega_f(x)\geq \delta \} \\
     &= \bigcup^\infty_{n=1} \{x \; | \; \Omega_f(x)\geq 1/n \} =: \bigcup^\infty_{n=1}  X_n
 \end{align*}
-This works because $X$ is a union of points whose oscillation $\Omega_f(x)$ is non-zero. And by the Archimedian property, if we take $n\rightarrow \infty$ so that $1/n$ is sufficiently small, we'll capture \emph{all} of those points where $\Omega_f(x)>0$ eventually. In fact, as $n\rightarrow\infty$, size of our sets $X_n$ grows to include more and more points. On top of that, $X_n\supset X_m$ for $n>m$. Given all of these facts, we then know that the union of those sets will equal $X$.
+This works because $X$ is a union of points whose oscillation $\Omega_f(x)$ is non-zero. And by the Archimedian property, if we take $n\rightarrow \infty$ so that $1/n$ is sufficiently small, we'll capture \emph{all} of those points $\Omega_f(x)>0$ eventually, since we can get $0<1/n<\delta$ for all $\delta$. 
 
-So now the task is to show that $X_n$ is measure zero for all $n$.
+In fact, as $n\rightarrow\infty$, the size of each successive set $X_n$ grows to include more and more points. On top of that, it's also clear that $X_n\supset X_m$ for $n>m$. So given all of these facts, we then know that the union of those sets will equal $X$.
 
+So now the task is to show that $X_n$ is measure zero for all $\delta$. If we can do this, then in which case the countable union of measure zero sets will also be measure zero by Proposition \ref{countunion}.
+\\
+\\
+\textbf{($\Rightarrow$ Direction)} So consider $X_m$ (which we want to show is measure zero), and suppose that $\varepsilon>0$ is given. Then since $f\in\mathscr{R}([a,b])$, we know that there exists a partition $P$ such that
+\begin{equation}
+    \label{lebeg1}
+    U(f,P) - L(f,P) = 
+    \sum^n_{i=1} \Omega_f(I_i)\; |I_i| < \frac{\varepsilon}{2m} 
+\end{equation}
+where we rewrote the sum according to Proposition \ref{rewriteuml}, and $m$ corresponds that of $X_m$.
+\\
+\\
+Now since $P$ is finite, it suffices to show that $X_m\setminus P$ is measure zero. And so we can say
+\begin{equation}
+    \label{lebeg2}
+    \forall x \in X_m \setminus P \qquad
+    \exists I_{j} \ni x \quad \text{s.t.} \quad
+    \Omega_f(I_j) \geq \Omega_f(x) \geq \frac{1}{m}
+\end{equation}
+In words, this says that if $x$ is in the set $X_m\setminus P$, then it's in some open interval $I_j = (x_{j-1}, x_j)$. (Open since we removed the endpoints; these are our open sets covering $X_m\setminus P$, which we'll show are measure zero.) And that interval will have an oscillation greater than the ``minimum'' oscillation over all intervals containing $x$. And that minimum happens to be greater than or equal to $1/m$, since we're working with $X_m$, which is the set of all points $x$ where $\Omega_f(x)\geq 1/m$.
+\\
+\\
+And so let $I_{j}$ for $j=1,\ldots,k$ denote those intervals containing some $x\in X_m\setminus P$. Then combining Inequality \ref{lebeg1} with the information we have about the oscillation from the inequalities in \ref{lebeg2}, we see that
+\begin{align*}
+    \frac{1}{m} \sum^k_{j=1} |I_j| \leq 
+    \sum^k_{j=1} \Omega_f(x)\; |I_j| &\leq 
+    \sum^n_{k=1} \Omega_f(I_i)\; |I_i| < \frac{\varepsilon}{2m} \\
+    \Rightarrow \quad 
+    \sum^k_{j=1} |I_j| < \frac{\varepsilon}{2}
+\end{align*}
+And so taking the open sets $I_j = (x_{j-1}, x_j)$, where the endpoints correspond to the partition $P$ we got from the integrability of $f$, we can say that these intervals cover $X_m\setminus P$, and we can make them as small as necessary. 
+
+Adding in a finite number of sufficiently small open sets to account for any points we removed that were in $P$ (which we can easily do), we see that we can cover $X_m$, implying it's measure zero for all $m$.
+\\
+\\
+\textbf{($\Leftarrow$ Direction)} Next, assume that $f$ is continuous almost everwhere. We'll use the properties of $\Omega_f$ to find a good partition. Also, we'll again let $X$ be the set of points at which $f$ is discontinuous, and the sets $X_m$ will be as above as well.
+
+So let $\varepsilon>0$ (which dictates how close we'll have to make $U$ and $L$) be given. Without loss of generality, assume $f$ is not constant, which implies $\Omega_f([a,b]) > 0$.\footnote{Otherwise, $f$ is trivially integrable.} Also choose $m$ such that $\frac{b-a}{m}<\frac{\varepsilon}{2}$. Since $X_m$ is measure zero, we know that there exists a set of open intervals $\{I_n\}_1^\infty$ such that
+\[ 
+    \bigcup^\infty_{n=1} I_n \supset X_m \qquad  \text{and} \qquad
+    \sum^\infty_{n=1} |I_n| < \frac{ \varepsilon}{2\Omega_f([a,b])}
+\]
+We know that $\Omega_f([a,b])<\infty$ because $f$ is bounded.
+
+Next, we'll use the fact that $X_m$ is closed for all $m$ with respect to the relative topology of $[a,b]$. This is because the following set, by Lemma \ref{leblem2}, is open:
+\[ 
+    X_m^c = \{ x \in [a,b] \; | \; \Omega_f(x) < 1/m \}
+\]
+Since $X_m$ is closed and $[a,b]$ is compact, we know that $X_m$ is compact (as a closed subset of a compact space). This means there exists a finite subcover
+\begin{equation}
+    \label{badpartcover}
+    \bigcup^k_{j=1} I_{n_j} \supset X_m
+\end{equation}
+Now, express the interval not covered by those sets in \ref{badpartcover} as 
+\[ 
+    [a,b] \setminus \left( \bigcup^k_{j=1} I_{n_j}\right)
+    = \bigcup^p_{i=1} J_i 
+\]
+It's clear that the $J_i$ will be closed and disjoint. We just need to control the oscillation on these intervals, since the ``bad'' parts are already covered by the tiny $I_{n_j}$.
+
+Now by our definitions of everything up to this point, $x\in J_i$ implies that $x\not\in X$, which implies $x\in X^c_m$, which implies $\Omega_f(x) < 1/m$. So we can apply Lemma \ref{leblem} to say that there exists a partition $P_i$ for each $J_i$ such that 
+\[ 
+    U(f,P_i) - U(f,P_i) \leq \frac{1}{m}|P_i|
+\]
+Taking $P = \bigcup_{i=1}^p P_i \cup \{a,b\}$, we see that $P$ is a partition of $[a,b]$. Thus
+\begin{align*}
+    U(f,P) - U(f,P) &= \sum^p_{i=1} \left[
+        U(f,P_i) - U(f,P_i)\right] + \sum^k_{j=1}
+        \Omega_f(I_{n_j}) |I_{n_j}| \\
+    &\leq \frac{1}{m} \sum^p_{i=1} |J_i| 
+        + \Omega_f([a,b]) \sum^k_{j=1} |I_{n_j}| \\
+    \text{By choice of $m$ at beginning} \quad 
+        &\leq \frac{b-a}{m} + \Omega_f([a,b]) 
+        \frac{\varepsilon}{2\Omega_f([a,b])} \\
+    &\leq \frac{\varepsilon}{2} + \frac{\varepsilon}{2} =
+        \varepsilon
+\end{align*}
 \end{proof}
 
+\begin{rmk}
+The main method used in the last proof represents fairly standard approache to solving integration problems (and analysis problems, even more generally).  Namely, you separate the function into ``good'' and ``bad'' parts. (In the previous thereom, those parts were determined by the oscillations of $f$ on $[a,b]$.) Then, you make the contribution from the ``bad'' parts very small.
+\end{rmk}
 
+\begin{cor}
+If $f\in\mathscr{R}([a,b])$ and $\int^b_a |f| = 0$, then $f=0$ almost everywhere.
+\end{cor}
+
+\begin{proof}
+$f$ is continuous almost everywhere (by Lebesgue's Theorem); therefore, $|f|$ is continuous almost everywhere. 
+
+If $f$ were continuous at a point $x$ for which $f(x)\neq 0$, then there exists an interval $I\ni x$ such that $|I|>0$ and $|f|>0$, which would imply $\int^b_a |f| > 0$. Hence we see that that the set of points $\{x \; | \; f(x)\neq 0\} \subset \{x \; | \; f \text{ discont.}\}$, which is of measure zero.
+\end{proof}
+
+\begin{cor}
+If $f\in\mathscr{R}([a,b])$, then $F(x):=\int^x_0 f(t) \; dt$ implies that $F$ is differentiable almost everywhere and $F'(x)=f(x)$.
+\end{cor}
 
 \newpage
 \section{General Theory of Measure Integration}
 
-We've seen in the section about sequences of functions that we can't always exchange the limit and the integral sign. In particular, there are sequences $\{f_n\}\rightarrow f$ such that each $f_n \in \mathscr{R}_\alpha([a,b])$, but $f \not\in \mathscr{R}_\alpha([a,b])$.
+Riemann inegrals are good for continuous or piecewise continuous functions.  But for more irregular and general functions, Riemann integration breaks down.
 
-This stems from a deficiency in Riemann integrals arising from the relatively reigid structure of intervals---the sets over which we integrate. So this chapter will be about replacing integrals with more general ``measurable sets.'' 
+For example, we've seen in the section about sequences of functions that we can't always exchange the limit and the integral sign. In particular, there are sequences $\{f_n\}\rightarrow f$ such that each $f_n \in \mathscr{R}_\alpha([a,b])$, but $f \not\in \mathscr{R}_\alpha([a,b])$.
+
+This stems from a deficiency in Riemann integrals arising from the relatively reigid structure of intervals---the sets over which we integrate. So this chapter will be about replacing intervals with more general ``measurable sets'', which contain intervals as a special case.
 
 So we'll want a generalized notion of ``measure'' for subsets $A\subset\mathbb{R}$, which we'll denote $m(A)$. The function $m(\cdot)$ will be how to weight subsets of the real line.
 
@@ -1443,18 +1584,33 @@ If we're constructing a general theory from scratch, there's a number of desirea
 \end{enumerate}
 
 \begin{rmk}
-This wishlist is incompatible if our number system consists exclusively of rationls. This is because $m(\{p\}) = 0$, for all single rationals $p\in\mathbb{Q}$. Then $m(\mathbb{Q})=\sum m(\{p_n\}) = 0$. So the measure of all sets is zero, giving us no useful theory.
+This wishlist is incompatible if our number system consists exclusively of rationals. This is because $m(\{p\}) = 0$, for all single rationals $p\in\mathbb{Q}$. Then $m(\mathbb{Q})=\sum m(\{p_n\}) = 0$. So the measure of all sets is zero, giving us no useful theory.
 
 We also can't make it work if we define $m(\{p\})=c>0$, because then $m(\mathbb{Q})=\infty$. This normally wouldn't be a problem, but then $m([0,1]\cap \mathbb{Q}) = \infty \neq 1$. 
 \end{rmk}
 
 \begin{rmk}
-    It also turns out that you can't satisfy the wishlist if you try to define a measure for the powerset,$\mathscr{P}(\mathbb{R})$. We'll need to consider a proper subset of $\mathscr{P}(\mathbb{R})$.
+    It also turns out that you can't satisfy the wishlist if you try to define a measure for the power set,$\mathscr{P}(\mathbb{R})$. We'll need to consider a proper subset of $\mathscr{P}(\mathbb{R})$.
+\end{rmk}
+
+\subsection{Extended Real Number System}
+
+\begin{defn}
+We denote the extended reals by $\bar{\mathbb{R}}$, and it is constructed as 
+\[ 
+    \bar{\mathbb{R}} = {\mathbb{R}} \cup \{-\infty, \infty\}
+\]
+Open sets are defined as the open sets of $\mathbb{R}$ plus any sets of the form $[-\infty, a)$ or $(a,\infty]$ for $a\in\mathbb{R}$, along with unions of these basic building blocks too.
+\end{defn}
+
+\begin{rmk}
+For the remainder of this section, we will construct our theory for the \emph{extended} reals to allow for the greatest possible generality.
 \end{rmk}
 
 \subsection{$\sigma$-Algebras and Measurable Spaces}
 
 \begin{defn} 
+\label{algebra}
 (Algebra of Sets)
 Let $X$ be any set, and let $\mathscr{A}$ be a collection of subsets of $X$ (so $\mathscr{A}\subset\mathscr{P}(\mathbb{R})$). We say that $\mathscr{A}$ is an \emph{algebra} if 
 \begin{enumerate}
@@ -1471,39 +1627,266 @@ Implications of our definition:
 
 \begin{defn} 
 ($\sigma$-algebra)
-An algebra $\mathscr{A}$ is a \emph{$\sigma$-algebra} if it's closed under countable unions,  i.e. whenever $\{A_n\}^\infty_{n=1}$ is a sequence in $\mathscr{A}$, then $\bigcup^\infty_{n=1} A_n \in \mathscr{A}$. As a consequence, in a $\sigma$-algebra, $\bigcap^\infty_{n=1} A_n \in \mathscr{A}$ as well.
+An algebra $\mathscr{A}$ (satisfying the conditions in Definition \ref{algebra}) is a \emph{$\sigma$-algebra} if it's closed under countable unions,  i.e. whenever $\{A_n\}^\infty_{n=1}$ is a sequence in $\mathscr{A}$, then $\bigcup^\infty_{n=1} A_n \in \mathscr{A}$. As a consequence, in a $\sigma$-algebra, $\bigcap^\infty_{n=1} A_n \in \mathscr{A}$ as well.
 \end{defn}
+
+\begin{prop}
+If $\{\mathscr{M}_\alpha\}_{\alpha\in I}$ is a collection of $\sigma$-algebras, then $\bigcap_{\alpha\in I} \mathscr{M}_\alpha$ is one too.
+\end{prop}
+
+\begin{ex}
+The easiest non-trivial $\sigma$-algebra is the power set $\mathscr{P}(X)$.
+\end{ex}
+
+\begin{ex}
+The \emph{Borel $\sigma$-algebra} is defined as the smallest $\sigma$ algebra that contains all open sets (and hence, all closed sets too). It can be written as the intersection of all $\sigma$-algebras containing all open sets of $X$, which we know to be nonempty, since the power set $\mathscr{P}(X)$ is one such set.
+\end{ex}
 
 \begin{ex}
 There exist algebras which are not $\sigma$-algebras. Take $X=\mathbb{Z}$. Then take $\mathscr{A} = \{A\subset \mathbb{Z} \; |\; \text{either $A$ or $A^c$ finite}\}$. 
 \end{ex}
 
 \begin{defn} 
-Let $X$ be a set and $U$ be a $\sigma$-algebra on $X$. Then the couplet $(X, U)$ is called a \emph{measurable space}.
+Let $X$ be a set and $\mathscr{M}$ be a $\sigma$-algebra on $X$. Then the couplet $(X, \mathscr{M})$ is called a \emph{measurable space}. It is ``measur\emph{able}'' in the sense that we can assign a measure to it, which we'll discuss in this next subsection.
 \end{defn}
 
-\subsection{Measure Spaces}
+
+
+\subsection{Non-Negative Measures and Measure Spaces}
 
 \begin{defn} 
-A \emph{measure} on a measurable space $(X,U)$ is a set function $\mu: U \rightarrow [0,\infty)$.
-\end{defn}
-
-\begin{defn} 
-    A \emph{non-negative measure} is a measure that satisfies ``countable additivity'' for all sequences $\{A_n\}_{n=1}^\infty$ in $\mu$. That means $\mu\left(\bigcap^\infty_{n=1}A_n\right) = \sum^n_{n=1} \mu(A_n)$, where the $A_i$ are pairwise disjoint.
+A \emph{measure} on a measurable space $(X,U)$ is a set function $\mu: U \rightarrow [0,\infty]$.
 \end{defn}
 
 \begin{defn} 
-The triplet $(X,U,\mu)$ is called a \emph{measure space}. They have the following properties:
+A \emph{non-negative measure} is a measure that satisfies 
 \begin{enumerate}
-    \item $\mu(\emptyset)=0$. To prove this, write for any non-empty set $A=A\cup\emptyset\cup\emptyset\cdots$. Then use countable addivity.
-    \item Finite additivity, which follows from countable additivity and a similar argument as 1).
+    \item $\mu(A)<\infty$ for at least one $A\in\mathscr{M}$ 
+    \item \emph{Countable additivity} for all sequences $\{A_n\}_{n=1}^\infty$ in $\mu$. That means 
+        \[
+            \mu\left(\bigcap^\infty_{n=1}A_n\right) 
+            = \sum^n_{n=1} \mu(A_n)
+        \]
+        where the $A_i$ are pairwise disjoint.
 \end{enumerate}
 \end{defn}
+
+\begin{defn} 
+If we add a non-negative measure to a measure space, then the triplet $(X,\mathscr{M},\mu)$ is called a \emph{measure space}. 
+\end{defn}
+
+\subsection{Properties of Measure Spaces}
+
+Measure spaces have a number of properties that follow from the framework and conditions imposed upon them, which we saw in the definitions of $\sigma$-algebras and positive measures. Here, we enumerate those properties and provide justifications for them:
+\begin{enumerate}
+
+\item $\mu(\emptyset)=0$. To see this, write for any non-empty set $A=A\cup\emptyset\cup\emptyset\cdots$. Then use countable addivity.
+
+\item Finite additivity, which follows from countable additivity and an argument like (1).
+
+\item If $A,B\in \mathscr{M}$, then $A\setminus B \in \mathscr{M}$. To see this, write $A\setminus B = A \cap B^c$.
+
+\item If $A \subseteq B$, then $\mu(A) \leq \mu(B)$. 
+\begin{proof}
+This follows because $B = A \cup (B\setminus A)$, which is a union of disjoint sets. Then use finite additivity to say $\mu(B) = \mu(A) + \mu(B\setminus A) \geq \mu(A)$.
+\end{proof}
+
+\item Given a nesting of measurable sets $A_1\subset A_2\subset A_3 \subset \cdots$
+\[
+    \mu\left(\bigcup^\infty_{n=1} A_n\right) = 
+    \lim_{n\rightarrow\infty} \mu(A_n)
+\]
+\begin{proof}
+To exchange sums and unions, we need to use countable additivity. But we can only do so if the sequences are pairwise disjoint, so construct the following pairwise disjoint sequence of sets 
+\begin{align*}
+    B_1 = A_1 \qquad B_2 = A_2 \setminus A_1
+    \qquad B_3 = A_3 \setminus A_2 \qquad \cdots
+\end{align*}
+Then note that we can equivalently work with the sequence $\{B_n\}_1^\infty$ instead of $\{A_n\}_1^\infty$:
+\[ 
+    A_N = \bigcup^N_{n=1} A_n =
+    \bigcup^N_{n=1} B_n 
+    \qquad \Rightarrow \qquad
+    \bigcup^\infty_{n=1} A_n =
+    \bigcup^\infty_{n=1} B_n 
+\]
+So then we can exploit countable and finite additivity for disjoint sets:
+\begin{align*}
+    \mu\left(\bigcup^\infty_{n=1} A_n \right)
+    = \mu\left(\bigcup^\infty_{n=1} B_n \right)
+    &= \sum^\infty_{n=1} \mu(B_n)
+        = \lim_{N\rightarrow\infty}\sum^N_{n=1} \mu(B_n) 
+    = \lim_{N\rightarrow\infty}
+        \mu\left(\bigcup^N_{n=1} B_n\right) \\
+    &= \lim_{N\rightarrow\infty}
+        \mu\left(\bigcup^N_{n=1} A_n\right) 
+    = \lim_{N\rightarrow\infty}
+        \mu\left(A_n\right)  
+\end{align*}
+\end{proof}
+
+
+\item \emph{Countable Sub-Additivity}: For \emph{any} (non necessarily pairwise disjoint or nested) sequence of sets $\{A_n\}_1^\infty$, we have
+    \[ 
+        \mu\left(\bigcup^\infty_{n=1} A_n\right)
+        \leq \sum^n_{i=1} \mu(A_n)
+    \]
+\begin{proof}
+Similar to the proof of the last property, construct the sets
+\[
+    B_1 = A_1 \qquad B_2 = A_2 \setminus A_1 
+    \qquad B_3 = A_3 \setminus (B_1 \cup B_2)
+\]
+Clearly, we have $B_i \cap B_j$ for all $i\neq j$. On top of that $B_n \subset A_n$ for all $n$. Thus
+\[
+    \mu\left(\bigcup^\infty_{n=1} A_n\right)
+    = \mu\left(\bigcup^\infty_{n=1} B_n\right)
+    = \sum^n_{i=1}\mu(B_n) 
+    \leq \sum^n_{i=1} \mu(A_n)
+\]
+\end{proof}
+
+
+\item Let $A_1 \supset A_2 \supset A_3 \supset \cdots$. If there exists a $k$ such that $\mu(A_k)<\infty$, then 
+    \[
+        \mu\left(\bigcap^\infty_{n=1} A_n\right)
+        = \lim_{n\rightarrow\infty} \mu(A_n)
+    \]
+\begin{proof}
+Without loss of generality, assume that $k=1$. Then construct the following sets
+\[
+    B_1 = A_1 \setminus A_2 \qquad
+    B_2 = A_2 \setminus A_3 \qquad
+    \cdots\qquad
+    B_n = A_n \setminus A_{n+1} 
+\]
+Then, for all $n$, we can express $A_1$ as a disjoint union
+\begin{align}
+    A_1 &= B_1 \cup B_2 \cup \cdots \cup B_n
+    \cup A_{n+1} \notag\\
+    \Rightarrow \qquad 
+    \mu(A_1) &= \sum^n_{\ell=1} \mu(B_\ell) + 
+    \mu(A_{n+1}) \label{prop.6.1}
+\end{align}
+Next, we can also say that if $x\not\in \bigcup^\infty_{n=1} B_n$, then we must have $x\in A_n$ for all $n$. This implies that we can express $A_1$ as the following disjoint union:
+\begin{align}
+    A_1 &= \left(\bigcup^\infty_{n=1} B_n \right)\cup 
+        \left(\bigcap^\infty_{n=1} A_n\right) \notag \\
+    \Rightarrow \qquad 
+        \mu(A_1) &= 
+        \sum^\infty_{n=1} \mu(B_n) +
+        \mu\left(\bigcap^\infty_{n=1} A_n\right) 
+        \label{prop.6.2}
+\end{align}
+And since we know that $\lim_{n\rightarrow \infty} \sum^n_{\ell=1} \mu(B_\ell) = \sum^\infty_{\ell=1} \mu(B_\ell)$, we can deduce from Equations \ref{prop.6.1} and \ref{prop.6.2} (and from the fact that $\mu(A_{n+1}) \leq \mu(A_n) <\infty$) that 
+\[ \mu(A_{n+1})\rightarrow 
+    \mu\left(\bigcap^\infty_{n=1} A_n\right)
+\]
+\end{proof}
+\end{enumerate}
+
 
 \begin{ex}
     Take $X=\mathbb{Z}$ and $U=\mathscr{P}(\mathbb{Z})$. Then if we take a measure $\mu(A) = \#A = \text{card}\left( A \right)$, simple reasoning shows that $(X,U,\mu)$ is a measure space.
 \end{ex}
 
+\begin{ex}
+    We stipulated in property (7) for our measure space that there must be some $k$ such that $\mu(A_k)<\infty$. Suppose that didn't hold, and we can construct a counterexample. 
+    
+    Consider $X = \mathbb{N}$ and $\mathscr{M} =\mathscr{P}(\mathbb{N})$. Next let $A_n = \{n, n+1, n+2, \ldots\}$. In this case, $\mu(A_n) = \infty$ for all $n$, but
+    \[ 
+        \mu\left(\bigcap^\infty_{n=1} A_n\right) = 
+        \mu(\emptyset) = 0
+    \]
+\end{ex}
+
+\subsection{Measurable Functions}
+
+
+Given a function $f:X\rightarrow\mathbb{R}$, an equivalent representation of the function $f$ is by the disjoint collection $\{E_a\}_{a\in\mathbb{R}}$ where $E_a = f^{-1}\left(\{a\}\right)$. In this way, we partition the space $X$ based on what $f$ maps different subsets of $X$ to.  
+
+This is exactly equivalent to definining an output $y=f(x)\in\mathbb{R}$ for every $x\in X$.  it's just a different way of looking at the function $f$. Moreover, it's a way that we'll use to our benefit for integration, by thinking about a $\sigma$-algebra on $X$. In this way, some of the sets $E_a$ will be measurable (i.e. they will be in $\mathscr{M}$) while others will not.
+
+\begin{defn}
+Let $(X,\mathscr{M})$ be a measurable space and let $f:X\rightarrow\bar{\mathbb{R}}$ be a function mapping to the extended reals. We say that $f$ is a \emph{measurable function} if $f^{-1}(U)$ is measurable (i.e.  $f^{-1}(U)\in\mathscr{M}$) whenever $U\subset\bar{\mathbb{R}}$ is open.\footnote{And, hence, closed as well} 
+\end{defn}
+
+\begin{rmk}
+The notion of a measurable function is \emph{heavily} dependent upon our choice of $\mathscr{M}$.  Specifically, measurable functions are always \emph{relative to a given $\sigma$-algebra}, as we'll see in the next example.
+\end{rmk}
+
+\begin{ex}
+Let $X$ be any set. If we take $\mathscr{M} = \mathscr{P}(X)$, the power set of $X$, then \emph{any} function $f$ is measurable, since $f^{-1}(U)$ will be in $\mathscr{P}(X)$ for any open $U\subset \bar{\mathbb{R}}$.
+\end{ex}
+
+\begin{prop}
+Given a measurable space $(X,\mathscr{M})$ and a measurable function $f$, the set
+\[
+    S = \{B \subset \bar{\mathbb{R}} \; | \; f^{-1}(B) 
+    \text{ measurable} \}
+\]
+is a $\sigma$-algebra on $\bar{\mathbb{R}}$ that contains all open sets of $\bar{\mathbb{R}}$.  
+\end{prop}
+
+\begin{rmk}
+This implies something about the Borel Set for $\bar{\mathbb{R}}$, denoted $\mathscr{B}_{\bar{\mathbb{R}}}$. Namely, that $f^{-1}(B)\in \mathscr{M}$ for all open sets $B\in\mathscr{B}_{\bar{\mathbb{R}}}$.
+\end{rmk}
+
+\begin{thm}
+$f$ is measurable if and only if $f^{-1}\left((a,\infty]\right)\in\mathscr{M}$ for all $a\in\mathbb{R}$. 
+\end{thm}
+
+\begin{thm}
+If $X=\mathbb{R}$ and $\mathscr{M}=\mathscr{B}_\mathbb{R}$ with $f:\mathbb{R}\rightarrow\mathbb{R}$ continuous, then $f$ is measurable.
+\end{thm}
+
+\begin{lem}
+Let $f:X\rightarrow\mathbb{R}$ be measurable and $\varphi: \mathbb{R}\rightarrow\mathbb{R}$ be continuous. Then $\varphi\circ f$ is also measurable.
+\end{lem}
+\begin{proof}
+For an open set $U\subset\mathbb{R}$, 
+\begin{align*}
+    (\varphi\circ f)^{-1}(U) &= 
+        f^{-1}\left(\varphi^{-1}(U)\right)
+    = f^{-1}(V) \qquad \text{where }V = \varphi^{-1}(U)
+\end{align*}
+We know that $V$ is open by the continuity of $\varphi$, and since $f$ is measurable, $f^{-1}(V)\in\mathscr{M}$.
+\end{proof}
+
+\begin{cor}
+If $f$ is measurable, then so is $c f$ for $c\in\mathbb{R}$, $|f|$, and $f^2$.
+\end{cor}
+
+\begin{thm}
+Let $\{f_n\}^\infty_1$ be a sequence of measurable functions with $f_n: X\rightarrow\bar{\mathbb{R}}$. Then the following function is measurable as well:
+    \[ f(x) := \sup_n f_n(x) \]
+\end{thm}
+\begin{proof}
+For all $a\in\mathbb{R}$, note that 
+\begin{equation}
+    \label{measseq}
+    \{x \; | \; f(x) > a \} = \bigcup_n \; \{x \; | \; f_n(x)>a\}
+\end{equation}
+To see this, note that if $f(x)>a$, then there's some $n$ for which $f_n(x)>a$, given that same $x$. So the lefthand side is a subset of the righthand side. On the other hand, if $f_m(x)>a$ for some $m$, then the sup over the $f_n$ will be at least as large as $f_m(x)$. Hence the right is a subset of the left, proving equality.
+
+Next, note that we can rewrite Equality \ref{measseq} above as 
+\[ 
+    f^{-1}\left((a,\infty]\right) = 
+    \{x \; | \; f(x) > a \} = \bigcup_n \; \{x \; | \; f_n(x)>a\}
+    = \bigcup_n \; f_n^{-1}\left((a,\infty]\right) 
+\]
+Since $f_n^{-1}\left((a,\infty]\right)$ will be in $\mathscr{M}$ for all $n$ by the measrability of each $f_n$, we can say that the union of all these sets in $\mathscr{M}$ will also be in $\mathscr{M}$ by the definition of $\mathscr{M}$ being a $\sigma$-algebra. Thus, $f^{-1}\left( (a, \infty]\right) \in\mathscr{M}$, implying that $f$ is measurable.
+\end{proof}
+
+\begin{cor}
+If $f_n$ is measurable, then so is 
+\begin{itemize}
+    \item $f(x) := \inf_n f_n(x)$
+    \item $f(x) := \lim \sup f_n(x) = \lim_{k\rightarrow\infty} \left(\sup_{n\geq k} f_n\right)$.
+    \item $f(x) := \lim \inf f_n(x) = \lim_{k\rightarrow\infty} \left(\inf_{n\geq k} f_n\right)$.
+\end{itemize}
+
+\end{cor}
 
 %%%% APPPENDIX %%%%%%%%%%%
 
