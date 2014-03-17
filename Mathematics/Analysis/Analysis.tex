@@ -1833,6 +1833,7 @@ This implies something about the Borel Set for $\bar{\mathbb{R}}$, denoted $\mat
 \end{rmk}
 
 \begin{thm}
+\label{measequiv}
 $f$ is measurable if and only if $f^{-1}\left((a,\infty]\right)\in\mathscr{M}$ for all $a\in\mathbb{R}$. 
 \end{thm}
 
@@ -1885,8 +1886,78 @@ If $f_n$ is measurable, then so is
     \item $f(x) := \lim \sup f_n(x) = \lim_{k\rightarrow\infty} \left(\sup_{n\geq k} f_n\right)$.
     \item $f(x) := \lim \inf f_n(x) = \lim_{k\rightarrow\infty} \left(\inf_{n\geq k} f_n\right)$.
 \end{itemize}
-
 \end{cor}
+
+\begin{thm}
+\label{convmeas}
+If a sequnce of measurable functions $\{f_n\}\rightarrow f$ pointwise, then $f$ is measurable.\footnote{This shows that measurable functions are potentially more powerful, because continuity isn't preserved so nicely. That requires more stringent uniform convergence.}
+\end{thm}
+
+\begin{thm}
+    \label{summeas}
+If $f, g$ are measurable, then $f+g$ is also measurable.
+\end{thm}
+\begin{proof}
+To prove, we will make use of Theorem \ref{measequiv}. That means we have to show that $(f+g)^{-1}\left( (a, \infty]\right)$ is in $\mathscr{M}$ for all $a\in\mathbb{R}$. So let's start with another way to represent that set
+\[
+    (f+g)^{-1}\left( (a, \infty]\right)
+    =\{x \; | \; f(x) + g(x) > a\} 
+\]
+But we can rewrite the expression as follows, rearranging terms a bit as we go:
+\begin{align*}
+    \{x \; | \; f(x) + g(x) > a\} &= 
+        \{x \; | \; f(x) > a - g(x) \}  \\
+    &= \bigcup_{r\in \mathbb{R}} 
+        \left( \{ x \; | \: f(x) > r\}
+        \cap \{ x \; | \; r > a - g(x) \}
+        \right) \\
+    &= \bigcup_{r\in \mathbb{R}} 
+        \left( \{ x \; | \: f(x) > r\}
+        \cap \{ x \; | \; g(x) > a - r \}
+        \right) 
+\end{align*}
+Now we'll rewrite the intersection above, naming the sets in the intersection. On top of that, we'll also take the union over $\mathbb{Q}$ instead of $\mathbb{R}$. See the end of the proof for why we can do that, but in the meantime.
+\begin{align*}
+    \{x \; | \; f(x) + g(x) > a\} 
+    &= \bigcup_{r\in \mathbb{Q}} 
+        A_r \cap B_r  \\\\
+    \text{where } \quad 
+        A_r = \{ x \; | \: f(x) > r\} &\qquad
+        B_r = \{ x \; | \; g(x) > a - r \}
+\end{align*}
+Now since $f$ is measurable and $g$ is measurable, we know that $A_r = f^{-1}\left( (r, \infty]\right)$ and $B_r = g^{-1}\left( (a-r, \infty])\right)$ will both be in $\mathscr{M}$. And thus, their intersection will be, and a countable union will be as well, implying that $f^{-1}\left( (a,\infty]\right)$, our starting set, is in $\mathscr{M}$. And so $f+g$ is measurable.
+
+Oh, and that part about taking the union over $\mathbb{Q}$ instead of $\mathbb{R}$? We can do that for this reason. Suppose there's some $r \in \mathbb{R} \setminus \mathbb{Q}$ such that $f(x)>r$ and $r>a-g(x)$. Also suppose, without loss of generality, that $r>0$. 
+
+Well then, since the rationals are dense in the reals, we know that there's a rational, call it $q$ between $r$ and $a-g(x)$ for all $f\in\mathbb{R}$. That means $f(x)>r>q$. It also means that $q>a-g(x)$. Thus, $r$ and $q$ accomplish the same task: we'll have \emph{both} $f(x)>n$ \emph{and} $n>a-g(x)$ whether $n=r$ or $n=q$. So we'll hit all the points we need to if we just take the union we saw above over $\mathbb{Q}$ instead of $\mathbb{R}$.
+\end{proof}
+
+\begin{rmk}
+This last proof shows that measurable functions for a \emph{vector space}, since they are closed under addition.
+\end{rmk}
+
+\begin{cor}
+If $f$ and $g$ are measurable functions, then so is $fg$.
+\end{cor}
+\begin{proof}
+Recall that we can write the product
+\[ 
+    fg = \frac{1}{2}\left[(f+g)^2 - f^2 - g^2\right]
+\]
+Then apply the theorems we had about sums and continuous compositions.
+\end{proof}
+
+\begin{cor}
+If $\{f_n\}$ is a sequnce of measurable unctions and $\sum^n_{i=1} f_n$ converges, then $\sum^n_{i=1} f_n$ is also measurable. 
+\end{cor}
+\begin{proof}
+We know that $S_N = \sum^N_{i=1} f_n$ is also measurable by Theorem \ref{summeas}. Then, since $S_N\rightarrow F$, we know that $F$ is measurable too by Theorem \ref{convmeas}.
+\end{proof}
+
+\subsection{Simple Functions}
+
+
+
 
 %%%% APPPENDIX %%%%%%%%%%%
 
