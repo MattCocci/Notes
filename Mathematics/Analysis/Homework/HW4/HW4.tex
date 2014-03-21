@@ -1,0 +1,288 @@
+\documentclass[12pt]{article}
+
+\author{Matthew Cocci}
+\title{\textbf{Homework 4}}
+\date{\today}
+
+%% Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{fullpage}
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\pagestyle{fancy} 
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt} 
+    %---Make the header bigger to avoid overlap
+
+%\renewcommand{\headrulewidth}{0.3pt} 
+    %---Width of the line
+
+%\setlength{\headsep}{0.2in}    
+    %---Distance from line to text
+            
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{amsthm} %allows for labeling of theorems
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+%\usepackage{blindtext}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{graphicx}
+\usepackage{subfigure} 
+    %---For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %---Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref} 
+\hypersetup{	
+    colorlinks,		
+        %---This colors the links themselves, not boxes
+    citecolor=black,	
+        %---Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\usepackage{verbatim} 
+    %---For including verbatim code from files, no colors
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{RGB}{28,172,0}
+\definecolor{mylilas}{RGB}{170,55,241}
+\newcommand{\matlabcode}[1]{%
+    \lstset{language=Matlab,%
+        basicstyle=\footnotesize,%
+        breaklines=true,%
+        morekeywords={matlab2tikz},%
+        keywordstyle=\color{blue},%
+        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+        identifierstyle=\color{black},%
+        stringstyle=\color{mylilas},%
+        commentstyle=\color{mygreen},%
+        showstringspaces=false,%
+            %---Without this there will be a symbol in 
+            %---the places where there is a space
+        numbers=left,%
+        numberstyle={\tiny \color{black}},% 
+            %---Size of the numbers
+        numbersep=9pt,% 
+            %---Defines how far the numbers are from the text
+        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+            %---Some words to emphasise
+    }%
+    \lstinputlisting{#1}
+}
+    %---For including Matlab code from .m file with colors,
+    %---line numbering, etc. 
+
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\usepackage{enumitem} 
+    %---Has to do with enumeration	
+\usepackage{appendix}
+%\usepackage{natbib} 
+    %---For bibliographies
+\usepackage{pdfpages}
+    %---For including whole pdf pages as a page in doc
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%\newcommand{\nameofcmd}{Text to display}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+\begin{document}
+
+\maketitle 
+
+\begin{enumerate}
+
+\item 
+\begin{enumerate}
+\item \textbf{Exercise 57.7}: We want to show that $f$ continuous on $[a,b]$ with $f(x)=0$ almost everywhere on $[a,b]$ implies that $f(x)=0$ for all $x\in[a,b]$. We'll do so by contradiction.
+
+So suppose that $f(x)=0$ almost everywhere, but there exists an $x\in[a,b]$ such that $f(x)\neq 0$. That means that 
+\[ 
+    |f(x)| > \varepsilon \qquad \text{for some $\varepsilon>0$}
+\]
+Then, using this $\varepsilon$, by the continuity of $f$, we know that there exists a $\delta>0$ such that
+\[
+    |x-y|<\delta \quad \Rightarrow \quad |f(x)-f(y)|<\varepsilon
+\]
+Now since this is the case, we can say that
+\[
+    y\in(x-\delta, x+\delta) \quad \Rightarrow \quad 
+    f(y) \in \left(f(x)-\varepsilon, f(x)+\varepsilon\right)
+\]
+Supposing, without loss of generality, that $f(x) > 0$, we have that 
+\[
+    f(x) > \varepsilon \quad \Rightarrow \quad
+    f(x) - \varepsilon > 0
+\]
+Thus, we can conclude that, $f(y) > 0$ for all $y\in(x-\delta, x+\delta)$.\footnote{A similar result holds if $f(x)<0$, just flip the direction of the inequality.}
+
+\item \textbf{Exercise 57.8}: We want to show that if $\alpha\in BV([a,b])$, then $\alpha$ is continuous almost everywhere in $[a,b]$.  
+
+Now if we want a cheap proof, we can say that $\alpha$ is of bounded variation, and so it's Riemann Integrable. In that case, by Lebesgue's Theorem, $\alpha$ is continuous almost everywhere, and we're done.
+
+\emph{But}, that's kind of cheating. So let's use the hint, which says to prove that a monotonic function has at most countably many points of discontinuity. If we can prove this, then we're done. Here's the steps and results from class that motivate that statement:
+\begin{enumerate}
+    \item We know from class that our function $\alpha$ of bounded variation can be represented as the difference of monotonically increasing functions, $u$ and $v$.
+    \item By the hint we will prove, each monotonic function will have at most countably many points of discontinuity. Call those sets of points $D_u$ and $D_v$.
+    \item Since these two sets $D_u$ and $D_v$ are at most countable, each set will be of measure zero by a result we saw in class. 
+    \item Since the total set of discontinuities for $f$ is the union $D_u \cup D_v$, we know that this finite union of at most countable sets will be at most countable, and so measure zero.
+    \item Finally, we now have that the set of discountinuities of $f$ is measure zero, implying $f$ is continuous almost everywhere.
+\end{enumerate}
+Now let's prove that monontonic functions have at most countable many points of discontinuities, so that whole line of reasoning doesn't fall apart.
+
+Let $A$ equal the set of discontinuities of $f$. Denote the righthand limit at $a\in A$ as $f(a^+)$, and lefthand limit as $f(a^-)$. Now since $f$ is monotonic, we know that $f(a^-) < f(a^+)$. Now because we're on the real line, we know that there exists a $q_a\in\mathbb{Q}$ such that
+\[
+    f(a^-) < q_a < f(a^+)   \qquad \forall a \in A
+\]
+And because $f$ is monotonic, each $q_a$ will be unique for each point of discontinuity. That's because if $b$ is a point of discontinuity greater than $a$, then $f(b^-)>f(a^+)$ by the monotonicity of $f$. 
+\\
+\\
+And so this establishes a one to one correspondence between $A$ and $\mathbb{Q}$ (or a subset of $\mathbb{Q}$ if $A$ finite). So $A$ is countable.
+
+\end{enumerate}
+
+\item \textbf{Exercise 58.1}: Let $f\in\mathscr{R}([a,b])$ and suppose $\int^x_a f\;dx = 0$ for all $x\in(a,b]$. We want to show that $f(x)=0$ almost everywhere in $[a,b]$. We'll do this by contradiction, in a manner similar to Question (1a).
+
+Start with the fact that $f\in\mathscr{R}([a,b])$. First, by the Fundamental Theorem of calculus, $F(x)=\int^x_a f\;dx$ is continuous and differentiable wherever $f$ is continuous. Then by Lebesgue's theorem, $f$ is continuous almost everywhere. 
+
+So let $x^*$ be a point where $f$ is continuous in $(a,b]$. Then, because $f$ is continuous, we know that for any $\varepsilon>0$, there exists a $\delta>0$ such that 
+\[
+    |x^*-x|<\delta \quad \Rightarrow \quad |f(x^*)-f(x)|<\varepsilon
+\]
+Thus, we can write $F(x^*)$ as 
+\[
+    F(x^*) = \int^{x^*}_a f\;dx = 
+\]
+Use Lebesgue, think of question one, split up integral from $[a,x-\delta]$ and $[x-\delta, x]$, the latter half of which will be greater than 0.
+    
+\item 
+\begin{enumerate}
+\item 
+Let $S$ equal the set of all finite unions of intervals in $\mathbb{R}$:
+\[
+    S = \left\{ \bigcup^n_{i=1} I_i \quad | \quad
+    I_i \text{ is an interval in }  \mathbb{R} 
+    \right\}
+\]
+First, we show that this is an algebra. To do so, we need to show that the properties of an algebra are satisfied:
+\begin{itemize}
+    \item To show $A\in{S}\Rightarrow A^c\in S$, write out $A$:
+    \[ 
+        A = \bigcup^n_{i=1} I_i  
+    \]
+    By DeMorgan's laws, we can rewrite
+    \begin{align*}
+        A^c &= \left(\bigcup^n_{i=1} I_i \right)^c 
+        = \bigcap^n_{i=1} I^c_i  \\
+    \end{align*}
+    But for an interval 
+    
+\end{itemize}
+
+\item To show that a union of two algebras need not be an algebra, consider the following two algebras:
+\begin{align*}
+    \mathscr{A}_1 &= \{ A \subset \mathbb{Z} \; | \;
+        A \text{ or } A^c \text{ odd} \} \\
+    \mathscr{A}_2 &= \{ A \subset \mathbb{Z} \; | \;| 
+        A \text{ or } A^c \text{ even} \}
+\end{align*}
+Both are clearly algebras. First, a union of odd numbers will be odd, and the same for even. Second, by the criterion that the set \emph{or} it's complement is odd, we guarantee that $A\in\mathscr{A}_1$ implies $A^c\in\mathscr{A}_1$. Same for even.
+
+Now, we can also easily show that $\mathscr{A}_1 \cup \mathscr{A}_2$ is not an algebra. We do this by taking the sets
+\[
+    A_1 \cup A_2 = \{1\} \cup \{2\} = \{1,2\}
+    \qquad A_1 \subset \mathscr{A}_1
+    \quad A_2 \subset \mathscr{A}_2
+\]
+Now since $\{1,2\}$ has both odd and even numbers (and so does its compliment) $A_1 \cup A_2$ will be in neither $\mathscr{A}_1 \cup \mathscr{A}_2$. Therefore, it won't be in $\mathscr{A}_1 \cup \mathscr{A}_2$, violating a basic property of algebras.
+
+\end{enumerate}
+
+\item 
+\item 
+\item 
+\item Use Theorem 4.6.4 from the notes. Draw the function to get intuition.
+
+For other direction, show contrapositive.
+
+
+\end{enumerate}
+
+\end{document}
+
+
+
+%%%% INCLUDING FIGURES %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+   % H indicates here 
+   %\begin{figure}[h!]
+   %   \centering
+   %   \includegraphics[scale=1]{file.pdf}
+   %\end{figure}
+
+%   \begin{figure}[h!]
+%      \centering
+%      \mbox{
+%	 \subfigure{
+%	    \includegraphics[scale=1]{file1.pdf}
+%	 }\quad
+%	 \subfigure{
+%	    \includegraphics[scale=1]{file2.pdf} 
+%	 }
+%      }
+%   \end{figure}
+ 
+
+%%%%% Including Code %%%%%%%%%%%%%%%%%%%%%5
+% \verbatiminput{file.ext}    % Includes verbatim text from the file
+% \texttt{text}	  % includes text in courier, or code-like, font
