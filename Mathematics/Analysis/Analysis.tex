@@ -145,7 +145,7 @@
 \newpage
 \section{The Riemann-Stieltjes Integral}
 
-This definition of the integral was made rigorous in the 1800s by Riemann, Darboux, and Stieltjes.  It's an intuitive way to define the area under a curve, and it works well with numerical integration (approximations). \emph{However}, it is incomplete in the sense that there are functions of interest that we cannot integrate in a Riemann sense but can in a Lebesgue sense. 
+This definition of the integral was made rigorous in the 1800s by Riemann, Darboux, and Stieltjes.  It's an intuitive way to define the area under a curve, and it works well with numerical integration (approximations). \emph{However}, it is incomplete in the sense that there are functions of interest that we cannot integrate in a Riemann sense but can in a Lebesgue sense, which retains Riemann as a special case.
 
 Throughout this section, unless otherwise noted, we'll largely stick to bounded functions that are univariate from a compact interval to $\mathbb{R}$: 
 
@@ -271,7 +271,8 @@ We can assert that the sup and inf exist because $f$ is bounded. From Theorem \r
 \end{defn}
 
 \begin{ex} A case where $f \notin \mathscr{R}_\alpha([a,b])$ is where 
-    \[ f(x) = \begin{cases} 1 & $x$\text{ rational} \\
+    \[ f(x) = \chi_{\mathbb{Q}\cap [a,b]}
+        =\begin{cases} 1 & $x$\text{ rational} \\
             0 & $x$\text{ irrational} \end{cases}\]
 for $x\in[0,1]$. In this case, the upper integral is always 1, while the lower integral is always zero.
 \end{ex}
@@ -302,7 +303,7 @@ Taking the common refinement, and using Theorem \ref{sumineq}, we get that
 
 \begin{thm} 
     \label{contthm}    
-The set of all continuous functions on $[a,b]$, denoted ${C}([a,b])$, is a subset of $\mathscr{R}([a,b])$.
+The set of all continuous functions on $[a,b]$, denoted ${C}([a,b])$, is a subset of $\mathscr{R}([a,b])$.\footnote{Note that we need continuity over \emph{all} of $[a,b]$. If $f$ isn't continuous at the endpoints, we can't apply this proof directly. We instead need to split up $[a,b]$ into ``good'' and ``bad'' parts.}
 \end{thm}
 \begin{proof} 
 By Theorem \ref{riemcond}, we want to show that, for all $\epsilon>0$, there exists a partition $P$ such that 
@@ -358,12 +359,16 @@ and $c \in \mathbb{R}$.
             there then exists $\delta>0$ such that 
             \begin{equation}
                 \label{cont}
-                 |u- v| \leq \delta \quad \Rightarrow
-                    \quad |g(u) - g(v)| \leq \varepsilon
+                 |u- v| \leq 2K\delta \quad \Rightarrow
+                    \quad |g(u) - g(v)| \leq 
+                    \frac{\varepsilon}{2\left[\alpha(b)-\alpha(a)
+                    \right]}
             \end{equation}
-            Finally, $g$ also happens to be bounded because it
+            where $K$ is some positive, finite number. But what
+            is $K$ exactly? Well,
+            $g$ also happens to be bounded because it is
             continuous on a compact interval, thus $|g(x)| \leq K$
-            for some $K$ and all $x$.
+            for some $K$ and all $x$. So we'll go with that.
             \\
             \\
             Next, since we know that $f \in 
@@ -374,17 +379,17 @@ and $c \in \mathbb{R}$.
                  U_\alpha(f,P)- L_\alpha(f,P) \leq \epsilon\cdot
                     \delta
             \end{equation}
-            And, considering the building blocks $M_i(f)$ and 
-            $m_i(f)$, by the uniform continuity of $g$, we
-            also have for any $i$, for all $\varepsilon$, there must
-            be a $\delta$ such that
-            \begin{equation}
-                \label{compcont}
-                M_i(f) - m_i(f) < 2K{\delta}
-                    \quad \Rightarrow \quad 
-                    M_i(g\circ f) - m_i(g\circ f) \leq 
-                    \frac{\varepsilon}{2[\alpha(b)-\alpha(a)]}
-            \end{equation}
+            %And, considering the building blocks $M_i(f)$ and 
+            %$m_i(f)$, by the uniform continuity of $g$, we
+            %also have for any $i$, for all $\varepsilon$, there must
+            %be a $\delta$ such that
+            %\begin{equation}
+            %    \label{compcont}
+            %    M_i(f) - m_i(f) < 2K{\delta}
+            %        \quad \Rightarrow \quad 
+            %        M_i(g\circ f) - m_i(g\circ f) \leq 
+            %        \frac{\varepsilon}{2[\alpha(b)-\alpha(a)]}
+            %\end{equation}
             Now that everything's spelled out, 
             we're interested in showing Riemann 
             integrability for $g\circ f$, which requires us
@@ -404,17 +409,18 @@ and $c \in \mathbb{R}$.
                     \Delta\alpha_i \notag\\
                 &= \sum_{i\in A} \quad + \quad
                     \sum_{i\in B} \notag\\
-                \text{By Equation \ref{compcont}} \qquad
+                \qquad
                 &\leq \frac{\varepsilon}{2[\alpha(b)-\alpha(a)} 
                     \sum_{i\in A} \Delta\alpha_i+
                     K \sum_{i\in B} \Delta\alpha_i
                     \label{final}
             \end{align}
-            where the result from the sum for $B$ comes from $g$
-            being bounded.
+            where the result from the sum over $A$ comes from 
+            Equation \ref{cont} and the result for the sum over 
+            $B$ comes from $g$ being bounded.
             \\
             \\
-            Now let's consider the righthand term from the last
+            Now let's consider the sum over $B$ from the last
             line, and relate it back to Expression \ref{forf}.
             We know that by our definition of $B$:
             \begin{align*}
@@ -423,13 +429,13 @@ and $c \in \mathbb{R}$.
                 \sum_{i\in B} \left[M_i(f) - m_i(f) \right]
                 \Delta\alpha_i \leq \varepsilon\cdot\delta \\
                 &\Rightarrow \qquad \sum_{i\in B} \Delta\alpha_i
-                \leq \frac{\epsilon}{2K}
+                \leq \frac{\varepsilon}{2K}
             \end{align*}
             Substituting this result back into Equation    
             \ref{final}, we see that we must have
             \begin{align*}
                 U_\alpha(g\circ f,P) - L_\alpha(g\circ f,P)
-                &\leq \frac{\varepsilon}{2[\alpha(b)-\alpha(a)}    
+                &\leq \frac{\varepsilon}{2[\alpha(b)-\alpha(a)]}    
                     [\alpha(b)-\alpha(a)]
                     + K\frac{\varepsilon}{2K} \\
                     &\leq \frac{\varepsilon}{2} + 
@@ -477,6 +483,7 @@ and $c \in \mathbb{R}$.
                     \int^b_a f \; d\alpha \right\rvert 
             \end{align*}
         \end{proof}
+        ($*$) This is an often-used result.
         
 \end{itemize}
 
@@ -490,7 +497,7 @@ We'll prove a more general result that retains this as a special case.
 \label{mvt}
 Suppose that $f,g\in\mathscr{R}_\alpha([a,b])$ and assume $g\geq0$. Then there exists a $\mu\in[m,M]$, i.e. in between the upper and lower bounds of $f$, such that 
         \[ \int^b_a fg\;d\alpha = \mu \int^b_a g\;d\alpha \]
-Moreover, if $f$ is continuous, then there exists a $c\in[a,b]$ such that $\mu = f(c)$.
+Moreover, if $f$ is continuous, then there exists $c\in[a,b]$ such that $\mu = f(c)$.
 \end{thm}
 \begin{proof}
 Since $g\geq0$, we can conclude that 
@@ -512,14 +519,14 @@ If we take $g(x)=1$, then we get the plain vanilla MVT we opened up the subsecti
 \newpage
 \subsection{Convergence of Riemann-Stieltjes Sums, $S_\alpha(f,P,T)$}
 
-Basic calculus makes us all think that we approximate a Riemann-Sieltjes integral by taking finer and finer partitions, which we use to weight the value of the function at an increasing number of evaluation points.  So it would be very nice and very convenient if Riemann-Stieltjes sums converged to the value of the integral whenever we construct just that sort of limiting approximation. 
+Basic calculus makes us all think that we approximate a Riemann-Sieltjes integral by taking finer and finer partitions, which we use to weight the value of the function at an increasing number of evaluation points along the interval $[a,b]$.  So it would be very nice and very convenient if Riemann-Stieltjes sums converged to the value of the integral whenever we construct just that sort of limiting approximation. 
 
 \emph{However}, this will not always be the case.  That is, there will be some functions that are RS-integrable, which won't \emph{necessarily} converge if you take finer and finer partitions with more and more evaluations points. So the theorems in this section will illustrate when that will and won't apply. In certain cases, arbitrarily fine partitions might converge to different values, none of which must equal the value of the integral (if it even exists).
 
 \begin{thm}
 \label{weaker}
-Let $f$ be a bounded function on $[a,b]$. Then $f\in\mathscr{R}_\alpha([a,b])$ if and only if there exists a number $I$such that for every $\varepsilon>0$, there exists a corresponding partition $P$ such that for all $P^* \supset P$, we have that
-    \[ |S_\alpha(f,P*,T) - I | \leq \varepsilon \qquad \forall T\]
+Let $f$ be a bounded function on $[a,b]$. Then $f\in\mathscr{R}_\alpha([a,b])$ if and only if there exists a number $I$ such that for every $\varepsilon>0$, there exists a corresponding partition $P$ where, for all $P^* \supset P$, we have 
+    \[ |S_\alpha(f,P^*,T) - I | \leq \varepsilon \qquad \forall T\]
 And if $f\in\mathscr{R}_\alpha([a,b])$, then $I = \int^b_a f\;d\alpha$.
 \end{thm}
 \begin{rmk}
@@ -527,7 +534,7 @@ We could have written a weaker theorem, leaving out the part about $P^*\supset P
 \end{rmk}
 \begin{proof}
 First, we prove the $\Rightarrow$ direction. Since $f\in\mathscr{R}_\alpha([a,b])$, we know that there's a partition $P$ such that
-    \[ U_\alpha(f,P) - L_\alpha(f,P)\varepsilon \qquad 
+    \[ U_\alpha(f,P) - L_\alpha(f,P)<\varepsilon \qquad 
     \forall \varepsilon \]
 Considering $P^*\supset P$, we also have
 \begin{align*}
@@ -551,7 +558,7 @@ Next, we want to show the $\Leftarrow$ direction. We begin by noting that given 
 This works because given any partition, we can always choose a $T_1$ and $T_2$ to satisfy by taking $T_1$ ($T_2$) as the set of all $M_i$ ($m_i$). 
 \\
 \\
-So now, let's take $P^*$ to be the partition such that the RS sum is $\varepsilon$ close to $I$ for all $T$; note, this $P^*$ is taken to exist in this direction of the proof. Then we have from the inequalities from \ref{proof1.17} that
+So now, let's take $P^*$ to be the partition such that the RS sum is $\varepsilon$ close to $I$ for all $T$. (Note that this $P^*$ is taken to exist in this direction of the proof.) Then we have from the inequalities in \ref{proof1.17} that
 \begin{align*}
     U_\alpha(f,P) - L_\alpha(f,P) &\leq 
         \left[ S_\alpha(f,P,T_1) + \varepsilon\right] -
@@ -569,8 +576,8 @@ Since the Upper and Lower sums can be made arbitrarily close, we then know that 
 \begin{rmk}
 Before moving on, let's recap what the last theorem said in words---or at least what it didn't say.  It didn't say that if you keep taking smaller partitions, you will \emph{always} force your RS-Sum to converge to the value of an integral.  What it did say was twofold:
 \begin{enumerate}
-    \item First, if your function \emph{is} Riemann-Integrable, then and you can find \emph{some} partition (though it might not be true for all of them) where the RS-Sums given that partition and \emph{all finer} partitions get arbitrarily close to this integral that exists.
-    \item Next, suppose you know an $I$ that the sums get arbitrarily close to.  More specifically, that means if you're handed any $\varepsilon>0$, you can find a partition that gets the RS-Sums arbitrarily close to that $I$, no matter the $T$ tagging the partition $P$. Now we're not saying that the sums \emph{must} converge to some $I$ when you take finer partitions. (We only kind of have that if we consider the other direction of the proof where $f\in\mathscr{R}_\alpha([a,b])$ is assumed). Instead, we're just saying it's possible, and if $I$ \emph{does} exist, $f$ is RS integrable.
+    \item First, if your function \emph{is} Riemann-Integrable, then and you can find \emph{some} partition (though it might not be true for all of them) where the RS-Sums given that partition and \emph{all finer} partitions get arbitrarily close to this integral (which exists).
+    \item Next, suppose you know an $I$ that the RS-sums get arbitrarily close to.  More specifically, that means if you're handed any $\varepsilon>0$, you can find a partition that gets the RS-Sums arbitrarily close to that $I$, no matter the $T$ tagging the partition $P$. Now we're not saying that the sums \emph{must} converge to some $I$ when you take finer partitions. Instead, we're just saying it's possible, and if $I$ \emph{does} indeed exist, then $f$ is RS integrable.
 \end{enumerate}
 Now we can move on to consider that thorny case of ever-shrinking partitions.
 \end{rmk}
@@ -601,7 +608,7 @@ Now we give an example of why the other direction in Theorem \ref{oneway} wouldn
 Depending on whether the point $1/2$ is included in the partition, we can construct ever-finer partitions that make the RS-Sums converge to 0 sometimes, and to 1 at other times.
 \end{ex}
 \begin{rmk}
-Thus we have that the strongest statement is in Definition \ref{strongest}. If we can show the limit exists as $||P||\rightarrow 0$, then we can show that $f$ is integrable. If we can't use that, we should think a little harder and try to find a $P$ as in Theorem \ref{weaker} before concluding that $f$ isn't RS-integrable. However, if we require more from our function $f$, we can can be more conclusive, as in the next theorem.
+    Thus we have that the strongest statement is in Definition \ref{strongest} and Theorem \ref{oneway}. If we can show the limit exists as $||P||\rightarrow 0$, then we can show that $f$ is integrable. If we can't use that, we should think a little harder and try to find a $P$ as in Theorem \ref{weaker} before concluding that $f$ isn't RS-integrable. However, if we require more from our function $f$, we can can be more conclusive, as in the next theorem.
 \end{rmk}
 
 \begin{thm}
@@ -613,7 +620,7 @@ Let $f\in\mathscr{R}_\alpha([a,b])$. If either $f$ or $\alpha$ is continuous on 
 \end{equation}
 \end{thm}
 \begin{rmk}
-This previous definition is important, because if we just consider \emph{Riemann} integrability, then $\alpha(x) = x$, which is continuous. Thus, Riemann-integrability and the existence of the limit of Riemann sums (as the partition intervals get smaller) are equivalent notions.
+This previous theorem is important, because if we just consider \emph{Riemann} integrability, then $\alpha(x) = x$, which is continuous. Thus, Riemann-integrability and the existence of the limit of Riemann sums (as the partition intervals get smaller) are equivalent notions.
 \end{rmk}
 So our goal will be to show that, for all $\epsilon>0$,
 \begin{equation}
@@ -647,7 +654,7 @@ Then, summing over $i$, we can define
         &= \sum^n_{i=1} f(c_i) \Delta\alpha_i
         \equiv S_\alpha(f,P,C)
 \end{align*}
-So now, we can replace the integral with this sum in the statement that we want to prove, Equation \ref{contequiv.toshow}:
+So now, we can replace the integral with this sum in the statement that we want to prove, as given in Inequality \ref{contequiv.toshow}:
 \begin{equation}
     \label{contequiv.toshow2}
     \lim_{||P||\rightarrow 0}
@@ -675,13 +682,13 @@ Now if we take our partition such that $||P||\leq\delta$, we can write our sums 
 \end{align*}
 \end{proof}
 \begin{proof}($\alpha$ Continuous)
-Suppose $\varepsilon$ is given. Since $f\in\mathscr{R}_\alpha([a,b])$, we know that there exists a $P^*$ (with $\#P$, or $n+1$, subintervals) such that 
+Suppose $\varepsilon$ is given. Since $f\in\mathscr{R}_\alpha([a,b])$, we know that there exists a $P^*$ (with $\#P^*$, or $n+1$, subintervals) such that 
 \begin{equation}
     \label{bases}
     U_\alpha(f,P^*) < \int^b_a f\;d\alpha + \varepsilon
         \qquad L_\alpha(f,P^*) > \int^b_a f\;d\alpha - \varepsilon
 \end{equation}
-To construct the proof from here, we'll want eventually to compare the any arbitrary RS-Sum $S_\alpha(f,P,T)$ to these specific upper and lower sums (using $P^*$) that we know something about---i.e. how close they are to the target integral. Then we'll take the limit for $P$ once we've established that relationship.
+To construct the proof from here, we'll want eventually to compare any arbitrary RS-Sum $S_\alpha(f,P,T)$ to these specific upper and lower sums (using $P^*$) that we know something about---i.e. how close they are to the target integral. Then we'll take the limit for $P$ once we've established that relationship.
 \\
 \\
 Also, assume that $f(x)>0$ over $[a,b]$. We'll resolve this simplifying assumption later on, and it will help in the meantime.
@@ -690,11 +697,11 @@ Also, assume that $f(x)>0$ over $[a,b]$. We'll resolve this simplifying assumpti
 So since that interval is compact and $\alpha$ is continuous, we know that $\alpha$ is \emph{uniformly} continuous, implying that
     \[ \exists \delta > 0 \quad \text{s.t.} \qquad 
     w_\alpha(\delta) < \frac{\varepsilon}{\#P^*} \]
-where $n$ is the number of sub-intervals in $P^*$. And so 
+where $\#P^*$ is the number of sub-intervals in $P^*$. And so 
     \[ \forall P \qquad ||P||<\delta \quad \Rightarrow 
         \quad \alpha(x_i) - \alpha(x_{i-1}) < w_\alpha(\delta)
         <  \frac{\varepsilon}{\#P^*} \]
-Now, considering any such set $P$, let's also define the following sets, which group the indices for the subintervals of any $P$ into two categories:
+Now, considering any such set $P$, let's also define the following sets, which group the indices for the subintervals of any $P$ into two categories, based on how they interact with $P^*$:
 \begin{align*}
     I_1 &:= \{i \; | \; [x_{i-1},x_i) \cap P^* = \emptyset \}\\
     I_2 &:= \{i \; | \; [x_{i-1},x_i) \cap P^* \neq \emptyset \}
@@ -709,7 +716,7 @@ Having done all of groundwork from above, we can now write an expression for the
          + \sum_{I\in I_2} M_i(f) \Delta\alpha_i
          \label{twosums}
 \end{align}
-But clearly, $I_2$ can only contain, at most, $\#P$ points since there are only $\#P$ points \emph{to contain}, so we must have that $\#I_2 \leq \#P$. Thus, the sum over $I_2$ simplifies:
+But clearly, $I_2$ can only contain, at most, $\#P$ points since there are only $\#P$ intervals of $P$, so we must have that $\#I_2 \leq \#P$. Thus, the sum over $I_2$ simplifies:
 \begin{align}
         \sum_{I\in I_2} M_i(f) \Delta\alpha_i 
         &\leq \sum_{I\in I_2} M \frac{\varepsilon}{\#P} =    
@@ -804,11 +811,11 @@ To start, we take $P^*$ as the partition such that
 which we know exists, since the integrability of $f$ is assumed. 
 \\
 \\
-Now we want to show that for all $\varepsilon>0$, there exists a $P$ such that $Q\supset P$ implies that 
-    \[ \left\lvert S_f(\alpha,Q,T) -  f(b) \alpha(b) - 
+Now we want to show that for all $\varepsilon>0$, there exists a $P$ such that $P^*\supset P$ implies that 
+    \[ \left\lvert S_f(\alpha,P^*,T) -  f(b) \alpha(b) - 
         f(a)\alpha(a) - \int^b_a f \; d\alpha \right\rvert \leq 
         \varepsilon \qquad \forall \; T\]
-        So we rewrite the righthand side of Equation \ref{intbyparts}, recasting them as telescoping sums, also substituting in $S_f(\alpha,P^*,T)$ for the integral:\footnote{You might object and say ``Hey, you can't do that.  You don't know that there's an equivalent RS-Sum for the integral---particularly if you use that same $P^*$ we've been using all along.'' But I actually don't care whether this sum I'm substituting in is actually equivalent (yet). I'm just taking the righthand side of Equation \ref{intbyparts} as inspiration, and using the $P^*$ we've been using to write an RS-Sum. We'll see at the very end that it's a \emph{result} that this RS-Sum approximates the integral, not an assumption.}
+        So we rewrite the righthand side of Equation \ref{intbyparts}, recasting them as telescoping sums, also substituting in $S_f(\alpha,P^*,T)$ for the integral:\footnote{You might object and say ``Hey, you can't do that.  You don't know that there's an equivalent RS-Sum for the integral $\int^b_a \alpha\;df$---particularly if you use that same $P^*$ we've been using all along.'' But I actually don't care whether this sum I'm substituting in is actually equivalent (yet). I'm just taking the righthand side of Equation \ref{intbyparts} as inspiration, and using the $P^*$ we've been using to write an RS-Sum. We'll see at the very end that it's a \emph{result} that this RS-Sum approximates the integral, not an assumption.}
 \begin{align}
     f(b) \alpha(b) - f(a)\alpha(a) - S_f(\alpha,P^*,T)
         &= \sum^n_{i=1} f(x_i) \alpha(x_i) - f(x_{i-1})
@@ -817,10 +824,10 @@ Now we want to show that for all $\varepsilon>0$, there exists a $P$ such that $
         \right] \notag\\
     &= \sum^n_{i=1} f(x_i) \left[\alpha(x_i) - \alpha(t_i) \right]
         \notag\\
-    &\qquad \sum^n_{i=1} f(x_{i-1}) \left[\alpha(t_i) 
-    + \alpha(x_{i-1})\right]\label{righthandtwosums}
+    &\qquad +\sum^n_{i=1} f(x_{i-1}) \left[\alpha(t_i) 
+    - \alpha(x_{i-1})\right]\label{righthandtwosums}
 \end{align}
-Now the righthand side kind of looks like a RS-Sum, so let's define a partition and set of tag points so it is. Define define a new partition, call it $P^{**}$, which will be the union of the old $P^*$ and the points $t_i$. So $P^{**} = P^*\cup T$. Next, define a new set of tagging points,
+Now the righthand side kind of looks like a RS-Sum, so let's define a partition and set of tag points so it is. Define define a new partition, call it $P^{**}$, which will be the union of the old $P^*$ and the points $t_i$. So $P^{**} = P^*\cup T$, with multiplicities. Next, define a new set of tagging points,
     \[ T^{**} = \{ x_0, x_1, x_1, x_2, x_2,\ldots, x_n \} \]
 Now we can collapse the righthand side in Equation \ref{righthandtwosums} into a proper RS-Sum:
 \begin{align*}
@@ -921,7 +928,7 @@ and linear in between.  Another similar example take
 Both look something like the harmonic series that sums $1/n$, which we know diverges.
 \end{ex}
 \begin{ex}
-As an example of a function of bounded variation that's not continuous, consider the function $f=\chi_{[1,2,1]}$ on $[0,1]$. Clearly there's a jump, but $V_a^b(f) = 1 < \infty$.
+As an example of a function of bounded variation that's not continuous, consider the function $f=\chi_{[1/2,1]}$ on $[0,1]$. Clearly there's a jump, but $V_a^b(f) = 1 < \infty$.
 \end{ex}
 
 \begin{thm}
@@ -953,12 +960,12 @@ This implies that $f+g$ and $cf$ are both of bounded variation as well.
 \begin{rmk}
 Given this definition and the triangle inequality, we see that Bounded Variation looks like a linear space. In fact, it's \emph{semi-norm}, meaning that it satisfies all but the 0 condition, since a non-zero (constant) function will have 0 total variation. 
 
-But we can fix that, getting a full norm by adding the sup-norm ($||f||_\infty = \sup_[a,b] f$) to total variation. Thus if we define our norm as
+But we can fix that, getting a full norm by adding the sup-norm ($||f||_\infty = \sup_{[a,b]} f$) to total variation. Thus if we define our norm as
     \[ ||f||_\infty + V_a^b(f) \]
 we see that we've satisfied all of the conditions for a norm on the function space:
 \begin{enumerate}
     \item $||f||_\infty + V_a^b(f) = 0$ if and only if $f=0$.
-    \item $||cf||_\infty + V_a^b(cf) = c||f||_\infty + cV_a^b(f)
+    \item $||cf||_\infty + V_a^b(cf) = c||f||_\infty + |c|V_a^b(f)
         = c\left[||f||_\infty + V_a^b(f)\right]$.
     \item $||f+g||_\infty + V_a^b(f+g) \leq 
         \left[||f||_\infty + V_a^b(f)\right] +
@@ -997,7 +1004,7 @@ First, take the $\Leftarrow$ direction. This is pretty trivial since
 And since $u$ and $v$ are monotonically increasing, the terms $V_a^b(u)$ and $V_a^b(v)$ are finite.
 \\
 \\
-Now for the $\Rightarrow$ direction. Set $u(x) = V_a^x(f)$, and let $v(x)=V_a^x(f) - f(x)$. Clearly, $f = u-v$; we just have to prove that $v$ is monotonically increasing.
+Now for the $\Rightarrow$ direction. Set $u(x) = V_a^x(f)$, and let $v(x)=V_a^x(f) - f(x)$. Clearly, $f = u-v$; we just have to prove that $v$ is monotonically increasing, since the $u$ case is fairly obvious.
 \\
 \\
 Supposing that $y>x$, we want to show that $v(y) > v(x)$. We can do so by starting with an obvious statement that 
@@ -1009,13 +1016,12 @@ Then we rewrite and rearrange terms to show
     \Leftrightarrow\quad v(x) &\leq v(y)  
 \end{align*}
 \end{proof}
-
-Now that we have the whole framework for functions of bounded variation in place, we can return to integration when either $f$ or $\alpha$ is of bounded variation (or both). 
+Now that we have the whole framework for functions of bounded variation in place, we can return to integration where either $f$ or $\alpha$ is of bounded variation (or both). 
 
 \subsection{Integration with Respect to Functions of Bounded Variation}
 
 \begin{thm}
-If $f$ is continuous on $[a,b]$ and $\alpha\in BV([a,b])$, then $f\in\mathscr{R}_\alpha([a,b])$. Equivalently, since we can swap the integrand and integrator, if $f\in BV([a,b])$ and $\alpha$ continuous, then $f\in\mathscr{R}_\alpha([a,b])$
+If $f$ is continuous on $[a,b]$ and $\alpha\in BV([a,b])$, then $f\in\mathscr{R}_\alpha([a,b])$. Also, since we can swap the integrand and integrator, if $f\in BV([a,b])$ and $\alpha$ continuous, then $f\in\mathscr{R}_\alpha([a,b])$
 \end{thm}
 \begin{proof}
 Suppose that $f$ is continuous and $\alpha\in BV([a,b])$. Then by Theorem \ref{monot}, we have that $\alpha = u -v$, both of which are increasing. Thus $f\in\mathscr{R}_u([a,b]) \;\cap \;\mathscr{R}_v([a,b])$, which entails $u, v \in \mathscr{R}_f([a,b])$ by Theorem \ref{thm.intbyparts}.  This implies that $u-v\in\mathscr{R}_f([a,b])$, which implies $f\in\mathscr{R}_{u-v}([a,b]) = \mathscr{R}_\alpha([a,b])$.
@@ -1035,7 +1041,7 @@ We get a number of familiar results from regular integration when $\alpha\in BV(
 \label{ftcbasis}
 Suppose $\alpha$ is continuous and differentiable on $[a,b]$ with $\alpha', f\in\mathscr{R}([a,b])$. Then $f\in\mathscr{R}_\alpha([a,b])$ and
     \[ \int^b_a f\;d\alpha = \int^b_a f \alpha'\;dx\]
-Since $\alpha'$ is bounded on $[a,b]$, $\alpha \in BV([a,b])$. 
+Since $\alpha$ is continuous and $\alpha'$ is bounded on $[a,b]$, $\alpha \in BV([a,b])$. 
 \end{thm}
 \begin{proof}
 Now we know by the Mean Value Theorem that, for all subintervals,
@@ -1129,14 +1135,15 @@ Next, for $x\in[a,b]$ and $h\neq 0$:
 \[ 
     \frac{F(x+h)-F(x)}{h} = \frac{1}{h}\int^{x+h}_x f(t)\;dt
 \]
-Applying the Mean Value Theorem for integrals, we know that there is some $\mu \in [m, M]$, where $m$ is the inf and $M$ the sup over the interval $[x,x+h]$, such that 
+Applying the Mean Value Theorem for integrals, we know that there is some $\mu \in [m, M]$, where $m = \inf f$ and $M = \sup f$ over the interval $[x,x+h]$, such that 
     \[ \mu = \frac{1}{h}\int^{x+h}_x f(t)\;dt \]
 Now, if $f$ is continuous at $x$, then for all $\varepsilon>0$, there exists a $\delta>0$ such that 
 \begin{align*}
     |h| \leq \delta \quad \Rightarrow \quad |f(x) - f(y)|
         &\leq\varepsilon \\
     \Rightarrow \qquad |\mu - f(x)|&\leq\varepsilon \\
-    \Rightarrow \quad | \frac{F(x+h)-F(x)}{h}- f(x)|
+    \Rightarrow \quad \left\lvert \frac{F(x+h)-F(x)}{h}- f(x)
+        \right\rvert
         &\leq\varepsilon 
 \end{align*}
 So $f$ is differentiable at $x$ and $F'(x)=f(x)$.
@@ -2060,7 +2067,7 @@ On the other hand, Mr. Lebesgue first takes all of the coins out of his pocket a
 
 \begin{defn} We define the modulus of continuity of the function $f$, $w_f(\delta)$ as 
 \begin{equation}
-    w_f(\delta) \equiv \sup_{x,y\leq\delta} |f(x)-f(y)|
+    w_f(\delta) \equiv \sup_{|x-y|\leq\delta} |f(x)-f(y)|
 \end{equation}
 \end{defn}
 It's a useful definition because of it's close relation to uniform continuity.
@@ -2105,6 +2112,23 @@ Now it's clear that at each stage, the subinterval we choose (after removing the
 Now clearly, $a_n\in C$ for all $n$ since the endpoints are ``sticky'' in $C$.  On top of that, $a\neq c_n$ for all $n$, since we chose the subsintervals explicity not to contain $c_n$ for all $n$.  But this is a contradiction since $a$ is a limit point of $\{a_n\}\subset C$, and the closed set $C$ should contain its limit points. And so $C$ is uncountable.
 \end{proof}
 
+
+\newpage
+\section{Useful Tricks}
+
+There are a number of useful ways to write different expressions, which are listed here:
+\begin{itemize}
+\item Often we know that addition, subtraction, and taking the absolute value of functions (which is a continuous operation) preserves certain properties. And so if we want to prove that the max or the min of two functions preserves certain properties, writing the max and min as follows often makes quick work of otherwise tedious proofs. These forms add or subtract the ``residual'' of one function relative to the other: 
+\[
+    \max \{f,g\} = \frac{f+g+|f-g|}{2}\qquad 
+    \min\{f,g\} = \frac{f+g-|f-g|}{2}
+\]
+
+\item Building off the last point, we can write 
+    \[ 
+        |f|=\max\{f,-f\}
+    \]
+\end{itemize}
 
 \newpage
 \section{Quizzes}
