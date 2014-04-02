@@ -1,26 +1,133 @@
-\documentclass[a4paper,12pt]{scrartcl}
+\documentclass[12pt]{article}
 
 \author{Matt Cocci}
 \title{Notes for Bayesian Statistics}
 \date{January 24, 2013}
-\usepackage{enumitem} %Has to do with enumeration	
-\usepackage{amsfonts}
+
+%% Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{fullpage}
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\pagestyle{fancy} 
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt} 
+    %---Make the header bigger to avoid overlap
+
+%\renewcommand{\headrulewidth}{0.3pt} 
+    %---Width of the line
+
+%\setlength{\headsep}{0.2in}    
+    %---Distance from line to text
+            
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \usepackage{amsmath}
+\usepackage{amsfonts}
 \usepackage{amsthm} %allows for labeling of theorems
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{blindtext}
-\usepackage{graphicx}
-\usepackage[hidelinks]{hyperref}
-%\numberwithin{equation}{section} 
-%, This labels the equations in relation to the sections rather than other equations
-%\numberwithin{equation}{subsection} %This labels relative to subsections
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{prop}[thm]{Proposition}
 \newtheorem{cor}[thm]{Corollary}
-\setkomafont{disposition}{\normalfont\bfseries}
+%\numberwithin{equation}{section} 
+    %---This labels the equations in relation to the sections 
+    %---rather than other equations
+%\numberwithin{equation}{subsection} 
+    %---This labels relative to subsections
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{graphicx}
+\usepackage{subfigure} 
+    %---For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %---Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref} 
+\hypersetup{	
+    colorlinks,		
+        %---This colors the links themselves, not boxes
+    citecolor=black,	
+        %---Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\usepackage{verbatim} 
+    %---For including verbatim code from files, no colors
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{RGB}{28,172,0}
+\definecolor{mylilas}{RGB}{170,55,241}
+\newcommand{\matlabcode}[1]{%
+    \lstset{language=Matlab,%
+        basicstyle=\footnotesize,%
+        breaklines=true,%
+        morekeywords={matlab2tikz},%
+        keywordstyle=\color{blue},%
+        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+        identifierstyle=\color{black},%
+        stringstyle=\color{mylilas},%
+        commentstyle=\color{mygreen},%
+        showstringspaces=false,%
+            %---Without this there will be a symbol in 
+            %---the places where there is a space
+        numbers=left,%
+        numberstyle={\tiny \color{black}},% 
+            %---Size of the numbers
+        numbersep=9pt,% 
+            %---Defines how far the numbers are from the text
+        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+            %---Some words to emphasise
+    }%
+    \lstinputlisting{#1}
+}
+    %---For including Matlab code from .m file with colors,
+    %---line numbering, etc. 
+
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\usepackage{enumitem} 
+    %---Has to do with enumeration	
 \usepackage{appendix}
+%\usepackage{natbib} 
+    %---For bibliographies
+\usepackage{pdfpages}
+    %---For including whole pdf pages as a page in doc
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%\newcommand{\nameofcmd}{Text to display}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
 \begin{document}
@@ -1012,7 +1119,7 @@ to do a priori,
 unless we have a look at the data before we estimate parameters.
 
 \newpage
-\subsection{Optimization}
+\subsection{Ridge Regression}
 
 In classical regression, to estimate $\hat{\beta}_{\text{MLE}}$,
 we will solve
@@ -1027,8 +1134,7 @@ However, in Bayesian regression, the problem becomes
    \]
 \[ \Rightarrow \hat{\beta} = \arg \min_\beta \sum^n_{i=1} 
    (y_i - X_i \beta)^2 - \ln p(\beta) \]
-where the log of the prior acts as a penalty term. We'll examine this
-in more detail through an example.
+where the log of the prior acts as a penalty term. And there just so happen to be a number of interesting penalty.
 
 \paragraph{Example} {\sl Ridge Regression (L2 Regression)}:
 Now let's consider the case where 
