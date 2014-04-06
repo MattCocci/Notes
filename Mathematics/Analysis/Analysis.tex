@@ -1939,9 +1939,9 @@ Oh, and that part about taking the union over $\mathbb{Q}$ instead of $\mathbb{R
 Well then, since the rationals are dense in the reals, we know that there's a rational, call it $q$ between $r$ and $a-g(x)$ for all $f\in\mathbb{R}$. That means $f(x)>r>q$. It also means that $q>a-g(x)$. Thus, $r$ and $q$ accomplish the same task: we'll have \emph{both} $f(x)>n$ \emph{and} $n>a-g(x)$ whether $n=r$ or $n=q$. So we'll hit all the points we need to if we just take the union we saw above over $\mathbb{Q}$ instead of $\mathbb{R}$.
 \end{proof}
 
-\begin{rmk}
-This last proof shows that measurable functions for a \emph{vector space}, since they are closed under addition.
-\end{rmk}
+\begin{cor}
+This last proof shows that measurable functions for a \emph{vector space}, since they are closed under addition and scalar multiples.
+\end{cor}
 
 \begin{cor}
 If $f$ and $g$ are measurable functions, then so is $fg$.
@@ -1963,18 +1963,21 @@ We know that $S_N = \sum^N_{i=1} f_n$ is also measurable by Theorem \ref{summeas
 
 \subsection{Simple Functions}
 
-Before we get into the specifics of simple functions, note that we approximated the Riemann integral by (effectively) a step function over the intervals of $[a,b]$:
-    \[ \sum^N_{i=1} c_i \chi_{I_i} \]
+Before we get into the specifics of simple functions, note that we approximated the Riemann integral by (effectively) a step function over the intervals of $[a,b]$. In fact, we can cast an Riemann sum in the notation we'll see for simple functions:
+    \[ S(f,P,T) = \sum^N_{i=1} c_i \chi_{I_i} \]
 We'll do something exactly similar in this section.
 
 \begin{defn}
-Let $(X,\mathscr{M})$ be given. Also let $A=\{A_1, \ldots, A_N\}$ be a disjoint collection in $\mathscr{M}$. Then any function of the form 
+Let $(X,\mathscr{M})$ be given. Also let $A=\{A_1, \ldots, A_N\}$ be a disjoint collection in $\mathscr{M}$. Then any function that can be written 
 \[ 
     f = \sum^N_{i=1} c_i \cdot \chi_{A_i} \quad
     \text{ where } A_i = f^{-1}(c_i)
 \]
-is called a \emph{simple function}. Thus, $A$ is a \emph{measurable partition} of $X$.
+is called a \emph{simple function}. Thus, $A$ is a \emph{measurable partition} of $X$. Said another way, simple functions have a finite range, $\{c_1, \ldots, c_N\}$.
 \end{defn}
+
+\begin{rmk} Simple functions form a vector space.
+\end{rmk}
 
 \begin{thm}
 \label{lebapprox}
@@ -1983,7 +1986,7 @@ Let $f: X\rightarrow[0,\infty]$ be measurable. Then there exists a sequence $\{s
     0 \leq s_1 \leq s_2 \leq \cdots \leq f 
     \qquad \forall x\in X
 \]
-such that $s_n\rightarrow f$ from below.
+such that $s_n\rightarrow f$ (pointwise, or ``everywhere'') from below.
 \end{thm}
 \begin{proof}
 We prove by successive approximation. Let's denote how we'll partition our intervals and then construct our approximation functions:
@@ -2042,6 +2045,115 @@ This, in turn, implies that
 \end{enumerate}
 
 \end{proof}
+
+\subsection{Integration of Non-Negative Measurable Functions}
+
+\begin{defn}
+Consider the measure space $(X,\mathscr{M},\mu)$, and let $f\geq0$ be a measurable function. Then define
+\[
+    \int_X f \; d\mu := \sup_{0\leq s\leq f} \int_X s \; d\mu
+    \qquad \text{where}\qquad
+    \int_X s \; d\mu := \sum^n_{i=1} c_i \; \mu(A_i)
+\]
+where the sup is taken over $s$, which denotes a simple function
+\end{defn}
+
+\begin{ex}
+Suppose $f$ is, itself, a simple, measurable function. Then we just need to compute the following
+\[
+    \int_X f \; d\mu := \sum^n_{i=1} c_i \; \mu(A_i)
+\]
+I mention this to stress that the definition of the integral we gave above does, indeed, make sense. We see, in the case of a simple function, that we're just weighting the values that $f$ takes on by the measure over each set, $A_i$, in the partition of our domain. This is similar to what we did for the Riemann integral, only now, our $A_i$ partitioning the domain can be more arbitrary measurable sets, rather than more restrictive intervals.
+\end{ex}
+
+\begin{ex}
+    Next, suppose that we have the measure space $(\mathbb{N},\mathscr{P}(\mathbb{N}), \mu)$, where $\mu$ is the counting measure. Then any function $f: \mathbb{N}\rightarrow[0,\infty]$  will be measurable, and functions are simply sequences, where we use $f=\{f(n)\}_1^\infty$ to denote any arbitrary function on $[0,\infty]$.\footnote{Recall that a sequence is a function from the natural numbers to some set ($[0,\infty]\subset\bar{\mathbb{R}}$, in this case).} I claim that the value of the integral can be written 
+\begin{equation}
+    \int_X f \; d\mu = \sum^\infty_{n=1}f(n) 
+    \label{ex4.8.3.1}
+\end{equation}
+\begin{proof}
+To prove this, we now consider a few cases for the integral of $f$:
+\begin{enumerate}
+    \item {\sl $f$ simple}: Start by unpacking the definition of the integral, and recall the previous example
+    \begin{equation}
+        \label{ex4.8.3.2}
+        \int_X f \; d\mu := \sum^n_{i=1} c_i \; \mu(A_i)
+    \end{equation}
+    Now we consider whether Equation \ref{ex4.8.3.2} does indeed equal Equation \ref{ex4.8.3.1} given all the possible values \ref{ex4.8.3.2} could take on:
+    \begin{enumerate}
+        \item Suppose that Equation \ref{ex4.8.3.2} equals $\infty$. Then either there's a $c_i=\infty$ (in which case Equation \ref{ex4.8.3.1} would clearly be infinite as well) or there exists a $0< c_i<\infty$ such that $f = c_i$ at infinitely many points. Then $f(n)=c_i$ for infinitely many $n$, which implies that Equation \ref{ex4.8.3.1} equals $\infty$ as well.
+        \item Suppose that Equation \ref{ex4.8.3.2} is less than $\infty$. Then by the same reasoning as we had before, $c_i<\infty$ for all $i$, and there must be only finitely many non-zero terms. In that case, we must also have an $N$ such that $f(n)=0$ for all $n>N$, in which case Equation \ref{ex4.8.3.1} equals Equation \ref{ex4.8.3.2}.
+    \end{enumerate}
+
+\item {\sl $f$ is any non-negative function on $\mathbb{N}$}: First, assume that $f$ is finite valued.\footnote{In the case where it is \emph{not} finite valued, the statement is trivially true.}  Then, start by letting $s_N = f\cdot\chi_{[1,N]}$. Because we're restricting the non-zero values of the function $s_N$ to a finite domain, it will have a finite range too: $\{f(n)\}$ for $n=\{1,\ldots,N\}$, and 0 for $n>N$. 
+    
+So clearly, $s_N$ is a simple function such that $0\leq s_N \leq f$ for all $N$, since we're just considering non-negative functions. That means
+\begin{equation}
+    \label{4.8.3tosub}
+    \int_\mathbb{N} s_N \;d\mu \leq
+    \int_\mathbb{N} f \;d\mu 
+\end{equation}
+since the latter is the sup over all simple functions with $0\leq s\leq f$. But we can simplify the integral of $s_N$, using the fact that Equation \ref{ex4.8.3.1} is true for simple functions like $s_N$ (which we proved in Case 1 of this exercise):
+    \[
+        \int_\mathbb{N} s_N \;d\mu = \sum^\infty_{n=1}s_N(n) 
+        = \sum^N_{n=1} f(n)
+    \]
+Substituting this expression for the integral of $s_N$ into Equation \ref{4.8.3tosub}, and taking the limit, we get that 
+\begin{equation}
+    \label{toreverse}
+    \sum^\infty_{n=1} f(n) \leq \int_\mathbb{N} f\; d\mu 
+\end{equation}
+Note that the righthand side is unaffected by the limit, since it doesn't depend upon $N$ at all.
+
+Next, we need to show that we can reverse the inequality in Equation \ref{toreverse} to show equality as in Equation \ref{ex4.8.3.1}. To do so, suppose that $\sum^\infty_{n=1} f(n)<\infty$, otherwise there is nothing to prove. Then consider a simple function $s$ such that $0\leq s \leq f$. Then it's clear that 
+\[
+    \sum^\infty_{n=1} s(n)<\infty
+\]
+It's also clear that, since $s$ is simple, we can write it as
+\[
+    \int_\mathbb{N} s \; d\mu = \sum^\infty_{n=1} s(n)
+    \leq \sum^\infty_{n=1} f(n)
+\]
+given the work we did above for the case where $f$ is simple. Finally, note that since $s$ was an arbitrary simple function, since the integral of $f$ involves taking the sup over all simple functions, and since the sum $\sum^\infty_{n=1}f(n)$ does not depend upon $s$, we can assert that
+\[
+    \int_\mathbb{N} f \; d\mu \leq \sum^\infty_{n=1} f(n)
+\]
+which, together with Equation \ref{toreverse} establishes Equation \ref{ex4.8.3.1} for arbitrary non-negative functions on $(\mathbb{N}, \mathscr{P}(\mathbb{N}), \mu)$.
+\end{enumerate}
+\end{proof}
+\end{ex}
+
+
+\subsection{Integration of Arbitrary Measurable Functions}
+
+\begin{defn}
+For any measurable function $f$ in $(X,\mathscr{M},\mu)$, define
+\[
+    f_+(x) := \max\{f(x), 0\}
+    \qquad
+    f_-(x) := -\min\{f(x), 0\}
+\]
+Because both $f$ and $0$ are measurable, the functions that equal the pointwise max and min will \emph{also} be measurable. Thus $f_+$ and $f_-$ are measurable.
+
+Also note, by our definition, 
+\begin{itemize}
+    \item $f = (f_+) - (f_-)$ and $|f| = (f_+) + (f_-)$
+    \item $f_+$ and $f_-$ will be non-negative \emph{everywhere}.  
+\end{itemize}
+These items will provide a link to the results from the previous subsection.
+\end{defn}
+
+\begin{defn}
+Let $f$ be any \emph{arbitrary} measurable function (i.e. non neccessarily non-negative) on the measure space $(X,\mathscr{M},\mu)$. Then define 
+\[
+    \int_X f\; d\mu := \int_X f_+ \; d\mu - \int_X f_- \; d\mu
+\]
+provided that at least one is finite---otherwise the integral is undefined.
+
+Moreover, we say that $f$ is integrable if \emph{both} $\int_X f_+ \; d\mu$ and $\int_X f_- \; d\mu$ are \textbf{finite}, in which case we say $f\in\mathscr{L}(X,\mathscr{M},\mu)$, the set of all integrable functions $f:X\rightarrow\mathbb{R}$.
+\end{defn}
+
 
 \subsection{($*$) Lebesgue Intuition}
 
