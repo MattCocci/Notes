@@ -128,6 +128,7 @@
 %% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 %\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
 
 
 
@@ -1683,6 +1684,7 @@ If we add a non-negative measure to a measure space, then the triplet $(X,\maths
 \end{defn}
 
 \subsection{Properties of Measure Spaces}
+\label{subsec:propmeas}
 
 Measure spaces have a number of properties that follow from the framework and conditions imposed upon them, which we saw in the definitions of $\sigma$-algebras and positive measures. Here, we enumerate those properties and provide justifications for them:
 \begin{enumerate}
@@ -2154,6 +2156,221 @@ provided that at least one is finite---otherwise the integral is undefined.
 Moreover, we say that $f$ is integrable if \emph{both} $\int_X f_+ \; d\mu$ and $\int_X f_- \; d\mu$ are \textbf{finite}, in which case we say $f\in\mathscr{L}(X,\mathscr{M},\mu)$, the set of all integrable functions $f:X\rightarrow\mathbb{R}$.
 \end{defn}
 
+\begin{ex}
+    If we take $(\mathbb{N}, \mathscr{P}(\mathbb{N}), \mu)$ where $\mu$ is the counting measure, then $f$ is integrable if and only if $\sum^\infty_{n=1}|f(n)|<\infty$, as $|f| = f_+ + f_-$.
+\end{ex}
+
+\begin{thm} \emph{(Properties of $\mathscr{L}(X,\mathscr{M}, \mu)$)} Given $f,g\in\mathscr{L}(X,\mathscr{M},\mu)$,
+    
+    \begin{itemize}
+        \item {Monotonicity}: $f\leq g$, we have $\int_X f \leq\int_X g$.
+        \item If $f$ is measurable and bounded, and if $\mu(X)<\infty$, then $f\in\mathscr{L}(X,\mathscr{M},\mu)$.
+        \item {Homogoneity}: $f\in\mathscr{L}(X,\mathscr{M},\mu)$ if and only if $cf\in\mathscr{L}(X,\mathscr{M},\mu)$ for all $c\in\mathbb{R}$, the non-extended reals.
+        \item If $\mu(X)=0$, then \emph{any} measurable function $f: X\rightarrow\bar{\mathbb{R}}$ will be integrable with $\int_X f \; d\mu=0$, even if $f=\infty$ on $X$.
+    \end{itemize}
+\end{thm}
+\begin{proof} We consider each in turn:
+\begin{itemize} 
+
+    \item Note that if $f$ and $g$ are both non-negative, $g\leq f$ implies
+\[
+    \{ s \; | \; 0\leq s\leq f \} \subset
+    \{ s \; | \; 0\leq s\leq g \}  \quad\Rightarrow\quad
+    \int_X f \; d\mu \leq
+    \int_X g \; d\mu 
+\]
+For general $f\leq g$, we have $f_+ \leq g_+$ and $f_- \geq g_-$ which implies that 
+\[
+    \int_X f_+ \; d\mu \leq 
+    \int_X g_+ \; d\mu
+    \qquad\qquad 
+    -\int_X f_- \; d\mu \leq 
+    -\int_X g_- \; d\mu
+\]
+Taken together, the desired result follows.
+
+    \item This is a corollary to the first part.  
+        
+    \item If $s$ is a simple function, then $cs$ is also a simple function. And so we can write that $\int_X cf \; d\mu = c\int_X f \; d\mu$.
+        
+    \item Note that all simple functions will integrate to zero, so that the sup over simple functions will be zero as well.
+\end{itemize}
+\end{proof}
+
+\begin{rmk}
+You may have noticed that we didn't include the usual linearity property. We will eventually have this, but it turns out to be tougher for the more general integral we've developed. We need to do the hard work in the next subsection to establish this property.
+\end{rmk}
+
+\subsection{Pillar Convergence Theorems: Foundation}
+
+Before we get to the main pillar theorems concerning convergence, it will help to define a few concepts and prove a few results that we can use freely in the next subsection.
+
+\begin{defn}
+Consider the measure space $(X,\mathscr{M},\mu)$ and let $A\in\mathscr{M}$. Then define
+\[
+    \lambda_f(A) := \int_A f \; d\mu 
+    := \int_X f\cdot\chi_A \;d\mu
+\]
+\end{defn}
+
+\begin{lem} 
+\label{measurelem}
+If $s$ is a simple, measurable non-negative function, then $\lambda_s(A)$ is a non-negative measure on $(X,\mathscr{M})$.
+\end{lem}
+\begin{proof}
+It's easy to see that $\lambda_s(\emptyset) = 0<\infty$, so all that's left to prove is countable additivity.
+\\
+\\
+So let $A_1, A_2,\ldots$ be disjoint, and notice we can write
+\[
+    \lambda_s\left(\bigcup^\infty_{n=1} A_n\right)
+    = \int_{\cup A_n} s \;d\mu =
+    \int_{X} s \cdot \Chi_{\cup A_n}\;d\mu =
+    \int_{X} \left(s \cdot  
+    \sum^\infty_{n=1}\Chi_{A_n}\right)\;d\mu 
+\]
+Now let's rewrite the final expression, using the fact that $s$ is simple:
+\begin{align*}
+    \int_{X} \left(s \cdot  \sum^\infty_{n=1}
+    \Chi_{A_n}\right)\;d\mu 
+    &= \sum^m_{i=1} \left(c_i \cdot  
+    \sum^\infty_{n=1}\Chi_{A_n} 
+    \right)\mu(A_i) \\
+    &= \sum^m_{i=1} \sum^\infty_{n=1}c_i \cdot \Chi_{A_n} 
+    \mu(A_i)
+    =  \sum^\infty_{n=1}\sum^m_{i=1} c_i \cdot \Chi_{A_n} 
+    \mu(A_i) \\
+    &=   \sum^\infty_{n=1}\int_X s \cdot \Chi_{A_n} 
+        \; d\mu =  \bigcup^\infty_{n=1}\lambda(A_n)
+\end{align*}
+So we see that because $s$ is simple, we can exchange the sum and the integral, which allows us to gain the desired result of countable additivity.
+\end{proof}
+
+\begin{cor}
+\label{cormtc}
+Given $s\geq 0$ simple and measurable with $A_1\subset A_2\subset\cdots$, we have
+\[
+    \lim_{n\rightarrow\infty} \int_{A_n} s\;d\mu
+    = \lim_{n\rightarrow\infty} \lambda_s(A_n) =
+    \lambda_s(\cup A_n) 
+    = \int_{\cup A_n} s \; d\mu
+\]
+\end{cor}
+\begin{proof}
+This uses Lemma \ref{measurelem} and Property 5 in Subsection \ref{subsec:propmeas}, ``Properties of Measure Spaces.''
+\end{proof}
+
+\subsection{Pillar Convergence Theorems: Results}
+
+The theorems in this subsection are equivalent, and they furnish several particularly important results. Among them, linearity falls right out of the Monotone Convergence Theorem.
+
+\begin{thm}
+\emph{(Monotone Convergence Theorem)} For the measure space $(X,\mathscr{M},\mu)$, let $0\leq f_n(x)\leq f_{n+1}(x)$ be measurable for $n=1,2,\ldots$. Then we can exchange limits with the integral:
+\[
+    \int_X \left(\lim_{n\rightarrow\infty} f_n\right) 
+    \; d\mu = 
+    \lim_{n\rightarrow\infty} \int_X f_n \; d\mu
+\]
+\end{thm}
+\begin{proof} We'll prove the statement above by showing the lefthand side is less than the righthand side and vice verse.
+\\
+\\
+($\leq$ Proof) Let $f = \lim f_n$. Since, $\{f_n\}$ converges to $f$ from below, we can use monotonicity: 
+\[
+    f_n \leq f \quad \Rightarrow\quad
+    \int_X f_n \; d\mu \leq \int_X f\; d\mu
+\]
+But that's also true if take the limit of the inequality over $n$. The righthand side, which doesn't depend upon $n$, will remain the same:
+\[
+    \lim_{n\rightarrow\infty}
+    \int_X f_n \; d\mu \leq \int_X f\; d\mu
+\]
+And if we substitute in for $f=\lim_{n\rightarrow\infty}$, we get the desired inequality:
+\[
+    \lim_{n\rightarrow\infty}
+    \int_X f_n \; d\mu 
+    \leq \int_X \lim_{n\rightarrow\infty}f\; d\mu
+\]
+($\geq$ Proof) Take any simple function $s$ with $0\leq s\leq f$, then set $t\in(0,1)$ and define
+\begin{equation}
+    \label{mtcset}
+    A_n := \{x \; |\; f_n \geq ts \}
+\end{equation}
+Then it will be the case that $A_1\subset A_2\subset \cdots$ with $X = \bigcup^\infty_{n=1} A_n$.
+\\
+\\
+To see this, suppose $s(x)=0$. Then $x\in A_n$ for all $n$. For all other $x$, we have that
+\[
+    s(x)>0\quad\Rightarrow\quad ts(x)< s(x)\leq f(x)
+\]
+Now since $ts(x)<f(x)$ strictly, and since $f_n\rightarrow f$, we know that we can find a sufficiently large $n$, such that $ts(x)<f_n(x)\leq f$ for all $x$ where $s(x)\neq 0$. That means, there will be an $N$ such that $n\geq N$ implies $x\in A_n$.
+\\
+\\
+Next, we form an inequality chain:
+\begin{align}
+    \label{ineqchain}
+    \int_X f\;d\mu \geq \int_X f_n\;d\mu
+    \geq \int_{A_n} f_n \;d\mu\geq \int_{A_n} ts \;d\mu
+\end{align}
+This first inequality follows from the fact that $f_n\rightarrow f$ from below and from monotonicity; the middle inequality from the fact that the lesser integral restricts the domain where $f_n$ is non-zero; the final from the set definition in (\ref{mtcset}).
+
+Next, before we take the limit of that inequality chain, apply Corollary \ref{cormtc} to the simple function $ts$ to note that 
+\[
+    \lim_{n\rightarrow\infty} \int_{A_n} ts \; d\mu
+    = \int_{\cup A_n} ts \;d\mu
+    = \int_{X} ts \;d\mu
+\]
+Alright, now we're ready to take the limit of the inequalities in (\ref{ineqchain}) to get:
+\begin{align*}
+    \int_X f\;d\mu \geq \lim_{n\rightarrow\infty}
+    \int_X f_n\;d\mu &\geq
+     \lim_{n\rightarrow\infty}\int_{A_n} ts \;d\mu \\
+    \Rightarrow \quad\lim_{n\rightarrow\infty}
+    \int_X f_n\;d\mu &\geq
+     t\int_{X} s \;d\mu \\
+\end{align*}
+Finally, we note that $t$ was arbitrary within $(0,1)$, so we can let $t\rightarrow 1$ and drop it from in front of the integral. We can also take the sup over all simple functions $s$ in the last line to get
+\begin{align*}
+     \quad\lim_{n\rightarrow\infty}
+    \int_X f_n\;d\mu &\geq
+    \int_{X} f \;d\mu 
+\end{align*}
+Noting that $f$ can be replaced with $\lim_{n\rightarrow\infty}$ and that we also had the reverse inequality above, we have established equality.
+
+\end{proof}
+
+\begin{cor} If measurable $f,g\in\mathscr{L}(X,\mathscr{M},\mu)$, then $f+g\in\mathscr{L}(X,\mathscr{M},\mu)$.
+\end{cor} 
+\begin{proof}
+    Suppose that $f,g\geq 0$. Then let $s_n{\rightarrow} f$ from below and $t_n{\rightarrow} g$ from below, where $\{s_n\}$ and $\{t_n\}$ are simple and non-negative for all $n$, $\lim_{n\rightarrow\infty}\int s_n = \int f$, and $\lim_{n\rightarrow\infty}\int t_n=\int g$. Then $s_n+t_n\rightarrow f+g$ from below and, by the Monotone Convergence Theorem, we have 
+\[
+    \lim_{n\rightarrow\infty}   
+    \int_X (s_n+t_n)\;d\mu = \int_X (f+g)\;d\mu 
+    \qquad \text{where}\qquad
+    \int_X (s_n + t_n)\;d\mu
+    = \int_X s_n \;d\mu+ \int_X t_n\;d\mu
+\]
+We then generalize to all measurable $f\in\mathscr{L}(X,\mathscr{M},\mu)$ by working with $f_+$ and $f_-$ as we have done in earlier proofs.
+\end{proof}
+
+
+\subsection{Counterexamples to the Pillar Convergence Theorems}
+
+It might seem a little weird that the limit and the integral sign are not always be interchangeable. So to drive home this point, here are a few counterexamples to the Monotone Convergence Theorem where they are not interchangeable. They all fail to satisify the requirement that the $f_n(x)\leq f_{n+1}(x)$ for all $x$ and $n$, which is why we can't apply the MTC.
+
+\begin{ex}
+(Moving Bump Function for $\mathbb{N}$) This example demonstrates why you can't always exchange the limit with the integral. So suppose that we have $(\mathbb{N},\mathscr{P}(\mathbb{N}),\mu)$ where $\mu$ is the counting measure. 
+
+Let $f_n = \chi_{\{n\}}$.  Clearly, $f_n\rightarrow 0$ pointwise; \emph{however}, we also have that $\int_\mathbb{N} f_n = n$, whose limit goes to $\infty$. You might naturally think the problem is pointwise convergence, but that's true either, as we'll now see.
+
+Let $g_n = \frac{1}{n}\chi_{[n,2n)}$. If you take the limit, $g_n\rightarrow 0$. (Gradually, $g_n$ will spread to be $1/n$ across the entire support, which goes to 0.) What's more, this function $g_n$ even converges to 0 \emph{uniformly}. However, if we compute the integral of the simple functions, $\int_X g_n$, the value equals 1 for all $n$. So clearly, we can't exchange the limit. 
+\end{ex}
+
+\begin{ex}
+(Moving Bump Function for $\mathbb{R}$) Suppose we have the measure space $(\mathbb{R},\mathscr{P}(\mathbb{R}),\mu)$, where $\mu$ is any non-negative measure. 
+
+Let $f_n = n\chi_{[1/n,\;2/n]}$. This function converges to 0 pointwise, since we have a bump that is growing in height, but moving ever closer to 0. However, if we were to compute the integral for the simple function $f_n$ (for any $n$), we find that $\int f_n = n$, which diverges to $\infty$.
+\end{ex} 
 
 \subsection{($*$) Lebesgue Intuition}
 
