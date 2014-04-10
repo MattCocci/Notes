@@ -168,20 +168,218 @@ $(\geq)$ Unpack the righthand side, sup the left.
 \end{enumerate}
 
 % Question 2
-\item 
+\item In both, we have a positive measure space, $(X,\mathscr{M},\mu)$, with $\mu(X)<\infty$.
 
 \begin{enumerate} 
-        
 
 % Question 2a
-\item \textbf{Exercise 88.6}: The constant function $M$ is measurable. Since $\mu(X)<\infty$, $g(x)=M$ is integrable. Then we can bound the limit of the integrals, exchange the limit and integral(DTC), so that the integral is finite, so lebesgue integrable.
+\item \textbf{Exercise 88.6}: We have a sequence of measurable functions $\{f_n\}_1^\infty$ such that $f=\lim f_n$. We also know that the $f_n$ are bounded so that $|f_n(x)|\leq M$ for all $n$ and $x$. 
 
-Here we have that $f$ is bounded by pointwise convergence. Look VERY carefully at DTC to see if I can apply it.
+This setup lends itself nicely to using the Dominated Convergence Theorem.  Specifically, set $g(x)=M$. A constant function is clearly measurable, and because $\mu(X)<\infty$ we know from class and by Theorem 88.4 in the book that $\int_X g \; d\mu$ exists (and is finite) so that $g\in\mathscr{L}(X,\mathscr{M},\mu)$.
+
+Thus we satisfy the conditions of the Dominated Convergence Theorem because $f_n$ is measurable, $\lim f_n$ exists for all $x$, and $|f_n|\leq g\in\mathscr{L}(X,\mathscr{M},\mu)$. Thus, 
+\[
+  \lim_{n\rightarrow\infty} \int_X f_n \; d\mu  
+  = \int_X \lim_{n\rightarrow\infty} f_n \; d\mu
+  = \int_X  f \; d\mu
+\]
 
 % Question 2b
-\item \textbf{Exercise 88.10}: Moving bump from class. Here we have that $f$ is not necessarily bounded, although the $f_n$ are
+\item \textbf{Exercise 88.10}: For this question, we have a sequence of bounded real measurable functions $\{f_n\}^\infty_1$ on $X$ such that $f_n\rightarrow f$ uniformly. We again want to show that 
+\begin{equation}
+    \lim_{n\rightarrow\infty} \int_X f_n \; d\mu
+    = \int_X f \; d\mu
+\end{equation}
+    
+($\leq$ Direction) First, we know that because $f_n\rightarrow f$ uniformly, $f$ is measurable, so we can integrate. We also know that for any $\varepsilon>0$, we can find an $N$ such that 
+\begin{equation}
+    \label{stillholds}
+    f_n \in (f-\varepsilon, f+\varepsilon) 
+    \qquad \text{For all $n>N$ and $x\in X$}
+\end{equation}
+And so we know that $f_N\leq f+\varepsilon$, to which we can apply the monotonicity of the integral
+\begin{equation}
+    \label{q2.tolim}
+    \int_X f_N \; d\mu \leq \int_X (f+\varepsilon) \; d\mu
+    <\infty
+\end{equation}
+Note, $f+\varepsilon$ is measurable because it's the sum of two measurable functions: $f$ and a constant, $\varepsilon$. We can also say that the integral of $f+\varepsilon$ is finite (i.e. it exists) because we have a measurable function over a space $X$ where $\mu(X)<\infty$. So by the same reasoning as in part $(a)$, integral is finite.
+
+Now take the limit of Inequality \ref{q2.tolim} with respect to $N$. 
+\begin{equation}
+    L=\lim_{N\rightarrow\infty}
+    \int_X f_N \; d\mu \leq \int_X (f+\varepsilon) \; d\mu
+\end{equation}
+The inequality will still hold because Statement (\ref{stillholds}) holds for all $n>N$. But $\varepsilon$ was arbitrary, so take the limit as $\varepsilon\rightarrow0$ to get that 
+\begin{equation}
+    L \leq \int_X f \; d\mu
+\end{equation}
+
+($\geq$ Direction) Now, by the same reasoning, we know that as above, we know that $f - \varepsilon \leq f_N$, $f-\varepsilon$ is measurable, and the integral of $f$ is finite, since it measurable on 
+
+
 \end{enumerate}
 
+\textbf{Discussion}: At the surface, part (b) looks very similar to part (a); however, there is one key difference: The sequence is not necessarily bounded. We know the functions are bounded, so for each $f_n$, there exists a $M_n$ such that $|f_n|\leq M_n$. But we cannot necessarily find a \emph{common} $M$ such that all functions are bounded by it, which disallows the application of the Dominated Convergence Theorem in part (a).
+
+% Question 88.12
+\item We have $f\in\mathscr{L}(X,\mathscr{M},\mu)$, and want to show that for all $\varepsilon>0$, there exists a $\delta>0$ such that 
+\[
+    \mu(E)<\delta \quad \text{for $E\in\mathscr{M}$ implies}
+    \quad \int_E |f| \; d\mu <\varepsilon
+\]
+We will proceed via proof by contradiction.
+
+As in the hint, take $\varepsilon>0$ and let $\{E_n\}^\infty_1 \subset \mathscr{M}$ such that $\lim_{n\rightarrow\infty} \mu(E_n)=0$. We know such a set exists because we always have $\emptyset \in \mathscr{M}$, where $\mu(\emptyset)$ always. Also, suppose by contradiction that for all $\delta$, there exists a $\varepsilon>0$ such that 
+\begin{equation}
+    \label{q4}
+    \varepsilon\leq \int_{E_n} |f| \; d\mu :=
+    \int_X |f|\Chi_{E_n} \; d\mu
+    \qquad\text{for all $n$}
+\end{equation}
+Next, define a sequence $\{f_n\}=\left\{|f|\chi_{E_n}\right\}$. A couple facts about our sequence and about $|f|$:
+\begin{itemize}
+    \item $|f|\in\mathscr{L}(X,\mathscr{M},\mu)$. By Theorem 88.12, our assumption that $f\in\mathscr{L}(X,\mathscr{M},\mu)$ implies this result.
+    \item $f_n$ is measurable, for all $n$. To see this, note that since $|f|\in\mathscr{L}(X,\mathscr{M},\mu)$, $|f|$ is measurable, and since $E_n\in\mathscr{M}$, $f_n = |f|\chi_{E_n}$ is also measurable, for all $n$.
+    \item $f_n \leq |f|$: This is fairly obvious, after writing out the definition of $f_n$, 
+\begin{equation}
+    \label{dtcapply}
+    f_n := |f|\Chi_{E_n}\leq |f|
+\end{equation}
+    \item $\lim_{n\rightarrow\infty}f_n=0$. Note that since $\mu(E_n)\rightarrow 0$, it must be that $\Chi_{E_n}\rightarrow 0$. 
+\end{itemize}
+So, let's use these facts to apply the Dominated Convergence Theorem. 
+
+First, since $\{f_n\}$ is a measurable sequence of functions, bounded by $|f|\in\mathscr{L}(X,\mathscr{M},\mu)$ for all $n$, we know that we can apply the Dominated Convergence Theorem, and exchange the limit and integral:
+\begin{align*}
+    \lim_{n\rightarrow\infty} \int_X f_n \; d\mu&=
+    \int_X \lim_{n\rightarrow\infty}f_n \; d\mu  \\ 
+\end{align*}
+Then, we can evaluate the limit within the integral, applying what was stated above:
+\begin{align*}
+    \lim_{n\rightarrow\infty} \int_X f_n \; d\mu &=
+    \int_X 0 \; d\mu = 0 \\ 
+    \Rightarrow\quad
+    \lim_{n\rightarrow\infty} \int_X |f|\Chi_{E_n} \; 
+    d\mu &= 0
+\end{align*}
+But this contradicts our assumption in Inequality \ref{q4}, which should hold for all $n$.
+
+
+% Quesiton 6
+\newpage 
+\item \textbf{Exercise 88.15}: For a sequence of measurable functions $\{f_n\}$, we're told that $\sum^\infty_{n=1} |f_n(x)|$ converges for all $x\in X$, and that $\sum^\infty_{n=1}|f_n(x)|\in\mathscr{L}(X,\mathscr{M},\mu)$. 
+\begin{enumerate}
+    % Part 6a
+    \item First, we want to prove that $\sum^\infty_{n=1} f_n(x)$ converges for all $x\in X$. Begin by noting that 
+\begin{equation}
+    \label{q6a.1}
+    \sum^\infty_{n=1} f_n(x) \leq 
+    \left\lvert\sum^\infty_{n=1} f_n(x)\right\rvert =
+    c \sum^\infty_{n=1} f_n(x)
+\end{equation}
+where $c=1$ or $-1$. Then, it's clear that 
+\begin{equation}
+    \label{q6a.2}
+    c \sum^\infty_{n=1} f_n(x) =
+    \sum^\infty_{n=1} c f_n(x) \leq
+    \sum^\infty_{n=1} \left\lvert f_n(x) \right\rvert
+    <\infty
+\end{equation}
+where the final inequality follows from the assumption that $\sum^\infty_{n=1} |f_n(x)|$ converges for all $x$. Putting (\ref{q6a.1}) and (\ref{q6a.2}) together, we see
+\begin{equation}
+    \sum^\infty_{n=1} f_n(x) \leq 
+    \sum^\infty_{n=1} \left\lvert f_n(x) \right\rvert
+    <\infty
+\end{equation}
+so that $\sum^\infty_{n=1} f_n(x)$ converges for all $x$.
+
+% Part 6b
+\item Next, we want to show that $\sum^\infty_{n=1} f_n\in \mathscr{L}(X,\mathscr{M},\mu)$. But to show this, we just need to show that $\left\lvert\sum^\infty_{n=1}f_n\right\rvert\in\mathscr{L}(X,\mathscr{M},\mu)$, and then apply Theorem 88.12.
+\\
+\\
+But first, a result from class states that because the $f_n$ are measurable, and because $\sum^\infty_{n=1} f_n$ converges (by part (a)), we know that the sum is measurable, which implies the absolute value $\left\lvert\sum^\infty_{n=1}f_n\right\rvert$ is measurable too. 
+\\
+\\
+Next, note from (\ref{q6a.1}) and (\ref{q6a.2}) that 
+\begin{align*}
+    0\leq 
+    \left\lvert \sum^\infty_{n=1} f_n(x)\right\rvert \leq
+    \sum^\infty_{n=1} \left\lvert 
+        f_n(x)\right\rvert 
+\end{align*}
+Then use monotonicity of the integral on these measurable functions to get
+\begin{align*}
+    \int_X 0\;d\mu &\leq 
+    \int_X 
+    \left\lvert \sum^\infty_{n=1} f_n(x)\right\rvert 
+    \; d\mu
+    \leq
+    \int_X\sum^\infty_{n=1} \left\lvert 
+        f_n(x)\right\rvert \;d\mu < \infty \\
+    \Rightarrow \quad
+    0 &\leq
+    \int_X 
+    \left\lvert \sum^\infty_{n=1} f_n(x)\right\rvert 
+    \; d\mu <\infty
+\end{align*}
+And because the integral is finite, we know that $\left\lvert \sum^\infty_{n=1} f_n \right\rvert\in\mathscr{L}(X,\mathscr{M},\mu)$, which implies $\sum^\infty_{n=1} f_n \in\mathscr{L}(X,\mathscr{M},\mu)$ by Theorem 88.12.
+
+% Q6c 
+\item Finally, we want to prove that 
+\begin{equation}
+    \label{q6c.target}
+    \int_X \left( \sum^\infty_{n=1} f_n\right) d\mu
+    = \sum^\infty_{n=1} \int_X f_n \; d\mu
+\end{equation}
+So start by defining the partial sum, which is a measurable function as a finite sum of measurable functions:
+\begin{equation}
+    g_m = \sum^m_{n=1} f_n
+\end{equation}
+Note that, by what we showed in part (a), we have 
+\begin{equation}
+    \lim_{m\rightarrow\infty} g_m = 
+    \lim_{m\rightarrow\infty} \sum^m_{n=1} <\infty
+    \quad \Rightarrow\quad
+    g_m\rightarrow \sum^\infty_{n=1} f_n(x)
+\end{equation}
+Now rewrite Equality \ref{q6c.target} in a more suggestive, but equivalent statement
+\begin{align}
+    \label{q6.crux}
+    \int_X \lim_{m\rightarrow\infty} g_m \; d\mu =
+    \lim_{m\rightarrow\infty} \int_X g_m \; d\mu
+\end{align}
+The first term is obviously equilvalent to that of Equality \ref{q6c.target}, and the second can be shown as equivalent because, for any $m$, we can apply Theorem 88.11 to write
+\[
+    \int_X g_m \; d\mu 
+    = \int_X \sum^m_{n=1}f_n \; d\mu
+    = \sum^m_{n=1}\int_X f_n \; d\mu
+\]
+And while the sequence $\{g_m\}$ is a sequence of measurable functions, we just need to show that we can bound the sequence for all $m$ and $x$, after which we can apply the Dominated Convergence Theorem.
+\\
+\\
+So start by using facts from and simplifications similar to parts (a) and (b)
+\[
+    |g_m| =
+    \left\lvert \sum^m_{n=1} f_n \right\rvert \leq 
+    \sum^m_{n=1} \left\lvert f_n \right\rvert \leq 
+    \sum^\infty_{n=1} \left\lvert f_n \right\rvert
+    <\infty
+\]
+We now have a sequence of measurable functions $\{g_m\}$ whose limit exists for all $x\in X$, since $\sum^\infty_{n=1} f_n$ is convergent. We also have a function, $\sum^\infty_{n=1}|f_n|\in\mathscr{L}(X,\mathscr{M},\mu)$ bounding $\{g_m\}$. Then, we can apply the Dominated Convergence Theorem to say that Equation \ref{q6.crux} holds, a statement which is exactly equivalent to what we want to prove: Equation \ref{q6c.target}.
+
+
+
+
+
+    
+
+
+\end{enumerate}
+
+
+
+\newpage
 % Question 7
 \item We start with the function $|f|>0$, which is measurable because $f$ is integrable and $|f|$ is a continuous transformation of $f$. We also know that $|f|\in\mathscr{L}(X,\mathscr{M},\mu)$ by Theorem 88.12. Now consider the set
 \[
