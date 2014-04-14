@@ -1241,6 +1241,7 @@ Suppose that we have $f_n(x)=x^n$ on $[0,1]$. Then $f_n\rightarrow f$ pointwise,
 Each $f_n$ is continuous, but $f$ clearly is not.
 \end{ex}
 
+\newpage
 \subsection{Integrability}
 
 \begin{thm}
@@ -1256,11 +1257,21 @@ then
 Again, we need uniform convergence, and the next example shows why pointwise convergence is insufficient.
 
 \begin{ex}
+    \label{Qex}
     Enumerate the rationals on $[0,1]$: $\mathbb{Q}\cap[0,1] = \{q_1, q_2, \ldots\}$. Then set the sequence of functions equal to a sequence of characteristic functions:
 \[ 
     f_n = \chi_{\{q_1, \ldots, q_n\}} \in \mathscr{R}([a,b])
+    \quad \text{with} \quad
+    \int^b_a f_n \; d\alpha = 0
+    \qquad \forall n
 \]
-But we know that the sequence $\{f_n\}$ converges to $f=\chi_{\mathbb{Q}\cap [0,1]}\not\in\mathscr{R}([a,b])$.
+But we know that the sequence $\{f_n\}$ converges to $f=\chi_{\mathbb{Q}\cap [0,1]}\not\in\mathscr{R}([a,b])$, as
+\[
+    \overline{\int_a^b} f \; d\alpha = 1 
+    \qquad 
+    \underline{\int_a^b} f \; d\alpha = 0
+\]
+because any interval will contain both a real and a rational number since $\mathbb{Q}$ is dense in $\mathbb{R}$.
 \end{ex}
 
 \begin{thm}
@@ -1274,7 +1285,7 @@ Let $\alpha\in BV([a,b])$ and $\{f_n\}_{n=1}^\infty\subset \mathscr{R}_\alpha([a
 \end{thm}
 
 
-\newpage
+
 \section{Measure Zero and Lebesgue's Theorem}
 
 This section tackles Lebesgue's Theorem, which provides a necessary and sufficient condition for $f\in\mathscr{R}_\alpha([a,b])$, using the concept of measure zero, which will develop in the next subsection.
@@ -1573,33 +1584,13 @@ If $f\in\mathscr{R}([a,b])$, then $F(x):=\int^x_0 f(t) \; dt$ implies that $F$ i
 \newpage
 \section{$\sigma$-Algebras, Measure Spaces, and Measurable and Simple Functions}
 
-Riemann integrals are good for continuous or piecewise continuous functions.  But for more irregular and general functions, Riemann integration breaks down.
+Riemann integrals are good for continuous or piecewise continuous functions.  But for more irregular and general functions, and particularly for sequences of functions, Riemann integration breaks down.
 
-For example, we've seen in the section about sequences of functions that we can't always exchange the limit and the integral sign. In particular, there are sequences $\{f_n\}\rightarrow f$ such that each $f_n \in \mathscr{R}_\alpha([a,b])$, but $f \not\in \mathscr{R}_\alpha([a,b])$.
+This stems from a deficiency in Riemann integrals owing to the relatively rigid structure of intervals---the sets over which we integrate. So this chapter lays the groundwork for replacing intervals with more general ``measurable sets'', which contain intervals as a special case.
 
-This stems from a deficiency in Riemann integrals arising from the relatively rigid structure of intervals---the sets over which we integrate. So this chapter will be about replacing intervals with more general ``measurable sets'', which contain intervals as a special case.
+We'll also develop a generalized notion of ``measure'' for subsets $A\subset X$, which we'll denote $\mu(A)$, a function for weighting subsets of the domain. Only in later sections will we restrict $X$ to the real line, when we consider the more specific Lebesgue Measure and Integral.
 
-So we'll want a generalized notion of ``measure'' for subsets $A\subset\mathbb{R}$, which we'll denote $m(A)$. The function $m(\cdot)$ will be how to weight subsets of the real line.
 
-\subsection{Desired Structure and Limitations}
-
-When it comes time to construct a more general notion of the integral, there's a number of desirable features that we would like:
-\begin{enumerate}
-    \item If $A$ is in an interval, $m(A) = |A|$, the length of the interval.
-    \item Translation invariance: $m(A+x) = m(A)$.
-    \item Countable additivity: If $A_1, \ldots, A_n$ disjoint, then $m(\cup A_n) = \sum m(A_n)$. 
-    \item If $A_1 \subset A_2$, $m(A_1) < m(A_2)$.
-\end{enumerate}
-
-\begin{rmk}
-This wishlist is incompatible if our number system consists exclusively of rationals. This is because $m(\{p\}) = 0$, for all single rationals $p\in\mathbb{Q}$. Then $m(\mathbb{Q})=\sum m(\{p_n\}) = 0$. So the measure of all sets is zero, giving us no useful theory.
-
-We also can't make it work if we define $m(\{p\})=c>0$, because then $m(\mathbb{Q})=\infty$. This normally wouldn't be a problem, but then $m([0,1]\cap \mathbb{Q}) = \infty \neq 1$. 
-\end{rmk}
-
-\begin{rmk}
-    It also turns out that you can't satisfy the wishlist if you try to define a measure for the power set,$\mathscr{P}(\mathbb{R})$. We'll need to consider a proper subset of $\mathscr{P}(\mathbb{R})$.
-\end{rmk}
 
 \subsection{Extended Real Number System}
 
@@ -1607,12 +1598,19 @@ We also can't make it work if we define $m(\{p\})=c>0$, because then $m(\mathbb{
 We denote the extended reals by $\bar{\mathbb{R}}$, and it is constructed as 
 \[ 
     \bar{\mathbb{R}} = {\mathbb{R}} \cup \{-\infty, \infty\}
+    = [-\infty,\infty]
 \]
-Open sets are defined as the open sets of $\mathbb{R}$ plus any sets of the form $[-\infty, a)$ or $(a,\infty]$ for $a\in\mathbb{R}$, along with unions of these basic building blocks too.
+Notice, we can now write any intervals with $-\infty$ or $+\infty$ using \emph{closed} brackets now, since they are points in our set; whereas, we could only write $[a,\infty)$ before.
+
+The order relations, addition, and multiplication are extended exactly as one would expect. Only $\infty-\infty$ and $0\cdot \infty$ are undefined.
+\end{defn}
+
+\begin{defn}
+Open sets of $\bar{\mathbb{R}}$ are defined as the open sets of $\mathbb{R}$, any sets of the form $[-\infty, a)$ or $(a,\infty]$ for $a\in\mathbb{R}$, plus unions of these basic building blocks too.
 \end{defn}
 
 \begin{rmk}
-For the remainder of this section, we will construct our theory for the \emph{extended} reals to allow for the greatest possible generality.
+For the remainder of this section, we will construct our theory for the \emph{extended} reals (unless otherwise noted) to allow for the greatest possible generality.
 \end{rmk}
 
 \subsection{$\sigma$-Algebras and Measurable Spaces}
@@ -1620,7 +1618,7 @@ For the remainder of this section, we will construct our theory for the \emph{ex
 \begin{defn} 
 \label{algebra}
 (Algebra of Sets)
-Let $X$ be any set, and let $\mathscr{A}$ be a collection of subsets of $X$ (so $\mathscr{A}\subset\mathscr{P}(\mathbb{R})$). We say that $\mathscr{A}$ is an \emph{algebra} if 
+Let $X$ be any set, and let $\mathscr{A}$ be a collection of subsets of $X$ (so $\mathscr{A}\subset\mathscr{P}(X)$). We say that $\mathscr{A}$ is an \emph{algebra} if 
 \begin{enumerate}
     \item $A\in\mathscr{A}\Rightarrow A^c\in\mathscr{A}$
     \item $A,B\in\mathscr{A} \Rightarrow A\cup B\in\mathscr{A}$
@@ -1663,14 +1661,10 @@ There exist algebras which are not $\sigma$-algebras. Take $X=\mathbb{Z}$. Then 
 \subsection{Non-Negative Measures and Measure Spaces}
 
 \begin{defn} 
-A \emph{measure} on a measurable space $(X,\mathscr{M})$ is a set function $\mu: \mathscr{M} \rightarrow [0,\infty]$.
-\end{defn}
-
-\begin{defn} 
-A \emph{non-negative measure} is a measure that satisfies 
+A \emph{non-negative measure} on a measurable space $(X,\mathscr{M})$ is a set function $\mu: \mathscr{M} \rightarrow [0,\infty]$ that satisfies 
 \begin{enumerate}
     \item $\mu(A)<\infty$ for at least one $A\in\mathscr{M}$ 
-    \item \emph{Countable additivity} for all sequences $\{A_n\}_{n=1}^\infty$ in $\mu$. That means 
+    \item \emph{Countable additivity} for all sequences $\{A_n\}_{n=1}^\infty$ in $\mathscr{M}$. That means 
         \[
             \mu\left(\bigcup^\infty_{n=1}A_n\right) 
             = \sum^n_{n=1} \mu(A_n)
@@ -1682,6 +1676,14 @@ A \emph{non-negative measure} is a measure that satisfies
 \begin{defn} 
 If we add a non-negative measure to a measure space, then the triplet $(X,\mathscr{M},\mu)$ is called a \emph{measure space}. 
 \end{defn}
+
+\begin{ex}
+(Counting Measure) One of the easiest examples of a non-negative measure is the \emph{counting measure}, defined as follows. For any set $X$ and $\sigma$-algebra $\mathscr{M} =\mathscr{P}(X)$, define the following measure $\mu$ on measurable space $(X,\mathscr{P}(X))$ to be 
+\[
+    \mu(A) = \text{card}(A)  \qquad A\in\mathscr{M}
+\]
+So $\mu$ just counts the number of elements in any set.
+\end{ex}
 
 \subsection{Properties of Measure Spaces}
 \label{subsec:propmeas}
@@ -1796,11 +1798,11 @@ And since we know that $\lim_{n\rightarrow \infty} \sum^n_{\ell=1} \mu(B_\ell) =
 
 
 \begin{ex}
-Take $X=\mathbb{Z}$ and $\mathscr{M}=\mathscr{P}(\mathbb{Z})$. Then if we take a measure $\mu(A) = \#A = \text{card}\left( A \right)$, simple reasoning shows that $(X,\mathscr{M},\mu)$ is a measure space.
+Take $X=\mathbb{Z}$ and $\mathscr{M}=\mathscr{P}(\mathbb{Z})$. Then if we take a measure $\mu(A) = \text{card}\left( A \right)$, the counting measure, simple reasoning shows that $(X,\mathscr{M},\mu)$ is a measure space.
 \end{ex}
 
 \begin{ex}
-    We stipulated in property (7) for our measure space that there must be some $k$ such that $\mu(A_k)<\infty$. Suppose that didn't hold, and we can construct a counterexample. 
+We stipulated in property (7) for our measure space that there must be some $k$ such that $\mu(A_k)<\infty$. Suppose that didn't hold, and we can construct a counterexample. 
     
     Consider $X = \mathbb{N}$ and $\mathscr{M} =\mathscr{P}(\mathbb{N})$. Next let $A_n = \{n, n+1, n+2, \ldots\}$. In this case, $\mu(A_n) = \infty$ for all $n$, but
     \[ 
@@ -1809,15 +1811,20 @@ Take $X=\mathbb{Z}$ and $\mathscr{M}=\mathscr{P}(\mathbb{Z})$. Then if we take a
     \]
 \end{ex}
 
-\subsection{Measurable Functions}
+\subsection{Measurable Functions: Intuition}
 
+Given any function $f: X\rightarrow\bar{\mathbb{R}}$, the most natural way to characterize the function is to take all $x$ in $X$ and specify a rule for assigning $x$ to $f(x)\in\bar{\mathbb{R}}$. 
 
-Given a function $f:X\rightarrow\mathbb{R}$, an equivalent representation of the function $f$ is by the disjoint collection $\{E_a\}_{a\in\mathbb{R}}$ where $E_a = f^{-1}\left(\{a\}\right)$. In this way, we partition the space $X$ based on what $f$ maps different subsets of $X$ to.  
+\emph{However}, you can flip that logic around to construct another equally valid characterization of the function $f$ via the range. Namely, step over the elements $a\in\bar{\mathbb{R}}$ and define the disjoint collection $\{E_a\}_{a\in\bar{\mathbb{R}}}$ where $E_a = f^{-1}\left(\{a\}\right)$. In this way, we characterize the function \emph{and} partition the space $X$ based on what $f$ maps different subsets of $X$ to.  Some of the sets $E_a$ will be measurable (i.e. they will be in $\mathscr{M}$) while others will not.
 
-This is exactly equivalent to defining an output $y=f(x)\in\mathbb{R}$ for every $x\in X$.  It's just a different way of looking at the function $f$. Moreover, it's a way that we'll use to our benefit for integration, by thinking about a $\sigma$-algebra on $X$. In this way, some of the sets $E_a$ will be measurable (i.e. they will be in $\mathscr{M}$) while others will not.
+So keep in mind that pre-images say a lot about the function, and we'll work with this characterization to define the concept of measurable functions.
+
+\subsection{Measurable Functions: Definition}
+
+We now define the important notion of measurable functions, which will be the class of functions for which we define the more general integral in the next section. Note that they \emph{only} require a measurable space to be defined; we don't need a full measure space unless we want to do integration.
 
 \begin{defn}
-Let $(X,\mathscr{M})$ be a measurable space and let $f:X\rightarrow\bar{\mathbb{R}}$ be a function mapping to the extended reals. We say that $f$ is a \emph{measurable function} if $f^{-1}(U)$ is measurable (i.e.  $f^{-1}(U)\in\mathscr{M}$) whenever $U\subset\bar{\mathbb{R}}$ is open.\footnote{And, hence, closed as well} 
+Let $(X,\mathscr{M})$ be a measurable space and let $f:X\rightarrow\bar{\mathbb{R}}$ be a function mapping to the extended reals. We say that $f$ is a \emph{measurable function} if $f^{-1}(U)$ is measurable (i.e.  $f^{-1}(U)\in\mathscr{M}$) whenever $U\subset\bar{\mathbb{R}}$ is open.\footnote{And, hence, when $U$ is closed as well.} 
 \end{defn}
 
 \begin{rmk}
@@ -1825,30 +1832,49 @@ The notion of a measurable function is \emph{heavily} dependent upon our choice 
 \end{rmk}
 
 \begin{ex}
-Let $X$ be any set. If we take $\mathscr{M} = \mathscr{P}(X)$, the power set of $X$, then \emph{any} function $f$ is measurable, since $f^{-1}(U)$ will be in $\mathscr{P}(X)$ for any open $U\subset \bar{\mathbb{R}}$.
+Let $X$ be any set. If we take $\mathscr{M} = \mathscr{P}(X)$, the power set of $X$, then \emph{any} function $f$ is measurable, since $f^{-1}(U)$ will be in $\mathscr{P}(X)$ for any open set $U\subset \bar{\mathbb{R}}$.
 \end{ex}
-
-\begin{prop}
-Given a measurable space $(X,\mathscr{M})$ and a measurable function $f$, the set
-\[
-    S = \{B \subset \bar{\mathbb{R}} \; | \; f^{-1}(B) 
-    \text{ measurable} \}
-\]
-is a $\sigma$-algebra on $\bar{\mathbb{R}}$ that contains all open sets of $\bar{\mathbb{R}}$. So we can make a $\sigma$-algebra for the range set of $f$ if we have a $\sigma$-algebra defined on the domain.
-\end{prop}
-
-\begin{rmk}
-This implies something about the Borel Set for $\bar{\mathbb{R}}$, denoted $\mathscr{B}_{\bar{\mathbb{R}}}$. Namely, that $f^{-1}(B)\in \mathscr{M}$ for all open sets $B\in\mathscr{B}_{\bar{\mathbb{R}}}$.
-\end{rmk}
 
 \begin{thm}
 \label{measequiv}
-$f$ is measurable if and only if $f^{-1}\left((a,\infty]\right)\in\mathscr{M}$ for all $a\in\mathbb{R}$. 
+Consider the measurable space $(X,\mathscr{M})$. Take $f:X\rightarrow\bar{\mathbb{R}}$. Then the following are equivalent:
+\begin{itemize}
+    \item $f$ is measurable.
+
+    \item $\{x \; | \; f(x) > a\} = f^{-1}\left((a,\infty]\right)\in\mathscr{M}$ for all $a\in\mathbb{R}$. 
+
+    \item $\{x \; | \; f(x) \geq a\} = f^{-1}\left([a,\infty]\right)\in\mathscr{M}$ for all $a\in\mathbb{R}$. 
+
+    \item $\{x \; | \; f(x) < b\} = f^{-1}\left([-\infty,b)\right)\in\mathscr{M}$ for all $b\in\mathbb{R}$. 
+
+    \item $\{x \; | \; f(x) \leq b\} = f^{-1}\left([-\infty,b]\right)\in\mathscr{M}$ for all $b\in\mathbb{R}$. 
+\end{itemize}
+Note: \emph{This is a \emph{very} important theorem, because it's often much easier to work with these pre-image sets than with arbitrary open sets.}
 \end{thm}
+
+\subsection{The Class of Measurable Functions}
+
+We now wish to discuss properties of measurable functions, and show that they are closed under certain operations. 
+
+\begin{prop}
+Given a measurable space $(X,\mathscr{M})$ and a measurable function $f$, we can generate a $\sigma$-algebra for the range, $\bar{\mathbb{R}}$. Namely, define the set
+\[
+    S = \{B \subset \bar{\mathbb{R}} \; | \; f^{-1}(B) 
+    \text{ \emph{measurable}} \}
+\]
+Then $S$ is a $\sigma$-algebra on $\bar{\mathbb{R}}$ that contains all open sets of $\bar{\mathbb{R}}$. So we can make a $\sigma$-algebra for the range set, $\bar{\mathbb{R}}$, if we have a $\sigma$-algebra defined on the domain.
+\end{prop}
+
+\begin{rmk}
+If we consider the Borel Set for $\bar{\mathbb{R}}$, denoted $\mathscr{B}_{\bar{\mathbb{R}}}$, then $f^{-1}(B)\in \mathscr{M}$ for all open sets $B\in\mathscr{B}_{\bar{\mathbb{R}}}$, provided $f$ is a measurable function.
+\end{rmk}
 
 \begin{thm}
 If $X=\mathbb{R}$ and $\mathscr{M}=\mathscr{B}_\mathbb{R}$ with $f:\mathbb{R}\rightarrow\mathbb{R}$ continuous, then $f$ is measurable.
 \end{thm}
+\begin{proof}
+Recall the definition of continuous functions: for $U\subset\mathbb{R}$ open, then $f^{-1}(U)$ is open, in which case it will be in $\mathscr{B}_{\mathbb{R}}$.
+\end{proof}
 
 \begin{lem}
 Let $f:X\rightarrow\mathbb{R}$ be measurable and $\varphi: \mathbb{R}\rightarrow\mathbb{R}$ be continuous. Then $\varphi\circ f$ is also measurable.
@@ -1864,15 +1890,24 @@ We know that $V$ is open by the continuity of $\varphi$, and since $f$ is measur
 \end{proof}
 
 \begin{cor}
-If $f$ is measurable, then so is $c f$ for $c\in\mathbb{R}$, $|f|$, and $f^2$.
+If $f$ is measurable, then so is $c f$ for $c\in\mathbb{R}$, $|f|$, and $f^2$. 
 \end{cor}
+\begin{proof}
+This follows from the previous lemma for real-valued functions, but it also holds for extended real-valued functions. Although we can't use the previous lemma to show this, it is easily shown for the functions listed if we recall Theorem \ref{measequiv}.
+\end{proof}
 
 \begin{thm}
-Let $\{f_n\}^\infty_1$ be a sequence of measurable functions with $f_n: X\rightarrow\bar{\mathbb{R}}$. Then the following function is measurable as well:
-    \[ f(x) := \sup_n f_n(x) \]
+Let $\{f_n\}^\infty_1$ be a sequence of measurable functions with $f_n: X\rightarrow\bar{\mathbb{R}}$. Then the following functions are measurable as well:
+\begin{itemize}
+    \item $f(x) := \sup_n f_n(x)$
+    \item $f(x) := \inf_n f_n(x)$
+    \item $f(x) := \lim \sup f_n(x) = \lim_{k\rightarrow\infty} \left(\sup_{n\geq k} f_n\right)$.
+    \item $f(x) := \lim \inf f_n(x) = \lim_{k\rightarrow\infty} \left(\inf_{n\geq k} f_n\right)$.
+\end{itemize}
+\emph{\emph{Note:} This is an important proof for when we get to integration and consider the various convergence theorems.}
 \end{thm}
 \begin{proof}
-For all $a\in\mathbb{R}$, note that 
+We prove the statement for $sup_n f_n(x)$ only, as the other cases are similar. For all $a\in\mathbb{R}$, note that 
 \begin{equation}
     \label{measseq}
     \{x \; | \; f(x) > a \} = \bigcup_n \; \{x \; | \; f_n(x)>a\}
@@ -1889,18 +1924,13 @@ Since $f_n^{-1}\left((a,\infty]\right)$ will be in $\mathscr{M}$ for all $n$ by 
 \end{proof}
 
 \begin{cor}
-If $f_n$ is measurable, then so is 
-\begin{itemize}
-    \item $f(x) := \inf_n f_n(x)$
-    \item $f(x) := \lim \sup f_n(x) = \lim_{k\rightarrow\infty} \left(\sup_{n\geq k} f_n\right)$.
-    \item $f(x) := \lim \inf f_n(x) = \lim_{k\rightarrow\infty} \left(\inf_{n\geq k} f_n\right)$.
-\end{itemize}
+\label{convmeas}
+If a sequence of measurable functions $\{f_n\}\rightarrow f$ pointwise, then $f$ is measurable. 
 \end{cor}
 
-\begin{thm}
-\label{convmeas}
-If a sequence of measurable functions $\{f_n\}\rightarrow f$ pointwise, then $f$ is measurable.\footnote{This shows that measurable functions are potentially more powerful, because continuity isn't preserved so nicely. That requires more stringent uniform convergence.}
-\end{thm}
+\begin{rmk}
+This shows that measurable functions are potentially more powerful, because recall that continuity isn't preserved so nicely. That requires more stringent uniform convergence. This is another theorem that we'll use when we consider integration and the pillar convergence theorems.
+\end{rmk}
 
 \begin{thm}
     \label{summeas}
@@ -1942,7 +1972,7 @@ Well then, since the rationals are dense in the reals, we know that there's a ra
 \end{proof}
 
 \begin{cor}
-This last proof shows that measurable functions for a \emph{vector space}, since they are closed under addition and scalar multiples.
+This last theorem shows that measurable functions form a \emph{vector space}, since they are closed under addition and scalar multiplication.
 \end{cor}
 
 \begin{cor}
@@ -1966,7 +1996,7 @@ We know that $S_N = \sum^N_{i=1} f_n$ is also measurable by Theorem \ref{summeas
 \newpage
 \subsection{Simple Functions}
 
-Before we get into the specifics of simple functions, note that we approximated the Riemann integral by (effectively) a step function over the intervals of $[a,b]$. In fact, we can cast an Riemann sum in the notation we'll see for simple functions:
+Before we get into the specifics of simple functions, note that we approximated the Riemann integral by (effectively) a step function over the intervals of $[a,b]$. In fact, we can cast a Riemann sum in the notation we'll see for simple functions:
     \[ S(f,P,T) = \sum^N_{i=1} c_i \chi_{I_i} \]
 We'll do something exactly similar in this section.
 
@@ -2047,13 +2077,34 @@ This, in turn, implies that
     f(x)
 \]
 \end{enumerate}
-
 \end{proof}
 
 
 \newpage
 \section{General Theory of Measure Integration}
-In this section, many theorems will have conditions like ``suppose $s$ is a simple, nonegative, measurable function'', or some subset, combination, or permutation thereof. To distinguish, the theorems, definitions, and examples in this section will have flags after them to denote these restrictions. 
+
+In this section, we define a general theory of integration of measurable functions, where the integral is denoted:
+\[
+    \int_X f \; d\mu 
+\]
+From this definition, we see that we need a measure space $(X,\mathscr{M},\mu)$ to make sense of this object.\footnote{The $\sigma$-algebra, $\mathscr{M}$ is necessary so we can work with simple $\mathscr{M}$-measurable functions that approximate $f$.} In the next section, we will restrict to the case where $X$ is real line and $\mu$ is the Lebesgue Measure, to obtain the Lebesgue Integral, a subset of this general case.
+
+\subsection{Intuition for General Integration}
+
+What we did in the proof of Theorem \ref{lebapprox} is \emph{the key} to our general theory of integration.  And it all has to do with how we partitioned $X$.
+
+Namely, we partitioned $X$ in almost \emph{the complete opposite way} compared to what we did for Riemann Integrals. Instead of imposing that our partitions of $X$ will be intervals, we partitioned $X$ by what the points $x\in X$ \emph{get mapped to} by $f$. The sets of this partition could be crazy---things way more complicated that an interval $[x_{i-1}, x_i]$, because the $x\in f^{-1}([a,b))$ don't even have to be near each other. And that's key.
+
+So instead of starting with a partition of $X$ into intervals and studying how a function $f$ behaves on those intervals, we look at the range of values $f$ can take, then pull it back to $X$.
+
+\paragraph{Metaphor}
+A wise man, Sam Kapon, in quoting Lebesgue himself, described the situation in the following way. Your coffee is rung up for \$1.74. Riemann starts taking successive coins out of his pocket one by one until he has enough to pay. He does so blindly, without any reference to their value (their $f(x)$) and to the fact that one coin could represent different amounts.
+
+On the other hand, Mr. Lebesgue first takes all of the coins out of his pocket and surveys their value (their $f(x)$) before putting down a series of coins that makes sense \emph{given} their value. He pays in a way that makes a distinction between quarters, dimes, and nickels rather than lumping them all together simply as coins. 
+
+\subsection{Notation}
+
+In this section, many theorems will have conditions like ``suppose $s$ is a simple, nonegative, measurable function'', or some subset, combination, or permutation thereof. To help clarify, the theorems, definitions, and examples in this section will have flags after them to denote these restrictions. 
 
 So $(s, +, m)$ measurable function will denote that the result concerns ``simple, non-negative, measurable functions'', which is the most restrictive case we'll encounter. The absence of one of those markers says that the result has sufficient generality that the restriction is not needed.
 
@@ -2068,16 +2119,18 @@ Let $s$ be a simple measurable function on the measure space $(X,\mathscr{M},\mu
     \int_X s \; d\mu = \sum^n_{i=1} c_i \; \mu(A_i)
 \end{equation}
 where, as in our definition of a simple function,  $A_i = s^{-1}(c_i)$.
-
-I also want to mention that this definition of the integral does, indeed, make a lot sense. We see that this definition prescribes that we average $s$ over $X$.  It says simply to weight the values of the function by, effectively, how often they show (i.e. ``the measure of their preimage'').This is similar to what we did for the Riemann integral, only now, our $A_i$ partitioning the domain can be more arbitrary measurable sets, rather than more restrictive intervals.
 \end{defn}
+
+\begin{rmk}
+I also want to mention that this definition of the integral does, indeed, make a lot sense. We see that this definition prescribes that we average $s$ over $X$.  It says simply to weight the values of the function by, effectively, how many points of the domain map there (i.e. ``the measure of their preimage'').This is similar to what we did for the Riemann integral, only now, our $A_i$ partitioning the domain can be more arbitrary measurable sets, rather than more restrictive intervals.
+\end{rmk}
 
 \begin{defn} (+, m)
 Consider the measure space $(X,\mathscr{M},\mu)$, and let $f\geq0$ be a measurable function. Then define
 \[
     \int_X f \; d\mu := \sup_{0\leq s\leq f} \int_X s \; d\mu
 \]
-where $s$ is any such simple function, and the rightand side integral is defined as in Definition \ref{simpleint}.
+where $s$ is any such simple function, and the rightand side integral is defined as in Definition \ref{simpleint}. Note that the integral is \emph{only} defined for measurable functions.
 \end{defn}
 
 
@@ -2090,7 +2143,7 @@ where $s$ is any such simple function, and the rightand side integral is defined
 \begin{proof}
 To prove this, we now consider a few cases for the integral of $f$:
 \begin{enumerate}
-    \item {\sl $f$ simple}: Start by unpacking the definition of the integral, and recall the previous example
+    \item {\sl $f$ simple}: Start by unpacking the definition of the integral,
     \begin{equation}
         \label{ex4.8.3.2}
         \int_X f \; d\mu := \sum^n_{i=1} c_i \; \mu(A_i)
@@ -2101,7 +2154,7 @@ To prove this, we now consider a few cases for the integral of $f$:
         \item Suppose that Equation \ref{ex4.8.3.2} is less than $\infty$. Then by the same reasoning as we had before, $c_i<\infty$ for all $i$, and there must be only finitely many non-zero terms. In that case, we must also have an $N$ such that $f(n)=0$ for all $n>N$, in which case Equation \ref{ex4.8.3.1} equals Equation \ref{ex4.8.3.2}.
     \end{enumerate}
 
-\item {\sl $f$ is any non-negative function on $\mathbb{N}$}: First, assume that $f$ is finite valued.\footnote{In the case where it is \emph{not} finite valued, the statement is trivially true.}  Then, start by letting $s_N = f\cdot\chi_{[1,N]}$. Because we're restricting the non-zero values of the function $s_N$ to a finite domain, it will have a finite range too: $\{f(n)\}$ for $n=\{1,\ldots,N\}$, and 0 for $n>N$. 
+\item {\sl $f$ is any non-negative function on $\mathbb{N}$}: First, assume that $f$ is finite valued.\footnote{In the case where it is \emph{not} finite valued, the statement is trivially true.}  Then let $s_N = f\cdot\chi_{[1,N]}$. Because we're restricting the non-zero values of the function $s_N$ to a finite domain, it will have finite range too: $\{f(n)\}$ for $n=\{1,\ldots,N\}$, and 0 for $n>N$. 
     
 So clearly, $s_N$ is a simple function such that $0\leq s_N \leq f$ for all $N$, since we're just considering non-negative functions. That means
 \begin{equation}
@@ -2114,12 +2167,12 @@ since the latter is the sup over all simple functions with $0\leq s\leq f$. But 
         \int_\mathbb{N} s_N \;d\mu = \sum^\infty_{n=1}s_N(n) 
         = \sum^N_{n=1} f(n)
     \]
-Substituting this expression for the integral of $s_N$ into Equation \ref{4.8.3tosub}, and taking the limit, we get that 
+Substituting this expression into Equation \ref{4.8.3tosub}, and taking the limit, we get that 
 \begin{equation}
     \label{toreverse}
     \sum^\infty_{n=1} f(n) \leq \int_\mathbb{N} f\; d\mu 
 \end{equation}
-Note that the righthand side is unaffected by the limit, since it doesn't depend upon $N$ at all.
+Note that the righthand side is unaffected by the limit; it is independent of $N$.
 
 Next, we need to show that we can reverse the inequality in Equation \ref{toreverse} to show equality as in Equation \ref{ex4.8.3.1}. To do so, suppose that $\sum^\infty_{n=1} f(n)<\infty$, otherwise there is nothing to prove. Then consider a simple function $s$ such that $0\leq s \leq f$. Then it's clear that 
 \[
@@ -2130,7 +2183,7 @@ It's also clear that, since $s$ is simple, we can write it as
     \int_\mathbb{N} s \; d\mu = \sum^\infty_{n=1} s(n)
     \leq \sum^\infty_{n=1} f(n)
 \]
-given the work we did above for the case where $f$ is simple. Finally, note that since $s$ was an arbitrary simple function, since the integral of $f$ involves taking the sup over all simple functions, and since the sum $\sum^\infty_{n=1}f(n)$ does not depend upon $s$, we can assert that
+given the work we did above for the case where $f$ is simple. Finally, note that since $s$ was an arbitrary simple function, since the integral of $f$ involves taking the sup over all simple functions, and since $\sum^\infty_{n=1}f(n)$ does not depend upon $s$, we can assert that
 \[
     \int_\mathbb{N} f \; d\mu \leq \sum^\infty_{n=1} f(n)
 \]
@@ -2166,24 +2219,27 @@ Let $f$ be any \emph{arbitrary} measurable function (i.e. non neccessarily non-n
 \]
 provided that at least one is finite---otherwise the integral is undefined.
 
-Moreover, we say that $f$ is Lebesgue integrable on $X$ with respect to $\mu$ if \emph{both} $\int_X f_+ \; d\mu$ and $\int_X f_- \; d\mu$ are \textbf{finite}, denoted $f\in\mathscr{L}(X,\mathscr{M},\mu)$, the set of all Lebesgue integrable functions $f:X\rightarrow\mathbb{R}$.
+Moreover, we say that $f$ is integrable on $X$ with respect to $\mu$ if \emph{both} $\int_X f_+ \; d\mu$ and $\int_X f_- \; d\mu$ are \textbf{finite}, denoted $f\in\mathscr{L}(X,\mathscr{M},\mu)$, the set of all integrable functions $f:X\rightarrow\mathbb{R}$.
 \end{defn}
 
 \begin{ex}
     If we take $(\mathbb{N}, \mathscr{P}(\mathbb{N}), \mu)$ where $\mu$ is the counting measure, then $f$ is integrable if and only if $\sum^\infty_{n=1}|f(n)|<\infty$, as $|f| = f_+ + f_-$.
 \end{ex}
 
-\begin{thm} \emph{(Properties of $\mathscr{L}(X,\mathscr{M}, \mu)$)} Given $f,g\in\mathscr{L}(X,\mathscr{M},\mu)$,
+\newpage
+\subsection{Properties of $\mathscr{L}(X,\mathscr{M},\mu)$}
+
+\begin{thm} \emph{Properties of $\mathscr{L}(X,\mathscr{M}, \mu)$:} Given $f,g\in\mathscr{L}(X,\mathscr{M},\mu)$,
     
-    \begin{itemize}
+    \begin{enumerate}
         \item {Monotonicity}: If $f\leq g$, we have $\int_X f \leq\int_X g$.
         \item If $f$ is measurable and bounded, and if $\mu(X)<\infty$, then $f\in\mathscr{L}(X,\mathscr{M},\mu)$.
         \item {Homogoneity}: $f\in\mathscr{L}(X,\mathscr{M},\mu)$ if and only if $cf\in\mathscr{L}(X,\mathscr{M},\mu)$ for all $c\in\mathbb{R}$, the non-extended reals.
         \item If $\mu(X)=0$, then \emph{any} measurable function $f: X\rightarrow\bar{\mathbb{R}}$ will be integrable with $\int_X f \; d\mu=0$, even if $f=\infty$ on $X$.
-    \end{itemize}
+    \end{enumerate}
 \end{thm}
 \begin{proof} We consider each in turn:
-\begin{itemize} 
+\begin{enumerate} 
 
     \item Note that if $f$ and $g$ are both non-negative, $g\leq f$ implies
 \[
@@ -2207,18 +2263,19 @@ Taken together, the desired result follows.
     \item If $s$ is a simple function, then $cs$ is also a simple function. And so we can write that $\int_X cf \; d\mu = c\int_X f \; d\mu$.
         
     \item Note that all simple functions will integrate to zero, so that the sup over simple functions will be zero as well.
-\end{itemize}
+\end{enumerate}
 \end{proof}
 
 \begin{rmk}
-You may have noticed that we didn't include the usual linearity property. We will eventually have this, but it turns out to be tougher for the more general integral we've developed. We need to do the hard work in the next subsection to establish this property.
+You may have noticed that we didn't include the usual linearity property. We will eventually have this as a consequence of pillar convergence theorems, but it turns out to be tougher for the more general integral we've developed. We need to do the hard work in the next subsections to establish this property.
 \end{rmk}
 
+\newpage
 \subsection{Pillar Convergence Theorems: Preliminary Foundation}
 
 Before we get to the main pillar theorems concerning convergence, it will help to define a few concepts and prove a few results that we can use freely in the next subsection.
 
-\begin{defn}
+\begin{defn} (m)
 Consider the measure space $(X,\mathscr{M},\mu)$ and let $E\in\mathscr{M}$. Then define
 \[
     \lambda_f(E) := \int_E f \; d\mu 
@@ -2231,7 +2288,7 @@ Consider the measure space $(X,\mathscr{M},\mu)$ and let $E\in\mathscr{M}$. Then
 If $s$ is a simple, measurable non-negative function, then $\lambda_s(E)$ is a non-negative measure on $(X,\mathscr{M})$.
 \end{lem}
 \begin{proof}
-It's easy to see that $\lambda_s(\emptyset) = 0<\infty$, so all that's left to prove is countable additivity.
+It's easy to see that $\lambda_s(\emptyset) = 0<\infty$. Moreover, since $s$ is non-negative, we know that $\lambda_s(A) \in [0,\infty]$. So all that's left to prove is countable additivity.
 \\
 \\
 So let $E_1, E_2,\ldots$ be disjoint, and notice we can write
@@ -2280,7 +2337,7 @@ This uses Lemma \ref{measurelem} and Property 5 in Subsection \ref{subsec:propme
 The theorems in this subsection are equivalent, and they furnish several particularly important results. Among them, linearity falls right out of the Monotone Convergence Theorem.
 
 \begin{thm}
-\emph{(Monotone Convergence Theorem (m,+))} For the measure space $(X,\mathscr{M},\mu)$, let $0\leq f_n(x)\leq f_{n+1}(x)$ be measurable for $n=1,2,\ldots$. Then we can exchange limits with the integral:
+\emph{(Monotone Convergence Theorem (m,+))} For the measure space $(X,\mathscr{M},\mu)$, let $0\leq f_n(x)\leq f_{n+1}(x)$ be measurable for $n=1,2,\ldots$, and suppose $\lim_{n\rightarrow\infty}f_n=f$. Then we can exchange limits with the integral:
 \[
     \lim_{n\rightarrow\infty} \int_X f_n \; d\mu =
     \int_X \left(\lim_{n\rightarrow\infty} f_n\right) 
@@ -2405,9 +2462,13 @@ Let $\{f_n\}$ be a sequence of measurable functions such that $\lim f_n = f$ and
 \]
 \end{thm}
 
-\subsection{Pillar Convergence Theorems: Consequences}
+\newpage
+\subsection{Pillar Convergence Theorems: Consequences and Additional Properties for $\mathscr{L}(X,\mathscr{M},\mu)$}
 
-\begin{cor} If measurable $f,g\in\mathscr{L}(X,\mathscr{M},\mu)$, then $f+g\in\mathscr{L}(X,\mathscr{M},\mu)$.
+\begin{cor} 
+\label{lebadd}    
+\emph{(m)}
+If measurable $f,g\in\mathscr{L}(X,\mathscr{M},\mu)$, then $f+g\in\mathscr{L}(X,\mathscr{M},\mu)$.
 \end{cor} 
 \begin{proof}
     Suppose that $f,g\geq 0$. Then let $s_n{\rightarrow} f$ from below and $t_n{\rightarrow} g$ from below, where $\{s_n\}$ and $\{t_n\}$ are simple and non-negative for all $n$, $\lim_{n\rightarrow\infty}\int s_n = \int f$, and $\lim_{n\rightarrow\infty}\int t_n=\int g$. Then $s_n+t_n\rightarrow f+g$ from below and, by the Monotone Convergence Theorem, we have 
@@ -2421,7 +2482,103 @@ Let $\{f_n\}$ be a sequence of measurable functions such that $\lim f_n = f$ and
 We then generalize to all measurable $f\in\mathscr{L}(X,\mathscr{M},\mu)$ by working with $f_+$ and $f_-$ as we have done in earlier proofs.
 \end{proof}
 
+
+\begin{thm} \emph{(+, m)} 
+Let $f$ be a non-negative measurable function on $X$. Then $\lambda_f(E)$ defines a non-negative measure on $\mathscr{M}$.
+\end{thm}
+\begin{proof}
+Since $f$ is non-negative and since $\lambda_f(\emptyset)=0$, we just need to check countable additivity. So let $E=\bigcup^\infty_{n=1} E_n$ be a pairwise disjoint sequence in $\mathscr{M}$ and define
+\begin{align*}
+    f_n = \sum^n_{i=1} f \Chi_{E_i}
+\end{align*}
+Then $\{f_n\}$ is a sequence of non-negative measurable functions on $X$ with $f_n \leq f_{n+1}$ for all $n$. So we can write out the integral, using Corollary \ref{lebadd} to swap the sum and integrals since we have a finite sum:
+\begin{align*}
+    \int_X f_n \; d\mu &= 
+    \int_X \left(\sum^n_{i=1} f\Chi_{E_i}\right)\; d\mu \\
+    &= \sum^n_{i=1} \int_X f\Chi_{E_i}\; d\mu 
+    = \sum^n_{i=1}\lambda_f(E_i) \\ 
+    \Rightarrow \quad 
+    \lim_{n\rightarrow\infty}\int_X f_n \; d\mu &= 
+    \sum^\infty_{i=1}\lambda_f(E_i) 
+\end{align*}
+Now use the fact that $\lim_{n\rightarrow\infty}f_n = f\Chi_E$, then apply the MTC to get
+\begin{align*}
+    \lambda_f\left(\bigcup^\infty_{i=1} E_i\right) 
+    =\lambda_f(E)
+    &:= \int_X f\Chi_E \; d\mu
+        = \int_X \lim_{n\rightarrow\infty}f_n \; d\mu \\
+    &= \lim_{n\rightarrow\infty}\int_X f_n \; d\mu
+        = \sum^\infty_{i=1} \lambda(E_i)
+\end{align*}
+which is countable additivity.
+\end{proof}
+
+\begin{cor} 
+\label{lebsetadd}
+If $f\in\mathscr{L}(X,\mathscr{M},\mu)$, then $\lambda_f(E)$ defines a countably additive set function on $\mathscr{M}$, i.e.
+\[
+    \lambda(A) + \lambda(B) =
+    \int_A f \; d\mu + \int_B f \; d\mu 
+    = \int_{A\cup B} f \; d\mu
+\]
+\end{cor}
+\begin{proof}
+Apply the previous theorem to arbitrary measurable $f$ by using it on $f_-$ and $f_+$.
+\end{proof}
+
+
+\newpage
+\begin{thm}
+\emph{(Radon-Nikodym Theorem)} This is roughly the converse to the previous theorem. Namely, instead of assuming we have a measurable $f$ on $(X,\mathscr{M},\mu)$ then defining a new non-negative measure, $\lambda_f$, we assume that we have two non-negative measures $\mu$ and $\lambda$ on $(X,\mathscr{M})$. Then, provided $\mu(X)<\infty$ and $\lambda(X)<\infty$, there will exist a non-negative measurable function $f$ on $X$ such that
+\[
+    \lambda(E) = \int_E f \; d\mu
+\]
+\end{thm}
+
+\begin{thm}
+$f\in\mathscr{L}(X,\mathscr{M},\mu)$ if and only if $|f|\in\mathscr{L}(X,\mathscr{M},\mu)$.
+\end{thm}
+\begin{note}
+This is an important theorem, since it means we that we can prove a function $f$ is in $\mathscr{L}(X,\mathscr{M},\mu)$ just by proving that $|f|$ is, which is often \emph{much}, much easier to work with since it is non-negative, allowing us to work with our integration primitive: simple functions. So we can approximate arbitrary integrals of $|f|$ with integrals of simple functions, then assert that integrability (or non-integrability) of $|f|$ holds for $f$ too.
+\end{note}
+\begin{proof}
+($\Rightarrow$ Direction) Suppose that $f\in\mathscr{L}(X,\mathscr{M},\mu)$. Then $f_-, f_+\in\mathscr{L}(X,\mathscr{M},\mu)$. Since $|f|=f_+ + f_-$, we can conlcude that $|f|\in\mathscr{L}(X,\mathscr{M},\mu)$ as well.
+\\
+\\
+($\Leftarrow$ Direction) Suppose that $|f|\in\mathscr{L}(X,\mathscr{M},\mu)$. Then we know from the fact $|f|=f_+ + f_-$ and from monotonicity that
+\[
+    f_-, f_+ \leq |f| \qquad \Rightarrow
+    \qquad 
+    \int_X f_- \; d\mu \leq \int_X f \; d\mu <\infty\qquad
+    \int_X f_+ \; d\mu \leq \int_X f \; d\mu <\infty
+\]
+which implies that $f_-, f_+\in\mathscr{L}(X,\mathscr{M},\mu)$, so that $f\in\mathscr{L}(X,\mathscr{M},\mu)$.
+\end{proof}
+
+\begin{cor} If we have $f\in\mathscr{L}(X,\mathscr{M},\mu)$, then 
+\[ 
+    \left\lvert \int_X f \; d\mu\right\rvert \leq
+    \int_X \left\lvert f \right\rvert \; d\mu
+\]
+\end{cor}
+\begin{proof}
+Since $f\in\mathscr{L}(X,\mathscr{M},\mu)$, we know from the previous theorem that $|f|\in\mathscr{L}(X,\mathscr{M},\mu)$. Then it's clear that 
+\[ 
+    \left\lvert \int_X f \; d\mu\right\rvert 
+    = c \int_X f \; d\mu\qquad\text{where $c=1$ or $c=-1$}
+\]
+Then, since $cf\leq |f|$, we can say that 
+\[ 
+    \left\lvert \int_X f \; d\mu\right\rvert 
+    = c \int_X f \; d\mu 
+    = \int_X c f \; d\mu \leq 
+     \int_X |f| \; d\mu 
+\]
+\end{proof}
+
+\begin{ex}
 To Do: Double series result in book.
+\end{ex}
 
 \subsection{Pillar Convergence Theorems: Counterexamples}
 
@@ -2441,24 +2598,65 @@ Let $g_n = \frac{1}{n}\chi_{[n,2n)}$. If you take the limit, $g_n\rightarrow 0$.
 Let $f_n = n\chi_{[1/n,\;2/n]}$. This function converges to 0 pointwise, since we have a bump that is growing in height, but moving ever closer to 0. However, if we were to compute the integral for the simple function $f_n$ (for any $n$), we find that $\int f_n = n$, which diverges to $\infty$.
 \end{ex} 
 
-\subsection{($*$) Lebesgue Intuition}
 
-What we did in the proof of Theorem \ref{lebapprox} is \emph{the key} to the Lebesgue Integral.  And it all has to do with how we partitioned $X$.
+\subsection{General Notion of Measure-Zero and Almost Everywhere}
 
-Namely, we partitioned $X$ in almost \emph{the complete opposite way} compared to what we did for Riemann Integrals. Instead of imposing that our partitions of $X$ will be intervals, we partitioned $X$ by what the points $x\in X$ \emph{get mapped to} by $f$. The sets of this partition could be crazy---things way more complicated that an interval $[x_{i-1}, x_i]$. This is because the $x\in f^{-1}([a,b))$ don't even have to be near each other. And that's key.
+We now develop a more general notion of concepts we previously defined only for subsets of $\mathbb{R}$. We extend this to arbitrary measure spaces.
 
-Instead of starting with a partition of $X$ into intervals and studying how a function $f$ behaves on those intervals, we look at the range of values $f$ can take, then pull it back to $X$.
+\begin{defn}
+Suppose we have a measure space $(X,\mathscr{M},\mu)$, with $A, E\in\mathscr{M}$. Then, if a property $P$ holds for every $x\in E\setminus A$ and if $\mu(A)=0$, we say that $P$ holds $\mu$-almost everywhere (or $\mu$-a.e.) on $E$.
+\end{defn}
 
-\paragraph{Metaphor}
-A wise man, Sam Kapon, in quoting Lebesgue himself, described the situation in the following way. Your coffee is rung up for \$1.74. Riemann starts taking successive coins out of his pocket one by one until he has enough to pay. He does so blindly, without any reference to their value (their $f(x)$) and to the fact that one coin could represent different amounts.
+\begin{rmk}
+In working with functions that are ``nice'' almost everywhere, we usually apply Corollary \ref{lebsetadd} to break up the integral over $X$ into an integral over the ``bad'' part $E\subset X$ (where some nice property does not hold) and $X\setminus E$ (where some nice property \emph{does} hold). Then, since $\mu(E)$ equals zero, the integral $\int_E f \; d\mu=0$, \emph{regardless} of what the function $f$ does or looks like on $E$. This is precisely how to prove the next theorem.
+\end{rmk}
 
-On the other hand, Mr. Lebesgue first takes all of the coins out of his pocket and surveys their value (their $f(x)$) before putting down a series of coins that makes sense \emph{given} their value. He pays in a way that makes a distinction between quarters, dimes, and nickels rather than lumping them all together simply as coins. 
+\begin{thm}
+If $f,g\in\mathscr{L}(X,\mathscr{M},\mu)$ and $f=g$ $\mu$-a.e. on $X$, then 
+\[
+    \int_X f \; d\mu = \int_X g \; d\mu
+\]
+\end{thm}
 
+\begin{thm}
+    Suppose $f$ is measurable and $f\geq 0$ for all $x\in X$. Then 
+\[
+    \int_X f \; d\mu = 0 \quad \Rightarrow\quad
+    f = 0 \text{ $\mu$-a.e.}
+\]
+\end{thm}
+
+
+\newpage
+\section{The Lebesgue Measure and Integral}
+
+For example, we've seen in the section about sequences of functions that we can't always exchange the limit and the integral sign. In particular, there are sequences $\{f_n\}\rightarrow f$ such that each $f_n \in \mathscr{R}_\alpha([a,b])$, but $f \not\in \mathscr{R}_\alpha([a,b])$.
+
+\subsection{Desired Structure and Limitations}
+
+When it comes time to construct a more general notion of the integral, there's a number of desirable features that we would like:
+\begin{enumerate}
+    \item If $A$ is in an interval, $m(A) = |A|$, the length of the interval.
+    \item Translation invariance: $m(A+x) = m(A)$.
+    \item Countable additivity: If $A_1, \ldots, A_n$ disjoint, then $m(\cup A_n) = \sum m(A_n)$. 
+    \item If $A_1 \subset A_2$, $m(A_1) < m(A_2)$.
+\end{enumerate}
+
+\begin{rmk}
+This wishlist is incompatible if our number system consists exclusively of rationals. This is because $m(\{p\}) = 0$, for all single rationals $p\in\mathbb{Q}$. Then $m(\mathbb{Q})=\sum m(\{p_n\}) = 0$. So the measure of all sets is zero, giving us no useful theory.
+
+We also can't make it work if we define $m(\{p\})=c>0$, because then $m(\mathbb{Q})=\infty$. This normally wouldn't be a problem, but then $m([0,1]\cap \mathbb{Q}) = \infty \neq 1$. 
+\end{rmk}
+
+\begin{rmk}
+    It also turns out that you can't satisfy the wishlist if you try to define a measure for the power set,$\mathscr{P}(\mathbb{R})$. We'll need to consider a proper subset of $\mathscr{P}(\mathbb{R})$.
+\end{rmk}
 
 %%%% APPPENDIX %%%%%%%%%%%
 
 \newpage
 \appendix
+
 \section{Additional Definitions}
 
 \subsection{Modulus of Continuity}
