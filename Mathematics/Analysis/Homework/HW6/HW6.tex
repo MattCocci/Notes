@@ -144,9 +144,12 @@
 \begin{enumerate} 
 
 % Question 1
-\item We want to prove that if $N$ open intervals in $\mathbb{R}$ cover $[a,b]$, denoted $I_1, \ldots,I_N$, then $\sum^N_{n=1} \ell(I_n)\geq b-a$.
+\item We want to prove that if $N$ open intervals in $\mathbb{R}$ cover $[a,b]$, denoted $I_1, \ldots,I_N$, then $\sum^N_{n=1} \ell(I_n)\geq b-a$. 
 
-So without loss of generality, let $\{I_n\}_1^N$ be any such collection, where $I_n=(a_n, b_n)$ and $a_1\leq a_2\leq\cdots\leq a_N$.\footnote{If they are not ordered in such a way, just reorder and relabel so that they are.} Then, rearrange the $b_n$ and define 
+So without loss of generality, let $\{I_n\}_1^N$ be any such collection, where $I_n=(a_n, b_n)$ and $a_1\leq a_2\leq\cdots\leq a_N$.\footnote{If they are not ordered in such a way, just reorder and relabel so that they are.} We will assume that $b_n>a_n$, otherwise $(a_n,b_n)=\emptyset$, in which case that interval is irrelevant to covering $[a,b]$. 
+\\
+\\
+Now, rearrange the $b_n$ and define 
 \[
     b_1^* \leq \cdots \leq b_N^* \qquad
     I_n^* := (a_n, b^*_n)
@@ -172,32 +175,75 @@ But we can reorder the terms in the first sum, which won't change its value, and
     &= \sum^N_{n=1} \ell(I_n) 
 \end{align*}
 
-\item Next, we want to show that $\{I_n^*\}^N_1$ also covers $[a,b]$. But first, assume without loss of generality that $I_n\cap [a,b] \neq \emptset$ for all $n$. Then, note that for $\{I_n\}$ to cover $[a,b]$, we must have 
+\item Next, we want to show that $\{I_n^*\}^N_1$ also covers $[a,b]$. To do so, suppose there is a point $x\in [a,b]$ that's not covered by $\{I_n^*\}^N_1$, which will lead to a contradiction. 
+\\
+\\
+Now, because $\{I^*_n\}$ does not cover $x$, we must have 
 \begin{equation}
-    \label{q1.reason}
-    a_{n+1} < b_n 
-    \qquad \text{for all $n=1,\ldots,N-1$}
+    \label{q1.crux}
+    \text{for all $a_n < x$} \qquad b_n^*\leq x
 \end{equation}
-Otherwise, since the $\{a_n\}$ are ordered and monotonically increasing, there would be an interval $[b_n, a_{n+1}]\neq\emptyset$ not covered by $\{I_n\}$, contradicting the assumption that it covers $[a,b]$.
+Otherwise, there would be some open interval $(a_n, b_n^*)$ covering $x$.
 \\
 \\
-Next, we will assume we have an $x\in[a,b]$ such that $x$ is not in any $I_n^*$ for any $n$, then draw a contradiction. So let $I_n$ be the interval containing $x$, which we know to exist since $\{I_n\}$ covers $[a,b]$ and $x\in[a,b]$. Then, since $x\not\in \{I_n^*\}$, it must be the case that
-\[
-    x \in I_n \setminus I_n^* \quad \Rightarrow \quad
-    x \in [b_n^*, b_n)
-\]
-But since we just reordered to get the $\{b_n^*\}$, we know $b_n^*$ is just $b_m$ for some $m=1,\ldots,N$. Now note that we can't have $m=N$, because 
-
-So by Statement \ref{q1.reason}, we can find an $a_{m+1}$ such that 
-
+Now suppose there are $K$ left endpoints such that $a_n < x$. Then, by the fact that $\{a_n\}$ is ordered, the set of such points must be 
+\begin{equation}
+\label{q1.a}
+    A = \{a_1, \ldots, a_K\} = \{ a_n \; | \; a_n < x\}
+\end{equation}
+Next, by Statement \ref{q1.crux}, we must have $K$ intervals where $b_n^*\leq x$. But because the set $\{b_n^*\}$ is just a reordering of $\{b_n\}$, the set of right endpoints, we can define the following
+\begin{equation}
+\label{q1.b}
+    B = \{b_n \; | \; b_n \leq x\}
+\end{equation}
+and say that it must be of size $K$ too.
+\\
+\\
+But this will give us our contradiction. To see this, note that 
+\begin{equation}
+    \label{q1.ind}
+    b_n \leq x \quad \Rightarrow \quad n \leq K
+\end{equation}
+This is because if $n>K$, we know from set $A$ that $a_n\geq x$. So $b_n\leq x$ couldn't be paired with $a_n \geq x$ to form a non-empty or ill-formed interval.
+\\
+\\
+And so we've split up the original collection of intervals, $\{I_n\}$, into two classes:
+\begin{align*}
+    S_1 &= \{I_n \; | \; n \leq K \} = \{ I_n \; | \; b_n \leq x \} 
+        \quad \text{From \ref{q1.b} and \ref{q1.ind}} \\
+    S_2 &= \{I_n \; | \; n > K \} = \{ I_n \; | \; a_n \geq x \} 
+        \quad \text{From \ref{q1.a}}
+\end{align*}
+It's clear that neither $S_1$ nor $S_2$ can cover $x$; therefore, $\{I_n\}$ is not an open cover, contradicting our assumption.
 \end{enumerate}
 
-Now to the final proof. By part (a), we can show an equivalent statment:
+Now to the final proof. By part (a), we can show an equivalent statement:
 \begin{equation}
     \label{q1.toshow}
     \sum_{n=1}^N I^*_n \geq b - a
 \end{equation}
-So suppose that we have a cover where $N=1$ of $[a,b]$. 
+So suppose that we have a cover where $N=1$ of $[a,b]$. Then clearly $I_1 = I_1^*$ so that if $I_1$ covers $[a,b]$, then $I_1^*$ will too. It's then clear that 
+\[
+    I_1 = I_1^* = (a_1, b_1^*) = (a-\varepsilon_1, b+\varepsilon_2)
+\]
+where $\varepsilon_1, \varepsilon_2>0$, so that 
+\[
+    \ell(I_1^*) = b_1^* - a_1 = b-a + \varepsilon_2 + \varepsilon_1 \geq b -a
+\]
+Next, suppose that it holds when $N$ open intervals cover a closed interval. To prove it for the $N+1$ case, divide $[a,b]$ into 
+\begin{equation}
+    [a,b] = [a,c] \cup [c,b]
+\end{equation}
+where $c \in (a_{N+1}, b_N^*)$. We know such a $c$ exists because we know that $a_{n+1} < b_n^*$ for all $n=1,\ldots,N-1$. Otherwise, there would be a set $[b_n^*, a_{n+1}]\neq \emptyset$ not covered by $\{I_n^*\}_1^{N+1}$. We know $[b_n^*, a_{n+1}]$ wouldn't be covered by $\{I_n^*\}$ because there'd be no $a_m$ or $b_k$ in between $b_n^*$ and $a_{n+1}$ by the way we ordered the endpoints above. But this is a contradiction, because we know $\{I_n^*\}$ covers $[a,b]$.
+\\
+\\
+As a result, the set $\{I^*_n\}^N_1$ covers $[a,c]$ and $I_{N+1}^*$ covers $[c,b]$. Since we assumed the $N$ case holds, we can write
+\begin{align*}
+    \sum_{n=1}^{N+1} \ell(I_n^*)  
+    &= \ell(I_{N+1}^*) + \sum_{n=1}^{N} \ell(I_n^*) \\ 
+    &\geq (b - c) + (c-a) = b-a
+\end{align*}
+The last line followed from the previous because, again, we assumed the $N$ case to hold (which got us $c-a$) and because we proved the case where $N=1$ above (which got us $b-c$). And so the statement holds for all $N$.
 
 
 % Question 2
@@ -211,55 +257,71 @@ Then, we can define $I_x:=(a_x, b_x)$ to be the \emph{largest} interval such tha
 
 We want to show that for all $y\in I_x$, we have $I_y = I_x$. To do so, we show each is a subset of the other.
 \begin{enumerate}
-    \item ($I_y\supseteq I_x$): First, note that $y\in I_x$ and $I_x$ is an open interval. But since $I_y$ is the \emph{largest} open interval containing $y$, we see that clearly $I_y\supseteq I_x$. 
-    \item ($I_y\subseteq I_x$): Next, note that since 
-    
-\end{enumerate}
-
-
-
-
-
-\end{enumerate}
-
-\begin{enumerate}
-% Question 3
-\item ($I_y\subseteq I_x$) To show this, note that we have
+    \item ($I_y\supseteq I_x$): First, note that $y\in I_x$ and $I_x$ is an open interval in $U$. But since $I_y$ is the \emph{largest} open interval containing $y$ such that $I_y\subset U$, we see that clearly $I_y\supseteq I_x$. 
+    \item ($I_y\subseteq I_x$): To show this, note that we have
 \[
     I_y := (a_y, b_y) \quad \Rightarrow \quad
     I_y\subseteq (a_y, b_y) \cup (a_x, b_x) 
     = (\min\{a_x,a_y\}, \max\{b_x, b_y\})
 \]
-The fact that the union above results in an interval stems from the fact that $y$ is in both $I_y$ and $I_x$; therefore, the intervals must overlap. Finally, this final interval is clearly an interval containing $x$. And since $I_x$ is the \emph{largest} interval containing $x$, it follows that $I_x\supset I_y$.
+The fact that the union above results in an interval stems from the fact that $y$ is in both $I_y$ and $I_x$; therefore, the intervals must overlap since they are connected. Finally, this interval $(\min\{a_x,a_y\}, \max\{b_x, b_y\})$ is clearly an interval containing $x$ in $U$. And since $I_x$ is the \emph{largest} interval containing $x$ such that $I_x\subset U$, it follows that $I_x\supset I_y$.
+\end{enumerate}
+Now that we have $I_y = I_x$ for all $y\in I_x$, we can dramatically reduce in size the number of open intervals needed to construct $U$. 
 \\
 \\
-Now that we have $I_y = I_x$ for all $y\in I_x$, we can dramatically reduce in size the number of open intervals needed to cover $U$. 
-\\
-\\
-Next, we consider the sequence the 
+So consider the union
 \[
-    U\supset \bigcup_{x\in U} I_x 
-    =\bigcup_{x\in U} (a_x, b_x)
+    U = \bigcup_{x\in U} I_x 
+    =\bigcup_{x\in U} (a_x, b_x) \qquad I_x \subset U
 \]
 Now we saw above that if $y\in I_x$ then $I_y = I_x$, so suppose we have two points $x\neq y$ such that $I_y\neq I_x$. Then it must be that
 \[
     I_y \cap I_x = \emptyset \quad \Rightarrow
     \quad b_y > a_y \geq b_x > a_x
 \]
-This now allows us to order the intervals, based on the unique values of the lefthand side of each interval. So for each interval $I_x$, let $I_y$ denote the next interval in the ordering and choose
+This now allows us to order the disjoint intervals, based on the unique values of the left endpoint of each interval. So for each unique interval $I_x$, let $I_y$ denote the next unique, disjoint interval in the ordering and choose
 \[
     q_x \in [a_x, a_y] \qquad q_x \in \mathbb{Q}
 \]
-which we can do since the rationals are dense in the reals. For the final set (if the set of intervals is finite), any rational larger than the last will do.
+which we can do since the rationals are dense in the reals and $a_x < a_y$. For the final set (if the set of intervals is finite), any rational larger than the previous rational will do.
 \\
 \\
-So we now have a one-to-one correspondence between our sets and the rational numbers, implying that the set $\{I_x\}_{x\in U}$ reduces to a countable set of disjoint intervals.
+So we now have a one-to-one correspondence between our disjoint intervals and the rational numbers, implying that the set covering $U$, written $\{I_x\}_{x\in U}$, reduces to a countable set of disjoint intervals. 
+\\
+\\
+To show uniqueness, suppose by contradiction that there is another such countable, pairwise-disjoint union of open intervals, $\{J_n\}$ with
+\[
+    U = \bigcup^\infty_{n=1} I_n = 
+    \bigcup^\infty_{n=1} J_n \qquad \{I_n\} \neq \{J_n\}
+\]
+Then, suppose there is an $I \in \{I_n\}$ such that $I \not\in \{J_n\}$. But because $I \subset \cup I_n = U$, we know that that
+\begin{align*}
+    I \subset U = 
+    \bigcup^\infty_{n=1} I_n
+    = \bigcup^\infty_{n=1} J_n
+\end{align*}
+Thus, there must be a $J \in \{J_n\}$ where 
+\[
+    J \cap I \neq \emptyset
+\]
+Since we're assuming by contradiction that $J$ and $I$ are distinct, we can say, without loss of generality, that there's an endpoint of $J$, call it $a_j$, in $I$.\footnote{For $J$ and $I$ to have a non-empty intersection, each must have an endpoint in the other, and we could handle the right endpoint just as easily as the left with minor modifications.} So now, because $a_{j}\in I$, it is in $U = \cup I_n = \cup J_n $; therefore, there must be \emph{another} interval $J' \in \{J_n\}$ containing $a_{j}$. 
+\\
+\\
+But this gives us a contradiction because $a_j$ being an endpoint of $J$ contained within $J'$ implies
+\[
+    J \cap J' \neq \emptyset
+\]
+since the right endpoint of $J'$ will have to be strictly larger than the left endpoint of $J$ to have $a_j \in J'$. But this contradicts the assumption of $\{J_n\}$ being pairwise disjoint and distinct.
 
 
-\item We have a finite sequence of disjoint intervals, $\{I_n\}_1^N$. We can use the result from class that the outer measure value $m^*(I_n)$ is independent of whether of whether $I_n$ is open, closed, or half-open.
+
+
+
+% Question 3
+\item We have a finite sequence of disjoint intervals, $\{I_n\}_1^N$. We can use the result from class that the outer measure value $m^*(I_n)$ is independent of whether $I_n$ is open, closed, or half-open.
 \\
 \\
-So first, denote the endpoints of $I_n$ as $a_n$ on the left and $b_n$ on the right. With that, for an positive $\varepsilon$, we know that we can cover $I_n$ by open sets
+So first, denote the endpoints of $I_n$ as $a_n$ on the left and $b_n$ on the right. With that, for any positive $\varepsilon$, we know that we can cover $I_n$ by open sets
 \[
     I_n \subset (a_n-\varepsilon, b_n+\varepsilon)
     \quad \Rightarrow\quad
@@ -279,7 +341,7 @@ Thus, if we return to the definition of the outer measure, we see that
 \end{align*}
 where the last line follows by taking the limit as $\varepsilon\rightarrow 0$.
 
-Next, for any open cover of the interval $I_n$, denoted $\{J_{n,m}\}_{m=1}^\infty$, we know by compactness that there exists a finite set of open intervals, $\{J_{n,1}, J_{n,2}, \ldots,J_{n,M_n}\}$ such that 
+Next, for any open cover of the interval $I_n$ consisting of intervals, denoted $\{J_{n,m}\}_{m=1}^\infty$, we know by compactness that there exists a finite set of open intervals, $\{J_{n,1}, J_{n,2}, \ldots,J_{n,M_n}\}$ such that 
 \[
     \bigcup^{M_n}_{m=1} J_{n,m} \supset I_n
 \]
@@ -296,12 +358,12 @@ Proceeding in this way for all $n$, we see that
     \geq \sum^N_{n=1} (b_n - a_n)
     =\sum^N_{n=1} \ell\left(I_n\right)
 \end{equation}
-Taking the infimum over all open covers (which affects the lefthand side only), we see that 
+Taking the infimum over all open covers consisting of intervals (which affects the lefthand side only), we see that 
 \begin{align*}
     m^*\left(\bigcup^N_{n=1} I_n\right) &\geq 
     \sum^N_{n=1} \ell(I_n) 
 \end{align*}
-And so we have equality.
+And so, combined with the earlier result, we have equality.
 
 
 
