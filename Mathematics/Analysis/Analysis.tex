@@ -31,6 +31,7 @@
 %% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{amsfonts}
 \usepackage{mathrsfs}
 \usepackage{amsthm} %allows for labeling of theorems
@@ -2630,7 +2631,14 @@ If $f,g\in\mathscr{L}(X,\mathscr{M},\mu)$ and $f=g$ $\mu$-a.e. on $X$, then
 \newpage
 \section{The Lebesgue Measure and Integral}
 
-For example, we've seen in the section about sequences of functions that we can't always exchange the limit and the integral sign. In particular, there are sequences $\{f_n\}\rightarrow f$ such that each $f_n \in \mathscr{R}_\alpha([a,b])$, but $f \not\in \mathscr{R}_\alpha([a,b])$.
+We now have a sufficient foundation to build the Lebesgue Integral, which is just a special case of the more general integral we defined in the previous section, obtained by choosing a very specific measure and $\sigma$-algebra.
+
+Therefore, the goal of this section rests in defining that $\sigma$-alebra $\mathscr{M}$, consisting of \emph{Lebesgue Measurable Sets}, along with the special \emph{Lebesgue Measure}, $m$. Both of these will allow us to construct the \emph{Lebesgue Integral} such that
+\[
+    \int_{[a,b]} f \; dm = \int_a^b f \; dx
+\]
+for all Riemann Integrable functions. The added advantage will be that there will be additional functions that are Lebesgue Integrable, but \emph{not} Riemann Integrable, allowing us to extend the class of integrable functions so that $\mathscr{L}([a,b],\mathscr{M},m) \supsetneq \mathscr{R}([a,b])$.
+
 
 \subsection{Desired Structure and Limitations}
 
@@ -2649,13 +2657,266 @@ We also can't make it work if we define $m(\{p\})=c>0$, because then $m(\mathbb{
 \end{rmk}
 
 \begin{rmk}
-    It also turns out that you can't satisfy the wishlist if you try to define a measure for the power set,$\mathscr{P}(\mathbb{R})$. We'll need to consider a proper subset of $\mathscr{P}(\mathbb{R})$.
+    It also turns out that you can't satisfy the wishlist if you try to define a measure for the power set,$\mathscr{P}(\mathbb{R})$. We'll need to consider a proper subset of $\mathscr{P}(\mathbb{R})$ to define a true non-negative measure.
+
+To cope with this limitation, we will, in the next subsection, define a so-called ``outer measure'' that is defined on $\mathscr{P}(\mathbb{R})$, but then restrict it to special subest of $\mathscr{P}(\mathbb{R})$ to get a proper non-negative measure.
 \end{rmk}
+
+
+\newpage
+\subsection{The Lebesgue Outer Measure}
+
+We will construct the Lebesgue Measure by first defining the \emph{Lebesgue Outer Measure}, denoted $m^*$. But this won't be a proper measure, since it will fail countable additivity. So then we will construct a $\sigma$-algebra $\mathscr{M}$ such that $m:=m^*|_\mathscr{M}$ is a proper measure.
+
+\begin{defn}
+We define the \emph{Lebesgue Outer Measure} $m^*:\mathscr{P}(\mathbb{R})\rightarrow[0,\infty]$
+\[
+    m^*(A) := \inf\left\{
+    \sum^\infty_{n=1} \ell(I_n) \;| \;
+    A \subset \bigcup^\infty_{n=1} I_n
+    \right\} \qquad A \subset \mathbb{R}
+\]
+where $\ell(I_n)$ is the length $x-y$ of the open interval $I_n=(x,y)$, and where the infimum is taken over the set of all open-interval covers of $A$. Intuitively, $m^*$ gives the size of the ``least-cost'' or ``most efficient'' open-interval cover that is at-most-countable.
+\\
+\\
+\textbf{Properties}: The Lebesgue outer measure has the following properties:
+\begin{enumerate}
+
+\item $m^*$ is translation invariant. This follows from $\ell(\cdot)$ being translation invariant. 
+
+\item $m^*(\emptyset)=0$, $m^*(\{p\})=0$, and $m^*\left(\bigcup^\infty_{i=1} \{p_i\}\right)=0$
+
+\item \emph{Monotonicity}: $A\subset B$ implies $m^*(A)\leq m^*(B)$
+
+\item $m^*(I)=\ell(I)$ where $I$ is any interval.
+
+\item \emph{Countable Sub-Additivity}: For all $\{A_n\}^\infty_1\subset\mathbb{R}$, we have
+\[
+    m^*\left(\bigcup^\infty_{n=1}A_n\right) \leq
+    \sum^\infty_{n=1}m^*\left(A_n\right) 
+\]
+But take note: If the $A_n$ are disjoint, it does \textbf{not} imply additivity. This is why we call $m^*$ the Lebesgue \emph{outer} measure, which is distinct from the Lebesgue measure, which we will define as a restriction of $m^*$.
+
+\end{enumerate}
+
+\begin{proof}
+We prove only two of the properties, both of which are very important:
+\begin{enumerate}
+\item[4.] Although this looks like a tautology, this does, in fact, require a proof. And although $I$ can be any interval $(a,b)$, $(a,b]$, $[a,b)$, $[a,b]$ with no assumption about the finiteness of the endpoints, consider first $[a,b]$ and suppose the endpoints are finite (otherwise the proof is trivial).
+
+($\leq$ Direction) First define $I_1 = (a-\varepsilon, b+\varepsilon)\supset[a,b]$ for all $\varepsilon>0$. Then it's clear that $I_1$ satisfies as an open interval cover of $[a,b]$, and since $m^*$ is the \emph{infimum} of all open interval covers, we have
+\begin{align}
+    m^*(I) &\leq \ell(I_1) = b-a + 2\varepsilon
+        \qquad \forall \varepsilon>0 \notag \\
+    \text{Send $\varepsilon\rightarrow0$} \qquad 
+    m^*(I) &\leq b-a = \ell(I)
+\end{align}
+
+($\geq$ Direction) Next, for any cover $\{I_n\}_1^\infty$ of open intervals covering $[a,b]$, we can apply Heine Borel since $[a,b]$ is compact to get a finite subcover, $\{I_1,\ldots,I_N\}$ such that 
+\[
+    \bigcup^N_{n=1} I_n \supset [a,b] 
+    \quad \Rightarrow \quad
+    \sum^N_{n=1} I_n \geq b-a
+\]
+This last result is easy to prove; the full proof is written in the homework. It just requires induction and being clever about how to order the open intervals. 
+
+And we can do this for any at-most-countable open interval cover, so take the infimum over all such covers to get
+\[
+    m^*(I) \geq b-a = \ell(I)
+\]
+Next, for the open interval, we take any $\varepsilon>0$ and use monotonicity before applying the above result concerning closed intervals:
+\begin{align*}
+    [a+\varepsilon, b-\varepsilon] &\subset
+    (a,b) \subset [a,b] \\
+    \text{By monotonicity}\qquad
+    m^*([a+\varepsilon, b-\varepsilon]) &\leq
+    m^*((a,b)) \leq m^*([a,b]) \\
+    b-a-2\varepsilon &\leq
+    m^*((a,b)) \leq b-a \\
+    \text{Since $\varepsilon$ arbitrary }\Rightarrow\qquad
+    m^*((a,b)) &= b-a 
+\end{align*}
+Finally, for all other types of intervals, use monotonicity, squeezing the half-open intervals between the closed and open intervals, and we have all cases covered.
+
+\item[5.] Let $\varepsilon>0$ be given. Then for all $A_n\subset\mathbb{R}$, there exists an open interval cover $\{I_{n,j}\}^\infty_{j=1}$ such that
+\begin{equation}
+    \label{singcov}
+    \bigcup^\infty_{j=1} I_{n,j} \supset A_n   
+    \qquad \text{and}\qquad
+    m^*(A_n) \leq \sum^\infty_{j=1} \ell(I_{n,j})
+    \leq m^*(A_n) + \frac{\varepsilon}{2^n}
+\end{equation}
+Without loss of generality, we will assume $m^*(A_n)<\infty$ for all $n$ (otherwise it's trivial). 
+
+Now if we take the union of all these countable interval covers (over all $n$), we have 
+\begin{align}
+    \bigcup^\infty_{n=1}A_n &\subset 
+        \bigcup^\infty_{j=1} 
+        \bigcup^\infty_{n=1} I_{n,j} \notag\\
+    \Rightarrow \quad
+    m^*\left(\bigcup^\infty_{n=1}A_n\right) 
+    &\leq \sum^\infty_{j=1} \sum^\infty_{n=1}\ell(I_{n,j})
+    \label{countadd1}
+\end{align}
+Next, we can use the righthand side of \ref{singcov}, summing over all covers:
+\begin{align}
+    \sum^\infty_{j=1} \sum^\infty_{n=1}\ell(I_{n,j})
+    &\leq \sum^\infty_{n=1} \left(m^*\left(A_n\right) 
+    + \frac{\varepsilon}{2^n}\right) \notag \\
+    &\leq \varepsilon
+    +\sum^\infty_{n=1} m^*\left(A_n\right) 
+    \label{countadd2}
+\end{align}
+Thus, combining \ref{countadd1} and \ref{countadd2}, we have
+\begin{align}
+    m^*\left(\bigcup^\infty_{n=1}A_n\right) 
+    \leq \sum^\infty_{j=1} \sum^\infty_{n=1}\ell(I_{n,j})
+    \leq \varepsilon+\sum^\infty_{n=1} m^*\left(A_n\right)
+\end{align}
+But since, $\varepsilon$ was arbitrary, we have the desired result of countable sub-additivity.
+\end{enumerate}
+\end{proof}
+
+\end{defn}
+
+
+
+\begin{ex}
+Here's why we don't have countable addivity on $\mathscr{P}(\mathbb{R})$. Pick any irrational $\alpha\in\mathbb{R}\setminus\mathbb{Q}$.
+\end{ex}
+
+\subsection{General Outer Measures}
+
+\begin{defn} 
+\label{outermeas}
+Consider any set $X$ and any function $\mu^*:\mathscr{P}(X)\rightarrow[0,\infty]$. We call $\mu^*$ an \emph{outer measure} if it satisfies
+\begin{enumerate}
+    \item $\mu^*(\emptyset)=0$
+    \item \emph{Monontonicity}: $A\subseteq B$ implies $\mu^*(A) \leq \mu^*(B)$
+    \item \emph{Countable sub-additivity}: $\mu^*\left(\bigcup_{n=1}^\infty A_n\right) \leq \sum^\infty_{n=1} \mu^*(A_n)$
+\end{enumerate}
+Clearly, this is a generalization of the Lebesgue outer measure.
+\end{defn}
+
+\begin{defn} 
+\label{caracrit}    
+(Caratheodory's Criterion)
+We say that $S\subset X$ is \emph{$\mu^*$-measurable} if, for all ``test sets'' $T\subset X$, we have
+\[
+    \mu^*(T) = \mu^*(T\cap S) + \mu^*(T\cap S^c) 
+\]
+Note that $T$ can be written as a disjoint union, $T=(T\cap S) \cup (T\cap S^c)$. We then define a $\sigma$-algebra composed of $\mu^*$-measurable sets:
+\[
+    \mathscr{M} 
+    := \{S\subset X \; | \; \forall T\subset X, \;\;
+        \mu^*(T) = \mu^*(T\cap S) + \mu^*(T\cap S^c) 
+    \}
+\]
+But how can we be sure $\mathscr{M}$ is a $\sigma$-algebra? See the next theorem.
+\end{defn}
+\begin{rmk}
+Note that for any $T\subset X$, we have
+\[
+    \mu^*(T) = \mu^*\left((T\cap S)\cup(T\cap S^c)\right)
+\]
+where $T$ is written as a disjoint union on the righthand side. Then, by the sub-additivity of $\mu^*$, the last line automatically implies 
+\begin{equation}
+    \mu^*(T) 
+    \leq \mu^*\left(T\cap S\right) + 
+    \mu^*\left(T\cap S^c\right)
+\end{equation}
+Now again, this is automatic for all $T\subset X$. So to have $S\in\mathscr{M}$, we must also have
+\begin{equation}
+    \mu^*(T) 
+    \geq \mu^*\left(T\cap S\right) + 
+    \mu^*\left(T\cap S^c\right)
+    \qquad \forall \; T\subset X
+\end{equation}
+because this will be the only type of inequality that allows $S$ to satisfy Caratheodory's Criterion. This implies that $S$ will \emph{not} be $\mu^*$-measurable if we can find a $T\subset X$ such that 
+\begin{equation}
+    \mu^*(T) 
+    > \mu^*\left(T\cap S\right) + 
+    \mu^*\left(T\cap S^c\right)
+\end{equation}
+where, just to emphasize the key point, the last inequality is strict.
+\end{rmk}
+
+\begin{thm}
+\emph{(Caratheodory's Theorem)} For $\mu^*$ as in Definition \ref{outermeas} and $\mathscr{M}$ as in Definition \ref{caracrit}, $\mathscr{M}$ is a $\sigma$-algebra, and the restriction $\mu:=\mu^*|_\mathscr{M}$ is a non-negative measure on $\mathscr{M}$.
+\end{thm}
+\begin{proof}
+(Show $\mathscr{M}$ is an Algebra) It's stupidly obvious first, that if $S\in\mathscr{M}$, then $S^c\in\mathscr{M}$ too, and second, that $\emptyset, X\in\mathscr{M}$. 
+
+Now, we just need to prove that for $S_1,S_2\in\mathscr{M}$, we have $S_1\cup S_2\in\mathscr{M}$. So given any $T\subset X$, we use a little set theory. But before we do that, let's just establish one helpful result:
+\begin{align}
+    \label{outmeasmod}
+    T\cap (S_1\cup S_2) &=  
+    T\cap (S_1\cup (S_2\cap S_1^c)) \notag \\
+    &= (T\cap S_1)\cup (T\cap S_2\cap S_1^c) 
+\end{align}
+Now we can move onto the main portion, using the previous result:
+\begin{align*}
+    \mu^*(T\cap(S_1\cup S_2)) +
+    \mu^*(T\cap(S_1\cup S_2)^c) &=
+    \mu^*(T\cap (S_1\cup (S_2\cap S_1^c))) 
+    +\mu^*(T\cap(S_1\cup S_2)^c) \\
+    &= \mu^*((T\cap S_1)\cup (T_1 \cap S_2\cap S_1^c)) \\
+    &\qquad+\mu^*(T\cap S_1^c\cap S_2^c) 
+\end{align*}
+Now, apply countable additivity on the last expression:
+\begin{align*}
+    \mu^*(T\cap(S_1\cup S_2)) +
+    \mu^*(T\cap(S_1\cup S_2)^c) 
+    &\leq\mu^*(T\cap S_1) + \mu^*(T_1\cap S_1^c \cap S_2)\\
+    &\qquad+\mu^*(T\cap S_1^c\cap S_2^c) 
+\end{align*}
+Defining $\tilde{T}=T\cap S_1^c$, we can 
+\end{proof}
+
+\begin{thm}
+Given an outer measure $\mu^*$ and a set $S\subset X$, if $\mu^*(S)=0$, then $S\in\mathscr{M}$, where $\mathscr{M}$ is the set of all $\mu^*$-measurable sets. 
+\end{thm}
+\begin{rmk}
+Since we know that $\mu:=\mu^*|_{\mathscr{M}}$ is a non-negative measure as shown in the previous theorem, we now know from this theorem that $\mu$ is a \emph{complete measure} which defines a complete measure space $(X, \mathscr{M}, \mu)$ that is very convenient to work with.
+\end{rmk}
+\begin{proof}
+We can use the monotonicity of $\mu^*$ to say that
+\begin{equation}
+    \label{monty1}
+    (T\cap S) \subset S 
+    \quad \Rightarrow\quad
+    0\leq\mu^*(T\cap S) \leq \mu^*(S) = 0
+    \quad \Rightarrow\quad
+    \mu^*(T\cap S) = 0 
+\end{equation}
+Then again, by monotonicity, we have for all $T\subset X$
+\begin{equation}
+    \label{monty2}
+    (T\cap S^c) \subset T
+    \quad \Rightarrow\quad
+    \mu^*(T\cap S^c) \leq \mu^*(T)
+\end{equation}
+Putting \ref{monty1} and \ref{monty2} together, we have
+\begin{align*}
+    \mu^*(T) &\geq 
+    \mu^*(T\cap S^c) =  
+    \mu^*(T\cap S^c) + 0  \\
+    &\geq \mu^*(T\cap S^c) + \mu^*(T\cap S)
+\end{align*}
+Then, we recall the remark after Caratheodory's Criterion (Definition \ref{caracrit}) to establish $S\in\mathscr{M}$.
+
+\end{proof}
+
+
+
+
+
 
 %%%% APPPENDIX %%%%%%%%%%%
 
 \newpage
 \appendix
+
 
 \section{Additional Definitions}
 
