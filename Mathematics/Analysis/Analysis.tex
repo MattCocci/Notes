@@ -2785,7 +2785,7 @@ But since, $\varepsilon$ was arbitrary, we have the desired result of countable 
 Here's why we don't have countable addivity on $\mathscr{P}(\mathbb{R})$. Pick any irrational $\alpha\in\mathbb{R}\setminus\mathbb{Q}$.
 \end{ex}
 
-\subsection{General Outer Measures}
+\subsection{General Outer Measures and Caratheodory's Criterion}
 
 \begin{defn} 
 \label{outermeas}
@@ -2845,7 +2845,7 @@ where, just to emphasize the key point, the last inequality is strict.
 \emph{(Caratheodory's Theorem)} For $\mu^*$ as in Definition \ref{outermeas} and $\mathscr{M}$ as in Definition \ref{caracrit}, $\mathscr{M}$ is a $\sigma$-algebra, and the restriction $\mu:=\mu^*|_\mathscr{M}$ is a non-negative measure on $\mathscr{M}$.
 \end{thm}
 \begin{proof}
-(Show $\mathscr{M}$ is an Algebra) It's stupidly obvious first, that if $S\in\mathscr{M}$, then $S^c\in\mathscr{M}$ too, and second, that $\emptyset, X\in\mathscr{M}$. 
+(Show $\mathscr{M}$ is an Algebra) First, it's stupidly obvious, that if $S\in\mathscr{M}$, then $S^c\in\mathscr{M}$ too, and second, that $\emptyset, X\in\mathscr{M}$. 
 
 Now, we just need to prove that for $S_1,S_2\in\mathscr{M}$, we have $S_1\cup S_2\in\mathscr{M}$. So given any $T\subset X$, we use a little set theory. But before we do that, let's just establish one helpful result:
 \begin{align}
@@ -2863,14 +2863,65 @@ Now we can move onto the main portion, using the previous result:
     &= \mu^*((T\cap S_1)\cup (T_1 \cap S_2\cap S_1^c)) \\
     &\qquad+\mu^*(T\cap S_1^c\cap S_2^c) 
 \end{align*}
-Now, apply countable additivity on the last expression:
+Now, apply countable sub-additivity to the last expression:
 \begin{align*}
     \mu^*(T\cap(S_1\cup S_2)) +
     \mu^*(T\cap(S_1\cup S_2)^c) 
     &\leq\mu^*(T\cap S_1) + \mu^*(T_1\cap S_1^c \cap S_2)\\
     &\qquad+\mu^*(T\cap S_1^c\cap S_2^c) 
 \end{align*}
-Defining $\tilde{T}=T\cap S_1^c$, we can 
+Defining $\tilde{T}=T\cap S_1^c$, we can rewrite the last expression:
+\begin{align}
+    \label{union.final}
+    \mu^*(T\cap(S_1\cup S_2)) +
+    \mu^*(T\cap(S_1\cup S_2)^c) 
+    &\leq\mu^*(T\cap S_1) + \mu^*(\tilde{T} \cap S_2)
+    +\mu^*(\tilde{T}\cap S_2^c) 
+\end{align}
+Before simplifying this last expression, we use Caratheodory's criterion to simplify 
+\begin{align*}
+    \mu^*(\tilde{T} \cap S_2)
+    +\mu^*(\tilde{T}\cap S_2^c) =
+    \mu^*(\tilde{T}) = \mu^*(T\cap S_1^c)
+\end{align*}
+Plugging this result into \ref{union.final} and applying Caratheodory again,
+\begin{align*}
+    \mu^*(T\cap(S_1\cup S_2)) +
+    \mu^*(T\cap(S_1\cup S_2)^c) 
+    &\leq\mu^*(T\cap S_1) 
+    + \mu^*(T\cap S_1^c) 
+    =\mu^*(T)
+\end{align*}
+Invoking the remark after Definition \ref{caracrit}, we have the desired result.
+\\
+\\
+(Show $\mathscr{M}$ is a $\sigma$-algebra) To show countable additivity, we first show finite additivity. So assume we have $S_1, S_2\in\mathscr{M}$ with $S_1\cap S_2=\emptyset$. Then applying Caratheodory's Criterion to $T=S_1\cup S_2$ and $S=S_1$, we have
+\begin{align*}
+    \mu^*(S_1\cup S_2) &= \mu^*( (S_1\cup S_2) \cap S_1)
+        + \mu^*( (S_1\cup S_2) \cap S^c_1) \\
+    &= \mu^*( (S_1\cap S_1)\cup (S_1\cap S_2) )
+        + \mu^*( (S_1 \cap S^c_1) \cup (S^c_1\cap S_2))\\
+    \text{Since $S_1\cap S_2=\emptyset$} \qquad 
+        &= \mu^*( S_1\cup \emptyset )
+        + \mu^*( \emptyset \cup S_2)\\
+        &= \mu^*(S_1)+ \mu^*(\cup S_2)
+\end{align*}
+Now, to show countable-additivity, we suppose $\{A_n\}_1^\infty \subset \mathscr{M}$.  Then, define 
+\[
+    S_1 = A_n \qquad 
+    S_n = A_n \setminus \left(\bigcup^{n-1}_{n=1} S_{n-1}\right)
+    \quad \text{$n>1$}
+\]
+It's clear that $\{S_n\}_{1}^\infty$ will be a pairwise disjoint subset of $\mathscr{M}$. So we define
+\begin{align*}
+    B_n := \bigcup^n_{i=1} A_i = \bigcup^n_{i=1} S_i
+    \qquad \forall n
+\end{align*}
+Then, letting $T\subset X$, 
+
+
+
+
 \end{proof}
 
 \begin{thm}
@@ -2907,7 +2958,38 @@ Then, we recall the remark after Caratheodory's Criterion (Definition \ref{carac
 
 \end{proof}
 
+\begin{thm}
+Given an outer measure $\mu^*$, $A\subset X$, and $S_1\cap S_2=\emptyset$ for $S_1,S_2\in\mathscr{M}$ (the $\sigma$-algebra of $\mu^*$-measurable sets), we have
+\[
+    \mu^*(A\cap (S_1\cup S_2) = 
+    \mu^*(A\cap S_1) + 
+    \mu^*(A\cap S_2) 
+\]
+\end{thm}
+\begin{proof}
+Applying Caratheodory's Criterion setting $T=A\cap (S_1\cup S_2)$ and $S=S_1$, you can write
+\begin{align*}
+    \mu^*(A\cap(S_1\cup S_2)) 
+        &= \mu^*( A \cap (S_1 \cup S_2) \cap S_1)
+        + \mu^*( A \cap (S_1 \cup S_2) \cap S^c_1) 
+\end{align*}
+Straightforward simplification reveals that 
+\begin{align*}
+    S_1 = (S_1 \cup S_2) \cap S_1 &\qquad
+    S_2 = (S_1 \cup S_2) \cap S^c_1 \\\\
+    \Rightarrow\qquad \mu^*(A\cap(S_1\cup S_2)) 
+        &= \mu^*( A \cap S_1)
+        + \mu^*( A \cap S_2)
+\end{align*}
+\end{proof}
 
+\begin{cor}
+Using induction on the previous theorem, if $A\subset X$ and $\{S_i\}^n_1$ is a sequence of pairwise disjoint sets in $\mathscr{M}$, 
+\[
+    \mu^*\left(A \cap \bigcup^n_{i=1} S_i \right)
+    = \sum^n_{i=1} \mu^*(A \cap S_i)
+\]
+\end{cor}
 
 
 
