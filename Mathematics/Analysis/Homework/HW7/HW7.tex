@@ -197,10 +197,11 @@ Implying, together with the other direction above, that
 \textbf{Scaling}: First, suppose $r=0$. Then $rA=\{0\}$ impliying $m(rA)=0$ since $(-1/n, 1/n)$ will cover $\{0\}$ for all $n$, so that the smallest open interval cover can be made arbitrarily tiny. Thus, $m(rA)=0=|0|\cdot m(A)$ for all $A$.
 \\
 \\
-Next, suppose that $r\neq 0$. Again, let $\{I_n\}$ be a countable collection of intervals covering $A$. Since 
-\\
-\\
-Easy, finish this up
+Next, suppose that $r\neq 0$. Again, let $\{I_n\}$ be a countable collection of intervals covering $A$. In exactly the same way as above, $\{r I_n\} := \{(r a_n,r  b_n)\}$ will cover $rA$, since
+\[
+    \sum_{n=1}^\infty \ell(rI_n) = |r| \sum_{n=1}^\infty\ell(I_n)
+\]
+Then everything follows like we saw above with the additive case.
 
 % Book exercies
 \item     
@@ -219,12 +220,39 @@ So it's clear that we also have
 \[
     m^*(A + r) = m^*(A) \qquad m^*(rA) = |r|m^*(A)
 \]
-To show this, we will show an equivalent statement, for all $a,b\in\mathbb{R}$:
-\begin{equation}
-    \label{q1.equiv}
-    B = \{ax+b\;|\;x\in A\}\in\mathscr{M}_m
-\end{equation}
-Then, we can get each set in Statement \ref{q1.given} by taking $a=1$, $b=r$; $a=-1$, $b=0$; $a=r$, $b=0$, respectively.
+So let's start by showing that if $A\in \mathscr{M}_m$, then $A_r:=A+r \in \mathscr{M}_m$. To do so, suppose by contradiction that $A_r \not\in \mathscr{M}_m$. Then there exists a set (suggestively) called $S_r := S + r$ such that 
+\begin{align*}
+    \label{q1.contra}
+    m^*(S_r) &\neq m^*(S_r \cap A_r) +m^*(S_r \cap A_r^c) \\
+    m^*(S+r) &\neq m^*((S + r) \cap (A+r)) +m^*((S+r) \cap (A+r)^c) \\
+    m^*(S+r) &\neq m^*((S\cap A)+ r) +m^*((S+r) \cap (A^c+r)) \\
+    m^*(S+r) &\neq m^*((S\cap A)+ r) +m^*((S\cap A^c)+r) 
+\end{align*}
+Applying the fact that $m^*$ is translation invariant:
+\begin{align*}
+    m^*(S) &\neq m^*(S\cap A) +m^*(S\cap A^c) 
+\end{align*}
+This is clearly a contradiction, since we assumed $A\in\mathscr{M}_m$, implying the last line holds for arbitrary $S$
+\\
+\\
+Next, suppose that $A\in \mathscr{M}_m$, and by contradiction, that $A_r:=rA\not\in \mathscr{M}_m$. If $r=0$, then the result is trivial, as $A_r = \{0\}$, which is a closed set that will be in $\mathscr{M}_m$ since it contains the Borel $\sigma$-algebra (and, hence, all closed sets).
+\\
+\\
+Now suppose $r\neq 0$. Then since $A_r\not\in\mathscr{M}_m$, there exists a set $S_r:=rS$ such that 
+\begin{align*}
+    m^*(S_r) &\neq m^*(S_r \cap A_r) +m^*(S_r \cap A_r^c) \\
+    m^*(rS) &\neq m^*(rS \cap rA) +m^*(rS \cap (rA)^c) \\
+    m^*(rS) &\neq m^*(rS \cap rA) +m^*(rS \cap rA^c) \\
+    m^*(rS) &\neq m^*(r(S \cap A)) +m^*(r(S \cap A^c)) 
+\end{align*}
+Now, applying the result above for scaling, 
+\begin{align*}
+    |r|m^*(S) &\neq |r|m^*(S \cap A) + |r| m^*(S \cap A^c)
+\end{align*}
+Since $r\neq 0$, we can divide through to derive a contradiction to the assumption that $A\in\mathscr{M}_m$:
+\begin{align*}
+    m^*(S) &\neq m^*(S \cap A) + m^*(S \cap A^c)
+\end{align*}
 
 \end{enumerate}
 
@@ -257,7 +285,15 @@ Now, supposing that $m(E^c)$ is finite, we can immediately cancel to get the des
 \begin{align*}
     \varepsilon &\geq m(E\setminus F) 
 \end{align*}
-If, on the other hand, $m(E^c)$ is infinite, we have to take a different approach.
+If, on the other hand, $m(E^c)$ is infinite, we have to take a different approach, working with another representation of $\mathbb{R}$:
+\[
+    \mathbb{R} = \bigcup^\infty_{n=1} I_n = \bigcup^\infty_{n=1} [-n,n]
+\]
+Then, working with the sets
+\[
+    E_n = E \cap I_n 
+\]
+we can apply what we did above to these finite sets.
 \\
 \\
 ($\Leftarrow$ Direction) Suppose that for all $\varepsilon>0$, there exists a closed set $F\subset E$ such that $m^*(E\setminus F)<\varepsilon$. We want to show $E$ is $m^*$-measurable. But first, let's prove a result that we will use later on. Namely, we want to show for any $T$ and $F\subset E$
@@ -323,7 +359,45 @@ But since $\varepsilon$ was arbitrary, we have
 This implies that $E$ is $m^*$-measurable by Caratheodory's criterion. The other direction for the inequality sign is implied automatically by countable sub-additivity, which---togther with the result derived here---gives equality.
 
 % Q2b
-\item \textbf{Exercise 89.7d}:
+\item \textbf{Exercise 89.7d}: For $E\subset\mathbb{R}$, we want to show that $E$ is measurable if and only if $E = B\cup S$ where $B\in\mathscr{B}_\mathbb{R}$ and $m(S)=0$.
+\\
+\\
+($\Rightarrow$ Direction) Suppose that $E$ is measurable. Let $1/n>0$ be given. Then according to the last problem, there exists a closed set $F_n\subset E$ such that $m(E\setminus F_n) \leq 1/n$. Letting
+\[
+    F = \bigcup^\infty_{n=1} F_n 
+\]
+it's clear that since all $F_n\subset E$, $F\subset E$ as well. Moreover, we note that
+\begin{align*}
+    E\setminus F &= E\cap \left(\bigcup^\infty_{n=1} F_n\right)^c  
+    = E\cap \left(\bigcap^\infty_{n=1} F_n^c\right) \\
+    &= \lim_{N\rightarrow\infty}
+        E\cap \left(\bigcap^N_{n=1} F_n^c\right) 
+\end{align*}
+Moreover, we note that for all $N$,
+\begin{align*}
+    E\cap \left(\bigcap^N_{n=1} F_n^c\right) 
+    \subset E \cap F^c_N
+\end{align*}
+so that we can use monotonicity of $m^*$
+\begin{align*}
+    \lim_{N\rightarrow\infty} 
+    m^*\left(E\cap \left(\bigcap^N_{n=1} F_n^c\right) 
+   \right)  \leq
+    \lim_{N\rightarrow\infty} 
+    m^*\left(\subset E \cap E_N\right) 
+    \leq \lim_{N\rightarrow\infty} 1/N = 0
+\end{align*}
+Thus, we have our candidates for $B$ and $S$:
+\begin{align*}
+    E = B \cup S &=: (E \cap F) \cup (E\cap F^c)  \\
+    \text{Since $F\subset E$} \quad &= F \cup (E\cap F^c)
+\end{align*}
+To finish up, not that $F$ is a countable union of closed sets. The Borel $\sigma$-algebra contains all open and closed sets, plus countable unions of them since it is a $\sigma$-algebra, implying $F\in\mathscr{B}_\mathbb{R}$. So $B=F$ works.
+\\
+\\
+Next, we showed above that $m^*(E\cap F^c)=0$, so that works for $S$.
+
+
 
 
 \end{enumerate}
@@ -347,7 +421,7 @@ But since $B$ is open, $B^c$ is closed, so that
 \[
     K = A \setminus B = A \cap B^c 
 \]
-where the set representation of $K$ as the intersection of two closed sets (with $A$ compact), implies that $K$ is compact as well. On top of that, since $B$ is larger
+where the set representation of $K$ as the intersection of two closed sets (with $A$ compact), implies that $K$ is closed as well. On top of that, since $B$ is larger
 \begin{align*}
     B \supset (A\setminus E) 
     \quad \Rightarrow\quad
@@ -357,10 +431,133 @@ where the set representation of $K$ as the intersection of two closed sets (with
     \Rightarrow\quad
     K &\subset E
 \end{align*}
-Finally, we can apply Caratheodory's Criterion to $E$ since it's measurable, then use the approximation (\ref{q3.approx1}):
+Finally, we use the fact that $E$ is measurable to say that
 \begin{align*}
-    m(A) = m(A\cap E) 
+    m(A) &= m(A \cap E) + m(A \cap E^c) \\
+        &= m(E) + m(A\setminus E ) \\
+    \Rightarrow \quad
+    m(E) &= m(A) - m(A \cap E^c) 
 \end{align*}
+Next, we use the fact that $A \subset (K\cup B)$ along with countable additivity:
+\begin{align*}
+    m(A) \leq m(K) + m(B)
+\end{align*}
+Now use our approximation \ref{q3.approx1} with these previous expressions:
+\begin{align*}
+    m(E) &= m(A) - m(A\cap E^c)  \\
+    &\leq m(K) + m(B) - m(A\setminus E)\\
+    &\leq m(K) + [m(A \setminus E)+\varepsilon] - m(A\setminus E)\\
+    &\leq m(K) + \varepsilon
+\end{align*}
+But since $\varepsilon$ is arbitrary, we have $m(E) \leq m(K)$. The other direction follows from monotonicity, i.e.
+\[
+    K \subset E 
+    \quad \Rightarrow \quad
+    m(K) \leq m(E)
+\]
+Since the proof no way dependend upon compactness (only the fact that $K$ was closed), the second equality follows as well.
+
+
+% Question 4
+\item Let $\varepsilon>0$ be given. For a measurable $A\supset E$ and arbitrary $E$, we have by countable sub-additivity and the fact that $A$ is measurable,
+\begin{align*}
+    m(A) = m^*(A)&= m^*((A\cap E) \cup (A\cap E^c)) \\
+    &\leq m^*(A\cap E) + m^*(A\cap E^c) 
+    = m^*(E) + m^*(A\setminus E) 
+\end{align*}
+Though I wasn't able to get this, the proof will likely use the fact that for a measurable set $A$, clearly,
+\[
+    m_*(A) = m(A) = m^*(A)
+\]
+It will also make use of approximating sets by supersets that are open.
+
+
+
+% Question 5
+\item \textbf{Exercise 89.9}: Supposing that $f$ is differentiable on $[a,b]$. To show that $f'$ is $m$-measurable in $[a,b]$, note first that $f$ will be continuous since it is differentiable. Then, since $\mathscr{M}$, the set of all Lebesgue- or $m$-measurable  sets, contains the Borel $\sigma$-algebra, we know that $f$ will be $m$-measurable. This follows from the definition of a measurable function, since for any open $U\subset \bar{\mathbb{R}}$, we know that 
+\[
+    f^{-1}(U) \text{ open, by continuity} 
+    \quad \Rightarrow \quad
+    f^{-1}(U) \in \mathscr{B}_{\bar{\mathbb{R}}} \subset \mathscr{M}
+\]
+so that $f$ is $m$-measurable. Next define the following function:
+\[
+    f_n = \frac{f(x+1/n) - f(x)}{1/n}
+\]
+Since $f(x)$ is $m$-measurable, $f(x+1/n)$ will be as well, since we can use an alternative representation of measurability
+\[
+    f(x) \text{ measurable}
+    \quad \Rightarrow \quad
+    \{x \; | \; f(x)> a \} \in \mathscr{M} \quad 
+    \text{for all $a\in\mathbb{R}$}
+\]
+But since $a$ is arbitrary, it's clear that by changing $a$, we can establish a one-to-one correspondence between 
+\[
+    \{x \; | \; f(x)> a_1 \} \quad
+    \{x + 1/n \; | \; f(x)> a_2 \}
+\]
+And so the difference of two-measurable functions, $f(x)$ and $f(x+1/n)$ will be measurable. Moreover, the constant function $n = 1/(1/n)$ is certainly $m$-measurable for all $n$.
+\\
+\\ 
+Putting everything together, we see that $f(x + 1/n) - f(x)$, as the difference of two $m$-measurable functions, is $m$-measurable. Then, multiplied by another $m$-measurable function $1/(1/n)$, the result will again be $m$-measurable. So $f_n$ itself is $m$-measurable. Finally, pointwise limits of measurable functions are measurable, and the fact that $f$ is differentiable let's us say
+\[
+    \lim_{n\rightarrow\infty} 
+    \frac{f(x+1/n) - f(x)}{1/n} = f'(x)
+\]
+which will be $m$-measurable.
+
+% Question 6
+\item \textbf{Exercise 89.10}: For $X,Y\subset\mathbb{R}$, we want to show that  
+\begin{align*}
+    \inf\{|x-y| \; |\; x\in X, y\in Y\} 
+    \quad \Rightarrow\quad
+    m(X\cup Y) = m(X) + m(Y)
+\end{align*}
+To do so, note that the condition on the left effectively says that $X$ and $Y$ are disjoint. Otherwise, there would be a $p\in X, Y$, allowing $|p-p|=0$. Also, let 
+\[
+    q =
+    \inf\{|x-y| \; |\; x\in X, y\in Y\}  > 0
+\]
+Next, let $U$ be an open cover of $X \cup Y$ such that 
+\begin{align}
+    \label{q6.approx}
+    m(U) \leq m^*(X \cup Y) + \varepsilon
+\end{align}
+Then, we can construct separate open covers of $X$ and $Y$: 
+\begin{align*}
+    X \subset U_1 &:= U \cap \{x \in \mathbb{R} \; | \; \inf_{p\in X} |x-p| < q/2 \} \\
+    Y \subset U_2 &:= U \cap \{y \in \mathbb{R} \; | \; \inf_{p\in Y} |y-p| < q/2 \}
+\end{align*}
+It's clear that if $x\in X$, $x\in U_1$. It's also clear that $U_1$ and $U_2$ are disjoint. So now, use monotonicity to write out
+\begin{align*}
+    m^*(X) + m^*(Y) \leq 
+    m^*(U_1) + m^*(U_2)
+\end{align*}
+Next, use the fact that $U_1$ and $U_2$ are open, implying they are $m^*$-measurable, permitting countable additivity on the last expression:
+\begin{align*}
+    m^*(X) + m^*(Y) \leq 
+    m^*(U_1) + m^*(U_2)= 
+    m(U_1) + m(U_2)= m(U_1\cup U_2)
+\end{align*}
+Next, use the monotonicity again, since $U\cap (U_1 \cup U_2)$ and use our approximation (\ref{q6.approx}), to write
+\begin{align*}
+    m^*(X) + m^*(Y) &\leq 
+    m^*(U_1) + m^*(U_2)= 
+    m(U_1) + m(U_2)= m(U_1\cup U_2)\\
+    &\leq m(U) \leq m^*(X \cup Y) + \varepsilon
+\end{align*}
+But $\varepsilon$ was arbitrary, implying that
+\begin{align*}
+    m^*(X) + m^*(Y) &\leq 
+    m^*(X \cup Y)
+\end{align*}
+The other direction, 
+\begin{align*}
+    m^*(X) + m^*(Y) &\geq 
+    m^*(X \cup Y)
+\end{align*}
+follows from countable sub-additivity, allowing us to conclude equivalence. 
+
 
 
 
