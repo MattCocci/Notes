@@ -1,0 +1,254 @@
+___________WORKSPACE & OBJECTS______________________________________
+
+ls() 			# Lists all objects.
+ls.str() 		# Lists details of all objects
+str(myobject) 	# Lists details of <myobject>.
+list.files() 	# Lists all files in the current directory.
+dir() 			# Lists all files in the current directory.
+myobject 		# Prints simply the object.
+rm(myobject) 	# removes the object <myobject>.
+rm(list=ls()) 	# removes all the objects in the working space.
+save.image()	# saves workspace image to whatever you specify
+getwd()
+setwd()
+
+
+
+save(myobject, file="myobject.rda")
+	# saves the object <myobject> in a file <myobject.rda>.
+
+Objects     # Things like vectors, matrices, datasets, plots, regression
+	        #   results; typically hold collections of things
+workspace   # full of objects
+
+
+_____DATA STRUCTURES________________________________________
+
+
+                    linear   | rectangular
+		            -----------------------
+all the same type   | vector | matrix     |
+                    |--------|------------|
+    mixed type      | list   | data frame |
+                    ----------------------
+ 
+
+== matrices ==
+
+    To Create:  matrix(1:10, nrow = 5, ncol = 2)
+    To Index:   
+    
+    - Vector in two dimensions.
+    - Items must be of the same type
+
+
+== arrays ==
+
+    To Create:  array(1:12, c(2,3,2))
+    To Index:    
+
+    - Matrices with more than two dimensions. 
+    - Items must be of the same type
+
+== vectors ==
+
+    To Create:  c(1, 2, 3)
+    To Index:   x[1] 
+    
+
+    - Lists of elements
+    - All elements must be of the same tpe
+    - Vectors with common length but different types can be
+        combined into data frames (see below)
+
+== data frames ==
+
+    To Create:  data.frame()
+    To Index:   df$colName, df[2,3], df["rname","cname"]
+
+    - Like matrices, but named cols of dif types
+    - Accessing columns:
+
+        data.frame$colName
+
+== lists ==
+
+    To Create:  list(a.vector, a.matrix, a.list, a.df)
+    To Index:   a.list$name
+
+    
+
+    - Contain elements that can be of any data type, 
+        including other lists
+    - This is the most general of all data types. To see
+        an example, you could have a list that has at its
+        elements a single scalar, a vector, a matrix,
+        a data frame, and another list
+
+
+________DIRECTORY__________________________________________________
+dir()			# Lists all files in the current directory
+file.remove()	# Removes a file from current directory
+
+
+
+_______DATA IMPORT EXPORT___________________________________________
+
+
+load("mywork.rda")	# loads "mywork.rda" into workspace
+read.table()		# reads file into dataframe object 
+				    # check out all the nifty args 
+				    # like header, na.strings, sep
+some.df$new.var<-x	# Assigns x to a new column/variable in the
+				    #data frame "some.df"
+				    #NOTE: let x = NULL to remove
+data.frame()		# creates a data frame out of objects passed in
+read.table()		# also creates a data frame
+scan()			    # can read data into a matrix
+slotNames(file.dat)	# gives you the names; more with finmetrics objs
+				    # if you need to use @, use this
+names()			    # gives you name of object; for S-Plus objs
+				    # if you need to use $, use this
+exportData()
+
+
+# NOTE: R automatically reads in a column of character 
+# vectors as factor variables when using read.table. To
+# suppress this, use stringsAsFactors = False when calling
+
+__________DATA MANIPULATION & FUNCTIONS__________________________________
+
+subset(some.df, cond)	# Selects a subset of a data frame 
+				        # based on some conditions you pass
+replace()		        # replaces stuff based on conditions
+data.class()		    # gives the class of an object
+args(function)		    # tells you what args function uses
+
+
+c()			    # puts objects together into a vector
+names()			# adds names to cols
+rbind()			# puts stuff together, binding rows
+cbind()			# puts stuff together, binding columns
+matrix()		# reshapes vectors into matrices
+t(some.matrix)	# transposes a matrix			
+
+
+is.na()			        # tests for missing values
+
+rep(x,y)		        # replicates x a total of y times 
+                        # in a vector
+seq(x,y,by=,length=)	# from x to y either by z or of length z 
+rev()			        # reverses vector or list
+
+
+___________WRITING FUNCTIONS AND SUCH__________________________	
+
+function.name <- function(args){code}
+for( i in 1:10) {expression}
+while(condition) {expression}
+
+
+___________GGPLOT2_________________________________________
+
+install.packages("ggplot2") # Installs
+library(ggplot2)            # Put at top of script to use
+
+
+# Scatterplot
+qplot(col.x, col.y, data=data.frame, color=cat.var, 
+    size=size.var, alpha=I(0.5), xlab="x.title"
+    ylab="y.title", main="main.title", geom="point")
+
+    # data: Specifies the data frame that col.x 
+    #   and col.y are columns of
+    # color: specifies which column is a categorical var
+    #   that should be used to color the data points and name
+    #   those data points in the legend
+    # size: specifies variable to use in establishing 
+    #   relative sizing of the data points
+    # alpha: Sets the transparency
+    # geom: Type of plot to make
+    
+
+# Bar plot
+qplot(cat.x, weight = cont.y, geom="bar")
+
+    # geom: Tells ggplot2 to make a bargraph. 
+    # weight: What to plot as the continuous variable in
+    #   a bar plot
+
+
+# Line plot
+qplot(cont.x, cont.y, data = data.frame, geom="line")
+
+    # Straight line plot above
+   
+qplot(cont.x, cont.y, data = data.frame, 
+    geom=c("line","point"))
+
+    # Line plot with points attached
+
+
+# Layering 
+
+    # ggplot is big into "layering" where you add layers
+    #   like a regression line on top of the basic plot
+
+
+    # Adding a regression line with bands
+    qplot(cont.x, cont.y) + geom_smooth(method = lm)
+
+    # Adding any old abline
+    qplot(cont.x, cont.y) 
+        + geom_abline(intercept = b, slope = m)
+
+# Scatterplots via objects
+
+    # Initialize, specifiying data and "aes"thetics
+    p <- ggplot(data = data.frame, 
+        aes(x = x.data, y = y.data, color = cat.var))
+
+    # Add "points" layer, describing how to display the data
+    p <- p + layer(geom = "points")  
+
+    # Render
+    p
+
+# "aes" specification
+
+    # "aes" is short for aethstetics and it describes how
+    # DATA maps to colors and aethstetic flourishes
+
+    # It specifies how to CONDITIONALLY color plots, while
+    # we use other methods for color points or bars 
+    # unconditionally (over all data)
+
+    i.e.
+
+    p <- ggplot(data = data.frame)
+    p <- p + aes(x = x.data, y = y.data)
+    p <- p + ggtitle("My Title")
+    p1 <- p + geom_point(aes(colour = cat.var))
+    p2 <- p + geom_point(colour = a.colour)
+
+    # p1 will color points by the value of categorical 
+    #   variable "cat.var"
+    # p2 will color all points as "a.colour"
+
+
+# Types of geoms
+    
+    geom_abline
+    geom_histogram
+    geom_point
+    geom_boxplot
+
+    see docs.ggplot2.org/current/index.html
+    
+
+
+
+
+
+
+
