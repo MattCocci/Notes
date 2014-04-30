@@ -1654,8 +1654,27 @@ There exist algebras which are not $\sigma$-algebras. Take $X=\mathbb{Z}$. Then 
 \end{ex}
 
 \begin{defn} 
-    Let $X$ be a set and $\mathscr{M}$ be a $\sigma$-algebra on $X$. Then the couplet $(X, \mathscr{M})$ is called a \emph{measurable space}. It is ``measur\emph{able}'' in the sense that we can assign a \emph{measure} to it, a concept we'll discuss in this next subsection.
+Let $X$ be a set and $\mathscr{M}$ be a $\sigma$-algebra on $X$. Then the couplet $(X, \mathscr{M})$ is called a \emph{measurable space}. It is ``measur\emph{able}'' in the sense that we can assign a \emph{measure} to it, a concept we'll discuss in this next subsection.
 \end{defn}
+
+\begin{defn}
+\label{relsigal}
+Suppose we have a $\sigma$-algebra $\mathscr{M}$ for $X$. Then for any set $E\subset X$, we call
+\[
+    \mathscr{M}_E = \{ A \cap E \; | \; A \in \mathscr{M}\}
+\]
+a \emph{relative} $\sigma$-algebra. But before taking this for granted, we'll have to prove it which we do in the next theorem.
+\end{defn}
+
+\begin{thm}
+\label{relsigal.thm}
+The set $\mathscr{M}_E$ in Definition \ref{relsigal} is, indeed, a $\sigma$-algebra.
+\end{thm}
+\begin{proof}
+To do.
+\end{proof}
+
+
 
 
 
@@ -1812,7 +1831,122 @@ We stipulated in property (7) for our measure space that there must be some $k$ 
     \]
 \end{ex}
 
-\subsection{Measurable Functions: Intuition}
+
+\subsection{Complete and Relative Measure Spaces}
+
+\begin{defn}
+Suppose we have a measure space $(X,\mathscr{M},\mu)$ such that, when taken together,
+\[
+    \left.
+    \begin{array}{r}
+        B\in\mathscr{M} \\
+        \mu(B) = 0\\
+        A\subset B
+    \end{array} \right\}
+    \quad \Rightarrow\quad
+    A\in\mathscr{M}
+\]
+Then we call $\mathscr{M}$ a \emph{complete measure space}. Said another way, complete measure spaces contain \emph{all} subsets of measure zero sets.
+\end{defn}
+
+\begin{thm}
+Given an abitrary measure space $(X,\mathscr{M},\mu)$, we can extend it to be a \emph{complete} measure space, denoted $(X,\bar{\mathscr{M}},\bar{\mu})$ by defining
+\[
+    \bar{\mathscr{M}} = \{S\cup A \} 
+    \quad \text{s.t.} \quad 
+    \left\{
+        \begin{array}{l}
+        S, B\in\mathscr{M} \\
+        \mu(B) = 0 \\ 
+        A \subset B 
+    \end{array}
+    \right.
+    \qquad \text{and} \qquad
+    \bar{\mu}(S\cup A) = \mu(S)
+\]
+In this way, we solve a logical gap that might occur with just $(X,\mathscr{M},\mu)$. Namely, there might be subsets of measure zero sets that aren't in $\mathscr{M}$. 
+\end{thm}
+\begin{proof}
+(Check that $\bar{\mu}$ is Well-Defined) Let $\bar{S}\in\mathscr{M}$ and suppose we have
+\[
+    \bar{S} = S_1 \cup A_1 = S_2 \cup A_2 
+    \quad\text{with}\quad
+    A_i \subset B_i, \quad \mu(B_i) = 0, 
+    \quad S_i, B_i \in \mathscr{M}
+\]
+We need to show that $\mu(S_1) = \mu(S_2)$ to show $\bar{\mu}(S_1\cup A_1) = \bar{\mu}(S_2\cup A_2$. To do so, use monotonicity of $\mu$ on $\mathscr{M}$, the equivalent representations of $\bar{S}$, and countable additivity on $\mathscr{M}$:
+\begin{align*}
+    \mu(S_2) \leq \mu(S_2 \cup B_2) \leq 
+        \mu(S_1 \cup B_1) \leq \mu(S_1) + \mu(B_1)
+        \leq \mu(S_1) + 0 = \mu(S_1)  \\
+    \mu(S_1) \leq \mu(S_1 \cup B_1) \leq 
+        \mu(S_2 \cup B_2) \leq \mu(S_2) + \mu(B_2)
+        \leq \mu(S_2) + 0 = \mu(S_2)  \\
+\end{align*}
+Therefore, $\mu(S_1) = \mu(S_2)$.
+\\
+\\
+(Show $\bar{\mathscr{M}}$ is a $\sigma$-algebra) We need to show a few properties.
+\begin{enumerate}
+\item
+First, we show closed under countable unions:
+\begin{align*}
+    \bigcup^\infty_{n=1} (S_n\cup A_n) = 
+    \left(\bigcup^\infty_{n=1} S_n\right)
+    \cup \left(\bigcup^\infty_{n=1}\cup A_n\right)
+\end{align*}
+Morever, it's clear that for the sets $B_n \supset A_n$:
+\begin{align*}
+    B = \bigcup^\infty_{n=1} B_n &\supset 
+    \bigcup^\infty_{n=1} A_n 
+    \qquad \text{with} \quad \mu(B) = 0
+\end{align*}
+This implies that
+\[
+    \left(\bigcup^\infty_{n=1} S_n\right) \cup B \in 
+    {\mathscr{M}} 
+\]
+which allows us to conclude that $\cup A_n$, as a subset of the measure zero set $B$, can be joined to the $S_n$ sets so that $\cup (S_n \cap A_n)\in\bar{\mathscr{M}}$.
+
+\item
+Next, we show that complements are in $\mathscr{M}$. So take
+\begin{align*}
+    (S\cup A)^c = S^c \cap A^c \supset S^c \cap B^c
+\end{align*}
+Now it's clear that $S^c \cap B^c\in \mathscr{M}$. In addition, we can rewrite $S^c\cap A^c$ as
+\[
+    S^c\cap A^c = (S^c \cap B^c) \cup (B\cap A^c)
+\]
+Then $B \cap A^c = B\setminus A$ will be measure zero, implying that $S^c \cap A^c\in \bar{\mathscr{M}}$.
+
+\item Countable additivity is straightforward, given how $\bar{\mu}$ is defined.
+\end{enumerate}
+\end{proof}
+
+\begin{thm}
+Given any measure space $(X,\mathscr{M},\mu)$, if $E\subset X$ and $E\in\mathscr{M}$, then the triplet $(E,\mathscr{M}_E,\mu_E)$ is called a \emph{relative measure space} with
+\[
+    \mathscr{M}_E = \{ A \cap E \; | \; A \in \mathscr{M}\}
+    \qquad 
+    \mu_E(A) = \mu(A\cap E)
+\]
+Moreover, $\mathscr{M}_E$ is a proper $\sigma$-algebra and $\mu_E$ will, indeed, be a non-negative measure.
+\end{thm}
+\begin{proof}
+For the proof that $\mathscr{M}_E$ is a $\sigma$-algebra, see Theorem \ref{relsigal.thm}. To show $\mu_E$ is a non-negative measure, we must show countable additivity. To do so, use the fact that any set $B\in\mathscr{M}_E$ can be respresented as $A\cap E$ for some $A\in\mathscr{M}$:
+\begin{align}
+    \label{relsigal.chain}
+    \mu_E\left(\bigcup^\infty_{n=1} A_n \right)
+    &= \mu\left(\left(\bigcup^\infty_{n=1} A_n 
+    \right) \cap E \right)
+    = \mu\left(\bigcup^\infty_{n=1} (A_n 
+    \cap E)\right) 
+\end{align}
+And since $A_n$ is in $\mathscr{M}_E$ for all $n$, we know that it can be represented as $A_n=B_n\cap E$ for some $B_n\in \mathscr{M}$ by construction. So $B_n \cap E \cap E$ will be in $\mathscr{M}$ for all $n$, allowing us to apply countable additivity of $\mu$ to the final representation in Expression \ref{relsigal.chain}. Thus, countable additivity for $\mu_E$ will follow.
+\end{proof}
+
+
+\subsection{Measurable Functions: Motivation and Intuition}
 
 Given any function $f: X\rightarrow\bar{\mathbb{R}}$, the most natural way to characterize the function is to take all $x$ in $X$ and specify a rule for assigning $x$ to $f(x)\in\bar{\mathbb{R}}$. 
 
@@ -1852,6 +1986,48 @@ Consider the measurable space $(X,\mathscr{M})$. Take $f:X\rightarrow\bar{\mathb
 \end{itemize}
 Note: \emph{This is a \emph{very} important theorem, because it's often much easier to work with these pre-image sets than with arbitrary open sets.}
 \end{thm}
+
+\begin{thm}
+Suppose $f:X\rightarrow\bar{\mathbb{R}} $ is a measurable function on measure space $(X,\mathscr{M},\mu)$. Then $f|_E$ is a measurable function on the \emph{relative} measure space $(E,\mathscr{M}_E,\mu_E)$, where $E\in\mathscr{M}$.
+\end{thm}
+\begin{proof}
+Suppose that we have an open set $B$. Then 
+\[
+    f^{-1}|_E(B) = f^{-1}(B)\cap E
+\]
+by definition. Moreover, since $f$ is measurable, $f^{-1}(B)$ is in $\mathscr{M}$ so that $f^{-1}(B) \cap E$ will be in $\mathscr{M}_E$.
+\end{proof}
+
+\begin{thm}
+Suppose that for $E\subset X$, the function $f:E\rightarrow\bar{\mathbb{R}}$ is $\mathscr{M}_E$ measurable on the relative measure space $(E,\mathscr{M}_E,\mu_E)$. Then the function
+\[
+    g(x) = \begin{cases}
+            f(x) & x \in E \\
+            0 & x \in X\setminus E \\
+        \end{cases}
+\]
+will be measurable on $(X,\mathscr{M},\mu)$.
+\end{thm}
+\begin{proof}
+We will use Theorem \ref{measequiv}. So suppose first that $r>0$, in which case
+\[
+    \{x \in X \; | \; g(x) > r\} = 
+    \{x \in E\; | \; f(x) > r\} 
+\]
+Since $f$ is $\mathscr{M}_E$ measurable, this set will be in $\mathscr{M}_E$, implying that they are in $\mathscr{M}$ as well.
+\\
+\\
+Next, suppose that $r\leq 0$. Then
+\[
+    \{x \in X \; | \; g(x) > r\} = 
+    \{x \in E\; | \; f(x) > r\} 
+    \cup \{x\in X\setminus E \}
+\]
+Now the first set will be in $\mathscr{M}_E$ since $f$ is $\mathscr{M}_E$-measurable, implying it is in $\mathscr{M}$ as well. Moreover, the second set will be in $\mathscr{M}$ as well, because $E\in\mathscr{M}$, so that $X\setminus E$ is also. 
+
+
+\end{proof}
+
 
 \subsection{The Class of Measurable Functions}
 
@@ -1993,6 +2169,17 @@ If $\{f_n\}$ is a sequence of measurable functions and $\sum^\infty_{n=1} f_n$ c
 \begin{proof}
 We know that $S_N = \sum^N_{i=1} f_n$ is also measurable by Theorem \ref{summeas}. Then, since $S_N\rightarrow F$, we know that $F$ is measurable too by Theorem \ref{convmeas}.
 \end{proof}
+
+
+\subsection{General Notion of Measure-Zero}
+
+We now develop a more general notion of concepts we previously defined only for subsets of $\mathbb{R}$. We extend this to arbitrary measure spaces.
+
+\begin{defn}
+Suppose we have a measure space $(X,\mathscr{M},\mu)$, with $A, E\in\mathscr{M}$. Then, if a property $P$ holds for every $x\in E\setminus A$ and if $\mu(A)=0$, we say that $P$ holds $\mu$-almost everywhere (or $\mu$-a.e.) on $E$.
+\end{defn}
+
+This concept will be applied to great use and effect in the next section's subsection entitled ``General Notions of Convergence.''
 
 \newpage
 \subsection{Simple Functions}
@@ -2271,6 +2458,62 @@ Taken together, the desired result follows.
 You may have noticed that we didn't include the usual linearity property. We will eventually have this as a consequence of pillar convergence theorems, but it turns out to be tougher for the more general integral we've developed. We need to do the hard work in the next subsections to establish this property.
 \end{rmk}
 
+\begin{thm}
+If $f,g\in\mathscr{L}(X,\mathscr{M},\mu)$ and $f=g$ $\mu$-a.e. on $X$, then 
+\[
+    \int_X f \; d\mu = \int_X g \; d\mu
+\]
+\end{thm}
+\begin{proof}
+If $f=0$ $\mu$-a.e., then it must be that $f_-$ and $f_+$ equal 0 $\mu$-a.e. In that case, by monotonicity and non-negativity of $f_-$ and $f_+$, 
+\begin{align*}
+    0 \leq f_- \leq 0  
+    \quad \Rightarrow \quad
+    0 \leq \int f_- \leq 0  \\
+    0 \leq f_+ \leq 0  
+    \quad \Rightarrow \quad
+    0 \leq \int f_+ \leq 0  
+\end{align*}
+\end{proof}
+
+
+\begin{thm}
+Suppose $f$ is measurable and $f\geq 0$ for all $x\in X$. Then 
+\[
+    \int_X f \; d\mu = 0 \quad \Rightarrow\quad
+    f = 0 \text{ $\mu$-a.e.}
+\]
+\end{thm}
+\begin{proof}
+Choose a sequence of simple functions $\{s_n\}$ that converge to $f$ from below such that 
+\begin{align*}
+    0 \leq s_n \leq f 
+    \quad\Rightarrow\quad
+    0 \leq \int s_n \leq \int f = 0
+\end{align*}
+That implies 
+\[
+    \mu\left(\{x \; | \; s_n > 0 \}\right) = 0
+    \qquad \forall n
+\]
+otherwise an approximation of the integral by a simple function would be positive, implying $\int f$ is positive. So then we can write
+\[
+    \{x \; | \; f>0 \} =    
+    \bigcup^\infty_{n=1} \{x \; | \; s_n>0 \} 
+\]
+Then, by countable additivity
+\[
+    \mu\left(\{x \; | \; f>0 \} \right)=    
+    \mu\left(\bigcup^\infty_{n=1} \{x \; | \; s_n>0 \} 
+    \right) = 0
+\]
+
+
+
+\end{proof}
+
+
+
 \newpage
 \subsection{Pillar Convergence Theorems: Preliminary Foundation}
 
@@ -2344,8 +2587,9 @@ The theorems in this subsection are equivalent, and they furnish several particu
     \int_X \left(\lim_{n\rightarrow\infty} f_n\right) 
     \; d\mu 
 \]
+This is valid whether $f$ is infinite or not.
 \end{thm}
-\begin{proof} We'll prove the statement above by showing the lefthand side is less than the righthand side and vice verse.
+\begin{proof} We'll prove the statement above by showing the lefthand side is less than the righthand side and vice versa.
 \\
 \\
 ($\leq$ Proof) Let $f = \lim f_n$. Since, $\{f_n\}$ converges to $f$ from below, we can use monotonicity: 
@@ -2408,13 +2652,14 @@ Finally, we note that $t$ was arbitrary within $(0,1)$, so we can let $t\rightar
 Noting that $f$ can be replaced with $\lim_{n\rightarrow\infty}f$ and that we also had the reverse inequality above, we have established equality.
 \end{proof}
 
-\begin{thm}
+\begin{lem}
+\label{fatoulem}
 \emph{(Fatou's lemma, (+, m))} Let $\{f_n\}^\infty_1\geq0$ be measurable. Then 
 \[
     \int_X \left(\lim \inf f_n\right) \; d\mu
     \leq \lim \inf \int_X f_n \; d\mu
 \]
-\end{thm}
+\end{lem}
 \begin{proof}
 Define $g_k := \inf_{n\geq k} f_n$. Then, since $f_n$ is measurable for all $n$ and the inf of a measurable function is measurable, we know $g_k$ is measurable. Also, by the definition of the lim inf, $\lim_{k\rightarrow\infty} g_k = \lim \inf f_n$. Now we know that $g_k\leq g_{k+1}$ since $g_k$ converges to $\lim \inf f_n$ from below. So, we can apply the MTC:
 \begin{equation}
@@ -2480,7 +2725,24 @@ If measurable $f,g\in\mathscr{L}(X,\mathscr{M},\mu)$, then $f+g\in\mathscr{L}(X,
     \int_X (s_n + t_n)\;d\mu
     = \int_X s_n \;d\mu+ \int_X t_n\;d\mu
 \]
-We then generalize to all measurable $f\in\mathscr{L}(X,\mathscr{M},\mu)$ by working with $f_+$ and $f_-$ as we have done in earlier proofs.
+We now generalize to all measurable $f\in\mathscr{L}(X,\mathscr{M},\mu)$. 
+\\
+\\
+But first, we claim that if $f$ and $g$ are non-negative and integrable, then $\int (f-g) = \int f - \int g$. To prove this, write
+\begin{align*}
+    \int (f-g) &= \int (f-g)_+ - \int (f-g)_- \\
+    &= \int (f-g)\Chi_A - \int (g-f) \Chi_{A^c}
+    \qquad A = \{x \;|\; f\geq g\}
+\end{align*}
+Then, it's clear that both $(f-g)\Chi_A$ and $(g-f)\Chi_{A^c}$ will be non-negative, allowing us to apply the additivity we proved for non-negative functions: 
+\[
+    \int f\Chi_A = \int (f-g) \Chi_A + 
+\]
+
+
+
+
+
 \end{proof}
 
 
@@ -2526,6 +2788,9 @@ If $f\in\mathscr{L}(X,\mathscr{M},\mu)$, then $\lambda_f(E)$ defines a countably
 \begin{proof}
 Apply the previous theorem to arbitrary measurable $f$ by using it on $f_-$ and $f_+$.
 \end{proof}
+\begin{rmk}
+In working with functions that are ``nice'' almost everywhere, we usually apply Corollary \ref{lebsetadd} to break up the integral over $X$ into an integral over the ``bad'' part $E\subset X$ (where some nice property does not hold) and $X\setminus E$ (where some nice property \emph{does} hold). Then, since $\mu(E)$ equals zero, the integral $\int_E f \; d\mu=0$, \emph{regardless} of what the function $f$ does or looks like on $E$. This is precisely how to prove the next theorem.
+\end{rmk}
 
 
 \newpage
@@ -2586,46 +2851,119 @@ To Do: Double series result in book.
 It might seem a little weird that the limit and the integral sign are not always be interchangeable. So to drive home this point, here are a few counterexamples to the Monotone Convergence Theorem where they are not interchangeable. They all fail to satisify the requirement that the $f_n(x)\leq f_{n+1}(x)$ for all $x$ and $n$, which is why we can't apply the MTC.
 
 \begin{ex}
-(Moving Bump Function for $\mathbb{N}$) This example demonstrates why you can't always exchange the limit with the integral. So suppose that we have $(\mathbb{N},\mathscr{P}(\mathbb{N}),\mu)$ where $\mu$ is the counting measure. 
+(Moving Bump Function for $\mathbb{N}$) This example demonstrates why you can't always exchange the limit with the integral. 
 
-Let $f_n = \chi_{\{n\}}$.  Clearly, $f_n\rightarrow 0$ pointwise; \emph{however}, we also have that $\int_\mathbb{N} f_n = n$, whose limit goes to $\infty$. You might naturally think the problem is pointwise convergence, but that's true either, as we'll now see.
+Suppose that we have $(\mathbb{N},\mathscr{P}(\mathbb{N}),\mu)$ where $\mu$ is the counting measure.  Let $f_n = \Chi_{\{n\}}$.  Clearly, $f_n\rightarrow 0$ pointwise; \emph{however}, we also have that $\int_\mathbb{N} f_n = n$, whose limit goes to $\infty$. You might naturally think the problem is that $f_n$ converges to $f$ only \emph{pointwise}, which we know to be weaker than uniform convergnce. But we'll see that we can uniformly convergent functions where we can't exchange the limit and the integral, as we'll now see in the next example.
+\end{ex}
 
-Let $g_n = \frac{1}{n}\chi_{[n,2n)}$. If you take the limit, $g_n\rightarrow 0$. (Gradually, $g_n$ will spread to be $1/n$ across the entire support, which goes to 0.) What's more, this function $g_n$ even converges to 0 \emph{uniformly}. However, if we compute the integral of the simple functions, $\int_X g_n$, the value equals 1 for all $n$. So clearly, we can't exchange the limit. 
+\begin{ex} (Diluted Bump Function for $\mathbb{N}$)
+Let $g_n = \frac{1}{n}\Chi_{[n,2n)}$. If you take the limit, $g_n\rightarrow 0$. (Gradually, $g_n$ will spread to be $1/n$ across the entire support, which goes to 0.) What's more, this function $g_n$ even converges to 0 \emph{uniformly}. However, if we compute the integral of the simple functions, $\int_X g_n$, the value equals 1 for all $n$. So clearly, we can't exchange the limit. 
 \end{ex}
 
 \begin{ex}
 (Moving Bump Function for $\mathbb{R}$) Suppose we have the measure space $(\mathbb{R},\mathscr{P}(\mathbb{R}),\mu)$, where $\mu$ is any non-negative measure. 
 
-Let $f_n = n\chi_{[1/n,\;2/n]}$. This function converges to 0 pointwise, since we have a bump that is growing in height, but moving ever closer to 0. However, if we were to compute the integral for the simple function $f_n$ (for any $n$), we find that $\int f_n = n$, which diverges to $\infty$.
+Let $f_n = n\Chi_{(1/n,\;2/n]}$. This function converges to 0 pointwise, since we have a bump that is growing in height, but moving ever closer to 0. However, if we were to compute the integral for the simple function $f_n$ (for any $n$), we find that $\int f_n = 1$, so we can't exchange.
 \end{ex} 
 
+\begin{ex} (Strict Inequality in Fatou) Here are two examples showing that we can have the inequality in Lemma \ref{fatoulem} (Fatou's Lemma) be strict.
+\\
+\\
+First, suppose that we define the function on the interval $[0,1]$:
+\[
+    f_n = n \Chi_{(0,1/n)}
+\]
+It's clear that the function converges pointwise to $f(x)=0$, as we saw in the previous example. In this case, the integral of $f_n$ will always be 1 for all $n$, while the integral of $f$ will be 0; hence strict inequality.
+\\
+\\
+Next, consider an oscillating function on $[1,2]$:
+\[
+    f_n = 
+    \begin{cases}
+        \Chi_{[0,1]} & \text{$n$ even} \\
+        \Chi_{[1,2]} & \text{$n$ odd} \\
+    \end{cases}
+\]
+Then
+\[
+    0 = \int_X \lim \inf f_n \; d\mu
+    <  \lim \inf\int_X f_n \; d\mu = 1
+\]
+\end{ex}
 
-\subsection{General Notion of Measure-Zero and Almost Everywhere}
+\subsection{General Notions of Convergence}
 
-We now develop a more general notion of concepts we previously defined only for subsets of $\mathbb{R}$. We extend this to arbitrary measure spaces.
+We have very elementary notions of pointwise and uniform convergence for a sequence of functions $\{f_n\}$. Now we develop notions using the concepts we've developed regarding non-negative measures. 
+
+This is less restrictive because $\{f_n\}$ won't have to converge to a function $f$ \emph{everywhere}. We'll just require that the set of points were the sequence does \emph{not} converge is very small.
 
 \begin{defn}
-Suppose we have a measure space $(X,\mathscr{M},\mu)$, with $A, E\in\mathscr{M}$. Then, if a property $P$ holds for every $x\in E\setminus A$ and if $\mu(A)=0$, we say that $P$ holds $\mu$-almost everywhere (or $\mu$-a.e.) on $E$.
+Consider the measure space $(X,\mathscr{M},\mu)$. We say that a sequence functions $\{f_n\}$ converges $\mu$-almost everywhere to $f$ either uniformly (or pointwise) if the set of points $S$ where $f_n \not\rightarrow f$ uniformly (or pointwise) is such that $\mu(S) = 0$.
 \end{defn}
 
-\begin{rmk}
-In working with functions that are ``nice'' almost everywhere, we usually apply Corollary \ref{lebsetadd} to break up the integral over $X$ into an integral over the ``bad'' part $E\subset X$ (where some nice property does not hold) and $X\setminus E$ (where some nice property \emph{does} hold). Then, since $\mu(E)$ equals zero, the integral $\int_E f \; d\mu=0$, \emph{regardless} of what the function $f$ does or looks like on $E$. This is precisely how to prove the next theorem.
-\end{rmk}
-
 \begin{thm}
-If $f,g\in\mathscr{L}(X,\mathscr{M},\mu)$ and $f=g$ $\mu$-a.e. on $X$, then 
+Let $(X,\mathscr{M},\mu)$ be a measure space and let $f$ and $\{f_n\}$ be measurable functions on $X$ such that for every $\delta>0$, 
+\begin{equation}
+    \label{convinmeas}
+    \lim_{n\rightarrow\infty} \mu\left(
+    \{x \; : \; |f_n(x) - f(x)| > \delta\}\right)
+    = 0
+\end{equation}
+Then we say $f_n$ converges \emph{in measure} to $f$, and there exists a subsequence $\{f_{n_k}\}$ that converges pointwise to $f$ $\mu$-almost everywhere, i.e there is an $S\in\mathscr{M}$ with $\mu(S)=0$ such that  
 \[
-    \int_X f \; d\mu = \int_X g \; d\mu
+    \lim_{k\rightarrow\infty} f_{n_k}(x) = f(x)
+    \qquad \forall x \in X\setminus S
 \]
+Before going to the proof, we first offer an example of function of why this only holds for a \emph{subsequence}, and why Property \ref{convinmeas} does \emph{not} imply pointwise convergence $\mu$-a.e. for the original sequence $\{f_n\}$.
 \end{thm}
+\begin{ex}
+    Consider the shrinking, sliding indicator function on $[0,1]$ defined
+\begin{align*}
+    f_1 &= \Chi_{[0,\;1/2]} \qquad
+    f_2 = \Chi_{[1/2,\;1]} \\
+    f_3 &= \Chi_{[0,\;1/3]} \qquad
+    f_4 = \Chi_{[1/3,\;2/3]} \qquad
+    f_5 = \Chi_{[2/3,\;1]} \\
+    f_6 &= \Chi_{[0,\;1/4]} \qquad
+    f_7 = \Chi_{[1/4,\;2/4]} \qquad
+    f_8 = \Chi_{[2/4,\;3/4]} \qquad
+    f_9 = \Chi_{[3/4,\;1]} \\
+    \vdots & 
+    \qquad\qquad\qquad\qquad \vdots
+    \qquad\qquad\qquad\qquad \vdots
+    \qquad\qquad\qquad\qquad \vdots
+\end{align*}
+We keep shrinking the size of the subintervals, then have the function step over them.
+\\
+\\
+Clearly, the subintervals where $f_n$ is away from 0 (equal to 1) become arbitrarily small as $n\rightarrow\infty$, so that Condition \ref{convinmeas} holds. \emph{But}, each point will be 1 \emph{infinitely many} times. So while the function $f_n\rightarrow 0$, we can't say $f_n\rightarrow 0$ \emph{pointwise}. This is the reason for our caution in the last Theorem where we only claimed pointwise convergence for a \emph{subsequence}.
+\\
+\\
+Now let's see why that is true.
+\end{ex}
+\begin{proof}
+Choose $\delta = 1/j$. Then choose the $\{n_j\}$ such that
+\[
+    \mu(E_j) < \frac{1}{2^j} \qquad \text{where} \qquad
+    E_j = \{ x \; : \; |f_{n_j}(x) -f(x)|>1/j\} 
+\]
+Then if we form the union
+\[
+    G_k = \bigcup_{j=k}^\infty E_j 
+\]
+this will be decreasing in $k$.
 
-\begin{thm}
-    Suppose $f$ is measurable and $f\geq 0$ for all $x\in X$. Then 
-\[
-    \int_X f \; d\mu = 0 \quad \Rightarrow\quad
-    f = 0 \text{ $\mu$-a.e.}
-\]
-\end{thm}
+\end{proof}
+
+\begin{defn}
+    Although we will discuss $L^1$ in more detail later, it is now useful to define convergence in $L^1$ for a sequence of functions $\{f_n\}\subset\mathscr{L}(X,\mathscr{M},\mu)$. We say $f_n \rightarrow f$ in $L^1$ if 
+\begin{align*}
+    \lim_{n\rightarrow\infty} \int_X |f_n-f| \; d\mu
+    = 0
+\end{align*}
+\end{defn}
+
+
 
 
 \newpage
@@ -2782,9 +3120,35 @@ But since, $\varepsilon$ was arbitrary, we have the desired result of countable 
 
 
 \begin{ex}
-Here's why we don't have countable addivity on $\mathscr{P}(\mathbb{R})$. Pick any irrational $\alpha\in\mathbb{R}\setminus\mathbb{Q}$.
+Here's why we don't have countable addivity on $\mathscr{P}(\mathbb{R})$. Pick any irrational $\alpha\in\mathbb{R}\setminus\mathbb{Q}$. Then define the equivalence relation
+\[
+    x\sim y 
+    \quad \Rightarrow \quad
+    x-y = n \alpha \qquad n \in\mathbb{Z}
+\]
+So we say that integer-spaced points in $\mathbb{R}$ are equivalent according to $\sim$. 
+\\
+\\
+Next, consider the equivalence classes, mod 1---i.e. wrapped around a circle. Then call these disjoint equivalence classes $\{E_\lambda\}_{\lambda \in \Lambda}$. Then, pick an $x_\lambda$ from each distince equivalence class and form the set $A$.\footnote{We're using the axiom of choice here.} Then translate the set $A$ (turn it around the circle) and note
+\[
+    A \cap (A + n \alpha \text{ mod } 1 ) = \emptyset
+    \qquad n \in \mathbb{Z}_{++}
+\]
+Then, we can partition $[0,1)$ by $\{A_n\}$ where
+\[
+    A_n := (A + n\alpha \text{ mod } 1)
+\]
+Now in accordance with our wish list, we'd like our measure $m^*$ to be translation invariance, i.e. $m^*(A_n) = m^*(A)$ for all $n\in\mathbb{Z}$. But if we had this, countable additivity, and the desireable and sensible property that $m^*([0,1))=1$, then
+\[
+    m^*([0,1)) = \sum^\infty_{n=1} m^*(A_n) = 
+    \sum^\infty_{n=1} m^*(A) 
+\]
+But this would be a countradiction, since we can't choose an $m^*$ such that this equality would hold.
+
+
 \end{ex}
 
+\newpage
 \subsection{General Outer Measures and Caratheodory's Criterion}
 
 \begin{defn} 
@@ -2841,11 +3205,15 @@ because this will be the only type of inequality that allows $S$ to satisfy Cara
 where, just to emphasize the key point, the last inequality is strict.
 \end{rmk}
 
+\newpage
 \begin{thm}
-\emph{(Caratheodory's Theorem)} For $\mu^*$ as in Definition \ref{outermeas} and $\mathscr{M}$ as in Definition \ref{caracrit}, $\mathscr{M}$ is a $\sigma$-algebra, and the restriction $\mu:=\mu^*|_\mathscr{M}$ is a non-negative measure on $\mathscr{M}$.
+\emph{(Caratheodory's Theorem)} For an outer measure $\mu^*$ on $X$ and for $\mathscr{M}$, the collection of all $\mu^*$ measurable sets, $\mathscr{M}$ is a $\sigma$-algebra, and the restriction $\mu:=\mu^*|_\mathscr{M}$ is a non-negative measure on $\mathscr{M}$.
 \end{thm}
 \begin{proof}
-(Show $\mathscr{M}$ is an Algebra) First, it's stupidly obvious, that if $S\in\mathscr{M}$, then $S^c\in\mathscr{M}$ too, and second, that $\emptyset, X\in\mathscr{M}$. 
+There's a lot in this theorem so we'll proceed by breaking into down into a the main steps.
+
+\begin{enumerate}
+\item (Show $\mathscr{M}$ is an Algebra) First, it's stupidly obvious, that if $S\in\mathscr{M}$, then $S^c\in\mathscr{M}$ too, and second, that $\emptyset, X\in\mathscr{M}$. 
 
 Now, we just need to prove that for $S_1,S_2\in\mathscr{M}$, we have $S_1\cup S_2\in\mathscr{M}$. So given any $T\subset X$, we use a little set theory. But before we do that, let's just establish one helpful result:
 \begin{align}
@@ -2878,7 +3246,7 @@ Defining $\tilde{T}=T\cap S_1^c$, we can rewrite the last expression:
     &\leq\mu^*(T\cap S_1) + \mu^*(\tilde{T} \cap S_2)
     +\mu^*(\tilde{T}\cap S_2^c) 
 \end{align}
-Before simplifying this last expression, we use Caratheodory's criterion to simplify 
+Before simplifying this last line, we use Caratheodory's criterion to simplify 
 \begin{align*}
     \mu^*(\tilde{T} \cap S_2)
     +\mu^*(\tilde{T}\cap S_2^c) =
@@ -2893,8 +3261,8 @@ Plugging this result into \ref{union.final} and applying Caratheodory again,
     =\mu^*(T)
 \end{align*}
 Invoking the remark after Definition \ref{caracrit}, we have the desired result.
-\\
-\\
+
+\item 
 (Show $\mathscr{M}$ is a $\sigma$-algebra) To show countable additivity, we first show finite additivity. So assume we have $S_1, S_2\in\mathscr{M}$ with $S_1\cap S_2=\emptyset$. Then applying Caratheodory's Criterion to $T=S_1\cup S_2$ and $S=S_1$, we have
 \begin{align*}
     \mu^*(S_1\cup S_2) &= \mu^*( (S_1\cup S_2) \cap S_1)
@@ -2904,12 +3272,16 @@ Invoking the remark after Definition \ref{caracrit}, we have the desired result.
     \text{Since $S_1\cap S_2=\emptyset$} \qquad 
         &= \mu^*( S_1\cup \emptyset )
         + \mu^*( \emptyset \cup S_2)\\
-        &= \mu^*(S_1)+ \mu^*(\cup S_2)
+        &= \mu^*(S_1)+ \mu^*(S_2)
 \end{align*}
+Then, by induction
+\\
+\\
 Now, to show countable-additivity, we suppose $\{A_n\}_1^\infty \subset \mathscr{M}$.  Then, define 
 \[
     S_1 = A_n \qquad 
-    S_n = A_n \setminus \left(\bigcup^{n-1}_{n=1} S_{n-1}\right)
+    S_n = A_n \setminus 
+    \left(\bigcup^{n-1}_{m=1} S_{m}\right)
     \quad \text{$n>1$}
 \]
 It's clear that $\{S_n\}_{1}^\infty$ will be a pairwise disjoint subset of $\mathscr{M}$. So we define
@@ -2917,15 +3289,26 @@ It's clear that $\{S_n\}_{1}^\infty$ will be a pairwise disjoint subset of $\mat
     B_n := \bigcup^n_{i=1} A_i = \bigcup^n_{i=1} S_i
     \qquad \forall n
 \end{align*}
-Then, letting $T\subset X$, 
+Then, for any $T\subset X$, we want to show the following equals $\mu^*(T)$, satisfying Caratheodory's criterion and implying the union is in $\mathscr{M}$:
+\[
+    \mu^*\left(T \cap \left(\bigcup^\infty_{n=1} A_n
+    \right)\right) + 
+    \mu^*\left(T \cap \left(\bigcup^\infty_{n=1} A_n
+    \right)^c\right) 
+    \leq 
+    \mu^*\left(T \cap \left(\bigcup^\infty_{n=1} S_n
+    \right)\right) + 
+    \mu^*(T \cap B_n^c)
+\]
 
 
 
+\end{enumerate}
 
 \end{proof}
 
 \begin{thm}
-Given an outer measure $\mu^*$ and a set $S\subset X$, if $\mu^*(S)=0$, then $S\in\mathscr{M}$, where $\mathscr{M}$ is the set of all $\mu^*$-measurable sets. 
+Given an outer measure $\mu^*$ and any set $S\subset X$, if $\mu^*(S)=0$, then $S\in\mathscr{M}$, where $\mathscr{M}$ is the set of all $\mu^*$-measurable sets. 
 \end{thm}
 \begin{rmk}
 Since we know that $\mu:=\mu^*|_{\mathscr{M}}$ is a non-negative measure as shown in the previous theorem, we now know from this theorem that $\mu$ is a \emph{complete measure} which defines a complete measure space $(X, \mathscr{M}, \mu)$ that is very convenient to work with.
@@ -2990,6 +3373,222 @@ Using induction on the previous theorem, if $A\subset X$ and $\{S_i\}^n_1$ is a 
     = \sum^n_{i=1} \mu^*(A \cap S_i)
 \]
 \end{cor}
+
+\subsection{The Lebesgue Measure on $\mathbb{R}$ and Regularity Properties}
+
+We now return from general outer measures on any space $X$ to the Lebesgue measure (denoted $m$) and the Lebesgue Measure space $(\mathbb{R},\mathscr{M},m)$, which we obtain by restricting $\mathscr{M}$ to $m^*$-measurable and restricting $m^*$ to $m$, precisely as we did in the previous subsection.
+
+Importantly, we also consider some \emph{regularity properties} of the Lebesgue measure, which tell us how well we can approximate the measure of \emph{any} arbitrary subset of $\mathbb{R}$ by open sets or other more familiar sets that are Lebesgue measurable.
+
+\begin{prop} $\mathscr{M}\supsetneq \mathscr{B}_\mathbb{R}$, the Borel $\sigma$-algebra on $\mathbb{R}$. 
+\end{prop}
+\begin{proof} We proceed by considering all open and closed sets that would need to be contained in $\mathscr{M}$ for it to contain $\mathscr{B}_\mathbb{R}$.
+\\
+\\
+($S=(a,infty)$) For any arbitrary $T\subset\mathbb{R}$, we want to show that $S$ satisfies Caratheodory's criterion (or, more simply, the non-trivial half of it):
+\begin{equation}
+    \label{borel.cara}
+    m^*(T) \geq m^*(T \cap (a,\infty)) + 
+    m^*(T \cap (-\infty,a])
+\end{equation}
+Suppose without loss of generality that $m^*(T)$ is finite. Then let $\varepsilon>0$ be given and let $\{I_n\}$ be an open interval covering of $T$ such that
+\begin{equation}
+    \label{borel.approx}
+    \sum^\infty_{n=1} \ell(I_n) \leq m^*(T) + \varepsilon
+\end{equation}
+which we know to exist by the definition of $m^*$ as the infimum of all such coverings. Then let 
+\[
+    J_n := I_n \cap (a,\infty)
+    \qquad
+    K_n := I_n \cap (-\infty,a]
+\]
+Clearly
+\[
+    \ell(I_n) = \ell(J_n) + \ell(K_n)
+\]
+and, on top of that, recall 
+\[
+    m^*(J_n) = \ell(J_n) 
+    \qquad
+    m^*(K_n) = \ell(K_n) 
+\]
+Putting this all together, we know that we can write $T\cap (a,\infty)$ as a union of the sets $J_n$, which implies, by countable sub-additivity and the fact that $m^*(I) = \ell(I)$ for intervals, that
+\begin{equation}
+    \label{borel.1}
+    m^*(T \cap (a,\infty)) =
+    m^*\left(\bigcup^\infty_{n=1} J_n\right) 
+    \leq \sum^\infty_{n=1}
+    m^*(J_n) = \sum^\infty_{n=1} \ell(J_n)
+\end{equation}
+Similarly, we do the same thing for the $K_n$
+\begin{equation}
+    \label{borel.2}
+    m^*(T \cap (-\infty,a]) =
+    m^*\left(\bigcup^\infty_{n=1} K_n\right) 
+    \leq \sum^\infty_{n=1}
+    m^*(K_n) = \sum^\infty_{n=1} \ell(K_n)
+\end{equation}
+We now add Inequalities \ref{borel.1} and \ref{borel.2}:
+\begin{align*}
+    m^*(T \cap (a,\infty)) +
+    m^*(T \cap (-\infty,a]) &\leq
+    \sum^\infty_{n=1} \ell(J_n)
+    + \sum^\infty_{n=1} \ell(K_n) 
+    \leq \sum^\infty_{n=1} \ell(I_n) \\
+    \text{By \ref{borel.approx}} \Rightarrow
+    \qquad &\leq m^*(T) + \varepsilon
+\end{align*}
+But $\varepsilon>0$ was arbitrary, so we have the desired result.
+\end{proof}
+
+\begin{rmk} This next theorem is important because it tell us that we can approximate the value of outer measure for any arbitrary set by working with more-familiar open sets which we just showed to be in $\mathscr{M}$, the set of all Lebesgue measurable sets.
+\end{rmk}
+
+\begin{thm} 
+\label{openreg}    
+Given any $A\subset\mathbb{R}$ and any $\varepsilon>0$, there exists an open set $U\supset A$ such that
+\[
+    m(U) \leq m^*(A) + \varepsilon
+\]
+\end{thm}
+\begin{proof}
+To Do.
+\end{proof}
+
+\begin{cor}
+If $A\in\mathscr{M}$, then for all $\varepsilon>0$, there exists an open set $U$ such that 
+
+\[
+    m(U\setminus A) < \varepsilon
+\]
+This implies that the Lebesgue Measure is \emph{$\sigma$-finite}.
+\end{cor}
+\begin{proof}
+Since $A\in\mathscr{M}$, we can use Caratheodory's Criterion and Theorem \ref{openreg} to choose an open set $U \supset $ such that  
+\begin{align*}
+    m(U\cap A) + m(U\cap A^c) &= m(U) \leq m(A) 
+    +\varepsilon \\
+    \Leftrightarrow  \quad
+    m(A) + m(U\setminus A) &\leq m(A) +\varepsilon
+\end{align*}
+Now if $m(A)$ is finite, we can cancel to get 
+\begin{align*}
+    m(U\setminus A) &\leq \varepsilon
+\end{align*}
+If $m(A)$ is infinite, we can partition $\mathbb{R}$ and express $A_n$ as a countalbe union of disjoint sets:
+\begin{align*}
+    \mathbb{R} = \bigcup_{n\in\mathbb{Z}} [n,n+1)
+    \qquad \qquad 
+    A = \bigcup_{n\in\mathbb{Z}} A_n = 
+    \bigcup_{n\in\mathbb{Z}} \left(A \cap [n,n+1)\right)
+\end{align*}
+Then, for all $n$, choose an open $U_n\supset A_n$ such that
+\[
+    m(U_n \setminus A_n) < \frac{\varepsilon}{2^{|n|}}
+\]
+which is possible because of what we first proved for finite $m(A)$. Then, we let $U = \bigcup^\infty_{n\in\mathbb{Z}} U_n \supset A$, which gives
+\[
+    U\setminus A \subset \bigcup^\infty_{n\in\mathbb{Z}}
+    \left(U_n \setminus A_n \right)
+    \quad \Rightarrow\quad
+    m(U\setminus A) \leq \sum^\infty_{n\in\mathbb{Z}}
+    \frac{\varepsilon}{2^{|n|}} = 3\varepsilon
+\]
+Since $\varepsilon$ was arbitrary, the result follows.
+\end{proof}
+
+
+\begin{cor}
+For all $A\subset\mathbb{R}$, there exists a $G\supset A$ where $G \in G_\delta$, i.e. $G$ can be written as a countable intersection of open sets such that 
+\[
+    m(G) = m^*(A)
+\]
+\end{cor}
+\begin{proof}
+For all $n$, apply Theorem \ref{openreg} and let $U_n$ be an open set containing $A$ such that 
+\[
+    m(U_n) \leq m^*(A) + \frac{1}{n}
+\]
+Then choose our $G$ by setting
+\[
+    G = \bigcap^\infty_{n=1} U_n \supset A
+\]
+This will work because it's clear by monotonicity and $G\supset A$ that
+\begin{align*}
+    m^*(A) \leq m(G) &\leq m(U_n) =
+    \leq m^*(A) + \frac{1}{n} 
+\end{align*}
+for all $n$. So let $n\rightarrow\infty$.
+\end{proof}
+
+
+\begin{thm} 
+Similar to above, for all $A\subset\mathbb{R}$, there exists a $G \in G_\delta$ such that $G\supset A$ and $m(G\setminus A) = 0$.
+\end{thm}
+
+\begin{thm}
+\emph{(Inner Regularity)}
+For all $A\in\mathscr{M}$ and $\varepsilon>0$, there exists a set $F \subset A$ such that
+\[
+    m(A \setminus F) <\varepsilon
+\]
+\end{thm}
+
+\begin{thm}
+For all $A\in\mathscr{M}$, there exists a set $F\in F_\sigma$ (i.e. $F$ is a countable union of closed sets such that $F\subset A$ and 
+\[
+    m(A\setminus F) = 0
+\]
+\end{thm}
+
+\begin{thm}
+For any arbitrary $A\subset\mathbb{R}$, let $U$ denote open sets, $F$ closed sets, and $K$ compact sets:
+\[
+    m^*(A) = \inf_{U\supset A} m(U) = 
+    \sup_{F\subset A} m(F) = \sup_{K\subset A} m(K)
+\]
+\end{thm}
+
+
+\newpage
+\section{$L^p$ Spaces}
+
+\begin{defn}
+We define an equivalence relation between functions, denoted $f$ `$=$' $g$:
+\[
+    f \text{ `$=$' } g
+    \quad \Leftrightarrow\quad 
+    g(x) = f(x) \quad \text{a.e.}
+\]
+\end{defn}
+
+\begin{defn} ($L^1$) We the norm on $L^1$ to be
+\[
+    ||f||:= \int_X |f| \; d\mu
+\]
+We then define $L_1$ as
+\[
+    L_1 := \mathscr{L}(X,\mathscr{M},\mu) / \sim
+    = \{\text{Distinct equiv. classes of functions}\}
+\]
+This is a proper normed vector space because the following properties are satisfied:
+\begin{enumerate}
+    \item $||f|| = 0$ if and only if $f=0$, then zero element.
+    \item $||f+g||\leq ||f|| + ||g||$.
+    \item $||c f|| = |c| \cdot ||f||$.
+\end{enumerate}
+\end{defn}
+
+\begin{defn} ($L^p$) We define $L^p$ with the norm
+\[
+    ||f||_p:= \left(\int_X |f|^p \; d\mu\right)^{1/p}
+\]
+We then define the space
+\[
+    L^p(X,\mu) := \{\text{$f$ measurable}\;:\;
+    \text{$||f||_p < \infty$}\}
+\]
+\end{defn}
 
 
 
