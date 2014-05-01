@@ -202,35 +202,249 @@ Moving on to $f$, we know that $f(x)=0$ on $[0,1]$, therefore
 \begin{align*}
     F(x) = \int_{[a,x]} f \; dm \qquad x\in[a,b]
 \end{align*}
-is of bounded variation on $[a,b]$.
+is of bounded variation on $[a,b]$. So first note that for $d>c$, we have
+\begin{align*}
+    F(d) - F(c) &= \int_{[c,d]} f \; dm
+\end{align*}
+To see this, just recall that we can split up intervals for the Lebesgue integral 
+\begin{align*}
+    F(d) - F(c) &= 
+        \int_{[a,d]} f \; dm - \int_{[a,c]} f \; dm \\
+    &= \int_{[a,c]} f \; dm 
+        + \int_{[c,d]} f \; dm- \int_{[a,c]} f \; dm \\
+    &= \int_{[c,d]} f \; dm
+\end{align*}
+From there, note that for any partition $\{x_0, \ldots, x_n\}$:
+\begin{align*}
+    \sum^n_{i=1} |F(x_i) - F(x_{i-1})| &= 
+    \sum^n_{i=1} \left\lvert\int_{[x_{i-1},x_i]}f \; dm
+    \right\rvert \leq  
+    \sum^n_{i=1} \int_{[x_{i-1},x_i]}|f| \; dm \\
+    &\leq \int_{[a,b]}|f| \; dm 
+\end{align*}
+Now, we've gotten rid of any dependence on the partition on the righthand side, so it will bound the sum given any arbitrary partition. Now take the sup over all partitions to get
+\[
+    V_a^b(F) = \sup_P
+    \sum^n_{i=1} |F(x_i) - F(x_{i-1})| \leq
+    \int_{[a,b]}|f| \; dm 
+\]
+Finally, to ensure that this is indeed finite, note that for Lebegue integrals, $f\in\mathscr{L}([a,b])$ automatically implies $|f|\in\mathscr{L}([a,b])$, and vice versa. And since the former is assumed, we must have
+\[
+    V_a^b(F) \leq 
+    \int_{[a,b]}|f| \; dm  <\infty
+\]
+so that $F$ is of bounded variation on $[a,b]$.
 
 
+\newpage
 % Question 3
 \item \textbf{Exercise 90.5}
 \begin{enumerate} 
 
 % Part a
-\item We have $f,|f|\in\mathscr{R}([c,b])$ for all $c\in(a,b)$ and that the improper Riemann integral
-\begin{equation}
-    \int^b_{a^+} |f| \; dx
-\end{equation}
-converges. Then we want to show that 
+\item We have $f,|f|\in\mathscr{R}([c,b])$ for all $c\in(a,b)$ and that the improper Riemann integral $\int^b_{a^+} |f| \; dx$ converges. Then we want to show that 
 \[
     \int_{[a,b]} f \; dm = 
     \int^b_{a^+} f \; dx
 \]
-But first, we want to show, more simply, that $f\in\mathscr{L}([a,b])$. To do so, we define a sequence of functions
+\begin{enumerate} 
+\item 
+Start by defining 
 \[
-    f_n(x) = f(x)\cdot\Chi_{[1/n,1]} 
+    f_n = f \Chi_{[a+1/n,\;b]}
 \]
-Now it's clear that as $n\rightarrow\infty$, 
+Clearly, $f_n\rightarrow f$ pointwise on $(a,b]$. In addition, this gives us a way to express and relate the relevant integrals more conveniently:
+\[
+    \int_{[a,b]} f_n \; dm = 
+    \int_{[a,b]} f \Chi_{[a+1/n,\;b]} \; dm = 
+    \int_{a+1/n}^b f \; dx
+\]
+We know these integrals are well-formed because $f\in\mathscr{R}([a+1/n,\;b]$ for all $n$, which implies (by the Theorem from class) that the Lebesgue integrals on the lefthand side of the above equality will exist since 
+\[
+    \int_{a+1/n}^b f \; dx = 
+    \int_{[a+1/n,\;b]} f \; dm := 
+    \int_{[a,b]} f \Chi_{[a+1/n,\;b]} \; dm 
+\]
+Next, we need to show that $f\in\mathscr{L}([a,b])$. We do so by working with absolute values.
+
+Then use mtc on the $|f_n|$ and $|f|$ to show integrable.
+
+Then, once we have integrable, use the fact that $|f|$ is integrable and dominates $f_n$ to get equality.
+
+\end{enumerate} 
+Basically, define that indicator function. Notice it's integral over $[a,b]$ will the same as the riemann integral of $f$ over $[c_n,b]$. Then, take the limit of the righthand side. Also, take the limit 
+
+\item To compute $\int_{[0,1]} f \; dm$, we will work with the Riemann integral and use the first part to assert that it's equivalent for the function 
+\begin{equation}
+    f(x) = \begin{cases} 1/\sqrt{x} & x \in (0,1] \\
+        0 & x=0 \end{cases}
+\end{equation}
+So form and compute the integral
+\begin{align*}
+    \int_{[0,1]} f \; d\mu &= 
+    \int_{0^+}^1 f \; dx = 
+    \lim_{t\rightarrow 0^+}
+    \int_{t}^1 \frac{1}{\sqrt{x}} \; dx 
+    = \lim_{t\rightarrow 0^+}2 \sqrt{x}\; |^1_{t}
+    = \lim_{t\rightarrow0^+}2(\sqrt{1} - \sqrt{t}) = 2
+\end{align*}
+
+\end{enumerate} 
+
+\newpage
+% Question 4
+\item For $f\in\mathscr{L}([a,b])$, we want to show that the following statements are equivalent:
+\begin{itemize}
+\item[i.] For all $\varepsilon>0$, there exists a $g\in C([a,b])$ such that \[
+    m(\{x\;:\; |f(x) - g(x)|>\varepsilon\}) < \varepsilon
+\]
+\item[ii.] For all $\varepsilon_1,\varepsilon_2 >0$, there exists a $g\in C([a,b])$ such that \[
+    m(\{x\;:\; |f(x) - g(x)|>\varepsilon_1\}) < 
+    \varepsilon_2
+\]
+\end{itemize}
+(i. $\Rightarrow$ ii.) Suppose $\varepsilon_1$ and $\varepsilon_2$ are given; we need to be able to find a suitable function $g$ satisfying (ii.) given that (i.) is true.
+\\
+\\
+So start by supposing that $\varepsilon_1 > \varepsilon_2$. Then by (i.) there exists a $g\in C([a,b])$ such that
+\[
+    m(\{x\;:\; |f(x) - g(x)|>\varepsilon_2\}) < \varepsilon_2
+\]
+But because $\varepsilon_1 >\varepsilon_2$, it's clear that 
+\[
+    \{x\;:\; |f(x) - g(x)|>\varepsilon_1\} \subseteq
+    \{x\;:\; |f(x) - g(x)|>\varepsilon_2\}
+\]
+In words: since $\varepsilon_2$ is a ``tighter'' constraint on how well $g$ must approximate $f$, it's clear that relaxing the constraint means $g$ will be an even better approximation of $f$ relative to this looser constraint.
+\\
+\\
+Now apply monotonicity of $m$ to get the desired result:
+\begin{align*}
+    m(\{x\;:\; |f(x) - g(x)|>\varepsilon_1\}) &\leq
+    m(\{x\;:\; |f(x) - g(x)|>\varepsilon_2\}) < 
+    \varepsilon_2 \\
+    \Rightarrow \quad
+    m(\{x\;:\; |f(x) - g(x)|>\varepsilon_1\}) &<
+    \varepsilon_2 
+\end{align*}
+just as desired. So we have our function $g$.
+\\
+\\
+For the case where $\varepsilon_1 \leq \varepsilon_2$, just reverse the ordering in the above, choosing $g$ so it approximates $f$ according to the tighter constraint $\varepsilon_1$. Then apply monotonicity again, which shows that you can find a suitable $g$.
+\\
+\\
+(ii. $\Rightarrow$ i.) Next, suppose $\varepsilon$ is given; we need to be able to find a suitable function $g$ satisfying (i.) given that (ii.) is true.
+\\
+\\
+But this is trivial. Set $\varepsilon_1 = \varepsilon$ and $\varepsilon_2 = \varepsilon$, then you know, since (ii.) holds for all $\varepsilon_1,\varepsilon_2>0$, that there's a $g\in C([a,b])$ such that
+\begin{align*}
+    m(\{x\;:\; |f(x) - g(x)|>\varepsilon_1\}) < 
+    \varepsilon_2
+    \quad \Leftrightarrow \quad
+    m(\{x\;:\; |f(x) - g(x)|>\varepsilon\}) < 
+    \varepsilon
+\end{align*}
+
+% Question 5
+\item  
+\begin{enumerate} 
+
+\item We want to show that for a bounded, measurable $f$ on $[a,b]$ (and hence, Lebesgue integrable), we have  
+\[
+    \int_{[a,b]} fg \; dm = 0 \qquad \forall 
+    g\in C([a,b]) 
+    \quad \Rightarrow \quad
+    f=0 \quad \text{a.e.}
+\]
+To do so, first note that  
+
+use the fact that we can approximate $f$ by a continuous function because it is bounded (so finite almost everywhere) and because it is Lebesgue-measurable.
+\\
+\\
+So first, let $S$ denote the set of points where $f\neq 0$, so that we must show for all $\varepsilon>0$
+\[
+    m(S) = m(\{x \; | \; f(x) \neq 0 \}) \leq \varepsilon
+\]
+Given $\varepsilon$, let $h$ denote the continuous function that approximates $f$ so that 
+\[
+    m(A):=
+    m(\{x \; : \; |f(x)-h(x)|>\varepsilon\}) <\varepsilon
+\]
+Then, we can write the integral as
+\[
+    \int_{[a,b]} f \; dm + 
+    \int_{[a,b]} f \; dm = 0 \qquad \forall 
+\]
+
+\item Next, we suppose only that $f\in\mathscr{L}([a,b])$ and that 
+\begin{equation}
+    \label{q5.main}
+    \int_{[a,b]} fg \; dm = 0 \qquad \forall 
+    g\in C([a,b]) 
+\end{equation}
+Then, for any interval $I\subset[a,b]$, we let $\{g_n\}$ be a sequence in $C([a,b])$ such that 
+\[
+    0\leq g_n \leq \Chi_I 
+    \quad \text{and} \quad
+    g_n\rightarrow \Chi_I\quad\text{pointwise}
+\]
+\begin{enumerate} 
+\item First, we want to show that 
+\[
+    \int_I f \; dm = 0
+\]
+To do so, start by defining a sequence of measurable funtions, $\{f_n\}$ where  $f_n= g_n \cdot f$. Since the $g_n$ and $f$ are measurable, their product will be as well. So we can integrate each $f_n$. Moreover, it's clear that we have a dominating function for the sequence $\{f_n\}$:
+\[
+    |f_n| = |g_n\cdot f| 
+    \leq |\Chi_I\cdot f| 
+    \leq |\Chi_{[a,b]}\cdot f| 
+    \leq |f|
+\]
+which works because $f\in\mathscr{L}([a,b])$ implies $|f|\in\mathscr{L}([a,b])$. In addition, the limit of $f_n$ exists:
+\[
+    \lim_{n\rightarrow\infty} f_n = 
+    \lim_{n\rightarrow\infty} g_n f = 
+    f \lim_{n\rightarrow\infty} g_n = 
+    f\Chi_I
+\]
+Putting everything together, we can apply the Dominated Convergence Theorem to Statement \ref{q5.main}, using the continuous $g_n$ in place of $g$:
+\begin{align*}
+    \text{For all $n$} \qquad 0 &= 
+    \int_{[a,b]} fg_n \; dm   \\
+    \text{Take the limit } \Rightarrow \quad 0 &= 
+    \lim_{n\rightarrow\infty}\int_{[a,b]} fg_n \; dm \\
+    \text{Apply DTC } 
+    \Rightarrow \quad \;\;
+    &= \int_{[a,b]} \lim_{n\rightarrow\infty} fg_n \; dm 
+    = \int_{[a,b]} f\lim_{n\rightarrow\infty} g_n \; dm \\
+    0 &= \int_{[a,b]} f\Chi_I \; dm 
+    =: \int_{I} f \; dm 
+\end{align*}
+So we have the desired result.
+
+\item Next, we want to use the Fundamental Theorem of Calculus, Part II, to show that $f=0$ almost everywhere. Since $f\in\mathscr{L}([a,b])$, the theorem says that 
+\[
+    F(x) := \int_{[a,x]} f \; dm
+\]
+is countinuous and differentiable almost everywhere and $F'(x)=f(x)$ almost everywhere. So let $x$ be a point where $F$ is differentiable. That means the following expression exists:
+\[
+    F'(x) = \lim_{h\rightarrow 0} \frac{F(x+h) - F(x)}{h}
+\]
+Then, substite in for $F(x+h)$ and $F(x)$, letting $I_1=[a,x+h]$ and $I_2=[a,x]$ before applying the result from part (i.):
+\begin{align*}
+    f(x) = F'(x) 
+    &= \lim_{h\rightarrow 0} \frac{F(x+h) - F(x)}{h}
+    = \lim_{h\rightarrow 0} 
+    \frac{\int_{I_1} f \; dm - \int_{I_2} f \; dm}{h} \\
+    &= \lim_{h\rightarrow 0} 
+    \frac{0-0}{h} = \lim_{h\rightarrow 0}0 = 0
+\end{align*}
+And so $f=0$ almost everywhere.
+\end{enumerate} 
 
 
 
 \end{enumerate} 
-    
-
-
 
 \end{enumerate} 
 \end{document}
