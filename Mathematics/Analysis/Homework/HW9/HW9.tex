@@ -32,6 +32,7 @@
 
 \usepackage{amsmath}
 \usepackage{amsfonts}
+\usepackage{mathtools}
 \usepackage{mathrsfs}
 \usepackage{amsthm} %allows for labeling of theorems
 \theoremstyle{plain}
@@ -220,20 +221,71 @@ Since this is true for all $i$, we can sum over the $N$ intervals to get
   \sum_{i=1}^N  |f({b_i})-f({a_i})| 
   \leq \sum_{i=1}^N\frac{\varepsilon}{N} = \varepsilon
 \]
-($g$ Absolutely Continuous) Again,fixing $\varepsilon$ and $N$, chose $\delta$ as in (\ref{q2b}). Then, we see that
+($g$ Absolutely Continuous) We will use Question 1 and show that $g$ is Lipschitz, which implies absolutely continuous. So, start $x,y\in[0,1]$:
 \begin{align*}
-    |f({b_i})-f({a_i})|^2 &\leq
+    |f({x})-f({y})| &= \left\lvert 
+    x^2\left(2+\sin\frac{1}{x}\right) -
+    y^2\left(2+\sin\frac{1}{y}\right) \right\rvert \\
+    &= \left\lvert 2(x^2 - y^2) + x^2\sin\frac{1}{x}
+    - y^2\sin\frac{1}{y}\right\rvert \\
+    &\leq \left\lvert 2(x^2 - y^2)\right\rvert 
+    + \left\lvert x^2\sin\frac{1}{x}
+    - y^2\sin\frac{1}{y}\right\rvert 
 \end{align*}
+Now, note that the maximum of the sin function is 1 and the minimum -1, so the righthand term in the sum can't possibly be larger than $|x^2 + y^2|$.
 
 % Q3c
-\item 
+\item The flaw in (a)'s reasoning comes in neglecting the possibility that the function $g$ in $f\circ g$ might turn disjoint intervals into non-disjoint intervals. As hinted at, the definition is for disjoint intervals, and that is crucial.
+
+To give an example, take $f$ and $g$ in part (b). Then note that the $\sin\frac{1}{x}$ has its maxima and minima at $\left\{\frac{2}{(4k+1)\pi}\right\}_0^\infty$ and $\left\{\frac{2}{(4k+3)\pi}\right\}_0^\infty$, respectively. So let's take disjoint intervals in $[0,1]$ to be
+\[
+    (a_1,b_1) = \left(\frac{2}{3\pi}, \frac{2}{\pi}\right)
+    \qquad
+    (a_2,b_2) = \left(\frac{2}{7\pi}, \frac{2}{5\pi}\right)
+\]
+Then, mapping these intervals with $g$, we see that we get overlapping intervals as a result:
+\begin{align*}
+    g((a_1,b_1)) = \left(\frac{4}{9\pi^2}, \frac{12}{\pi^2}\right)
+    \approx (0.045, 1.215)\\
+    g((a_2,b_2)) = \left(\frac{4}{49\pi^2}, 
+    \frac{12}{25\pi^2}\right)
+    \approx (0.008, 0.049)
+\end{align*}
+So we see that $g$ doesn't preserve the disjointness of the intervals when it's time to apply $f$ to get $f\circ g$.
+
 
 % Q3d
 \item 
 \begin{enumerate} 
 
 % Q3d,i
-\item 
+\item Suppose that the functions $f$ and $g$ are strongly absolutely continuous. Letting $\varepsilon>0$ be given, we want to show that $f\circ g$ is stongly absolutely continuous, i.e. we can choose a $\delta$ such that 
+\begin{equation}
+    \sum_{i=1}^N |b_i-a_i|<\delta_{f\circ g}
+    \quad\Rightarrow\quad
+    \sum_{i=1}^N |f(g(b_i))-f(g(a_i))|<\varepsilon
+\end{equation}
+So, we'll take the ``obvious'' approach from part (a), which will work here for the reasons explained in part (c). So, since $f$ is absolutely continuous, there exists a $\delta_f$ such that
+\begin{equation}
+    \sum_{i=1}^N |p_i-q_i|<\delta_f
+    \quad\Rightarrow\quad
+    \sum_{i=1}^N |f(p_i)-f(q_i)|<\varepsilon
+\end{equation}
+where $\{(q_i,p_i)\}_1^N$ is \emph{any} finite collection of intervals. Next, we can use the fact that $g$ is strongly absolutely continuous to choose a $\delta_g$ such that
+\begin{equation}
+    \sum_{i=1}^N |b_i-a_i|<\delta_g
+    \quad\Rightarrow\quad
+    \sum_{i=1}^N |g(b_i)-g(a_i)|<\delta_f
+\end{equation}
+Now setting our overall $\delta_{g\circ f}:=\delta_g$, we see that for any set of intervals $\{(a_i, b_i)\}$
+\begin{align*}
+    \sum_{i=1}^N |b_i-a_i|<\delta_g
+    &\quad\Rightarrow\quad
+    \sum_{i=1}^N |g(b_i)-g(a_i)|<\delta_f \\
+    &\quad\Rightarrow\quad
+    \sum_{i=1}^N |f(g(b_i))-f(g(a_i))|<\varepsilon
+\end{align*}
+where $\{(g(a_i),g(b_i)\}^N_1$ is a finite collection of open intervals for $f$.
 
 % Q3d,ii 
 \item We want to show $f(x)=\sqrt{x}$ is not strongly absolutely continuous. To do so, suppose by contridiction that $f$ is strongly absolutely continuous. And without loss of generality, also suppose that $\varepsilon<1/2$ and that $\delta$ is chosen accordingly. We will now find a finite collection such that
@@ -267,7 +319,13 @@ Next, let's look at result, using the fact that $\frac{1}{N+k} \geq \frac{1}{2N}
 And we assumed that $\varepsilon<1/2$, so this is a contradiction. 
 
 
+% Part q3d, iii
+\item To show that Lipshitz implies strongly absolutely continuous, note that the proof given in Question 1 in now way depended upon the disjointness of the intervals. It was entirely formulated in terms of the \emph{lengths} of the intervals being sufficiently small. 
 
+So as long as we set $\delta$ as in Equation \ref{q1.step}, we get the desired result.
+
+% Part q3d, iv
+\item To show strongly absolutely continuous implies Lipschitz, let $\varepsilon=1$ and let $\delta_0$ be the corresponding $\delta$. Now if $|u-v|<\delta_0$, let $N=\left\lfloor{\frac{\delta_0}{|u-v|}}\right\rfloor$
 
 
 
