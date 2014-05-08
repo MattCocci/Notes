@@ -1,0 +1,310 @@
+\documentclass[12pt]{article}
+
+\author{Matthew Cocci}
+\title{\textbf{Homework 9}}
+\date{\today}
+
+%% Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{fullpage}
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\pagestyle{fancy} 
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt} 
+    %---Make the header bigger to avoid overlap
+
+%\renewcommand{\headrulewidth}{0.3pt} 
+    %---Width of the line
+
+%\setlength{\headsep}{0.2in}    
+    %---Distance from line to text
+            
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{amsthm} %allows for labeling of theorems
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+%\usepackage{blindtext}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{graphicx}
+\usepackage{subfigure} 
+    %---For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %---Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref} 
+\hypersetup{	
+    colorlinks,		
+        %---This colors the links themselves, not boxes
+    citecolor=black,	
+        %---Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\usepackage{verbatim} 
+    %---For including verbatim code from files, no colors
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{RGB}{28,172,0}
+\definecolor{mylilas}{RGB}{170,55,241}
+\newcommand{\matlabcode}[1]{%
+    \lstset{language=Matlab,%
+        basicstyle=\footnotesize,%
+        breaklines=true,%
+        morekeywords={matlab2tikz},%
+        keywordstyle=\color{blue},%
+        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+        identifierstyle=\color{black},%
+        stringstyle=\color{mylilas},%
+        commentstyle=\color{mygreen},%
+        showstringspaces=false,%
+            %---Without this there will be a symbol in 
+            %---the places where there is a space
+        numbers=left,%
+        numberstyle={\tiny \color{black}},% 
+            %---Size of the numbers
+        numbersep=9pt,% 
+            %---Defines how far the numbers are from the text
+        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+            %---Some words to emphasise
+    }%
+    \lstinputlisting{#1}
+}
+    %---For including Matlab code from .m file with colors,
+    %---line numbering, etc. 
+
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\usepackage{enumitem} 
+    %---Has to do with enumeration	
+\usepackage{appendix}
+%\usepackage{natbib} 
+    %---For bibliographies
+\usepackage{pdfpages}
+    %---For including whole pdf pages as a page in doc
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+\begin{document}
+
+\maketitle 
+
+\begin{enumerate} 
+
+% Question 1
+\item Let $f$ be a function that is Lipschitz. We want to prove that it is absolutely continuous. So let $C$ and $\eta$ be non-negative constants such that that 
+\begin{equation}
+\label{lip}
+    |x-y|<\eta
+    \quad\Rightarrow\quad
+    |f(x)-f(y)|<C|x-y|
+\end{equation}
+Then, fix $\varepsilon>0$ and choose $\delta$ such that
+\begin{equation}
+\label{q1.step}
+    \sum_{i=1}^N|b_i-a_i| \leq 
+    \delta := \frac{\min\{\varepsilon,\eta\}}{C}
+\end{equation}
+This choice of $\delta$ obviously implies that $(b_i-a_i)<\eta$ for all $i$. So 
+now let's use that together with Condition \ref{lip} to bound the target sum by $\varepsilon$:
+\begin{align*}
+    \sum_{i=1}^N |f(b_i)-f(a_i)| \leq 
+    \sum_{i=1}^N C|b_i-a_i| &=
+    C \sum_{i=1}^N |b_i-a_i| \\
+    \text{By (\ref{q1.step})} \qquad
+    &\leq 
+    C \cdot \frac{\min\{\varepsilon,\eta\}}{C}
+    = \min\{\varepsilon,\eta\}
+\end{align*}
+Clearly, the sum is bounded by $\varepsilon$.
+
+
+
+
+% Question 2
+\item 
+\begin{enumerate} 
+
+% Part a
+\item Suppose that we have a composition $f\circ g$. We want to show that, for fixed $\varepsilon>0$, there exists a $\delta$ such that 
+\begin{equation}
+    \label{q2a}
+    \sum_{i=1}^N |b_i-a_i|<\delta 
+    \quad\Rightarrow\quad
+    \sum_{i=1}^N |f(g(b_i))-f(g(a_i))|<\varepsilon
+\end{equation}
+The ``obvious'' attempt says to, fixing $\varepsilon$, find the relevant $\delta_f$ for the function $f$ such that
+\[
+    \sum_{i=1}^N |b_i-a_i|<\delta_f
+    \quad\Rightarrow\quad
+    \sum_{i=1}^N |f(b_i)-f(a_i)|<\varepsilon
+\]
+Then, let this $\delta_f$ be the new $\varepsilon'$, and find $\delta_g$ for the function $g$ such that
+\[
+    \sum_{i=1}^N |b_i-a_i|<\delta_g
+    \quad\Rightarrow\quad
+    \sum_{i=1}^N |g(b_i)-g(a_i)|<\varepsilon' := \delta_f
+\]
+In a sense, this approach tries to control the size of the second sum in (\ref{q2a}) in two stages. We want the intervals to be sufficiently small such that, when mapped by $g$, the result will still be sufficiently small for when $f$ maps them.
+
+% Part b
+\item ($f$ Absolutely Continuous) Let $\varepsilon$ and $N$ (the number of disjoint intervals) be given. Then choose $\delta$ such that 
+\begin{equation}
+    \label{q2b}
+    \delta:= \frac{\varepsilon^2}{N^2}
+\end{equation}
+For any individual open interval $(b_i-a_i)\subset[0,1]$, we see that $|b_i-a_i|<\delta$, so that
+\begin{align*}
+    |f({b_i})-f({a_i})|^2 &\leq
+    \left(\sqrt{b_i}-\sqrt{a_i}\right)\left(\sqrt{b_i}+\sqrt{a_i}\right) 
+    = b_i - a_i < \delta := \frac{\varepsilon^2}{N^2} \\
+    \Rightarrow\quad
+    |f({b_i})-f({a_i})|^2 &\leq \frac{\varepsilon^2}{N^2} \\
+    \Leftrightarrow\quad
+    |f({b_i})-f({a_i})| &\leq \frac{\varepsilon}{N} 
+\end{align*}
+Since this is true for all $i$, we can sum over the $N$ intervals to get 
+\[
+  \sum_{i=1}^N  |f({b_i})-f({a_i})| 
+  \leq \sum_{i=1}^N\frac{\varepsilon}{N} = \varepsilon
+\]
+($g$ Absolutely Continuous) Again,fixing $\varepsilon$ and $N$, chose $\delta$ as in (\ref{q2b}). Then, we see that
+\begin{align*}
+    |f({b_i})-f({a_i})|^2 &\leq
+\end{align*}
+
+% Q3c
+\item 
+
+% Q3d
+\item 
+\begin{enumerate} 
+
+% Q3d,i
+\item 
+
+% Q3d,ii 
+\item We want to show $f(x)=\sqrt{x}$ is not strongly absolutely continuous. To do so, suppose by contridiction that $f$ is strongly absolutely continuous. And without loss of generality, also suppose that $\varepsilon<1/2$ and that $\delta$ is chosen accordingly. We will now find a finite collection such that
+\[
+    \sum_{i=1}^N (b_i-a_i) < \delta
+    \quad\text{but}\quad
+    \sum_{i=1}^N |f(b_i)-f(a_i)| \geq \varepsilon 
+\]
+So, given $\delta$, construct a set of overlapping intervals 
+\[
+    \left\{\left(0,\frac{1}{(N+k)^2}\right)\right\}^N_{k=1}
+\]
+Now given this set, to choose $N$, we note that
+\begin{align*}
+    \frac{1}{(N+k)^2} <  \frac{1}{N^2}  
+    \quad\Rightarrow\quad
+    \sum_{k=1}^N |b_i-a_i| &=
+    \sum_{k=1}^N \left\lvert\frac{1}{(N+k)^2}-0\right\rvert \\
+    &<\sum_{k=1}^N \frac{1}{N^2}
+     =N\cdot \frac{1}{N^2} = \frac{1}{N}
+\end{align*}
+So then just choose $N$ such that $1/N < \delta$. We now have our finite set of intervals. 
+
+Next, let's look at result, using the fact that $\frac{1}{N+k} \geq \frac{1}{2N} $ for $k\leq N$. 
+\begin{align*}
+    \sum_{k=1}^N |f(b_i)-f(a_i)| = \sum_{k=1}^N 
+    \left\lvert \sqrt{\frac{1}{(N+k)^2}} - \sqrt{0}\right\rvert
+    &= \sum_{k=1}^N {\frac{1}{N+k}}  \\
+    &\geq \sum_{k=1}^N {\frac{1}{2N}}  = N\cdot \frac{1}{2N} = \frac{1}{2}
+\end{align*}
+And we assumed that $\varepsilon<1/2$, so this is a contradiction. 
+
+
+
+
+
+
+
+
+\end{enumerate} 
+
+
+\end{enumerate} 
+
+
+\end{enumerate} 
+\end{document}
+
+
+
+%%%% INCLUDING FIGURES %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+   % H indicates here 
+   %\begin{figure}[h!]
+  %   \centering
+   %   \includegraphics[scale=1]{file.pdf}
+   %\end{figure}
+
+%   \begin{figure}[h!]
+%      \centering
+%      \mbox{
+%	 \subfigure{
+%	    \includegraphics[scale=1]{file1.pdf}
+%	 }\quad
+%	 \subfigure{
+%	    \includegraphics[scale=1]{file2.pdf} 
+%	 }
+%      }
+%   \end{figure}
+ 
+
+%%%%% Including Code %%%%%%%%%%%%%%%%%%%%%5
+% \verbatiminput{file.ext}    % Includes verbatim text from the file
+% \texttt{text}	  % includes text in courier, or code-like, font

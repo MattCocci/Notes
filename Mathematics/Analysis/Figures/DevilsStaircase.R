@@ -38,17 +38,17 @@ cantor.step <- function(in.matrix){
     plot.matrix <- in.matrix
 
     # Add and subtract lengths
-    out.matrix[near0,2] <- out.matrix[near0,1] + seg.length
-    out.matrix[near1,1] <- out.matrix[near1,2] - seg.length
-    plot.matrix[,1] <- plot.matrix[,1] + seg.length
-    plot.matrix[,2] <- plot.matrix[,2] - seg.length
+    out.matrix[near0,2] <- out.matrix[near0,1] + seg.length 
+    out.matrix[near1,1] <- out.matrix[near1,2] - seg.length 
+    plot.matrix[,1] <- plot.matrix[,1] + seg.length + 1e-3
+    plot.matrix[,2] <- plot.matrix[,2] - seg.length - 1e-3
 
     list(plot.matrix,out.matrix)
 }
 
 
 # Loop through and plot
-n.removals <- 3
+n.removals <- 8
 in.matrix <- matrix(c(0,1),1,2)
 plot(1,type="n",xlim=c(0,1),ylim=c(0,1),xlab="",ylab="")
 for(i in 1:n.removals){
@@ -57,14 +57,10 @@ for(i in 1:n.removals){
     plot.matrix <- output[[1]]
     in.matrix <- output[[2]]
     
-    plot.count <- nrow(plot.matrix)
-    ylocs <- seq(1,2^plot.count,((2^plot.count)-1))/(2^plot.count)
+    ylocs <- seq(1,2^i,2)/(2^i)
 
-    for(i in 1:plot.count){
-        lines(plot.matrix[i,],rep(ylocs[i],2))
+    for(j in 1:(2^(i-1))){
+        lines(plot.matrix[j,],rep(ylocs[j],2))
     }
 }
 
-# 1/2 
-# 1/4, 3/4
-# 1/8, 3/8, 5/8, 7/8
