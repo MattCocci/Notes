@@ -21,12 +21,15 @@
 #   2. Remaining matrix
 cantor.step <- function(in.matrix){
 
+    # Number of stages of removals done so far
+    n.stages <- log(nrow(in.matrix), base=2)
+
     # Number of new segments; initialize out matrix
     n.seg <- 2*nrow(in.matrix)
     out.matrix <- matrix(0,n.seg,2)
 
     # Length of new segments
-    seg.length <- 1/(3^nrow(in.matrix))
+    seg.length <- 1/(3^(n.stages+1))
 
     # Indicators for new segments close to 0 or 1
     near0 <- as.logical(matrix(rbind(rep(1,n.seg/2),rep(0,n.seg/2)),n.seg,1))
@@ -48,7 +51,7 @@ cantor.step <- function(in.matrix){
 
 
 # Loop through and plot
-n.removals <- 8
+n.removals <- 9
 in.matrix <- matrix(c(0,1),1,2)
 plot(1,type="n",xlim=c(0,1),ylim=c(0,1),xlab="",ylab="")
 for(i in 1:n.removals){
