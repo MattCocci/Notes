@@ -1,5 +1,7 @@
 ___________WORKSPACE & OBJECTS______________________________________
 
+
+
 ls() 			    # Lists all objects.
 ls.str() 		  # Lists details of all objects
 str(myobject) # Lists details of <myobject>.
@@ -12,17 +14,22 @@ save.image()	# saves workspace image to whatever you specify
 getwd()
 setwd()
 
-
-
+# saves the object <myobject> in a file <myobject.rda>.
 save(myobject, file="myobject.rda")
-	# saves the object <myobject> in a file <myobject.rda>.
+	
 
 Objects     # Things: vectors, matrices, datasets, plots, reg
             # results; typically hold collections of things
 workspace   # full of objects
 
 
-_____DATA TYPES_____________________________________________ 
+________DIRECTORY_______________________________________________________
+
+dir()			    # Lists all files in the current directory
+file.remove()	# Removes a file from current directory
+
+
+_____DATA TYPES_________________________________________________________
 
 
 From least to most flexible:
@@ -45,6 +52,10 @@ automatically so that you can use it more easily. For example 1/4 will
 coerce integers 1 and 4 to be doubles so that the division can be done. 
 Similarly, c(1, "b") will yield a character vector "1" "b".
 
+Functions:
+  as.matrix()
+  as.data.frame()
+
 
 
 _____DATA STRUCTURES________________________________________
@@ -54,7 +65,7 @@ Hetero- and Homogeneous refers to whether they must all
 be of the same type (all strings, all numbers, etc.):
 
                   linear |  rectangular
-		            --------------------------
+                --------------------------
 Homogeneous     | vector | matrix, array |
                 |--------|---------------|
 Heterogeneous   | list   | data frame    |
@@ -63,23 +74,6 @@ Heterogeneous   | list   | data frame    |
 
 str(object)   Gives description of any R object
 
-
-== matrices ==
-
-    To Create:  matrix(1:10, nrow = 5, ncol = 2)
-    To Index:   
-    
-    - Vector in two dimensions.
-    - Items must be of the same type
-
-
-== arrays ==
-
-    To Create:  array(1:12, c(2,3,2))
-    To Index:    
-
-    - Matrices with more than two dimensions. 
-    - Items must be of the same type
 
 == vectors ==
 
@@ -93,56 +87,92 @@ str(object)   Gives description of any R object
     - Vectors with common length but different types can be
         combined into data frames (see below)
 
-== data frames ==
+== matrices ==
 
-    To Create:  data.frame()
-    To Index:   df$colName, df[2,3], df["rname","cname"]
+    To Create:  matrix(1:10, nrow = 5, ncol = 2)
+                as.matrix(vector, nrow, ncol)
+    To Index:   
+    To Name:    rownames(x) <- "row.name"
+                colnames(x) <- "col.name"
+    
+    - Vector with a dim attribute, but one in two dimensions.
+    - Items must be of the same type
 
-    - Like matrices, but named cols of dif types
-    - Accessing columns:
+== arrays ==
 
-        data.frame$colName
+    To Create:  array(1:12, c(2,3,2))
+    To Index:    
+
+    - Vector with a dim attribute, but with more than two dimensions. 
+    - Items must be of the same type
+
 
 == lists ==
 
     To Create:  list(a.vector, a.matrix, a.list, a.df)
                 as.list(vector)
-    To Index:   a.list$name
+    To Index:   a.list$name, a.list[[1]]
 
     
     - Contain elements that can be of any data type, 
-        including other lists
+      including other lists
     - This is the most general of all data types. To see
-        an example, you could have a list that has at its
-        elements a single scalar, a vector, a matrix,
-        a data frame, and another list
+      an example, you could have a list that has at its
+      elements a single scalar, a vector, a matrix,
+      a data frame, and another list
     - They can contain other lists, so they nest
+    - The [[1]] syntax returns the object IN position one,
+      a single value. [1] would return a list, not the contents
+      of said list.
 
 
+== data frames ==
 
-________DIRECTORY__________________________________________________
-dir()			# Lists all files in the current directory
-file.remove()	# Removes a file from current directory
+    To Create:  data.frame(colname1 = vec1, colname2 = vec2, ...)
+                data.frame(matrix)
+    To Index:   df$colName, df[2,3], df["rname","cname"]
+
+    - A list of equal length vectors.
+    - Accessing columns: data.frame$colName
+    - Default behavior is to turn strings to factors so use
+      stringsAsFactors = FALSE
+
+
+== Special: Factors ==
+
+    To Create: factor(a.vector)
+    
+    - A vector in the "factor" class is just an integer vector, BUT 
+      one that can only take on a restricted set of values. 
+    - Using levels() on a factor vector will show the restricted set of 
+      unique values the factor variable can assume.
+    - Often used to define categorical variables. 
+
+    NOTE: 
+    1.  Often, when you read in data, doubles or characters will be
+        converted to factor variables. This usually stems from missing 
+        data in a column, causing the whole column to be coerced into a 
+        factor. The fix: as.character() then as.double(), or specify how 
+        the NA values are encoded in the incoming dataset.
+    2.  Often, characters will also come in as factors. This is 
+        annoying, so use stringsAsFactors = FALSE when reading in.
+
+
 
 
 
 _______DATA IMPORT EXPORT___________________________________________
 
 
-load("mywork.rda")	# loads "mywork.rda" into workspace
-read.table()		# reads file into dataframe object 
-				    # check out all the nifty args 
-				    # like header, na.strings, sep
-some.df$new.var<-x	# Assigns x to a new column/variable in the
-				    #data frame "some.df"
-				    #NOTE: let x = NULL to remove
-data.frame()		# creates a data frame out of objects passed in
-read.table()		# also creates a data frame
-scan()			    # can read data into a matrix
-slotNames(file.dat)	# gives you the names; more with finmetrics objs
-				    # if you need to use @, use this
-names()			    # gives you name of object; for S-Plus objs
-				    # if you need to use $, use this
+load("mywork.rda")    # loads "mywork.rda" into workspace
+read.table()          # Reads file into dataframe object 
+                      #   check out all the nifty args 
+                      #   like header, na.strings, sep
+some.df$new.var <- x  # Assigns x to a new column/variable in the
+                      #   data frame "some.df"    
+                      #   NOTE: let x = NULL to remove
+data.frame()          # Creates a data frame from passed objects
+scan()                # Can read data into a matrix
 exportData()
 
 
@@ -150,29 +180,101 @@ exportData()
 # vectors as factor variables when using read.table. To
 # suppress this, use stringsAsFactors = False when calling
 
+__________SUBSETTING_____________________________________________________
+
+
+Simplifying vs. Preserving
+--------------------------
+
+A simplifying subset operation will return the simplest possible 
+TYPE of object. For example, if you pull column 1 (which is a bunch of 
+integers) from a data frame, simplifying subsetting returns a vector of 
+integers; preserving subsetting returns a dataframe, same type as the 
+original object.
+
+
+                  Simplifying   |  Preserving
+               --------------------------------
+Vector        |    x[[1]]       |    x[1]      |
+Factor        | x[1:4, drop=T]  |   x[1:4]     |
+Matrix/Array  |    x[1, ]       | x[1,,drop=F] |
+List          |    x[[1]]       |    x[1]      |
+Dataframe     |   See Below     |  See Below   |
+               --------------------------------
+
+Preserving behavior ALWAYS gives you the same type of output as input. 
+Simplification is more subtle. Here's the result of each simplifying 
+operation by data structure
+
+1. Vector: Drops names.
+2. Factor: Drops unused levels.
+3. Matrix/Array: If any dimension is length 1, drop that dimension. So
+                 you will get a vector, not a column matrix from x[,1]
+4. List: Return object inside list, not single element list.
+5. Dataframe: Return vector instead of single column dataframe (if you 
+              pull one column only. 
+
+
+NOTE: This is often a source of errors. Generally, good programming
+practice says to return the same type of object that is passed in. 
+Then, use a function to transform to the type you want after. DON'T use
+the subsetting process to modify type; use it to subset only.
+
+NOTE: $ almost equals [[]]. Except the former does partial matching. 
+Example
+
+  x <- list(abc=1)
+  x$a 
+    1 
+  x[["a"]]
+    NULL
+
+
+Example with Dataframes
+-----------------------------
+
+As an application of simplifying vs. presenrving, Say you have a list 
+and you want to return the first column. There are a number of ways 
+you might go about this, each to different effect. For simplicity, 
+assume the dataframe is named "a", with column one as a vector of ints 
+called "C1".
+
+    a[,1], a$C1, a[[1]], a[["C1"]]
+  
+    Returns the contents of column one in simplest form, so a vector 
+    of ints.
+
+    a["C1"], a[1], a[,1, drop=F]
+
+    Returns a dataframe that has one variable, i.e. column 1.
+
+
+
+
+
 __________DATA MANIPULATION & FUNCTIONS__________________________________
 
-subset(some.df, cond)	# Selects a subset of a data frame 
-				        # based on some conditions you pass
-replace()		        # replaces stuff based on conditions
-data.class()		    # gives the class of an object
-args(function)		    # tells you what args function uses
+subset(some.df, cond)	# Selects a subset of a data frame based on some 
+                      #   conditions you pass
+replace()             # Replaces stuff based on conditions
+data.class()          # Gives the class of an object
+args(function)        # Tells you what args function uses
 
 
-c()			    # puts objects together into a vector
-names()			# adds names to cols
-rbind()			# puts stuff together, binding rows
-cbind()			# puts stuff together, binding columns
-matrix()		# reshapes vectors into matrices
-t(some.matrix)	# transposes a matrix			
+c()             # puts objects together into a vector
+names()         # adds names to cols of df or elements of vector
+rbind()         # Puts dfs and matrices together, binding rows
+cbind()         # Puts dfs and matrices together, binding columns
+matrix()        # reshapes vectors into matrices
+t(some.matrix)  # transposes a matrix			
+order()         # Returns a vector such that x[order(x)] puts x in 
+                #   ascending order
 
 
-is.na()			        # tests for missing values
-
-rep(x,y)		        # replicates x a total of y times 
-                        # in a vector
-seq(x,y,by=,length=)	# from x to y either by z or of length z 
-rev()			        # reverses vector or list
+is.na()               # Tests for missing values
+rep(x,y)              # Replicates x a total of y times in a vector
+seq(x,y,by=,length=)	# From x to y either by z or of length z 
+rev()			            # Reverses vector or list
 
 
 ___________WRITING FUNCTIONS AND SUCH__________________________	
