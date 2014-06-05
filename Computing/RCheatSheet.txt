@@ -53,9 +53,8 @@ coerce integers 1 and 4 to be doubles so that the division can be done.
 Similarly, c(1, "b") will yield a character vector "1" "b".
 
 Functions:
-  as.matrix()
-  as.data.frame()
-
+  as.integer()
+  as.character()
 
 
 _____DATA STRUCTURES________________________________________
@@ -65,11 +64,11 @@ Hetero- and Homogeneous refers to whether they must all
 be of the same type (all strings, all numbers, etc.):
 
                   linear |  rectangular
-                --------------------------
+                 ------------------------
 Homogeneous     | vector | matrix, array |
                 |--------|---------------|
 Heterogeneous   | list   | data frame    |
-                --------------------------
+                 ------------------------
  
 
 str(object)   Gives description of any R object
@@ -114,16 +113,13 @@ str(object)   Gives description of any R object
     To Index:   a.list$name, a.list[[1]]
 
     
-    - Contain elements that can be of any data type, 
-      including other lists
-    - This is the most general of all data types. To see
-      an example, you could have a list that has at its
-      elements a single scalar, a vector, a matrix,
+    - Contain elements that can be of any data type, including other lists
+    - This is the most general of all data types. To see an example, you could
+      have a list that has at its elements a single scalar, a vector, a matrix,
       a data frame, and another list
     - They can contain other lists, so they nest
-    - The [[1]] syntax returns the object IN position one,
-      a single value. [1] would return a list, not the contents
-      of said list.
+    - The [[1]] syntax returns the object IN position one, a single value. [1]
+      would return a list, not the contents of said list.
 
 
 == data frames ==
@@ -142,20 +138,20 @@ str(object)   Gives description of any R object
 
     To Create: factor(a.vector)
     
-    - A vector in the "factor" class is just an integer vector, BUT 
-      one that can only take on a restricted set of values. 
-    - Using levels() on a factor vector will show the restricted set of 
-      unique values the factor variable can assume.
+    - A vector in the "factor" class is just an integer vector, BUT one that can
+      only take on a restricted set of values. 
+    - Using levels() on a factor vector will show the restricted set of unique
+      values the factor variable can assume.
     - Often used to define categorical variables. 
 
     NOTE: 
-    1.  Often, when you read in data, doubles or characters will be
-        converted to factor variables. This usually stems from missing 
-        data in a column, causing the whole column to be coerced into a 
-        factor. The fix: as.character() then as.double(), or specify how 
-        the NA values are encoded in the incoming dataset.
-    2.  Often, characters will also come in as factors. This is 
-        annoying, so use stringsAsFactors = FALSE when reading in.
+    1.  Often, when you read in data, doubles or characters will be converted 
+        to factor variables. This usually stems from missing data in a column,
+        causing the whole column to be coerced into a factor. The fix:
+        as.character() then as.double(), or specify how the NA values are
+        encoded in the incoming dataset.
+    2.  Often, characters will also come in as factors. This is annoying, so 
+        use stringsAsFactors = FALSE when reading in.
 
 
 
@@ -182,15 +178,45 @@ exportData()
 
 __________SUBSETTING_____________________________________________________
 
+Basics
+------
+
+x[i] <- NULL            # Removes the ith index from object i; works with dfs
+x[sample(length(x),n)]  # Sample n observations from x
+x[order(x)]             # Sorts x
+subset(df.name, conds)  # Easier subsetting from dataframes
+which(true.false.vec)   # Convert true-false vector to indices
+intersect(x, y)         # Return values for which x and y are both true
+union(x, y)             # Return values for which x or y are true
+head(df)                # Show the first few rows of a dataframe
+tail(df)                # Show the last few rows of a dataframe
+
+
+Subsetting with nothing (i.e. x[] <- ) can be usefult in assignment because it
+will preserve the original object class. 
+
+Lookup Tables
+-------------
+
+This is great for character matching and changing labels:
+
+x <- c("m", "f", "m")
+lookup <- c(m="Male", f="Female")
+lookup[x]
+#>      m        f      m
+#> "Male" "Female" "Male"
+
+unname(lookup[x])
+#> "Male" "Female" "Male"
+
 
 Simplifying vs. Preserving
 --------------------------
 
-A simplifying subset operation will return the simplest possible 
-TYPE of object. For example, if you pull column 1 (which is a bunch of 
-integers) from a data frame, simplifying subsetting returns a vector of 
-integers; preserving subsetting returns a dataframe, same type as the 
-original object.
+A simplifying subset operation will return the simplest possible TYPE of object.
+For example, if you pull column 1 (which is a bunch of integers) from a data
+frame, simplifying subsetting returns a vector of integers; preserving
+subsetting returns a dataframe, same type as the original object.
 
 
                   Simplifying   |  Preserving
@@ -215,10 +241,10 @@ operation by data structure
               pull one column only. 
 
 
-NOTE: This is often a source of errors. Generally, good programming
-practice says to return the same type of object that is passed in. 
-Then, use a function to transform to the type you want after. DON'T use
-the subsetting process to modify type; use it to subset only.
+NOTE: This is often a source of errors. Generally, good programming practice
+says to return the same type of object that is passed in.  Then, use a function
+to transform to the type you want after. DON'T use the subsetting process to
+modify type; use it to subset only.
 
 NOTE: $ almost equals [[]]. Except the former does partial matching. 
 Example
@@ -233,16 +259,14 @@ Example
 Example with Dataframes
 -----------------------------
 
-As an application of simplifying vs. presenrving, Say you have a list 
-and you want to return the first column. There are a number of ways 
-you might go about this, each to different effect. For simplicity, 
-assume the dataframe is named "a", with column one as a vector of ints 
-called "C1".
+As an application of simplifying vs. preserving, Say you have a list and you
+want to return the first column. There are a number of ways you might go about
+this, each to different effect. For simplicity, assume the dataframe is named
+"a", with column one as a vector of ints called "C1".
 
     a[,1], a$C1, a[[1]], a[["C1"]]
   
-    Returns the contents of column one in simplest form, so a vector 
-    of ints.
+    Returns the contents of column one in simplest form, so a vector of ints.
 
     a["C1"], a[1], a[,1, drop=F]
 
@@ -252,7 +276,7 @@ called "C1".
 
 
 
-__________DATA MANIPULATION & FUNCTIONS__________________________________
+__________DATA MANIPULATION_____________________________________________________
 
 subset(some.df, cond)	# Selects a subset of a data frame based on some 
                       #   conditions you pass
@@ -269,19 +293,25 @@ matrix()        # reshapes vectors into matrices
 t(some.matrix)  # transposes a matrix			
 order()         # Returns a vector such that x[order(x)] puts x in 
                 #   ascending order
+rev()			            # Reverses vector or list
 
 
 is.na()               # Tests for missing values
 rep(x,y)              # Replicates x a total of y times in a vector
 seq(x,y,by=,length=)	# From x to y either by z or of length z 
-rev()			            # Reverses vector or list
+x %in% y        # Checks if x is in y
 
 
-___________WRITING FUNCTIONS AND SUCH__________________________	
+___________FUNCTIONS____________________________________________________________
 
-function.name <- function(args){code}
-for( i in 1:10) {expression}
-while(condition) {expression}
+for (i in 1:10) {expression}
+while (condition) {expression}
+function.name <- function (args) {code}
+
+formals(f)      # List arguments needed for function f
+body(f)         # List code within the body of f
+environment(f)  # Lists the "map" of the location of the functions variables
+
 
 
 ___________GGPLOT2_________________________________________
