@@ -308,10 +308,10 @@ for (i in 1:10) {expression}
 while (condition) {expression}
 function.name <- function (args) {code}
 
-formals(f)      # List arguments needed for function f
-body(f)         # List code within the body of f
-environment(f)  # Lists the "map" of the location of the functions variables
-
+formals(f)       # List arguments needed for function f
+body(f)          # List code within the body of f
+environment(f)   # Lists the "map" of the location of the functions variables
+do.call(f, args) # Call function "f" with arguments arg
 
 
 codetools::findGlobals(f)   # Lists the global variables (or external
@@ -323,12 +323,161 @@ exection. So everything in the body happens in this "new" environment, that is
 then ditched when the fucntion finishes running. So functions have a "fresh
 start" in one sense.
 
-Moreover, when you have nesting of functions and variables, R will always look
-within the current environment for the variable or function value. If it can't
-find it, then it will look in the environment one level up, continuing if
-necessary until it hits the global environment.
+Lexical Scoping
+---------------
 
-Finally, 
+When you have nesting of functions and variables, R will always look within the
+current environment for the variable or function value. If it can't find it,
+then it will look in the environment one level up, continuing if necessary until
+it hits the global environment.
+
+Note: When creating a function, The way R looks up the value of variables and
+functions depends upon nesting at the time of creation of said function. As a
+result, you don't have to know how a function is called to determine how it will
+look up values.
+
+
+Function Environments
+---------------------
+
+There are four types of environments associated with a function.
+
+enclosing:  Environment where the function was created; only one per function.
+            It belongs to a function and never changes, no matter which
+            environment the function might get moved to. So in effect, functions
+            don't have to live just in their enclosing environment. They can
+            take that enclosing environment with them to other places.
+binding:    All environments which have a binding to a function. Determines how
+            we find a function. Useful because, as mentioned above, functions
+            can live outside their enclsing environment. 
+execution:  Environment created to store variables when executing. Thrown away
+            after execution is finished. It might become non-trivial if we
+            define functions within functions, because then that "child"
+            function will have an enclosing environment corresponding to the
+            execution environment of the parent function.
+calling:    Environment where the function was called.
+
+
+
+Lazy evaluation 
+---------------
+
+Arguments to a function are only evaluated if they're actually used. To force an
+argument to be supplied (even if it may not be used), place "force(arg)" in the
+body of the function.
+
+
+Infix Functions
+---------------
+
+These come between arguments and must be of the form %x% where x is some string
+of characters. Define them via
+
+`%x%` <- function(args) { body }
+
+
+Replacement Functions
+---------------------
+
+These are creations that worklike
+
+  rownames(x) <- c('a', 'b')
+
+They let you modify objects in place. Example
+
+  `modify<-` <- function(x, position, value) { 
+                  x[position] <- value
+                }
+
+This would let you change element i of object x like
+
+  modify(x, i) <- 5
+
+
+___________FUNCTIONAL PROGRAMMING__________________________
+
+
+R has first class functions---they are treated like any other object. In
+particular, you can even define "functionals", which are functions that take
+functions as arguments. 
+
+lapply(list, f)   # Applies function "f" to list "list." SUPER useful
+
+
+Anonymous Functions
+-------------------
+
+Although we often assign a name to a function, this isn't strictly necessary. We
+can have unnamed functions like 
+
+  function (x) x^2 
+
+which can be passed as an argument (since it is a stand-alone function) to
+functionals that take functions as arguments.
+
+
+Closures
+--------
+
+A major use of anonymous functions lies in creating closures---functions that
+are written by other functions. They are so named because these anonymous
+functions that are created carry with them the parent environment in which they
+were defined---i.e. they enclose the parent environment and its associated data. 
+
+This rests crucially on the fact that these anonymous functions (generated
+within a function) do, indeed, carry with them the environment in which they
+were defined (as discussed in the Function section).  Else, it just seems
+confusing and ass-backwards, since the function is created within said
+environment---how can it "enclose" or wrap this environment, in the colloqial
+sense, that seems to be higher in the food chain? 
+
+But again, the "enclosing" that we mean is the enclosing of the environment/data
+that are bound to the newly created function upon inception. Whereas most
+environments created to host a function's body/execution get tossed away once
+complete, any closures created will "capture" the execution environment.
+
+Ex.
+
+  power <- function(exponent) { 
+             function(x) {
+               x^exponent
+             }
+           }
+  square <- power(2)
+  cube <- power(3)
+
+
+
+___________DEBUGGING_______________________________________
+
+
+The "error" option specifies a function to run upon an error. The function that
+we would like to run will be "browser()", which starts an interactive console in
+the environment where the error occurred. 
+
+So, for example, by setting the "error" option to be "browser", the chain of
+steps and executions is
+
+  Error Happens -> Call Browser Function -> Step into environment of error
+
+But we can do one better. Let's set up a function that calls "browser" when a
+function with an error is run for the first time. 
+
+browseOnce <- function() {
+  old <- getOption("error")
+  function() {
+    options(error = old)
+    browser()
+  }
+}
+options(error = browseOnce())
+
+See also recover().
+
+Using debug(f) puts "browser()" at the first line within function "f", which
+will jump you into debug mode. Then undebug(f) will remove it.
+
+Use try() statements, and try(..., silent = TRUE) to supress error messages. 
 
 
 
