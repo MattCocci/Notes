@@ -1,0 +1,59 @@
+--------------------------------------------------------------------------------
+-- Functional Programming in Matlab --------------------------------------------
+--------------------------------------------------------------------------------
+
+
+cellfun(f, C) 
+
+  Where f is a function and C is a cell of anything. It could even be a cell of
+  function handles so that f---a function---takes other functions as arguments.
+  Often, we'll write f as an anonymous function using "@(args) body".
+
+
+map = @(fcns, vals) cellfun(@(f) f(vals{:}), fcns);
+
+  This maps a collections of functions to a cell array of inputs.
+
+  fcns: A cell array of function handles.
+  vals: A cell array consisting of inputs to the functions in fcns. It is
+        assumed that each function in "fcns" takes the same input
+
+  
+mapc = @(fcns, vals) cellfun(@(f) f(vals{:}), fcns, 'UniformOutput', false);
+
+  Again, this maps a collections of functions to a cell array of inputs;
+  however, unlike plain "map", this can handle the case where the output from
+  each function in "fcns" might be of a different type or size. Therefore, this
+  will return output in a cell array.
+
+
+iif = @(varargin) varargin{2*find([varargin{1:2:end}], 1, 'first')}(); 
+
+  Creates inline if-else statements. Let's you pass arguments corresponding to
+  'condition1', 'action1', 'condition2', 'action2'... It will select the first
+  true statement and execute the corresponding action.
+  
+  Example use:
+
+    sizeof = @(a) iif(a > 10, @() disp('Large'), ...
+                      a < 5,  @() disp('Small'), ...
+                      true,   @() disp('Medium'))
+
+
+paren = @(x, varargin) x(varargin{:});
+
+  For parenthetical subsetting via a function
+
+
+curly = @(x, varargin) x{varargin{:}};
+
+  For curlythetical subsetting via a function
+
+
+@() {plot(1:10), max([1, 5])}
+
+  This will execute the statements in the cell array. Moreover, we can even bind
+  this set of commands to a name. It also has the capacity to return output from
+  whatever the set of commands do.
+
+
