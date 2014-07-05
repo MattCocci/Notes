@@ -34,6 +34,90 @@
 
 % \tableofcontents %adds it here
 
+\section{Introduction}
+
+State Space Models and the Kalman Filter together rank among those ``Hugely Important Things I Never Knew Existed'' following my undergrad education. 
+
+They're hugely important because they embed as special cases many concepts in time series and dynamics. In fact, in such cases, you can almost always fall back on the toolkit developed here. It doesn't take much work to cast ARMA models, dynamic factor models, and other important concepts into state space model form, viewing those applications as special cases within the broader state space framework.
+
+So the first portion will consist of describing state space models and, naturally, the very important concept of state space. The second portion will consider how the Kalman Filter can be applied to such models.
+
+\section{State Space Models}
+
+\subsection{Basic Building Blocks}
+
+State space models describe how certain states evolve over time,\footnote{Hence, state space models capture the ``dynamics'' of a system.} where \emph{states} consist of observed and/or unobserved variables of interest. The evolution of these states are informed by series we can directly measure, called \emph{observables}.
+
+The \emph{states} in our model (which we'll collect into a state vector) might include GDP growth, inflation, unemployment, an unobserved ``business cycle'' component driving the dynamics of many series, a synthetic index indicating investment prospects, or any number of objects that we want to quantify, model, and forecast. With our states, we then define the \emph{state space} as the set of all values our state vector can assume. In other words, it's the multi-dimensional space spanned by our state vector. 
+
+To quantify and model the states, we use \emph{observables}---series we can directly measure and observe---to inform our estimates of the states, which we cannot always directly measure. So just to reiterate, the biggest distinction between states and observables: observables \emph{always} have a directly measurable series associated with them, while states might not.
+
+
+\subsection{State Space Models in Two Equations}
+
+State space models essentially reduce to two fundamental equations:
+\begin{align}
+  \text{State Transition Equation:} \quad
+    s_{t} &= C + T s_{t-1} + \varepsilon_{t} \label{ste}\
+    \quad\quad E[\varepsilon_t] = 0
+    \quad E[\varepsilon_t \varepsilon'_t] =  R \\
+  \text{Measurement Equation:} \quad
+    y_{t} &= D + M s_{t} + \eta_{t} \label{moe}
+    \quad\qquad E[\eta_t] =  0 
+    \quad E[\eta_t \eta'_t] =  Q 
+\end{align}
+Additionally, it is also assumed that $\varepsilon_t$ and $\eta_t$ are uncorrelated, iid, and independent of past values. And while $\varepsilon_t$ and $\eta_t$ are typically assumed to be normal, we wrote them here in the more general (yet equally valid) represenetation above. Later on, we will discuss the extra subtetly that non-normal errors introduce into the interpretation.
+
+
+\paragraph{State Transition Equation} Equation \ref{ste} describes how the state vector, $s_t$, evolves over time; it's a law of motion. In words, the state vector next period is a function of the previous period's state vector, plus some innovation or disturbance. 
+
+But since the states might be unobserved (so that they do not have a directly measurable series associated with them), we have to relate it to the data somehow, which is where the next equation comes in.
+
+\paragraph{Measurement Equation} Equation \ref{moe}, sometimes called the ``Observation Equation'', relates the states to the directly measurable observables, allowing for potential ``measurement error'' captured by $\eta_t$. More succinctly, $M$ is a matrix that maps states to observables. Since the number of states and observables may differ, $M$ need not be square.
+
+Finally, while everything in Equation \ref{ste} has to be estimated ($\{s_t\}$, $T$, $R$), the matrix $M$ will need to be pre-specified by the econometrician. Matrix $M$ makes explicit our idea of the relationship between the observables we see and the deep underlying model dynamics that (we think) drive what's observed. Of course, this relationship cannot be estimated; it can only be imposed via $M$.
+
+\subsection{Expanding the State Space}
+
+In this section, we show two examples of expanding the state space (introducing extra states), and why we might want to do that. 
+
+\subsubsection{Introducing Extra Lags}
+
+Equation \ref{ste} only explicitly incorporates one lag of the state vector. But suppose $s_t$ depends upon more than one lag. Not a problem; the representation in Equation \ref{ste} will still work if we expand the state space. Specifically, we can rewrite the State Transition Equation (in stacked vector and block matrix form) as 
+\begin{align}
+  \begin{bmatrix} s_{t} \\ s_{t-1}
+  \end{bmatrix}
+     &= 
+  \begin{bmatrix} C \\ \mathbf{0} 
+  \end{bmatrix}
+  +\begin{bmatrix} T_1 & T_2 \\ I & \mathbf{0}
+  \end{bmatrix}
+  \begin{bmatrix} s_{t-1} \\ s_{t-2}
+  \end{bmatrix}
+  + \begin{bmatrix} 
+      \varepsilon_{t}  \\ \mathbf{0}
+    \end{bmatrix}
+  \label{augmented.lags} 
+\end{align}
+So now our new state vector is no longer $s_t$, but the stacked $z_t:=(s_t \;\; s_{t-1})'$. In this formulation, $T_1$ captures the dependence of $s_t$ upon $s_{t-1}$, while $T_2$ captures the dependence upon $s_{t-2}$. The bottom half of the transition matrix above will enforce that $s_{t-1}=s_{t-1}$. The necessary changes to the measurement equation are obvious.
+
+To incorporate still more lags, the modifications to the state transition equation are similarly straightforward. In addition, it may even be the case that we need to use extra lags for only a few elements of $s_t$, rather than all elements of $s_t$. In such cases, Equation \ref{augmented.lags} can be simplified so that we augment the state vector with only the necessary lags, rather than $s_{t-1}$ (on the lefthand side) in it's entirety. Only the most minor of adjustments to the transition matrix would be necessary.
+
+
+\subsubsection{Measurement Error as a State}
+
+While the two-equation framework set up in \ref{ste} and \ref{moe} might be the most intuitive representation of our system, it might be easier (for programming or computational reasons) to remove measurement error from the measurement/observation equation. We can do so by, again, enlargint the state space and incorporate measurement error via extra states.
+
+\subsection{Examples within the State Space Framework}
+
+\subsubsection{AR Model}
+\subsubsection{MA Model}
+\subsubsection{GDP: Income and Expenditure}
+
+
+\newpage
+\section{Kalman Filter and Smoother}
+
 \section{Basic Idea and Terminology}
 
 Here's the basic procedure associated with the Kalman
