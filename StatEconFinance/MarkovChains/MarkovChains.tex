@@ -1,22 +1,139 @@
-\documentclass[a4paper,12pt]{scrartcl}
+\documentclass[12pt]{article}
 
-\author{Matt Cocci}
+\author{Matthew Cocci}
 \title{Markov Chains}
-\usepackage{enumitem} %Has to do with enumeration	
-\usepackage{amsfonts}
+\date{\today}
+
+%% Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{fullpage}
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\pagestyle{fancy} 
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt} 
+    %---Make the header bigger to avoid overlap
+
+%\renewcommand{\headrulewidth}{0.3pt} 
+    %---Width of the line
+
+%\setlength{\headsep}{0.2in}    
+    %---Distance from line to text
+            
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
 \usepackage{amsthm} %allows for labeling of theorems
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{blindtext}
-\usepackage{breqn}
-%\numberwithin{equation}{section} %, This labels the equations in relation to the sections rather than other equations
-%\numberwithin{equation}{subsection} %This labels relative to subsections
+\theoremstyle{plain}
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{prop}[thm]{Proposition}
 \newtheorem{cor}[thm]{Corollary}
-\setkomafont{disposition}{\normalfont\bfseries}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{graphicx}
+\usepackage{subfigure} 
+    %---For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %---Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref} 
+\hypersetup{	
+    colorlinks,		
+        %---This colors the links themselves, not boxes
+    citecolor=black,	
+        %---Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\usepackage{verbatim} 
+    %---For including verbatim code from files, no colors
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{RGB}{28,172,0}
+\definecolor{mylilas}{RGB}{170,55,241}
+\newcommand{\matlabcode}[1]{%
+    \lstset{language=Matlab,%
+        basicstyle=\footnotesize,%
+        breaklines=true,%
+        morekeywords={matlab2tikz},%
+        keywordstyle=\color{blue},%
+        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+        identifierstyle=\color{black},%
+        stringstyle=\color{mylilas},%
+        commentstyle=\color{mygreen},%
+        showstringspaces=false,%
+            %---Without this there will be a symbol in 
+            %---the places where there is a space
+        numbers=left,%
+        numberstyle={\tiny \color{black}},% 
+            %---Size of the numbers
+        numbersep=9pt,% 
+            %---Defines how far the numbers are from the text
+        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+            %---Some words to emphasise
+    }%
+    \lstinputlisting{#1}
+}
+    %---For including Matlab code from .m file with colors,
+    %---line numbering, etc. 
+
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\usepackage{enumitem} 
+    %---Has to do with enumeration	
+\usepackage{appendix}
+%\usepackage{natbib} 
+    %---For bibliographies
+\usepackage{pdfpages}
+    %---For including whole pdf pages as a page in doc
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%\newcommand{\nameofcmd}{Text to display}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
 \begin{document}
@@ -24,9 +141,20 @@
 
 \section{Introduction}
 
-One main application of Markov Chains is in \textbf{multi-state 
-transition models}, which describe random movements of a \emph{subject}
-through various \emph{states}.  
+This note looks at Markov chains, which describe the evolution of some object, call it $X_t$, over time. The ``chain'' is the sequence of values it takes on, $\{X_t\}_{t\geq0}$. Almost always, we'll consider the case where $X_t$ evolves \emph{stochastically}, because a deterministic process is much more boring than a randomly evolving stochastic process.\footnote{Even if you don't agree, a deterministic process can be easily embedded as a special within the more general class of stochastic processes. Just specify zero variance in everything here.} 
+
+So to preview, our very basic primitive will be the recurrence relation, or ``law of motion''
+\begin{equation}
+    X_{t+1} = AX_t + W_{t+1}
+    \qquad W_{t+1} \sim \text{N}(0,\sigma)
+\end{equation}
+Within this framework, $X_t$ can take on scalar values in $\mathbb{R}$, or it can be a vector in $\mathbb{R}^N$ (where $A$ is a matrix). Hence the notation above allows sufficient generality. 
+
+And if this still doesn't look general enough, note that we can even accommodate additional lags in this framework, as we'll see, by augmenting $X_t$, ``expanding the state space'', to include lagged values of itself.
+
+
+
+
 
 \section{Markov Chain Definition}
 
@@ -72,9 +200,9 @@ a {\sl homogeneous Markov Chain}.
 \\
 For this type of Markov Chain, 
 only state or position, \emph{not} time, factors into the distribution for the
-next period. This differs from the definition above, in that we 
-explicity allow $Q_{ij}^{(t_1)} \neq Q_{ij}^{(t_2)}$ for 
+next period. This differs from the definition above, in that we explicity allow $Q_{ij}^{(t_1)} \neq Q_{ij}^{(t_2)}$ for 
 $t_1\neq t_2$.
+
 
 \subsection{Order of a Markov Chain}
 We can generalize a bit and allow the Markov Chain to depend upon more
@@ -429,23 +557,16 @@ is in state $i$, we really mean that $y_t$ is in that bucket.
 There are, of course, $n-1$ equal width buckets.
 
 
+\newpage
+\section{Dynamical Systems}
 
+Now we look at an application of Markov Chains to the domain of {dynamical systems}.
 
+\subsection{Definition and Main Ideas}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+\begin{defn}
+A \emph{dynamical system} can be defined as the couplet $(S,h)$, where $S$ is a metric space and $h$ is a map from $S$ onto itself. Hence, we have a space within which objects can move according to some law of motion, $h$.
+\end{defn}
 
 
 

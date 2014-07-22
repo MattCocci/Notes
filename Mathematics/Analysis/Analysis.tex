@@ -49,6 +49,7 @@
 \newtheorem*{rmk}{Remark}
 \newtheorem*{note}{Note}
 
+\DeclareMathOperator*{\essup}{ess\,sup}
 
 %% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -4154,7 +4155,12 @@ An \emph{inner product space} is a vector space $X$ with an \emph{inner product}
 \begin{enumerate}
 \item $\langle x,x\rangle \geq 0$ for all $x\in X$. Moreover, $\langle x,x\rangle=0$ if and only if $x=0$, the zero vector.
 \item $\langle x,y\rangle= \overline{\langle y,x\rangle}$.
-\item $\langle \cdot,y\rangle$ is linear. Conjugate linearity by the previous statement.
+\item $\langle \cdot,y\rangle$ is linear. That is 
+\[
+    \langle \alpha x + y,z\rangle = 
+    \alpha \langle x ,z\rangle + \langle y,z\rangle
+\]
+Conjugate linearity by the previous statement.
 \end{enumerate}
 \end{defn}
 
@@ -4201,6 +4207,7 @@ Without loss of generality, assume $\langle x,y\rangle\neq 0$, otherwise trivial
 \end{proof}
 
 \begin{thm}
+\label{norminduce}
 Given an inner product space, we can define a norm by $\lVert x\rVert := \sqrt{\langle x,x\rangle}$.
 \end{thm}
 \begin{proof}
@@ -4219,6 +4226,23 @@ More generally, given an orthonormal set $\{u_1,\ldots,u_N\}$:
     = \sum_{i=1}^N |c_i|^2
 \]
 \end{thm}
+
+\begin{prop}
+Let $X$ be an inner product space. Then for all $x,y\in X$, we have the \emph{polarization identity}
+\[
+    \lVert x+y\rVert^2 + \lVert x-y\rVert^2
+    = 4\langle x,y\rangle
+\]
+along with the \emph{parallelogram law}:
+\[
+    \lVert x+y\rVert^2 + \lVert x-y\rVert^2
+    =2\left(\lVert x\rVert^2 +\lVert y\rVert^2\right)
+\]
+\end{prop}
+\begin{rmk}
+    This only works with inner product spaces. Altough the parallelogram law is written in terms of norms, it will not worked for \emph{all} normed vector spaces. It only holds for norms induced from an inner product as in Theorem
+\ref{norminduce}.
+\end{rmk}
 
 \begin{thm}
 \label{projorth}
@@ -4273,6 +4297,389 @@ Cauchy Schwarz can also be proved via Bessel's Inequality if we take $N=1$ and $
     \langle x,y\rangle \leq \lVert x\rVert\cdot \lVert y\rVert
 \]
 \end{rmk}
+
+\subsection{$L^p$ Spaces}
+
+
+\begin{defn}
+Given a measure space $X=L^p(\Omega,\mathscr{M},\mu)$, we define the following norm for functions on that space:
+\begin{align*}
+    \text{For }1\leq p < \infty \qquad
+    \lVert f\rVert_p &:= \left(\int_\Omega 
+    |f|^p \; d\mu\right)^{\frac{1}{p}}
+    \in [0,\infty]\\
+    \lVert f\rVert_\infty &:=
+    \essup_{x\in\Omega} |f(x)|
+    := \inf\{M\;:\; |f|\leq M \text{ $\mu$-a.e.}\}
+\end{align*}
+The essential supremum effectively ignores all measure zero infinities. 
+\\
+\\
+Next, we then define $L^p$ space, for $p\in[1,\infty]$ as 
+\begin{align*}
+    L^p(\Omega,\mathscr{M},\mu)
+    &:=\{f: \Omega \rightarrow \mathbb{C} \;:\;
+    \lVert f\rVert_p < \infty\} 
+\end{align*}
+where two functions are equal in $L^p$ if they are equal almost everywhere on $X$.
+\end{defn}
+
+\begin{rmk}
+Note, we will play a little fast and loose with notation in this section. Specifically, when you see something like $|f+g|\leq |f| + |g|$, we're really saying that , for all $x$, $|f(x)+g(x)|\leq |f(x)| + |g(x)|$. 
+
+On the other, you might see the following expression, which looks similar: $|f|\leq \lVert f\rVert_p$. So note that $\lVert f\rVert_p$ is always a \emph{number}. So $|f|\leq\lVert f\rVert_p$ means that for all \emph{points} $x\in\Omega$, $f(x)$ is less than or equal to the \emph{number} $\lVert f\rVert_p$, an upper bound. 
+
+Almost everywhere, the meaning will be immediately clear from the context, but for those measure zero instances where it's not, a note will be made. 
+\end{rmk}
+
+\begin{prop}
+$L^p(\Omega,\mathscr{M},\mu)$ is a normed vector space.
+\end{prop}
+\begin{proof}
+We check the properties that a normed vector space must have
+\begin{enumerate}
+    \item First, it's clear that $\lVert f\rVert_p=0$ if and only if $f=0$. (Recall that $f=0$ means that $f(x)=0$ for almost all $x\in\Omega$. It doesn't need to be the constant.)
+    \item Next, it's obvious that $\lVert cf\rVert_p = c\lVert f\rVert_p$.
+\item Finally, for the triangle inequality, suppose that $p=\infty$. Then since $\lVert \cdot\rVert_\infty$ is just the essential supremum, by definition
+\begin{align*}
+    |f|&\leq \lVert f\rVert_\infty
+    \quad \text{$\mu$-a.e.}\\
+    |g|&\leq \lVert g\rVert_\infty 
+    \quad \text{$\mu$-a.e.}
+\end{align*}
+So then for almost all $x$, since $|f(x)+g(x)|\leq |f(x)|+|g(x)|$, we have
+\begin{align*}
+    |f(x)+g(x)|\leq \lVert f\rVert_\infty 
+    + \lVert g\rVert_\infty
+\end{align*}
+Since this is true for all $x\in\Omega$, we can take the essential sup over the lefthand side to get
+\begin{align*}
+    \lVert f+g\rVert_p
+    \leq \lVert f\rVert_\infty 
+    + \lVert g\rVert_\infty
+    \quad \text{$\mu$-a.e.}
+\end{align*}
+Next, suppose $p\in[1,\infty)$. Also, assume without loss of generality that $f\neq 0$ and $g\neq 0$ (where, again, equality is almost-everywhere equality). Then define
+\begin{align*}
+    f_0 := \frac{|f|}{\lVert f\rVert_p}
+    \qquad
+    g_0 := \frac{|g|}{\lVert g\rVert_p}
+    \qquad 
+    \quad\Rightarrow\quad
+    \lVert f_0\rVert_p
+    =\lVert g_0\rVert_p
+    =1
+\end{align*}
+Then, if we look pointwise and let $C=\lVert f\rVert_p+\lVert g\rVert_p$ we have that
+\begin{align}
+    |f+g|^p&\leq \left(|f|+|g|\right)^p\notag\\
+    &\leq C^p\left(f_0\frac{\lVert f\rVert_p}{C}
+    + g_0\frac{\lVert g\rVert_p}{C}\right)^p
+    \label{convstep}
+\end{align}
+Now let's consider the beast inside the parentheses, raised to the $p$th power. The term inside is mapped $t\mapsto t^p$, which is convex function for $p\in[1,\infty)$. Now we can use this convexity towards our purpose if we rewrite the whole term, a little more suggestively, using the definition of $C$:
+\[
+    \left(f_0\frac{\lVert f\rVert_p}{C}
+    + g_0\frac{\lVert g\rVert_p}{C}\right)^p
+    = 
+    \left(\alpha f_0
+    + (1-\alpha)g_0\right)^p
+    \qquad \text{where}\quad
+    \alpha=\frac{\lVert f\rVert_p}{\lVert f\rVert_p 
+    +\lVert g\rVert_p }
+\]
+Finally, given a convex function written in this way, we know that 
+\[
+    \left(\alpha f_0
+    + (1-\alpha)g_0\right)^p
+    \leq 
+    \left(\alpha f_0^p
+    + (1-\alpha)g_0^p\right)
+\]
+Alright, almost there. Using this back in Inequality \ref{convstep}, we get an expression, which we'll then integrate:
+\begin{align*}
+    |f+g|^p  &\leq 
+    C^p\left(f_0^p\cdot\frac{\lVert f\rVert_p}{C}
+    + g_0^p\cdot\frac{\lVert g\rVert_p}{C}\right)\\
+    \Rightarrow\quad
+    \int_\Omega|f+g|^p \;d\mu &\leq \int_\Omega
+    C^p\left(f_0^p\cdot\frac{\lVert f\rVert_p}{C}
+    + g_0^p\cdot\frac{\lVert g\rVert_p}{C}\right)\;d\mu \\
+    &\leq C^p
+    \int_\Omega f_0^p\cdot\frac{\lVert f\rVert_p}{C}
+    \;d\mu+ C^p\int_\Omega 
+    g_0^p\cdot\frac{\lVert g\rVert_p}{C}\;d\mu
+\end{align*}
+\end{enumerate}
+\end{proof}
+
+\begin{thm}
+Provided $p\in[1,\infty)$, $\lVert f+g\rVert_p=\lVert f\rVert_p+\lVert g\rVert_p$ if and only if $f=\lambda g$ for some $\lambda\in \mathbb{C}$.
+\end{thm}
+
+\begin{thm}
+\emph{(Holder's Inequality)\footnote{Hodor.}}
+For $p\in[1,\infty]$, define $p'$ such that
+\[
+    \frac{1}{p}
+    +
+    \frac{1}{p'}
+    =1
+\]
+Then, if $f\in L^p$ and $g\in L^{p'}$, we have $fg\in L^1$ and 
+\[ 
+    \int_\Omega |fg| \; d\mu \leq \lVert f\rVert_p
+    \lVert g\rVert_{p'}
+\]
+\end{thm}
+\begin{rmk}
+This a generalization of Cauchy-Schwarz, which is a special case where $p=p'=2$.
+\end{rmk}
+\begin{proof}
+Suppose $p=1$. Then $p'=\infty$, and to have $g\in L^{p'}$, it must be that $g$ is bounded, i.e. there is an $M$ such that $|g|<M$ for all $x\in\Omega$. So
+\begin{align*}
+    \int_\Omega |fg| \; d\mu \leq 
+    M\int_\Omega |f| \; d\mu \leq 
+    \lVert g\rVert_\infty\int_\Omega |f| \; d\mu 
+    = 
+    \lVert g\rVert_\infty\lVert f\rVert_1
+\end{align*}
+The case where $p=\infty$ is the same.
+\\
+\\
+Now suppose $p\in(1,\infty)$. Also, note a simple result that we will use later:
+\begin{align}
+    \text{Since $\log$ is concave }
+    \Rightarrow \quad
+    \log(\alpha x + (1-\alpha)y)&\geq
+    \alpha \log x + (1-\alpha) \log y\notag\\
+    \text{After exponentiating }
+    \Rightarrow \quad
+    \alpha x + (1-\alpha)y &\geq
+    x^\alpha y^{1-\alpha}\label{logconc}
+\end{align}
+Now normalize
+\[
+    f_0 = \frac{|f|}{\lVert f\rVert_p}
+    \quad
+    g_0 = \frac{|g|}{\lVert g\rVert_{p'}}
+    \quad \Rightarrow\quad
+    \lVert f_0\rVert_p = \lVert g\rVert_{p'}=1
+\]
+and, so that we can use Inequality \ref{logconc}, define
+\[
+    x=|f_0|^p 
+    \quad 
+    y=|g_0|^{p'} 
+    \quad
+    \alpha=\frac{1}{p} 
+    \quad
+    1-\alpha=\frac{1}{p'}
+\]
+Plug into Result \ref{logconc}:
+\[
+    |f_0 \cdot g_0|=|f_0|\cdot|g_0|\leq 
+    \frac{1}{p} |f_0|^p
+    +\frac{1}{p'} |g_0|^{p'}
+\]
+We can now integrate the last expression to get 
+\begin{align*}
+    \int_\Omega
+    |f_0\cdot g_0|\;d\mu&\leq 
+    \frac{1}{p}
+    \int_\Omega |f_0|^p \;d\mu
+    +\frac{1}{p'}\int_\Omega |g_0|^{p'}\;d\mu \\
+    \Leftrightarrow\quad
+    \frac{1}{\lVert f\rVert_p \lVert g\rVert_{p'}}
+    \int_\Omega
+    |f g|\;d\mu
+    &\leq 
+    \frac{1}{p}\lVert f_0\rVert^p_p
+    +\frac{1}{p'}\lVert g_0\rVert_{p'}^{p'} 
+    = \frac{1}{p} + \frac{1}{p'}=1\\
+    \Rightarrow\quad
+    \int_\Omega
+    |f g|\;d\mu
+    &\leq 
+    {\lVert f\rVert_p \lVert g\rVert_{p'}}
+\end{align*}
+\end{proof}
+
+\begin{cor}
+The last theorem gives equality when $|f|=\lambda |g|^{\frac{p'}{p}}$, hence 
+\[
+    \sup_{\lVert g\rVert_{p'}=1} 
+    \int_\Omega fg \; d\mu = \lVert f\rVert_p
+\]
+\end{cor}
+
+\begin{cor}
+Suppose that $\mu(\Omega)<\infty$ and $p\geq q$. Then 
+\[
+    L^p(\Omega,\mathscr{M},\mu)
+    \subset 
+    L^q(\Omega,\mathscr{M},\mu)
+\]
+\end{cor}
+\begin{rmk}
+There are no inclusion relations between $L^p$ spaces when $\Omega=\mathbb{R}$. We obviously can't apply the last theorem since $\mu(\mathbb{R})$ is infinite, but to get some better inuition as to why there isn't inclusion, consider functions like $1/x^2$ and $1/\sqrt{x}$ which behave very differently in their tails and at $0$. 
+\end{rmk}
+
+\begin{rmk}
+    For all $(\Omega,\mathscr{M},\mu)$, we have for all $p\in[1,\infty]$
+\[
+    L^1 \cap L^\infty \subset L^p \subset L^1+L^\infty
+\]
+where the largest set in the relation above is the set of all functions that are the sum $f+g$ where $f\in L^1$ and $g\in L^\infty$.
+\end{rmk}
+
+
+\subsection{Completeness of $L^p$ Spaces}
+
+\begin{lem}
+\label{lem.absonv}
+Let $X$ be a normed vector space. Then $X$ is complete if and only if 
+\[
+    \sum^\infty_{n=1} \lVert x\rVert < \infty
+    \quad\Rightarrow\quad
+    \sum^\infty_{n=1}  x
+\]
+i.e. a summable series that is \emph{absolutely} convergent will also be convergent.
+\end{lem}
+
+\begin{thm}
+(Riesz-Fisher) For $p\in[1,\infty]$, $L^p$ is complete, i.e. $L^p$ is a Banach Space.
+\end{thm}
+\begin{proof}
+Let's take any sequence of functions $\{f_n\}\in L^p$ such that $M:=\sum^\infty_{n=1} \lVert f\rVert_p<\infty$. Then, by Lemma \ref{lem.absonv}, we can show $L^p$ to be complete if we can show that $\sum^\infty_{n=1} f_n <\infty$.  So define the following sums (pointwise)
+\[
+    S_N:=\sum^N_{n=1} f_n
+    \qquad 
+    T_N:=\sum^N_{n=1} |f_n|
+\]
+We deal first with $T_N$, since it uses absolute values, and so will always be increasing in $N$. But first, by Minkowski's inequality, it's clear that 
+\[
+    \lVert T_N \rVert_p =  
+    \left\lVert \sum^\infty_{n=1} |f_n|
+    \right\rVert_p \leq
+    \sum^\infty_{n=1} \left\lVert f_n
+    \right\rVert_p \leq
+    M
+\]
+And since we have a bounded sum that is increasing in 
+Now since $\sum^\infty_{n=1}\lVert f\rVert_p$ converges to $M$, it's clear that 
+\end{proof}
+
+
+\subsection{Duality in $L^p$ Spaces}
+
+Inuition: Duals shift the focus from \emph{elements} of a normed vector space to \emph{functions} on that vector space. So suppose we have a norm defined for elements in $X$. Duals build off this using a norm for functions defined on $X$ (mapping into $\mathbb{R}$ or $\mathbb{C}$).
+
+\begin{defn}
+A \emph{linear functional} is a linear mapping from a vector space to the field over which it is defined.
+\end{defn}
+
+\begin{defn}
+An \emph{algebraic dual} on a vector space $X$ is the set of all linear functionals $\ell: X\rightarrow\mathbb{R}$ (or $\mathbb{C}$). 
+\end{defn}
+
+\begin{defn}
+A \emph{topological dual}, $X^*$ for vector space $X$, is the space of all bounded linear functions. We now define a norm for linear functionals so that we call $\ell: X\rightarrow \mathbb{R}$ (or $\mathbb{C}$) bounded if
+\[
+    \lVert \ell\rVert := \sup_{\lVert x\rVert=1} 
+    |\ell(x)| 
+    = \sup_{x\in X\setminus 0} 
+    \frac{|l(x)|}{\lVert x\rVert} 
+    = \sup_{x\in X\setminus 0} 
+    \ell\left(
+    \frac{|x|}{\lVert x\rVert} 
+    \right)
+    <\infty
+\]
+where each of the representations above are equally valid. As a result of this definition
+\begin{equation}
+    \label{funcineq}
+    |\ell(x)| \leq \lVert \ell\rVert\cdot\lVert x\rVert
+\end{equation}
+\end{defn}
+
+\begin{prop}
+A linear functional $\ell$ is Lipschtz continuous.
+\end{prop}
+\begin{proof}
+We use the fact, first, that $\ell$ is linear and, second, Inequality \ref{funcineq}
+\[
+    |\ell(x)-\ell(y)|\leq 
+    |\ell(x-y)|\leq 
+    \lVert \ell\rVert\cdot \lVert x-y\rVert
+\] 
+\end{proof}
+
+\begin{prop}
+A continuous linear functional is bounded.
+\end{prop}
+\begin{proof}
+Suppose not. Then for all $n$, there is a vector $\lVert x_n\rVert=1$ such that 
+\[
+    |\ell(x_n)| \geq n 
+\]
+So then define the following
+\[
+    \tilde{x}_n = \frac{x_n}{\sqrt{n}}
+\]
+Then $\tilde{x}_n\rightarrow0$, but 
+\end{proof}
+
+\begin{thm}
+$(X^*,\lVert \cdot\rVert)$ is a normed vector space, with 
+\[
+    \lVert \ell_1+\ell_2\rVert = \sup_{\lVert x\rVert=1}
+    |\ell_1(x)+\ell_2(x)|\leq
+    \lVert \ell_1\rVert+ \lVert \ell_2\rVert
+\]
+\end{thm}
+
+\begin{prop}
+$X^*$ is a Banach Space.
+\end{prop}
+
+\begin{thm}
+For all $g\in L^{p'}$, where $p'$ is the Holder conjugate of $p$, we have $\ell_g\in(L^p)^*$, where 
+\[
+    \ell_g(f)=\int_X fg \; d\mu
+\]
+So $L^{p}$ is our base normed vector space consisting of functions $f\in L^p$. To evaluate a functional $\ell_g$ at the function $f$ in vector space $L^p$, just integrate $f$ against $g$.
+\end{thm}
+\begin{proof}
+To show that $\ell_g$ is in the dual of $L^p$, we need to show that $\ell_g$ is a bounded linear functional for all $g\in L^{p'}$. So first, by Holder's inequality,
+\[
+    |\ell_g(f)| = 
+    \left\lvert \int_X fg \; d\mu\right\rvert 
+    \leq 
+    \int_X \left\lvert fg \right\rvert \; d\mu
+    \leq \lVert f\rVert_p \lVert g\rVert_{p'}
+\]
+Then, taking the sup over all $f$ such that $\lVert f\rVert_p=1$, we get
+\[
+    \lVert \ell_g\rVert :=
+    \sup_{\lVert f\rVert_p=1}
+    |\ell_g(f)| \leq \lVert g\rVert_{p'}
+\]
+Hence, $\ell_g\in (L^p)^*$. 
+\end{proof}
+\begin{rmk}
+In words, this last theorem says that every $g\in L^{p'}$ gives rise to an element of the dual of $(L^p)^*$ with the norm (on the dual) equal to $\lVert g\rVert_{p'}$. In other words, $L^{p'}$ is ``embedded'' in $(L^p)^*$.
+\end{rmk}
+
+\begin{thm}
+\emph{(Riesz Representation Theorem for $\mathbb{R}$)}
+Suppose $p\in[1,\infty)$. Then for every $\ell\in(L^p(\mathbb{R}))^*$, there exists a unique function $g\in L^{p'}(\mathbb{R})$, where $p'$ is the Holder-conjugate of $p$ such that $\ell=\ell_g$, i.e.
+\[
+    \ell(f)=\int_\mathbb{R} fg \; d\mu
+\]
+In short $(L^p(\mathbb{R}))^* =\sim L^{p'}(\mathbb{R})$.
+\end{thm}
+
 
 
 

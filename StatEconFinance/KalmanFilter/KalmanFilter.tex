@@ -69,14 +69,17 @@ State space models essentially reduce to two fundamental equations:
 Additionally, it is also assumed that $\varepsilon_t$ and $\eta_t$ are uncorrelated, iid, and independent of past values. And while $\varepsilon_t$ and $\eta_t$ are typically assumed to be normal, we wrote them here in the more general (yet equally valid) represenetation above. Later on, we will discuss the extra subtetly that non-normal errors introduce into the interpretation.
 
 
-\paragraph{State Transition Equation} Equation \ref{ste} describes how the state vector, $s_t$, evolves over time; it's a law of motion. In words, the state vector next period is a function of the previous period's state vector, plus some innovation or disturbance. 
+\paragraph{State Transition Equation} Equation \ref{ste} describes how the state vector, $s_t$, evolves over time; it's a law of motion. In words, the state vector next period is a function of the previous period's state vector, plus some innovation or disturbance.  Since we iterate on the state vector $s_{t-1}$ to get the next period $s_{t}$, it's clear that $T$ must be square, while $C$ and $\varepsilon_t$ are vectors the same size as $s_t$.
 
 But since the states might be unobserved (so that they do not have a directly measurable series associated with them), we have to relate it to the data somehow, which is where the next equation comes in.
 
-\paragraph{Measurement Equation} Equation \ref{moe}, sometimes called the ``Observation Equation'', relates the states to the directly measurable observables, allowing for potential ``measurement error'' captured by $\eta_t$. More succinctly, $M$ is a matrix that maps states to observables. Since the number of states and observables may differ, $M$ need not be square.
+\paragraph{Measurement Equation} Equation \ref{moe}, sometimes called the ``Observation Equation'', relates the states to the directly measurable observables, allowing for potential ``measurement error'' captured by $\eta_t$. More succinctly, $M$ is a matrix that maps states to observables. Since the number of states and observables may differ, $M$ need not be square. Clearly, $D$ and $\eta_t$ must be the same size as $y_t$.
 
-Finally, while everything in Equation \ref{ste} has to be estimated ($\{s_t\}$, $T$, $R$), the matrix $M$ will need to be pre-specified by the econometrician. Matrix $M$ makes explicit our idea of the relationship between the observables we see and the deep underlying model dynamics that (we think) drive what's observed. Of course, this relationship cannot be estimated; it can only be imposed via $M$.
+\paragraph{Note on Free Parameters} (UPDATE THIS)
+When we write down the model, we will need to pre-specify certain parameters in both equations.
+While our goal will be estimate in Equation \ref{ste} has to be estimated ($\{s_t\}$, $T$, $R$), the matrix $M$ will need to be pre-specified by the econometrician. Matrix $M$ makes explicit our idea of the relationship between the observables we see and the deep underlying model dynamics that (we think) drive what's observed. Of course, this relationship cannot be estimated; it can only be imposed via $M$.
 
+\newpage
 \subsection{Expanding the State Space}
 
 In this section, we show two examples of expanding the state space (introducing extra states), and why we might want to do that. 
@@ -106,34 +109,146 @@ To incorporate still more lags, the modifications to the state transition equati
 
 \subsubsection{Measurement Error as a State}
 
-While the two-equation framework set up in \ref{ste} and \ref{moe} might be the most intuitive representation of our system, it might be easier (for programming or computational reasons) to remove measurement error from the measurement/observation equation. We can do so by, again, enlargint the state space and incorporate measurement error via extra states.
+While the two-equation framework set up in (\ref{ste}) and (\ref{moe}) might be the most intuitive representation of our system, it might be easier (for programming or computational reasons) to remove measurement error from the measurement/observation equation. We can do so by, again, enlarging the state space and incorporating any measurement error as extra states.
+
+So we now rearrange the terms in Equations \ref{ste} and \ref{moe} into new State Transition and Measurement Equations. Again, we use stacked vector and block matrix form, augmenting the state vector with extra rows, $s'_t$, which capture the contribution from the measurement errors:
+\begin{align}
+  \text{State Transition Equation:} \quad
+    \begin{bmatrix} s_{t} \\ s'_t \end{bmatrix}
+    &= \begin{bmatrix} C \\ \mathbf{0} \end{bmatrix}
+    + \begin{bmatrix} T & \mathbf{0} \\ 
+    \mathbf{0} & \mathbf{0} \end{bmatrix}
+    \begin{bmatrix} s_{t-1} \\ s'_{t-1} \end{bmatrix}
+    + \begin{bmatrix} \varepsilon_{t} \\ \eta_t \end{bmatrix}
+    \label{ste.withmerr}
+  \\ \notag \\
+  \text{Measurement Equation:} \quad
+    y_{t} &= D + 
+    \begin{bmatrix} M & \mathbf{0} \end{bmatrix}
+    \begin{bmatrix} s_{t} \\ s'_t \end{bmatrix}
+\end{align}
+In this representation, $s'_t$ effectively ``carries'' the measurement error from the state transition equation down to the measurement equation. But any past contributions from measurement errors are decisively zeroed out going forward, as we see in the new transition matrix of Equation (\ref{ste.withmerr}).
+
 
 \subsection{Examples within the State Space Framework}
 
+A few examples can best illustrate how state space models work in practice. Rather than just listing equations and general forms, we will fully specify some typical examples in state space form.
+
+By casting some familiar models into state space, we show that state space models really do unify and generalize many different ideas. In addition, we show that the state space framework can handle a larger class of problems, as the two layers of states and observables easily accommodate distinctions between ``true values'' we hope to discern and the noisy measures we actually observe---as in the GDP example below.\footnote{Regular time series analysis doesn't usually allow for such distinctions, treating the observed series as \emph{the} true value always.}
+
 \subsubsection{AR Model}
+
+Suppose that we have some variable $x_t$ that evolves according to an AR($p$) process, where $\mu$ denotes the mean of the series.\footnote{Both here and in the next subsection, $\mu$ is assumed to be known. Otherwise, it would need to be estimated, as we will describe in later sections.} In other words,
+\[
+  (x_t - \mu) = \sum^p_{i=1} \rho_i (x_{t-i} - \mu) 
+  + \varepsilon_t
+\]
+Since the state transition equation relates past and present, this is where we will express the autoregressive relationship, using the approach in Subsection (Extra Lags) to augment the state vector to include extra lags:
+\[
+  s_t = 
+  \begin{bmatrix} x_t - \mu \\ x_{t-1} - \mu \\ \vdots \\
+    x_{t-p+1} - \mu \end{bmatrix}
+  = 
+  \begin{bmatrix}
+    \rho_1 & \rho_2 & \cdots & \rho_{p+1} & \rho_p \\
+    1 & 0 & \cdots & 0 & 0 \\
+    0 & 1 & \cdots & 0 & 0 \\
+    \vdots & \vdots & \ddots & \vdots & \vdots \\
+    0 & 0 & \cdots & 1 & 0 \\
+  \end{bmatrix}
+  \begin{bmatrix} x_{t-1} - \mu \\ x_{t-2} - \mu \\ \vdots \\
+    x_{t-p}- \mu \end{bmatrix}
+  + \begin{bmatrix} \varepsilon_t \\ 0 \\ \vdots \\ 0 
+  \end{bmatrix}
+\]
+Finally, we specify the measurement equation to account for the de-meaning of $x_t$ within the state transition equation. Since we don't consider the additional layer of measurement error within regular AR($p$) models, we don't add any term for the error:
+\[
+  y_t = \begin{bmatrix} x_t \end{bmatrix}
+  = \mu + 
+  \begin{bmatrix}
+  1 & 0 & \cdots & 0 \\
+  \end{bmatrix}
+  \begin{bmatrix} x_t - \mu \\ x_{t-1} - \mu \\ \vdots \\
+    x_{t-p+1} - \mu \end{bmatrix}
+\]
+Thus, we have now embedded the simple AR($p$) model within a state space framework.
+
 \subsubsection{MA Model}
+
+Now, let's consider an MA($q$) model: 
+\[
+  (x_t - \mu) = \varepsilon_t 
+  + \sum^q_{i=1} \theta_i  \varepsilon_{t-i}
+\]
+Since we'll need to keep track of lagged \emph{innovations}, we'll incorporate those as elements of our state vector, rather than lagged values of $x_t$.\footnote{Here, we see a great example of the flexibility that state space models offer---the many different ways they allow the econometrician to think about and model the system.} This gives a state transition equation of 
+\[
+  s_t = 
+  \begin{bmatrix}
+  \varepsilon_t \\ \varepsilon_{t-1} \\
+  \vdots \\ \varepsilon_{t-q}
+  \end{bmatrix}
+  = \begin{bmatrix}
+  0 & 0 & \cdots & 0 & 0 \\
+  1 & 0 & \cdots & 0 & 0\\
+  0 & 1 & \cdots & 0 & 0\\
+  \vdots & \vdots & \ddots & \vdots & \vdots\\
+  0 & 0 & \cdots & 1 & 0\\ 
+  \end{bmatrix}
+  \begin{bmatrix}
+  \varepsilon_{t-1} \\ \varepsilon_{t-2} \\
+  \vdots \\ \varepsilon_{t-q-1}
+  \end{bmatrix}  
+  + \begin{bmatrix}
+  \varepsilon_t \\ 0 \\ \vdots \\ 0 
+  \end{bmatrix}
+\]
+Which then leads to the following observation equation. Again, no term for measurement error is necessary:
+\[
+  y_t = 
+  \begin{bmatrix} x_t \end{bmatrix}
+  = \mu +  
+  \begin{bmatrix} 1 & \theta_1 & \theta_2 & \cdots &
+    \theta_q \end{bmatrix}
+  \begin{bmatrix}
+  \varepsilon_t \\ \varepsilon_{t-1} \\
+  \vdots \\ \varepsilon_{t-q}
+  \end{bmatrix}
+\]
+
 \subsubsection{GDP: Income and Expenditure}
+We also present an example where there is some unobserved ``true'' level of GDP that we hope to capture, using two alternative measures that ostensibly measure the same thing---the income and expenditure measures of GDP. However, because of measurement error in both series, they provide only a ``noisy'' measure. This is a situation ideally suited to a state space representation.
 
 
 \newpage
 \section{Kalman Filter and Smoother}
 
-\section{Basic Idea and Terminology}
+Within the state space framework detailed above, we know face the task of estimating the sequence of (possibly unobserved) states. To do so, we typically use the Kalman filter, a recursive procedure to forecast and estimate states over time. The next section will illustrate 
+
+\subsection{Basic Idea and Terminology}
 
 Here's the basic procedure associated with the Kalman
-Filter:
+Filter to estimate and forecast the state vector, $s_t$, given data vector $y_t$ for which we have observations running from $t=1$ until $t=T$. Thereafter, we will construct forecasts.
 \begin{enumerate}
-    \item Start with a prior for some variable of interest
-	in the current period, $p(x)$.
-    \item Observe the current measurement $y_t$.
-    \item ``Filter'' out the noise and 
-	compute the filtering distribution: $p_t(x | y)$.
-    \item Compute predictive distribution $p_{t+1}(x)$
-	from  filtering distribution and your model.
-    \item Increment $t$ and return to step 1, taking
-	the predictive distribution as your prior.
+\item Start with a prior for the state vector at time $t$, call it, call it $p(s_t | s_{t-1}, y_{t-1})$. In the case where $t=1$, this is a true prior in that you don't use any data. 
+\item Observe the realized data point, $y_t$. 
+\item ``Filter'' out the noise and compute the ``filtering distribution'': $p(s_t | y_t)$.
+\item Compute the predictive distribution, $p(s_{t+1} | s_t, y_t)$, based on the filtering distribution and the your model's law of motion. 
+\item Take Increment $t$ and return to step 1, taking
+the predictive distribution as your prior.
+\end{enumerate} The remainder of this section will put some more structure to this basic idea, filling in the mathematical details. But first, a minor but very important detour.
 
-\end{enumerate}
+\subsection{Regression and Conditional Distributions with Multivariate Normal RV's}
+
+Suppose that There is a multivariate normal random variable $X$, which can be partitioned into two pieces and written
+\[
+  X \sim N(\mu, \Sigma) \quad\Leftrightarrow\quad
+  \begin{bmatrix} X_1 \\ X_2 \end{bmatrix}
+  \sim 
+  N\left(\begin{bmatrix} \mu_1 \\ \mu_2 \end{bmatrix},
+  \begin{bmatrix} \Sigma_{11} & \Sigma_{12} \\
+  \Sigma_{21} & \Sigma_{22} \end{bmatrix} 
+  \right)
+\]
 
 \section{Filtering Step}
 
