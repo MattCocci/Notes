@@ -1,0 +1,310 @@
+\documentclass[12pt]{article}
+
+\author{Matthew D. Cocci}
+\title{Applied Linear Algebra}
+\date{\today}
+
+%% Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{fullpage}
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\pagestyle{fancy} 
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt} 
+    %---Make the header bigger to avoid overlap
+
+%\renewcommand{\headrulewidth}{0.3pt} 
+    %---Width of the line
+
+%\setlength{\headsep}{0.2in}    
+    %---Distance from line to text
+            
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{amsthm} %allows for labeling of theorems
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+
+% Below supports left-right alignment in matrices so the negative
+% signs don't look bad
+\makeatletter
+\renewcommand*\env@matrix[1][c]{\hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols #1}}
+\makeatother
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{graphicx}
+\usepackage{subfigure} 
+    %---For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %---Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref} 
+\hypersetup{	
+    colorlinks,		
+        %---This colors the links themselves, not boxes
+    citecolor=black,	
+        %---Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\usepackage{verbatim} 
+    %---For including verbatim code from files, no colors
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{RGB}{28,172,0}
+\definecolor{mylilas}{RGB}{170,55,241}
+\newcommand{\matlabcode}[1]{%
+    \lstset{language=Matlab,%
+        basicstyle=\footnotesize,%
+        breaklines=true,%
+        morekeywords={matlab2tikz},%
+        keywordstyle=\color{blue},%
+        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+        identifierstyle=\color{black},%
+        stringstyle=\color{mylilas},%
+        commentstyle=\color{mygreen},%
+        showstringspaces=false,%
+            %---Without this there will be a symbol in 
+            %---the places where there is a space
+        numbers=left,%
+        numberstyle={\tiny \color{black}},% 
+            %---Size of the numbers
+        numbersep=9pt,% 
+            %---Defines how far the numbers are from the text
+        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+            %---Some words to emphasise
+    }%
+    \lstinputlisting{#1}
+}
+    %---For including Matlab code from .m file with colors,
+    %---line numbering, etc. 
+
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\usepackage{enumitem} 
+    %---Has to do with enumeration	
+\usepackage{appendix}
+%\usepackage{natbib} 
+    %---For bibliographies
+\usepackage{pdfpages}
+    %---For including whole pdf pages as a page in doc
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%\newcommand{\nameofcmd}{Text to display}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+\begin{document}
+\maketitle
+
+%\tableofcontents 
+
+\newpage
+\section{Properties of Matrices}
+
+Here are some words we use to describe matrices.
+\begin{enumerate}
+\item \emph{Symmetric}: $A=A^T$
+\item \emph{Sparse}: A matrix consisting of mostly zeros.
+\item \emph{Tridiagonal}: A matrix with three diagonals, something like
+\[
+  A = 
+  \begin{bmatrix}[r]
+   2 & -1 &  0 &  0 \\ 
+  -1 & 2 & -1 &  0 \\  
+   0 & -1 &  2 & -1 \\ 
+   0 &  0 & -1 &  2 \\   
+  \end{bmatrix} 
+\]
+\item \emph{Invertible}: Matrix $A$ is invertible if there exists a matrix $A^{-1}$ such that $A A^{-1} = I$.
+
+\item \emph{Rank}: For an arbitrary $m\times n$ matrix $A$, the rank is the number of linearly independent columns or, alternatively, rows of $A$.\footnote{Whether you check rows or columns doesn't matter, those numbers will be equal.} The rank $r$ is such that $r \leq n$ and $r\leq m$.
+\end{enumerate}
+Now, one of the most important concepts for describing an $n\times n$ matrix $A$. The singular vs. nonsingular distinction entails a whole host of consequences, detailed below:
+\begin{table}[h!]
+\centering
+\begin{tabular}{lll}
+\textbf{Nonsingular}                     && \textbf{Singular} \\
+$A$ invertible                           && $A$ not invertible \\
+Columns independent                      && Columns dependent \\
+Rows independent                         && Rows dependent \\
+$\det(A)\neq0$                           && $\det(A)=0$ \\
+$Ax = 0$ has one solution, $x = 0$       && $Ax=0$ has infinitely many solutions\\
+$Ax = b$ has one solution, $x = A^{-1}b$ && $Ax = b$ has no solution or infinitely many \\
+$A$ has $n$ (nonzero) pivots             && $A$ has $r<n$ pivots \\
+$A$ has full rank                        && $A$ has rank $r<n$ \\
+Reduced row echelon form is $R = I$      && $R$ has at least one zero row \\
+Column space is all of $\mathbb{R}^n$    && Column space has dimension $r<n$ \\
+Row space is all of $\mathbb{R}^n$       && Row space has dimension $r<n$ \\
+All eigenvalues are non-zero             && Zero is an eigenvalue of $A$ \\
+$A^T A$ is symmetric positive definite   && $A^T A$ is only semidefinite \\
+$A$ has $n$ (positive) singular values   && $A$ has $r<n$ singular values
+\end{tabular}
+\end{table}
+
+\section{Matrix Multiplication and the Nullspace}
+
+{\sl Matrix multiplication $Ax$ is the combination of the columns of $A$. Each column scaled by the corresponding element of $x$.} This is, hands down, one of the simplest, most important, and most practical ways of thinking about matrix multiplication. 
+
+Being more explicit, and letting $A_{\cdot i}$ denote the $i$th column of $A$ (an $m\times n$ matrix), and letting $x_j$ denote the $j$th element of $n\times 1$ vector $x$, we can express
+\[
+  A x = x_1 A_{\cdot 1}  + \cdots + x_n A_{\cdot n} 
+\]
+Since the result is a combination of the columns of $A$---each an $m\times 1$ vector---we can easily see that the result will also be an $m\times 1$ column vector.
+
+This intuition also provides a convenient way to ``pick out'' the $i$th column of matrix $A$ via matrix multiplication: just right-multiply $A$ by an $n \times 1$ vector whose elements are all zero, except for the $i$th element, which equals 1. Example,
+\[
+  \begin{bmatrix} 
+  8 & 1 & 6 \\
+  3 & 5 & 7 \\
+  4 & 9 & 2 
+  \end{bmatrix} 
+  \begin{bmatrix} 
+  0 \\ 1 \\ 0 
+  \end{bmatrix} 
+  = 0  
+  \begin{bmatrix} 8 \\ 3 \\ 4 \\ \end{bmatrix} 
+  + 1  \begin{bmatrix} 1 \\ 5 \\ 9 \\ \end{bmatrix} 
+  + 0  \begin{bmatrix} 6 \\ 7 \\ 2 \\ \end{bmatrix} 
+  = 
+  \begin{bmatrix} 1 \\ 5 \\ 9 \\ \end{bmatrix} 
+\]
+
+
+\begin{defn} 
+The \emph{nullspace} of a matrix $A$ ($m\times n$), which is denoted $N(A)$, is the set of all $x \in \mathbb{R}^n$ such that $Ax=0$. Intuitively, the nullspace consists of all vectors that can linearly combine the columns of $A$ to get the zero vector. 
+
+It is \emph{always} the case that the zero vector is in $N(A)$, so the set can never be empty. 
+\end{defn}
+
+
+
+
+
+%% APPPENDIX %%
+
+% \appendix
+
+
+
+
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%%%% SAMPLE CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    %% BIBLIOGRAPHIES %%
+
+        \cite{LabelInSourcesFile} 
+        \citep{LabelInSourcesFile} Cites in parens
+        \nocite{LabelInSourceFile} includes in refs w/o specific citation
+        \bibliographystyle{apalike} 
+        \bibliography{sources.bib} where sources.bib is file
+
+    %% SPACING %%
+
+        \vspace{1in}
+        \hspace{1in}
+
+
+    %% INCLUDING PDF PAGE %%
+
+        \includepdf{file.pdf}
+
+
+    %% INCLUDING CODE %%
+
+        \verbatiminput{file.ext}    
+            %---Includes verbatim text from the file
+        \texttt{text}	  
+            %---Renders text in courier, or code-like, font
+
+        \matlabcode{file.m}	  
+            %---Includes Matlab code with colors and line numbers
+
+
+    %% INCLUDING FIGURES %%
+
+        % Basic Figure with size scaling
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[scale=1]{file.pdf}
+            \end{figure}
+
+        % Basic Figure with specific height
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[height=5in, width=5in]{file.pdf}
+            \end{figure}
+
+        % Figure with cropping, where the order for trimming is  L, B, R, T
+            \begin{figure}
+               \centering
+               \includegraphics[trim={1cm, 1cm, 1cm, 1cm}, clip]{file.pdf}
+            \end{figure}
+
+
+        % Side by Side figures
+            \begin{figure}[h!]
+                \centering
+                \mbox{\subfigure{
+                    \includegraphics[scale=1]{file1.pdf}
+                }\quad\subfigure{
+                    \includegraphics[scale=1]{file2.pdf} 
+                }
+                }
+            \end{figure}
+    
+
