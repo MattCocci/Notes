@@ -1,0 +1,259 @@
+
+gcc
+---
+
+GNU C compiler. Sample use
+
+  gcc -Wall -g -O0 infilename.c -o outfilename.o
+
+Options
+-------
+-Wall   Enables (almost) compiler warnings
+-g -O0  Embed debugging info and disable optimization.
+        Disabling optimation will make sure your code is
+        compiled AS IS.  Otherwise, declared variables may not
+        exist at all.  Some statements might not be executed.
+        Etc. The -O0 disables that ish.
+
+gdb
+---
+
+Command line debugger. Let's you access the debugging info that
+was stored when you ran gcc with option -g. 
+
+  gdb program.o
+
+Here are some associated commands:
+  break linenumber        create breakpoint at specified line
+  break file:linenumber   create breakpoint at line in file
+  run                     run program
+  c                       continue execution
+  next                    execute next line
+  step                    execute next line or step into function
+  quit                    quit gdb
+  print expression        print current value of the specified 
+                          expression
+  help command            in-program help 
+
+
+valgrid
+-------
+
+Diagnoses memory-related problems
+
+  valgrind ./program.o
+
+
+
+===============================================================
+== Structure of a .c file =====================================
+===============================================================
+
+/* Comments about file contents */
+
+/* #include statements to both standard and local libraries */
+#include <stdio.h>  /* Basic input output */
+#include "lcl.h"    /* Local library */
+
+/* Function prototypes and preprocessor definitions */
+
+Define main() function
+{
+  Body
+}
+
+Define other function
+{
+  declare variables;
+  program statements;
+}
+
+===============================================================
+== #include Files =============================================
+===============================================================
+
+At the top of the files, you specify the files/libraries to
+import/include in your .c file. Some useful ones
+
+stdio.h   Standard input/output
+ctype.h   
+math.h
+stdlib.h
+string.h
+time.h
+
+
+===============================================================
+== Expressions and  Variables =================================
+===============================================================
+
+- A variable is a named link/reference to a valued stored in
+  memory or expression that can be evaluated. 
+
+- An expression is a combination of values, variables,
+  operators, and functions. Ex, x = y + 2
+
+- Variable declaration can happen in the body of main or of
+  particular functions.  
+
+- In C, you have to declare variables before you use them. You
+  don't necessarily have to define the _value_, but you do have
+  to define the _datatype_ of variable it will be
+
+    int     Integer
+    float   Floating point
+    char    Character
+
+  You can also declare on the same line, and selectively.
+  Terminate each line with a semicolon.
+  Examples:
+    
+    float pi = 3.1415;
+    int a, b, c = 0, d = e = 4;
+    int x, y, z; x = 2*y + 3*z;
+    char c='A';
+
+===============================================================
+== Datatypes ==================================================
+===============================================================
+
+- The datatype of an object/variable determines the set of
+  values it can have and what operations can be performed on it.
+
+- C Datatypes
+  - Numeric: int, float, double
+  - Character: char
+  - User defined: struct, union
+
+
+
+===============================================================
+== Function Prototypes ========================================
+===============================================================
+
+Functions must also be declared before use, before main() and
+after the #include files. They follow the general form,
+
+  return_type fname(arg1, arg2, ...); 
+
+Arguments: local variables passed from the caller.
+Return Value: Single value returned to caller when function
+              exits.
+
+Note, you can also use "void" to signify no return value or
+arguments.
+
+Examples:
+  int factorial(int n); 
+  int rand(void); 
+
+
+===============================================================
+== main() Function ============================================
+===============================================================
+
+
+This is the "entry point" for a C program. Some examples:
+
+int main(void)        
+
+  This accepts no arguments, outputs 0 if
+  successful, non-zero int otherwise.
+
+int main(int argc, char **argv):
+
+  This acceps command line arguments.
+    
+
+===============================================================
+== Other Functions ============================================
+===============================================================
+
+If the function is prototyped after the #includes, the function
+must match. The variables don't have to match.
+
+
+===============================================================
+== Example Program ============================================
+===============================================================
+
+#include <stdio.h>
+
+int main(void) 
+{
+  const char msg[] = "Goodbye, cruel world."
+  puts(msg);
+
+  return 0;
+}
+
+
+const keyword     Qualifies variable as constant
+char              Data type representing a single character;
+                  written in quotes 'a', '3', 'n'
+const char msg[]  A constant array of characters 
+
+
+===============================================================
+=== Strings in C ==============================================
+===============================================================
+
+- A string is stored as an array of characters. 
+- Strings are null terminated with '\0'. 
+- Special characters specified with escape char \
+  - \\ backslash
+  - \' Apostrophe 
+  - \" Quotation mark
+  - \b backspace
+  - \t tab
+  - \r carriage return
+  - \n newline
+
+
+- stdout, stdin: console output and input streams
+  - puts(string): print string to stdout
+  - putchar(char): print character to stdout
+  - char = getchar(): return character from stdin
+  - string = gets(string): read line from stdin into string
+
+===============================================================
+=== Pre-Processor Macros ======================================
+===============================================================
+
+- Begin with #, like #stdin
+- Can define constants throughout source file 
+
+    #define msg "Hello, World" 
+
+- Can define functions
+    
+    #define add3(x,y,z) ((x)+(y)+(z))
+
+
+===============================================================
+=== Logic, Increment/Decrement, and Simple Operations =========
+===============================================================
+
+Basic logic: 
+  - Short circuit operators (evaluation discontinued if value
+    can be determined early): &&, ||, !
+  - Bitwise Operators: &, |, and ^ (XOR, i.e. only one true)
+
+
+x++     short for x=x+1 
+++x     short for x=x+1 
+x--     short for x=x-1 
+--x     short for x=x-1 
+y=x++   short for y=x; x=x+1;. x evaluated before incremented.  
+y=++x   short for x=x+1; y=x;. x evaluated after incremented.
+y=x--   short for y=x; x=x-1;. x evaluated before decremented. 
+y=--x   short for x=x-1; y=x;. x evaluate after decremented
+
+
+
+x+=1  /* is the same as x=x+1  */
+x-=1  /* is the same as x=x-1  */
+x*=10 /* is the same as x=x*10 */
+x/=2  /* is the same as x=x/2  */
+x%=2  /* is the same as x=x%2  */ 
+
