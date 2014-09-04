@@ -441,7 +441,9 @@ filtering distribution, $p(s_t|\mathcal{I}_{t})=p(s_t|y_t, \mathcal{I}_{t-1})$. 
 for some value of the terms $\mu_{i}$, and $\Sigma_{jk}$, where $i, j, k\in\{1,2\}$. Now with this setup, it's clear how to compute the filtering distribution: apply the result from the last subsection to get $p(s_t|y_t, \mathcal{I}_{t-1}) = p(s_t | \;\mathcal{I}_{t})$. We just need to pin down those terms.
 \\
 \\
-{\sl Defining the Terms:}
+{\sl Defining the Terms:} Throughout, well use the notation that
+$E_{t-1}[\,\cdot\,] = E[\,\cdot\,|\mathcal{I}_{t-1}]$ to make things more
+readable.
 \begin{itemize}
   \item $\mu_1$ and $\Sigma_{11}$: These terms correspond
     to the mean and covariance matrix for $s_t |\;
@@ -452,41 +454,46 @@ for some value of the terms $\mu_{i}$, and $\Sigma_{jk}$, where $i, j, k\in\{1,2
   \item $\mu_2$ and $\Sigma_{22}$: First, use Measurement
     Equation \ref{moe} to get the mean
     \begin{align*}
-      \mu_2 := E[y_t | \; \mathcal{I}_{t-1}] &= 
-        E[Ms_t + \eta_t | \; \mathcal{I}_{t-1}] =
-        ME[s_t|\;\mathcal{I}_{t-1}] 
-        + E[\eta_t | \; \mathcal{I}_{t-1}]\\
+      \mu_2 := E_{t-1}[y_t ] &= 
+        E_{t-1}[Ms_t + \eta_t ] =
+        ME_{t-1}[s_t] 
+        + E_{t-1}[\eta_t ]\\
         &= M \mu_{t|t-1} + 0 = M\mu_{t|t-1}
     \end{align*}
-    Now, let's get the variance of $y_t$: 
+    Now that we have the mean, let's get the variance of $y_t$: 
     \begin{alignat*}{2}
       \text{From Measurement Equation} &\qquad
-        \text{Var}(y_t) &&= \text{Var}(Ms_t + \eta_t) \\
+        \text{Var}_{t-1}(y_t) 
+        &&= \text{Var}_{t-1}(Ms_t + \eta_t) \\
       \text{Since $s_t\perp\eta_t$} &\qquad 
-        &&= \text{Var}(Ms_t) + \text{Var}(\eta_t)\\
+        &&= \text{Var}_{t-1}(Ms_t) 
+        + \text{Var}_{t-1}(\eta_t)\\
       \text{Property of covariance matrices} &\qquad 
-        &&= M [\text{Var}(s_t)] M' + \text{Var}(\eta_t) \\
+        &&= M [\text{Var}_{t-1}(s_t)] M' 
+        + \text{Var}(\eta_t) \\
       \text{From Equations \ref{ste} and \ref{moe}} &\qquad 
-        &&= MRM' + Q =: \Sigma_{22}
+        &&= M\Sigma_{t|t-1} M' + Q =: \Sigma_{22}
     \end{alignat*}
     
   \item Finally, let's define $\Sigma_{12} =
     (\Sigma_{21})^T$, using some of the results just
     obtained and again substituting in using the
-    Measurement Equation:
+    Measurement Equation.
     \begin{align*}
-      \Sigma_{21} := E\left[(y_t-\mu_2)(s_t - \mu_1)'
+      \Sigma_{21} := E_{t-1}\left[(y_t-\mu_2)(s_t - \mu_1)'
         \right] &= 
-        E\left[(Ms_t+\eta_t-M\mu_{t|t-1})(s_t-\mu_{t|t-1})'
+        E_{t-1}\left[(Ms_t+\eta_t-M\mu_{t|t-1})(s_t-\mu_{t|t-1})'
         \right]  \\
-      &= E\left[\left\{\eta_t+ M(s_t-\mu_{t|t-1})\right\}
+      &= E_{t-1}\left[\left\{\eta_t+ M(s_t-\mu_{t|t-1})\right\}
         (s_t-\mu_{t|t-1})' \right]  \\
-      &= E\left[\eta_t(s_t-\mu_{t|t-1})'\right]
-        + E\left[M(s_t-\mu_{t|t-1})
+      \text{Distribute}
+      \qquad
+      &= E_{t-1}\left[\eta_t(s_t-\mu_{t|t-1})'\right]]\\
+      &\quad + E_{t-1}\left[M(s_t-\mu_{t|t-1})
         (s_t-\mu_{t|t-1})'\right]  \\
       \text{By definition of $\Sigma_{11}=\Sigma_{t|t-1}$}
       \qquad
-      &= E\left[\eta_t\varepsilon'_t\right]
+      &= E_{t-1}\left[\eta_t\varepsilon'_t\right]
         + M\Sigma_{t|t-1} \\
       \text{Since $\varepsilon_t\perp \eta_t$} \qquad
       &= 0 + M\Sigma_{t|t-1}  = M\Sigma_{t|t-1} 
@@ -503,18 +510,20 @@ are:
   &\sim 
   N\left(\begin{bmatrix} \mu_{t|t-1} \\ M\mu_{t|t-1} 
     \end{bmatrix},
-  \begin{bmatrix} \Sigma_{t|t-1} & \Sigma_{t|t-1} M'
+  \begin{bmatrix} 
+    \Sigma_{t|t-1} & \Sigma_{t|t-1} M'
     \notag\\
-  M\Sigma_{t|t-1} & MRM' + Q \end{bmatrix} 
+    M\Sigma_{t|t-1} & M\Sigma_{t|t-1}M' + Q 
+  \end{bmatrix} 
   \right) \notag\\\label{normfilt}\\
   \Rightarrow \qquad
   \mu_{t|t} =&& E[s_t|y_t, \mathcal{I}_{t-1}]
     &= \mu_{t|t-1} + \Sigma_{t|t-1} M' 
-    \left(MRM' + Q\right)^{-1} (y_t-M\mu_{t|t-1}) \notag\\
+    \left(M\Sigma_{t|t-1}M' + Q\right)^{-1} (y_t-M\mu_{t|t-1}) \notag\\
   \Sigma_{t|t} =&& 
     \text{Var}(s_t|y_t, \mathcal{I}_{t-1})
     &= \Sigma_{t|t-1} - \Sigma_{t|t-1}M' 
-    \left(MRM' + Q\right)^{-1} M\Sigma_{t|t-1} \notag
+    \left(M\Sigma_{t|t-1}M' + Q\right)^{-1} M\Sigma_{t|t-1} \notag
 \end{alignat}
 Echoing the last subsections intuition section, this
 result has a very nice interpretation. We see that our
@@ -530,18 +539,18 @@ $\Sigma_{t|t-1}$.
 mean and variance estimates, we can apply the law of
 motion as written in State Transition Equation \ref{ste} to get the mean and variance of the forecast for
 the states:
-\begin{align*}
-  E[s_{t+1}|\;\mathcal{I}_{t}] &= 
+\begin{alignat*}{3}
+  \mu_{t+1|t} =&& E[s_{t+1}|\;\mathcal{I}_{t}] &= 
     E[Ts_t + \varepsilon_t |\;\mathcal{I}_{t}] = 
     TE[s_t | \mathcal{I}_{t}] 
     + E[\varepsilon_t |\;\mathcal{I}_{t}]  \\
-    &= T\mu_{t|t} + 0 = T\mu_{t|t} \\
-  \text{Var}(s_{t+1}|\;\mathcal{I}_{t})
+    && &= T\mu_{t|t} + 0 = T\mu_{t|t} \\
+  \Sigma_{t+1|t} = &&\text{Var}(s_{t+1}|\;\mathcal{I}_{t})
   &= \text{Var}(Ts_t + \varepsilon_t |\;\mathcal{I}_{t})
   = T[\text{Var}(s_t|\;\mathcal{I}_{t})]T'
   + \text{Var}(\varepsilon_t|\;\mathcal{I}_{t}) \\
-  &= T\Sigma_{t|t}T' + R
-\end{align*}
+  && &= T\Sigma_{t|t}T' + R
+\end{alignat*}
 A similarly straightforward application and writing-out of
 the measurement equation will yield the following forecast
 mean and variance for the observables:
