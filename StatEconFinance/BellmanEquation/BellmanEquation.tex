@@ -40,9 +40,9 @@
 %\tableofcontents %adds it here
 
 
-\section{Introduction}
+\section{Shortest Path Problem}
 
-The shortest path problem has the following features:
+To get the intuition for the Bellman Equation, we will consider the shortest path problem, which has the following features:
 \begin{enumerate}
 
     \item You want to get from point $1$ to $N$.
@@ -56,10 +56,10 @@ The shortest path problem has the following features:
 
 Therefore, we want a general solution to the problem that
 provides us with the \emph{least cost} path to travel from
-$1$ to $N$.
+$1$ to $N$. 
 
 
-\section{The Bellman Equation}
+\subsection{The Bellman Equation}
 
 Suppose that at every single node, $i \in \{1, \ldots, N\}$, we \emph{knew}
 the least-cost path to get from node $i$ to node $N$. Of course we don't,
@@ -91,7 +91,7 @@ In words, this equation says
 The best solution to our problem must, therefore, satisfy Equation
 \ref{bellman}.
 
-\section{Solving for $J$}
+\subsection{Solving for the Minimum Cost Function, $J$}
 
 We now detail the standard algorithm to find $J$.
 \begin{enumerate}
@@ -110,6 +110,125 @@ We now detail the standard algorithm to find $J$.
 
 \end{enumerate}
 The solution thus propagates back from the destination node, $N$.
+
+
+\section{Infinite Horizon Dynamic Programming}
+
+\subsection{The Problem}
+
+Suppose that an infinitely-lived agent gets utility in period
+$t$ from consuming $y_t$. The variable $y_t$ is called the
+\emph{control}; its value is chosen by the agent at time $t$
+given some pre-determined value, $x_t$. Between periods,
+$x_{t+1}$ is a deterministic function of $x_t$ and $y_t$, i.e.
+\begin{align}
+  \label{xevol}
+  x_{t+1} = g(x_t, y_t)
+\end{align}
+subject to initial condition $x_0$.
+
+Next, our problem is to maximize discounted lifetime utility: 
+\begin{align}
+  \label{toughproblem}
+  \sum^\infty_{t=0} \beta^t u(y_t)
+  \qquad \beta\in (0,1)
+\end{align}
+by choosing an feasible optimal path $\{ y_t \}_0^\infty$, again
+subject to an initial condition $x_0$.  Here,
+``optimal'' means utility maximizing. Typically, feasibility
+will be determined by some sort of resource constraint or
+restriction to non-negativity of the sequence(s) $\{ y_t \}$
+and/or $\{x_t\}$. 
+
+\subsection{Policy Function Approach}
+
+Choosing an optimal path $\{y_t\}_0^\infty$ directly is hard. It
+amounts to selecting a point in infinite-dimensional space.
+But in most cases, we can do something easier. Specifically,
+we'll seek a \emph{policy function}---some function or
+``decision rule'' $\sigma$ such that 
+\begin{align}
+  \label{markov}
+  y_t = \sigma(x_t) = \sigma(g(x_{t-1}, y_{t-1}))
+  \qquad \sigma \in \Sigma
+\end{align}
+where $\Sigma$ is the set of all feasible policies. 
+
+Now a well-known result from dynamic programming says that, in
+the types of problems we want to consider, an optimal
+consumption sequence must be Markov just as it is above in
+Equation \ref{markov}, so that a policy function $\sigma$ will,
+indeed, exist and everything will work. This function $\sigma$
+will also be time-homogeneous, so it will remain the same for
+all $t$.
+
+Now we can rewrite the problem as expressed in
+(\ref{toughproblem}) and (\ref{xevol}) in terms of the policy
+function:
+\begin{align}
+  \label{policyapproach}
+  \max_{\sigma \in \Sigma} 
+  &\left\{ \sum^\infty_{t=0} \beta^t u(\sigma(x_t)) \right\}\\
+  \text{where} &\quad
+  x_{t+1} = g(x_t, \sigma(x_t)) \notag
+\end{align}
+where the initial condition $x_0$ is given. Since $g$ is
+assumed deterministic, we see that the only unknown in the
+problem written above is the policy function, $\sigma$. We have
+everything else we need.
+
+So we see the crux of the policy function approach. Rather than
+specifying a utility-maximizing infinite sequence
+$\{y_t\}^\infty_0$, we find a single function $\sigma$ that
+provides a map or decision rule to go from initial condition ($x_t$) to optimal choice for the control ($y_t$).
+This choice then propagates to the next period via deterministic
+$g$ to define the next initial condition.
+
+\subsection{Dynamic Programming Solution}
+
+We will solve for the optimal policy function using dynamic
+programming. But first, for each feasible policy $\sigma\in
+\Sigma$, define a \emph{policy value
+function}:
+\begin{align*}
+  v_\sigma(x_0) :=
+  \left\{ \sum^\infty_{t=0} \beta^t u(\sigma(x_t)) \right\}
+\end{align*}
+This gives the utility conditional on a policy and a initial
+condition.  Our goal will be to choose the \emph{optimal}
+policy, i.e. the policy function that yields the highest utility
+over the set of all $\sigma \in \Sigma$.
+
+Explicitly, we define \textbf{the} \emph{value function} for
+our optimization problem as 
+\begin{align}
+  \label{valfn}
+  v^*(x_0) := \sup_{\sigma\in\Sigma} \; v_\sigma(x_0)
+\end{align}
+A policy is called ``optimal'' if it attains the supremum in
+(\ref{valfn}) for all $x_0$. 
+\\
+\\
+We can better understand Our just-defined function $v^*$ if we
+compare it to the minimum-cost function $J$ in the Shortest Path
+problem above.
+\begin{enumerate}
+  \item Here, $v^*$ is a function of only the initial condition,
+    as $J$ was a function only of the starting node.
+  \item Moreover, $v^*$ does not depend upon a policy since we
+    optimize over all policies. Similarly, $J$ didn't depend on
+    the path we took since we optimized over all paths.
+\end{enumerate}
+
+Now with this definition of the value function in hand, we can
+define a Bellman Equation for our optimization problem: 
+\begin{align*}
+  v^*(x) = \max_{y} \left\{ u(y) + \beta v^*( \right\}
+\end{align*}
+
+
+
+
 
 
 
