@@ -115,18 +115,25 @@ The solution thus propagates back from the destination node, $N$.
 
 \section{Infinite Horizon Dynamic Programming}
 
+
 \subsection{The Problem and the Objective}
 
 Suppose that an infinitely-lived agent gets utility in period
 $t$ from consuming $y_t$. The variable $y_t$ is called the
 \emph{control}; its value is chosen by the agent at time $t$
-given some pre-determined value, $x_t$. Between periods,
-$x_{t+1}$ is a deterministic function of $x_t$ and $y_t$, i.e.
+given some pre-determined value, $x_t$, called the \emph{state}.
+Between periods, $x_{t+1}$ is a deterministic function of $x_t$ and
+$y_t$, i.e.
 \begin{align}
   \label{xevol}
   x_{t+1} = g(x_t, y_t)
+  \qquad
+  \text{$x_0$ given}
 \end{align}
-subject to initial condition $x_0$.
+Typically, the function $g$ will
+involve some tradeoff between $y_t$ and $x_{t+1}$. So given
+$x_t$, the more $y_t$ an agent chooses today, the less $x_{t+1}$ he
+gets next period. 
 
 Next, our problem is to maximize discounted lifetime utility: 
 \begin{align}
@@ -134,14 +141,19 @@ Next, our problem is to maximize discounted lifetime utility:
   \sum^\infty_{t=0} \beta^t u(y_t)
   \qquad \beta\in (0,1)
 \end{align}
-by choosing an feasible optimal path $\{ y_t \}_0^\infty$, again
+by choosing an feasible and optimal path $\{ y_t \}_0^\infty$, again
 subject to an initial condition $x_0$.  Here,
 ``optimal'' means utility maximizing. Typically, feasibility
 will be determined by some sort of resource constraint or
 restriction to non-negativity of the sequence(s) $\{ y_t \}$
 and/or $\{x_t\}$. 
 
-To make things simpler, we also define a bit of notation for feasibility. At time $t$, the set of all feasible $y_t$ is denoted $\mathcal{F}_t$. Therefore, $y_t$ is feasible if $y_t\in \mathcal{F}_t$. More generally, a sequence $\{y_t\}^\infty_0$, abbreviated $\{y_t\}$, is feasible if $\{y_t\} \subset \mathcal{F}$.
+To make things simpler, we also define a bit of notation for
+feasibility. At time $t$, the set of all feasible $y_t$ is denoted
+$\mathcal{F}_t$. Therefore, $y_t$ is feasible if $y_t\in
+\mathcal{F}_t$. More generally, a sequence $\{y_t\}^\infty_0$,
+abbreviated $\{y_t\}$, is feasible if $\{y_t\} \subset \mathcal{F}$.
+
 
 \subsection{Value Function and Bellman Equation}
 
@@ -154,21 +166,44 @@ defining the value function, $v^*$:
   \qquad
   \text{$x_0$ given}
 \end{align*}
-With the value function defined, we can now write the Bellman Equation, which looks very similar to the Shortest Path problem described above:
-\begin{equation}
-  v^*(x_t) = \max_{y_t \in \mathcal{F}_t} 
-  \left\{ u(y_t) + \beta \; v^*\big(g(x_t, y_t)\big) \right\}
-\end{equation}
+With the value function defined, we can now write the Bellman
+Equation, which looks very similar to what we had for the Shortest
+Path problem described above:
+\begin{align}
+  v^*(x_t) &= \max_{y_t \in \mathcal{F}_t} 
+  \left\{ u(y_t) + \beta \; v^*\big(g(x_t, y_t)\big) \right\} \\
+    \text{By (\ref{xevol})} \quad \Leftrightarrow \quad 
+  &= \max_{y_t \in \mathcal{F}_t} 
+    \left\{ u(y_t) + \beta v^*(x_{t+1}) \right\} \notag
+\end{align}
+Intuitively, this equation says that you maximize the value from the
+current state, $x_t$, by trading off current reward, $u(y_t)$, in
+exchange for the discounted future value of the resulting state,
+$\beta v^*(x_{t+1})$.
+
+Since we've formulated the problem in Bellman terms, it's clear that
+we'll eventually want to apply dynamic programming methods to solve
+for the value function $v^*$. That's what we did in the Shortest Path
+problem above; it's likely that we'll want to do the same here.
+And indeed, we will.
+
+\emph{However}, solving for the value function $v^*$ above doesn't
+\emph{quite} give us what we want. We don't just want to know the
+maximum lifetime utility of an agent; we want to know what path they
+will choose for the control. We want to know $\{y_t\}_0^\infty$. To
+solve for this sequence, we now discuss the policy function approach,
+which allows us to redefine the motivating problem and the Bellman
+Equation in simpler, more practical terms. 
 
 
+\subsection{The Policy Function Approach}
 
-\subsection{Policy Function Approach}
-
-Choosing an optimal path $\{y_t\}_0^\infty$ directly is hard. It
-amounts to selecting a point in infinite-dimensional space.
-But in most cases, we can do something easier. Specifically,
-we'll seek a \emph{policy function}---some function or
-``decision rule'' $\sigma$ such that 
+Even if we can solve for the value function, $v^*(k_0)$, directly specifying an
+optimal path $\{y_t\}_0^\infty$ is hard. It amounts to
+selecting a point in infinite-dimensional space.  But in most cases,
+we can do something easier. Specifically, we'll seek a \emph{policy
+function}---some function or ``decision rule'' $\sigma$ that depends
+upon the current state such that 
 \begin{align}
   \label{markov}
   y_t = \sigma(x_t) = \sigma(g(x_{t-1}, y_{t-1}))
@@ -176,15 +211,13 @@ we'll seek a \emph{policy function}---some function or
 \end{align}
 where $\Sigma$ is the set of all feasible policies. 
 
-Now a well-known result from dynamic programming says that, in
-the types of problems we want to consider, an optimal
-consumption sequence must be Markov just as it is above in
-Equation \ref{markov}, so that a policy function $\sigma$ will,
-indeed, exist and everything will work. This function $\sigma$
-will also be time-homogeneous, so it will remain the same for
-all $t$.
+Now a well-known result from dynamic programming says that, in the
+types of problems we want to consider, an optimal consumption sequence
+must be Markov just as in Equation \ref{markov} above, so that a
+policy function $\sigma$ will, indeed, exist.  This function $\sigma$
+will also be time-homogeneous, so it will remain the same for all $t$.
 
-Now we can rewrite the problem as expressed in
+Now we can rewrite our motivating problem as expressed in
 (\ref{toughproblem}) and (\ref{xevol}) in terms of the policy
 function:
 \begin{align}
@@ -192,19 +225,20 @@ function:
   \max_{\sigma \in \Sigma} 
   &\left\{ \sum^\infty_{t=0} \beta^t u(\sigma(x_t)) \right\}\\
   \text{where} &\quad
-  x_{t+1} = g(x_t, \sigma(x_t)) \notag
+  x_{t+1} = g(x_t, \sigma(x_t)) 
+  \qquad \text{$x_0$ given}
+  \notag
 \end{align}
-where the initial condition $x_0$ is given. Since $g$ is
-assumed deterministic, we see that the only unknown in the
-problem written above is the policy function, $\sigma$. We have
+Since $g$ is assumed deterministic, we see that the only unknown in
+the problem written above is the policy function, $\sigma$. We have
 everything else we need.
 
-So we see the crux of the policy function approach. Rather than
-specifying a utility-maximizing infinite sequence
-$\{y_t\}^\infty_0$, we find a single function $\sigma$ that
-provides a map or decision rule to go from initial condition ($x_t$) to optimal choice for the control ($y_t$).
-This choice then propagates to the next period via deterministic
-$g$ to define the next initial condition.
+So we now see the crux of the policy function approach. Rather than
+specifying a utility-maximizing infinite sequence $\{y_t\}^\infty_0$,
+we find a single function $\sigma$ that provides a map or decision
+rule to go from the state ($x_t$) to the optimal choice for the
+control ($y_t$).  This choice then propagates to the next period via
+deterministic $g$ to define the state next period.
 
 \subsection{Dynamic Programming Solution}
 
