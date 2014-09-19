@@ -14,17 +14,18 @@
 
 %% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%\pagestyle{fancy} 
-%\lhead{}
-%\rhead{}
-%\chead{}
-%\setlength{\headheight}{15.2pt} 
+\usepackage{fancyhdr}
+\pagestyle{fancy} 
+\rhead{Matthew D. Cocci}
+\lhead{Singular Value Decomposition and PCA}
+\chead{}
+\setlength{\headheight}{15.2pt} 
     %---Make the header bigger to avoid overlap
 
-%\renewcommand{\headrulewidth}{0.3pt} 
+\renewcommand{\headrulewidth}{0.3pt} 
     %---Width of the line
 
-%\setlength{\headsep}{0.2in}    
+\setlength{\headsep}{0.2in}    
     %---Distance from line to text
             
 
@@ -47,6 +48,7 @@
 %% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \usepackage[T1]{fontenc}
+\usepackage{lmodern}
 \usepackage[utf8]{inputenc}
 %\usepackage{blindtext}
 
@@ -131,47 +133,29 @@
 
 
 \begin{document}
-\maketitle
+%\maketitle
 
 %\tableofcontents 
 
-\section{Introduction}
-
-\section{Canonical Problem: The System of Linear Equations under the Row and Column Interpretations}
-
-Linear algebra's founding problem is likely the task of solving the simple system of linear equations:
-\begin{equation}
-    \label{canonical}
-    Ax = b
-\end{equation}
-For now, assume $A$ is $p\times p$. There are two ways to think of this equation:
-\begin{enumerate}
-    \item {\sl Row Interpretation}: We think of each row in the equation as defining a line in $p$ dimensional place. The solution is where those lines intersect.
-    \item {\sl Column Interpretation}: A solution to the equation exists if and only if $b$ is in the column space of $A$. More explicitly, there is a solution if and only if $b$ can be written as a linear combination of the $p$ vectors defined by the columns of $A$.
-\end{enumerate}
-The latter interpretation is very powerful. We see that the column space of $A$---the set of all linear combinations of the columns of $A$---is crucial to characterizing the matrix $A$. 
-
-For example, if the columns of $A$ are linearly independent, then the matrix, in a sense, ``covers'' the entire $p$-dimensional space. We can thus solve \emph{any} equation like Equation \ref{canonical} because $b$ will certainly lie within the column space of $A$. Thus, we can find some $x$ such that $Ax=b$. 
-
-We only potentially run into problems if the columns aren't linearly independent. So if the rank of the matrix is $k<p$, only a $k$-dimensional hyperplance embedded within $\mathbb{R}^p$ is covered by the columns of $A$. And $b$ might not lie in that subspace. This very possibility manifests itself in the non-invertability of $A$, which prevents us from trivially solving the system via $x = A^{-1}b$, for the very reasons just discussed.
-
-
-\section{Eigenvectors and Eigenvalues}
 \section{The Singular Value Decomposition}
 
 The singular value decomposition is a useful decomposition that works for \emph{any} matrix, which is part of the reason for its popularity. At it's most fundamental, the singular value decomposition amounts to the following: 
 \begin{quotation}
-    SVD breaks down any matrix into a three-matrix product, $A = U\Sigma V^T$. Geometrically, $A$ is the mapping of an orthonormal basis, $V^T$, into another orthonormal basis $U$, where the different basis elements of $V$ are \emph{stretched} by the values in $\Sigma$. 
+\noindent
+SVD breaks down any matrix into a three-matrix product: 
+  \[
+    A = U\Sigma V^T
+\]
+Geometrically, $A$ is the mapping of an orthonormal basis, $V^T$, into another orthonormal basis $U$, where the different basis elements of $V$ are \emph{stretched} by the values in the diagonal matrix $\Sigma$. 
 \end{quotation}
-So in the following subsection, we'll build up intuition by imposing different conditions on the $A$ matrix, and then seeing how we might find those orthonormal bases. To visualize this, we'll often display a grid whose axes we rotate to line up along the directions indicated by the basis in $V^T$. Then, we can see where those axes and gridpoints get mapped to, so that the new axes are along the basis defined in $U$.
+In the following subsection, we'll build up intuition by imposing different conditions on the matrix $A$, and then seeing how we might find those orthonormal bases, $U$ and $V$. 
 
 
 \subsection{Intuition}
 
-The intuition for the singular value decomposition comes down to simply notions like stretching and rotating. So we'll start with very simple examples, then consider increasingly complicated and general matrices.
-\\
-\\
-{\sl Diagonal Matrix}: So to begin, consider any diagonal matrix:
+The intuition for the SVD comes down to simple notions like stretching and rotating. So we'll start with very simple examples, then consider increasingly general matrices.
+\begin{enumerate}
+\item {\sl Diagonal Matrices}: To begin, consider any diagonal matrix,
 \[ 
     A = 
     \begin{pmatrix}
@@ -186,21 +170,72 @@ The intuition for the singular value decomposition comes down to simply notions 
     Ax = \begin{pmatrix} a_1 x_1 \\ a_2 x_2 \\ \vdots \\
         a_n x_n \end{pmatrix}
 \]
-It's quite clear that if $x$ is vector, the result of the product $Ax$ is merely a \emph{stretched} version of $x$. The $i$th coordinate, $x_i$, is simply stretched by $a_i$ along the $i$th axis. If we consider the map and vector
+It's quite clear that if $x$ is vector, the result of the product $Ax$ is merely a \emph{stretched} version of $x$. The $i$th coordinate, $x_i$, is simply stretched by $a_i$ along the $i$th axis. 
+\[ \text{Figure} \]
+
+\item {\sl Symmetric Matrices}: Next, suppose that instead of having $A$ diagonal, it is (more generally) just symmetric so that $A^T = A$. Then $A$ must have $n$ (not necessarily distinct) eigenvalues and $n$ distinct eigenvectors, where the eigenvectors are also orthogonal.\footnote{These are all properties of symmetric matrices.} Now why does this matter? 
+
+At first blush, since $A$ isn't diagonal, we seem to have lost the direct interpretation about $A$ stretching each coordinate of a vector along a Cartesian axis. \emph{However}, it so happens that the eigenvectors (by definition) define special axes along which vectors are stretched when multiplied by $A$.  
+\[ \text{Figure} \]
+Just as a diagonal matrix \emph{stretches} each vector element in the direction of its corresponding Cartesian axis, so too does a symmetric matrix stretch all vector elements along \emph{special} axes defined the orthogonal eigenvectors. Note the degree of stretching is determined by the corresponding eigenvalue for an eigenvector axis. 
+
+\item {\sl General Matrices}: For any abitrary matrix, $A$, we might ask ourselves ``Can we define a special set of axes such that vectors lying along any of these special axes simply stretch in the direction of those axes.'' The answer: yes, as we'll see below.
+
+
+\end{enumerate}
+But first, before proving that such special axes exist for any arbitrary
+matrix, $A$, let's fully develop the ideas from above.
+
+
+\subsection{The SVD Representation}
+
+Suppose that we can choose a set of orthogonal unit
+vectors, $\{v_1,\ldots,v_n\}$ such that the mapped vectors,
+$\{Av_1,\ldots,Av_n\}=:\{\sigma_1 u_1, \ldots, \sigma_n u_n\}$, are also
+orthogonal, where the $u_i$ are all unit vectors and the $\sigma_i$
+scale those unit vectors appropriately to match the $Av_i$.\footnote{In
+subsequent subsections, we'll show how to actually find
+$\{v_1,\ldots,v_n\}$.}
+
+Next, recall that we can express any arbitrary vector $x\in\mathbb{R}^n$
+in terms of any arbitrary orthogonal basis for $\mathbb{R}^n$ (like
+$\{v_1,\ldots,v_n\}$ as follows:
 \[
-    A = \begin{pmatrix} 3 & 0 \\ 0 & 2 \end{pmatrix}
-    \qquad x =\begin{pmatrix} 1 \\ 1  \end{pmatrix}
+  x = \sum^n_{i=1} \langle v_i, x\rangle v_i
 \]
-we see what happens when we apply $A$ to $x$:
+That is, project $x$ onto a special axis defined by $v_i$, multiply the
+resulting scalar by the $v_i$, and sum them up. As a result, we can
+write 
+\begin{align*}
+  Ax &= A\left(\sum^n_{i=1} \langle v_i, x\rangle v_i\right)
+  = \sum^n_{i=1} \langle v_i, x\rangle A v_i
+  = \sum^n_{i=1} \langle v_i, x\rangle \sigma_i u_i\\
+  \Leftrightarrow \quad &= \sum^n_{i=1} u_i \sigma_i (v_i^T x)\\
+\end{align*}
+where we played fast-and-loose with the ordering of terms (though it all
+checks out). Finally, let's remove $x$ from both sides to get
+\begin{align*}
+  A = \sum^n_{i=1} u_i \sigma_i v_i^T 
+  \qquad \Leftrightarrow \qquad
+  A = U \Sigma V^T
+\end{align*}
+where $U$ has columns $\{u_1,\ldots,u_n\}$ and $V$ has columns
+$\{v_1,\ldots,v_n\}$. The righthand express is the textbook
+representation you often see for the SVD.
+\\
+\\
+{\sl Interpretation}: We've just written arbitrary matrix $A$ as the
+product of three matrices:
+\begin{itemize}
+  \item $V$: An orthonormal basis in the domain of $A$.
+  \item $U$: An orthonormal basis in the range of $A$.
+  \item $\Sigma$: How much to stretch the vectors in $V$ to get the
+    vectors of $U$.
+\end{itemize}
 
-{\sl Symmetric Matrix}: Next, suppose that instead of having $A$ diagonal, it is (more generally) just symmetric so that $A^T = A$. Thus, $A$ will have $n$ eigenvalues and eigenvectors, where the eigenvectors are also orthogonal.\footnote{This is a property of symmetric matrices.} Now why does this matter? 
 
-At first blush, since $A$ isn't symmetric, we've lost the interpretation about $A$ stretching each coordinate of a vector along an axis. \emph{However}, it so happens that the eigenvectors (by definition) define special axes along which vectors are stretched when multiplied by $A=A^T$.  Just as a diagonal matrix \emph{stretches} each vector coordinate in the direction of its corresponding Cartesian axis, so too does a symmetric matrix \emph{stretch} each vector coordinate along a special axis defined by the eigenvectors. Note the degree of stretching is determined by the corresponding eigenvalue for an eigenvector axis. 
 
-So let's take an example. Suppose that we have the following matrix, whose eigevalues and eigenvectors are also listed
 
-So we see that symmetric matrices are akin to diagonal matrices;
-up to a rotation of the axes \emph{from} the usual Cartesian basis \emph{to} a special basis defined by the eigenvectors.
 
 
 
