@@ -135,7 +135,83 @@ Notes based on: www.atlassian.com/git/tutorial/
 
   where the -U denotes "upstream."
   
-  
+
+-- Git Branches --                
+
+    Branch: Practically speaking, branches are typically independent
+    lines of deveopment. From the standpoint of Git, a branch is just a
+    moveable pointer to a commit (there's no large-scale copying over
+    done). Developing different branches consists of making commits that
+    differ across branches, so that the pointers follow different,
+    divergent sequences of commits.
+
+    master: The default branch that is set up by Git. 
+    HEAD: Special file that is a pointer to your current branch.
+
+
+    git branch              List all branches in your repo; the branch
+                            with a * is your currently active branch,
+                            i.e.  the branch HEAD points to
+    git branch --merged     List branches that have been merged to the
+                            branch you are currently on; usually, the
+                            branches that show up are safe to delete
+    git branch --no-merged  List the branches that have work you haven't
+                            yet merged into the branch you're currently
+                            working on
+    git branch <br>         Create new branch called <br>---a pointer
+                            that points to the most recent commit; note
+                            this does NOT checkout the new branch (i.e.
+                            does not change HEAD so that it points to
+                            <br>)
+    git checkout <br>       Switch to a different branch; this changes
+                            the pointer HEAD so that it points to <br>;
+                            also changes all files in the working tree
+                            so that they match the most recent commit
+                            that branch <br> points to
+    git checkout -b <br>    Create and checkout <br>; shorthand for the
+                            command "git branch <br>" followed by "git
+                            checkout <br>"
+    git merge <br>          Merge changes from branch <br> into you
+                            current branch (i.e. whatever HEAD) is
+                            pointing to when you run this command 
+    git mergetool           Visual merging tool for resolving conflicts
+    git branch -d <br>      Delete specified branch; only works if no
+                            unmerged changes; often used after you
+                            finish work on certain code which you then
+                            merge back into main branch
+    git branch -D <br>      Force delete branch even if unmerged    
+                            changes; probably don't do this
+    git branch -m <br>      Rename the current branch as <branch>
+
+
+    -- Merging Particulars --
+    
+    For merging, the process is always the same. Checkout the branch you
+    want to merge into; then merge changes from another branch into your
+    current checked-out branch.
+
+    Now suppose you merge two branches such that the branches point to
+    two separate commits that have a simple parent-child relationship.
+    This happens when you create a branch, update some code, and try to
+    merge this updated branch back to the main codebase branch. Then
+    this results in a "fast-forward" merge where Git simply advances the
+    pointer forward to the commit with the updated code.
+
+    Next, suppose you merge two branches with _divergent_ histories.
+    That means you're merging the code from two commits that don't have
+    a simple parent-child relationship; the branches started from some
+    common ancestor commit, but there have been subsequent and separate
+    commits to each branch. Whenever you merge branches like this, Git
+    will create a special "merge commit" since it cannot proceed with a
+    simple "fast-forward" commit as we had above.
+
+    Sometimes a merge won't go smoothly since lines of a file will have
+    been modified differently accross branches. Here, you need to take a
+    stance and select the changes you want. You can see which files
+    weren't merge successfully by running "git status" after you merge
+    command. You can also run "git mergetool" to get a visual merging
+    tool.
+
 
 -- Checking Out --
 
@@ -242,43 +318,6 @@ Notes based on: www.atlassian.com/git/tutorial/
     bludgeon you with a fine Rawlings ashwood bat.
                 
                 
-
--- Git Branches --                
-
-    Branch: an independent line of deveopment
-
-
-    git branch            List all branches in your repo
-    git branch <branch>        Create new branch called <branch>,
-                although it does NOT checkout
-                the new branch
-    git branch -d <branch>  Delete specified branch; only
-                works if no unmerged changes; 
-                use after you finish and merge
-                code back into main branch
-    git branch -D <branch>  Force delete branch even if unmerged    
-                changes
-    git branch -m <branch>  Rename the current branch as <branch>
-
-
-    git checkout <existing-br>        Check out the specified branch
-                    making <existing-br> the 
-                    current branch, updating
-                    working dir to match
-    git checkout -b <new-br>        Create and checkout <new-br>
-    git checkout -b <new-br> <existing-br>
-                    Create and checkout <new-br>,
-                    breaking it off of 
-                    <existing-br>, not the 
-                    current branch.
-
-
-    NOTE: Branches are just pointers to commits. There's no
-    huge copy-over of files
-    NOTE: You can switch working on multiple feature branches by 
-    switching between them with checkout.
-
-
 
 -- Configuration --
 
