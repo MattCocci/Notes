@@ -1,19 +1,161 @@
+========================================================================
+== Intro .c File =======================================================
+========================================================================
 
-gcc
----
+/* Comments about file contents */
 
-GNU C compiler. Sample use
+/* #include statements that pull in both standard and local libraries */
 
-  gcc -Wall -g -O0 infilename.c -o outfilename.o
+#include <stdio.h>  // Basic input output 
+#include "lcl.h"    // Local library 
 
-Options
--------
--Wall   Enables (almost) compiler warnings
--g -O0  Embed debugging info and disable optimization.
-        Disabling optimation will make sure your code is
-        compiled AS IS.  Otherwise, declared variables may not
-        exist at all.  Some statements might not be executed.
-        Etc. The -O0 disables that ish.
+/* Function prototypes and preprocessor definitions */
+
+int main(int argc, char *argv[]) 
+{
+  int N = 1;
+  printf("Program %d", N);
+
+  return = 0;
+}
+
+
+int otherfcn() 
+{
+  declare variables;
+  program statements;
+}
+
+========================================================================
+== Compiling and Makefiles =============================================
+========================================================================
+
+Unlike Matlab, R, and Python, C is a compiled language rather than
+interpreted language. In Python, you type things or execute a function
+and the program proceeds line-by-line to call the functions needed to
+run on the fly (more or les).
+
+Instead, with C, you don't just run the program. You first compile the
+program, at which point the compiler will import and call all the
+necessary functions to build an executable file. That executable file is
+what you run. You don't run the source code file. You run the
+executable.
+
+Therefore, once you have created the source code that constitutes your
+program, you have to do the compiling. There are 2 approaches:
+
+
+gcc or cc
+---------
+These programs can be run as follows
+
+  gcc infilename.c -o exname
+
+or
+
+  cc infilename.c -o exname
+
+gcc and cc are two different compilers. For now, you can use either.
+Both will take the source code file infilename.c and compile it into an
+executable called "exname." You run that with "./exname"
+
+The options -Wall passed to gcc will show all warnings.
+
+
+Make Files
+----------
+Makefiles are an easy way to automate tasks and stitch programs
+together. They will also detect when changes do and don't need to be
+made and execute appropriately. 
+
+For example, you might run
+  
+  make prog
+
+Then, "make" will look in the current directory for "prog.c", run the
+correct compiler on it, and output an executable "prog." You can see
+that everything done or specified mannually above is done automatically
+by make.
+
+You can also create a Makefile (spelled and named exactly that way) and
+throw options and other capabilities in there. For example, Makefile
+could contain
+  
+  CFLAGS=-Wall -g
+
+  clean:
+    rm -f prog
+
+Then, when you run "make prog", you'll run it with warnings on and with
+debugging information (-Wall and -g respectively). Also, when you run
+"make clean", you'll clean up the project by executing the commands
+under "clean."
+
+  CFLAGS=-Wall 
+
+  all: prog1 prog2
+
+  clean:
+    rm -f prog
+
+Now, if you run simply "make", you will compile prog1.c and prog2.c.
+You could even put more commands under clear to automate more tasks.
+
+NOTE: Makefiles require tabs not spaces instead of tabs on indenting.
+
+========================================================================
+== #include Files ======================================================
+========================================================================
+
+These are at the top of the files, you specify the files/libraries to
+import/include in your .c file. Some useful ones below. Most have file
+extension "h" for "header."
+
+stdio.h   Standard input/output (including printf)
+ctype.h   
+math.h
+stdlib.h
+string.h
+time.h
+
+========================================================================
+== Datatypes and Formatted Printing ====================================
+========================================================================
+
+The datatype of an object/variable determines the set of values it can
+have and what operations can be performed on it. Below are the different
+data types available, the formatting code to use with printf (covered
+below), and how they are declared (for a few of the types)
+
+- Numeric
+  - short 
+  - long (%ld)
+  - int (%d)
+  - float (%f)
+  - double (%f)
+- Character
+  - char (%c): char mychar = 'A';
+  - string (%s): char mystring[] = "A string"; 
+    ^This is special/weird. It's an array of chars. No string primitive
+- User defined
+  - struct 
+  - union
+
+========================================================================
+== Formatted Printing ==================================================
+========================================================================
+
+In the <stdio.h> library.
+
+Example usage:
+
+  printf("%s is %d years old.\n", "Bob", 34);
+
+
+
+===============================================================
+== Debugging ==================================================
+===============================================================
 
 gdb
 ---
@@ -36,51 +178,15 @@ Here are some associated commands:
   help command            in-program help 
 
 
-valgrid
+valgrind
 -------
 
-Diagnoses memory-related problems
+Diagnoses memory-related problems for a compiled program
 
-  valgrind ./program.o
+  valgrind --track-origins=yes ./program
 
-
-
-===============================================================
-== Structure of a .c file =====================================
-===============================================================
-
-/* Comments about file contents */
-
-/* #include statements to both standard and local libraries */
-#include <stdio.h>  /* Basic input output */
-#include "lcl.h"    /* Local library */
-
-/* Function prototypes and preprocessor definitions */
-
-Define main() function
-{
-  Body
-}
-
-Define other function
-{
-  declare variables;
-  program statements;
-}
-
-===============================================================
-== #include Files =============================================
-===============================================================
-
-At the top of the files, you specify the files/libraries to
-import/include in your .c file. Some useful ones
-
-stdio.h   Standard input/output
-ctype.h   
-math.h
-stdlib.h
-string.h
-time.h
+Note: you need to pass that funky argument because Ubuntu is weird and
+doesn't print the line numbers otherwise.
 
 
 ===============================================================
@@ -112,18 +218,6 @@ time.h
     int a, b, c = 0, d = e = 4;
     int x, y, z; x = 2*y + 3*z;
     char c='A';
-
-===============================================================
-== Datatypes ==================================================
-===============================================================
-
-- The datatype of an object/variable determines the set of
-  values it can have and what operations can be performed on it.
-
-- C Datatypes
-  - Numeric: int, float, double
-  - Character: char
-  - User defined: struct, union
 
 
 
