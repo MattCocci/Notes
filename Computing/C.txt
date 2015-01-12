@@ -5,7 +5,6 @@
 /* Comments about file contents */
 
 /* #include statements that pull in both standard and local libraries */
-
 #include <stdio.h>  // Basic input output 
 #include "lcl.h"    // Local library 
 
@@ -13,18 +12,54 @@
 
 int main(int argc, char *argv[]) 
 {
-  int N = 1;
-  printf("Program %d", N);
+  if(argc != 2) {
+    return 1; // Abort program if condition not met
+  }
 
+  int N = 1;
+  printf("Program %d", N); 
   return = 0;
 }
 
 
-int otherfcn() 
+int otherfcn1() 
 {
-  declare variables;
-  program statements;
+  // declare variables;
+  // program statements;
 }
+
+void otherfcn2() 
+{
+  // declare variables;
+  // program statements;
+}
+
+
+
+
+Structure of a C Program
+------------------------
+Here's how a C program is run: the OS loads your program and runs the
+function "main." For this main function to be complete, it must
+
+  - Return an integer
+  - Take as arguments an int, argc (that counts the number of
+    arguments), and an array of char strings for the arguments, argv.
+
+Note, argc includes the name of the program itself. So if one argument
+is passed when calling the program, argc=2. We use *argv[] to represent
+an array of strings that include the program name and all arguments. See
+below for more on arrays of strings.
+
+
+int main(void)        
+
+  This accepts no arguments, outputs 0 if
+  successful, non-zero int otherwise.
+
+int main(int argc, char **argv):
+
+  This acceps command line arguments.
 
 ========================================================================
 == Compiling and Makefiles =============================================
@@ -88,11 +123,15 @@ could contain
     rm -f prog
 
 Then, when you run "make prog", you'll run it with warnings on and with
-debugging information (-Wall and -g respectively). Also, when you run
+debugging information (-Wall and -g, which show all warnings and
+incorporate debugging information, respectively). Also, when you run
 "make clean", you'll clean up the project by executing the commands
-under "clean."
+under "clean." 
 
-  CFLAGS=-Wall 
+To compile multiple programs with a single Makefiles, you might put in
+"Makefile" the following instructions:
+
+  CFLAGS=-Wall -g
 
   all: prog1 prog2
 
@@ -102,15 +141,16 @@ under "clean."
 Now, if you run simply "make", you will compile prog1.c and prog2.c.
 You could even put more commands under clear to automate more tasks.
 
-NOTE: Makefiles require tabs not spaces instead of tabs on indenting.
+NOTE: Makefiles require TABS (NOT spaces to mimic tabs) for indentation.
 
 ========================================================================
 == #include Files ======================================================
 ========================================================================
 
 These are at the top of the files, you specify the files/libraries to
-import/include in your .c file. Some useful ones below. Most have file
-extension "h" for "header."
+import/include in your .c file, which make various pre-written functions
+available. Some useful ones below. Most have file extension "h" for
+"header."
 
 stdio.h   Standard input/output (including printf)
 ctype.h   
@@ -129,40 +169,223 @@ data types available, the formatting code to use with printf (covered
 below), and how they are declared (for a few of the types)
 
 - Numeric
-  - short 
-  - long (%ld)
-  - int (%d)
-  - float (%f)
-  - double (%f)
+  - Integers (of various sizes). 
+    - short         2 bytes
+    - int    (%d)   4 bytes
+    - long   (%ld)  8 bytes
+  
+    **Note that "d" in the print codes above can be replaced with "u"
+    for "unsigned" if we work strictly with nonnegative integers.
+
+  - Decimals (of various sizes)
+    - float  (%f)   4 bytes
+    - double (%f)   8 bytes 
+
 - Character
-  - char (%c): char mychar = 'A';
-  - string (%s): char mystring[] = "A string"; 
-    ^This is special/weird. It's an array of chars. No string primitive
+  - char   (%c)   1 byte. Note also that, to C, characters are
+                  equivalent to 1 byte integers, with each character
+                  corresponding to a single integer.  As a result, you
+                  can do math on them.
+  - string (%s)   Represented in C as simply an array of characters (or,
+                  given the above discussion for chars, an array of
+                  bytes). There is no string primitive. See next
+                  section.
 - User defined
   - struct 
   - union
 
-========================================================================
-== Formatted Printing ==================================================
-========================================================================
+To get the size (in bytes) of all the objects above (or variables of any
+of those types), we can use the function "sizeof" from stdio.h.
+Examples:
 
-In the <stdio.h> library.
+  sizeof(int)
+  sizeof(float)
+  size(somevar)
 
-Example usage:
+where "somevar" is some arbitrary variable of some type above. That's
+how I got the number of bytes for each datatype above.
+
+
+Formatted Printing
+------------------
+The printf function from the <stdio.h> library draws upon the data type
+codes above, and is used as follows:
 
   printf("%s is %d years old.\n", "Bob", 34);
 
+If you want the % sign, use %%.
 
 
-===============================================================
-== Debugging ==================================================
-===============================================================
+========================================================================
+== Variables, Expressions, Arrays ======================================
+========================================================================
+
+Variable Declaration and Assignment
+-----------------------------------
+A variable is a named link/reference to a value stored in memory or
+expression that can be evaluated.  An expression is a combination of
+values, variables, operators, and functions (ex: x = y + 2).
+
+A variable's data _type_ MUST be declared before you use it. You don't
+necessarily have to define the _value_ of the variable, but you do have
+to define the _datatype_ that a variable will be.  You can declare
+variable types either in the body of main or in the body of other
+particular functions.
+
+You can also declare on the same line, and selectively.  Terminate each
+line with a semicolon. Examples:
+    
+    float pi = 3.1415;
+    int a, b, c = 0, d = e = 4;
+    int x, y, z; x = 2*y + 3*z;
+    char c = 'A';
+    char name[] = "Jerry";
+
+"Jerry" is simply treated as an array of characters, which brings us
+onto arrays.
+
+
+Arrays
+------
+Arrays group together data of the same type. Here's a few different ways
+to initialize arrays of various types:
+
+1. int heights    = {1, 2, 3, 4}; 
+2. char name1[]   = "Jerry";
+3. char name2[]   = {'J', 'e', 'r', 'r', 'y', '\0'};
+4. int numbers[4] = {1};
+5. char name3[4]  = {'a'};
+
+As in examples 1-3, you you don't need to provide explicitly the length
+of the array that you are initializing up front. 
+
+Examples 2 and 3 above produce the same object, with the 3rd example
+making very explicit how strings are just an array of
+characters---literally "stringing" together characters ending with '\0',
+the "null byte" character to denote the termination of a string. All
+strings terminate with this null-byte--perhaps implicitly if declared as
+in Example 2 above. So the length of a string in chars will be 1 longer
+than it looks if declared as in Example 2 above.
+
+In cases 4 and 5, we see how declaring length can economize on typing: 
+  - Example 4 fills the first entry of a length-4 int array with 1,
+    zeroes everywhere else. 
+  - Exmaple 5 creates a char array with 'a' in the first spot, null
+    bytes ('\0') everywhere else.
+
+
+NOTE: C has zero-based indexing, which is used with brackets. Examples:
+  heights[0]
+  name2[4]
+
+
+Arrays of Strings
+-----------------
+Since there are no string primites and strings are simply an array of
+characters, it's not obvious how to create an array of strings. We do so
+using the following syntax:
+
+  char *names[] = {"Jerry", "Elaine", "Kramer", "George"};
+
+This also explains why one of the arguments to the "main" function is
+"*argv[]". The arguments are, together, an array of strings. You can
+index the jth letter from the ith string as follows:
+
+  names[i][j]
+
+
+Assignment of Array Elements
+----------------------------
+To assign elements in an array, you can just assign without declaration
+of type. Examples
+
+  heights[0] = 100;
+  heights[3] = name1[0];
+  heights[6] = name1[6];
+
+In this case, we also assign elements from a string array (characters)
+to be elements in an int array. Since chars are just ints (that happen
+to print/pixelate differently on a screen), this is totally kosher. And
+even though name one only _appears_ to have 5 characters (since it's
+just "Jerry"), there's an implicit null byte character in name1 that we
+can pull/grab.
+
+
+========================================================================
+== Looping and If-Statements ===========================================
+========================================================================
+
+For and While-Loops
+-------------------
+
+for(i = 1; i <= 10; i++) {
+  // do something
+}
+
+
+while(i < 10){
+  // do something
+  i++;
+}
+
+
+If-Statements
+-------------
+
+if(i < 1) {
+  // do something
+}
+else if(i > 10 && j < 5){
+  // do something else
+}
+else {
+  // I don't know
+}
+
+
+Switch Statements
+-----------------
+
+switch(letter) {
+  case 'a':
+  case 'A':
+    // do something 
+    break;
+
+  case 'b':
+    // do something else
+    break;
+
+  default: 
+    // do default thing
+}
+
+Switch-Case statements as follows:
+- First mark where the swtich-case statement starts. Call that loc X. 
+- Then, translate "letter" (or some other variable translating into an
+  integer) to see how far to jump. Call that jump length Y. 
+- If X+Y is beyond the length of the switch-case statement, adjust to
+  default. Otherwise, jump to X+Y and proceed until you hit a "break;"
+  statement. 
+- Note that the 'a' and 'A' lines above denote "fallthrough". After jumping
+  to 'a', the program keeps executing each successive line until there's
+  a break statement. In this way, repetition can be avoided.
+
+NOTE: You NEED break statements. Don't forget them or else you'll
+execute too much code and too many cases. You should also probably mark
+fallthrough cases as such with comments to denote that they are on
+purpose.
+
+
+========================================================================
+== Debugging ===========================================================
+========================================================================
 
 gdb
 ---
 
 Command line debugger. Let's you access the debugging info that
-was stored when you ran gcc with option -g. 
+was stored when you ran cc or gcc with option -g. 
 
   gdb program.o
 
@@ -191,38 +414,6 @@ doesn't print the line numbers otherwise.
 
 
 ===============================================================
-== Expressions and  Variables =================================
-===============================================================
-
-- A variable is a named link/reference to a valued stored in
-  memory or expression that can be evaluated. 
-
-- An expression is a combination of values, variables,
-  operators, and functions. Ex, x = y + 2
-
-- Variable declaration can happen in the body of main or of
-  particular functions.  
-
-- In C, you have to declare variables before you use them. You
-  don't necessarily have to define the _value_, but you do have
-  to define the _datatype_ of variable it will be
-
-    int     Integer
-    float   Floating point
-    char    Character
-
-  You can also declare on the same line, and selectively.
-  Terminate each line with a semicolon.
-  Examples:
-    
-    float pi = 3.1415;
-    int a, b, c = 0, d = e = 4;
-    int x, y, z; x = 2*y + 3*z;
-    char c='A';
-
-
-
-===============================================================
 == Function Prototypes ========================================
 ===============================================================
 
@@ -242,23 +433,6 @@ Examples:
   int factorial(int n); 
   int rand(void); 
 
-
-===============================================================
-== main() Function ============================================
-===============================================================
-
-
-This is the "entry point" for a C program. Some examples:
-
-int main(void)        
-
-  This accepts no arguments, outputs 0 if
-  successful, non-zero int otherwise.
-
-int main(int argc, char **argv):
-
-  This acceps command line arguments.
-    
 
 ===============================================================
 == Other Functions ============================================
