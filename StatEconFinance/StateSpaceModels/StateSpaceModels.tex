@@ -36,23 +36,58 @@
 
 \section{Introduction}
 
-State Space Models and the Kalman Filter together rank among those ``Hugely Important Things I Never Knew Existed'' following my undergrad education. 
+State Space Models, the Kalman Filter, and simulation smoothers together
+rank among those ``Hugely Important Things I Never Knew Existed''
+following my undergrad education. 
 
-They're hugely important because they embed as special cases many concepts in time series and dynamics. In fact, in such cases, you can almost always fall back on the toolkit developed here. It doesn't take much work to cast ARMA models, dynamic factor models, and other important concepts into state space model form, viewing those applications as special cases within the broader state space framework.
+They're hugely important because they embed as special cases many
+concepts in time series and dynamics.  In fact, you can almost always
+fall back on the toolkit developed here. It doesn't take much work to
+cast ARMA models, dynamic factor models, structural VARs, and other
+important concepts into state space model form, viewing those
+applications as special cases within the broader state space framework.
+Once you know the state space representation and methods for efficient
+estimation and posterior sampling, you've done half the work for many
+applications in time series econometrics.
 
-So the first portion will consist of describing state
-space models and, naturally, the very important concept of
-state spaces. The second portion will consider how the Kalman Filter can be applied to such models.
+So the first portion will consist of describing state space models and,
+naturally, the very important concept of the ``state space.'' The second
+portion will then give an overview of the subsequent sections which
+discuss computing likelihood via the Kalman Filter and posterior
+sampling to draw paths from the underlying state dynamics that 
+model the data-generating process.
+
 
 \section{State Space Models}
 
 \subsection{Basic Building Blocks}
 
-State space models describe how certain states evolve over time,\footnote{Hence, state space models capture the ``dynamics'' of a system.} where \emph{states} consist of observed and/or unobserved variables of interest. The evolution of these states are informed by series we can directly measure, called \emph{observables}.
+State space models quantify and link the evolution of observed and
+(possibly) unobservated \emph{states} to series that we can directly
+measure---the data---called \emph{observables}. 
 
-The \emph{states} in our model (which we'll collect into a state vector) might include GDP growth, inflation, unemployment, an unobserved ``business cycle'' component driving the dynamics of many series, a synthetic index indicating investment prospects, or any number of objects that we want to quantify, model, and forecast. With our states, we then define the \emph{state space} as the set of all values our state vector can assume. In other words, it's the multi-dimensional space spanned by our state vector. 
+State space models quantify how certain states evolve over time, where
+\emph{states} consist of observed and/or unobserved variables of
+interest. The evolution of these states are informed by  
 
-To quantify and model the (possibly unobserved) states, we use \emph{observables}---series we can directly measure and observe---to inform our estimates of the states, which we cannot always directly measure. So just to reiterate, the biggest distinction between states and observables: observables \emph{always} have a directly measurable series associated with them, while states might not.
+Typically, we have some model that specifies how these states are
+related. The dynamics of these states then generate the observed data.
+
+The \emph{states} in our model (which we'll collect into a state vector)
+might include GDP growth, inflation, unemployment, an unobserved
+``business cycle'' component driving the dynamics of many series, a
+synthetic index indicating investment prospects, or any number of
+objects that we want to quantify, model, and forecast. With our states,
+we then define the \emph{state space} as the set of all values our state
+vector can assume. In other words, it's the multi-dimensional space
+spanned by our state vector. 
+
+To quantify and model the (possibly unobserved) states, we use
+\emph{observables}---series we can directly measure and observe---to
+inform our estimates of the states, which we cannot always directly
+measure. So just to reiterate, the biggest distinction between states
+and observables: observables \emph{always} have a directly measurable
+series associated with them, while states might not.
 
 
 \subsection{Linear State Space Models in Two Equations}
@@ -68,32 +103,46 @@ State space models essentially reduce to two fundamental equations:
     \quad\qquad E[\eta_t] =  0 
     \quad E[\eta_t \eta'_t] =  Q 
 \end{align}
-Additionally, it is also assumed that $\varepsilon_t$ and
-$\eta_t$ are uncorrelated, iid, and independent of past
-values. Also, by construction, $E[\varepsilon_t s_t']=0$
-and $E[\eta_t y_t']=0$.
+Additionally, it is also assumed that $\varepsilon_t$ and $\eta_t$ are
+uncorrelated, iid, and independent of past values. Also, by
+construction, $E[\varepsilon_t s_t']=0$ and $E[\eta_t y_t']=0$.
 
-Moreover, while $\varepsilon_t$ and $\eta_t$ are typically assumed to be normal, we wrote them here in the more general (yet equally valid) represenetation above. Later on, we will discuss the extra subtetly that non-normal errors introduce into the interpretation.
+Moreover, while $\varepsilon_t$ and $\eta_t$ are typically assumed to be
+normal, we wrote them here in the more general (yet equally valid)
+represenetation above. Later on, we will discuss the extra subtetly that
+non-normal errors introduce into the interpretation.
 
 
-\paragraph{State Transition Equation} Equation \ref{ste} describes how the state vector, $s_t$, evolves over time; it's a law of motion. In words, the state vector next period is a function of the previous period's state vector, plus some innovation or disturbance.  Since we iterate on the state vector $s_{t-1}$ to get the next period $s_{t}$, it's clear that $T$ must be square, while $C$ and $\varepsilon_t$ are column vectors the same size as $s_t$.
+\paragraph{State Transition Equation} Equation~\ref{ste} describes how
+the state vector, $s_t$, evolves over time; it's a law of motion. In
+words, the state vector next period is a function of the previous
+period's state vector, plus some innovation or disturbance.  Since we
+iterate on the state vector $s_{t-1}$ to get the next period $s_{t}$,
+it's clear that $T$ must be square, while $C$ and $\varepsilon_t$ are
+column vectors the same size as $s_t$.
 
-But since the states might be unobserved (so that they do not have a directly measurable series associated with them), we have to relate them to the data somehow, which is where the next equation comes in.
+But since the states might be unobserved (so that they do not have a
+directly measurable series associated with them), we have to relate them
+to the data somehow, which is where the next equation comes in.
 
-\paragraph{Measurement Equation} Equation \ref{moe}, sometimes called the ``Observation Equation'', relates the states to the directly measurable observables, allowing for potential ``measurement error'' captured by $\eta_t$. More succinctly, $M$ is a matrix that \emph{maps} states to observables. Since the number of states and observables may differ, $M$ need not be square. Clearly, $D$ and $\eta_t$ must be the same size as $y_t$.
+\paragraph{Measurement Equation} Equation~\ref{moe}, sometimes called
+the ``Observation Equation'', relates the states to the directly
+measurable observables, allowing for potential ``measurement error''
+captured by $\eta_t$. More succinctly, $M$ is a matrix that \emph{maps}
+states to observables. Since the number of states and observables may
+differ, $M$ need not be square. Clearly, $D$ and $\eta_t$ must be the
+same size as $y_t$.
 
 \paragraph{Note on Free Parameters} 
-When we write down a state space model, this typically
-involves imposing ones and zeros in certain entries of $M$,
-$R$, and $Q$, while leaving other parameters free so that we can
-estimate them.  to pre-specify certain parameters in both
-equations.  While our goal will be estimate in Equation
-\ref{ste} has to be estimated ($\{s_t\}$, $T$, $R$), the
-matrix $M$ will need to be pre-specified by the
-econometrician. Matrix $M$ makes explicit our idea of the
-relationship between the observables we see and the deep
-underlying model dynamics that (we think) drive what's
-observed. Of course, this relationship cannot be estimated; it
+When we write down a state space model, this typically involves imposing
+ones and zeros in certain entries of $M$, $R$, and $Q$, while leaving
+other parameters free so that we can estimate them.  To pre-specify
+certain parameters in both equations.  While our goal will be estimate
+in Equation~\ref{ste} has to be estimated ($\{s_t\}$, $T$, $R$), the
+matrix $M$ will need to be pre-specified by the econometrician. Matrix
+$M$ makes explicit our idea of the relationship between the observables
+we see and the deep underlying model dynamics that (we think) drive
+what's observed. Of course, this relationship cannot be estimated; it
 can only be imposed via $M$.
 
 \newpage
@@ -103,7 +152,12 @@ In this section, we show two examples of expanding the state space (introducing 
 
 \subsubsection{Introducing Extra Lags}
 
-Equation \ref{ste} only explicitly incorporates one lag of the state vector. But suppose $s_t$ depends upon more than one lag. Not a problem; the representation in Equation \ref{ste} will still work if we expand the state space---that is, incorporate additional variables into our state vector. Specifically, we can rewrite the State Transition Equation (in stacked vector and block matrix form) as 
+Equation~\ref{ste} only explicitly incorporates one lag of the state
+vector. But suppose $s_t$ depends upon more than one lag. Not a problem;
+the representation in Equation~\ref{ste} will still work if we expand
+the state space---that is, incorporate additional variables into our
+state vector. Specifically, we can rewrite the State Transition Equation
+(in stacked vector and block matrix form) as 
 \begin{align}
   \begin{bmatrix} s_{t} \\ s_{t-1}
   \end{bmatrix}
@@ -121,14 +175,30 @@ Equation \ref{ste} only explicitly incorporates one lag of the state vector. But
 \end{align}
 So now our new state vector is no longer $s_t$, but the stacked $z_t:=(s_t \;\; s_{t-1})'$. In this formulation, $T_1$ captures the dependence of $s_t$ upon $s_{t-1}$, while $T_2$ captures the dependence upon $s_{t-2}$. The bottom half of the transition matrix above will enforce that $s_{t-1}=s_{t-1}$. The necessary changes to the measurement equation are obvious.
 
-To incorporate still more lags, the extra modifications to the state transition equation are similarly straightforward. In addition, it may even be the case that we need to use extra lags for only a few elements of $s_t$, rather than all elements of $s_t$. In such cases, Equation \ref{augmented.lags} can be simplified so that we augment the state vector with only the necessary lags, rather than the vector $s_{t-1}$ (on the lefthand side) in it's entirety. Only the most minor of adjustments to the transition matrix would be necessary.
+To incorporate still more lags, the extra modifications to the state
+transition equation are similarly straightforward. In addition, it may
+even be the case that we need to use extra lags for only a few elements
+of $s_t$, rather than all elements of $s_t$. In such cases,
+Equation~\ref{augmented.lags} can be simplified so that we augment the
+state vector with only the necessary lags, rather than the vector
+$s_{t-1}$ (on the lefthand side) in it's entirety. Only the most minor
+of adjustments to the transition matrix would be necessary.
 
 
 \subsubsection{Measurement Error as a State}
 
-While the two-equation framework set up in (\ref{ste}) and (\ref{moe}) might be the most intuitive representation of our system, it might be easier (for programming or computational reasons) to remove measurement error from the measurement/observation equation. We can do so by, again, enlarging the state space and incorporating measurement error as extra states.
+While the two-equation framework set up in (\ref{ste}) and (\ref{moe})
+might be the most intuitive representation of our system, it might be
+easier (for programming or computational reasons) to remove measurement
+error from the measurement/observation equation. We can do so by, again,
+enlarging the state space and incorporating measurement error as extra
+states.
 
-So we now rearrange the terms in Equations \ref{ste} and \ref{moe} into new State Transition and Measurement Equations. Again, we use stacked vector and block matrix form, augmenting the state vector with extra rows, $s'_t$, which capture the contribution from the measurement errors:
+So we now rearrange the terms in Equation~\ref{ste} and
+Equation~\ref{moe} into new State Transition and Measurement Equations.
+Again, we use stacked vector and block matrix form, augmenting the state
+vector with extra rows, $s'_t$, which capture the contribution from the
+measurement errors:
 \begin{align}
   \text{State Transition Equation:} \quad
     \begin{bmatrix} s_{t} \\ s'_t \end{bmatrix}
@@ -233,7 +303,12 @@ Which then leads to the following observation equation. Again, no term for measu
 \]
 
 \subsubsection{GDP: Income and Expenditure}
-We also present an example where there is some unobserved ``true'' level of GDP that we hope to capture, using two alternative measures that ostensibly measure the same thing---the income and expenditure measures of GDP. However, because of measurement error in both series, they provide only a ``noisy'' measure. This is a situation ideally suited to a state space representation.
+We also present an example where there is some unobserved ``true'' level
+of GDP that we hope to capture, using two alternative measures that
+ostensibly measure the same thing---the income and expenditure measures
+of GDP. However, because of measurement error in both series, they
+provide only a ``noisy'' measure. This is a situation ideally suited to
+a state space representation.
 
 
 \newpage
