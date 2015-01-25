@@ -1,0 +1,329 @@
+\documentclass[12pt]{article}
+
+\author{Matthew D. Cocci}
+\title{Factor Models}
+\date{\today}
+
+%% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % most detailed page formatting control
+\usepackage{fullpage} % Simpler than using the geometry package; std effect
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+%% Formatting %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[margin=1in]{geometry}
+    %   Adjust the margins with geometry package
+%\usepackage{pdflscape}
+    %   Allows landscape pages
+%\usepackage{layout}
+    %   Allows plotting of picture of formatting 
+
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{fancyhdr} 
+%\pagestyle{fancy} 
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt} 
+    %   Make the header bigger to avoid overlap
+
+%\fancyhf{}
+    %   Erase header settings
+
+%\renewcommand{\headrulewidth}{0.3pt} 
+    %   Width of the line
+
+%\setlength{\headsep}{0.2in}    
+    %   Distance from line to text
+            
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{amsthm} %allows for labeling of theorems
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+
+% Below supports left-right alignment in matrices so the negative
+% signs don't look bad
+\makeatletter
+\renewcommand*\env@matrix[1][c]{\hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols #1}}
+\makeatother
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{graphicx}
+\usepackage{subfigure} 
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref} 
+\hypersetup{	
+    colorlinks,		
+        %   This colors the links themselves, not boxes
+    citecolor=black,	
+        %   Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\usepackage{verbatim} 
+    %   For including verbatim code from files, no colors
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{RGB}{28,172,0}
+\definecolor{mylilas}{RGB}{170,55,241}
+\newcommand{\matlabcode}[1]{%
+    \lstset{language=Matlab,%
+        basicstyle=\footnotesize,%
+        breaklines=true,%
+        morekeywords={matlab2tikz},%
+        keywordstyle=\color{blue},%
+        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+        identifierstyle=\color{black},%
+        stringstyle=\color{mylilas},%
+        commentstyle=\color{mygreen},%
+        showstringspaces=false,%
+            %   Without this there will be a symbol in 
+            %   the places where there is a space
+        numbers=left,%
+        numberstyle={\tiny \color{black}},% 
+            %   Size of the numbers
+        numbersep=9pt,% 
+            %   Defines how far the numbers are from the text
+        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+            %   Some words to emphasise
+    }%
+    \lstinputlisting{#1}
+}
+    %   For including Matlab code from .m file with colors,
+    %   line numbering, etc. 
+
+%% Bibliographies %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%\usepackage{natbib} 
+    %---For bibliographies
+%\setlength{\bibsep}{3pt} % Set how far apart bibentries are
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\usepackage{enumitem} 
+    %   Has to do with enumeration	
+\usepackage{appendix}
+%\usepackage{natbib} 
+    %   For bibliographies
+\usepackage{pdfpages}
+    %   For including whole pdf pages as a page in doc
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+\begin{document}
+\maketitle
+
+\tableofcontents 
+
+\clearpage
+\section{Key Result for Factor Models}
+
+The conditional distribution of jointly multivariate normal random variables is
+one of the most important results that underlies the estimation and application
+of factor, regression, and state space models. It can be summarized as follows:
+\begin{align}
+  \text{Given} \qquad 
+    \begin{bmatrix} X_1 \\ X_2 \end{bmatrix}
+    &\sim 
+    N\left(
+    \begin{bmatrix} \mu_1 \\ \mu_2 \end{bmatrix},
+    \begin{bmatrix} 
+      \Sigma_{11} & \Sigma_{12} \\
+      \Sigma_{21} & \Sigma_{22} 
+    \end{bmatrix} 
+    \right) \notag\\
+    \label{reg} \\
+  X_1 | X_2 &\sim N(\hat{\mu}, \hat{\Sigma})  \notag\\
+  \text{where} \quad
+  \hat{\mu} &= \mu_1 + \Sigma_{12} \Sigma^{-1}_{22} 
+    (X_2-\mu_2) \notag\\
+  \hat{\Sigma} &= \Sigma_{11} - \Sigma_{12} \Sigma^{-1}_{22} 
+    \Sigma_{21}\notag
+\end{align}
+This will be used again and again to derive the results presented below.
+
+\section{Factor Models without Dynamics}
+
+To begin with the simplest case, this section considers factor models without
+dynamics, ignoring any autocorrelation between observations even when dealing
+with time series data.
+
+First, suppose that we have data $\{X_{it}\}$ for $i=1,\ldots,n$ and
+$t=1,\ldots,T$. In economics, this will often be a panel dataset, with
+individuals or data series along the $i$ dimension and time across the $t$
+dimension. However, the model presented below could just as well characterize
+any dataset that varies along two dimensions.\footnote{For example, factor
+analysis was developed early on to extract certain components of intelligence
+(general intelligence, verbal intelligence, analytical intelligence, etc.). In
+that case, you $T$ individuals would answer $n$ different questions that
+test a range of abilities. Then, the $X_{it}$ would be variables denoting
+whether individual $t$ got question $i$ right, and you could extract common
+factors across individuals which correspond to these different types of
+intelligence.}
+
+The data $\{X_{it}\}$ is assumed to be explained by $r$ factors, $\{f_j\}_{j=1}^r$,
+plus random error:
+\begin{equation}
+  X_{it} = \mu_i + \lambda_{i1} f_{1t} + \cdots + \lambda_{ir} f_{rt} + e_{it}
+  \qquad i = 1,\ldots,n
+\end{equation}
+In matrix notation, we can stack all ovservations for $t$ and write out the
+additional distributional assumptions as:
+\begin{align*}
+  
+\end{align*}
+
+
+
+
+%% APPPENDIX %%
+
+% \appendix
+
+
+
+
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%%%% SAMPLE CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    %% VIEW LAYOUT %%
+    
+        \layout
+
+    %% LANDSCAPE PAGE %%
+
+        \begin{landscape}
+        \end{landscape}
+
+    %% BIBLIOGRAPHIES %%
+
+        \cite{LabelInSourcesFile}  %Use in text; cites
+        \citep{LabelInSourcesFile} %Use in text; cites in parens
+
+        \nocite{LabelInSourceFile} % Includes in refs w/o specific citation
+        \bibliographystyle{apalike}  % Or some other style
+
+        % To ditch the ``References'' header
+        \begingroup
+        \renewcommand{\section}[2]{} 
+        \endgroup
+
+        \bibliography{sources} % where sources.bib has all the citation info
+
+    %% SPACING %%
+
+        \vspace{1in}
+        \hspace{1in}
+
+
+    %% INCLUDING PDF PAGE %%
+
+        \includepdf{file.pdf}
+
+
+    %% INCLUDING CODE %%
+
+        \verbatiminput{file.ext}    
+            %   Includes verbatim text from the file
+        \texttt{text}	  
+            %   Renders text in courier, or code-like, font
+
+        \matlabcode{file.m}	  
+            %   Includes Matlab code with colors and line numbers
+
+
+    %% INCLUDING FIGURES %%
+
+        % Basic Figure with size scaling
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[scale=1]{file.pdf}
+            \end{figure}
+
+        % Basic Figure with specific height
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[height=5in, width=5in]{file.pdf}
+            \end{figure}
+
+        % Figure with cropping, where the order for trimming is  L, B, R, T
+            \begin{figure}
+               \centering
+               \includegraphics[trim={1cm, 1cm, 1cm, 1cm}, clip]{file.pdf}
+            \end{figure}
+
+
+        % Side by Side figures
+            \begin{figure}[h!]
+                \centering
+                \mbox{\subfigure{
+                    \includegraphics[scale=1]{file1.pdf}
+                }\quad\subfigure{
+                    \includegraphics[scale=1]{file2.pdf} 
+                }
+                }
+            \end{figure}
+    
+
