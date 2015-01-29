@@ -174,9 +174,10 @@
 \clearpage
 \section{Key Result for Factor Models}
 
-The conditional distribution of jointly multivariate normal random variables is
-one of the most important results that underlies the estimation and application
-of factor, regression, and state space models. It can be summarized as follows:
+The conditional distribution of jointly multivariate normal random
+variables is one of the most important results that underlies the
+estimation and application of factor, regression, and state space
+models. It can be summarized as follows:
 \begin{align}
   \text{Given} \qquad 
     \begin{bmatrix} X_1 \\ X_2 \end{bmatrix}
@@ -257,17 +258,119 @@ out the distributional assumptions as:
         \Psi & 0 \\
         0 & I \\
       \end{bmatrix}
-      \right)\notag
+      \right)\label{fmjoint}
 \end{align}
-where $\Psi$ is a diagonal matrix, and where the \emph{loading matrix}
-$\Lambda$ is not necessarily square (though it may look like it above).
+where the \emph{loading matrix} $\Lambda$ is not necessarily square
+(though it may look like it above). Note that in the case where $\Psi$
+is diagnoal, we call this setup an \emph{exact factor model}.
 
+Given the definition of $X_t$ in Equation~\ref{fm}, we can rewrite the
+joint distribution in (\ref{fmjoint}) in terms of $X_t$ and $F_t$ by
+deriving the means, variances, and covariances:
+\begin{align*}
+  EX_t &= E\left[\mu + \Lambda F_t + e_t\right]
+    = E[\mu] + \Lambda E[F_t] + E[e_t]\\
+  \text{By~\ref{fm}} \quad\Rightarrow\quad
+    EX_t &= \mu \\\\
+  E[(X_t-EX_t)(X_t-EX_t)'] &= EX_tX_t' - (EX_t)^2\\
+  &= E[(\mu+\Lambda F_t + e_t)(\mu+\Lambda F_t + e_t)'] - \mu\mu'\\
+  &= \mu\mu' + 2\mu E[F'_t]\Lambda' + 2\mu Ee_t' 
+    + \Lambda E[F_tF'_t] \Lambda' + E[e_te_t'] - \mu\mu'\\
+  \text{By~\ref{fm}} \quad\Rightarrow\quad
+    \text{Var}(X_t)
+    &= \Lambda \Lambda' + \Psi \\\\
+  E[(X_t-EX_t)(F_t-EF_t)'] &= 
+    E[X_tF_t'] - (EX_t)(EF_t)' = 
+      E[(\mu+\Lambda F_t + e_t) F_t'] - \mu\cdot 0\\
+    &= \Lambda E[F_tF_t'] + Ee_t\\
+  \text{By~\ref{fm}} \quad\Rightarrow\quad
+    \text{Cov}(X_t, F_t)
+    &= \Lambda 
+\end{align*}
+Putting all of this together to rewrite Distribution~\ref{fmjoint}, we
+can write
+\begin{equation}
+  \begin{bmatrix} X_t \\ F_t \end{bmatrix} \sim
+  N\left(
+    \begin{bmatrix} \mu \\ 0 \end{bmatrix} ,
+    \begin{bmatrix} 
+      \Lambda\Lambda' + \Psi & \Lambda \\
+      \Lambda' & I \\
+    \end{bmatrix}
+    \right)
+\end{equation}
+Then, conditional on the date, the factor structure, the factor loadings
+$\Lambda$, and the variance-covariance matrix of the errors, $\Psi$, we
+can apply Result~\ref{reg} to get the distribution of the factors:
+\begin{align}
+  F_t|X_t &\sim N\left(\mu_F, \Sigma_F\right) \label{fgivenx}\\
+  \mu_F &:= \Lambda'(\Lambda\Lambda'+\Psi)^{-1}(X_t-\mu) \notag\\
+  \Sigma_F &:= I- \Lambda'(\Lambda\Lambda'+\Psi)^{-1}\Lambda \notag
+\end{align}
+We postpone estimation of the loadings and identification to later
+sections. Lastly, see Appendix~\ref{sec:inv} for a matrix identity that
+enables a less costly computation of $\Lambda'(\Lambda\Lambda' +\Psi)^{-1}$.
 
 
 
 %% APPPENDIX %%
 
-% \appendix
+\clearpage
+\appendix
+\section{Matrix Inversion Identity}
+\label{sec:inv}
+
+Recall the distribution of the factors conditional on the data and the
+parameters from Result~\ref{fgivenx}:
+\begin{align}
+  F_t|X_t &\sim N\left(\mu_F, \Sigma_F\right) \notag\\
+  \mu_F &:= \Lambda'(\Lambda\Lambda'+\Psi)^{-1}(X_t-\mu) \notag\\
+  \Sigma_F &:= I- \Lambda'(\Lambda\Lambda'+\Psi)^{-1}\Lambda \notag
+\end{align}
+This requires the inversion of an $n\times n$ matrix. We typically use
+factor analysis when $n$ is large, seeking a small number $r$ of factors
+that efficiently summarize the data. So it would be nice if we find an
+identity that allows us to invert an $r\times r$ matrix instead, saving
+on computation time.
+
+Here, we can use a well-known matrix identity:
+\begin{align}
+  P(I+QP) &= (I+PQ)P \notag\\
+  \Rightarrow \qquad
+  (I+PQ)^{-1}P &= P (I+QP)^{-1} \label{invid}
+\end{align}
+Now, let's take $\Lambda'(\Lambda \Lambda' +\Psi)^{-1}$ and try to apply
+some matrix algebra so we can use that result:
+\begin{align*}
+    \Lambda'(\Lambda \Lambda' +\Psi)^{-1} &=
+    \Lambda' \left(\Psi^{-1}\Psi\right)(\Lambda \Lambda' +\Psi)^{-1}\\
+    &= \Lambda' \Psi^{-1}\left(\Psi(\Lambda \Lambda' +\Psi)^{-1}\right)\\
+    &= \Lambda' \Psi^{-1}\left((\Lambda \Lambda'
+      +\Psi)\Psi^{-1}\right)^{-1}\\
+    &= \Lambda' \Psi^{-1}\left(I+\Lambda \Lambda'\Psi^{-1}\right)^{-1}
+\end{align*}
+But notice that if we set $P:=\Lambda'\Psi^{-1}$ and $Q:=\Lambda$, we
+have the righthand side of Identity~\ref{invid}. So just use the
+Identity~\ref{invid} to exchange for the lefthand side and write out the
+main result
+\begin{equation}
+  \Rightarrow\qquad   
+  \Lambda'(\Lambda \Lambda' +\Psi)^{-1} = 
+  (I+\Lambda'\Psi^{-1}\Lambda)^{-1} \Lambda'\Psi^{-1} 
+\end{equation}
+So now, we only ever invert $\Psi$ or $(I+\Lambda'\Psi^{-1}\Lambda)$,
+both of which are $r\times r$ matrices.
+
+\paragraph{Conclusion}
+Rewriting our conditional factor distribution, we have
+\begin{align}
+  F_t|X_t &\sim N\left(\mu_F, \Sigma_F\right) \notag\\
+  \mu_F &:= 
+    (I+\Lambda'\Psi^{-1}\Lambda)^{-1} \Lambda'\Psi^{-1} (X_t-\mu)\notag\\
+  \Sigma_F &:= 
+    I- (I+\Lambda'\Psi^{-1}\Lambda)^{-1} \Lambda'\Psi^{-1}\Lambda \notag
+\end{align}
+
 
 
 
