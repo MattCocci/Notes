@@ -1,0 +1,838 @@
+\documentclass[12pt]{article}
+
+\author{Matthew D. Cocci}
+\title{Homework 3}
+\date{\today}
+
+%% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % most detailed page formatting control
+\usepackage{fullpage} % Simpler than using the geometry package; std effect
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt}
+    %---Make the header bigger to avoid overlap
+
+%\renewcommand{\headrulewidth}{0.3pt}
+    %---Width of the line
+
+%\setlength{\headsep}{0.2in}
+    %---Distance from line to text
+
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{amsthm} %allows for labeling of theorems
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+
+% Below supports left-right alignment in matrices so the negative
+% signs don't look bad
+\makeatletter
+\renewcommand*\env@matrix[1][c]{\hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols #1}}
+\makeatother
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %---For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %---Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+        %---This colors the links themselves, not boxes
+    citecolor=black,
+        %---Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{verbatim}
+    %---For including verbatim code from files, no colors
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{RGB}{28,172,0}
+\definecolor{mylilas}{RGB}{170,55,241}
+\newcommand{\matlabcode}[1]{%
+    \lstset{language=Matlab,%
+        basicstyle=\footnotesize,%
+        breaklines=true,%
+        morekeywords={matlab2tikz},%
+        keywordstyle=\color{blue},%
+        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+        identifierstyle=\color{black},%
+        stringstyle=\color{mylilas},%
+        commentstyle=\color{mygreen},%
+        showstringspaces=false,%
+            %---Without this there will be a symbol in
+            %---the places where there is a space
+        numbers=left,%
+        numberstyle={\tiny \color{black}},%
+            %---Size of the numbers
+        numbersep=9pt,%
+            %---Defines how far the numbers are from the text
+        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+            %---Some words to emphasise
+    }%
+    \lstinputlisting{#1}
+}
+    %---For including Matlab code from .m file with colors,
+    %---line numbering, etc.
+
+%% Bibliographies %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{natbib}
+    %---For bibliographies
+%\setlength{\bibsep}{3pt} % Set how far apart bibentries are
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{enumitem}
+    %---Has to do with enumeration
+\usepackage{appendix}
+\usepackage{pdfpages}
+    %---For including whole pdf pages as a page in doc
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+\maketitle
+
+%\tableofcontents
+
+\begin{enumerate}
+  \item
+  \begin{enumerate}
+    \item For continuous-time Markov Chain $X$ with generator
+      \begin{align*}
+        Q = \begin{pmatrix}
+              -\mu & \mu \\
+              \lambda & -\lambda
+            \end{pmatrix}
+      \end{align*}
+      we want to find the transition matrix $P(t)$. We know from class
+      and the notes that
+      \begin{align*}
+        P(t) = e^{Qt}
+      \end{align*}
+      To easily find $P(t)$, we first diagonalize $Q$ (for easier
+      exponentiation) by finding the eigenvectors and eigevalues that
+      solve
+      \begin{align*}
+        \det(\Lambda I - Q) = 0
+      \end{align*}
+      This implies characteristic polynomial
+      \begin{align*}
+        0 &= (\Lambda + \mu)(\Lambda+\lambda) - \mu\lambda\\
+          &= \Lambda^2 + \Lambda\lambda + \mu\Lambda + \mu\lambda - \mu\lambda\\
+          &= \Lambda^2 + \Lambda\lambda + \mu\Lambda \\ &= \Lambda( \Lambda + \lambda + \mu)
+      \end{align*}
+      Hence we have eigenvalues $\Lambda_1 = -(\lambda+\mu)$ and $\Lambda_2
+      = 0$. It then follows that we have corresponding eigenvectors
+      %\begin{align*}
+        %v_1 = \frac{1}{\sqrt{\mu^2+\lambda^2}}
+          %\begin{pmatrix} \mu \\ -\lambda \end{pmatrix}  \qquad
+        %v_2 = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ 1 \end{pmatrix}
+      %\end{align*}
+      \begin{align*}
+        v_1 = \begin{pmatrix} \mu \\ -\lambda \end{pmatrix}  \qquad
+        v_2 = \begin{pmatrix} 1 \\ 1 \end{pmatrix}
+      \end{align*}
+      So we can rewrite $Q$ as
+      \begin{align*}
+        Q =
+          \begin{pmatrix}
+            \mu & 1 \\
+            -\lambda & 1 \\
+          \end{pmatrix}
+          \begin{pmatrix}
+            -(\lambda+\mu) & 0 \\
+            0 & 0 \\
+          \end{pmatrix}
+          \begin{pmatrix}
+            \mu & 1 \\
+            -\lambda & 1 \\
+          \end{pmatrix}^{-1}
+      \end{align*}
+      %\begin{align*}
+        %Q =
+          %\begin{pmatrix}
+            %\frac{\mu}{\sqrt{\mu^2+\lambda^2}} & \frac{1}{\sqrt{2}} \\
+            %-\frac{\lambda}{\sqrt{\mu^2+\lambda^2}} & \frac{1}{\sqrt{2}} \\
+          %\end{pmatrix}^{-1}
+          %\begin{pmatrix}
+            %-(\lambda+\mu) & 0 \\
+            %0 & 0 \\
+          %\end{pmatrix}
+          %\begin{pmatrix}
+            %\frac{\mu}{\sqrt{\mu^2+\lambda^2}} & \frac{1}{\sqrt{2}} \\
+            %-\frac{\lambda}{\sqrt{\mu^2+\lambda^2}} & \frac{1}{\sqrt{2}} \\
+          %\end{pmatrix}
+      %\end{align*}
+      As a result, we can easily obtain $P$ by exponentiating the
+      entries in the diagonal matrix and carrying out the matrix
+      algebra:
+      \begin{align}
+        P(t) &= e^{Qt} =
+          \begin{pmatrix}
+            \mu & 1 \\
+            -\lambda & 1 \\
+          \end{pmatrix}
+          \begin{pmatrix}
+            e^{-(\lambda+\mu)t} & 0 \\
+            0 & e^{t \cdot 0} \\
+          \end{pmatrix}
+          \begin{pmatrix}
+            \mu & 1 \\
+            -\lambda & 1 \\
+          \end{pmatrix}^{-1} \label{q2a.1}\\
+        &=
+          \frac{1}{\mu+\lambda}
+          \begin{pmatrix}
+            \mu & 1 \\
+            -\lambda & 1 \\
+          \end{pmatrix}
+          \begin{pmatrix}
+            e^{-(\lambda+\mu)t} & 0 \\
+            0 & 1 \\
+          \end{pmatrix}
+          \begin{pmatrix}
+            1 & -1 \\
+            \lambda & \mu
+          \end{pmatrix}
+          \notag \\
+        &=
+          \frac{1}{\mu+\lambda}
+          \begin{pmatrix}
+            \mu e^{-(\lambda+\mu)t} & 1 \\
+            -\lambda e^{-(\lambda+\mu)t}& 1 \\
+          \end{pmatrix}
+          \begin{pmatrix}
+            1 & -1 \\
+            \lambda & \mu
+          \end{pmatrix}
+          \notag \\
+      \Rightarrow \qquad
+      P(t)
+        &=
+          \frac{1}{\mu+\lambda}
+          \begin{pmatrix}
+            \lambda + \mu e^{-(\lambda+\mu)t}
+              & \mu-\mu e^{-(\lambda+\mu)t} \\
+            \lambda -\lambda e^{-(\lambda+\mu)t}
+              & \mu + \lambda e^{-(\lambda+\mu)t} \\
+          \end{pmatrix} \notag
+      \end{align}
+      %\begin{align*}
+        %P(t) &= e^{Qt} =
+          %\begin{pmatrix}
+            %\frac{\mu}{\sqrt{\mu^2+\lambda^2}} & \frac{1}{\sqrt{2}} \\
+            %-\frac{\lambda}{\sqrt{\mu^2+\lambda^2}} & \frac{1}{\sqrt{2}} \\
+          %\end{pmatrix}^{-1}
+          %\begin{pmatrix}
+            %e^{-(\lambda+\mu)t} & 0 \\
+            %0 & e^{t \cdot 0} \\
+          %\end{pmatrix}
+          %\begin{pmatrix}
+            %\frac{\mu}{\sqrt{\mu^2+\lambda^2}} & \frac{1}{\sqrt{2}} \\
+            %-\frac{\lambda}{\sqrt{\mu^2+\lambda^2}} & \frac{1}{\sqrt{2}} \\
+          %\end{pmatrix}\\
+        %&=
+          %\begin{pmatrix}
+            %1 & -1 \\
+            %\frac{\lambda\sqrt{2}}{\mu+\lambda}
+              %& \frac{\mu\sqrt{2}}{\mu+\lambda}  \\
+          %\end{pmatrix}
+          %\begin{pmatrix}
+            %e^{-(\lambda+\mu)t} & 0 \\
+            %0 & 1 \\
+          %\end{pmatrix}
+          %\begin{pmatrix}
+            %\frac{\mu}{\sqrt{\mu^2+\lambda^2}} & \frac{1}{\sqrt{2}} \\
+            %-\frac{\lambda}{\sqrt{\mu^2+\lambda^2}} & \frac{1}{\sqrt{2}} \\
+          %\end{pmatrix}\\
+        %&=
+          %\begin{pmatrix}
+            %e^{-(\lambda+\mu)t} & -1 \\
+            %\frac{\lambda\sqrt{2}}{\mu+\lambda} e^{-(\lambda+\mu)t}
+              %& \frac{\mu\sqrt{2}}{\mu+\lambda}  \\
+          %\end{pmatrix}
+          %\begin{pmatrix}
+            %\frac{\mu}{\sqrt{\mu^2+\lambda^2}} & \frac{1}{\sqrt{2}} \\
+            %-\frac{\lambda}{\sqrt{\mu^2+\lambda^2}} & \frac{1}{\sqrt{2}} \\
+          %\end{pmatrix}\\
+        %&=
+          %\begin{pmatrix}
+            %\frac{\mu}{\sqrt{\mu^2+\lambda^2}}
+              %e^{-(\lambda+\mu)t}
+              %+ \frac{\lambda}{\sqrt{\mu^2+\lambda^2}}
+              %& \frac{1}{\sqrt{2}}e^{-(\lambda+\mu)t} - \frac{1}{\sqrt{2}}\\
+            %\frac{\lambda\sqrt{2}}{\mu+\lambda} e^{-(\lambda+\mu)t}
+              %& \frac{\mu\sqrt{2}}{\mu+\lambda}  \\
+          %\end{pmatrix}
+          %\begin{pmatrix}
+            %\frac{\mu}{\sqrt{\mu^2+\lambda^2}} & \frac{1}{\sqrt{2}} \\
+            %-\frac{\lambda}{\sqrt{\mu^2+\lambda^2}} & \frac{1}{\sqrt{2}} \\
+          %\end{pmatrix}\\
+      %\end{align*}
+
+    \item % Question 1b
+      To find the stationary distribution $\pi$ that satisfies $\pi
+      Q=0$, note that we must have
+      \begin{align*}
+        -\mu \pi_1 + \lambda \pi_2 &= 0
+        \qquad \Rightarrow \qquad
+        \pi_2 = \frac{\mu}{\lambda} \pi_1
+      \end{align*}
+      To pin down $\pi_1$, note that we must also have
+      \begin{align*}
+        1 &= \pi_1 + \pi_2
+          = \pi_1 + \frac{\mu}{\lambda} \pi_1 \\
+        \Rightarrow \quad \pi_1 &= \frac{\lambda}{\lambda+\mu} \\
+        \Rightarrow \quad \pi &=
+          \begin{pmatrix}
+          \frac{\lambda}{\lambda+\mu} &
+          \frac{\mu}{\lambda+\mu}
+          \end{pmatrix}
+      \end{align*}
+      To prove that $p_{ij}(t)\rightarrow \pi_j$ as
+      $t\rightarrow\infty$, we will use the representation of $P$ that
+      we had by diagonalizing in Equality~\ref{q2a.1}:
+      \begin{align*}
+        \lim_{t\rightarrow\infty} P(t)
+        &=
+        \lim_{t\rightarrow\infty}
+        \quad
+          \frac{1}{\mu+\lambda}
+          \begin{pmatrix}
+            \mu & 1 \\
+            -\lambda & 1 \\
+          \end{pmatrix}
+          \begin{pmatrix}
+            e^{-(\lambda+\mu)t} & 0 \\
+            0 & 1 \\
+          \end{pmatrix}
+          \begin{pmatrix}
+            1 & -1 \\
+            \lambda & \mu
+          \end{pmatrix}\\
+      &=
+        \frac{1}{\mu+\lambda}
+        \begin{pmatrix}
+          \mu & 1 \\
+          -\lambda & 1 \\
+        \end{pmatrix}
+        \left[
+          \lim_{t\rightarrow\infty}
+          \begin{pmatrix}
+            e^{-(\lambda+\mu)t} & 0 \\
+            0 & 1 \\
+          \end{pmatrix}
+        \right]
+          \begin{pmatrix}
+            1 & -1 \\
+            \lambda & \mu
+          \end{pmatrix} \\
+      &=
+        \frac{1}{\mu+\lambda}
+        \begin{pmatrix}
+          \mu & 1 \\
+          -\lambda & 1 \\
+        \end{pmatrix}
+        \begin{pmatrix}
+          0 & 0 \\
+          0 & 1 \\
+        \end{pmatrix}
+        \begin{pmatrix}
+          1 & -1 \\
+          \lambda & \mu
+        \end{pmatrix} \\
+      &=
+        \frac{1}{\mu+\lambda}
+        \begin{pmatrix}
+          0 & 1 \\
+          0 & 1 \\
+        \end{pmatrix}
+        \begin{pmatrix}
+          1 & -1 \\
+          \lambda & \mu
+        \end{pmatrix} \\
+      &=
+        \frac{1}{\mu+\lambda}
+        \begin{pmatrix}
+          \lambda & \mu \\
+          \lambda & \mu \\
+        \end{pmatrix}
+      \end{align*}
+    Hence $\lim_{t\rightarrow\infty} p_{ij}(t) = \pi_j$.
+
+  \item % Question 1c
+    Next, we want to compute $E[X^2(t)|X(0)=1]$ and $E[X^2(t)|X(0)=2]$.
+    To do so, we use the backward Kolmogorov Equation:
+    \begin{align*}
+      \frac{du}{dt} = Qu \qquad u(k,0)=f(k)
+    \end{align*}
+    In our case, $f(x)=x^2$ so that we have initial condition
+    \begin{align*}
+      u(\cdot,0) =
+        \begin{pmatrix}
+          1 \\ 4
+        \end{pmatrix}
+    \end{align*}
+    To solve the system $\frac{du}{dt} = Qu$ , note that we know $Q$ has
+    eigenvalues and eigenvectors
+    \begin{align*}
+      \Lambda_1 = -(\lambda+\mu), \quad
+        v_1 = \begin{pmatrix} \mu \\ -\lambda \end{pmatrix}
+      \qquad \qquad
+      \Lambda_2 = 0, \quad
+        v_2 = \begin{pmatrix} 1 \\ 1 \end{pmatrix}
+    \end{align*}
+    Thus we have solution
+    \begin{align*}
+      \begin{pmatrix}
+        u_1(t) \\ u_2(t)
+      \end{pmatrix}
+      = c_1 \begin{pmatrix} \mu \\ -\lambda \end{pmatrix}
+        e^{-(\lambda+\mu)t}
+        + c_2 \begin{pmatrix} 1 \\ 1 \end{pmatrix} e^{0\cdot t}
+    \end{align*}
+    Using our initial condition, we can solve
+    \begin{align*}
+      \begin{pmatrix} 1 \\ 4 \end{pmatrix}
+      &= c_1 \begin{pmatrix} \mu \\ -\lambda \end{pmatrix}
+        e^{-(\lambda+\mu)0}
+        + c_2 \begin{pmatrix} 1 \\ 1 \end{pmatrix}\\
+      \Rightarrow \qquad
+      1 &= c_1 \mu + c_2 \\
+      4 &= -c_1 \lambda + c_2
+    \end{align*}
+    Solving, we get
+    \begin{align*}
+      c_1 &= \frac{3}{-(\lambda+\mu)} \\
+      c_2 &= \frac{\lambda+4\mu}{\lambda+\mu}
+    \end{align*}
+    This implies a solution
+    \begin{align*}
+      u(\cdot, t) =
+        \begin{pmatrix}
+          \frac{3\mu }{-(\lambda+\mu)}  e^{-(\lambda+\mu)t}
+            + \frac{\lambda+4\mu}{\lambda+\mu}\\
+          \frac{3\lambda }{\lambda+\mu}  e^{-(\lambda+\mu)t}
+            + \frac{\lambda+4\mu}{\lambda+\mu}
+        \end{pmatrix}
+    \end{align*}
+    Taking the limit as $t\rightarrow\infty$, we see that
+    \begin{align*}
+      \lim_{t\rightarrow\infty}u(\cdot, t) =
+        \frac{\lambda+4\mu}{\lambda+\mu}
+        \begin{pmatrix} 1 \\ 1 \end{pmatrix}
+    \end{align*}
+
+
+
+
+  \end{enumerate}
+
+  \item % Question 2
+    \begin{enumerate}
+      \item % Question 2a
+        Given $i>0$ people in line, for short time intervals (small
+        $h$), we can write down the transition probabilities for the
+        following situations:
+        \begin{enumerate}
+          \item $j = i-1$: Case where nobody arrives and someone in line
+            is served:
+            \begin{align*}
+              p_{ij}(h)
+                &= (1-\lambda h + o(h)) (\mu h + o(h)) \\
+                &= \mu h + o(h)
+            \end{align*}
+          \item $j = i+1$: Somebody arrives and nobody is served.
+            \begin{align*}
+              p_{ij}(h)
+                &= (\lambda h + o(h))(1-\lambda h + o(h)) \\
+                &= \lambda h + o(h)
+            \end{align*}
+          \item $j \not\in\{i-1, i, i+1\}$: Not possible for small $h$:
+            \begin{align*}
+              p_{ij}(h) = 0
+            \end{align*}
+          \item $j = i$: Nobody arrives and nobody is served, or somebody
+            arrives and somebody is served.
+            \begin{align*}
+              p_{ij}(h) = 1 - \mu h - \lambda h + o(h)
+            \end{align*}
+        \end{enumerate}
+        That implies the following generator:
+        \begin{align*}
+          Q &=
+          \begin{pmatrix}
+            -\lambda & \lambda & 0 & 0 & 0 & 0 & \cdots \\
+            \mu & -\mu-\lambda & \lambda & 0 & 0 & 0 & \cdots\\
+            0 & \mu & -\mu-\lambda & \lambda & 0 & 0 & \cdots \\
+            0 & 0 & \mu & -\mu-\lambda & \lambda & 0 &  \cdots \\
+            \vdots & \vdots  & \vdots & \vdots & \vdots & \vdots & \vdots \\
+          \end{pmatrix}
+        \end{align*}
+
+    \item % Question 2b
+      To find the stationary distribution for the process defined by the
+      generator $Q$ above, we need to find the left eigenvector of $Q$
+      that corresponds to the eigevalue of 0. In other words, we want to
+      find a vector $x$ such that
+      \begin{align*}
+          \begin{pmatrix}
+            -\lambda & \lambda & 0 & 0 & 0 & 0 & \cdots \\
+            \lambda & -\mu-\lambda & \mu & 0 & 0 & 0 & \cdots\\
+            0 & \lambda & -\mu-\lambda & \mu & 0 & 0 & \cdots \\
+            0 & 0 & \lambda & -\mu-\lambda & \mu & 0 &  \cdots \\
+            \vdots & \vdots  & \vdots & \vdots & \vdots & \vdots & \vdots \\
+          \end{pmatrix}
+          \begin{pmatrix}
+            x_1 \\ x_2 \\ x_3 \\ x_4 \\ \vdots
+          \end{pmatrix}
+          = 0
+      \end{align*}
+      Solving first for $x_2$ in terms of $x_1$, we get
+      \begin{align}
+        x_2 = \frac{\lambda}{\mu} x_1
+        \quad \Leftrightarrow \quad
+        x_1 = \frac{\mu}{\lambda} x_2
+        \label{q2b.1}
+      \end{align}
+      Solving for $x_3$ in terms of $x_2$, we get
+      \begin{align*}
+        0 &= \lambda x_1 + (-\mu-\lambda)x_2 + \mu x_3\\
+        \text{From~\ref{q2b.1}}
+        \qquad
+        0 &= \lambda \left(\frac{\mu}{\lambda} x_2\right)
+          + (-\mu-\lambda)x_2 + \mu x_3 \\
+        \Rightarrow \quad x_3 &= \frac{\lambda}{\mu} x_2
+      \end{align*}
+      More generally, we can keep doing this substitution and find that
+      for all $n$
+      \begin{align*}
+        x_{n+1} &= \frac{\lambda}{\mu} x_n
+      \end{align*}
+      Expressed another way, for all $n$,
+      \begin{align*}
+        x_{n+1} = \left(\frac{\lambda}{\mu}\right)^n x_1
+      \end{align*}
+      But $x_1$ is not a free parameter. It must be chosen such that $x$
+      is a distribution, i.e.\ so that
+      \begin{align*}
+        1 &= \sum^\infty_{n=0}
+          \left(\frac{\lambda}{\mu}\right)^n x_1
+      \end{align*}
+      Clearly, this infinite sum will only converge if
+      \begin{align*}
+        \frac{\lambda}{\mu} < 1
+          \quad \Leftrightarrow \quad
+        \lambda < \mu
+      \end{align*}
+      Provided that is the case, we have
+      \begin{align*}
+        1 &= \frac{x_1}{1-\lambda/\mu}
+          \quad \Leftrightarrow \quad
+          x_1 = 1-\frac{\lambda}{\mu}
+      \end{align*}
+      Therefore the stationary distribution of the process with
+      $\lambda<\mu$ is
+      \begin{align*}
+        x_{n+1} =
+          \left(\frac{\lambda}{\mu}\right)^n
+          \left(1-\frac{\lambda}{\mu} \right)
+        \qquad n = 1,2,\ldots
+      \end{align*}
+
+    \end{enumerate}
+
+  \item % Question 3
+    To show that the arrival of insects forms a Poisson process with
+    rate $\lambda+\mu$, we check
+    \begin{enumerate}
+      \item[i.] $N(0) = 0$: Trivial
+      \item[ii.] $N(t)$ has stationary independent increments for all
+        $0\leq t_1 < t_2< \cdots < t_n$.
+
+        To check this, start by taking times $\{t_1,t_2,t_3\}$ strictly
+        increasing. Also let $N_\lambda(t)$ be the count of the process
+        with rate $\lambda$ at time $t$ and $N_\mu(t)$ be the count of
+        the process with rate $\mu$ at time $t$.
+        the Then
+        \begin{align*}
+          P(&N(t_3)-N(t_2)=j | N(t_2)-N(t_1)) =\\
+            & P(\left[\left(N_\lambda(t_3)-N_\lambda(t_2)\right)+
+              \left(N_\mu(t_3) - N_\mu(t_2)\right)\right]=j
+                | N(t_2)-N(t_1)=i) 
+        \end{align*}
+        But note also that
+        $N(t_2)-N(t_1)=(N_\lambda(t_2)-N_\lambda(t_1))-
+        (N_\mu(t_2)-N_\mu(t_1))$. Moreover, conditioning on
+        $N_\mu(t_2)-N_\mu(t_1)$ gives no information about
+        $N_\mu(t_3)-N_\mu(t_2)$  since $N_\mu$ is Poisson (hence
+        independent increments) and since $N_\lambda \perp N_\mu$ by
+        assumption. Similarly, conditioning on
+        $N_\lambda(t_2)-N_\lambda(t_1)$ gives no information about
+        future increments of $N_\lambda$ or $N_\mu$, implying we can
+        drop the conditioning and get indpendent increments
+        \begin{align*}
+          P(&N(t_3)-N(t_2)=j | N(t_2)-N(t_1))=
+          P(N(t_3)-N(t_2)=j )
+        \end{align*}
+        For arbitrary cut points $\{t_1,\ldots,t_n\}$ we can generalize
+        by breaking the increments up one-by-one: from above, we get
+        $[t_1,t_2]\perp[t_2,t_n]$, then apply again to get
+        $[t_2,t_3]\perp[t_4,t_n]$, and so on.
+
+      \item[iii.] To show the last portion, again we'll use
+        $N_\lambda(t)$ and $N_\mu(t)$. In particular,
+        \begin{align*}
+          P(N(t+h)=n+m|N(t)=n) &=
+          P(N(h)=m|N(0)=0)\\
+          &= P(N_\lambda(h) + N_\mu(h) = m|N(0)=0)
+        \end{align*}
+        Now for small time intervals $h$, 
+        \begin{align*}
+          P(&N_\lambda(h) + N_\mu(h) = m|N(0)=0) \\ 
+          &= 
+          \begin{cases}
+            (\lambda h + o(h)(1-\mu h + o(h)) + 
+            (1-\lambda h + o(h)(\mu h + o(h))
+              & m = 1 \\
+            (1-\lambda h + o(h))
+            (1-\mu h + o(h)) & m = 0\\
+            o(h) & m>0
+          \end{cases}\\
+          &= 
+          \begin{cases}
+            \lambda h + \mu h + o(h)
+              & m = 1 \\
+            1-\lambda h -\mu h + o(h) & m = 0\\
+            o(h) & m>0
+          \end{cases}
+        \end{align*}
+        which matches the definition of a Poisson($\mu+\lambda$) process.
+
+    \end{enumerate}
+
+  \item % Question 4
+
+  \item % Question 5
+    First, label the different boxes in the grid with the following
+    state numbers:
+    \begin{table}[htpb!]
+      \centering
+      \begin{tabular}{|c|c|c|c|}
+        \hline
+        1 & 5 & 9 & 13 \\\hline
+        2 & 6 & 10 & 14 \\\hline
+        3 & 7 & 11 & 15 \\\hline
+        4 & 8 & 12 & 16 \\\hline
+      \end{tabular}
+    \end{table}
+    This gives the following generator:
+    \setcounter{MaxMatrixCols}{16}
+    \begin{align*}
+      %&\begin{matrix}
+        %1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 &
+        %9 & 10& 11& 12& 13& 14& 15& 16&
+      %\end{matrix} \\
+      %\begin{matrix}
+        %1 \\ 2 \\ 3 \\ 4 \\ 5 \\ 6 \\ 7 \\ 8 \\
+        %9 \\ 10\\ 11\\ 12\\ 13\\ 14\\ 15\\ 16\\
+      %\end{matrix}
+      %\quad
+      &\begin{pmatrix}[r]
+         -2 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+          1 & -3& 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+          0 & 1 &-3 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+          0 & 0 & 1 & -2& 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+          1 & 0 & 0 & 0 &-3 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+          0 & 1 & 0 & 0 & 1 &-4 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+          0 & 0 & 1 & 0 & 0 & 1 &-4 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+          0 & 0 & 0 & 1 & 0 & 0 & 1 & -3& 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+          0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & -3 & 1 & 0 & 0 & 1 & 0 & 0 & 0 \\
+          0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 1  & -4 & 1 & 0 & 0 & 1 & 0 & 0 \\
+          0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0  & 1  &-4 & 1 & 0 & 0 & 1 & 0 \\
+          0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0  & 0  & 1 &-3 & 0 & 0 & 0 & 1 \\
+          0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1  & 0  & 0 & 0 & -2 & 1 & 0 & 0 \\
+          0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0  & 1  & 0 & 0 &  1 & -3 & 1 & 0 \\
+          0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0  & 0  & 1 & 0 &  0 &  1 &-3 & 1 \\
+          0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0  & 0  & 0 & 1 &  0 &  0 & 1 & -2 \\
+      \end{pmatrix}
+    \end{align*}
+
+  \begin{enumerate}
+    \item 
+    \item Mean first-passage times for different $N$
+      \begin{table}[htpb!]
+        \centering
+      \begin{tabular}{r|l}
+        N & Time \\\hline\hline
+        10 & 149.7\\
+        100& 112.3\\
+        1000& 134.6\\
+        5000& 142.5\\
+        10000& 140.2\\
+        50000& 140.6 \\
+      \end{tabular}
+      \end{table}
+
+    \item When $M$ becomes large, the disadvantages are that you need to
+      do larger matrix operations when solving the Kolmogorov equations
+      which might be computationaly costly or infeasible. The advantages
+      are that you only need to do this once and you don't need to
+      repeat computations and sampling.
+
+      In the simulation case, you will need to run the chain for longer
+      on average for Theseus to get to the Minotaur. When running this
+      many times, the computations will take longer time (if not
+      parallelized), though the computation steps being done are very
+      simple and straightforward.
+  \end{enumerate}
+
+\end{enumerate}
+
+
+%% APPPENDIX %%
+
+% \appendix
+
+
+
+
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% SAMPLE CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    %% BIBLIOGRAPHIES %%
+
+        \cite{LabelInSourcesFile}  %Use in text; cites
+        \citep{LabelInSourcesFile} %Use in text; cites in parens
+
+        \nocite{LabelInSourceFile} % Includes in refs w/o specific citation
+        \bibliographystyle{apalike}  % Or some other style
+
+        % To ditch the ``References'' header
+        \begingroup
+        \renewcommand{\section}[2]{}
+        \endgroup
+
+        \bibliography{sources} % where sources.bib has all the citation info
+
+    %% SPACING %%
+
+        \vspace{1in}
+        \hspace{1in}
+
+
+    %% INCLUDING PDF PAGE %%
+
+        \includepdf{file.pdf}
+
+
+    %% INCLUDING CODE %%
+
+        \verbatiminput{file.ext}
+            %---Includes verbatim text from the file
+        \texttt{text}
+            %---Renders text in courier, or code-like, font
+
+        \matlabcode{file.m}
+            %---Includes Matlab code with colors and line numbers
+
+
+    %% INCLUDING FIGURES %%
+
+        % Basic Figure with size scaling
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[scale=1]{file.pdf}
+            \end{figure}
+
+        % Basic Figure with specific height
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[height=5in, width=5in]{file.pdf}
+            \end{figure}
+
+        % Figure with cropping, where the order for trimming is  L, B, R, T
+            \begin{figure}
+               \centering
+               \includegraphics[trim={1cm, 1cm, 1cm, 1cm}, clip]{file.pdf}
+            \end{figure}
+
+
+        % Side by Side figures
+            \begin{figure}[h!]
+                \centering
+                \mbox{\subfigure{
+                    \includegraphics[scale=1]{file1.pdf}
+                }\quad\subfigure{
+                    \includegraphics[scale=1]{file2.pdf}
+                }
+                }
+            \end{figure}
+
+
