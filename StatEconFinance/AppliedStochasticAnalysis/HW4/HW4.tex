@@ -1,0 +1,416 @@
+\documentclass[12pt]{article}
+
+\author{Matthew D. Cocci}
+\title{Homework 4}
+\date{\today}
+
+%% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % most detailed page formatting control
+\usepackage{fullpage} % Simpler than using the geometry package; std effect
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt}
+    %---Make the header bigger to avoid overlap
+
+%\renewcommand{\headrulewidth}{0.3pt}
+    %---Width of the line
+
+%\setlength{\headsep}{0.2in}
+    %---Distance from line to text
+
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{amsthm} %allows for labeling of theorems
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+
+% Below supports left-right alignment in matrices so the negative
+% signs don't look bad
+\makeatletter
+\renewcommand*\env@matrix[1][c]{\hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols #1}}
+\makeatother
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %---For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %---Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+        %---This colors the links themselves, not boxes
+    citecolor=black,
+        %---Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{verbatim}
+    %---For including verbatim code from files, no colors
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{RGB}{28,172,0}
+\definecolor{mylilas}{RGB}{170,55,241}
+\newcommand{\matlabcode}[1]{%
+    \lstset{language=Matlab,%
+        basicstyle=\footnotesize,%
+        breaklines=true,%
+        morekeywords={matlab2tikz},%
+        keywordstyle=\color{blue},%
+        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+        identifierstyle=\color{black},%
+        stringstyle=\color{mylilas},%
+        commentstyle=\color{mygreen},%
+        showstringspaces=false,%
+            %---Without this there will be a symbol in
+            %---the places where there is a space
+        numbers=left,%
+        numberstyle={\tiny \color{black}},%
+            %---Size of the numbers
+        numbersep=9pt,%
+            %---Defines how far the numbers are from the text
+        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+            %---Some words to emphasise
+    }%
+    \lstinputlisting{#1}
+}
+    %---For including Matlab code from .m file with colors,
+    %---line numbering, etc.
+
+%% Bibliographies %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{natbib}
+    %---For bibliographies
+%\setlength{\bibsep}{3pt} % Set how far apart bibentries are
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{enumitem}
+    %---Has to do with enumeration
+\usepackage{appendix}
+\usepackage{pdfpages}
+    %---For including whole pdf pages as a page in doc
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+\maketitle
+
+%\tableofcontents
+
+\begin{enumerate}
+  \item % Question 1
+    To show that $B(s,t)=EX_sX_t$ is a positive semi-definite function,
+    we need to show that the matrix $B =
+    \left(B(t_i,t_j)\right)_{i,j=1}^k$ is positive semi-definite for all
+    finite slices $\{t_i\}_{i=1}^k$.
+
+    So let $\{t_i\}_{i=1}^k$ be any such finite slice. We want to show
+    that for any vector $z\neq 0$
+    \begin{align*}
+      0 \leq z^T B z
+      &= \sum^k_{j=1} \sum^k_{i=1} v_i v_j B(t_i,t_j)\\
+      &= \sum^k_{j=1} \sum^k_{i=1} v_i v_j E[X_{t_i}X_{t_j}]\\
+      \text{By linearity of expectations} \qquad
+      &= E\left[\sum^k_{j=1} \sum^k_{i=1} v_i v_j X_{t_i}X_{t_j}\right]\\
+      &= E\left[\sum^k_{j=1} v_j X_{t_j} \sum^k_{i=1} v_i
+          X_{t_i}\right]\\
+      &= E\left[\left(\sum^k_{j=1} v_j X_{t_j}\right)
+          \left( \sum^k_{i=1} v_i X_{t_i}\right)\right]\\
+      &= E\left[\left(\sum^k_{j=1} v_j X_{t_j}\right)^2 \right]
+    \end{align*}
+    which will certainly be greater than or equal to zero as the square
+    of the sum will always be non-negative.
+
+  \item % Question 2
+    To begin, the distribution of a Poisson process is as follows:
+    \begin{equation}
+      P(N_t = n) = e^{-\lambda t} \frac{(\lambda t)^n}{n!}
+    \end{equation}
+    \begin{enumerate}
+      \item % Question 2a
+        To calculate the mean
+        \begin{align*}
+          EN_t &=
+            \sum^\infty_{n=0} n e^{-\lambda t} \frac{(\lambda t)^n}{n!}
+            =\sum^\infty_{n=1} n e^{-\lambda t} \frac{(\lambda t)^n}{n!}\\
+          &=e^{-\lambda t} (\lambda t) \sum^\infty_{n=1}
+          \frac{(\lambda t)^{n-1}}{(n-1)!}\\
+          &=e^{-\lambda t} (\lambda t) \sum^\infty_{n=0}
+            \frac{(\lambda t)^{n}}{n!}\\
+          \text{Simplifying the power series} \qquad
+          &=e^{-\lambda t} (\lambda t) \cdot e^{\lambda t}\\
+          &=\lambda t
+        \end{align*}
+        To calculate the covariance, I first calculate the second
+        moment, which will be used in the computation of the former
+        \begin{align*}
+          EN_t^2 &=
+            \sum^\infty_{n=0} n^2 e^{-\lambda t} \frac{(\lambda t)^n}{n!}
+            =\sum^\infty_{n=1} n^2 e^{-\lambda t} \frac{(\lambda t)^n}{n!}\\
+          &=e^{-\lambda t} (\lambda t) \sum^\infty_{n=1} n
+          \frac{(\lambda t)^{n-1}}{(n-1)!}\\
+          &=e^{-\lambda t} (\lambda t) \sum^\infty_{n=0} (n+1)
+            \frac{(\lambda t)^{n}}{n!}\\
+          &=e^{-\lambda t} (\lambda t) \left\{\sum^\infty_{n=0} n
+            \frac{(\lambda t)^{n}}{n!} + \sum^\infty_{n=0}
+            \frac{(\lambda t)^{n}}{n!}\right\}\\
+          &=(\lambda t) \sum^\infty_{n=0} ne^{-\lambda t}
+            \frac{(\lambda t)^{n}}{n!}
+            +  (\lambda t)\sum^\infty_{n=0}e^{-\lambda t}
+            \frac{(\lambda t)^{n}}{n!}\\
+          \text{From above} \qquad
+          &=(\lambda t)(\lambda t)
+            +  (\lambda t)\sum^\infty_{n=0}e^{-\lambda t}
+            \frac{(\lambda t)^{n}}{n!}\\
+          &=(\lambda t)^2 + (\lambda t) \cdot 1\\
+          &=(\lambda t)^2 + \lambda t
+        \end{align*}
+        Now, to compute the covariance, I start by computing
+        $E[N_{t+s}N_s]$. However, since $N_{t+s}$ depends upon $N_s$
+        (and cannot be less than $N_s$), it will be easier to break
+        things up into increments as follows:
+        \begin{align*}
+          E[N_{t+s} N_s]
+            &= E[(N_{t+s} - N_s + N_s)N_s] \\
+            &= E[(N_{t+s} - N_s)N_s] + E[N^2_s]
+        \end{align*}
+        Since the Poisson process is defined by independent increments,
+        $N_{t+s}-N_s$ is independent of $N_s$, allowing us to apply $EXY
+        = EX\cdot EY$ for $X\perp Y$, implying
+        \begin{align*}
+          E[N_{t+s} N_s]
+            &= E[N_{t+s} - N_s]EN_s + EN^2_s \\
+            &= (\lambda t) (\lambda s) + (\lambda s)^2 + \lambda s \\
+        \end{align*}
+        where this above simplification uses
+        \begin{enumerate}
+          \item The second moment result from above to get
+            $EN_s^2=(\lambda s)^2 + \lambda s$.
+        \item The result we will prove below that $E[N_{t+s}-N_s] =
+          \lambda t$.
+        \end{enumerate}
+        Finally, this can be applied to compute the covariance function:
+        \begin{align*}
+          E[(N_{t+s}-EN_{t+s})(N_s-EN_s)]
+            &= E[N_{t+s}N_{s}] - E[N_{t+s}]E[N_{s}]\\
+            &= \left[(\lambda t) (\lambda s) + (\lambda s)^2 + \lambda s
+              \right] - (\lambda(t+s))(\lambda s)\\
+            &= \lambda s
+        \end{align*}
+        Since the covariance depends upon the time $s$ from the starting
+        time of the process, not the length $t$ of the time gap between
+        $N_{t+s}$ and $N_s$, the process is not weakly stationary.
+        Therefore, it cannot be strongly stationary either, since
+        strongly stationary implies weakly stationary.
+
+      \item % Question 2b
+        To show that $X_t = N_{t+\alpha}-N_t$ is strongly stationary
+
+      \item % Question 2c
+        First, the mean
+        \begin{align*}
+          EX_t &= E[N_{t+\alpha} - N_t]
+            = E[N_{t+\alpha}] - E[N_t]\\
+            &= \lambda(t+\alpha) - \lambda t = \lambda \alpha
+        \end{align*}
+        Next, $E[X_{t+s} X_s]$, using some of the results from part (a)
+        \begin{align}
+          E[X_{t+s} X_s]
+          &= E[(N_{t+s+\alpha}-N_{t+s})(N_{s+\alpha}-N_s)]\notag\\
+          &= E[N_{t+s+\alpha} N_{s+\alpha}]
+            - E[N_{t+s+\alpha}N_s]
+            - E[N_{t+s}N_{s+\alpha}]
+            + E[N_{t+s}N_s]\notag\\
+          &= \left[(\lambda t)(\lambda(s+\alpha)) + (\lambda(s+\alpha))^2
+            + \lambda (s+\alpha)\right]\notag\\
+            & \qquad - \left[(\lambda(t+\alpha))(\lambda s)
+               + (\lambda s)^2 + \lambda s\right]
+            - E[N_{t+s}N_{s+\alpha}] \notag \\
+          &\qquad + \left[(\lambda t)(\lambda s) +
+              (\lambda s)^2 + \lambda s\right]\notag\\
+          &= \lambda^2 ts + \lambda^2 t\alpha + \lambda^2 s^2
+            + \lambda^2 s\alpha + \lambda^2 \alpha^2 + \lambda s
+            +\lambda \alpha
+            \label{q2c.1}
+        \end{align}
+        Now suppose that $t>\alpha$. Again, we break up the interval
+        into independent increments
+        \begin{align*}
+          E[N_{t+s}N_{s+\alpha}]
+            &= E[(N_{t+s} - N_{s+\alpha} + N_{s+\alpha})N_{s+\alpha}]\\
+            &= E[(N_{t+s} - N_{s+\alpha})N_{s+\alpha}]
+              + E[N^2_{s+\alpha}]\\
+            &= E[N_{t+s} - N_{s+\alpha}]E[N_{s+\alpha}]
+              + E[N^2_{s+\alpha}]\\
+            &= (\lambda(t-\alpha)) (\lambda (s+\alpha))
+              + (\lambda(s+\alpha))^2 + \lambda (s+\alpha)
+        \end{align*}
+        In which case, after substituting in for
+        $E[N_{t+s}N_{s+\alpha}]$, Expression~\ref{q2c.1} simplifies to
+        \begin{align*}
+          E[X_{t+s} X_s] = \lambda^2 \alpha^2
+        \end{align*}
+        Similarly, if $t<\alpha$,
+        \begin{align*}
+          E[N_{t+s}N_{s+\alpha}]
+            &= (\lambda(\alpha-t)) (\lambda (s+t))
+              + (\lambda(s+t))^2 + \lambda (s+t)
+        \end{align*}
+        In which case, after substituting in for
+        $E[N_{t+s}N_{s+\alpha}]$, Expression~\ref{q2c.1} simplifies to
+        \begin{align*}
+          E[X_{t+s}X_{s+\alpha}]
+            = \lambda^2 \alpha^2 + \lambda \alpha + \lambda t
+        \end{align*}
+        In either case, the covariance does not depend upon $s$, total
+        length of time until $X_s$. Rather, it depends upon some fixed
+        constant $\alpha$ and the time gap $t$ between $X_{s}$ and
+        $X_{t+s}$. 
+
+    \end{enumerate}
+\end{enumerate}
+
+
+%% APPPENDIX %%
+
+% \appendix
+
+
+
+
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% SAMPLE CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    %% BIBLIOGRAPHIES %%
+
+        \cite{LabelInSourcesFile}  %Use in text; cites
+        \citep{LabelInSourcesFile} %Use in text; cites in parens
+
+        \nocite{LabelInSourceFile} % Includes in refs w/o specific citation
+        \bibliographystyle{apalike}  % Or some other style
+
+        % To ditch the ``References'' header
+        \begingroup
+        \renewcommand{\section}[2]{}
+        \endgroup
+
+        \bibliography{sources} % where sources.bib has all the citation info
+
+    %% SPACING %%
+
+        \vspace{1in}
+        \hspace{1in}
+
+
+    %% INCLUDING PDF PAGE %%
+
+        \includepdf{file.pdf}
+
+
+    %% INCLUDING CODE %%
+
+        \verbatiminput{file.ext}
+            %---Includes verbatim text from the file
+        \texttt{text}
+            %---Renders text in courier, or code-like, font
+
+        \matlabcode{file.m}
+            %---Includes Matlab code with colors and line numbers
+
+
+    %% INCLUDING FIGURES %%
+
+        % Basic Figure with size scaling
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[scale=1]{file.pdf}
+            \end{figure}
+
+        % Basic Figure with specific height
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[height=5in, width=5in]{file.pdf}
+            \end{figure}
+
+        % Figure with cropping, where the order for trimming is  L, B, R, T
+            \begin{figure}
+               \centering
+               \includegraphics[trim={1cm, 1cm, 1cm, 1cm}, clip]{file.pdf}
+            \end{figure}
+
+
+        % Side by Side figures
+            \begin{figure}[h!]
+                \centering
+                \mbox{\subfigure{
+                    \includegraphics[scale=1]{file1.pdf}
+                }\quad\subfigure{
+                    \includegraphics[scale=1]{file2.pdf}
+                }
+                }
+            \end{figure}
+
+
