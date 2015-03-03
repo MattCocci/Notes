@@ -176,10 +176,11 @@
       &= E\left[\left(\sum^k_{j=1} v_j X_{t_j}\right)^2 \right]
     \end{align*}
     which will certainly be greater than or equal to zero as the square
-    of the sum will always be non-negative.
+    of the sum will always be non-negative. Therefore $B(s,t)$ is
+    positive semi-definite.
 
   \item % Question 2
-    To begin, the distribution of a Poisson process is as follows:
+    To begin, the distribution of a Poisson process follows
     \begin{equation}
       P(N_t = n) = e^{-\lambda t} \frac{(\lambda t)^n}{n!}
     \end{equation}
@@ -199,7 +200,7 @@
           &=\lambda t
         \end{align*}
         To calculate the covariance, I first calculate the second
-        moment, which will be used in the computation of the former
+        moment:
         \begin{align*}
           EN_t^2 &=
             \sum^\infty_{n=0} n^2 e^{-\lambda t} \frac{(\lambda t)^n}{n!}
@@ -225,15 +226,15 @@
         Now, to compute the covariance, I start by computing
         $E[N_{t+s}N_s]$. However, since $N_{t+s}$ depends upon $N_s$
         (and cannot be less than $N_s$), it will be easier to break
-        things up into increments as follows:
+        things up into independent increments as follows:
         \begin{align*}
           E[N_{t+s} N_s]
             &= E[(N_{t+s} - N_s + N_s)N_s] \\
             &= E[(N_{t+s} - N_s)N_s] + E[N^2_s]
         \end{align*}
-        Since the Poisson process is defined by independent increments,
-        $N_{t+s}-N_s$ is independent of $N_s$, allowing us to apply $EXY
-        = EX\cdot EY$ for $X\perp Y$, implying
+        Since the definition of the Poisson process includes independent
+        increments, $(N_{t+s}~-~N_s) \perp N_s$, allowing us
+        to apply $EXY = EX\cdot EY$ for $X\perp Y$, implying
         \begin{align*}
           E[N_{t+s} N_s]
             &= E[N_{t+s} - N_s]EN_s + EN^2_s \\
@@ -243,8 +244,8 @@
         \begin{enumerate}
           \item The second moment result from above to get
             $EN_s^2=(\lambda s)^2 + \lambda s$.
-        \item The result we will prove below that $E[N_{t+s}-N_s] =
-          \lambda t$.
+        \item The result we will prove in part (c) that $E[N_{t+s}-N_s]
+          = \lambda t$.
         \end{enumerate}
         Finally, this can be applied to compute the covariance function:
         \begin{align*}
@@ -254,22 +255,29 @@
               \right] - (\lambda(t+s))(\lambda s)\\
             &= \lambda s
         \end{align*}
-        Since the covariance depends upon the time $s$ from the starting
-        time of the process, not the length $t$ of the time gap between
-        $N_{t+s}$ and $N_s$, the process is not weakly stationary.
-        Therefore, it cannot be strongly stationary either, since
-        strongly stationary implies weakly stationary.
+        Since the covariance depends upon $s$, the absolute time, not
+        the relative length $t$ of the time gap between $N_{t+s}$ and
+        $N_s$, the process is not weakly stationary.  Therefore, it
+        cannot be strongly stationary either, since strongly stationary
+        implies weakly stationary.
 
       \item % Question 2b
-        To show that $X_t = N_{t+\alpha}-N_t$ is strongly stationary
+        $X_t$ is strongly stationary because $X_t=N_{t+\alpha}-N_t$ is an
+        increment of a Poisson Process. By the definition of the Poisson
+        Process, these increments are independent and stationary, so
+        $P(N_{t+\alpha}-N_t) = P(N_\alpha-N_0)$. Therefore $P(X_t) =
+        P(X_0)$ for all $t$.
 
       \item % Question 2c
-        First, the mean
+        \begin{enumerate}
+        \item First, the mean
         \begin{align*}
           EX_t &= E[N_{t+\alpha} - N_t]
             = E[N_{t+\alpha}] - E[N_t]\\
             &= \lambda(t+\alpha) - \lambda t = \lambda \alpha
         \end{align*}
+
+        \item
         Next, $E[X_{t+s} X_s]$, using some of the results from part (a)
         \begin{align}
           E[X_{t+s} X_s]
@@ -287,7 +295,7 @@
               (\lambda s)^2 + \lambda s\right]\notag\\
           &= \lambda^2 ts + \lambda^2 t\alpha + \lambda^2 s^2
             + \lambda^2 s\alpha + \lambda^2 \alpha^2 + \lambda s
-            +\lambda \alpha
+            +\lambda \alpha- E[N_{t+s}N_{s+\alpha}]
             \label{q2c.1}
         \end{align}
         Now suppose that $t>\alpha$. Again, we break up the interval
@@ -307,7 +315,16 @@
         \begin{align*}
           E[X_{t+s} X_s] = \lambda^2 \alpha^2
         \end{align*}
-        Similarly, if $t<\alpha$,
+        As a result, we have the covariance
+        \begin{align*}
+          \text{Cov}(X_{t+s},X_s) &= EX_{t+s}X_s - (EX_{t+s})(EX_s)\\
+          &= \lambda^2\alpha^2 -(\lambda \alpha)(\lambda \alpha) \\
+          &= 0
+        \end{align*}
+        which follows from $t>\alpha$, since that means $X_{t+s}$ and
+        $X_s$ have disjoint intervals.
+
+        On the other hand, if $t<\alpha$,
         \begin{align*}
           E[N_{t+s}N_{s+\alpha}]
             &= (\lambda(\alpha-t)) (\lambda (s+t))
@@ -317,14 +334,376 @@
         $E[N_{t+s}N_{s+\alpha}]$, Expression~\ref{q2c.1} simplifies to
         \begin{align*}
           E[X_{t+s}X_{s+\alpha}]
-            = \lambda^2 \alpha^2 + \lambda \alpha + \lambda t
+            &= \lambda^2\alpha^2 + \lambda \alpha - \lambda t
         \end{align*}
-        In either case, the covariance does not depend upon $s$, total
-        length of time until $X_s$. Rather, it depends upon some fixed
-        constant $\alpha$ and the time gap $t$ between $X_{s}$ and
-        $X_{t+s}$. 
+        As a result, the covariance is
+        \begin{align*}
+          \text{Cov}(X_{t+s}, X_s)
+            &= EX_{t+s}X_s - (EX_{t+s})(EX_s)\\
+            &= \lambda^2\alpha^2 + \lambda \alpha - \lambda t - (\lambda\alpha)^2\\
+            &= \lambda (\alpha - t)
+        \end{align*}
+        So in either case ($t\geq \alpha$ or $t<\alpha$), the covariance
+        does not depend upon $s$, total length of time until $X_s$.
+        Rather, it depends upon some fixed constant $\alpha$ and the
+        time gap $t$ between $X_{s}$ and $X_{t+s}$.
+
+        As a result, we can define
+        \begin{align*}
+        C(t) = \lambda(\alpha - |t|)
+        \end{align*}
+        where the absolute value follows since we must have $C(t) =
+        C(-t)$.
+
+        \item Now for the spectral density of $X(t)$
+        \begin{align*}
+          S(\omega)
+           &= \frac{\lambda}{2\pi} \int^\infty_{-\infty} (\alpha-|t|)e^{-it\omega}  dt\\
+           &= \frac{\lambda}{2\pi} \int^\infty_{0} (\alpha-t)e^{-it\omega} dt
+              + \frac{\lambda}{2\pi}\int^0_{-\infty} (\alpha+t)e^{-it\omega} dt \\
+           &= \frac{\lambda}{2\pi}
+              \left( \frac{i}{\omega}(\alpha-t)e^{-it\omega} \big|^\infty_0
+              + \int^\infty_{0} \frac{i}{\omega}e^{-it\omega} dt
+              \right) \\
+            &\qquad
+             + \frac{\lambda}{2\pi}
+              \left( \frac{i}{\omega}(\alpha+t)e^{-it\omega} \big|^0_{-\infty}
+              - \int^0_{-\infty} \frac{i}{\omega}e^{-it\omega} dt
+              \right) \\
+           &= \frac{\lambda}{2\pi}
+              \left(
+                \frac{\alpha i}{\omega} +
+                \frac{i^2}{\omega^2}e^{-it\omega}\big|_0^\infty
+              \right) \\
+            &\qquad
+             + \frac{\lambda}{2\pi}
+              \left( \frac{i \alpha}{\omega}
+              -  \frac{i^2}{\omega^2}e^{-it\omega}\big|^0_{-\infty}
+              \right) \\
+           &= \frac{\lambda}{2\pi}
+              \left(
+                \frac{\alpha i}{\omega} -
+                \frac{1}{\omega^2}
+              \right)
+             + \frac{\lambda}{2\pi}
+              \left( \frac{i \alpha}{\omega}
+              +  \frac{1}{\omega^2}
+              \right)
+        \end{align*}
+      \end{enumerate}
+    \end{enumerate}
+
+  \item % Question 3
+    In this question $X_t = \xi_1 e^{i\lambda_1 t} + \xi_2
+    e^{i\lambda_2 t}$ with $\lambda_1 \neq \lambda_2$ and $\xi_i$ random
+    variables.
+    \begin{enumerate}
+      \item % Question 3a
+        First we show that $E\xi_i=0$ and $E\xi_1\xi_2=0$ implies $X_t$
+        is weakly stationary.
+
+        First, the mean:
+        \begin{align*}
+          EX_t &= E[ \xi_1 e^{i\lambda_1 t} + \xi_2e^{i\lambda_2 t}] \\
+          &=  e^{i\lambda_1 t}E[ \xi_1] + e^{i\lambda_2 t}E[\xi_2] \\
+          \text{By assumption} \qquad
+          &=  e^{i\lambda_1 t}\cdot 0 + e^{i\lambda_2 t}\cdot 0 = 0
+        \end{align*}
+        As a result, the mean of $X_t$ is constant at zero for all $t$.
+
+        Now for the covariance:
+        \begin{align*}
+          \text{Cov}(X_{s+t},X_s) &= EX_{t+s}\overline{X_s} -(EX_{t+s})(EX_s) \\
+          &=  EX_{t+s}\overline{X_s}-0 \\
+          &= EX_{t+s}\overline{X_s}\\
+          &= E[( \xi_1 e^{i\lambda_1 (t+s)} + \xi_2e^{i\lambda_2 (t+s)})
+            \overline{( \xi_1 e^{i\lambda_1 s} + \xi_2e^{i\lambda_2 s})}]\\
+          &= E[ (\xi_1 e^{i\lambda_1 (t+s)} + \xi_2e^{i\lambda_2 (t+s)})
+            ( \overline{\xi_1} e^{-i\lambda_1 s} + \overline{\xi_2}e^{-i\lambda_2 s})]\\
+          &= E[ \xi_1\overline{\xi_1} e^{i\lambda_1 t}]
+             + E[ \xi_1\overline{\xi_2} e^{i\lambda_1 (t+s)-i\lambda_2 s}]\\
+          &\qquad
+             + E[ \xi_2\overline{\xi_1} e^{i\lambda_2 (t+s)-i\lambda_1 s}]
+            + E[ \xi_2\overline{\xi_2} e^{i\lambda_2 t}] \\
+          &= e^{i\lambda_1 t}E[ \xi_1\overline{\xi_1} ]
+             + e^{i\lambda_1 (t+s)-i\lambda_2 s}E[ \xi_1\overline{\xi_2} ]\\
+          &\qquad
+             + e^{i\lambda_2 (t+s)-i\lambda_1 s}E[ \xi_2\overline{\xi_1}]
+            + e^{i\lambda_2 t}E[ \xi_2\overline{\xi_2} ] \\
+          &= e^{i\lambda_1 t}E[ \xi_1\overline{\xi_1} ]
+             +0 +0
+            + e^{i\lambda_2 t}E[ \xi_2\overline{\xi_2} ]
+        \end{align*}
+        Clearly, $EX_{t+s}X_s$ does not depend upon $s$, only the time
+        gap $t$ between $X_{s}$ and $X_{t+s}$.  Combined with the fact
+        that $X_t$ has constant mean, $X_t$ is therefore second-order
+        stationary.
+
+        Next, we want to show that second order stationary implies
+        $E\xi_i=0$ and $E\xi_1\xi_2=0$.
+
+        Starting with the mean, suppose without loss of generality that
+        $\lambda_2 >\lambda_1$. Then
+        \begin{align*}
+          EX_t &= E[ \xi_1 e^{i\lambda_1 t} + \xi_2e^{i\lambda_2 t}] \\
+          &=  e^{i\lambda_1 t}E[ \xi_1] + e^{i\lambda_2 t}E[\xi_2]
+          %\\
+          %&=  e^{i\lambda_1 t}\left( E[ \xi_1] + e^{i(\lambda_2-\lambda_1) t}E[\xi_2]
+          %\right)
+        \end{align*}
+        For this to be constant for all $t$, we need $E\xi_i=0$,
+        otherwise, for constants $E[\xi_1]$ and $E[\xi_2]$, the two
+        terms won't balance out at a constant (assuming $\lambda_1\neq
+        \lambda_2$) since the exponential will be growing at different
+        rates with $t$.
+
+        For the covariance, we use the fact that $E\xi_i=0$ and focus
+        on $E\xi_1\xi_2$. From above, we know
+        \begin{align*}
+          EX_{t+s}\overline{X_s}
+          &= e^{i\lambda_1 t}E[ \xi_1\overline{\xi_1} ]
+             + e^{i\lambda_1 (t+s)-i\lambda_2 s}E[ \xi_1\overline{\xi_2} ]\\
+          &\qquad
+             + e^{i\lambda_2 (t+s)-i\lambda_1 s}E[ \xi_2\overline{\xi_1}]
+            + e^{i\lambda_2 t}E[ \xi_2\overline{\xi_2} ] \\
+        \end{align*}
+        Since $\lambda_1\neq \lambda_2$, the terms $e^{i\lambda_1
+        (t+s)-i\lambda_2 s}$ and $e^{i\lambda_2 (t+s)-i\lambda_1 s}$
+        need to drop, otherwise the covariance will be a function of
+        $s$, violating second-order stationarity. The only way this can
+        happen is if $E\xi_1\xi_2=0$.
+
+      \item % Question 3b
+        Since $X_t = \sum^2_{i=1}\xi_i e^{i\lambda_i t}$, we know that
+        the spectral process of $X$ satisfies
+        \begin{align*}
+          dZ(\lambda) = \sum^2_{i=1} \xi_i \delta(\lambda -\lambda_i) d\lambda
+        \end{align*}
+        Therefore
+        \begin{align*}
+          dF(\lambda) = \sum^2_{j=1} a_j \delta(\lambda -\lambda_j) d\lambda
+        \end{align*}
+        where $E|\xi_j|^2 = a_j$.
+
+        As a result
+        \begin{align*}
+          C(t) &= \int_\mathbb{R} e^{i\lambda t} dF(\lambda) \\
+            &= \int_\mathbb{R} e^{i\lambda t}
+              \sum^2_{j=1} a_j \delta(\lambda -\lambda_j) d\lambda \\
+            &= \sum^2_{j=1} a_j e^{i\lambda_j t}
+        \end{align*}
+
+        Moreover, the spectral distribution function can be written
+        \begin{align*}
+         F(\lambda) =
+          \begin{cases}
+            0 & \lambda < \lambda_1 \\
+            a_1 & \lambda \in [\lambda_1,\lambda_2)\\
+            a_1+a_2 & \lambda \geq \lambda_2
+          \end{cases}
+        \end{align*}
+
+      \item % Question 3c
+      \item % Question 3d
 
     \end{enumerate}
+
+  \item % Question 4
+    \begin{enumerate}
+      \item % Question 4a
+        Because $X(0)\sim \pi$, we can evolve the probability
+        distributions by right multiplying probability distributions by
+        $P$. We also use the fact that $\pi$ is the stationary
+        distribution (implying $\pi P = \pi$) to get
+        \begin{align*}
+          X_n &\sim \pi P^n = (\pi P)P^{n-1} = \pi P^{n-1} = \cdots = \pi
+        \end{align*}
+        Since the distribution of $X_n$ is the same for all $n$, $X$ is
+        strongly stationary.
+
+        $I$ is also strongly stationary because the distribution of
+        $I_n$ is fully characterized by $P(I_n=1)=P(X_n=k)$, which does
+        not change over time since $X_n$ is strongly stationary,
+        implying $P(X_n=k)$ is constant. As a result $P(I_n=1)$ is
+        constant as well.
+
+      \item % Question 4b
+        First, the mean:
+        \begin{align*}
+          EI_n &= 1\cdot P(I_n=1) + 0\cdot P(I_n=0)\\
+          &= P(X_n=k)\\
+          &= \pi_k
+        \end{align*}
+        Next for the covariance function, I compute $E[I_{n+m}I_n]$
+        which will only be nonzero if $I_{n+m}=I_n=1$, allowing
+        \begin{align*}
+          E[I_{n+m}I_n] &= 1 \cdot 1\cdot P(I_{n+m}=1, I_n=1)\\
+          &= P(X_{n+m}=k , X_n=k)\\
+          &= P(X_{n+m}=k | X_n=k)\cdot P(X_n=k)\\
+          &= (P^m)_{kk}  \pi_k
+        \end{align*}
+        where $(P^m)_{kk}$ is the $k$th element of matrix $P^m$.
+
+      \item % Question 4c
+        First, we need to argue that $\frac{1}{n}S_n$ is weakly stationary:
+        \begin{align*}
+          E\left[\frac{1}{n}S_n\right] = \frac{1}{n}E\left\{\sum^{n-1}_{j=0}I_j\right\}
+            = \frac{1}{n}\sum^{n-1}_{j=0}E\left\{I_j\right\}
+            = \frac{1}{n} (n \pi_k) = \pi_k
+        \end{align*}
+        which is constant for all $n$.
+
+        In addition, the covariance function between
+        $\frac{1}{n+m}S_{n+m}$ and $\frac{1}{n}S_n$ will only depend
+        upon the gap $m$ since
+        $E\left(\frac{1}{n+m}S_{n+m}\right)\left(\frac{1}{n}S_n\right)$
+        is a sum of terms like $E[I_iI_j]$, which is just $(P^t)_kk$ for
+        some $t$ (see above) and thus independent of $n$.
+
+        Therefore, $\frac{1}{n}S_n$ is weakly stationary, and since the
+        rate of approach of $(P^n)_{ij}$ to $\pi_j$ is exponential
+        $C(n)\in L^1(0,\infty)$, implying that $\frac{1}{n}S_n$
+        converges to $\pi_k$ in mean square.
+
+        %Next, the covariance
+        %\begin{align*}
+          %E\left[\left(\frac{1}{n+m}S_{n+m} \right)\left(\frac{1}{n} S_n\right)\right]
+          %= \frac{1}{n(n+m)}E\left[S_{n+m}S_n\right]\\
+          %= \frac{1}{n(n+m)}E\left[(S_{n+m}-S_n + S_n)S_n\right]\\
+        %\end{align*}
+
+    \end{enumerate}
+
+  \item % Question 5
+    \begin{enumerate}
+      \item Assuming that $C(t) = EX_{t+s}X_s$ has a continuous second
+      derivative, we want to compute the limit of
+      \begin{align*}
+        E&\left[\frac{X_{t+h}-X_t}{h} - \frac{X_{t+h'}-X_t}{h'}\right]^2 \\
+        &\qquad
+          = E\left[\frac{\left(X_{t+h}-X_t\right)^2}{h^2}\right]
+            - 2E\left[ \frac{X_{t+h}-X_t}{h} \frac{X_{t+h'}-X_t}{h'}\right]\\
+          &\qquad\qquad + E\left[\frac{\left(X_{t+h'}-X_t\right)^2}{h'^2}\right]\\
+        &\qquad
+          =
+            \frac{1}{h^2}E\left[X^2_{t+h}-2X_{t+h}X_t+X_t^2\right]\\
+          & \qquad\qquad- \frac{2}{hh'}
+            E\left[ X_{t+h}X_{t+h'} -X_{t+h} X_t -X_{t+h'}X_t + X_t^2\right]\\
+          &\qquad\qquad + \frac{1}{h'^2} E\left[X_{t+h'}^2 - 2X_{t+h'}X_t + X_t^2\right]
+      \end{align*}
+    Breaking things up via linearity
+    \begin{align*}
+      E&\left[\frac{X_{t+h}-X_t}{h} - \frac{X_{t+h'}-X_t}{h'}\right]^2 \\
+        &\qquad=
+          \frac{1}{h^2}E\left[X^2_{t+h}\right]
+          -\frac{2}{h^2}E\left[X_{t+h}X_t\right]
+          +\frac{1}{h^2}E\left[X_t^2\right]\\
+        & \qquad\qquad
+          -\frac{2}{hh'}
+          E\left[ X_{t+h}X_{t+h'}\right]
+          +\frac{2}{hh'}
+          E\left[ X_{t+h} X_t\right]
+          +\frac{2}{hh'}
+          E\left[ X_{t+h'}X_t \right]
+          -\frac{2}{hh'}
+          E\left[ X_t^2\right]\\
+        &\qquad\qquad
+          + \frac{1}{h'^2} E\left[X_{t+h'}^2\right]
+          - \frac{2}{h'^2} E\left[X_{t+h'}X_t\right]
+          + \frac{1}{h'^2} E\left[X_t^2\right]\\\\
+    \end{align*}
+    Now using the definition of the covariance function, we can
+    substitute in and simplify:
+    \begin{align*}
+      E&\left[\frac{X_{t+h}-X_t}{h} - \frac{X_{t+h'}-X_t}{h'}\right]^2 \\
+        & \quad =
+          \frac{C(0) - 2C(h) +C(0)}{h^2}
+          -\frac{2 (C(h-h') - C(h) - C(h') +C(0))}{hh'}\\
+        &\qquad\qquad
+          + \frac{(C(0) -2C(h') + C(0) }{h'^2}
+    \end{align*}
+    Since $C(t)$ has a continuous second derivative, it has a first
+    derivative and we can apply the Mean Value Theorem
+    \begin{align*}
+      E&\left[\frac{X_{t+h}-X_t}{h} - \frac{X_{t+h'}-X_t}{h'}\right]^2 \\
+        & \quad =
+          -\frac{2}{h}\frac{C(h) - C(0)}{h}
+          -\frac{2}{h} \frac{C(h-h') - C(h)}{h'}
+          +\frac{2}{h} \frac{C(h') -C(0))}{h'}\\
+        &\qquad\qquad
+          -\frac{2}{h'}\frac{C(h') - C(0)}{h'}\\
+        & \quad =
+          -\frac{2}{h}C'(h_1)
+          -\frac{2}{h} C'(h_2)
+          +\frac{2}{h} C'(h_3)
+          -\frac{2}{h'}C'(h_4)
+    \end{align*}
+    Taking the limit as $h,h'\rightarrow 0$, $h_i\rightarrow 0$ as well
+    for $i=1,2,3,4$, and we get a sum of scalar multiples of $C'(0)$.
+    Since $C(0)$ is the maximum of the covariance function, $C'(0)=0$,
+    so the limit equals 0.
+
+    \item % Question 5b
+      To show this, we write out
+      \begin{align*}
+        E\left[ \frac{X_{s+t+h}-X_{s+t}}{h} \frac{X_{s+h}-X_s}{h}\right]
+        &= \frac{1}{h^2}
+        E\left[ (X_{s+t+h}-X_{s+t}) (X_{s+h}-X_s)\right]\\
+        &= \frac{1}{h^2}\left\{
+        E[ X_{s+t+h} X_{s+h}] -E[X_{s+t+h} X_s ] \right. \\
+        &\left. \qquad -E[X_{s+t} X_{s+h}]+ E[X_{s+t}X_{s}]
+        \right\}\\
+        &= \frac{1}{h^2}\left\{ C(t) -C(t+h) -C(t-h)+ C(t) \right\}
+      \end{align*}
+      Rearranging and applying the Mean Value Theorem
+      \begin{align*}
+        \lim_{h\rightarrow 0}
+        E\left[ \frac{X_{s+t+h}-X_{s+t}}{h} \frac{X_{s+h}-X_s}{h}\right]
+        &= \lim_{h\rightarrow 0}
+          \frac{1}{h^2}\left\{ C(t) -C(t+h) -C(t-h)+ C(t) \right\}\\
+        &= -\lim_{h\rightarrow 0}
+          \frac{1}{h}\left\{ \frac{C(t+h) -C(t)}{h} -\frac{C(t) -C(t-h)}{h} \right\}\\
+        &= -\lim_{h\rightarrow 0}
+          \frac{C'(h_1) - C'(h_2)}{h}
+      \end{align*}
+      for $h_1 \in [t,t+h]$ and $h_2\in [t-h,t]$. But this is
+      \begin{align*}
+        E\left[ \frac{X_{s+t+h}-X_{s+t}}{h} \frac{X_{s+h}-X_s}{h}\right]
+        &= -C''(t)
+      \end{align*}
+  \end{enumerate}
+
+  \item % Question 6
+    \begin{enumerate}
+      \item % Question 6a
+        To calculate $X'_t$ via the spectral representation:
+        \begin{align*}
+          X'_t
+            &=  \frac{d}{dt} \int^\infty_{-\infty} e^{i\lambda t} dZ(\lambda)\\
+            &=  \int^\infty_{-\infty} \frac{d}{dt} e^{i\lambda t} dZ(\lambda)\\
+            &=  \int^\infty_{-\infty} i\lambda e^{i\lambda t} dZ(\lambda)
+        \end{align*}
+
+      \item To compute the joint covariance:
+        \begin{align*}
+          C_{X,X'}(t) = EX_{t+s}\overline{X'_s}
+            &= \int^\infty_{-\infty} \int^\infty_{-\infty}
+            \left(e^{i\lambda (t+s)}\right)
+            \overline{\left(i\tilde{\lambda} e^{i\tilde{\lambda} s}\right)}
+            E(dZ(\lambda)\overline{dZ(\tilde{\lambda})}) \\
+          &= \int^\infty_{-\infty} \int^\infty_{-\infty}
+            -i\tilde{\lambda} e^{i(\lambda-\tilde{\lambda}) s +{i\lambda}t}
+            E(dZ(\lambda)\overline{dZ(\tilde{\lambda})}) \\
+          &= \int^\infty_{-\infty} \int^\infty_{-\infty}
+            -i\tilde{\lambda} e^{i(\lambda-\tilde{\lambda}) s +{i\lambda}t}
+            \delta(\lambda-\tilde{\lambda}) dF(\lambda)\tilde{\lambda}\\
+          &= \int^\infty_{-\infty} 
+            -i{\lambda} e^{{i\lambda}t}
+            dF(\lambda)
+        \end{align*}
+
+    \end{enumerate}
+
 \end{enumerate}
 
 
