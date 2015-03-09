@@ -1,3 +1,9 @@
+%% Code for Homework 3
+%
+% Matthew Cocci
+% Octave/Matlab Code
+
+
 %% Set up Generator Matrix
 Q = [...
  -2, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ;...

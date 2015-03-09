@@ -1,0 +1,687 @@
+\documentclass[12pt]{article}
+
+\author{Matthew D. Cocci}
+\title{Homework 5}
+\date{\today}
+%% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % most detailed page formatting control
+\usepackage{fullpage} % Simpler than using the geometry package; std effect
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt}
+    %---Make the header bigger to avoid overlap
+
+%\renewcommand{\headrulewidth}{0.3pt}
+    %---Width of the line
+
+%\setlength{\headsep}{0.2in}
+    %---Distance from line to text
+
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{amsthm} %allows for labeling of theorems
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+
+% Below supports left-right alignment in matrices so the negative
+% signs don't look bad
+\makeatletter
+\renewcommand*\env@matrix[1][c]{\hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols #1}}
+\makeatother
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %---For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %---Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+        %---This colors the links themselves, not boxes
+    citecolor=black,
+        %---Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{verbatim}
+    %---For including verbatim code from files, no colors
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{RGB}{28,172,0}
+\definecolor{mylilas}{RGB}{170,55,241}
+\newcommand{\matlabcode}[1]{%
+    \lstset{language=Matlab,%
+        basicstyle=\footnotesize,%
+        breaklines=true,%
+        morekeywords={matlab2tikz},%
+        keywordstyle=\color{blue},%
+        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+        identifierstyle=\color{black},%
+        stringstyle=\color{mylilas},%
+        commentstyle=\color{mygreen},%
+        showstringspaces=false,%
+            %---Without this there will be a symbol in
+            %---the places where there is a space
+        numbers=left,%
+        numberstyle={\tiny \color{black}},%
+            %---Size of the numbers
+        numbersep=9pt,%
+            %---Defines how far the numbers are from the text
+        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+            %---Some words to emphasise
+    }%
+    \lstinputlisting{#1}
+}
+    %---For including Matlab code from .m file with colors,
+    %---line numbering, etc.
+
+%% Bibliographies %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{natbib}
+    %---For bibliographies
+%\setlength{\bibsep}{3pt} % Set how far apart bibentries are
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{enumitem}
+    %---Has to do with enumeration
+\usepackage{appendix}
+\usepackage{pdfpages}
+    %---For including whole pdf pages as a page in doc
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+\maketitle
+
+%\tableofcontents
+
+\begin{enumerate}
+  \item % Question 1
+    \begin{enumerate}
+      \item % Question 1a
+        By definition, Brownian motion has normally distributed
+        increments and $W_0=0$. Therefore we can write
+        \begin{align*}
+          X_t = W_t - t W_1 = (W_t-W_0) - t(W_1-W_0)
+        \end{align*}
+        Since the sums of normally distributed random variables are also
+        normally distributed, the stochastic process $X_t$ will be
+        normal as it is the sum of two normally distributed RV's
+        (the increments $W_t-W_0$ and $-t(W_1-W_0)$).
+      \item % Question 1b
+        First the mean:
+        \begin{align*}
+          E[X_t] &= E[W_t - t W_1] = E[W_t] - tE[W_1] \\
+          &= 0 - 0 \cdot 0 = 0
+        \end{align*}
+        Next the covariance of $X_t$:
+        \begin{align*}
+          E[X_tX_s]
+          &= E\left[
+            (W_t -tW_1)(W_s -sW_1)
+            \right]\\
+          &= E\left[
+            W_t W_s - sW_tW_1 - t W_1 W_s + st W_1^2
+            \right]\\
+          &= E[ W_t W_s] - sE[W_tW_1] - tE[W_1 W_s] + stE[ W_1^2 ] \\
+          &= \min(s,t) - s\min(t,1) - t\min(1,s) + st
+        \end{align*}
+        If $s,t\in[0,1]$, then this simplifies to
+        \begin{align*}
+          E[X_tX_s]
+          &= \min(s,t) - st - ts + st
+          = \min(s,t) - st
+        \end{align*}
+
+      \item % Question 1c
+        To find the KL expansion on $[0,1]$ of $X_t$, we first find the
+        eigenfunctions
+        \begin{align*}
+          \lambda_k e_k(s) &=
+          \int^1_0 \left[ \min(s,t) - st\right]e_k(t) dt \\
+          &=
+          \int^s_0 \left[t - st\right]e_k(t) dt +
+          \int^1_s \left[ s - st\right]e_k(t) dt \\
+        \end{align*}
+        Taking the first derivative $\frac{d}{ds}$ gives
+        \begin{align*}
+          \lambda_k e'_k(s) &=
+          e_k(s)(s-s^2) - \int^s_0 te_k(t) dt
+          -  e_k(s)(s-s^2) + \int^1_s (1-t) e_k(t) dt \\
+          &= - \int^s_0 te_k(t) dt
+           + \int^1_s (1-t) e_k(t) dt
+        \end{align*}
+        Taking the derivative again, we get
+        \begin{align*}
+          \lambda_k e''_k(s) &=  -s e_k(s) + (s-1)e_k(s)\\
+          &= -e_k(s)
+        \end{align*}
+        Note that the above equations give boundary conditions of
+        $e_k(0)=e_k(1)=0$. Solving the following Sturm-Liouville problem
+        \begin{align*}
+          e''_k(s) +\frac{1}{\lambda_k} e_k(s) = 0
+        \end{align*}
+        This gives eigenvalues and eigenfunctions
+        \begin{align*}
+          \lambda_k = \left(\pi k\right)^{-2}
+          \qquad
+          e_k(s) = \sqrt{2} \sin\left( \pi ks \right)
+          \qquad k = 1,2,\ldots
+        \end{align*}
+        Therefore we can express the Brownian Bridge as
+        \begin{align*}
+          X_t = \sum_{k=1}^\infty \xi_k \frac{\sqrt{2}}{\pi k}
+          \sin(\pi kt)
+        \end{align*}
+        To pin down the $\xi_k$ terms:
+        \begin{align*}
+          \xi_k
+            &= \int^1_0 X_t e_k(t) dt \\
+            &= \sqrt{2} \int^1_0 X_t \sin(\pi k t) dt \\
+        \end{align*}
+        From the notes, we know that the $\xi_k$ terms are also Gaussian
+        with mean zero and variance $\lambda_k$, as the process $X_t$ is
+        Gaussian (from part a).
+
+
+    \end{enumerate}
+
+  \item % Question 2
+    Define $X_t = e^{-\frac{1}{2}\int^1_0 W_t^2 dt}$. Now, let's write
+    out $X_t$ using the KL expansion on $[0,1]$ for $W_t$ derived in the
+    notes, subtituting in for $W^2_t$:
+    \begin{align*}
+      X_t = \exp\left\{
+        -\frac{1}{2}\int^1_0
+        \left[
+        \sum^\infty_{k=1}\xi_k \frac{\sqrt{2}}{\pi\left(k-\frac{1}{2}\right)}
+        \sin\left(\pi\left(k-\frac{1}{2}\right)t\right)
+        \right]^2 dt
+      \right\}
+    \end{align*}
+    Since $E[\xi_k\xi_j]=0$ for all $k\neq j$, the cross product terms
+    drop, leaving
+    \begin{align*}
+      X_t
+      &= \exp\left\{
+        -\frac{1}{2}\int^1_0
+        \sum^\infty_{k=1}\xi^2_k \frac{2}{\pi^2\left(k-\frac{1}{2}\right)^2}
+        \sin^2\left(\pi\left(k-\frac{1}{2}\right)t\right) dt
+      \right\}\\
+      &= \exp\left\{
+        -\sum^\infty_{k=1}
+        \xi^2_k \frac{1}{\pi^2\left(k-\frac{1}{2}\right)^2}\int^1_0
+        \sin^2\left(\pi\left(k-\frac{1}{2}\right)t\right) dt
+      \right\}
+    \end{align*}
+    Sparing the tedious calculations, the integral and expression
+    evaluate to
+    \begin{align*}
+      X_t
+      &= \exp\left\{
+        -\sum^\infty_{k=1}\xi_k^2\cdot
+        \frac{2(\pi(2k-1) + \sin(2\pi k) )}{\pi^3(2k-1)^3}
+      \right\}
+    \end{align*}
+    Since the $\sin(2\pi k)$ term always evaluates at multiples of
+    $2\pi$, this expression will always be zero, allowing further
+    simplification
+    \begin{align*}
+      X_t
+      &= \exp\left\{
+        -\sum^\infty_{k=1}\xi_k^2\cdot
+        \frac{2(\pi(2k-1) + 0 )}{\pi^3(2k-1)^3}
+      \right\}\\
+      &= \exp\left\{
+        -\frac{1}{2}\sum^\infty_{k=1}
+        \frac{4\xi_k^2}{\pi^2(2k-1)^2}
+      \right\}\\
+    \end{align*}
+
+  \item % Question 3
+    To show that $Y_t = Q W_t$ is also a $d$-dimension Brownian motion,
+    we need to show that each component is an independent Brownian
+    motion.
+
+    \paragraph{Normality}
+    Let $Y^{(n)}_t$ be the $n$th entry in $Y_t$, which can be written
+    \begin{align*}
+      Y_t^{(n)} = Q_{n\cdot} W_t =
+      \sum^d_{j=1} q_{nj} W^{(j)}_t
+    \end{align*}
+    As a sum of independent Gaussians RV's, $Y^{(n)}_t$ will also be
+    Gaussian. Moreover, the process will be mean zero as it is a sum of
+    mean-zero processes.
+
+    \paragraph{Independent Elements} To show that any two entries
+    $Y^{(n)}_t$ and $Y^{(m)}_t$ (for $n\neq m$ and
+    $n,m\in\{1,\ldots,d\}$) in vector $Y_t$ are independent, it suffices
+    to show that they are uncorrelated since each element is Gaussian
+    (from above).
+
+    With that in mind, we now compute the covariance matrix of $Y_t$
+    (which is equivalent to $E[Y_tY^T_t]$ since mean zero):
+    \begin{align*}
+      E\left[Y_t Y^T_t\right]
+      &= E\left[
+        \left(Q W_t\right)
+        \left(QW_t\right)^T
+      \right] \\
+      &= E\left[
+        \left(Q W_t\right)
+        \left(W^T_t Q^T\right)
+      \right] \\
+      &= QE\left[
+        W_t
+        W^T_t\right] Q^T
+    \end{align*}
+    Since $W_t$ was composed of independent Brownian motions, the
+    covariance matrix of $W_t$ is
+    \begin{align*}
+      \text{Cov}(W_t,W^T_t)
+        &= E[W_tW^T_t] - E[W_t] E[W^T_t]\\
+        &= tI_d - 0
+    \end{align*}
+    Substituting into the expression above
+    \begin{align*}
+      E\left[Y_t Y^T_t\right]
+      &= QE\left[
+        W_t W^T_t
+        \right] Q^T
+      = Q
+        \left(t I_d\right)
+        Q^T \\
+      \text{By orthogonality} \qquad
+      &= t Q Q^T = t I_d
+    \end{align*}
+    Therefore all off-diagonal elements are 0, indicating that the
+    elements of $Y_t$ are uncorrelated. Since they are Gaussian, this
+    also implies independence.
+
+    \paragraph{Independent Increments}
+    For any $\{t_0,t_1,t_2\}$, we have
+    \begin{align*}
+      Y_{t_2} - Y_{t_1} &= Q (W_{t_2} - W_{t_1})\\
+      Y_{t_1} - Y_{t_0} &= Q (W_{t_1} - W_{t_0})
+    \end{align*}
+    By definition, $(W_{t_2}-W_{t_1}) \perp (W_{t_1}-W_{t_0})$,
+    therefore $Q(W_{t_2}-W_{t_1}) \perp Q(W_{t_1}-W_{t_0})$.
+
+    \paragraph{Continuity}
+    Since the sum of continuous processes is continuous, each element of
+    $Y_t$ is continuous.
+
+    Therefore $Y_t$ satisfies all properties of $d$-dimensional Brownian
+    motion.
+
+  \item % Question 4
+    \begin{enumerate}
+      \item % Question 4, Part a
+        First, start by defining a sequence of partitions
+        \begin{align*}
+          \sigma_n =
+          \left\{0,\frac{t}{n},\frac{2t}{n},\frac{3t}{n},\ldots,t\right\}
+          \Rightarrow |\sigma_n| = \frac{t}{n}
+        \end{align*}
+        To show convergence in mean square of the quadratic variation,
+        we need to show
+        \begin{align*}
+          \lim_{n\rightarrow \infty}
+          E|Q^{\sigma_n}_t(aW_t + bt) - a^2 t|^2 = 0
+        \end{align*}
+        where $X_n = Q^{\sigma_n}_t(aW_t + bt)$ is the random variable
+        that will be converging in mean square.
+
+        For more compact expressions, I will use the following notation
+        \begin{align*}
+          \Delta t_i = t_i-t_{i-1} \qquad
+          \Delta W_i = W_i-W_{i-1} \qquad
+        \end{align*}
+        I will also use the result from the notes that $(\Delta W_t)^2=
+        \Delta t$. As a result,
+        \begin{align*}
+          E|Q^{\sigma_n}_t(aW_t + bt) - a^2 t |^2
+          &=
+          E\left\lvert
+            \sum^{n}_{i=1}
+              \left[
+                \left(aW_{t_{i}} + bt_{i}\right)
+                -\left(aW_{t_{i-1}} + bt_{i-1}\right)
+              \right]^2
+              - a^2 t
+          \right\rvert^2\\
+          &=
+          E\left\lvert
+            \sum^{n}_{i=1}
+              \left[
+                a\left(W_{t_{i}} - W_{t_{i-1}}\right)
+                + b\left(t_{i} - t_{i-1}\right)
+              \right]^2
+              - a^2 t
+          \right\rvert^2\\
+          &=
+          E\left\lvert
+            \sum^{n}_{i=1}
+              \left[
+                a\left(\Delta W_{t_{i}}\right)
+                + b\left(\Delta t_i \right)
+              \right]^2
+              - a^2 \sum^n_{i=1} \Delta t_i
+          \right\rvert^2\\
+          &=
+          E\left\lvert
+            \sum^{n}_{i=1}
+                a^2\left(\Delta W_{t_{i}}\right)^2
+                + 2ab\left(\Delta W_{t_{i}}\right)\left(\Delta t_i \right)
+                + b^2\left(\Delta t_i \right)^2
+              - a^2 \Delta t_i
+          \right\rvert^2\\
+        \end{align*}
+      \item % Question 4b
+        Start by defining
+        \begin{align*}
+          M = \sup_{\sigma} \sum^n_{i=0} |f(t_{i+1})-f(t_i)|
+        \end{align*}
+        Next, let $\varepsilon>0$ be given. Since $f$ is continuous with
+        finite total variation on $[0,t]$ (and $[0,t]$ is compact), $f$
+        is uniformly continuous on $[0,t]$. Therefore there exists a
+        $\delta>0$ such that
+        \begin{align*}
+          |t_{i+1}-t_i|<\delta
+          \quad \Rightarrow \quad
+          |f(t_{i+1}) - f(t_i)|< \frac{\varepsilon}{M}
+        \end{align*}
+        As result, as $|\sigma|\rightarrow0$, we will have
+        $|\sigma|<\delta$, which implies
+        \begin{align*}
+          Q^\sigma_t(f) = \sum^n_{i=0} |f(t_{i+1})-f(t_i)|^2
+          \leq
+          \frac{\varepsilon}{M}
+          \sum^n_{i=0} |f(t_{i+1})-f(t_i)|
+          \leq \frac{\varepsilon}{M} \cdot M
+          = \varepsilon
+        \end{align*}
+        Now since $Q^\sigma_t(f)\geq 0$ by definition and since we just
+        showed that $Q^\sigma_t(f)\leq\varepsilon$ for arbitrary
+        $\varepsilon$, we have $Q^\sigma_t(f)\rightarrow 0$ as
+        $|\sigma|\rightarrow0$.
+
+
+    \end{enumerate}
+  \item % Question 5
+    To compute the generator of $X_t$, we need to simplify
+    \begin{align*}
+      \mathcal{A}f(x)
+        & \lim_{t\rightarrow0}
+        \frac{E_xf(X_t) - f(x)}{t} \\
+        &= \lim_{t\rightarrow0} \frac{1}{t}
+        \int_A (f(y)-f(x))p(y,t|x,0) dy\\
+    \end{align*}
+    Where $A$ is the (assumed) compact support of $f$. We then break up
+    this support into $A = A_{\geq\varepsilon} \cup A_{<\varepsilon}$, where
+    \begin{align*}
+      A_{\geq\varepsilon} = \{y \in A;\; |x-y| \geq \varepsilon\}
+      \qquad
+      A_{<\varepsilon} = \{y \in A:\; |x-y| < \varepsilon\}
+    \end{align*}
+    Splitting up the integral, we have
+    \begin{align}
+      \lim_{t\rightarrow0} \frac{1}{t}
+      \int_A (f(y)-f(x))p(y,t|x,0) dy
+      &= \lim_{t\rightarrow0} \frac{1}{t}
+        \left[
+        \int_{A_{\geq\varepsilon}} (f(y)-f(x))p(y,t|x,0) dy \right.
+        \label{q5.1}
+        \\
+        &\qquad \qquad +\left.
+        \int_{A_{<\varepsilon}} (f(y)-f(x))p(y,t|x,0) dy
+      \right]\notag
+    \end{align}
+    First, let's handle the first part of the sum in
+    Expression~\ref{q5.1}. Since $f$ is twice differentiable it is
+    continuous.  Since $A$, the domain of $f$, is compact, we know that
+    $f$ is bounded (and $f(y)-f(x)$ will be too). Then, by an assumption
+    of the problem,
+    \begin{align*}
+      \lim_{t\rightarrow0} \frac{1}{t}
+        \int_{A_{\geq\varepsilon}} (f(y)-f(x))p(y,t|x,0) dy
+      = O(\varepsilon)
+    \end{align*}
+    Now let's handle the second part of the sum in
+    Expression~\ref{q5.1}, using the fact that $f$ is twice
+    differentiable so that
+    \begin{align*}
+      f(y) = f(x)+f'(x)(y-x)+\frac{1}{2}f''(x)(y-x)^2 + |x-y|^2R(x,y)
+    \end{align*}
+    So we can substitute in the Taylor expansion to get
+    \begin{align*}
+      \lim_{t\rightarrow0} &\frac{1}{t}
+        \int_{A_{<\varepsilon}} (f(y)-f(x))p(y,t|x,0) dy
+        \\
+      &= \lim_{t\rightarrow0} \frac{1}{t}
+      \int_{A_{<\varepsilon}} \left[
+        f'(x)(y-x)+\frac{1}{2}f''(x)(y-x)^2 + |x-y|^2R(x,y)
+      \right]p(y,t|x,0) dy \\
+      &= \lim_{t\rightarrow0} \frac{1}{t}
+        \left[
+         f'(x)\int_{A_{<\varepsilon}}
+         (y-x) p(y,t|x,0) dy
+        + \frac{f''(x)}{2} \int_{A_{<\varepsilon}}
+          (y-x)^2 p(y,t|x,0) dy \right. \\
+        & \qquad \qquad \left. +\int_{A_{<\varepsilon}}
+          |x-y|^2R(x,y) p(y,t|x,0) dy
+        \right]
+    \end{align*}
+    By the assumptions of the problem, many of these limits simplify
+    \begin{align*}
+      \lim_{t\rightarrow0} &\frac{1}{t}
+        \int_{A_{<\varepsilon}} (f(y)-f(x))p(y,t|x,0) dy \\
+      &=
+        f'(x)\left[a(x) + O(\varepsilon)\right]
+        + \frac{f''(x)}{2} [b(x)+O(\varepsilon)] + O(\varepsilon^2)
+    \end{align*}
+    Letting $\varepsilon\to 0$ for everything and combining expressions,
+    \begin{align*}
+      (Af)(x) &= \lim_{\varepsilon\to0}
+        O(\varepsilon) +
+        \frac{\partial f}{\partial x}\left[a(x) + O(\varepsilon)\right]
+        + \frac{1}{2}\frac{\partial^2 f}{\partial x^2} [b(x)+O(\varepsilon)]
+        + O(\varepsilon^2) \\
+        &=
+        a(x)\frac{\partial f}{\partial x}
+        + b(x)\frac{1}{2}\frac{\partial^2 f}{\partial x^2}
+    \end{align*}
+
+  \item % Question 6
+    Again, break up $A$, the (assumed) compact support of $f$, into $A =
+    A_{\geq\varepsilon} \cup A_{<\varepsilon}$, where
+    \begin{align*}
+      A_{\geq\varepsilon} = \{y \in A;\; |x-y| \geq \varepsilon\}
+      \qquad
+      A_{<\varepsilon} = \{y \in A:\; |x-y| < \varepsilon\}
+    \end{align*}
+    Again, we split up the integral, use the fact that $f$
+    is twice differentiable, and take advantage of the assumed
+    limits for the different components:
+    \begin{align*}
+      \lim_{t\rightarrow0} &\frac{1}{t}
+      \int_A (f(y)-f(x))p(y,t|x,0) dy \\
+      &= \lim_{t\rightarrow0} \frac{1}{t}
+        \left[
+        \int_{A_{\geq\varepsilon}} (f(y)-f(x))p(y,t|x,0) dy
+        + \int_{A_{<\varepsilon}} (f(y)-f(x))p(y,t|x,0) dy
+      \right]\notag\\
+      &= \lim_{t\rightarrow0} \frac{1}{t}
+        \left[
+        \int_{A_{\geq\varepsilon}} (f(y)-f(x))p(y,t|x,0) dy \right]  \notag\\
+      &\quad \lim_{t\rightarrow0} \frac{1}{t}
+        \left[
+         f'(x)\int_{A_{<\varepsilon}}
+         (y-x) p(y,t|x,0) dy
+        + \frac{f''(x)}{2} \int_{A_{<\varepsilon}}
+          (y-x)^2 p(y,t|x,0) dy \right. \\
+        & \qquad \qquad \left. +\int_{A_{<\varepsilon}}
+          |x-y|^2R(x,y) p(y,t|x,0) dy
+        \right]\\
+      &=
+        \left[
+        \int_{A_{\geq\varepsilon}}
+        (f(y)-f(x))W(y|x,t)dy  + O(\varepsilon)
+        \right]
+      + \left[ 0 + 0 + O(\varepsilon^2) \right]
+    \end{align*}
+    Letting $\varepsilon\to0$, $A_{\geq\varepsilon}\to A$ and we get
+    \begin{align*}
+      (Af)(x) 
+      &=
+        \int_{A}
+        (f(y)-f(x))W(y|x,t)dy 
+    \end{align*}
+
+\end{enumerate}
+
+
+%% APPPENDIX %%
+
+% \appendix
+
+
+
+
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% SAMPLE CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    %% BIBLIOGRAPHIES %%
+
+        \cite{LabelInSourcesFile}  %Use in text; cites
+        \citep{LabelInSourcesFile} %Use in text; cites in parens
+
+        \nocite{LabelInSourceFile} % Includes in refs w/o specific citation
+        \bibliographystyle{apalike}  % Or some other style
+
+        % To ditch the ``References'' header
+        \begingroup
+        \renewcommand{\section}[2]{}
+        \endgroup
+
+        \bibliography{sources} % where sources.bib has all the citation info
+
+    %% SPACING %%
+
+        \vspace{1in}
+        \hspace{1in}
+
+
+    %% INCLUDING PDF PAGE %%
+
+        \includepdf{file.pdf}
+
+
+    %% INCLUDING CODE %%
+
+        \verbatiminput{file.ext}
+            %---Includes verbatim text from the file
+        \texttt{text}
+            %---Renders text in courier, or code-like, font
+
+        \matlabcode{file.m}
+            %---Includes Matlab code with colors and line numbers
+
+
+    %% INCLUDING FIGURES %%
+
+        % Basic Figure with size scaling
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[scale=1]{file.pdf}
+            \end{figure}
+
+        % Basic Figure with specific height
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[height=5in, width=5in]{file.pdf}
+            \end{figure}
+
+        % Figure with cropping, where the order for trimming is  L, B, R, T
+            \begin{figure}
+               \centering
+               \includegraphics[trim={1cm, 1cm, 1cm, 1cm}, clip]{file.pdf}
+            \end{figure}
+
+
+        % Side by Side figures
+            \begin{figure}[h!]
+                \centering
+                \mbox{\subfigure{
+                    \includegraphics[scale=1]{file1.pdf}
+                }\quad\subfigure{
+                    \includegraphics[scale=1]{file2.pdf}
+                }
+                }
+            \end{figure}
+
+
