@@ -1,8 +1,7 @@
 \documentclass[a4paper,12pt]{article}
 
 \author{Matthew Cocci}
-\title{Kalman Filter}
-\date{\today}
+\title{State Space Models} \date{\today}
 \usepackage{enumitem} %Has to do with enumeration	
 \usepackage{amsfonts}
 \usepackage{amsmath}
@@ -29,11 +28,25 @@
 \usepackage{verbatim} % for including verbatim code from a file
 %\usepackage{natbib} % for bibliographies
 
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref} 
+\hypersetup{%
+    colorlinks,		
+        %---This colors the links themselves, not boxes
+    citecolor=black,	
+        %---Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+
 \begin{document}
 \maketitle
 
-% \tableofcontents %adds it here
+\tableofcontents %adds it here
 
+\clearpage
 \section{Introduction}
 
 State Space Models, the Kalman Filter, and simulation smoothers together
@@ -41,85 +54,92 @@ rank among those ``Hugely Important Things I Never Knew Existed''
 following my undergrad education. 
 
 They're hugely important because they embed as special cases many
-concepts in time series and dynamics.  In fact, you can almost always
-fall back on the toolkit developed here. It doesn't take much work to
-cast ARMA models, dynamic factor models, structural VARs, and other
-important concepts into state space model form, viewing those
-applications as special cases within the broader state space framework.
-Once you know the state space representation and methods for efficient
+concepts in time series and dynamics.  In fact, when working with time
+series, you can almost always fall back on the toolkit developed here.
+It doesn't take much work to cast ARMA models, dynamic factor models,
+structural VARs, and other important classes of models into state space
+form, simply treating those applications as special cases.  Then, once
+you know the state space representation and methods for efficient
 estimation and posterior sampling, you've done half the work for many
 applications in time series econometrics.
 
-So the first portion will consist of describing state space models and,
-naturally, the very important concept of the ``state space.'' The second
-portion will then give an overview of the subsequent sections which
-discuss computing likelihood via the Kalman Filter and posterior
-sampling to draw paths from the underlying state dynamics that 
-model the data-generating process.
-
+So the first portion will consist of describing state space models and
+the very important concept of the ``state space.'' The second portion
+will then give an overview of the subsequent sections which discuss
+computing likelihood via the Kalman Filter and posterior sampling to
+draw paths for the underlying state dynamics.
 
 \section{State Space Models}
 
 \subsection{Basic Building Blocks}
 
-State space models quantify and link the evolution of observed and
-(possibly) unobservated \emph{states} to series that we can directly
-measure---the data---called \emph{observables}. 
+State space models are a nothing more than a particular approach to
+describe and model time series data. State space models assume
+that measurable, observed time series data---called \emph{observables} in
+state space model terminology---are simply a function of underlying
+(possibly unobserved) \emph{states}, whose dynamics can be restricted
+according to simple assumptions or a full-fledged structural model.
 
-State space models quantify how certain states evolve over time, where
-\emph{states} consist of observed and/or unobserved variables of
-interest. The evolution of these states are informed by  
+What makes state space models so useful is the flexibility provided by
+this approach that distinguishes between \emph{observables} (which
+correspond to the data) and \emph{states} (which are flexible enough to
+correspond to unobserved/latent variables, economic model concepts,
+exogenous shocks, or even the data itself). 
 
-Typically, we have some model that specifies how these states are
-related. The dynamics of these states then generate the observed data.
+To consider an economic example, the \emph{states} in our model (which
+we'll collect into a state vector) might correspond to a small number of
+unobserved ``dynamic factors,'' whose evolution captures many different
+features of the observed cross-sectional data.  With our states, we then
+define the \emph{state space} as the set of all values our state vector
+can assume. In other words, it's the multi-dimensional space spanned by
+our state vector. 
 
-The \emph{states} in our model (which we'll collect into a state vector)
-might include GDP growth, inflation, unemployment, an unobserved
-``business cycle'' component driving the dynamics of many series, a
-synthetic index indicating investment prospects, or any number of
-objects that we want to quantify, model, and forecast. With our states,
-we then define the \emph{state space} as the set of all values our state
-vector can assume. In other words, it's the multi-dimensional space
-spanned by our state vector. 
+To quantify and model these (possibly unobserved) states, we use
+\emph{observables}---series we can directly measure and observe like
+like GDP, inflation, unemployment, or really any number of objects that
+we want to quantify, model, and forecast. These data series inform our
+estimates of the states, which we cannot always directly measure.  
 
-To quantify and model the (possibly unobserved) states, we use
-\emph{observables}---series we can directly measure and observe---to
-inform our estimates of the states, which we cannot always directly
-measure. So just to reiterate, the biggest distinction between states
-and observables: observables \emph{always} have a directly measurable
-series associated with them, while states might not.
-
+So just to reiterate, the biggest distinction between states and
+observables: observables \emph{always} correspond one-to-one with data,
+while states need not have a directly measurable series associated with
+them.
 
 \subsection{Linear State Space Models in Two Equations}
 
 State space models essentially reduce to two fundamental equations:
 \begin{align}
-  \text{State Transition Equation:} \quad
-    s_{t} &= C + T s_{t-1} + \varepsilon_{t} \label{ste}\
-    \quad\quad E[\varepsilon_t] = 0
-    \quad E[\varepsilon_t \varepsilon'_t] =  R \\
+  \text{Transition Equation:} \quad
+    s_{t} &= C(\theta) + T(\theta) s_{t-1} + \varepsilon_{t} \label{ste}\
+    \quad E[\varepsilon_t] = 0
+    \quad E[\varepsilon_t \varepsilon'_t] =  R(\theta) \\
   \text{Measurement Equation:} \quad
-    y_{t} &= D + M s_{t} + \eta_{t} \label{moe}
-    \quad\qquad E[\eta_t] =  0 
-    \quad E[\eta_t \eta'_t] =  Q 
+    y_{t} &= D(\theta) + M(\theta) s_{t} + \eta_{t} \label{moe}
+    \qquad E[\eta_t] =  0 
+    \quad E[\eta_t \eta'_t] =  Q(\theta) 
 \end{align}
-Additionally, it is also assumed that $\varepsilon_t$ and $\eta_t$ are
-uncorrelated, iid, and independent of past values. Also, by
-construction, $E[\varepsilon_t s_t']=0$ and $E[\eta_t y_t']=0$.
+where $\theta$ is a vector of parameters to be estimated.\footnote{These
+parameters will typically include a mix of simple concepts (means,
+variances, autocorrelation coefficients) and complex concepts (like
+perhaps elasticities in an economic model).} It is also assumed that
+$\varepsilon_t$ and $\eta_t$ are uncorrelated, iid, and independent of
+past values.\footnote{Though this easily be generalized by shutting down
+$\eta_t$ and incorporating measurement error into the states. See the
+example below on expanding the state space.} Also, by construction, $E[\varepsilon_t s_t']=E[\eta_t
+y_t']=0$.
 
 Moreover, while $\varepsilon_t$ and $\eta_t$ are typically assumed to be
 normal, we wrote them here in the more general (yet equally valid)
-represenetation above. Later on, we will discuss the extra subtetly that
+representation above. Later on, we will discuss the extra subtlety that
 non-normal errors introduce into the interpretation.
-
 
 \paragraph{State Transition Equation} Equation~\ref{ste} describes how
 the state vector, $s_t$, evolves over time; it's a law of motion. In
 words, the state vector next period is a function of the previous
 period's state vector, plus some innovation or disturbance.  Since we
 iterate on the state vector $s_{t-1}$ to get the next period $s_{t}$,
-it's clear that $T$ must be square, while $C$ and $\varepsilon_t$ are
-column vectors the same size as $s_t$.
+it's clear that $T(\theta)$ must be square, while $C(\theta)$ and
+$\varepsilon_t$ are column vectors the same size as $s_t$. 
 
 But since the states might be unobserved (so that they do not have a
 directly measurable series associated with them), we have to relate them
@@ -133,22 +153,28 @@ states to observables. Since the number of states and observables may
 differ, $M$ need not be square. Clearly, $D$ and $\eta_t$ must be the
 same size as $y_t$.
 
-\paragraph{Note on Free Parameters} 
-When we write down a state space model, this typically involves imposing
-ones and zeros in certain entries of $M$, $R$, and $Q$, while leaving
-other parameters free so that we can estimate them.  To pre-specify
-certain parameters in both equations.  While our goal will be estimate
-in Equation~\ref{ste} has to be estimated ($\{s_t\}$, $T$, $R$), the
-matrix $M$ will need to be pre-specified by the econometrician. Matrix
-$M$ makes explicit our idea of the relationship between the observables
-we see and the deep underlying model dynamics that (we think) drive
-what's observed. Of course, this relationship cannot be estimated; it
-can only be imposed via $M$.
+\paragraph{Identification Assumptions} 
+The representation above both useful and problematic because it is so
+flexible.  It is useful because many models can be written into state
+space form, so we will be able to develop a common set of techniques for
+a wide variety of models. It is problematic for exactly the same reason.
+What exactly is the ``correct'' way to set up the transition and
+observation equation matrices?
+
+For now, I'm going to punt. That task is really left to the
+econometrician. In particular, she chooses a particular model from a
+broad class of models (VAR, SVAR, DSGE, Dynamic Factor Model), and the
+matrix representations follow. The methods developed from here onwards
+won't tell you which model to use. Rather, they'll tell you how to
+efficiently estimate and conduct inference on $\theta$ and the sequence
+states $\{s_t\}_0^T$ for \emph{any} model you choose to use (provided it
+can be written in state space form).
 
 \newpage
 \subsection{Expanding the State Space}
 
-In this section, we show two examples of expanding the state space (introducing extra states), and why we might want to do that. 
+In this section, we show two examples of expanding the state space
+(introducing extra states), and why we might want to do that. 
 
 \subsubsection{Introducing Extra Lags}
 
@@ -185,16 +211,20 @@ $s_{t-1}$ (on the lefthand side) in it's entirety. Only the most minor
 of adjustments to the transition matrix would be necessary.
 
 
-\subsubsection{Measurement Error as a State}
+\subsubsection{Measurement Error in the State Vector}
 
 While the two-equation framework set up in (\ref{ste}) and (\ref{moe})
 might be the most intuitive representation of our system, it might be
 easier (for programming or computational reasons) to remove measurement
 error from the measurement/observation equation. We can do so by, again,
 enlarging the state space and incorporating measurement error as extra
-states.
+states. Here, we exploit the fact that states are flexible enough to be
+anything, really: unobserved latent variables, observed data,
+measurement error, etc. So the distinction between states and
+observables is somewhat artifical; we can always throw everything we
+want to track and model into the state vector.
 
-So we now rearrange the terms in Equation~\ref{ste} and
+So to begin, rearrange the terms in Equation~\ref{ste} and
 Equation~\ref{moe} into new State Transition and Measurement Equations.
 Again, we use stacked vector and block matrix form, augmenting the state
 vector with extra rows, $s'_t$, which capture the contribution from the
@@ -214,8 +244,20 @@ measurement errors:
     \begin{bmatrix} M & I \end{bmatrix}
     \begin{bmatrix} s_{t} \\ s'_t \end{bmatrix}
 \end{align}
-In this representation, $s'_t$ effectively ``carries'' the measurement error from the state transition equation down to the measurement equation. But any past contributions from measurement errors are decisively zeroed out going forward, as we see in the new transition matrix of Equation (\ref{ste.withmerr}).
+In this representation, $s'_t$ effectively ``carries'' the measurement
+error from the state transition equation down to the measurement
+equation. But any past contributions from measurement errors are
+decisively zeroed out going forward, as we see in the new transition
+matrix of Equation~\ref{ste.withmerr}.
 
+This representation also allows us to introduce correlation between
+measurement errors, $\eta_t$, and shocks to the states, $\varepsilon_t$.
+Since Equation~\ref{ste.withmerr} is the new state transition equation,
+we know that the error term $\begin{bmatrix} \varepsilon_t' & \eta_t'
+\end{bmatrix}'$, we know it must have a covariance matrix $R'(\theta)$.
+We can simply make the off-diagonal elements non-zero bewteen
+measurement error terms and shocks to the original state transition
+equation as specified in Equation~\ref{ste}.
 
 \subsection{Examples within the State Space Framework}
 
@@ -306,39 +348,107 @@ Which then leads to the following observation equation. Again, no term for measu
 We also present an example where there is some unobserved ``true'' level
 of GDP that we hope to capture, using two alternative measures that
 ostensibly measure the same thing---the income and expenditure measures
-of GDP. However, because of measurement error in both series, they
+of GDP\@. However, because of measurement error in both series, they
 provide only a ``noisy'' measure. This is a situation ideally suited to
 a state space representation.
 
+\clearpage
+\subsection{Working with State Space Models}
+
+In order to work with state space models, we need to be able to
+estimate them and draw from the posterior distribution of parameters and
+states.  The following sections will detail the methods to handle these
+tasks, but a birds eye view will help organize thought and provide
+motivation for the coming sections.
+\begin{enumerate}
+  \item \textbf{Kalman Filter}: Whether approaching state space models
+    from a frequentist or Bayesian point of view, you'll need to
+    construct the likelihood, $p(y_{1:T}|\theta)$. The Kalman Filter
+    provides a recursive algorithm to construct the likelihood given
+    known transition and measurement equation matrices.
+
+\end{enumerate}
+
+
 
 \newpage
-\section{Kalman Filter under Known State and Observation Equations}
+\section{The Kalman Filter}
 
 Within the state space framework detailed above, we now face the task of estimating the sequence of (possibly unobserved) states. To do so, we typically use the Kalman filter, a recursive procedure to estimate and forecast states over time. 
 
-Subsection 1 sketches the basic sequence of steps for deriving the distributions of the (possibly unobserved) states and then forecasting their future values. Next, Subsection 2 describes this recursive filtering algorithm in greater detail. Subsection 3 first defines the conditional distributions of normal random variables and then comments on the the consequence of assuming Gaussian errors in the Kalman Filter procedure. Subsection 4 then follows with a detailed examination of this special case of Gaussian errors.
+Section~\ref{subsec:kfoutline} sketches the basic sequence of steps for
+deriving the distributions of the (possibly unobserved) states and then
+forecasting their future values. Next, Section~\ref{subsec:kfdetails}
+describes this recursive filtering algorithm in greater detail.
+Section~\ref{subsec:kfnormal} then follows with a detailed examination
+of this special case of Gaussian errors, relying on conditional
+expectations for MVN Random Variables as described in
+Appendix~\ref{sec:mvncond}.
 
-Throughout this entire section, we will assume that the matrices defined in Equations \ref{ste} and \ref{moe} are entirely \emph{known}, postponing estimation (which entails constructing the full likelihood function) for a later section after first nailing down the intuition. 
+Throughout this entire section, we will assume that the matrices defined
+in Equation~\ref{ste} and Equation~\ref{moe} are entirely \emph{known},
+postponing estimation (which entails constructing the full likelihood
+function) for a later section after first nailing down the intuition. 
 
 \subsection{Outline of the Recursive Procedure}
+\label{subsec:kfoutline}
 
-Here's the basic Kalman Filter procedure to estimate and forecast the state vector, $s_t$, and it's distribution given data vector $y_t$ for which we have observations running from $t=1$ until $t=T$. The procedure specified here applies to all linear state space models as written in Equations \ref{ste} and \ref{moe}.
+Here's the basic Kalman Filter procedure to estimate and forecast the
+state vector, $s_t$, and it's distribution given data vector $y_t$ for
+which we have observations running from $t=1$ until $t=T$. The procedure
+specified here applies to all linear state space models as written in
+Equations~\ref{ste} and~\ref{moe}.
 \begin{enumerate}
-\item Start with a prior for the state vector at time $t$, call it, call it $p(s_t |\; \mathcal{I}_{t-1})$, where $\mathcal{I}_{t}$ denotes the set of information available at arbitrary time $t$, i.e. $y_1, \ldots, y_{t}$.\footnote{In the case where $t=1$, we form a true prior in that you haven't observed any $y_t$, so you don't have any data or information as a basis for the distribution of $s_1$.}
-\item Observe the time $t$ realized data point, $y_t$. 
-\item Use Bayes' Rule to ``filter'' out the noise and compute the filtering distribution, $p(s_t |\; \mathcal{I}_{t})$, where $\mathcal{I}_{t}$ reflects available information at time $t$.
-\item Compute the one-step-ahead predictive distribution, $p(s_{t+1} | \; \mathcal{I}_{t})$, based on the filtering distribution from Step (3) and the your model's law of motion as specified in the State Transition Equation.  
-\item Increment $t$ and return to step 1, taking
-the predictive distribution $p(s_{t+1} |\; \mathcal{I}_{t})$ as your prior.
-\end{enumerate} 
-Note that many introductions to the Kalman Filter often frame the recursive process in terms of the evolution of only the \emph{mean} and \emph{variance} of $\{s_t\}$ over time. This is done because the Kalman Filter is often applied in the case where errors are normally distributed, in which case the mean and variance pin down the successive distributions {entirely}.\footnote{This is a feature of multivariate normal random variables.} However, the procedure outlined above is ``General'' in that it frames the recursive process in terms of the full \emph{distributions} for $\{s_t\}$ over time. Such an exposition then remains valid even when errors have a non-normal distribution.
+\item Start with a prior for the state vector at time $t$, call it, call
+  it $p(s_t |\; \mathcal{I}_{t-1})$, where $\mathcal{I}_{t}$ denotes the
+  set of information available at arbitrary time $t$, i.e. $y_1, \ldots,
+  y_{t}$.\footnote{In the case where $t=1$, we form a true prior in that
+  you haven't observed any $y_t$, so you don't have any data or
+  information as a basis for the distribution of $s_1$.}
 
-Going forward, the remainder of this section will put some more structure on this basic procedure, filling in the mathematical details. It will also cover that special case of normal errors, and say why this assumption might not be as dangerous as it seems. For that discussion, follow a minor yet very important detour in two subsections.
+\item Observe the time $t$ realized data point, $y_t$. 
+
+\item Use Bayes' Rule to ``filter'' out the noise and compute the
+  filtering distribution, $p(s_t |\; \mathcal{I}_{t})$, where
+  $\mathcal{I}_{t}$ reflects available information at time $t$.
+
+\item Compute the one-step-ahead predictive distribution, $p(s_{t+1} |
+  \; \mathcal{I}_{t})$, based on the filtering distribution from Step
+  (3) and the your model's law of motion as specified in the State
+  Transition Equation.  
+
+\item Increment $t$ and return to step 1, taking the predictive
+  distribution $p(s_{t+1} |\; \mathcal{I}_{t})$ as your prior.
+\end{enumerate} 
+Note that many introductions to the Kalman Filter often frame the
+recursive process in terms of the evolution of only the \emph{mean} and
+\emph{variance} of $\{s_t\}$ over time. This is done because the Kalman
+Filter is often applied in the case where errors are normally
+distributed, in which case the mean and variance pin down the successive
+distributions {entirely}.\footnote{This is a feature of multivariate
+normal random variables.} However, the procedure outlined above is
+``General'' in that it frames the recursive process in terms of the full
+\emph{distributions} for $\{s_t\}$ over time. Such an exposition then
+remains valid even when errors have a non-normal distribution.
+
+Going forward, the remainder of this section will put some more
+structure on this basic procedure, filling in the mathematical details.
+It will also cover that special case of normal errors, and say why this
+assumption might not be as dangerous as it seems. For that discussion,
+follow a minor yet very important detour in two subsections.
 
 
 \subsection{The General Kalman Filter}
+\label{subsec:kfdetails}
 
-Given a sequence of data points $\{y_t\}_{t=1}^T$ our goal is to estimate the sequence of states $\{s_t\}^T_{t=1}$. Of course, this will all be probabilistic. Unless the system is degenerate, we won't be able to know with certainty the true value of the states. We'll instead compute a sequence of probability distributions for the states at each point in time. Again, we assume throughout that the matrices of our linear state space model defined by Equations \ref{ste} and \ref{moe} are entirely known.
+Given a sequence of data points $\{y_t\}_{t=1}^T$ our goal is to
+estimate the sequence of states $\{s_t\}^T_{t=1}$. Of course, this will
+all be probabilistic. Unless the system is degenerate, we won't be able
+to know with certainty the true value of the states. We'll instead
+compute a sequence of probability distributions for the states at each
+point in time. Again, we assume throughout that the matrices of our
+linear state space model defined by Equations~\ref{ste} and~\ref{moe}
+are entirely known.
 
 
 \paragraph{Prior Step} Suppose we're standing at time $t-1$, in full possession of all information up until then. Specifically, we know $y_1, \ldots, y_{t-1}$, denoted as the information set $\mathcal{I}_{t-1}$. 
@@ -357,29 +467,42 @@ But how exactly do we do this? Bayes' rule, of course, along with the fact that 
 \begin{align*}
   p(s_t | \mathcal{I}_{t}) = 
   p(s_t | \; y_t, \mathcal{I}_{t-1}) = 
-  \frac{
-    p(y_t | s_t, \mathcal{I}_{t-1}) 
+  \frac{p(y_t | s_t, \mathcal{I}_{t-1}) 
     \cdot p(s_t|\; \mathcal{I}_{t-1})
   }{p(y_t | \; \mathcal{I}_{t-1})}
 \end{align*}
-This doesn't look like we've gotten anywhere, but note that we can simplify a bit. By the setup and assumptions in Equations \ref{ste} and \ref{moe}, we know that past values $y_1, \ldots, y_{t-1}$ have no bearing upon $y_t$ if we know the state, $s_t$. Hence $p(y_t|s_t, \mathcal{I}_{t-1}) = p(y_t|s_t)$. In addition, since the denominator is just a normalizing constant, we can simplify the expression further to  
+This doesn't look like we've gotten anywhere, but note that we can
+simplify a bit. By the setup and assumptions in Equations~\ref{ste}
+and~\ref{moe}, we know that past values $y_1, \ldots, y_{t-1}$ have no
+bearing upon $y_t$ if we know the state, $s_t$. Hence $p(y_t|s_t,
+\mathcal{I}_{t-1}) = p(y_t|s_t)$. In addition, since the denominator is
+just a normalizing constant, we can simplify the expression further to  
 \begin{equation}
   \label{filt}
   \text{Filtering Distribution:} \quad
   p(s_t | \mathcal{I}_{t}) \propto p(y_t | s_t) \cdot 
   p(s_t |\mathcal{I}_{t-1})
 \end{equation}
-This is a very friendly expression since we already have $p(s_t | \mathcal{I}_{t-1})$ from our prior and, given the setup in Equations \ref{ste} and \ref{moe}, the likelihood $p(y_t|s_t)$ is very easy to compute once we condition on the state $s_t$.
+This is a very friendly expression since we already have $p(s_t |
+\mathcal{I}_{t-1})$ from our prior and, given the setup in
+Equations~\ref{ste} and~\ref{moe}, the likelihood $p(y_t|s_t)$ is very
+easy to compute once we condition on the state $s_t$.
 
-In fact, the measurement equation determines the distribution $p(y_t|s_t)$ entirely. Since the $\eta_t$ errors are mean zero with covariance matrix, $Q$, we know by construction that
+In fact, the measurement equation determines the distribution
+$p(y_t|s_t)$ entirely. Since the $\eta_t$ errors are mean zero with
+covariance matrix, $Q$, we know by construction that
 \[
   E[y_t|s_t] = D + M s_t 
   \qquad 
   \text{Var}(y_t|s_t) = Q
 \]
-Beyond the mean and variance, the full distribution is characterized by the distribution we assume for the measurement errors.
+Beyond the mean and variance, the full distribution is characterized by
+the distribution we assume for the measurement errors.
 
-\paragraph{Forecast Step} Now that we have our filtering distribution, we compute the \emph{forecast distribution}, which the one-step ahead distribution of $s_{t+1}$ given $\mathcal{I}_{t}$. Again, Bayes' Rule is useful
+\paragraph{Forecast Step} Now that we have our filtering distribution,
+we compute the \emph{forecast distribution}, which the one-step ahead
+distribution of $s_{t+1}$ given $\mathcal{I}_{t}$. Again, Bayes' Rule is
+useful
 \begin{align*}
   p(s_{t+1} | \; \mathcal{I}_{t}) &= 
     \int p(s_{t+1}, s_t |\; \mathcal{I}_{t}) \; ds_t \\
@@ -411,57 +534,9 @@ filtering distribution we computed in the last step.
 All of these steps simplify considerably and become much more concrete if we're willing to assume normal errors. But how big of an assumption is that? What are the practical consequences of such a choice? To answer these questions, we will take a minor detour for the sake of intuition and interpretation before delving into the particular case of the Kalman Filter under normal errors.
 
 \clearpage
-\subsection{Detour: Conditional Distributions and Interpretation in the Case of Normal Errors}
-
-Suppose that there is a multivariate normal random variable $X$---a vector that can be partitioned into two pieces and written
-\[
-  X \sim N(\mu, \Sigma) \quad\Leftrightarrow\quad
-  \begin{bmatrix} X_1 \\ X_2 \end{bmatrix}
-  \sim 
-  N\left(\begin{bmatrix} \mu_1 \\ \mu_2 \end{bmatrix},
-  \begin{bmatrix} \Sigma_{11} & \Sigma_{12} \\
-  \Sigma_{21} & \Sigma_{22} \end{bmatrix} 
-  \right)
-\]
-Then the distribution of $X_1$ given $X_2$ (i.e. after having observed $X_2$) is 
-\begin{align}
-  X_1 | X_2 \sim &N(\hat{\mu}, \hat{\Sigma})  \notag\\
-  \label{reg} \\
-  \text{where} \quad
-  \hat{\mu} = \mu_1 + \Sigma_{12} \Sigma^{-1}_{22} 
-  (X_2-\mu_2)  & \quad \quad
-  \hat{\Sigma} = \Sigma_{11} - \Sigma_{12} \Sigma^{-1}_{22} 
-    \Sigma_{21}
-  \notag
-\end{align}
-See Appendix {link} for the derivation.
-
-\paragraph{Intuition}
-Consider the case where $X_1$ and $X_2$ are scalars, not vectors. Then we see in the second term of the sum for $\hat{\mu}$ that an above-average realization of $X_2$ will lead us to \emph{upwardly} revise a purely unconditional forecast of $X_1$ above the mean $\mu_1$ (provided $\Sigma_{12}>0$, otherwise we revise down). 
-
-In addition, provided that the correlation $\Sigma_{12} = \Sigma_{21}$ is non-zero, we will revise \emph{down} the variance of $X_1$ relative to the baseline of $\Sigma_{11}$. This follows because the observation of $X_2$ has provided valuable information about $X_1$. 
-
-
-\paragraph{The Normality Assumption} 
-Consider your basic regression with 
-\begin{align}
-  \label{regex}
-  Y_i = \alpha + \beta X_i + \varepsilon_t
-\end{align}
-In Intro Stat, any discussion of regression analysis starts by assuming that the errors, $\varepsilon_t$, are normally distributed, which is equivalent to assuming that $Y_i$ and the regressors in $X_i$ are, together, jointly normally distributed---i.e.  $\begin{bmatrix} Y_i & X^T_i \end{bmatrix}^T$ is  multivariate normal. 
-
-Then, if you get to intermediate Stat, your professor starts to retreat on the normality assumptions. In particular, you learn that it doesn't have to be the case that the variables are, in fact, jointly normally distributed. It could just be that you want the best \emph{linear predictor} of $Y_i$ given $X_i$. In that case, you care about regression estimates only because they provide the best linear approximation of the conditional expectation function, $E[Y_i|X_i]$. Alternatively, you might also hear that linear regression gives the best linear ``projection'' of $Y_i$ onto $X_i$. 
-
-Well, that's our ticket. If you look at Result \ref{reg}, you'll notice that we're getting a kind of \emph{regression estimate} of $X_1$ given $X_2$. To be even more explicit, we might write
-\[
-  E[X_1|X_2] = \mu_1 + \beta (X_2 - \mu_2) 
-\]
-where $\beta= \Sigma_{12}\Sigma^{-1}_{22}$. This is just like Regression \ref{regex} above, only here, we regress \emph{vector} (not scalar) $X_1$ on vector $X_2$. However, the intuition remains the same.
-
-Therefore, Kalman Filter estimates that assume normally distributed errors are not as nefarious as they seem. Since Kalman Filter estimates of the states under the normality assumption will follow directly from Result \ref{reg} above (as we will see in the next subsection), we can motive the Kalman Filter with normal errors by framing it as a recursive procedure to find the best \emph{linear estimates} or \emph{projection estimates} of the states. 
-
 
 \subsection{Kalman Filter Under Normal Errors}
+\label{subsec:kfnormal}
 
 We now derive the Kalman Filter procedure in the case of normally distributed errors, $\varepsilon_t$ and $\eta_t$. Since the normal distribution is pinned down entirely by the mean and variance, we need only characterize the evolution of these two objects to characterize the evolution of the full distribution of the states. For simpler notation, we will ignore the constant vectors, $C$ and $D$ throughout this section.
 
@@ -501,11 +576,16 @@ Suppose that we have a Guassian prior for $s_t$, given $\mathcal{I}_{t-1}$,
   s_t | \; \mathcal{I}_{t-1} 
   \sim N(\mu_{t|t-1}, \Sigma_{t|t-1})
 \]
-In the case where $t=1$, then this is a true prior, and $\mu_{1|0}$ and $\Sigma_{1|0}$ reflect an initial guess. When $t>1$, the Kalman Filter procedure will furnish a Gaussian prior, which we will derive in full below.
+In the case where $t=1$, then this is a true prior, and $\mu_{1|0}$ and
+$\Sigma_{1|0}$ reflect an initial condition/guess. When $t>1$, the
+Kalman Filter procedure will furnish a Gaussian prior, which we will
+derive in full below.
 
 \paragraph{Filtering Step}
 Recall that the goal of the filtering step is to compute the
-filtering distribution, $p(s_t|\mathcal{I}_{t})=p(s_t|y_t, \mathcal{I}_{t-1})$. Now because we're assuming both $s_t$ and $y_t$ are normally distributed (since the error terms are), we can write 
+filtering distribution, $p(s_t|\mathcal{I}_{t})=p(s_t|y_t,
+\mathcal{I}_{t-1})$. Now because we're assuming both $s_t$ and $y_t$ are
+normally distributed (since the error terms are)
 \begin{align*}
   \begin{bmatrix} s_t \\ y_t \end{bmatrix} | \; 
   \mathcal{I}_{t-1}
@@ -515,12 +595,16 @@ filtering distribution, $p(s_t|\mathcal{I}_{t})=p(s_t|y_t, \mathcal{I}_{t-1})$. 
   \Sigma_{21} & \Sigma_{22} \end{bmatrix} 
   \right)
 \end{align*}
-for some value of the terms $\mu_{i}$, and $\Sigma_{jk}$, where $i, j, k\in\{1,2\}$. Now with this setup, it's clear how to compute the filtering distribution: apply the result from the last subsection to get $p(s_t|y_t, \mathcal{I}_{t-1}) = p(s_t | \;\mathcal{I}_{t})$. We just need to pin down those terms.
+for some value of the terms $\mu_{i}$, and $\Sigma_{jk}$, where $i, j,
+k\in\{1,2\}$. Now with this setup, it's clear how to compute the
+filtering distribution: apply the result from the last subsection to get
+$p(s_t|y_t, \mathcal{I}_{t-1}) = p(s_t | \;\mathcal{I}_{t})$. We just
+need to pin down those terms.
 \\
 \\
-{\sl Defining the Terms:} Throughout, well use the notation that
-$E_{t-1}[\,\cdot\,] = E[\,\cdot\,|\mathcal{I}_{t-1}]$ to make things more
-readable.
+{\sl Defining the Terms:} \/Throughout, well use the notation that
+$E_{t-1}[\,\cdot\,] = E[\,\cdot\,|\mathcal{I}_{t-1}]$ to make things
+more readable.
 \begin{itemize}
   \item $\mu_1$ and $\Sigma_{11}$: These terms correspond
     to the mean and covariance matrix for $s_t |\;
@@ -529,7 +613,7 @@ readable.
     $\Sigma_{t|t-1}$, respectively. 
 
   \item $\mu_2$ and $\Sigma_{22}$: First, use Measurement
-    Equation \ref{moe} to get the mean
+    Equation~\ref{moe} to get the mean
     \begin{align*}
       \mu_2 := E_{t-1}[y_t ] &= 
         E_{t-1}[Ms_t + \eta_t ] =
@@ -548,7 +632,7 @@ readable.
       \text{Property of covariance matrices} &\qquad 
         &&= M [\text{Var}_{t-1}(s_t)] M' 
         + \text{Var}(\eta_t) \\
-      \text{From Equations \ref{ste} and \ref{moe}} &\qquad 
+      \text{From Equations~\ref{ste} and~\ref{moe}} &\qquad 
         &&= M\Sigma_{t|t-1} M' + Q =: \Sigma_{22}
     \end{alignat*}
     
@@ -576,11 +660,9 @@ readable.
       &= 0 + M\Sigma_{t|t-1}  = M\Sigma_{t|t-1} 
     \end{align*}
 \end{itemize}
-Now that all the components have been specified, we can
-fill in, apply the result in the previous subsection, and
-conclude. Also remember that
-$\mathcal{I}_{t}=\mathcal{I}_{t-1} \cup \{y_t\}$. Here we
-are:
+Now that all of the components have been specified, we can fill in,
+apply the result from Appendix~\ref{sec:mvncond}, and conclude (also
+remembering that $\mathcal{I}_{t}=\mathcal{I}_{t-1} \cup \{y_t\}$):
 \begin{alignat}{3}
   &&\begin{bmatrix} s_t \\ y_t \end{bmatrix} | \; 
   \mathcal{I}_{t-1}
@@ -602,20 +684,17 @@ are:
     &= \Sigma_{t|t-1} - \Sigma_{t|t-1}M' 
     \left(M\Sigma_{t|t-1}M' + Q\right)^{-1} M\Sigma_{t|t-1} \notag
 \end{alignat}
-Echoing the last subsections intuition section, this
-result has a very nice interpretation. We see that our
-estimate of the filtered mean $\mu_{t|t}$ is the sum of
-the prior mean $\mu_{t|t-1}$ plus the scaled error for
-$y_t$ relative to it's prior expectation $M\mu_{t|t-1}$.
-In addition, the information provided by $y_t$ allows us
-to reduce our the variance in our estimate of $s_t$ to
-$\Sigma_{t|t}$ relative to the prior variance
-$\Sigma_{t|t-1}$.
+This result has a very nice interpretation. We see that our estimate of
+the filtered mean $\mu_{t|t}$ is the sum of the prior mean $\mu_{t|t-1}$
+plus the scaled error for $y_t$ relative to it's prior expectation
+$M\mu_{t|t-1}$.  In addition, the information provided by $y_t$ allows
+us to reduce our the variance in our estimate of $s_t$ to $\Sigma_{t|t}$
+relative to the prior variance $\Sigma_{t|t-1}$.
 
-\paragraph{Forecast Step} Now that we have our filtered
-mean and variance estimates, we can apply the law of
-motion as written in State Transition Equation \ref{ste} to get the mean and variance of the forecast for
-the states:
+\paragraph{Forecast Step} Now that we have our filtered mean and
+variance estimates, we can apply the law of motion as written in State
+Transition Equation~\ref{ste} to get the mean and variance of the
+forecast for the states:
 \begin{alignat*}{3}
   \mu_{t+1|t} =&& E[s_{t+1}|\;\mathcal{I}_{t}] &= 
     E[Ts_t + \varepsilon_t |\;\mathcal{I}_{t}] = 
@@ -639,7 +718,12 @@ mean and variance for the observables:
 
 \subsection{Long-Horizon Forecasts}
 
-The section has so far only discussed the consruction of one step ahead forecast distributions for states and observables. However, once we reach the end of the sample and derive $p(s_T | \mathcal{I}_{T})$, we will often want to forecast $s_{T+1}$, $s_{T+2}$, etc. along with $y_{T+1}$, $y_{T+2}$, etc. So let's now characterize the distributions of our forecasts. 
+The section has so far only discussed the consruction of one step ahead
+forecast distributions for states and observables. However, once we
+reach the end of the sample and derive $p(s_T | \mathcal{I}_{T})$, we
+will often want to forecast $s_{T+1}$, $s_{T+2}$, etc.\ along with
+$y_{T+1}$, $y_{T+2}$, etc. So let's now characterize the distributions
+of our forecasts. 
 
 For simplicity, we ignore the constant terms $C$ and $D$. We will also construct the $m$-step ahead distributions for any $t=1,\ldots,T$, not just $t=T$ since the results are the same.
 
@@ -688,17 +772,229 @@ Next, we construct the error of the forecast, which we then square to get the co
 
 
 \clearpage
-\section{Kalman Smoother under Known State and Observation Equations}
+\section{Smoothing}
 
-The last section laid out in detail the recursive Kalman Filter procedure for deriving the distributions $\{s_t\}_1^T$ given observations $\{y_t\}_1^T$. If you only care about forecasting $s_{t+i}$ and $y_{t+i}$ for $i>0$, then you're done. The Kalman Filter gave you an estimate of the distribution of $s_T$. Forecast forward from there.
+The last section laid out in detail the recursive Kalman Filter
+procedure for computing the likelihood and deriving a sequence of
+distributions for the states:
+\begin{equation}
+  \label{distseq}
+  N(\mu_{1|1}, \Sigma_{1|1}) \quad \ldots \quad  N(\mu_{T|T}, \Sigma_{T|T})
+\end{equation}
+If you only care about forecasting $s_{T+i}$ and $y_{T+i}$ for $i>0$,
+then you're done.  The Kalman Filter gave you the best possible estimate
+of the distribution of $s_T$.  Forecast forward from there.
 
-However, if you're also interested in the states themselves---that is, the sequence $\{s_t\}_1^T$ actually matters to you---then you can do better. This is because we're working with time series and $y_{t+1}$ can give you useful information about $s_1, \ldots, s_t$, not just $s_{t+1}$. But you'll notice that the Kalman Filter ignores this information. It only goes from $t=1$ to $t=T$ without ever looking back and revising early estimates in light of later information. 
+However, we're typically not only interested in forecasting; we often
+want to draw/simulate paths from the joint distribution of states and
+obtain the best possible estimates of the distribution of states
+from $t=1,\ldots,T$. More precisely, we want 
+\begin{enumerate}
+  \item To draw/simulate paths $\{\tilde{s}_1,\ldots,\tilde{s}_T\}$
+    from $p(s_{1:T}|\theta, y_{1:T})$, and 
+  \item Obtain estimates $\mu_{t|T} := E[s_t|\mathcal{I}_T]$ and 
+    $\Sigma_{t|T} := \text{Var}(s_t|\mathcal{I}_T)$ where
+    $\mathcal{I}_T$ is the full information set.
+\end{enumerate}
 
-This is where the Kalman Smoother comes in: it is another recursive procedure to improve our estimates of the state distributions by conditioning each estimate on the \emph{entire} information set, $\mathcal{I}_{T}$. 
+In both of these tasks, we see why the Kalman Filter is not enough.
+Specifically, we shouldn't simply simulate a path
+$\{\tilde{s}_1,\ldots,\tilde{s}_T\}$ by drawing $\tilde{s}_1$ from
+$N(\mu_{1|1}, \Sigma_{1|1})$, then drawing $\tilde{s}_2$ from
+$N(\mu_{2|2}, \Sigma_{2|2})$, and so on. That approach wouldn't account
+for the correlation between successive draws of states (since
+$\tilde{s}_1$ and $\tilde{s}_2$ are not independent). More precisely, we
+want to draw paths from a sequence of \emph{conditional} distributions
+of the states, not \emph{marginal} distributions that ignore
+autocorrelation between states.
+
+Second, Kalman Filter estimates of the state distributions don't use the
+full information set.  The Kalman Filter proceeds from $t=1$ to $t=T$
+without ever looking back and revising early estimates of
+$\mu_{t|t}$ or $\Sigma_{t|t}$ for $t<T$ in light of later
+information. 
+
+For all of these reasons, smoothing methods have been developed to solve
+all of these problems, using the full information set $\mathcal{I}_T$ to
+draw paths of the states and provide better estimates of the marginal
+means and variances.
+
+\subsection{The Key Conditional Distribution in Smoothing}
+\label{sec:smoothresult}
+
+Just as the normal-erros Kalman Filter used the result about conditional
+distributions for MVN RV's (detailed in Appendix~\ref{sec:mvncond}),
+we'll again apply this result in the context of smoothing under Gaussian
+disturbances. Only now, we'll think about the effect that knowing the
+future state $s_{t+1}$ has on our estimate of $s_t$, consistent with our
+desire to do ``backward'' revisions/updates of the states.
+
+From the forecast step in the Kalman filter procedure, we can fill in
+almost everything we need, having already computed most objects of
+interest:  
+\begin{equation}
+  \label{smoothsetup}
+  \left. \begin{bmatrix} s_t \\ s_{t+1} \end{bmatrix} \;\right\rvert
+  \mathcal{I}_t
+  \sim N\left( 
+  \begin{bmatrix} \mu_{t|t} \\ T\mu_{t|t} \end{bmatrix}, 
+  \begin{bmatrix} \Sigma_{t|t} & \cdot \\ 
+                  \cdot & T\Sigma_{t|t} T'+R \end{bmatrix}, 
+  \right)
+\end{equation}
+Only the correlation between $s_t$ and $s_{t+1}$ remains to compute:
+\begin{align*}
+  E\left[(s_t-\mu_{t|t})(s_{t+1}-T\mu_{t|t})' | \mathcal{I}_t\right] &=
+    E\left[(s_t-\mu_{t|t})(Ts_t + R\varepsilon_{t+1}-T\mu_{t|t})' |\;
+      \mathcal{I}_t\right] \\
+  \text{Distributing} \qquad
+    &= E\left[(s_t-\mu_{t|t})(Ts_t -T\mu_{t|t})' |\;
+      \mathcal{I}_t\right] 
+    + E\left[(s_t-\mu_{t|t})(R\varepsilon_{t+1})' |\;
+      \mathcal{I}_t\right] \\
+  &= E\left[(s_t-\mu_{t|t})(s_t -\mu_{t|t})' |\;
+      \mathcal{I}_t\right] T' \\
+    &\qquad
+    + E\left[s_t\varepsilon_{t+1}' |\;
+      \mathcal{I}_t\right] R'
+    + \mu_{t|t}\left(E\left[\varepsilon_{t+1}' |\;
+      \mathcal{I}_t\right]\right)R' \\\\
+  \Rightarrow\quad \text{Cov}(s_t, s_{t+1}|\; \mathcal{I}_t)
+      &= \Sigma_{t|t}T' 
+\end{align*}
+where the last two terms dropped because $s_t \perp \varepsilon_{t+1}$
+and $E[\varepsilon_t]=0$ for all $t$.
+
+Finally, now that we have filled out all of the terms in
+Equation~\ref{smoothsetup}, we can use the result in
+Appendix~\ref{sec:mvncond} to derive the conditional distribution that
+represents the key relationship in smoothing given normal errors:
+\begin{alignat}{3}
+  &&\left. \begin{bmatrix} s_t \\ s_{t+1} \end{bmatrix} \;\right\rvert
+    \mathcal{I}_t
+    &\sim N\left( 
+    \begin{bmatrix} \mu_{t|t} \\ T\mu_{t|t} \end{bmatrix}, 
+    \begin{bmatrix} \Sigma_{t|t} & \Sigma_{t|t}T' \\ 
+                    T\Sigma_{t|t} & T\Sigma_{t|t} T'+R \end{bmatrix}
+    \right) \notag\\\label{smoothresult}\\
+  \Rightarrow \quad
+  %\mu_{t|T} := 
+  &&E[s_t|s_{t+1}, \mathcal{I}_t] &= 
+      \mu_{t|t} + \Sigma_{t|t}T'\left(T\Sigma_{t|t} T'+R\right)^{-1}
+      (s_{t+1}-T\mu_{t|t}) \notag\\
+  %\Sigma_{t|T} :=  
+  &&\text{Var}\left(s_t|s_{t+1},\mathcal{I}_t\right)
+    &= \Sigma_{t|t} - \Sigma_{t|t}T' \left(T\Sigma_{t|t} T'+R\right)^{-1}
+      T\Sigma_{t|t}
+  \notag
+\end{alignat}
+We'll come back to this recursive relationship in subsequent sections as
+we draw from the full posterior distribution of the states.
+
+
+\subsection{Simplifying the Joint Posterior of States}
+
+Throughout this section, recall that our goal is to draw from the
+posterior distribution of states
+\begin{equation}
+  p(s_{0:T}|\theta, y_{1:T})
+\end{equation}
+We will do this in a sequnce of steps:
+\begin{enumerate}
+  \item First, we can break this joint probability up into a product of
+    conditionals:
+    \begin{equation}
+      \label{key2}
+      p(s_{0:T}|y_{1:T},\theta) = 
+      \left[ \prod_{t=0}^{T-1} p(s_t|s_{t+1:T},y_{1:T},\theta) \right] 
+      p(s_T|y_{1:T},\theta)
+    \end{equation}
+  \item Next, we simplify further by recognizing that, 
+    $p(s_t|s_{t+1:T},y_{1:T},\theta) = p(s_t|s_{t+1:T},y_{1:t},\theta)$.
+    That is because, conditional on future states $s_{t+1:T}$ and past
+    data $y_{1:t}$, future observations $y_{t+1:T}$ provide no
+    additional information about $s_t$:
+    \begin{align*}
+      y_{t+i} &= M s_{t+i} + \eta_{t+i} 
+      \quad \text{with } \eta_{t+i} \perp \{\varepsilon_0, \ldots,
+      \varepsilon_t\} \qquad \forall \; i \geq 1 \\
+      \Rightarrow\qquad 
+      p(s_t|s_{t+1:T},y_{1:T},\theta)
+      &= p(s_t|s_{t+1:T},y_{1:t},\theta)
+    \end{align*}
+    That allows us to write Equation~\ref{key2} as 
+    \begin{equation}
+      p(s_{0:T}|y_{1:T},\theta) = 
+      \left[ \prod_{t=0}^{T-1} p(s_t|s_{t+1:T},y_{1:t},\theta) \right] 
+      p(s_T|y_{1:T},\theta)
+    \end{equation}
+  \item Lastly, we can simplify again by recognizing that
+    $p(s_t|s_{t+1}, y_{1:t},\theta) = p(s_t|s_{t+1:T},y_{1:t},\theta)$.
+    Conditional on past data $y_{1:t}$ and the next state $s_{t+1}$, the
+    entire future sequence of states $s_{t+2:T}$ provides no additional
+    information about $s_t$.  To see this, first note that
+    \begin{align}
+      s_{t+1+i} = T^i s_{t+1} + \sum^i_{j=1} T^{i-j} R \varepsilon_{t+1+j}
+      \qquad \forall \; i \geq 1 
+      \label{st1i}
+    \end{align}
+    We want to show that for all $i\geq1$, conditional on $s_{t+1}$ and
+    $y_{1:t}$, the states $s_{t+1+i}$ and $s_t$ are independent.  Since
+    everything is Guassian, it suffices to prove merely that
+    $s_{t+1+i}|s_{t+1},y_{1:t}$ and $s_t|s_{t+1},y_{1:t}$ are
+    uncorrelated.  So let's try that approach and write the
+    conditional covariance matrix:
+    \begin{align*}
+      &E\left\{
+        \left(s_t - E[s_t|s_{t+1},y_{1:t}]\right) 
+        \left(s_{t+1+i} - E[s_{t+1+i}|s_{t+1},y_{1:t}]\right)'
+        | s_{t+1},y_{1:t}
+      \right\}  \\
+      \text{By~\ref{st1i}} 
+      &\quad\qquad =
+      E\left\{\left.
+        \left(s_t - E[s_t|s_{t+1},y_{1:t}]\right) 
+        \left(\sum^i_{j=1} T^{i-j} R \varepsilon_{t+1+j}\right)'
+        \right\rvert s_{t+1},y_{1:t} 
+      \right\}  \\
+      &\quad\qquad =
+      E\left\{\left.
+        \zeta_t
+        \left(\sum^i_{j=1} T^{i-j} R \varepsilon_{t+1+j}\right)'
+        \right\rvert s_{t+1},y_{1:t} 
+      \right\} \\\\
+      &\text{where } 
+      \zeta_t :=  \left(s_t - E[s_t|s_{t+1},y_{1:t}]\right) 
+    \end{align*} 
+    But we can deduce the distribution of $\zeta_t | s_{t+1}, y_{1:t}$
+    from work we did in Section~\ref{sec:smoothresult}, recalling
+    Result~\ref{smoothresult} in particular: 
+    \begin{equation}
+      \zeta_t| s_{t+1}, y_{1:t}\sim 
+      N(0, \Sigma_{t|t} - \Sigma_{t|t}T'
+           \left(T\Sigma_{t|t} T'+R\right)^{-1} T\Sigma_{t|t})
+    \end{equation}
+    Now note that the distribution of $\zeta_t$ is only a function of
+    $\Sigma_{t|t}$, which is independent of past realized values
+    $y_{1:t}$. Moreover, 
+
+\end{enumerate}
+
+
+
+
+
+
+
+\subsection{Simulation Smoother}
+
+
 
 \subsection{Outline of the Recursive Procedure}
 
-Again, we seek the distribution of $s_t$ given data $\{y_t\}^T_1$. This applies to all linear state space models as written in Equations \ref{ste} and \ref{moe}:
+Again, we seek the distribution of $s_t$ given data $\{y_t\}^T_1$. This
+applies to all linear state space models as written in
+Equation~\ref{ste} and Equation~\ref{moe}:
 \begin{enumerate}
   \item Run the Kalman Filter, storing the filtered
     probability distributions (or relevant parameters
@@ -1063,9 +1359,91 @@ the state space framework developed above to accommodate.
 %
 %%%%% APPPENDIX %%%%%%%%%%%
 %
-%\newpage
-%\appendix
-%
+\clearpage
+\appendix
+
+
+\section{Conditional Distributions with Normal Errors}
+\label{sec:mvncond}
+
+Suppose that there is a multivariate normal random variable $Z$---a
+vector that can be partitioned into two pieces and written
+\[
+  Z \sim N(\mu, \Sigma) \quad\Leftrightarrow\quad
+  \begin{bmatrix} Y \\ X \end{bmatrix}
+  \sim 
+  N\left(\begin{bmatrix} \mu_Y \\ \mu_X \end{bmatrix},
+  \begin{bmatrix} \Sigma_{YY} & \Sigma_{YX} \\
+  \Sigma_{XY} & \Sigma_{XX} \end{bmatrix} 
+  \right)
+\]
+Then the distribution of $Y$ given $X$ is 
+\begin{align}
+  Y | X \sim &N(\hat{\mu}, \hat{\Sigma})  \notag\\
+  \label{reg} \\
+  \text{where} \quad
+  \hat{\mu} = \mu_Y + \Sigma_{YX} \Sigma^{-1}_{XX} 
+  (X_X-\mu_X)  & \quad \quad
+  \hat{\Sigma} = \Sigma_{YY} - \Sigma_{YX} \Sigma^{-1}_{XX} 
+    \Sigma_{XY}
+  \notag
+\end{align}
+
+\paragraph{Intuition}
+Consider the case where $Y$ and $X$ are scalars, not vectors. Then we
+see in the second term of the sum for $\hat{\mu}$ that an above-average
+realization of $X$ will lead us to \emph{upwardly} revise a purely
+unconditional forecast of $Y$ above the mean $\mu_Y$ (provided
+$\Sigma_{YX}>0$, otherwise we revise down).  
+
+In addition, provided that the correlation $\Sigma_{YX} = \Sigma_{XY}$
+is non-zero, we will revise \emph{down} the variance of $Y$ relative to
+the baseline of $\Sigma_{YY}$. This follows because the observation of
+$X$ has provided valuable information about $X$. 
+
+
+\paragraph{The Normality Assumption} 
+Consider your basic regression with 
+\begin{align}
+  \label{regex}
+  Y_i = \alpha + \beta X_i + \varepsilon_t
+\end{align}
+In Intro Stat, any discussion of regression analysis starts by assuming
+that the errors, $\varepsilon_t$, are normally distributed, which is
+equivalent to assuming that $Y_i$ and the regressors in $X_i$ are,
+together, jointly normally distributed---i.e.  $\begin{bmatrix} Y_i &
+  X^T_i \end{bmatrix}^T$ is  multivariate normal. 
+
+Then, if you get to intermediate Stat, your professor starts to retreat
+on the normality assumptions. In particular, you learn that it doesn't
+have to be the case that the variables are, in fact, jointly normally
+distributed. It could just be that you want the best \emph{linear
+predictor} of $Y_i$ given $X_i$. In that case, you care about regression
+estimates only because they provide the best linear approximation of the
+conditional expectation function, $E[Y_i|X_i]$. Alternatively, you might
+also hear that linear regression gives the best linear ``projection'' of
+$Y_i$ onto $X_i$. 
+
+Well, that's our ticket. If you look at Result~\ref{reg}, you'll notice
+that we're getting a kind of \emph{regression estimate} of $Y$ given
+$X$. To be even more explicit, we might write
+\[
+  E[Y|X] = \mu_Y + \beta (X - \mu_X) 
+\]
+where $\beta= \Sigma_{YX}\Sigma^{-1}_{XX}$. This is just like
+Regression~\ref{regex} above, only here, we regress \emph{vector} (not
+scalar) $Y$ on vector $X$. However, the intuition remains the same.
+
+Therefore, Kalman Filter estimates that assume normally distributed
+errors are not as nefarious as they seem. Since Kalman Filter estimates
+of the states under the normality assumption will follow directly from
+Result~\ref{reg} above (as we will see in the next subsection), we can
+motive the Kalman Filter with normal errors by framing it as a recursive
+procedure to find the best \emph{linear estimates} or \emph{projection
+estimates} of the states. 
+
+
+
 \section{Woodbury Matrix Identity}
 
 For matrices $A$, $U$, $C$, and $V$:

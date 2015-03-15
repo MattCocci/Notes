@@ -31,8 +31,7 @@ int otherfcn1()
 void otherfcn2() 
 {
   // declare variables;
-  // program statements;
-}
+  // program statements; }
 
 
 
@@ -54,8 +53,8 @@ below for more on arrays of strings.
 
 int main(void)        
 
-  This accepts no arguments, outputs 0 if
-  successful, non-zero int otherwise.
+  This accepts no arguments, outputs 0 if successful, non-zero int
+  otherwise.
 
 int main(int argc, char **argv):
 
@@ -152,11 +151,18 @@ import/include in your .c file, which make various pre-written functions
 available. Some useful ones below. Most have file extension "h" for
 "header."
 
-stdio.h   Standard input/output (including printf)
-ctype.h   
+stdio.h: Standard input/output (including printf)
+  - printf
+
+ctype.h: Checking the types of variables
+  - isalpha
+  - isblank
+
+string.h
+  - strlen
+
 math.h
 stdlib.h
-string.h
 time.h
 
 ========================================================================
@@ -222,7 +228,18 @@ codes above, and is used as follows:
 
   printf("%s is %d years old.\n", "Bob", 34);
 
-If you want the % sign, use %%.
+If you want the % sign, use %%. To print addresses of pointers, use %p.
+
+Special Characters
+------------------
+Special characters specified with escape char \
+  - \\ backslash
+  - \' Apostrophe 
+  - \" Quotation mark
+  - \b backspace
+  - \t tab
+  - \r carriage return
+  - \n newline
 
 
 ========================================================================
@@ -385,6 +402,84 @@ execute too much code and too many cases. You should also probably mark
 fallthrough cases as such with comments to denote that they are on
 purpose.
 
+========================================================================
+== Functions in C ======================================================
+========================================================================
+
+Functions must also be defined or (if not defined) at least declared
+before use. This typically happens after the #include statements.
+Function declarations generally look something like this:
+
+  void f1(char ch, char string[], char *strings[], int i, ...);
+
+or
+
+  int f2(void);
+
+where "void" can be used to signify that a function either takes no
+arguments (example 2 above) or returns no output (example 1 above). 
+
+
+========================================================================
+== Pointers ============================================================
+========================================================================
+
+To C, the computer is just one big chunk of available memory. Variables
+are information stored at some address in this giant chunk of memory.
+Accordingly, pointers simply point somewhere in the memory, and they
+allow you to access information in that part (and nearby parts) of
+memory to return information. 
+
+More concretely, given arrays of ints and strings, 
+
+  int jerry[] = {1, 2, 3};
+  char *george[] = {"kramer", "elaine"};
+
+we can create pointers to these objects as follows:
+
+  int *jerry_pointer = jerry;
+  char **george_pointer = george;
+
+We can then index using pointers and reference elements of jerry and
+george as follows:
+
+  jerry_pointer[i]  // for some i < length of jerry
+  george_pointer[i] // for some i < length of george
+
+OR 
+  
+  *(jerry_pointer + i)   // for some i < length of jerry
+  *(george_pointer + i) // for some i < length of george
+
+Both of these say "go to location 'jerry' (or 'george') in memory, then
+take 'i' steps." This sizing of the steps is controlled by varaible
+type. In this way, 'jerry' and 'george' are just locations in
+memory---the starting point for a chunk of information. Indexing merely
+goes to this location and then steps.
+
+The advantage of pointers is that they are something like an array and
+an indexer (like i) rolled into one. You can increment and decrement
+pointers like an indexer, but you can also return values like an array.
+
+Pointers also give you direct access to memory.
+
+
+General Syntax
+---------------
+type *ptr         // A pointer of type 'type' named 'ptr'
+*ptr              // Returns the value of whatever ptr is pointed at
+*(ptr+i)          // Return value of what ptr is pointed, plus offset i
+&thing            // The address of thing
+type *ptr = &abc  // Pointer type named ptr set to the address of thing
+ptr++             // Incremement where ptr points
+
+
+Practical Benefits of Pointers
+------------------------------
+- You can pass lightweight pointers to data between functions, rather
+  than the data itself, which might be cumbersome.
+
+
 
 ========================================================================
 == Debugging ===========================================================
@@ -423,35 +518,6 @@ doesn't print the line numbers otherwise.
 
 
 ===============================================================
-== Function Prototypes ========================================
-===============================================================
-
-Functions must also be declared before use, before main() and
-after the #include files. They follow the general form,
-
-  return_type fname(arg1, arg2, ...); 
-
-Arguments: local variables passed from the caller.
-Return Value: Single value returned to caller when function
-              exits.
-
-Note, you can also use "void" to signify no return value or
-arguments.
-
-Examples:
-  int factorial(int n); 
-  int rand(void); 
-
-
-===============================================================
-== Other Functions ============================================
-===============================================================
-
-If the function is prototyped after the #includes, the function
-must match. The variables don't have to match.
-
-
-===============================================================
 == Example Program ============================================
 ===============================================================
 
@@ -471,28 +537,6 @@ char              Data type representing a single character;
                   written in quotes 'a', '3', 'n'
 const char msg[]  A constant array of characters 
 
-
-===============================================================
-=== Strings in C ==============================================
-===============================================================
-
-- A string is stored as an array of characters. 
-- Strings are null terminated with '\0'. 
-- Special characters specified with escape char \
-  - \\ backslash
-  - \' Apostrophe 
-  - \" Quotation mark
-  - \b backspace
-  - \t tab
-  - \r carriage return
-  - \n newline
-
-
-- stdout, stdin: console output and input streams
-  - puts(string): print string to stdout
-  - putchar(char): print character to stdout
-  - char = getchar(): return character from stdin
-  - string = gets(string): read line from stdin into string
 
 ===============================================================
 === Pre-Processor Macros ======================================
