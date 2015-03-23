@@ -1,7 +1,8 @@
-function [ new ] = ...
+function [ new, accept ] = ...
   Traveling_MHStep(D, beta, old, prop_type)
 
-  prop = old;
+  prop   = old;
+  accept = 0;
 
   switch prop_type
     case 1 % Exchange two randomly
@@ -15,10 +16,12 @@ function [ new ] = ...
   delta_dist = prop.dist - old.dist;
   if delta_dist < 0
     new = prop;
+    accept = 1;
   else
     u = rand(1);
     if u < exp(-beta*delta_dist)
       new = prop;
+      accept = 1;
     else
       new = old;
     end
