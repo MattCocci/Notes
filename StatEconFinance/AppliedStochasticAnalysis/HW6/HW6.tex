@@ -452,74 +452,161 @@
           \qquad
           P(X>5) \approx 0.0000003
         \end{align*}
-        where the value is computed using \texttt{normcdf} in
-        Matlab. Taking $1/P(X>5)$, we see that we would have to
-        generate, on average, about 3,488,556 $N(0,1)$ RVs to get one
-        draw such that $X>5$, i.e.\ one non-zero value for the
-        integrand.
+        where the value is computed using \texttt{normcdf} in Matlab.
+        Taking $1/P(X>5)$, we see that we would have to generate, on
+        average, about 3,488,556 $N(0,1)$ RVs to get one draw such that
+        $X>5$, i.e.\ one non-zero value for the integrand.
 
       \item % Question 4b
         If $r$ is large, we want to center the alternative density
         function $N(\mu,1)$ so that few draws are wasted, i.e.\ so that
         most draws $\{X_i\}$ from $N(\mu,1)$ are such that $X_i>r$.
 
-        But we also face a tradeoff. Namely, we could insure that the
+        But we also face a trade-off. Namely, we could insure that the
         draws $X_i$ are almost always greater than $r$ by setting
-        $\mu>>r$, but this would also waste draws. This is becauase the
-        RV $X^2 1_{X>r}$ has a distriution that is more concentrated
-        close to $r$, rather than much larger than $r$.
+        $\mu>>r$, but this would also waste draws. This is because the
+        RV $X^2 1_{X>r}$ has a distribution that is more concentrated
+        closer to $r$, rather than much larger than $r$.
 
-        First, to estimate $E(X^2 1_{X>r})$, choose $\mu$ as above.
-        Then, let $\varphi(x)$ denote the standard normal density
-        function.
+        Therefore, a reasonable way to set $\mu$ might be to choose
+        \begin{align*}
+          \mu = r + 2
+        \end{align*}
+        since most draws from a normal will fall within 2 standard
+        deviations of the mean. This means most draws won't register as
+        zero when we compute $1_{x>r}$, while also clustering most of
+        the draws in the highest probability region for the distribution
+        of $X^2|X>r$. I'm not sure of a really optimal way to choose
+        this otherwise.
+
+        First, to estimate $E(X^2 1_{X>r})$, suppose that $\mu$ is
+        given.  Then, let $\varphi_\theta(x)$ denote the standard normal
+        density function centered at mean $\theta$. Let $f(x)~=~x^2
+        (1_{x>r})\varphi_0(x)$ denote the integrand in the expectation.
+        Then we will use importance sampling to compute
+        \begin{align*}
+          E(X^2 1_{X>r}) =
+          \int^\infty_{-\infty} x^2 (1_{x>r})\varphi_0(x) dx
+          &=
+          \int^\infty_{-\infty} x^2
+          (1_{x>r})\frac{\varphi_0(x)}{\varphi_\mu(x)} \varphi_\mu(x) dx\\
+          &= \int^\infty_{-\infty} x^2(1_{x>r})
+          e^{-\frac{x^2}{2} + \frac{(x-\mu)^2}{2}} \varphi_\mu(x) dx\\
+          &= \int^\infty_{-\infty} x^2(1_{x>r})
+          e^{-\frac{2x\mu -\mu^2}{2}} \varphi_\mu(x) dx\\
+          &= E\left[x^2(1_{x>r}) e^{-\frac{2x\mu -\mu^2}{2}}\right]
+        \end{align*}
+        %\begin{align*}
+          %E(X^2 1_{X>r}) =
+          %\int^\infty_{-\infty} x^2 (1_{x>r})\varphi_0(x) dx
+          %&=
+          %\int^\infty_{-\infty} x^2
+          %(1_{x>r})\frac{\varphi_0(x)}{\varphi_\mu(x)} \varphi_\mu(x) dx\\
+          %&= \int^\infty_{-\infty} x^2(1_{x>r})
+          %e^{-\frac{x^2}{2} + \frac{(x-\mu)^2}{2}} \varphi_\mu(x) dx\\
+          %&= \int^\infty_{-\infty} x^2(1_{x>r})
+          %e^{-\frac{2x\mu -\mu^2}{2}} \varphi_\mu(x) dx\\
+          %&= E\left[x^2(1_{x>r}) e^{-\frac{2x\mu -\mu^2}{2}}\right]
+        %\end{align*}
+        Next, to estimate $P(X>r)$, notice that this is equal to
+        $E[1_{X>r}]$. So, much as above,
+        \begin{align*}
+          P(X>r) = E[1_{X>r}] &=
+          \int^\infty_{-\infty} (1_{x>r})\varphi_0(x) dx \\
+          &=
+          \int^\infty_{-\infty}
+          (1_{x>r})\frac{\varphi_0(x)}{\varphi_\mu(x)} \varphi_\mu(x) dx\\
+          &= \int^\infty_{-\infty} (1_{x>r})
+          e^{-\frac{2x\mu -\mu^2}{2}} \varphi_\mu(x) dx\\
+          &= E\left[(1_{x>r}) e^{-\frac{2x\mu -\mu^2}{2}}\right]
+        \end{align*}
+        Together, these results suggest the following approach for
+        computing $E[X^2 1_{X>r}]$ and $P(X>r)$:
         \begin{enumerate}
-          \item Draw $N$ standard normal RV's (for large $N$).  Denote
-            these draws as $\{x_i\}^N_1$.
-          \item Compute the following:
+          \item For large $N_1$, draw $X_{1i} \sim N(\mu,1)$ and compute
+            \begin{align*}
+              \hat{I}_1 = \frac{1}{N} \sum^{N_2}_{i=1}
+              x_{1i}^2 (1_{x_{1i} > r}) e^{-\frac{2x_{1i}\mu-\mu^2}{2}}
+            \end{align*}
+          \item For large $N_2$, draw $X_{2i} \sim N(\mu,1)$ and compute
+            \begin{align*}
+              \hat{I}_2 = \frac{1}{N} \sum^{N_2}_{i=1}
+              (1_{x_{2i} > r}) e^{-\frac{2x_{2i}\mu-\mu^2}{2}}
+            \end{align*}
+          \item Then compute
             \begin{align}
-              \hat{I} = \frac{1}{N}
-              \sum^N_{i=1} \frac{%
-              (x_i+\mu)^2 \left(1_{x_i+\mu > r}\right) \varphi(x_i+\mu)}{%
-                \varphi(x_i)}
-              \label{q4b.1}
+              E[X^2|1_{X>r}] = \frac{E(X^21_{X>r})}{P(X>r)}
+              \approx \frac{\hat{I}_1}{\hat{I}_2}
+              \label{q4b.2}
             \end{align}
         \end{enumerate}
-        This is exactly the object we want.
+        %Next, to find
+        %\begin{enumerate}
+          %\item Draw $N$ standard normal RV's (for large $N$).  Denote
+            %these draws as $\{x_i\}^N_1$.
+          %\item Compute the following:
+            %\begin{align}
+              %\hat{I} = \frac{1}{N}
+              %\sum^N_{i=1} \frac{%
+              %(x_i+\mu)^2 \left(1_{x_i+\mu > r}\right) \varphi(x_i+\mu)}{%
+                %\varphi(x_i)}
+              %\label{q4b.1}
+            %\end{align}
+        %\end{enumerate}
+        %This is exactly the object we want.
 
-        To see this more explicitly, it helps to rewrite it a bit.
-        Namely, let $f(x)~=~x^2 (1_{x>r})\varphi(x)$ denote the
-        integrand in the expectation. Also let $p(x)$ be the pdf for
-        RV's drawn from $N(\mu,1)$.  Then we can rewrite
-        Expression~\ref{q4b.1} as
-        \begin{align*}
-          \hat{I} = \frac{1}{N}\sum^N_{i=1}
-          \frac{f(x_i+\mu)}{p(x_i+\mu)}
-        \end{align*}
-        which is exactly the importance sampling formula given in
-        the notes, where $\{x_i+\mu\}_1^N$ constitute draws from
-        $N(\mu,1)$.
+        %To see this more explicitly, it helps to rewrite it a bit.
+        %Namely, let $f(x)~=~x^2 (1_{x>r})\varphi(x)$ denote the
+        %integrand in the expectation. Also let $p(x)$ be the pdf for
+        %RV's drawn from $N(\mu,1)$.  Then we can rewrite
+        %Expression~\ref{q4b.1} as
+        %\begin{align*}
+          %\hat{I} = \frac{1}{N}\sum^N_{i=1}
+          %\frac{f(x_i+\mu)}{p(x_i+\mu)}
+        %\end{align*}
+        %which is exactly the importance sampling formula given in
+        %the notes, where $\{x_i+\mu\}_1^N$ constitute draws from
+        %$N(\mu,1)$.
 
-        To estimate $P(X>r)$, I would hope that I have access to matlab
-        so I can do \texttt{1-normcdf(r)} or \texttt{normcdf(-r)}. If I
-        don't have such luck (or there are numerical precision issues),
-        I can recycle the draws $\{x_i\}^N_1$ from step (i) above and
-        compute empirically the fraction
-        \begin{align*}
-          P(X>r) \approx \frac{1}{N} \sum^N_{i=1} 1_{x_i > r}
-        \end{align*} Of course, for the reasons discussed above, we
-        would need $N$ to be very large for this to give a reasonable
-        estimate. But the fact that we can re-purpose the $x_i$ already
-        drawn saves some computational time.
+        %To estimate $P(X>r)$, I can recycle the draws $\{x_i\}^N_1$ from
+        %step (i) above and compute empirically the fraction
+        %\begin{align*}
+          %P(X>r) \approx \frac{1}{N} \sum^N_{i=1} 1_{x_i > r}
+        %\end{align*}
+        %Of course, for the reasons discussed above, we would need $N$ to
+        %be very large for this to give a reasonable estimate (or
+        %\emph{any} observations above $r=7$ or so (I ran up against
+        %Matlab's memory limits before I could generate one observation
+        %for $r=7$). But the fact that we can re-purpose the $x_i$
+        %already drawn saves computational time when this is a feasible
+        %approach.
 
-        As $r\rightarrow\infty$, I think this will behave very poorly.
-        Already in Octave and R, I was having numerical precision
-        issues or had to wait a bit to compute that many draws. As a
-        result, computing the denominator for the target expression was
-        problematic both with the built in functions and using the draws
-        to compute an empirical estimate. I even had to switch to a
-        higher bit machine to compute these results, which does not bode
-        well for $r\rightarrow\infty$.
+        %As $r\rightarrow\infty$, this will behave very poorly.
+        %As mentioned, I ran up against numerical precision and memory
+        %issues in computing \texttt{normcdf(r)} and taking a large
+        %number of draws to generate observations for $r$ as it creeped
+        %towards double digits.
 
+
+      \item % Question 4c
+        Implementing the above method yields the following estimates of
+        $E[X^2|1_{X>r}]$:
+        \begin{table}[htpb!]
+          \centering
+          \begin{tabular}{r|r}
+            r & Estimate \\\hline\hline
+            3  & 10.8  \\
+            5  & 26.9  \\
+            10 & 102.2 \\
+            20 & 403.7 \\
+            25 & 615.1 \\
+            30 & 909.4 \\
+          \end{tabular}
+        \end{table}
+        As $r\rightarrow\infty$, I would assume this behaves poorly for
+        reasons of numerical precision, as the denominator in
+        Expression~\ref{q4b.2} becomes very small, causing the overall
+        estimate to become very unstable.
 
     \end{enumerate}
 
