@@ -1,0 +1,657 @@
+\documentclass[12pt]{article}
+
+\author{Matthew D. Cocci}
+\title{Homework 6}
+\date{\today}
+%% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % most detailed page formatting control
+\usepackage{fullpage} % Simpler than using the geometry package; std effect
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt}
+    %---Make the header bigger to avoid overlap
+
+%\renewcommand{\headrulewidth}{0.3pt}
+    %---Width of the line
+
+%\setlength{\headsep}{0.2in}
+    %---Distance from line to text
+
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{amsthm} %allows for labeling of theorems
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+
+% Below supports left-right alignment in matrices so the negative
+% signs don't look bad
+\makeatletter
+\renewcommand*\env@matrix[1][c]{\hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols #1}}
+\makeatother
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %---For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %---Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+        %---This colors the links themselves, not boxes
+    citecolor=black,
+        %---Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{verbatim}
+    %---For including verbatim code from files, no colors
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{RGB}{28,172,0}
+\definecolor{mylilas}{RGB}{170,55,241}
+\newcommand{\matlabcode}[1]{%
+    \lstset{language=Matlab,%
+        basicstyle=\footnotesize,%
+        breaklines=true,%
+        morekeywords={matlab2tikz},%
+        keywordstyle=\color{blue},%
+        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+        identifierstyle=\color{black},%
+        stringstyle=\color{mylilas},%
+        commentstyle=\color{mygreen},%
+        showstringspaces=false,%
+            %---Without this there will be a symbol in
+            %---the places where there is a space
+        numbers=left,%
+        numberstyle={\tiny \color{black}},%
+            %---Size of the numbers
+        numbersep=9pt,%
+            %---Defines how far the numbers are from the text
+        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+            %---Some words to emphasise
+    }%
+    \lstinputlisting{#1}
+}
+    %---For including Matlab code from .m file with colors,
+    %---line numbering, etc.
+
+%% Bibliographies %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{natbib}
+    %---For bibliographies
+%\setlength{\bibsep}{3pt} % Set how far apart bibentries are
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{enumitem}
+    %---Has to do with enumeration
+\usepackage{appendix}
+\usepackage{pdfpages}
+    %---For including whole pdf pages as a page in doc
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+\maketitle
+
+%\tableofcontents
+
+
+\begin{enumerate}
+  \item % Question 1
+    To generate a discrete random variable $X$ taking on values
+    $\{x_i\}_1^m$ with probabilities $\{p_i\}_1^m$,
+    \begin{enumerate}
+      \item[i.] Construct the sequence $\{I_i\}_1^m$ of $m$ intervals:
+        \begin{align*}
+          I_1 &= [0, p_1] \\
+          I_i &= \left(\sum_{j=1}^{i-1} p_j, \; \sum_{j=1}^{i} p_j\right]
+          \qquad i = 2, \ldots, m
+        \end{align*}
+      \item[ii.] Draw $u \sim U([0,1])$.
+      \item[iii.] Find $i$ such that $u\in I_i$ and set draw $x = x_i$.
+    \end{enumerate}
+
+  \item % Question 2
+    \begin{enumerate}
+      \item % Question 2a
+        Let's start by writing out the CDF of $Y$:
+        \begin{align*}
+          F_Y(x) &= P(Y \leq x)  \\
+          &= P(\max\{X_1, \ldots,X_m\} \leq x)  \\
+          \text{By independence} \qquad
+            &= P(X_1 \leq x) \cdot P(X_2 \leq x)\cdots P(X_m\leq x) \\
+          &= F_{X_1}(x) \cdot F_{X_2}(x) \cdots F_{X_m}(x) \\
+          \text{Since identically distributed} \qquad
+            &= \left[F_{X_1}(x)\right]^m
+        \end{align*}
+        Intuitively, to have $Y \leq x$, we need all $X_i \leq x$.
+
+        Substituting in the cdf for exponential random variables, we get
+        \begin{align*}
+          F_Y(x) = \left( 1-e^{-\lambda x} \right)^m
+        \end{align*}
+
+      \item % Question 2b
+        To generate random draws for $Y$, we can use the inverse
+        transform method. Letting $u$ represent a draw from $U([0,1])$,
+        we can invert $F_Y(y)$ to get $y$ in terms of $u$:
+        \begin{align*}
+          u &= \left( 1-e^{-\lambda y} \right)^m\\
+          \Rightarrow \qquad
+          y &= -\frac{1}{\lambda}\ln\left(1-u^{1/m}\right)
+        \end{align*}
+        By drawing $u$ and setting $y$ equal to this value, we can
+        generate draws for $Y$ directly without having to generate $m$
+        exponential random variables first.
+    \end{enumerate}
+
+  \item % Question 3
+    \begin{enumerate}
+      \item % Question 3a
+        To make the acceptance-rejection method efficient, we want to
+        minimize the area between the true probability distribution and
+        the covering $g(x)$ curve. Since both $p(x)$ (the normal pdf)
+        and $g(x)$ are symmetric, we can work with just the positive
+        part of the domain.
+
+        So we want to choose $\alpha$ to minimize:
+        \begin{align*}
+          \int^\infty_0 g(x) - p(x) dx
+          &= \int^\infty_0 \frac{\alpha}{2} e^{-x}
+            - \frac{1}{\sqrt{2\pi}} e^{-\frac{x^2}{2}}dx\\
+          &= \frac{\alpha}{2} \int^\infty_0 e^{-x}
+            - \frac{1}{\sqrt{2\pi}}\int^\infty_0 e^{-\frac{x^2}{2}}dx \\
+          &= \frac{\alpha}{2} \left[-e^{-x}\right]^\infty_0 -\frac{1}{2}\\
+          &= \frac{\alpha}{2} -\frac{1}{2}
+        \end{align*}
+        Clearly, we want to choose small values of $\alpha$, but we also
+        need to ensure that $g(x)$ covers $p(x)$. Too small a value of
+        $\alpha$ would violate this condition.
+
+        So we want to choose the lowest possible $\alpha$ such that the
+        following holds for all $x$ (again, focusing on the positive
+        part of the domain):
+        \begin{align*}
+          \frac{\alpha}{2} e^{-x} &\geq
+            \frac{1}{\sqrt{2\pi}} e^{-\frac{x^2}{2}}\\
+          \alpha &\geq
+            \frac{\sqrt{2}}{\sqrt{\pi}} e^{x-\frac{x^2}{2}}
+        \end{align*}
+        To figure out the smallest possible value of $\alpha$ still
+        allowing $g(x)$ to cover $p(x)$, we compute the largest value of
+        the righthand side of the above inequality. That will determine
+        the lower bound on $\alpha$.
+
+        With that in mind, the righthand side of the above inequality
+        will be largest when $x-\frac{x^2}{2}$ is large and positive.
+        Finding the max:
+        \begin{align*}
+          \frac{d}{dx}\left[ x-\frac{x^2}{2}\right]
+          &= 1 - x \\
+          \Rightarrow \quad
+          \max_x \left[x-\frac{x^2}{2}\right] &= 1
+        \end{align*}
+        Plugging this into the condition for $\alpha$, we see that we
+        must have
+        \begin{align*}
+          \alpha &=
+            \frac{\sqrt{2}}{\sqrt{\pi}} e^{1/2}
+        \end{align*}
+        Hence the most efficient choice of $g(x)$ is
+        \begin{align*}
+          g(x) &=
+            \frac{\sqrt{2}}{\sqrt{\pi}} e^{1/2}
+            \left(\frac{1}{2} e^{-|x|}\right) \\
+          &=
+          \frac{1}{\sqrt{2\pi}} e^{-|x|+\frac{1}{2}}
+        \end{align*}
+        As a visual check, Figure~\ref{fig:q3a} depicts both the $N(0,1)$
+        pdf, $p(x)$, and $g(x)$ with the above choice of $\alpha$.
+        \begin{figure}
+          \centering
+          \caption{Normal pdf vs. $g(x)$}
+          \label{fig:q3a}
+          \includegraphics[scale=0.4, trim={2cm, 7cm, 2cm, 7cm}, clip]{Figures/q3a.pdf}
+        \end{figure}
+
+      \item % Question 3b
+        To draw using the acceptance-rection method, we will need to
+        draw from $g(x)$, which requires computing the (improper)
+        cumulative distribution function so that we can apply the
+        inverse transform method.
+
+        Since this involves an absolute value, start with the case where
+        $x < 0$:
+        \begin{align*}
+          \text{For $x< 0$} \qquad
+          G(x) &= \frac{1}{\sqrt{2\pi}} \int^x_{-\infty} e^{-|y|+\frac{1}{2}} dy
+          = \frac{1}{\sqrt{2\pi}} \int^x_{-\infty} e^{y+\frac{1}{2}} dy \\
+          &= \frac{1}{\sqrt{2\pi}} \left(e^{y+\frac{1}{2}}\right) |^x_{-\infty} \\
+          &= \frac{1}{\sqrt{2\pi}} e^{x+\frac{1}{2}}
+          %\\\\
+          %\text{For $x\geq 0$} \qquad
+          %G(x) &= \frac{1}{\sqrt{2\pi}} \int^x_{-\infty} e^{-|y|+\frac{1}{2}} dy \\
+          %&= \frac{1}{\sqrt{2\pi}} \int^0_{-\infty} e^{y+\frac{1}{2}} dy
+            %+ \frac{1}{\sqrt{2\pi}} \int^x_{0} e^{-y+\frac{1}{2}} dy \\
+          %\text{From $x<0$ case above} \qquad
+          %&= \frac{1}{\sqrt{2\pi}} e^{\frac{1}{2}}
+           %+ \frac{1}{\sqrt{2\pi}} \left(-e^{-y+\frac{1}{2}}\right) |^x_{0} \\
+          %&= \frac{1}{\sqrt{2\pi}} \left( e^{\frac{1}{2}}
+            %- e^{x+\frac{1}{2}} +  e^{\frac{1}{2}}\right)\\
+          %&= \frac{1}{\sqrt{2\pi}} \left( 2e^{\frac{1}{2}}
+            %- e^{x+\frac{1}{2}} \right)
+        \end{align*}
+        And I'll actually stop there, rather than deal with the case
+        where $x\geq 0$, since that will make the inverse transform more
+        complicated. I'll instead account for the sign later on.
+
+        Now that we have the improper distribution function $G(x)$ for
+        $x< 0$, let's invert:
+        \begin{align*}
+          y = \frac{1}{\sqrt{2\pi}} e^{x+\frac{1}{2}} \\
+          \Rightarrow \qquad
+          x = \ln(y\sqrt{2\pi}) - \frac{1}{2}
+        \end{align*}
+        Finally, using $G(x)$, let's get the normalizing constant $Z$ since
+        $g(x)$ is an improper distribution. We find this by letting
+        $x\rightarrow 0$, the upper bound of $G(x)$ on $(-\infty, 0)$
+        \begin{align*}
+          Z = \frac{1}{\sqrt{2\pi}} \int^0_{-\infty} e^{-|y|+\frac{1}{2}} dy
+          = G(0) = \frac{1}{\sqrt{2\pi}} e^{\frac{1}{2}}
+        \end{align*}
+        \paragraph{Algorithm}
+        This is now enough to draw samples for $X$ according to the
+        following algorithm:
+        \begin{enumerate}
+          \item Draw $U_1, U_2 \sim U([0,1])$.
+          \item Set the proposed $X'$ as follows
+            \begin{align*}
+              X' =
+                \begin{cases}
+                  \ln( (ZU_1) \sqrt{2\pi}) - \frac{1}{2} & U_2 \geq 0.5 \\
+                  -\ln( (ZU_1) \sqrt{2\pi}) + \frac{1}{2} & U_2 < 0.5
+                \end{cases}
+            \end{align*}
+            where $Z$ is as above. This uses the symmetry of $g(x)$ and
+            an extra draw $U_2$ rather than dealing with the
+            complications coming from the absolute value in implementing
+            the inverse transform method.\footnote{Of course, it's
+            possible that $U_1=0$ (especially since these are draws on a
+            computer with limited precision). If $U_1=0$, set $X'=0$. I
+            put my reasoning for this fix/hack in a note at the end of
+            this homework.}
+          \item Choose $U_3 \sim U([0, g(X')]$.
+          \item If $0\leq U_3 \leq p(X')$, accept and set $X=X'$.
+            Otherwise reject and try again.
+
+        \end{enumerate}
+
+      \item % Question 3c
+        We can compute the unconditional probability of accepting by
+        first computing the acceptance probability conditional on $X'$,
+        then integrating over all $X'$. In other words
+        \begin{align}
+          P(\text{accept}) = \int_{-\infty}^\infty h(\text{accept}|x')
+          h(x') dx'
+          \label{q3c.0}
+        \end{align}
+        where $h$ denotes a distribution (to differentiate it from $p$
+        and $g$ above).
+
+        From the algorithm, we know that conditional on a draw $x'$,
+        it's clear that the probability of accepting is
+        \begin{align}
+          h(\text{accept}|x') = \frac{p(x')}{g(x')}
+          \label{q3c.1}
+        \end{align}
+        We also know that the distribution of draws of $x'$ is
+        proportional $g$ and, when properly normalized, has distribution
+        \begin{align}
+          h(x') = \frac{g(x)}{Z}
+          \label{q3c.2}
+        \end{align}
+        Plugging Equations~\ref{q3c.1} and~\ref{q3c.2} into
+        Expression~\ref{q3c.0}, we see
+        \begin{align}
+          P(\text{accept})
+          &= \int_{-\infty}^\infty \frac{p(x')}{g(x')} \frac{g(x)}{Z} dx'\\
+          &= \frac{1}{Z}\int_{-\infty}^\infty p(x') dx'
+          = \frac{1}{Z} \cdot 1\\
+          &= \frac{1}{Z}
+        \end{align}
+        Therefore, the expected number of draws until acceptance will be
+        $1/\frac{1}{Z} = Z$ (which is a really neat result I did not see
+        coming until working this out).
+
+      \item % Question 3d
+        No. As can be seen in Figure~\ref{fig:q3a}, the normal tapers
+        off much more quickly than the double exponential in the tails.
+        We would not be able to scale an normal RV so that it covers
+        a double exponential RV.
+
+        More explicitly, suppose that we have a double exponential RV
+        with probability distribution
+        \begin{align*}
+          p(x) = \frac{1}{2b} e^{-\frac{|x|}{b}}
+        \end{align*}
+        Assume it is zero-mean since we can always just shift the mean
+        of $p(x)$ and a normal RV without changing the shape.
+
+        Next, suppose by contradiction that there is a covering function
+        $g(x) \propto N(0,\sigma^2)$:
+        \begin{align*}
+          g(x) = \frac{a}{\sigma\sqrt{2\pi}} e^{-\frac{x^2}{2\sigma^2}}
+        \end{align*}
+        for some constants $a$ and $\sigma$. Then for $g(x)$ to cover
+        $p(x)$, it must be the case (focusing on the positive part of
+        the domain again) that
+        \begin{align}
+          \frac{a}{\sigma\sqrt{2\pi}} e^{-\frac{x^2}{2\sigma^2}} \geq
+          \frac{1}{2b} e^{-\frac{x}{b}} \qquad \forall x > 0
+          \label{q3d.1}
+        \end{align}
+        However it's clear that the lefthand side decays at a rate
+        proportional to $e^{-cx^2}$ (for a constant $c$) while the
+        righthand side decays only at a rate proportional to $e^{-dx}$
+        (for a constant $d$). Therefore it must be the case that there
+        is some value of $x<\infty$ such that Condition~\ref{q3d.1} is
+        violated.
+        %Plugging in $x=0$, we get
+        %\begin{align*}
+          %\frac{a}{\sigma\sqrt{2\pi}} \geq
+          %\frac{1}{2b}
+        %\end{align*}
+        %However, if we plug $x=\frac{2(2\sigma^2)}{b}$ into inequality
+        %(\ref{q3d.1}), we get that
+        %\begin{align*}
+          %\frac{a}{\sigma\sqrt{2\pi}}
+            %e^{-\frac{\left(2(2\sigma^2)/b \right)^2}{2\sigma^2}}
+            %&\geq
+          %\frac{1}{2b} e^{-\frac{2(2\sigma^2)/b}{b}} \\
+          %\Rightarrow\qquad
+          %\frac{a}{\sigma\sqrt{2\pi}}
+            %e^{-\frac{4(2\sigma^2)}{b^2}}
+            %&\geq
+          %\frac{1}{2b} e^{-\frac{2(2\sigma^2)}{b^2}} 
+        %\end{align*}
+
+    \end{enumerate}
+
+  \item % Question 4
+    \begin{enumerate}
+      \item % Question 4a
+        The integral we want to compute is
+        \begin{align*}
+          I = E(X^2 1_{X>r}) =
+          \int^\infty_{-\infty} x^2 1_{X>r} \varphi(x) dx
+        \end{align*}
+        where $\varphi(x)$ is the normal pdf.\
+
+        The integrand $x^2 1_{X>r}\varphi(x)$ will be nonzero if and
+        only if $X>r$. Supposing that $r=5$, we have
+        \begin{align*}
+          \text{For $X\sim N(0,1)$}
+          \qquad
+          P(X>5) \approx 0.0000003
+        \end{align*}
+        where the value is computed using \texttt{normcdf} in
+        Matlab. Taking $1/P(X>5)$, we see that we would have to
+        generate, on average, about 3,488,556 $N(0,1)$ RVs to get one
+        draw such that $X>5$, i.e.\ one non-zero value for the
+        integrand.
+
+      \item % Question 4b
+        If $r$ is large, we want to center the alternative density
+        function $N(\mu,1)$ so that few draws are wasted, i.e.\ so that
+        most draws $\{X_i\}$ from $N(\mu,1)$ are such that $X_i>r$.
+
+        But we also face a tradeoff. Namely, we could insure that the
+        draws $X_i$ are almost always greater than $r$ by setting
+        $\mu>>r$, but this would also waste draws. This is becauase the
+        RV $X^2 1_{X>r}$ has a distriution that is more concentrated
+        close to $r$, rather than much larger than $r$.
+
+        First, to estimate $E(X^2 1_{X>r})$, choose $\mu$ as above.
+        Then, let $\varphi(x)$ denote the standard normal density
+        function.
+        \begin{enumerate}
+          \item Draw $N$ standard normal RV's (for large $N$).  Denote
+            these draws as $\{x_i\}^N_1$.
+          \item Compute the following:
+            \begin{align}
+              \hat{I} = \frac{1}{N}
+              \sum^N_{i=1} \frac{%
+              (x_i+\mu)^2 \left(1_{x_i+\mu > r}\right) \varphi(x_i+\mu)}{%
+                \varphi(x_i)}
+              \label{q4b.1}
+            \end{align}
+        \end{enumerate}
+        This is exactly the object we want.
+
+        To see this more explicitly, it helps to rewrite it a bit.
+        Namely, let $f(x)~=~x^2 (1_{x>r})\varphi(x)$ denote the
+        integrand in the expectation. Also let $p(x)$ be the pdf for
+        RV's drawn from $N(\mu,1)$.  Then we can rewrite
+        Expression~\ref{q4b.1} as
+        \begin{align*}
+          \hat{I} = \frac{1}{N}\sum^N_{i=1}
+          \frac{f(x_i+\mu)}{p(x_i+\mu)}
+        \end{align*}
+        which is exactly the importance sampling formula given in
+        the notes, where $\{x_i+\mu\}_1^N$ constitute draws from
+        $N(\mu,1)$.
+
+        To estimate $P(X>r)$, I would hope that I have access to matlab
+        so I can do \texttt{1-normcdf(r)} or \texttt{normcdf(-r)}. If I
+        don't have such luck (or there are numerical precision issues),
+        I can recycle the draws $\{x_i\}^N_1$ from step (i) above and
+        compute empirically the fraction
+        \begin{align*}
+          P(X>r) \approx \frac{1}{N} \sum^N_{i=1} 1_{x_i > r}
+        \end{align*} Of course, for the reasons discussed above, we
+        would need $N$ to be very large for this to give a reasonable
+        estimate. But the fact that we can re-purpose the $x_i$ already
+        drawn saves some computational time.
+
+        As $r\rightarrow\infty$, I think this will behave very poorly.
+        Already in Octave and R, I was having numerical precision
+        issues or had to wait a bit to compute that many draws. As a
+        result, computing the denominator for the target expression was
+        problematic both with the built in functions and using the draws
+        to compute an empirical estimate. I even had to switch to a
+        higher bit machine to compute these results, which does not bode
+        well for $r\rightarrow\infty$.
+
+
+    \end{enumerate}
+
+  \item % Question 5
+    \begin{enumerate}
+      \item % Question 5a
+        We first want to calculate Var($\hat{p}_A$). To begin, write out
+        the expression using the definition of $\hat{p}_A$:
+        \begin{align*}
+          \text{Var}(\hat{p}_A)
+          &=\text{Var}\left( \frac{1}{n} \sum^n_{i=1} X_A(i)\right) \\
+          &= \frac{1}{n^2} \text{Var}\left( \sum^n_{i=1} X_A(i)\right) \\
+          \text{By independence} \qquad
+          &= \frac{1}{n^2} \sum^n_{i=1}  \text{Var}\left(X_A(i)\right)
+        \end{align*}
+        Since $C_A(0) = \text{Var}(X_A(t))$ by definition, the above
+        simplifies to
+        \begin{align*}
+          \text{Var}(\hat{p}_A)
+          &= \frac{1}{n^2} \sum^n_{i=1}  C_A(0)
+          = \frac{n}{n^2} C_A(0)\\
+          &= \frac{C_A(0)}{n}
+        \end{align*}
+
+      \item % Question 5b
+        To calculate $\hat{p}_A$ for $n$ correlated samples, we again
+        write out and simplify:
+        \begin{align*}
+          \text{Var}(\hat{p}_A)
+          &=\text{Var}\left( \frac{1}{n} \sum^n_{i=1} X_A(i)\right) \\
+          &= \frac{1}{n^2} \text{Var}\left( \sum^n_{i=1} X_A(i)\right) \\
+          &= \frac{1}{n^2} \sum^n_{j=1}\sum^n_{i=1}
+            \text{Cov}\left(X_A(i), X_A(j)\right)\\
+          \text{By definition} \qquad
+            &= \frac{1}{n^2} \sum^n_{j=1}\sum^n_{i=1} C_A(i-j) \\
+          &= \frac{1}{n^2}
+            \left[ n C_A(0) + 2 \sum_{i>j} C_A(i-j) \right] \\
+          &= \frac{1}{n^2}
+            \left[ n C_A(0) + 2 \sum^{n-1}_{i=1} C_A(i) \right] \\
+          &= \frac{C_A(0)}{n}
+            + \frac{2}{n^2} \sum^{n-1}_{i=1} C_A(i)
+        \end{align*}
+
+
+    \end{enumerate}
+
+\end{enumerate}
+
+
+%% APPPENDIX %%
+
+% \appendix
+
+
+
+
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% SAMPLE CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    %% BIBLIOGRAPHIES %%
+
+        \cite{LabelInSourcesFile}  %Use in text; cites
+        \citep{LabelInSourcesFile} %Use in text; cites in parens
+
+        \nocite{LabelInSourceFile} % Includes in refs w/o specific citation
+        \bibliographystyle{apalike}  % Or some other style
+
+        % To ditch the ``References'' header
+        \begingroup
+        \renewcommand{\section}[2]{}
+        \endgroup
+
+        \bibliography{sources} % where sources.bib has all the citation info
+
+    %% SPACING %%
+
+        \vspace{1in}
+        \hspace{1in}
+
+
+    %% INCLUDING PDF PAGE %%
+
+        \includepdf{file.pdf}
+
+
+    %% INCLUDING CODE %%
+
+        \verbatiminput{file.ext}
+            %---Includes verbatim text from the file
+        \texttt{text}
+            %---Renders text in courier, or code-like, font
+
+        \matlabcode{file.m}
+            %---Includes Matlab code with colors and line numbers
+
+
+    %% INCLUDING FIGURES %%
+
+        % Basic Figure with size scaling
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[scale=1]{file.pdf}
+            \end{figure}
+
+        % Basic Figure with specific height
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[height=5in, width=5in]{file.pdf}
+            \end{figure}
+
+        % Figure with cropping, where the order for trimming is  L, B, R, T
+            \begin{figure}
+               \centering
+               \includegraphics[trim={1cm, 1cm, 1cm, 1cm}, clip]{file.pdf}
+            \end{figure}
+
+
+        % Side by Side figures
+            \begin{figure}[h!]
+                \centering
+                \mbox{\subfigure{
+                    \includegraphics[scale=1]{file1.pdf}
+                }\quad\subfigure{
+                    \includegraphics[scale=1]{file2.pdf}
+                }
+                }
+            \end{figure}
+
+
