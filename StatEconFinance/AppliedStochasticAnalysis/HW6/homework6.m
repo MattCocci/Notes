@@ -1,7 +1,7 @@
 
 %% Question 4a
 
-N   = 100000000;
+N   = 1000000000;
 rs  = [3 5 10 20 25 30];
 I   = nan(1, length(rs));
 mus = rs + 1.5;

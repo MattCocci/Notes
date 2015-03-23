@@ -208,17 +208,17 @@
     \end{align*}
 
   \item % Question 1e
-%    Somewhat. It is true that $B_r$ satisfies the Markov Property:
-%    \begin{align*}
-%      P(B_r|B_{r-1},\ldots,B_0) =
-%      P(B_r|B_{r-1})
-%    \end{align*}
-%    However, it is also true that
-%    \begin{align*}
-%      P(B_r) = P(B_r|B_{r-1},\ldots,B_0) =
-%      P(B_r|B_{r-1})
-%    \end{align*}
-%    In other words, the history is entirely irrelevant
+    Somewhat. It is true that $B_r$ satisfies the Markov Property:
+    \begin{align*}
+      P(B_r|B_{r-1},\ldots,B_0) =
+      P(B_r|B_{r-1})
+    \end{align*}
+    However, it is also true that
+    \begin{align*}
+      P(B_r) = P(B_r|B_{r-1},\ldots,B_0) =
+      P(B_r|B_{r-1})
+    \end{align*}
+    The history is irrelevant to the distribution at time $r$.
 \end{enumerate} % End question 1
 
 \item % Question 2
@@ -261,7 +261,7 @@
       \label{q2.vi}
       v_i = \sum_j v_j p_{ji} = v P_{\cdot i}
     \end{equation}
-    Hence, we can write
+    So we can write
     \begin{align*}
       v =
       \begin{pmatrix}
@@ -310,27 +310,179 @@
   $j\not\in\{i-1,i+1\}$ (and in the opposite direction) are zero for all
   such $j$, as only one particle moves at a time.
 
-  To show that this is the stationary distribution, first note that $v$
-  is the binomial distribution, so the elements must sum to 1. Also,
-  $v_i>0$ for all $i=1,\ldots,m$. Lastly
-  \begin{align*}
-    v P_{\cdot j} = \sum_i v_i P_{ij} &=
-      \frac{m!}{(j-1)!(m-(j-1))!} \left(\frac{1}{2}\right)^m
-      +
-      \frac{m!}{(j+1)!(m-(j+1))!} \left(\frac{1}{2}\right)^m\\
-    &=
-      \frac{j m!}{j!(m-j)!(m-(j-1))} \left(\frac{1}{2}\right)^m
-      +
-      \frac{(m-j)m!}{(j+1)j!(m-j)!} \left(\frac{1}{2}\right)^m\\
-  \end{align*}
-
+%  To show that this is the stationary distribution, first note that $v$
+%  is the binomial distribution, so the elements must sum to 1. Also,
+%  $v_i>0$ for all $i=1,\ldots,m$. Lastly
+%  \begin{align*}
+%    v P_{\cdot j} = \sum_i v_i P_{ij} &=
+%      \frac{m!}{(j-1)!(m-(j-1))!} \left(\frac{1}{2}\right)^m
+%      +
+%      \frac{m!}{(j+1)!(m-(j+1))!} \left(\frac{1}{2}\right)^m\\
+%    &=
+%      \frac{j m!}{j!(m-j)!(m-(j-1))} \left(\frac{1}{2}\right)^m
+%      +
+%      \frac{(m-j)m!}{(j+1)j!(m-j)!} \left(\frac{1}{2}\right)^m\\
+%  \end{align*}
+%
 
 \item % Question 4
-  \begin{enumerate} % Question 4a
-    \item
+  \begin{enumerate} 
+    \item % Question 4a
+      First, calculate $P(T_A = n|X_0=j)$:
+      \begin{align*}
+        P(T_A = n|X_0=j) 
+          &=  \sum_k P(T_A = n, X_1 = k |X_0=j) \\
+          &=  \sum_k P(T_A = n| X_1 = k) P(X_1 = k|X_0=j) \\
+          &=  \sum_{k} P(T_A = n-1| X_0 = k) p_{jk} 
+%          &\quad +\sum_{j\in A} P(T_A = n-1| X_0 = j) p_{ij} \\
+%          &=  \sum_{j\not\in A} P(T_A = n-1| X_0 = j) p_{ij} +0
+      \end{align*}
+      Now calculate $\tau_j$, supposing that $j \not\in A$:
+      \begin{align*}
+        \tau_j 
+          &= \sum_{n=1}^\infty n\sum_k P(T_A = n-1| X_0 = k) p_{jk} \\
+          &= \sum_k \sum_{n=1}^\infty (n-1)P(T_A = n-1| X_0 = k) p_{jk} 
+          + P(T_A = n-1| X_0 = k) p_{jk}\\
+          &= \sum_k \sum_{n=1}^\infty (n-1)P(T_A = n-1| X_0 = k) p_{jk} 
+          + \sum_k \sum_{n=1}^\infty P(T_A = n-1| X_0 = k) p_{jk}\\
+          &= 1+\sum_k E[T_A|X_0=k] p_{jk} \\
+          &= 1+\sum_k \tau_k  p_{jk} 
+      \end{align*}
+
+
+    \item %Question 4b
+      Mean time: 36 steps. Code below
+
+      \matlabcode{HW2.m}
+  \end{enumerate}
+
+
+\item % Question 5
+  To get $u(\cdot,n+1)$, first fix at element $k$:
+  \begin{align*}
+    u(k,n+1) = E[f(X_{n+1})|X_0=k] 
+      &= \sum_x f(x) P(X_{n+1}=x|X_0=k)\\
+    \text{Law of Total Probability} \qquad 
+      &= \sum_x f(x) \sum_j P(X_{n+1}=x, X_1=j|X_0=k)\\
+      &= \sum_x f(x) \sum_j P(X_{n+1}=x| X_1=j) P(X_1=j |X_0=k)\\
+    \text{Homogeneity} \quad
+      &= \sum_x f(x) \sum_j P(X_{n}=x| X_0=j) p_{kj}\\
+      &= \sum_j \sum_x f(x) P(X_{n}=x| X_0=j) p_{kj}\\
+      &= \sum_j E[f(X_n)| X_0=j] p_{kj}\\
+      &= P_{k,\cdot} u(\cdot,n)
+  \end{align*}
+  Stacking, we get
+  \begin{align*}
+    u(\cdot,n+1) = P u(\cdot,n)
+  \end{align*}
+
+\item % Question 6
+  \begin{enumerate}
+    \item % Question 6a
+      {\sl Showing $\pi$ is the stationary distribution:} First, we show that
+      $\pi_i = \frac{d_i}{\sum_k d_k}$ is the stationary distribution, showing
+      that it satisfies all the conditions of a stationary distribution. 
+      
+      Since the weights $w_{ij}\geq 0$, then $d_i = \sum_j w_{ij}\geq 0$ for
+      all $i$, hence $\pi_i\geq 0$ for all $i$. Moreover, 
+      \begin{align*}
+        \sum_j \pi_j = \sum_j \frac{d_j}{\sum_k d_k} = 1
+      \end{align*}
+
+      Finally, to show that $\pi = \pi P$, we proceed elementwise, examining
+      each element in the vector that results from the matrix multiplication
+      $\pi P$:
+      \begin{align*}
+        \pi P_{\cdot,j} 
+          = \sum_i \pi_i p_{ij} 
+          &= \sum_j \frac{d_i}{\sum_k d_k} \frac{w_{ij}}{d_i}\\
+          &= \frac{1}{\sum_k d_k} \sum_j w_{ij}\\
+          &= \frac{d_i}{\sum_k d_k} = \pi_i
+      \end{align*}
+      Hence the $i$th element of $\pi$ equals the $i$th element of $\pi P$,
+      implying $\pi=\pi P$.
+
+      {\sl Showing $P$ satisfies detailed balance:} This requires checking
+      \begin{align*}
+        v_i p_{ij} &= \frac{d_i}{\sum_k d_k} \frac{w_{ij}}{d_i}  
+        = \frac{w_{ij}}{\sum_k d_k}  \\
+        \text{By assumption $w_{ij}=w_{ji}$} \quad &= \frac{w_{ji}}{\sum_k d_k}  
+         = \frac{d_j}{\sum_k d_k} \frac{w_{ji}}{d_j}  \\
+         &= v_j p_{ji}
+      \end{align*}
+      which is exactly the detailed balance condition.
+
+    \item % Question 6b
+      $P$ has a full set of real eignevalues because it satsfies detailed
+      balance and can be symmetrized 
+      \begin{align*}
+        V = \Lambda P \Lambda^{-1}
+      \end{align*}
+      $V$ is symmetric, so it has a full set of real eigenvalues $\lambda_j$
+      for $j=1,\ldots,n$ (where $P$ is $n\times n$). Therefore $P$ also has
+      eignevalues $\{\lambda_j\}$
+
+    \item % Question 6c
+      
+  \end{enumerate}
+  
+
+\item % Question 7
+  \begin{enumerate}
+    \item % Question 7a 
+      To transition from $i$ to $j\neq i$, you must first draw $j$ (probability
+      $h_{ij}$) and then accept $j$ (probability $a_{ij}$). Hence
+      \begin{align*}
+        p_{ij} = h_{ij}a_{ij} \qquad i\neq j 
+      \end{align*}
+      To transition from $i$ to $i$, you can either draw $i$ ($h_{ii}$) and
+      accept or reject, \emph{or} you can draw $j\neq i$ and reject (with
+      probability $1-a_{ij}$). Hence
+      \begin{align*}
+        p_{ii} = h_{ii} + \sum_j h_{ij}(1-a_{ij})
+      \end{align*}
+      In total
+      \begin{align*}
+        p_{ij} = 
+          \begin{cases}
+            h_{ij}a_{ij}                     & i\neq j \\
+            h_{ii} + \sum_j h_{ij}(1-a_{ij}) & i= j 
+          \end{cases}
+      \end{align*}
+
+    \item % Question 7b 
+      To check that this satisfies detailed balance, first consider $i\neq j$:
+      \begin{align*}
+        \pi_i p_{ij} = 
+          \pi_i h_{ij}a_{ij} 
+          &= \pi_i h_{ij}\min\left\{1, \frac{\pi_j h_{ji}}{\pi_ih_{ij}}\right\}\\
+          &= \min\left\{\pi_i h_{ij}, \pi_j h_{ji}\right\} \\
+          &= \pi_j h_{ji}\min\left\{ \frac{\pi_i h_{ij}}{\pi_j h_{ji}}, 1\right\} 
+          = \pi_j h_{ji}a_{ji} = \pi_j p_{ji}
+      \end{align*}
+      Finally, the case where $j=i$ necessarily satisfies detailed balance.
+
+    \item % Question 7c 
+      Again, we need only consider $i\neq j$:
+      \begin{align*}
+        \pi_i p_{ij} = 
+          \pi_i h_{ij}a_{ij} 
+          &= \pi_i h_{ij} \left(1+\frac{\pi_i h_{ij}}{\pi_j h_{ji}}\right)^{-1} \\
+          &= \pi_i h_{ij} \left(\frac{\pi_j h_{ji} + \pi_i h_{ij}}{\pi_j h_{ji}}\right)^{-1} \\
+          &= \pi_i h_{ij} \left(\frac{\pi_j h_{ji}}{\pi_j h_{ji} + \pi_i h_{ij}}\right) \\
+          \text{Exchanging terms} \qquad
+            &= \pi_j h_{ji}\left(\frac{\pi_i h_{ij} }{\pi_j h_{ji} + \pi_i h_{ij}}\right) \\
+            &= \pi_j h_{ji}\left(\frac{\pi_j h_{ji} + \pi_i h_{ij}}{\pi_i h_{ij} }\right)^{-1} \\
+            &= \pi_j h_{ji}\left(1+\frac{\pi_j h_{ji}}{\pi_i h_{ij} }\right)^{-1} 
+            = \pi_j h_{ji} a_{ji}
+      \end{align*}
+      
+
   \end{enumerate}
 
 \end{enumerate}
+
+
 
 
 %% APPPENDIX %%
