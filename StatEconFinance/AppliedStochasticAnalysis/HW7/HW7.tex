@@ -182,24 +182,253 @@
       rule.
 
     \item % Question 1b
-      Let $P_1$ be a partition $\{t_{1,j}\}_0^{n-1}$ of some interval. We
-      want to compute
-      \begin{align*}
-        \sum_j W_{j+\frac{1}{2}} \Delta W_j
-      \end{align*}
-      However, note that we can define another partition of the interval
-      \begin{align*}
-        P_2 = \{t_{2,j}\}_0^{2n-1}
-        = t_{1,0}, \left( t_{1,0} + \frac{1}{2}\right), t_{1,1},
-        \left(t_{1,1}+ \frac{1}{2}\right), t_{1,2},
-        \left(t_{1,2}+ \frac{1}{2}\right), \ldots, t_{1,n}
-      \end{align*}
-      This partition is equally valid and ``fills in'' the points of
-      distance $1/2$ from lefthand boundary of the intervals defining
-      $P_1$. As a result, $P_2$ is a refinement of $P_1$, i.e.
-      $P_1\subset P_2$.
+      Next, we want to evaluate the mean square limit of $\sum_j
+      W_{j+\frac{1}{2}}\Delta W_j$. The claim is that the mean square
+      limit is $\frac{1}{2}W^2_t$.
 
-      With this new partition in mind, we can rewrite
+      To show this, I will use Question 1a in reverse, rewriting
+      \begin{align*}
+        \frac{1}{2}W_t^2=\frac{1}{2}\sum_j(W_j+W_{j+1})\Delta W_j
+      \end{align*}
+      in terms of some partition (the one we choose to evaluate $\sum_j
+      W_{j+\frac{1}{2}}\Delta W_j$). Since Question 1a worked for any
+      partition as a telescoping sum and since it didn't require us to
+      take a limit, this is a valid representation of
+      $\frac{1}{2}W^2_t$.
+
+      Now, let's write
+      \begin{align*}
+        %\lim_{||\Delta t_j||\rightarrow 0}
+        E\left[ \sum_j W_{j+\frac{1}{2}}\Delta W_j - \frac{1}{2}W_t^2
+        \right]^2
+        &= E\left[ \sum_j W_{j+\frac{1}{2}}\Delta W_j -
+          \frac{1}{2}\sum_j (W_j + W_{j+1}) \Delta W_j
+        \right]^2\\
+        &=
+        E\left[ \frac{1}{2}\sum_j \left(2W_{j+\frac{1}{2}} - W_j -
+        W_{j+1}\right)\Delta W_j \right]^2
+      \end{align*}
+      Notice that on the righthand side, the sum is a sum increments.
+      For a given $j$, we're adding and multiplying
+      $W_{j+\frac{1}{2}}-W_j$, $W_{j+\frac{1}{2}}-W_{j+1}$, and $\Delta
+      W_j = W_{j+1}-W_j$. Since disjoint increments of Brownian motion
+      are independent, that means that \emph{across} $j$'s and across
+      intervals in our partition, the elements of this sum are
+      independent. Hence we only need to keep the square of elements in
+      the sum, not cross-products, allowing us to write
+      \begin{align*}
+        E\left[ \sum_j W_{j+\frac{1}{2}}\Delta W_j - \frac{1}{2}W^2
+        \right]^2
+        &=
+        \frac{1}{4}\sum_j E\left[ \left(2W_{j+\frac{1}{2}} - W_j -
+        W_{j+1}\right)\Delta W_j \right]^2
+      \end{align*}
+      To simplify further, let's first define $\Delta' W_j=
+      (W_{j+\frac{1}{2}} - W_j)$ so that $\Delta'$ increments by $1/2$
+      only. This will make for a cleaner representation below:
+      \begin{align*}
+        E\left[(2W_{j+\frac{1}{2}}
+        \right. &\left.
+        - W_j -W_{j+1})(\Delta' W_{j+\frac{1}{2}} + \Delta' W_j)\right]^2\\
+        &=
+        E\left\{
+          \left(\Delta' W_{j} - \Delta' W_{j+\frac{1}{2}}\right)
+          (\Delta' W_{j+\frac{1}{2}} + \Delta' W_j)
+          \right\}^2\\
+        &=
+        E\left\{
+          \left(\Delta' W_{j} - \Delta' W_{j+\frac{1}{2}}\right)^2
+          (\Delta' W_{j+\frac{1}{2}} + \Delta' W_j)^2
+          \right\}\\
+        &=
+        E\left\{
+          \left[
+          \left(\Delta' W_{j}\right)^2
+          + \left( \Delta' W_{j+\frac{1}{2}}\right)^2
+          - 2 (\Delta' W_{j} )( \Delta' W_{j+\frac{1}{2}})
+          \right]
+          \right. \\ & \qquad \qquad \times \left.
+          \left[
+            (\Delta' W_{j+\frac{1}{2}})^2 
+            + \left(\Delta' W_j\right)^2
+            + 2(\Delta' W_{j+\frac{1}{2}})(\Delta' W_j)
+          \right]
+          \right\}
+      \end{align*}
+      Note that when we multiply this out, we'll either be adding up the
+      squares and cross products of disjoint intervals. As a result,
+      we'll be able to use $E[XY] = E[X]E[Y]$ for $X\perp Y$ to simplify
+      this in a lot of cases. So after multiplying the above out and
+      using this trick, we have
+      \begin{align*}
+        E\left[ \sum_j W_{j+\frac{1}{2}}\Delta W_j - \frac{1}{2}W^2
+        \right]^2
+        &=\frac{1}{4}\sum_j
+        E(\Delta' W_{j})^4
+        + E(\Delta' W_{j+\frac{1}{2}})^4
+        - 2E(\Delta' W_{j+\frac{1}{2}})^2 E(\Delta' W_{j})^2\\
+        &\leq
+        \frac{1}{4}\sum_j
+        E(\Delta' W_{j})^4
+        + E(\Delta' W_{j+\frac{1}{2}})^4
+      \end{align*}
+      Assuming that $t_{j+\frac{1}{2}}$ is actually the midpoint of the
+      interval $[t_j,t_{j+1}]$ (since as $||\Delta t_j ||\rightarrow 0$,
+      this is the only thing that makes sense, we know that the length
+      of the interval $[t_j, t_{j+\frac{1}{2}}] =
+      [t_{j+\frac{1}{2}},t_{j+1}] = \Delta t_j /2$, we know that the
+      variance of these half-intervals are $\Delta t_j/2$, allowing us
+      to write
+      \begin{align*}
+        E\left[ \sum_j W_{j+\frac{1}{2}}\Delta W_j - \frac{1}{2}W^2
+        \right]^2
+        &\leq
+        \frac{3}{4}\sum_j
+        (\Delta_j /2)^2 + (\Delta_j /2)^2\\
+        &\leq
+        C ||\Delta t_j|| \sum_j
+        \Delta_j /2 + \Delta_j/2 \\
+        &\leq
+        C ||\Delta t_j|| t
+      \end{align*}
+      So as $||\Delta t_j||\rightarrow 0$, we see that we have
+      \begin{align*}
+        \sum_j W_{j+\frac{1}{2}}\Delta W_j \xrightarrow{m.s.}
+        \frac{1}{2}W^2
+      \end{align*}
+      This demonstrates that whether you take the midpoint of the time
+      period or the average of the endpoints of $W_t$ over an interval,
+      the Stratonovich Integral gives the same result.
+        %&=
+        %E\left\{
+          %\left[(W_{j+\frac{1}{2}}-W_j) %- (W_{j+1}-W_{j+\frac{1}{2}})\right]^2
+          %(\Delta W_j)^2
+          %\right\}\\
+        %\text{$(a-b)^2 < a^2+b^2$} \qquad
+        %&\leq
+        %E\left\{
+          %\left[(W_{j+\frac{1}{2}}-W_j)
+          %- (W_{j+1}-W_{j+\frac{1}{2}})\right]^2
+          %(\Delta W_j)^2
+          %\right\}\\
+        %&=
+        %E\left\{
+          %\left[(W_{j+\frac{1}{2}}-W_j)
+          %- (W_{j+1}-W_{j+\frac{1}{2}})\right]^2
+          %\right. \\ &\qquad\quad \left.
+          %\times \left[ (W_{j+1}-W_{j+\frac{1}{2}}) + (W_{j+\frac{1}{2}}
+          %- W_j)\right]^2
+          %\right\}\\
+        %&\leq
+        %E\left[(W_{j+\frac{1}{2}}-W_j)^2 (\Delta W_j)^2 \right]
+        %+ E\left[(W_{j+1}-W_{j+\frac{1}{2}})^2 (\Delta W_j)^2\right]
+        %E\left\{
+          %\left[(W_{j+\frac{1}{2}}-W_j) + (W_{j+\frac{1}{2}}-W_{j+1})\right]
+          %\;
+          %\left[(W_{j+1}-W_{j+\frac{1}{2}})+(W_{j+\frac{1}{2}}-W_j)\right]
+          %\right\}^2\\
+      %To get at the expectation terms, let's start with
+      %\begin{align*}
+        %E\left[(W_{j+\frac{1}{2}}-W_j)^2 (\Delta W_j)^2 \right]
+        %&= E\left[(W_{j+\frac{1}{2}}-W_j)^2
+          %(W_{j+1}-W_{j+\frac{1}{2}} + W_{j+\frac{1}{2}}- W_j)^2 \right]\\
+        %&= E\left\{(W_{j+\frac{1}{2}}-W_j)^2
+          %\left[(W_{j+1}-W_{j+\frac{1}{2}})
+          %+ (W_{j+\frac{1}{2}}- W_j)\right]^2 \right\}\\
+        %&= E\left\{(W_{j+\frac{1}{2}}-W_j)^2
+          %\left[
+          %(W_{j+1}-W_{j+\frac{1}{2}})^2
+          %+ (W_{j+\frac{1}{2}}- W_j)^2
+          %\right. \right. \\
+          %&\qquad \left. \left. +2
+          %(W_{j+1}-W_{j+\frac{1}{2}})
+          %(W_{j+\frac{1}{2}}- W_j)
+          %\right] \right\} \\
+        %\text{Using independence} \quad
+        %&= E\left[(W_{j+\frac{1}{2}}-W_j)^2\right]
+          %\cdot E\left[(W_{j+1}-W_{j+\frac{1}{2}})^2\right]
+          %+ E\left[(W_{j+\frac{1}{2}}-W_j)^4\right] \\
+          %&\qquad + 2 E\left[(W_{j+\frac{1}{2}}-W_j)^3\right]
+          %\cdot E\left[ (W_{j+1}-W_{j+\frac{1}{2}})\right]
+        %\\
+        %&= \frac{1}{2}\left(\Delta t_j - \frac{1}{2}\right)
+          %+ 3\left(\frac{1}{2}\right)^2
+          %&\qquad + 2 E\left[(W_{j+\frac{1}{2}}-W_j)^3\right]
+          %+ 0
+        %\\
+      %\end{align*}
+      %To simplify notation, let $\Delta W_{[j,k]}$ be $W_{t_k}-W_{t_j}$
+      %here, giving
+      %\begin{align*}
+        %E\left[(2W_{j+\frac{1}{2}}
+        %\right. &\left.
+        %- W_j -W_{j+1})\Delta W_j\right]^2\\
+        %&=
+        %E\left\{
+          %\left(
+            %\Delta W_{[j,j+\frac{1}{2}]} - \Delta W_{[j+\frac{1}{2},j+1]}
+          %\right)
+          %\left(
+            %\Delta W_{[j+\frac{1}{2},j+1]} + \Delta W_{[j,j+\frac{1}{2}]}
+          %\right)
+          %\right\}^2\\
+        %\text{Distributing} \quad
+        %&=
+        %E\left\{
+          %\left(\Delta W_{[j,j+\frac{1}{2}]}\right)
+            %\left(\Delta W_{[j+\frac{1}{2},j+1]}\right)
+          %+ \left(\Delta W_{[j,j+\frac{1}{2}]}\right)^2
+          %\right. &  \\
+        %&\qquad\qquad \left.
+          %- \left(\Delta W_{[j+\frac{1}{2},j+1]}\right)^2
+          %- \left(\Delta W_{[j+\frac{1}{2},j+1]}\right)
+            %\left(\Delta W_{[j,j+\frac{1}{2}]}\right)
+          %\right\}^2\\
+      %\end{align*}
+      %Notice that when we square the object inside the $\{\; \}$, many
+      %of the products will be of independent intervals, so we will be
+      %able to use $E[XY]=E[X]E[Y]$. Moreover, when we do that, some
+      %terms will drop since $E[W_s-W_t]$ for all intervals. Taking this
+      %into account and expanding the square above gives:
+
+      %Half the terms are the expectation of a product of disjoint
+      %intervals, so their correlation and the expected value of the
+      %product is 0, leaving
+      %\begin{align*}
+        %E\left[(2W_{j+\frac{1}{2}}
+        %\right. &\left.
+        %- W_j -W_{j+1})\Delta W_j\right]^2
+        %&=
+        %E\left[(W_{j+\frac{1}{2}}-W_j)^2\right]
+        %- E\left[(W_{j+1}-W_{j+\frac{1}{2}})^2\right]
+      %\end{align*}
+      %Substituing in for the variance terms on the righthand side, we
+      %get
+      %\begin{align*}
+        %E\left[(2W_{j+\frac{1}{2}}
+        %- W_j -W_{j+1})\Delta W_j\right]^2
+        %&= \frac{1}{2} - \frac{1}{2} = 0
+      %\end{align*}
+
+%      Let $P_1$ be a partition $\{t_{1,j}\}_0^{n-1}$ of some interval. We
+      %want to compute
+      %\begin{align*}
+        %\sum_{j,P_1} W_{j+\frac{1}{2}} \Delta W_j
+      %\end{align*}
+      %However, note that we can define another partition of the interval
+      %\begin{align*}
+        %P_2 = \{t_{2,j}\}_0^{2n-1}
+        %= t_{1,0}, \left( t_{1,0} + \frac{1}{2}\right), t_{1,1},
+        %\left(t_{1,1}+ \frac{1}{2}\right), t_{1,2},
+        %\left(t_{1,2}+ \frac{1}{2}\right), \ldots, t_{1,n}
+      %\end{align*}
+      %This partition is equally valid and ``fills in'' the points of
+      %distance $1/2$ from lefthand boundary of the intervals defining
+      %$P_1$. As a result, $P_2$ is a refinement of $P_1$, i.e.
+      %$P_1\subset P_2$.
+
+
+      %With this new partition in mind, we can rewrite
 
     \item % Question 1c
       Finally, we want compute the following:
@@ -320,6 +549,11 @@
       \begin{align*}
         E\left( \sum_j W_j (\Delta W_j)^2 - \int^t_0 W_s ds\right)^2
       \end{align*}
+      But this is where I got stuck. I tried breaking up the integral
+      $\sum_j \int^{t_{j+1}}_{t_j} W_s ds$ and use a sum approximation
+      of the Riemann sum, but I could not get the convergence to work
+      out cleanly. Intuitively, though, this result makes sense given
+      $dW^2_t=dt$.
 
   \end{enumerate}
 
@@ -404,22 +638,21 @@
     \begin{enumerate}
       \item % Question 3a
         Suppose that $f(t,z) = z/(1+t)$. Then we want to know the SDE of
-        $X_t=Z_t/(1+t)$.  To do so, we can use Ito's formula.
-
-        But before applying Ito's formula, let's first find the
-        necessary derivatives of $f(t,y)$:
+        $X_t=Z_t/(1+t)$.  So we can apply Ito's formula, let's first
+        find the necessary derivatives of $f(t,y)$:
         \begin{align*}
-          \frac{\partial f}{\partial t} &= -\frac{z}{(1+t)^2} \\
-          \frac{\partial f}{\partial z} &= \frac{1}{(1+t)} \\
-          \frac{\partial^2 f}{\partial z^2} &= 0
+          \frac{\partial f}{\partial t} = -\frac{z}{(1+t)^2} \qquad\qquad
+          \frac{\partial f}{\partial z} = \frac{1}{(1+t)}\qquad\qquad
+          \frac{\partial^2 f}{\partial z^2} = 0
         \end{align*}
         Substituting into Ito's Formula:
         \begin{align*}
           dX_t = - \frac{Z_t}{(1+t)^2} dt
           + \frac{1}{(1+t)} dZ_t + \frac{1}{2}\cdot 0
         \end{align*}
-        Substituting in for $dZ_t$ using Expression~\ref{q3.0} and the
-        fact that $X_t = Z_t/(1+t)$, the above simplifies to
+        Substituting in $Z_t=W_t$ and $dZ_t=dW_t$ (from
+        Expression~\ref{q3.0}) and the fact that $X_t =
+        Z_t/(1+t)=W_t/(1+t)$, the above simplifies to
         \begin{align*}
           dX_t &= - \frac{X_t}{(1+t)} dt + \frac{1}{(1+t)} dW_t \\
           \Leftrightarrow \qquad
@@ -427,21 +660,40 @@
         \end{align*}
 
       \item % Question 3b
-        Next, we want to find the SDE satisfied by $X_t = b \sin W_t = b \sin
-        Z_t$. (In this problem $b=1$, but I leave it general for
-        Question 3c.) So in this case, $f(t,z) = b\sin(z)$, giving the
-        following derivatives:
+        Next, we want to find the SDE satisfied by $X_t = \sin W_t$. So
+        in this case, $f(t,z) = \sin(z)$, giving the following
+        derivatives:
         \begin{align*}
-          \frac{\partial f}{\partial t} &= 0 \\
-          \frac{\partial f}{\partial z} &= b\cos(z) \\
-          \frac{\partial^2 f}{\partial z^2} &= -b\sin(z)
+          \frac{\partial f}{\partial t} = 0 \qquad\qquad
+          \frac{\partial f}{\partial z} = \cos(z) \qquad\qquad
+          \frac{\partial^2 f}{\partial z^2} = -\sin(z)
         \end{align*}
         Using Ito's Formula
         \begin{align*}
-          dX_t = 0 \cdot dt + b \cos(Z_t) dZ_t
-          + \frac{1}{2} \left(-b \sin(Z_t)\right) (dZ_t)^2
+          dX_t = 0 \cdot dt + \cos(Z_t) dZ_t
+          + \frac{1}{2} \left(-\sin(Z_t)\right) (dZ_t)^2
         \end{align*}
-        Substiting in $Z_t = W_t$
+        Substiting in $Z_t = W_t$ and $dZ_t=dW_t$, this gives
+        \begin{align*}
+          dX_t &= \cos(W_t) dW_t
+          + \frac{1}{2} \left(-\sin(W_t)\right) (dW_t)^2\\
+          \text{By $dW_t^2=dt$} \qquad\qquad
+          &= \cos(W_t) dW_t
+          + \frac{1}{2} \left(-\sin(W_t)\right) dt \\
+          &= \cos(W_t) dW_t
+          + \frac{1}{2} \left(-X_t\right) dt \\
+          \Rightarrow\quad
+          dX_t &= -\frac{1}{2} X_t dt +  \cos(W_t) dW_t
+        \end{align*}
+        And if it's not okay to leave $W_t$ in the SDE (i.e.\ if we need
+        to have the SDE be only a function of $t,X_t,dt$ and $dW_t$),
+        then we can use $X_t=\sin W_t \Rightarrow W_t = \sin^{-1}(X_t)$
+        to write
+        \begin{align*}
+          dX_t &= -\frac{1}{2} X_t dt +  \cos(\sin^{-1}X_t) dW_t\\
+          \Leftrightarrow \quad dX_t
+          &= -\frac{1}{2} X_t dt +  \sqrt{1-X_t^2} \; dW_t
+        \end{align*}
 
 
       \item % Question 3c
@@ -476,7 +728,7 @@
           dX_t = - a \sin W_t dW_t - \frac{1}{2} a\cos W_t (dW_t)^2\\
           dY_t =   b \cos W_t dW_t - \frac{1}{2} b\sin W_t (dW_t)^2
         \end{align*}
-        Using $dW_t^2 = dt$,
+        Using $dW_t^2 = dt$ and reordering,
         \begin{align*}
           dX_t = - \frac{1}{2} a\cos W_t dt - a \sin W_t dW_t  \\
           dY_t = - \frac{1}{2} b\sin W_t dt + b \cos W_t dW_t
@@ -487,9 +739,139 @@
           dX_t = - \frac{1}{2} X_t dt - \frac{a}{b} Y_t dW_t  \\
           dY_t = - \frac{1}{2} Y_t dt + \frac{b}{a} X_t dW_t
         \end{align*}
+        If we want to write this all as a single equation, we can stack
+        $A_t = \begin{pmatrix} X_t & Y_t \end{pmatrix}^T$ and write
+        \begin{align*}
+          dA_t = - \frac{1}{2} A_t dt
+            + \begin{pmatrix}
+              0 & -\frac{a}{b} \\
+              \frac{b}{a} & 0  \\
+              \end{pmatrix}
+              A_t dW_t
+        \end{align*}
 
     \end{enumerate}
 
+  \item % Question 4
+    Note that in this question, I'll be supressing some notation so that
+    the steps on the way to the main result are more readable eyes,
+    e.g.\ $b(\omega,t)$ becomes just $b$. It will be implicit that $b$
+    and $\sigma$ dependend on $\omega$ and (possibly) $t$.
+
+    Now before simplifying, let's write out $(dX_t)^T$, which we will
+    use below.
+    \begin{align*}
+      (dX_t)^T
+        &= (bdt + \sigma dW_t)^T\\
+        &= b^T dt+ dW_t^T \sigma^T
+    \end{align*}
+    Now we want to simplify the following object:
+    \begin{align*}
+      \left[b^T dt+ dW_t^T \sigma^T \right](\nabla^2 f)
+      \left[b dt+ \sigma dW_t  \right]
+    \end{align*}
+    But note that this product results in a number, so we can trivially
+    write
+    \begin{align*}
+      \left[b^T dt+ dW_t^T \sigma^T \right](\nabla^2 f)
+      \left[b dt+ \sigma dW_t  \right]
+      =
+      \text{trace}\left( \left[b^T dt+ dW_t^T \sigma^T \right](\nabla^2 f)
+      \left[b dt+ \sigma dW_t  \right]\right)
+    \end{align*}
+    From there, we use properties of the trace operator, notably
+    $\text{trace}(AB)=\text{trace}(BA)$. I will also use the fact that
+    $dt$ is a scalar, so that it can always be moved in and around
+    matrix operations, as well as inside and outside of the trace
+    operator.
+    \begin{align*}
+      \text{trace}\left( \left[b^T dt+ dW_t^T \sigma^T \right]
+      \right.&\left.
+      (\nabla^2 f)
+      \left[b dt+ \sigma dW_t  \right]\right)
+      =
+      \text{trace}\left(
+        \left[b dt+ \sigma dW_t  \right]
+        \left[b^T dt+ dW_t^T \sigma^T \right]
+        (\nabla^2 f) \right)\\
+      &=
+      \text{trace}\left(
+        \left[bb^T (dt)^2 + b dtdW^T_t\sigma^T + \sigma  dW_t dt b^T
+          + \sigma dW_t dW_t^T \sigma^T
+        \right]
+        (\nabla^2 f) \right)
+    \end{align*}
+    Next, I will use the fact that $dt^2 = dt \cdot dW_t = 0$ and that
+    $dW_t dW_t^T =dt \cdot I_n$. This latter result follows because
+    $W_t$ is a vector of independent Brownian motions, hence all the
+    off-diagonal elements of $dW_t dW_t^T$ (representing
+    cross-correlation) are 0. Only the $W_{t,i} W_{t,i}$ terms remain
+    (where $W_{t,i}$ is the element of $W_t)$, and we can apply the
+    usual result for scalar Brownian Motion, $dW_t^2 = dt$.
+
+    Putting all this together, we can simplify the expression above to
+    \begin{align*}
+      \left[b^T dt+ dW_t^T \sigma^T \right](\nabla^2 f)
+      \left[b dt+ \sigma dW_t  \right]
+      &=
+      \text{trace}\left(
+        \left[0 + 0 + 0
+          + \sigma (dt I_n) \sigma^T
+        \right]
+        (\nabla^2 f) \right)\\
+      &=
+      \text{trace}\left(
+        \sigma \sigma^T
+        (\nabla^2 f) \right) dt\\
+      &=
+        \left( \sigma \sigma^T : \nabla^2 f \right) dt
+    \end{align*}
+
+  \item % Question 5
+    For this question, to apply multi-dimensional Ito's Formula, we will
+    consider the function $f(x) = (x_1^2 + \cdots + x_n^2)^{1/2}$ for
+    $x\in\mathbb{R}^n$. It has the following derivatives:
+    \begin{align*}
+      \frac{\partial f}{\partial } &= 0\\
+      \frac{\partial f}{\partial x_i}
+        &= \frac{1}{2} (2x_i) (x_1^2+\cdots+x_n^2)^{-1/2}
+        = \frac{x_i}{(x_1^2+\cdots+x_n^2)^{1/2}}
+        = \frac{x_i}{f(x)}\\
+        \frac{\partial^2 f}{\partial x_i^2}
+        &= \frac{1}{f(x)} - x_i
+        \left[\frac{2x_i}{2}(x_1^2+\cdots+x_n^2)^{-3/2}\right]
+        = \frac{1}{f(x)} - \frac{x^2_i}{f(x)^3}
+    \end{align*}
+    Finally, note that the original process $X_t=B_t$ satisifes $dX_t =
+    dB_t$, so that the drift term $b=0$ and the variance-covariance
+    matrix $\sigma=I$. Now we have everything we need to apply Ito's
+    formula. Substituting in,
+    \begin{align*}
+      dR_t
+      &=
+      \left(b \cdot \nabla f + \frac{1}{2}\sigma \sigma^T
+      \; : \:
+      \nabla^2 f\right)dt + (\nabla f)^T\sigma dB_t\\
+      &=
+      \left(0 + \frac{1}{2} I
+      \; : \:
+      \nabla^2 f\right)dt + (\nabla f)^T I dB_t\\
+      &= \frac{1}{2}\text{tr}(\nabla^2 f) dt + (\nabla f)^T dB_t\\
+      &= \frac{1}{2}
+        \left(\sum^n_{i=1} \frac{1}{R_t} - \frac{B_i^2}{R_t^3}\right)dt
+        + \begin{pmatrix}
+            \frac{B_1}{R_t} & \cdots  &\frac{B_n}{R_t}
+          \end{pmatrix}dB_t\\
+      &= \frac{1}{2}
+        \left(\frac{n}{R_t} - \frac{\sum^n_{i=1} B_i^2}{R_t^3}\right)dt
+        + \frac{1}{R_t} \sum B_i dB_t\\
+      &= \frac{1}{2}
+        \left(\frac{n}{R_t} - \frac{R_t^2}{R_t^3}\right)dt
+        + \frac{1}{R_t} \sum B_i dB_t\\
+      &= \frac{1}{2}
+        \frac{n-1}{R_t} dt
+        + \frac{1}{R_t} \sum B_i dB_t\\
+    \end{align*}
 \end{enumerate}
 
 
