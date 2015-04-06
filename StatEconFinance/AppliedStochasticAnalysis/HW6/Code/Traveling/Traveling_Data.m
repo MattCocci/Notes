@@ -1,3 +1,6 @@
+%% This file constructs the data matrices that include the distance
+%  between schools and the latitude and longitude coordinates
+
 %% Assign indices for code readability
 Butler     = 1;
 ND         = 2;

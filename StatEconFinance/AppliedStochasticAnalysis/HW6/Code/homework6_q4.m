@@ -1,3 +1,4 @@
+%% Matt Cocci - Matlab/Octave Code for Question 4
 
 %% Question 4c
 
@@ -10,8 +11,6 @@ mus = rs + 2;
 
 % This will hold the values of the integral for each block and r
 I = nan(1, length(rs));
-
-% Draw normals
 
 % Loop over values of r
 for i_ = 1:length(rs)
