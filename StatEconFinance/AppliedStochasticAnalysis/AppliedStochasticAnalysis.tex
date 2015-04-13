@@ -277,6 +277,115 @@ $Z(\lambda_2)-Z(\lambda_1)$, not $W(\lambda_2)-W(\lambda_1)$.
 
 \section{Week 5}
 
+\section{Week 6}
+
+\subsection{Generating Random Variables}
+
+Suppose that we can generate $U([0,1])$ RV's. Then we can generate a
+whole lot of other, more complex distributions with the methods in this
+section.
+
+\begin{thm}\emph{(Inverse Transform Method)}
+Suppose that random variable $Y$ has some invertible cumulative
+distribution $F_Y(y)$. Then if $X\sim U([0,1])$, the random variable
+$Y = F^{-1}(X)$ will have cumulative distribution function $F_Y$.
+\end{thm}
+
+\begin{proof}
+We can simply use definitions:
+\begin{align*}
+  P(Y\leq y) = P(F_Y^{-1}(X) \leq y) = P(X \leq F_Y(y)) = F_Y(y)
+\end{align*}
+\end{proof}
+
+\begin{rmk}
+Intuitively, we are choosing probabilities on $[0,1]$ by drawing $X\sim
+U([0,1])$, i.e.\ we are choosing values in the range of $F_Y(y)$. We
+then invert, using the fact that $F_Y$ is a one-to-one, to find the
+corresponding draw $Y$ in the domain of $F_Y(y)$ that would have given
+us $F_Y(y) = X$.
+
+Though exceedingly straightforward, this procedure has the following
+drawbacks: not all cdf's are easily invertible. In fact, most aren't.
+Only uniform, exponential, Cauchy, Weibull, logistic, and discrete RV's
+can use this approach.
+\end{rmk}
+
+\begin{thm}\emph{(Acceptance-Rejection)}
+Suppose that we want to draw from $p(x)$. Let $g(x)$ be a any function
+such that
+\begin{enumerate}
+  \item $0 \leq p(x) \leq g(x)$, i.e. $g$ ``covers'' $p$.
+  \item $\int^\infty_{-\infty} g \; dx = M < \infty$.
+  \item We have an analytic expression for $G^{-1}(x)$, where $G(x) =
+    \int_{-\infty}^x g \; dx$.
+\end{enumerate}
+Then we can generate draws $X_i$ for an arbitrary pdf $p(x)$ using the
+following algorithm:
+\begin{enumerate}
+  \item Draw $U_1\sim U([0,1])$
+  \item Set a proposed draw $X'_i = G^{-1}(MU_1)$, where $M$ (as defined
+    above) normalizes $g$ so that it is a proper probability
+    distribution.
+  \item Draw $U_2\sim U([0, g(X_i)])$.
+  \item If $U_2 \leq p(X'_i)$, set $X_i = X'_i$ (i.e.\ accept $X'_i$).
+    Otherwise, reject and try again.
+\end{enumerate}
+Proceed this way for $i=1,\ldots,N$.
+\end{thm}
+\begin{rmk}
+Intuitively, we're drawing (via the inverse transform method) from the
+distribution of $g(x)$ (properly normalized so it integrates to 1).
+We're then only retaining those draws that fall under the curve of the
+true distribution $p(x)$ so that the frequencies of draws match the
+distribution of $p(x)$, not that of $g(x)$.
+\end{rmk}
+
+This works well for low deimsions, but in higher dimensions, rejection
+sampling is actually pretty bad. Your covering $g(x)$ will leave a lot
+of gaps between itself and the true distribution $p(x)$, especially at
+the ``corners'', hence you will reject a lot. Instead, use MCMC methods.
+
+\subsection{Monte Carlo Integration}
+
+The general idea of Monte Carlo integration is to approximate the
+integral by discretizing over a grid. However, the grid of points is
+randomly chosen rather than deterministic and evenly spaced.
+
+Throughout this subsection, we will want to compute something like the
+following:
+\begin{equation}
+  I(f) = \int^b_a f(x) \; dx
+  \label{mcint}
+\end{equation}
+In small dimensions (like Expression~\ref{mcint} above), grid
+approximations work. In higher dimensions, The best approach will be
+Monte Carlo integration.
+
+\begin{thm}
+Suppose we would like to approximate Expression~\ref{mcint}. We can do so by drawing $X_i \sim U[a,b]$ for $i=1,\ldots,N$ (large) and computing
+\begin{align}
+  \label{mcintapprox}
+  \hat{I}(f) = \frac{1}{N} \sum^N_1 f(X_i)
+\end{align}
+In higher dimensions, we simply draw $X_i \sim U^d(D)$ where $d$ is the
+number of dimensions and $D$ is the domain. The variance of the error is
+\begin{align*}
+  E[\hat{I}(f) - I(f)]^2
+  &= E\left[ \left( \frac{1}{N}\sum^N_{i=1} f(X_i) \right)-I(f)\right]^2\\
+  &= \frac{1}{N^2}E\left[ \sum^N_{i=1} \left(f(X_i)-I(f)\right)\right]^2\\
+  \text{Since the $X_i$ are iid} \qquad
+  &= \frac{1}{N^2}\sum^N_{i=1} E\left[ f(X_i)-I(f)\right]^2\\
+  &= \frac{1}{N^2}\sum^N_{i=1} E\left[ \left( f(X_i) \right)- I(f)\right]^2\\
+\end{align*}
+\end{thm}
+
+Notice that we drew from a (possibly multi-dimensional) uniform
+distribution in computing $\hat{I}(f)$ in~\ref{mcintapprox}. But in the
+case where 
+
+\begin{thm}
+\end{thm}
 
 %% APPPENDIX %%
 
