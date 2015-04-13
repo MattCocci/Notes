@@ -8,6 +8,7 @@
 %\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % most detailed page formatting control
 \usepackage{fullpage} % Simpler than using the geometry package; std effect
 \usepackage{setspace}
+\usepackage{pdflscape} 
 %\onehalfspacing
 \usepackage{microtype}
 
@@ -430,7 +431,7 @@
           %\frac{a}{\sigma\sqrt{2\pi}}
             %e^{-\frac{4(2\sigma^2)}{b^2}}
             %&\geq
-          %\frac{1}{2b} e^{-\frac{2(2\sigma^2)}{b^2}} 
+          %\frac{1}{2b} e^{-\frac{2(2\sigma^2)}{b^2}}
         %\end{align*}
 
     \end{enumerate}
@@ -650,18 +651,243 @@
             + \frac{2}{n^2} \sum^{n-1}_{i=1} C_A(i)
         \end{align*}
 
+      \item Unable to solve without consulting outside sources.
+    \end{enumerate}
+
+  \item[8.] % Question 8
+
+    In this problem, I will compute the shortest path on a road trip to
+    see some of the best teams currently in (or recently knocked out of)
+    the NCAA tournament.
+
+    Those colleges are as follows with the corresponding latitude and
+    longitude coordinates taken from Google Maps:
+    \begin{table}[htpb!]
+      \centering
+      \begin{tabular}{l|rr}
+      University & Longitude & Latitude \\ \hline\hline
+      Butler     & -86.169784  & 39.839703 \\
+      ND         & -86.235382  & 41.705728 \\
+      Kansas     & -95.255871  & 38.954548 \\
+      Louisville & -85.758953  & 38.211178 \\
+      Villanova  & -75.337329  & 40.034889 \\
+      Duke       & -78.938261  & 36.001561 \\
+      UNC        & -79.046881  & 35.904882 \\
+      Georgetown & -77.072269  & 38.907588 \\
+      UCLA       & -118.445181 & 34.068997 \\
+      Arizona    & -110.950098 & 32.231808 \\
+      UVA        & -78.507934  & 38.033507 \\
+      Oklahoma   & -97.445832  & 35.205872 \\
+      Kentucky   & -84.504024  & 38.030613 \\
+      \end{tabular}
+      \caption{Schools and Coordinates}
+      \label{table:latlon}
+    \end{table}
+
+    However, rather than use simply the Euclidian distance between these
+    coordinates, I used Google maps to pull the driving distance (in
+    miles), which would more accurately reflect the true cost of
+    traveling between these locations. That gives the dataset depicted
+    in Table~\ref{table:data}, where the $ij$ entry is the total miles
+    to travel from $i$ to $j$ according to the Google Maps suggested
+    route.
+
+    A sample path along with the locations of the schools is plotted
+    below (with a overlap among very close schools). This was randomly
+    chosen as were the starting point for all procedures detailed below:
+    \begin{figure}[htpb!]
+      \centering
+      \caption{Example Starting Path}
+      \label{fig:q8.0}
+      \includegraphics[scale=0.8, trim={1cm, 3cm, 1cm, 3cm}, clip]{Figures/ExampleStarting.pdf}
+    \end{figure}
+
+    \clearpage
+    \begin{landscape}
+    \begin{table}
+      \caption{Distances from School to School}
+      \label{table:data}
+      \scriptsize
+      \centering
+      \begin{tabular}{l|rrrrrrrrrrrrr}
+      & \multicolumn{12}{|c}{Traveling to} \\
+      Traveling From &
+      Butler&Notre&Dame&Kansas&Louisville&Villanova&Duke&UNC&Georgetown&UCLA&Arizona&UVA\\\hline\hline
+      Butler & 136&530& 122& 632& 608& 606& 573& 2090& 1692& 561& 747& 195 \\
+      Notre Dame && 620& 260& 656& 723& 721& 604& 2111& 1808& 681& 881& 328\\
+      Kansas &&&548& 1153& 1085& 1083& 1097& 1553& 1156& 1038& 334& 624\\
+      Louisville &&&& 661& 540& 538& 602& 2102& 1704& 493& 778& 79\\
+      Villanova &&&&& 400& 409& 147& 2713& 2315& 251& 1388& 622\\
+      Duke &&&&&& 11& 262& 2531& 2114& 184& 1194& 468\\
+      UNC &&&&&&& 466& 2530& 2112& 188& 1192& 466\\
+      Georgetown &&&&&&&& 2682& 2277& 113& 1344& 530\\
+      UCLA &&&&&&&&& 500& 2563& 1364& 2178\\
+      Arizona &&&&&&&&&& 2157& 973& 1825\\
+      UVA &&&&&&&&&&& 1223& 420\\
+      Oklahoma &&&&&&&&&&&& 853\\
+      \end{tabular}
+    \end{table}
+    \end{landscape}
+
+    \begin{enumerate}
+      \item Below is a graph of the distances through each iteration for
+      different values of $\beta$:
+      \begin{figure}[htpb!]
+        \centering
+        \caption{Distances for Fixed $\beta$}
+        \label{fig:q8a.1}
+        \includegraphics[scale=0.5, trim={1cm, 7cm, 1cm, 7cm}, clip]{Figures/q8a_1.pdf}
+      \end{figure}
+      For small values of $\beta$, there's too much exploring and the
+      algorithm accepts too many poor draws. For large values, the
+      algorithm is too likely to stay put and not explore potentially
+      optimal values.
+
+      Given that the middle of the range appears best, so here's that
+      same graph, focusing in on the more successfull values of $\beta$:
+      \begin{figure}[htpb!]
+        \centering
+        \caption{Distances for Fixed $\beta$}
+        \label{fig:q8a.2}
+        \includegraphics[scale=0.5, trim={1cm, 7cm, 1cm, 7cm}, clip]{Figures/q8a_1b.pdf}
+      \end{figure}
+      Finally, below plots the optimal route according to the algorithm,
+      which is 3691 miles long:
+      \begin{figure}[htpb!]
+        \centering
+        \caption{Optimal Route}
+        \label{fig:q8a.3}
+        \includegraphics[scale=0.8, trim={1cm, 3cm, 1cm, 3cm}, clip]{Figures/q8a_2.pdf}
+      \end{figure}
+
+    \item % Question 8b
+      In this next part, I try varying $\beta$ across iterations. The
+      first is a periodic variation
+      \begin{align*}
+        \beta^{(i)} = 5 \sin \left(\frac{\pi i}{4}\right) + 5.01
+      \end{align*}
+      where $\beta^{(i)}$ is the value of $\beta$ on the $i$th step of
+      the algorithm. This puts $\beta \in [0.01, 10.1]$, the values that
+      seemed to work well above.
+
+      The other approach is annealing. For this, I set
+      \begin{align*}
+        \beta^{(i)} = 0.001  (1.005)^{i-1}
+      \end{align*}
+      The starting point and the growth factor were chosen by trial and
+      error so that $\beta^{(i)}$ for $i$ large does not explode to an
+      absurdly high level.
+
+      The results are shown in Figure~\ref{fig:q8b.1} for one
+      realization. The periodic approach appears to do very well
+      \begin{figure}[htpb!]
+        \centering
+        \caption{Distance Across Iterations}
+        \label{fig:q8b.1}
+        \includegraphics[scale=0.7, trim={1cm, 7cm, 1cm, 7cm}, clip]{Figures/q8b_1.pdf}
+      \end{figure}
+
+      However, this appears to be the case only because the annealing
+      method ``settles'' too quickly. By curbing the gradual increase in
+      $\beta$ with a new specification
+      \begin{align*}
+        \beta^{(i)} = 0.001  (1.001)^{i-1}
+      \end{align*}
+      we can see that annealing does just as well as the periodic
+      approach, as shown in Figure~\ref{fig:q8b.2}.
+      \begin{figure}[htpb!]
+        \centering
+        \caption{Distance Across Iterations, Slower Increase Annealing (Independent Run)}
+        \label{fig:q8b.2}
+        \includegraphics[scale=0.7, trim={1cm, 7cm, 1cm, 7cm}, clip]{Figures/q8b_1b.pdf}
+      \end{figure}
+
+    \item % Question 8c
+      Below is a table of acceptances computed for different values of
+      $\beta$, using the approach in Q8a:
+      \begin{table}[htpb!]
+        \centering
+        \begin{tabular}{r|c}
+          $\beta$ & Fraction Accepted \\\hline\hline
+          0.0001&    0.9594\\
+          0.001&    0.6069\\
+          0.01&    0.0717\\
+          0.05&    0.0130\\
+          0.1&    0.0192\\
+          1&    0.0022\\
+          5&    0.0020\\
+          10&    0.0010\\
+          100&    0.0020\\
+        \end{tabular}
+      \end{table}
+      Based on the evidence above very high acceptance ratios give quite
+      poor results, while acceptance ratios on the order of 1-10\% tend
+      to do well. This is in terms of reaching and \emph{staying at}
+      small values, though the high acceptance runs can luck out (though
+      they don't remain at the minimum or seek smaller values in that
+      neighborhood).
+
+      However, there's a big gap in acceptance ratios in the table above.
+      Trying some more values of $\beta$ to fill in the table with a
+      smoother range of accept ratios, I obtained the following paths of
+      distance for different values of beta and acceptance ratios:
+      \begin{table}[htpb!]
+        \centering
+        \begin{tabular}{r|c}
+          $\beta$ & Fraction Accepted \\\hline\hline
+          0.0010&    0.5908\\
+          0.0020&    0.4027\\
+          0.0040&    0.1928\\
+          0.0060&    0.1203\\
+          0.0080&    0.0818\\
+          0.0100&    0.0620\\
+        \end{tabular}
+      \end{table}
+      \begin{figure}[htpb!]
+        \centering
+        \caption{Distances for Fixed $\beta$}
+        \label{fig:q8c.1}
+        \includegraphics[scale=0.5, trim={1cm, 7.5cm, 1cm, 7.5cm}, clip]{Figures/q8c_1.pdf}
+      \end{figure}
+      It still appears to be the case that acceptance ratios closer to
+      10\% (rather than higher) tend to win out, which I found a bit
+      surprising.
+
 
     \end{enumerate}
 
 \end{enumerate}
 
 
+
 %% APPPENDIX %%
 
-% \appendix
+\clearpage
+\appendix
+\section{Code}
 
+\subsection{Question 4}
 
+\matlabcode{Code/homework6_q4.m}
 
+\subsection{Question 8}
+
+\subsubsection{\url{Traveling_Main.m}}
+\matlabcode{Code/Traveling/Traveling_Main.m}
+
+\clearpage
+\subsubsection{\url{Traveling_CalcDist.m}}
+\matlabcode{Code/Traveling/Traveling_CalcDist.m}
+
+\subsubsection{\url{Traveling_MHStep.m}}
+\matlabcode{Code/Traveling/Traveling_MHStep.m}
+
+\subsubsection{\url{Traveling_PlotTrip.m}}
+\matlabcode{Code/Traveling/Traveling_PlotTrip.m}
+
+\subsubsection{\url{Traveling_Data.m}}
+\matlabcode{Code/Traveling/Traveling_Data.m}
+%\verbatim{Code/Traveling/Traveling_PlotTrip.R}
 
 \end{document}
 

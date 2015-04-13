@@ -15,19 +15,19 @@
 %% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \usepackage{fancyhdr}
-\pagestyle{fancy} 
+\pagestyle{fancy}
 \rhead{Matthew D. Cocci}
 \lhead{Singular Value Decomposition and PCA}
 \chead{}
-\setlength{\headheight}{15.2pt} 
+\setlength{\headheight}{15.2pt}
     %---Make the header bigger to avoid overlap
 
-\renewcommand{\headrulewidth}{0.3pt} 
+\renewcommand{\headrulewidth}{0.3pt}
     %---Width of the line
 
-\setlength{\headsep}{0.2in}    
+\setlength{\headsep}{0.2in}
     %---Distance from line to text
-            
+
 
 %% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -38,10 +38,10 @@
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{prop}[thm]{Proposition}
 \newtheorem{cor}[thm]{Corollary}
-%\numberwithin{equation}{section} 
-    %---This labels the equations in relation to the sections 
+%\numberwithin{equation}{section}
+    %---This labels the equations in relation to the sections
     %---rather than other equations
-%\numberwithin{equation}{subsection} 
+%\numberwithin{equation}{subsection}
     %---This labels relative to subsections
 
 
@@ -56,27 +56,27 @@
 %% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \usepackage{graphicx}
-\usepackage{subfigure} 
+\usepackage{subfigure}
     %---For plotting multiple figures at once
 %\graphicspath{ {Directory/} }
     %---Set a directory for where to look for figures
 
 
 %% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage{hyperref} 
-\hypersetup{	
-    colorlinks,		
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
         %---This colors the links themselves, not boxes
-    citecolor=black,	
+    citecolor=black,
         %---Everything here and below changes link colors
     filecolor=black,
     linkcolor=black,
     urlcolor=black
 }
 
-%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\usepackage{verbatim} 
+\usepackage{verbatim}
     %---For including verbatim code from files, no colors
 
 \usepackage{listings}
@@ -94,12 +94,12 @@
         stringstyle=\color{mylilas},%
         commentstyle=\color{mygreen},%
         showstringspaces=false,%
-            %---Without this there will be a symbol in 
+            %---Without this there will be a symbol in
             %---the places where there is a space
         numbers=left,%
-        numberstyle={\tiny \color{black}},% 
+        numberstyle={\tiny \color{black}},%
             %---Size of the numbers
-        numbersep=9pt,% 
+        numbersep=9pt,%
             %---Defines how far the numbers are from the text
         emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
             %---Some words to emphasise
@@ -107,48 +107,48 @@
     \lstinputlisting{#1}
 }
     %---For including Matlab code from .m file with colors,
-    %---line numbering, etc. 
+    %---line numbering, etc.
 
 
-%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\usepackage{enumitem} 
-    %---Has to do with enumeration	
+\usepackage{enumitem}
+    %---Has to do with enumeration
 \usepackage{appendix}
-%\usepackage{natbib} 
+%\usepackage{natbib}
     %---For bibliographies
 \usepackage{pdfpages}
     %---For including whole pdf pages as a page in doc
 
 
-%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %\newcommand{\nameofcmd}{Text to display}
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \begin{document}
 %\maketitle
 
-%\tableofcontents 
+%\tableofcontents
 
 \section{The Singular Value Decomposition}
 
-The singular value decomposition is a useful decomposition that works for \emph{any} matrix, which is part of the reason for its popularity. At it's most fundamental, the singular value decomposition amounts to the following: 
+The singular value decomposition is a useful decomposition that works for \emph{any} matrix, which is part of the reason for its popularity. At it's most fundamental, the singular value decomposition amounts to the following:
 \begin{quotation}
 \noindent
-SVD breaks down any matrix into a three-matrix product: 
+SVD breaks down any matrix into a three-matrix product:
   \[
     A = U\Sigma V^T
 \]
-Geometrically, $A$ is the mapping of an orthonormal basis, $V^T$, into another orthonormal basis $U$, where the different basis elements of $V$ are \emph{stretched} by the values in the diagonal matrix $\Sigma$. 
+Geometrically, $A$ is the mapping of an orthonormal basis, $V^T$, into another orthonormal basis $U$, where the different basis elements of $V$ are \emph{stretched} by the values in the diagonal matrix $\Sigma$.
 \end{quotation}
-In the following subsection, we'll build up intuition by imposing different conditions on the matrix $A$, and then seeing how we might find those orthonormal bases, $U$ and $V$. 
+In the following subsection, we'll build up intuition by imposing different conditions on the matrix $A$, and then seeing how we might find those orthonormal bases, $U$ and $V$.
 
 
 \subsection{Intuition}
@@ -156,30 +156,30 @@ In the following subsection, we'll build up intuition by imposing different cond
 The intuition for the SVD comes down to simple notions like stretching and rotating. So we'll start with very simple examples, then consider increasingly general matrices.
 \begin{enumerate}
 \item {\sl Diagonal Matrices}: To begin, consider any diagonal matrix,
-\[ 
-    A = 
+\[
+    A =
     \begin{pmatrix}
         a_1 & 0 & \cdots & 0 \\
         0 & a_2 & \cdots & 0 \\
         \vdots & \vdots & \ddots & \vdots \\
         0 & 0 & \cdots & a_n \\
     \end{pmatrix}
-    \quad 
-    \Rightarrow 
-    \quad 
+    \quad
+    \Rightarrow
+    \quad
     Ax = \begin{pmatrix} a_1 x_1 \\ a_2 x_2 \\ \vdots \\
         a_n x_n \end{pmatrix}
 \]
-It's quite clear that if $x$ is vector, the result of the product $Ax$ is merely a \emph{stretched} version of $x$. The $i$th coordinate, $x_i$, is simply stretched by $a_i$ along the $i$th axis. 
+It's quite clear that if $x$ is vector, the result of the product $Ax$ is merely a \emph{stretched} version of $x$. The $i$th coordinate, $x_i$, is simply stretched by $a_i$ along the $i$th axis.
 
 To see an example, consider the following matrix and picture
 \[ \text{Figure} \]
 
-\item {\sl Symmetric Matrices}: Next, suppose that instead of having $A$ diagonal, it is (more generally) just symmetric so that $A^T = A$. Then $A$ must have $n$ (not necessarily distinct) eigenvalues and $n$ distinct eigenvectors, where the eigenvectors are also orthogonal.\footnote{These are all properties of symmetric matrices.} Now why does this matter? 
+\item {\sl Symmetric Matrices}: Next, suppose that instead of having $A$ diagonal, it is (more generally) just symmetric so that $A^T = A$. Then $A$ must have $n$ (not necessarily distinct) eigenvalues and $n$ distinct eigenvectors, where the eigenvectors are also orthogonal.\footnote{These are all properties of symmetric matrices.} Now why does this matter?
 
-At first blush, since $A$ isn't diagonal, we seem to have lost the direct interpretation about $A$ stretching each coordinate of a vector along a Cartesian axis. \emph{However}, it so happens that the eigenvectors (by definition) define special axes along which vectors are stretched when multiplied by $A$.  
+At first blush, since $A$ isn't diagonal, we seem to have lost the direct interpretation about $A$ stretching each coordinate of a vector along a Cartesian axis. \emph{However}, it so happens that the eigenvectors (by definition) define special axes along which vectors are stretched when multiplied by $A$.
 \[ \text{Figure} \]
-Just as a diagonal matrix \emph{stretches} each vector element in the direction of its corresponding Cartesian axis, so too does a symmetric matrix stretch all vector elements along \emph{special} axes defined the orthogonal eigenvectors. Note the degree of stretching is determined by the corresponding eigenvalue for an eigenvector axis. 
+Just as a diagonal matrix \emph{stretches} each vector element in the direction of its corresponding Cartesian axis, so too does a symmetric matrix stretch all vector elements along \emph{special} axes defined the orthogonal eigenvectors. Note the degree of stretching is determined by the corresponding eigenvalue for an eigenvector axis.
 
 \item {\sl General Matrices}: For any abitrary matrix, $A$, we might ask ourselves ``Can we define a special set of axes such that vectors lying along any of these special axes simply stretch in the direction of those axes.'' The answer: yes, as we'll see below.
 
@@ -207,7 +207,7 @@ $\{v_1,\ldots,v_n\}$ as follows:
 \]
 That is, project $x$ onto a special axis defined by $v_i$, multiply the
 resulting scalar by the $v_i$, and sum them up. As a result, we can
-write 
+write
 \begin{align*}
   Ax &= A\left(\sum^n_{i=1} \langle v_i, x\rangle v_i\right)
   = \sum^n_{i=1} \langle v_i, x\rangle A v_i
@@ -217,7 +217,7 @@ write
 where we played fast-and-loose with the ordering of terms (though it all
 checks out). Finally, let's remove $x$ from both sides to get
 \begin{align*}
-  A = \sum^n_{i=1} u_i \sigma_i v_i^T 
+  A = \sum^n_{i=1} u_i \sigma_i v_i^T
   \qquad \Leftrightarrow \qquad
   A = U \Sigma V^T
 \end{align*}
@@ -252,23 +252,23 @@ into
 \subsection{Overview}
 
 Principal Component Analysis is a type of \emph{feature extraction}
-that takes a number of ``features'' or independent variables, then 
-uses them in combination to build and rank new variables which 
+that takes a number of ``features'' or independent variables, then
+uses them in combination to build and rank new variables which
 explain the largest share of variability in some response (or
 dependent) variable. This differs from \emph{feature selection}
 which takes a list of features and selects a subset to use as is
 (free of any combination or modification).
 
-Principal Component Analysis can also be used to combat the 
+Principal Component Analysis can also be used to combat the
 \emph{curse of dimensionality}.  Loosely speaking, this technical
 problem arises when you have many features or independent variables
-that might explain some dependent variable. As the number of 
-features grows, the data becomes ever sparser in a higher 
+that might explain some dependent variable. As the number of
+features grows, the data becomes ever sparser in a higher
 dimensional space.\footnote{Say that an outcome $y$ is dependent
-upon the roll of $N$ dice, $\{x_1, \ldots, x_N\}$. As $N$ increases, 
-there are exponentially more outcomes that might 
-result--$6^N$ to be precise. So as $N$ increases, the space within 
-which the data lives grows exponentially, which necessitates 
+upon the roll of $N$ dice, $\{x_1, \ldots, x_N\}$. As $N$ increases,
+there are exponentially more outcomes that might
+result--$6^N$ to be precise. So as $N$ increases, the space within
+which the data lives grows exponentially, which necessitates
 exponentially larger samples to match the explanatory power you
 would have in dimensions with lower $N$.}
 Principal Component Analysis can be used to combine features, rank
@@ -303,18 +303,18 @@ linear algebra terminology, we can use another \emph{basis}.
 \end{document}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%% SAMPLE CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     %% BIBLIOGRAPHIES %%
 
-        \cite{LabelInSourcesFile} 
+        \cite{LabelInSourcesFile}
         \citep{LabelInSourcesFile} Cites in parens
         \nocite{LabelInSourceFile} includes in refs w/o specific citation
-        \bibliographystyle{apalike} 
+        \bibliographystyle{apalike}
         \bibliography{sources.bib} where sources.bib is file
 
     %% SPACING %%
@@ -330,12 +330,12 @@ linear algebra terminology, we can use another \emph{basis}.
 
     %% INCLUDING CODE %%
 
-        \verbatiminput{file.ext}    
+        \verbatiminput{file.ext}
             %---Includes verbatim text from the file
-        \texttt{text}	  
+        \texttt{text}
             %---Renders text in courier, or code-like, font
 
-        \matlabcode{file.m}	  
+        \matlabcode{file.m}
             %---Includes Matlab code with colors and line numbers
 
 
@@ -366,9 +366,9 @@ linear algebra terminology, we can use another \emph{basis}.
                 \mbox{\subfigure{
                     \includegraphics[scale=1]{file1.pdf}
                 }\quad\subfigure{
-                    \includegraphics[scale=1]{file2.pdf} 
+                    \includegraphics[scale=1]{file2.pdf}
                 }
                 }
             \end{figure}
-    
+
 

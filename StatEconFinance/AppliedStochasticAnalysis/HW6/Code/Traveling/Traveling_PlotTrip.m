@@ -1,3 +1,5 @@
+%% This writes a trip to a csv file so that R can read it in and plot on
+%  a map
 function [ ] = Traveling_PlotTrip(L, trip, names, saving)
 
   f = fopen('Trip.csv', 'w');
@@ -6,6 +8,6 @@ function [ ] = Traveling_PlotTrip(L, trip, names, saving)
   end
   fclose(f);
 
-  system(['Rscript Traveling_PlotTrip.R ' saving])
+  %system(['Rscript Traveling_PlotTrip.R ' saving])
 
 end
