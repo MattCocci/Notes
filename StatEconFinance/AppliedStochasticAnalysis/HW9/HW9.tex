@@ -213,14 +213,16 @@
           d\left(tW_t\right) &= W_t dt + t dW_t
         \end{align*}
         Integrating gives
-        \begin{align*}
-          \int^t_0 d\left(sW_s\right) &= \int^t_0 W_s ds + \int^t_0 s dW_s\\
+        \begin{align}
+          \int^t_0 d\left(sW_s\right) &= \int^t_0 W_s ds + \int^t_0 s dW_s
+          \notag \\
           \Rightarrow \qquad
-          tW_t &= \int^t_0 W_s ds + \int^t_0 s dW_s\\
+          tW_t &= \int^t_0 W_s ds + \int^t_0 s dW_s\notag \\
           \Rightarrow \qquad
           \int^t_0 s dW_s &=
             tW_t - \int^t_0 W_s ds
-        \end{align*}
+            \label{q1a.2}
+        \end{align}
         Substituting this result into Expression~\ref{q1a.1}, we get
         \begin{align*}
           \int^t_0 \int_0^{s_1} \int_0^{s_2} dW_{s_3}dW_{s_2}dW_{s_1}
@@ -294,13 +296,9 @@
           dW_{s_2}dW_{s_1}
         \end{align*}
 
-
-
-
-
-
     \end{enumerate}
 
+  \clearpage
   \item % Question 2
     First, the identity that will be heavily used
     \begin{align}
@@ -309,34 +307,127 @@
       \label{q2.1}\\
       \mathscr{L}_0
         &= b\frac{\partial}{\partial x}
-          +\frac{1}{2}\sigma^2\frac{\partial}{\partial x}
+          +\frac{1}{2}\sigma^2\frac{\partial^2}{\partial x^2}
         \qquad\qquad
       \mathscr{L}_1 = \sigma \frac{\partial}{\partial x}
+      \notag
     \end{align}
-    Next, note that the Milstein scheme was derived by using
-    (\ref{q2.1}) with $f=\mathscr{L}_1\sigma(X_z)$ to expand
-    \begin{align*}
-      \int^t_0\int^s_0\mathscr{L}_1\sigma(X_z)dW_zdW_s
-      &= \int^t_0\int^s_0
-      \left[
-        \mathscr{L}_1\sigma(X_0)
-        + \int^z_0 \mathscr{L}_0\mathscr{L}_1\sigma(X_p) dp
-        + \int^z_0 \mathscr{L}^2_1\sigma(X_p) dW_p
-      \right]
-      dW_z dW_s\\
-      &= \mathscr{L}_1\sigma(X_0)\int^t_0\int^s_0  dW_z dW_s+
-      \int^t_0\int^s_0\int^z_0
-        \mathscr{L}_0\mathscr{L}_1\sigma(X_p) dp\\
+    To get to the Milstein scheme, we considered the first remainder
+    from Ito expansion:
+    \begin{align}
+      \label{q2.2}
+      R_1
+      &=
+      \int^t_0 \int^s_0 \mathscr{L}_0b(X_z) dz ds
+      +\int^t_0 \int^s_0 \mathscr{L}_1 b(X_z) dW_z ds
+      +\int^t_0 \int^s_0 \mathscr{L}_0 \sigma(X_z) dz dW_s\\
       &\qquad
-        + \int^t_0\int^s_0 \int^z_0
-            \mathscr{L}^2_1\sigma(X_p) dW_p dW_z dW_s
-    \end{align*}
-    To proceed, apply (\ref{q2.1}) again, but this time, take
-    $f=\mathscr{L}_1^2\sigma(X_p)$ to expand the last term above
+      +\int^t_0 \int^s_0 \mathscr{L}_1 \sigma(X_z) dW_z dW_s
+      \notag
+    \end{align}
+    From there, we only expanded the last term.  So let's now expand the
+    other double integrals.
+    \begin{enumerate}
+      \item First, we apply (\ref{q2.1}), taking $f=\mathscr{L}_0b(X_s)$
+        \begin{align*}
+          \int^t_0 \int^s_0 \mathscr{L}_0b(X_z) dz ds
+          &=
+          \int^t_0 \int^s_0 \left[
+            \mathscr{L}_0b(X_0)
+            + \int^p_0 \mathscr{L}_0^2b(X_z) dp
+            + \int^p_0 \mathscr{L}_1\mathscr{L}_0b(X_z) dW_p
+            \right] dz ds \\
+          &=
+          \mathscr{L}_0b(X_0)
+            \int^t_0 \int^s_0 dz ds
+            + \int^t_0 \int^s_0\int^p_0 \mathscr{L}_0^2b(X_z) dp dz ds\\
+          &\qquad
+            + \int^t_0 \int^s_0\int^p_0
+              \mathscr{L}_1\mathscr{L}_0b(X_z) dW_p dz ds
+        \end{align*}
+        We'll drop the triple integral terms in the approximation,
+        leaving
+        \begin{align*}
+          \int^t_0 \int^s_0 \mathscr{L}_0b(X_z) dz ds
+          &\approx
+          \mathscr{L}_0b(X_0) \int^t_0 \int^s_0 dz ds\\
+          &=
+          \mathscr{L}_0b(X_0) \frac{t^2}{2}\\
+          &=
+          \left[ b\frac{\partial}{\partial x} + \frac{1}{2}\sigma^2
+          \frac{\partial^2}{\partial x^2}\right]
+            b(X_0) \frac{t^2}{2}\\
+          \Rightarrow \qquad
+          \int^t_0 \int^s_0 \mathscr{L}_0b(X_z) dz ds
+            &\approx \left( bb' + \frac{1}{2}\sigma^2 b''\right)
+            \frac{t^2}{2}
+        \end{align*}
+        where $b$, $b'$, and $\sigma$ are all evaluated at $X_0$.
+
+      \item Next, we expand the second term in (\ref{q2.2}), taking
+        $f=\mathscr{L}_1b(X_z)$ in (\ref{q2.1}). If we do that and drop
+        the triple integral terms, we'll be left with:
+        \begin{align*}
+          \int^t_0 \int^s_0 \mathscr{L}_1 b(X_z) dW_z ds
+          &\approx
+          \mathscr{L}_1 b(X_0)
+          \int^t_0 \int^s_0 dW_z ds\\
+          &=
+          \sigma \frac{\partial}{\partial x}
+          b(X_0)
+          \int^t_0 \int^s_0 dW_z ds\\
+          &=
+          \sigma b' Z_t
+        \end{align*}
+        where $\sigma$ and $b'$ are evaluated at $X_0$ and
+        \begin{align*}
+          Z_t:=\int^t_0\int^s_0 dW_s ds
+          \qquad
+          Z_t \sim N(0,\frac{1}{3}t^3)
+          \qquad EZ_t W_t = \frac{1}{2}t^2
+        \end{align*}
+        as given in the problem statement.
+
+      \item Lastly, the third double integral in (\ref{q2.2}). If we
+        expand and drop triple integrals, we get
+        \begin{align*}
+          \int^t_0 \int^s_0 \mathscr{L}_0 \sigma(X_z) dz dW_s
+          &\approx
+          \mathscr{L}_0 \sigma(X_0) \int^t_0 \int^s_0  dz dW_s\\
+          &=
+          \mathscr{L}_0 \sigma(X_0) \int^t_0 s \;dW_s
+        \end{align*}
+        Using a Result~(\ref{q1a.2}) from Question 1, we can simplify
+        that integral
+        \begin{align*}
+          \int^t_0 \int^s_0 \mathscr{L}_0 \sigma(X_z) dz dW_s
+          &\approx
+          \mathscr{L}_0 \sigma(X_0) \int^t_0 s dW_s \\
+          &=
+          \mathscr{L}_0\sigma(X_0)\left(tW_t - \int^t_0 W_s ds\right)\\
+          &=
+          \mathscr{L}_0\sigma(X_0)
+          \left(tW_t - \int^t_0 \int^s_0 dW_z ds\right)\\
+          &=
+          \mathscr{L}_0\sigma(X_0)\left(tW_t - Z_t\right)
+        \end{align*}
+        where I use the definition of $Z_t$ from above. Then, expanding
+        out $\mathscr{L}_0\sigma(X_0)$, we get
+        \begin{align*}
+          \int^t_0 \int^s_0 \mathscr{L}_0 \sigma(X_z) dz dW_s
+          &\approx
+          \left(b\sigma' + \frac{1}{2}\sigma^2\sigma''\right)
+          \left(tW_t - Z_t\right)
+        \end{align*}
+    \end{enumerate}
+    Finally, the only thing left to do is expand out the triple-integral
+    Ito term that was generated by the Milstein expansion and left in
+    the remainder. Doing that by taking $f=\mathscr{L}_1^2\sigma(X_p)$
+    (and dropping all quadruple integral terms) gives
     \begin{align*}
         \int^t_0\int^s_0 \int^z_0
           &\mathscr{L}^2_1\sigma(X_p) dW_p dW_z dW_s\\
-      &\qquad =
+      &=
         \int^t_0\int^s_0 \int^z_0
         \left[
           \mathscr{L}^2_1\sigma(X_0)
@@ -344,19 +435,7 @@
           +\int^p_0 \mathscr{L}^3_1\sigma(X_q) dW_q
         \right]
         dW_p dW_z dW_s\\
-      &\qquad =
-        \mathscr{L}^2_1\sigma(X_0) \int^t_0\int^s_0 \int^z_0 dW_p dW_z dW_s
-          + \int^t_0\int^s_0 \int^z_0\int^p_0
-            \mathscr{L}_0 \mathscr{L}^2_1\sigma(X_q)
-          dq dW_p dW_z dW_s\\
-      &\qquad\qquad\qquad
-          + \int^t_0\int^s_0 \int^z_0\int^p_0
-            \mathscr{L}^3_1\sigma(X_q) dW_q
-            dW_p dW_z dW_s
-    \end{align*}
-    We'll retain and simplify the following term (while leaving
-    everything else as a remainder)
-    \begin{align*}
+      &\approx
         \mathscr{L}^2_1\sigma(X_0) \int^t_0\int^s_0 \int^z_0 dW_p dW_z dW_s
     \end{align*}
     To simplify, compute the leading term
@@ -366,24 +445,26 @@
       \mathscr{L}_1\left(\mathscr{L}_1\sigma(X_0)\right) \\
       &=
       \mathscr{L}_1\left(
-        \sigma(X_0)
+        \sigma
         \frac{\partial}{\partial x}\sigma(X_0)
       \right)
-      = \mathscr{L}_1 \left( \sigma(X_0) \sigma'(X_0) \right) \\
+      = \mathscr{L}_1 \left( \sigma \sigma' \right) \\
       &=
-      \sigma(X_0)
+      \sigma
         \frac{\partial}{\partial x}
-      \left( \sigma(X_0) \sigma'(X_0) \right) \\
+      \left( \sigma \sigma' \right) \\
       &=
-      \sigma(X_0)
+      \sigma
       \left(
-        \sigma(X_0) \sigma''(X_0)
-        + \left[\sigma'(X_0)\right]^2
+        \sigma \sigma''
+        + \left[\sigma'\right]^2
       \right) \\
       &=
-        [\sigma(X_0)]^2 \sigma''(X_0)
-        + \sigma(X_0)\left[\sigma'(X_0)\right]^2
+        \sigma^2 \sigma''
+        + \sigma\left[\sigma'\right]^2
     \end{align*}
+    where $\sigma$, $\sigma'$, and $\sigma''$ are all evaluated at $X_0$.
+
     Finally, let's compute the integral, using the answer from Q1:
     \begin{align*}
         \int^t_0\int^s_0 \int^z_0 dW_p dW_z dW_s
@@ -396,20 +477,33 @@
           \left(
           \frac{1}{6}W_t^3 - \frac{1}{2} t W_t\right)
     \end{align*}
-    This suggests the following scheme:
+    Putting everything together, this all suggests the following scheme:
     \begin{align*}
       X_{n+1}
         &= X_n
         + b\Delta t + \sigma \Delta W_n
         + \frac{1}{2}\sigma\sigma' ( (\Delta W_n)^2 - \Delta t)\\
-      &\quad+ \left(\sigma^2\sigma'' +\sigma(\sigma')^2\right)
-        \left(\frac{1}{6} (\Delta W_n)^3 -\frac{1}{2}(\Delta t)(\Delta W_n)
-        \right)
+      &\quad + \frac{1}{2}\left(bb'+\frac{1}{2}\sigma^2 b''\right)
+        (\Delta t)^2\\
+      &\quad + \sigma b' \Delta Z\\
+      &\quad + \left( b\sigma' + \frac{1}{2}\sigma^2\sigma''\right)
+      \left[(\Delta t) (\Delta W_t) -\Delta Z\right]\\
+      &\quad+ \frac{1}{2}\left(\sigma^2\sigma'' +\sigma(\sigma')^2\right)
+        \left(\frac{1}{3}(\Delta W_n)^2 -\Delta t
+        \right)(\Delta W_n)
     \end{align*}
-    where $b$, $\sigma$, $\sigma'$, and $\sigma''$ are all evaluated at
-    $X_n$.
+    where $b$, $b'$, $b''$, $\sigma$, $\sigma'$, and $\sigma''$ are all
+    evaluated at $X_n$. To implement, we draw
+    \begin{align*}
+      \Delta W_n \sim N(0,\Delta t)
+      \qquad
+      \Delta Z \sim N\left(0,\frac{1}{3}(\Delta t)^3\right)
+      \quad \text{where} \quad
+      E[(\Delta Z)(\Delta W_n)] = \frac{1}{2}\Delta t
+    \end{align*}
 
 
+  \clearpage
   \item % Question 3
     We want to compute analytically the region of mean-square stability
     of Geometric Brownian Motion $X_t$ for the Milstein scheme, where
@@ -579,6 +673,7 @@
 \clearpage
 \appendix
 
+\section{Question 1a Detail}
 \begin{enumerate}
   \item[1a.] In this question, I chose the function $f(t,x)=tx$ in the
     application of Ito's Lemma by first considering the case of
