@@ -1,0 +1,52 @@
+  %% Plot weak convergence plots
+  if 0
+    % Analytical means against computed mean
+    figure()
+    for s = 1:length(step_sizes)
+      subplot(ceil(length(step_sizes)/2), 2, s)
+      hold on
+
+      % Plot analytical mean
+      plot(log(weak.mean{s}),'b')
+
+      % Plot em and milstein means
+      plot(log(weak.mean_em{s}),'r')
+      plot(log(weak.mean_mil{s}),'g')
+      hold off
+      legend('Analytical', 'EM', 'Milstein')
+    end
+
+
+    for m = 1:length(methods)
+
+      x = []; y = [];
+      for s = 1:length(step_sizes)
+        y = [y; abs([weak.mean{s} - weak.(['mean_' methods{m}]){s}]') ]; % Error
+        x = [x; repmat(step_sizes(s), length(weak.mean{s}), 1)];
+      end
+      x_log = log10(x);
+      y_log = log10(y);
+
+      figure()
+
+      % Plot sample points on log scale
+      loglog(x, y, 'o')
+      hold on
+
+      % Get beta 
+      coeffs = regress(y_log, [ones(length(y_log),1), x_log]);
+      logC   = coeffs(1);
+      beta   = coeffs(2);
+
+      % Plot line of best fit
+      xl = [step_sizes(end)-step_sizes(end)/2, step_sizes(1)+0.1];
+      plot(xl, (10^logC)*(xl.^beta), 'r')
+
+      % Axes and legend
+      set(gca, 'xlim', xl);
+      legend('Samples', sprintf('Line of Best Fit, \\beta = %1.2f', beta), 'Location', 'NorthWest')
+      title([methods_names{m} ' Method'], 'FontSize', 16)
+      set(gca, 'FontSize', 12)
+    end
+  end
+
