@@ -193,7 +193,7 @@ outcomes are $N$-tuples with each element in $\{H,T\}$.
 \subsection{Discrete Time, Discrete Space}
 
 \begin{defn}
-The process $\{X_t\}$ is a \emph{discrete time, discrete space Markov
+The process $\{X_n\}$ is a \emph{discrete time, discrete space Markov
 chain} if it satisfies the \emph{Markov Property}:
 \begin{align*}
   P(X_n = x_n | X_{n-1}=x_{n-1}, \ldots, X_0 =x_0)
@@ -245,13 +245,148 @@ transition. In these cases, we drop time from the notation so that
 $P(n)$ becomes $P$ and $p_{ij}(n)$ becomes $p_{ij}$.
 \end{defn}
 
+\begin{rmk}
+From here on, we will exclusively work with homogeneous Markov Chains.
+\end{rmk}
 
+\begin{thm}{\emph{(Chapman-Komogorov Equation)}}
+For a homogeneous Markov Chain, we can compute $m$ step ahead transition
+probabilities as follows:
+\begin{align*}
+  P(X_{n+m}=j | X_{n}=i) = \sum_k P(X_{n+m}=j| X_\ell=k)
+    P(X_\ell = k| X_n=i)
+  \qquad
+  n \leq \ell \leq n+m
+\end{align*}
+In words, break the probability of moving from $i$ to $j$ in $m$ steps
+into a smaller problem: $i$ to $m$ then $m$ to $i$ for some intermediate
+step $m$.
+\end{thm}
 
-\section{Week 3: Continuous Time, Discrete Space Markov Chains}
+\begin{thm}{\emph{(Forward Kolmorogov Equation)}}
+This relationship tells us how to evolve distributions. In particular,
+if $X_n\sim \mu^{(n)}$ where $\mu^{(n)}$ is a row vector or
+probabilities summing to 1, then $\mu^{(n+1)}$, the distribution of
+$X_{n+1}$ can be computed
+\begin{align*}
+  \mu^{(n+1)} = \mu^{(n)} P
+\end{align*}
+\end{thm}
 
+\begin{thm}{\emph{(Backward Komogorov Equation)}}
+This theorem tells us how to evolve moments and expected values. In
+particular, for a function $f$ and Markov chain $\{X_n\}$ taking on any
+of $m$ possible values, define column vector
+\begin{align*}
+  u_n =
+  \begin{pmatrix}
+    u^{(1)}_n & \cdots & u^{(k)}_n & \cdots & u^{(m)}_n
+  \end{pmatrix}'
+  \quad\text{where}\quad
+  u^{(k)}_n := \mathbb{E}[f(X_n)|X_0=k]
+\end{align*}
+Then we have that
+\begin{align*}
+  u_{n+1} = P u_n
+\end{align*} \end{thm}
+\begin{proof}
+Law of Iterated Expectations:
+\begin{align*}
+  u_{n+1}^{(i)} &= \mathbb{E}[f(X_{n+1})|X_0=i]\\
+  \text{By definition}\qquad
+  &= \sum_j f(j) P(X_{n+1}=j |X_0=i)\\
+  \text{Chapman-Komogorov}\qquad
+  &= \sum_j f(j) \left(\sum_k P(X_{n+1}=j |X_1 = k) P(X_1=k|X_0=i)\right)\\
+  &= \sum_k \left(\sum_j f(j) P(X_{n+1}=j |X_1 = k)\right) P(X_1=k|X_0=i)\\
+  \text{By Homogeneity}\qquad
+  &= \sum_k \left(\sum_j f(j) P(X_{n}=j |X_0 = k)\right) P(X_1=k|X_0=i)\\
+  &= \sum_k \mathbb{E}[f(X_n)|X_0=k] \cdot P(X_1=k|X_0=i)\\
+  &= \sum_k u^{(k)}_n \cdot P(X_1=k|X_0=i)\\
+  &= P_{i,\cdot} u_n
+\end{align*}
+where $P_{i,\cdot}$ denotes the $i$th row. Stacking this result across
+the $i$, we get $u_{n+1}=Pu_n$.
+\end{proof}
+
+\begin{thm}{\emph{(Alternative Backward Komogorov Equation)}}
+For a function $f$, Markov chain $\{X_n\}$, and fixed time $N\geq n$,
+define column vector
+\begin{align*}
+  v_n =
+  \begin{pmatrix}
+    v^{(1)}_n & \cdots & v^{(k)}_n & \cdots & v^{(m)}_n
+  \end{pmatrix}'
+  \quad\text{where}\quad
+  v^{(k)}_n := \mathbb{E}[f(X_N)|X_n=k]
+\end{align*}
+Then we have that
+\begin{align*}
+  u_{n+1} = P u_n
+\end{align*}
+\end{thm}
+
+\begin{rmk}
+In both formulations of the Backward Equation, we have functions of time
+and of a starting point, $u^{(k)}_n$ and $v^{(k)}_n$. However, for $u$,
+the starting time is fixed, while we can vary the time \emph{from} or
+\emph{after} the starting point. On the other hand, for $v$, the ending
+time is fixed and $v$ varies as function of some time \emph{before} or
+\emph{until} that terminal time. It is, therefore, from $v$ that the
+name ``Backward Equation'' arises, as we can solve \emph{backwards}
+moments and functions of the state prior to some terminal time.
+\end{rmk}
+
+\subsection{Continuous Time, Discrete Space}
+
+\begin{defn}
+The process $X=\{X_t\}_{t\geq 0}$ is a \emph{continuous time, discrete
+space Markov Chain} if $X$ takes on only a discrete set of values in a finite or countable state space $S$ and if
+\begin{align*}
+  P(X_{t_n} = i_{n} | X_{t_{n-1}} = i_{n-1}, \ldots X_{t_1} = i_{1})
+  =
+  P(X_{t_n} = i_{n} | X_{t_{n-1}} = i_{n-1})
+\end{align*}
+for all states $i_1,\ldots,i_n\in S$ and times $t_1<\cdots<t_n$.
+\end{defn}
+
+Now that time isn't neatly divide into discrete intervals, we can't
+define a transition matrix since there's not necessarily a standard unit
+of time between jumps. There are then two approaches:
 \begin{enumerate}
-  \item Notes
+  \item Consider the \emph{generator} $Q$, which is like an limit of a
+    transition as the time step goes to~0.
+  \item Describe the distribution of jump times of $X_t$, defined as
+    $\tau_1, \tau_2,\ldots$, and then treat $X_t$ like a discrete time
+    Markov Chain jumping at these times.
 \end{enumerate}
+
+\begin{defn}{(Transition Probabilities in Cts. Time)}
+For a continuous time, discrete space Markov Chain, the \emph{transition
+probability} $p_{ij}(s,t)$ at time $s$ for time step $t$ is defined
+\begin{align*}
+  p_{ij}(s,t) = P(X_{t+s}=j|X_s=i)
+\end{align*}
+We can then collect these in a transition matrix $P(s,t) =
+(p_{ij}(s,t))$. Note that $P(s,0) = I$ for all $s$.
+
+If $X$ is a homogeneous Markov Chain, then we drop the argument $s$ and
+simply have $p_{ij}(t)$, the probability of transitioning from $i$ to
+$j$ in $t$ units of time. Similarly the matrix of transition
+probabilities becomes simply $P(t)$.
+\end{defn}
+
+\begin{rmk}
+Again, we'll consider only homogeneous Markov Chains from now on.
+\end{rmk}
+
+\begin{defn}{(Chapman-Kolmorogov)}
+Similar to the discrete-time case, we have
+\begin{align*}
+  p_{ij}(t+s) = \sum_k p_{ik}(t) p_{kj}(s)
+  \quad \Leftrightarrow \quad
+  P(t+s) = P(t)P(s)
+\end{align*}
+\end{defn}
 
 \section{Week 4: Stochastic Processes and Spectral Representation}
 
