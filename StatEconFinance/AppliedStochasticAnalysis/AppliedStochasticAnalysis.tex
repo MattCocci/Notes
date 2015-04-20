@@ -36,6 +36,7 @@
 \usepackage{amsfonts}
 \usepackage{mathrsfs}
 \usepackage{amsthm} %allows for labeling of theorems
+\usepackage{accents}
 \theoremstyle{plain}
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{lem}[thm]{Lemma}
@@ -575,10 +576,177 @@ number of dimensions and $D$ is the domain. The variance of the error is
 
 Notice that we drew from a (possibly multi-dimensional) uniform
 distribution in computing $\hat{I}(f)$ in~\ref{mcintapprox}. But in the
-case where 
+case where
 
 \begin{thm}
 \end{thm}
+
+\clearpage
+\section{Forward and Backward Equations}
+
+In the sections above, we considered SDEs of the form
+\begin{align*}
+  dX_t = b(X_t,t) dt + \sigma(X_t,t) dW_t
+\end{align*}
+We then tried to solve these to find expressions for the \emph{paths} of $X_t$ as a function of time and Brownian motion paths as follows:
+\begin{align*}
+  X_t = f(t,W_t)
+\end{align*}
+In this section, we try another approach. Here, we try instead to
+describe the evolution of the probability distribution of $X_t$ and of
+functions or moments of $X_t$ using PDE methods. Since $X_t$ is Markov
+(by the fact that it solves the above SDE with particular smoothness and
+growth conditions on $b$ and $\sigma$), we will often deal with the
+transition density:
+\begin{align*}
+  p(x,t|y,s) := P(X_t\in [x,x+dx) \; | \; X_s=y)
+\end{align*}
+
+\begin{defn}
+Given a function $f\in C_c^\infty(\mathbb{R}^d)$ and a time-homogeneous
+process (multi-dimensional) stochastic process $X_t$, define the
+\emph{generator} of $X_t$
+\begin{align*}
+  (\mathscr{A}f)(x)=
+  \lim_{t\rightarrow0} \frac{E[f(X_t)|X_0=x]-f(x)}{t}
+  &= (\mathscr{L}f)(x)
+\end{align*}
+where $\mathscr{L}$ is the linear operator
+\begin{align*}
+  \mathscr{L}f &= b \cdot \nabla f
+  + \frac{1}{2} \left(\sigma \sigma^T:\nabla^2 f\right)\\
+  \Leftrightarrow \qquad
+  &= \sum_i b_i \frac{\partial f}{\partial x_i}
+  + \frac{1}{2} \sum_i \sum_j \left(\sigma \sigma^T\right)
+    \frac{\partial^2 f}{\partial x_i \partial x_j}
+\end{align*}
+where $\nabla^2 f$ is the Hessian matrix of $f$, and $A:B :=
+\text{tr}(A^T B)$.
+\end{defn}
+\begin{proof}
+The result follows directly from Ito's Lemma. Therefore apply
+multi-dimensional Ito's Lemma to $f(X_t)$ for homogeneous process $X_t$:
+\begin{align*}
+  df(X_t) &=
+  \left(b\cdot \nabla f + \frac{1}{2}\sigma\sigma^T : \nabla^2 f\right)
+  dt
+  + \nabla f\cdot \sigma \;dW_t\\
+  f(X_t) - f(X_s) &=
+  \int^t_s
+  \left(b\cdot \nabla f + \frac{1}{2}\sigma\sigma^T : \nabla^2 f\right)
+  d\tau
+  +
+  \int^t_s
+  \nabla f\cdot \sigma \;dW_\tau
+\end{align*}
+Now take conditional expectation $E[\;\cdot\;|X_s=x]$ and use the fact
+that the Ito Integral has expectation of zero:
+\begin{align*}
+  E[f(X_t)|f(X_s)=x] - f(x) &=
+  E\left[
+  \int^t_s
+  \left(b\cdot \nabla f + \frac{1}{2}\sigma\sigma^T : \nabla^2 f\right)
+  d\tau
+  |f(X_s)=x\right]\\
+  &\qquad
+  +
+  E\left[
+  \int^t_s
+  \nabla f\cdot \sigma \;dW_\tau
+  |f(X_s)=x\right]
+  \\
+  &=
+  E\left[ \int^t_s (\mathscr{L} f)(X_\tau) d\tau \;\big|\:f(X_s)=x\right] + 0
+\end{align*}
+From there, we can compute the limit that defines the generator to get:
+\begin{align*}
+  (\mathscr{A}f)(x)
+  &=\lim_{t\rightarrow0} \frac{E[f(X_t)\;|\;f(X_s)=x] - f(x)}{t}\\
+  &=\lim_{t\rightarrow0} \frac{1}{t}
+  E\left[ \int^t_s (\mathscr{L} f)(X_\tau) d\tau \; \big|\:f(X_s)=x\right]\\
+  &=(\mathscr{L}f)(x)
+\end{align*}
+where the last step follows from the Dominated Convergence Theorem since
+$f$ and all of its derivatives are bounded (K\&S p 323).
+\end{proof}
+
+\begin{thm}{(Forward Kolmogorov Equation and Fokker-Planck Equation)}
+There are two formulations:
+\begin{enumerate}
+  \item The transition probability density $p(x,t|y,s)$ solves
+    \begin{align*}
+      \frac{\partial p}{\partial t} = \mathscr{L}^*_x p
+      \qquad p(x,s|y,s) = \delta(x-y)
+    \end{align*}
+    where $\mathscr{L}^*$ is defined
+    \begin{align*}
+      \mathscr{L}^*f_x = -\nabla_x \cdot (b f)
+      +\frac{1}{2}\nabla^2_x : (a f)
+    \end{align*}
+    This is the adjoint of $\mathscr{L}$ meaning that
+    on the Hilbert Space with inner product
+    $\langle\cdot,\cdot\rangle_{L^2}$,\footnote{%
+      The inner product $\langle\cdot,\cdot\rangle_{L^2}$ is defined as
+      \begin{align*}
+        \langle f,g\rangle_{L^2}
+        &= \int_X fg\;d\mu
+      \end{align*}
+    }
+    we have that $\langle\mathscr{L}f,g\rangle_{L^2} =\langle
+    f,\mathscr{L}^*g\rangle_{L^2}$
+
+  \item If $\rho_0(x)$ is the initial probability desnity and
+    $\rho(x,t)$ is the density at time $t$, then $\rho(x,t)$ solves
+    \begin{align}
+      \frac{\partial \rho}{\partial t} = \mathscr{L}^* \rho
+      \qquad \text{where } \; \rho(x,0) = \rho_0(x)
+      \label{fpeqn}
+    \end{align}
+\end{enumerate}
+\end{thm}
+\begin{proof}
+We take each case separately:
+\begin{enumerate}
+  \item By Ito's Lemma and results we saw above, we can write:
+    \begin{align*}
+      E[f(X_t) \;|\; X_s=y] -f(y)
+      &= E\left[\int^t_s (\mathscr{L}f(X_\tau) d\tau \;\big|\;
+          f(X_s)=y\right]
+    \end{align*}
+    Writing the expectation out explicitly,
+    \begin{align*}
+      \int_{\mathbb{R}^d} f(x)p(x,t|y,s)\;dx  -f(y)
+      &= \int_{\mathbb{R}^d} \int^t_s
+        (\mathscr{L}f)(x) \cdot p(x,\tau|y,s)\; d\tau dx
+    \end{align*}
+    Differentiating both sides with respect to $t$,
+    \begin{align*}
+      \int_{\mathbb{R}^d} f(x) \frac{\partial p}{\partial t}\;dx
+      &= \int_{\mathbb{R}^d}
+        (\mathscr{L}f)(x) \cdot p\; dx
+    \end{align*}
+    And this holds for all test functions $f$, so $p$ is a weak
+    solution.
+\end{enumerate}
+\end{proof}
+
+\subsection{Probability Flux}
+
+Let's write out the Fokker-Planck Equation (\ref{fpeqn}) as follows:
+\begin{align*}
+  \frac{\partial\rho}{\partial t}
+  &= \nabla \cdot \left( -b\rho + \frac{1}{2}\nabla \cdot (a\rho)\right)\\
+  \Leftrightarrow\qquad
+  0&=
+  \frac{\partial\rho}{\partial t}
+  + \nabla \cdot \underaccent{\bar}{j}
+  \qquad
+  \text{where}\;
+  \underaccent{\bar}{j} = b\rho - \frac{1}{2}\nabla\cdot(a\rho)
+\end{align*}
+This is a conservation law for $\rho$, showing that any increase in
+probability must be counterbalanced by $\nabla \cdot
+\underaccent{\bar}{j}$ and vice versa.
 
 %% APPPENDIX %%
 

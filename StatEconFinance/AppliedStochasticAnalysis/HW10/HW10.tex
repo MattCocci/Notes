@@ -1,0 +1,709 @@
+\documentclass[12pt]{article}
+\author{Matthew D. Cocci}
+\title{Homework 10}
+\date{\today}
+%% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % most detailed page formatting control
+\usepackage{fullpage} % Simpler than using the geometry package; std effect
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt}
+    %---Make the header bigger to avoid overlap
+
+%\renewcommand{\headrulewidth}{0.3pt}
+    %---Width of the line
+
+%\setlength{\headsep}{0.2in}
+    %---Distance from line to text
+
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{amsthm} %allows for labeling of theorems
+\usepackage{accents}
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+
+% Below supports left-right alignment in matrices so the negative
+% signs don't look bad
+\makeatletter
+\renewcommand*\env@matrix[1][c]{\hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols #1}}
+\makeatother
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %---For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %---Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+        %---This colors the links themselves, not boxes
+    citecolor=black,
+        %---Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{verbatim}
+    %---For including verbatim code from files, no colors
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{RGB}{28,172,0}
+\definecolor{mylilas}{RGB}{170,55,241}
+\newcommand{\matlabcode}[1]{%
+    \lstset{language=Matlab,%
+        basicstyle=\footnotesize,%
+        breaklines=true,%
+        morekeywords={matlab2tikz},%
+        keywordstyle=\color{blue},%
+        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+        identifierstyle=\color{black},%
+        stringstyle=\color{mylilas},%
+        commentstyle=\color{mygreen},%
+        showstringspaces=false,%
+            %---Without this there will be a symbol in
+            %---the places where there is a space
+        numbers=left,%
+        numberstyle={\tiny \color{black}},%
+            %---Size of the numbers
+        numbersep=9pt,%
+            %---Defines how far the numbers are from the text
+        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+            %---Some words to emphasise
+    }%
+    \lstinputlisting{#1}
+}
+    %---For including Matlab code from .m file with colors,
+    %---line numbering, etc.
+
+%% Bibliographies %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{natbib}
+    %---For bibliographies
+%\setlength{\bibsep}{3pt} % Set how far apart bibentries are
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{enumitem}
+    %---Has to do with enumeration
+\usepackage{appendix}
+\usepackage{pdfpages}
+    %---For including whole pdf pages as a page in doc
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+\maketitle
+
+%\tableofcontents
+
+
+\begin{enumerate}
+  \item % Question 1
+    In this question, we will reference GBM
+    \begin{align*}
+      dX_t = \lambda X_t dt + \sigma X_t dW_t
+    \end{align*}
+    \begin{enumerate}
+      \item % Question 1a
+        Letting $\rho(x,t)$ denote the density at time $t$ with
+        $\rho_0(x)$ representing the initial probability density, the
+        corresponding Fokker-Planck equation for GBM is
+        \begin{align*}
+          \frac{\partial \rho}{\partial t}
+          &= \mathscr{L}^*\rho\\
+          &= -\frac{\partial}{\partial x}
+            \left(
+            \lambda x \rho - \frac{1}{2}
+            \frac{\partial}{\partial x}\left((\sigma x)^2\rho\right)
+            \right)\\
+          &= -\lambda \frac{\partial}{\partial x}
+            \left( x \rho\right)
+            + \sigma^2 \frac{1}{2}
+            \frac{\partial^2}{\partial x^2}(x^2\rho)
+          \qquad \text{where } \rho(x,0) = \rho_0(x)
+        \end{align*}
+
+      \item % Question 1b
+        For a stationary distribution $\rho_s$ to exist, we must have
+        \begin{align*}
+          0 &= \mathscr{L}^*\rho_s\\
+          &= -\frac{\partial}{\partial x}
+            \left(
+            \lambda x \rho_s - \frac{1}{2}
+            \frac{\partial}{\partial x}\left((\sigma x)^2\rho_s\right)
+            \right)
+        \end{align*}
+        Let's look for a solution with the object in parens equal to
+        zero:
+        \begin{align*}
+          0
+          &=
+          - \lambda x \rho_s + \frac{1}{2}
+            \frac{\partial}{\partial x}\left((\sigma x)^2\rho_s\right)\\
+          &=
+          - \lambda x \rho_s + \frac{1}{2}
+            \sigma^2 \left[
+              2x\rho_s + x^2\frac{\partial \rho_s}{\partial x}
+            \right]\\
+          &=
+          - 2\lambda x \rho_s +
+            \sigma^2 \left[
+              2x\rho_s + x^2\frac{\partial \rho_s}{\partial x}
+            \right]\\
+          0 &=
+            x^2\frac{\partial \rho_s}{\partial x}
+            + 2x\rho_s (\sigma^2 -\lambda)
+        \end{align*}
+        Now since Geometric Brownian Motion is always positive (unless
+        it starts at initial condition $X_0=0$), we can divide through
+        by $x$ and simplify further:
+        \begin{align*}
+          0 &=
+            x\frac{\partial \rho_s}{\partial x}
+            + 2\rho_s (\sigma^2 -\lambda) \\
+          \Leftrightarrow\qquad
+            x\frac{\partial \rho_s}{\partial x}
+            &=
+            - 2\rho_s (\sigma^2 -\lambda) \\
+            \frac{d \rho_s}{\rho_s}
+            &=
+            - 2\rho_s (\sigma^2 -\lambda) \frac{1}{x} dx\\
+          \Rightarrow\qquad
+            \ln\rho_s
+            &=
+            - 2\rho_s (\sigma^2 -\lambda) \int^\infty_0 \frac{1}{x} dx
+        \end{align*}
+        Therefore, the stationary distribution $\rho_s$ cannot be
+        defined as the the integral on the righthand side
+        \begin{align*}
+          \int^\infty_0 \frac{1}{x} dx = (\ln x)|^\infty_0
+        \end{align*}
+        is not defined.
+
+      \item % Question 1c
+      \item % Question 1d
+        Letting $f(X_t) = X_t^n$, we calculate the following derivatives
+        necessary to apply Ito's formula:
+        \begin{align*}
+          \frac{\partial f}{\partial t} = 0
+          \qquad
+          \frac{\partial f}{\partial x} = nx^{n-1}
+          \qquad
+          \frac{\partial^2 f}{\partial x^2} = n(n-1)x^{n-2}
+        \end{align*}
+        we can apply Ito's formula to write
+        \begin{align*}
+          df(X_t)
+          &= \left(
+            nX_t^{n-1} (\lambda X_t)
+            + \frac{1}{2}n(n-1)X_t^{n-2} (\sigma X_t)^2
+            \right) dt
+            + n X_t^{n-1} (\sigma X_t)dW_t \\
+          dX^n_t
+          &= nX_t^{n}\left(
+            \lambda + \frac{1}{2}(n-1) \sigma^2
+            \right) dt
+            + n X_t^{n} \sigma dW_t \\
+          \Rightarrow\qquad
+          X^n_t - X^n_0
+          &= \int^t_0 nX_s^{n}\left(
+            \lambda + \frac{1}{2}(n-1) \sigma^2
+            \right) ds
+            + \int^t_0 n X_s^{n} \sigma dW_s
+        \end{align*}
+        Now apply the conditional expectation $E[\;\cdot\;|\; X_0=x_0]$
+        to the statement
+        \begin{align*}
+          E[X^n_t\;|\;X_0=x_0] - E[X^n_0 \;|\; X_0=x_0]
+          &= E\left[ \int^t_0 nX_s^{n}\left(
+            \lambda + \frac{1}{2}(n-1) \sigma^2
+            \right) ds\;\big| \;X_0=x_0\right]\\
+          &\qquad
+            + E\left[ \int^t_0 n X_s^{n} \sigma dW_s
+                \;\big|\; X_0=x_0\right]
+        \end{align*}
+        Since the Ito Integral is a martingale, the second term in the
+        sum drops out. We also substitute in for $M_n$ to get
+        \begin{align*}
+          M_n(x_0,t) - M_n(x_0,0)
+          &= E\left[ \int^t_0 nX_s^{n}\left(
+            \lambda + \frac{1}{2}(n-1) \sigma^2
+            \right) ds\;\big| \;X_0=x_0\right]\\
+          &= \int^t_0 n
+            E\left[X_s^{n}| \;X_0=x_0\right]
+            \left(
+            \lambda + \frac{1}{2}(n-1) \sigma^2
+            \right) ds\\
+          \Leftrightarrow \qquad
+          M_n(x_0,t) - x_0^n
+          &= \int^t_0 n
+            M_n(x_0,s)
+            \left(
+            \lambda + \frac{1}{2}(n-1) \sigma^2
+            \right) ds
+        \end{align*}
+        Differentiating with respect to $t$:
+        \begin{align*}
+          \frac{d}{dt}\left[
+          M_n(x_0,t) - x_0^n
+          \right]
+          &=
+          \frac{d}{dt}\left[
+          \int^t_0 n
+            M_n(x_0,s)
+            \left(
+            \lambda + \frac{1}{2}(n-1) \sigma^2
+            \right) ds
+          \right]\\
+          \frac{dM_n}{dt}
+          &=
+            nM_n
+            \left( \lambda + \frac{1}{2}(n-1) \sigma^2 \right)
+        \end{align*}
+        with $M_n(0) = x_0^n$.
+
+      \item % Question 1e
+        We can solve for $M_n(x_0,t)$ using separation of variables:
+        \begin{align*}
+          \frac{dM_n}{M_n}
+          &= n \left( \lambda + \frac{1}{2}(n-1) \sigma^2 \right) dt\\
+          \ln M_n
+          &=
+          \int_0^t
+          n \left( \lambda + \frac{1}{2}(n-1) \sigma^2 \right) ds\\
+          &=
+          n \left( \lambda + \frac{1}{2}(n-1) \sigma^2 \right) |_0^t\\
+          M_n
+          &=
+          x_0\exp\left\{
+            n \left( \lambda + \frac{1}{2}(n-1) \sigma^2 \right)t
+          \right\}
+        \end{align*}
+    \end{enumerate}
+
+  \item % Question 2
+
+  \item % Question 3
+    \begin{enumerate}
+      \item % Question 3a
+        $X_t$ evolves on $[0,L]$ as follows:
+        \begin{align*}
+          dX_t =
+          \begin{cases}
+            -F \; dt + \sigma dW_t & X_t \in [0,d]\\
+            \sigma dW_t & X_t \in (d,L]\\
+          \end{cases}
+        \end{align*}
+    \end{enumerate}
+
+  \item % Question 4
+    The Langevin equation is defined
+    \begin{align*}
+      m\ddot{X}_t + \gamma \dot{X}_t + \nabla U(X_t)
+      = \sqrt{2}\sigma \eta(t)
+    \end{align*}
+    \begin{enumerate}
+      \item % Question 4a
+        We first define
+        \begin{align*}
+          V_t := \dot{X}_t = \frac{dX_t}{dt}
+          \qquad\Rightarrow\qquad
+          dX_t = V_t dt
+        \end{align*}
+        We can also use the definition of $V_t$ to get
+        \begin{align*}
+        \ddot{X}_t = \frac{d}{dt} \dot{X}_t = \frac{d}{dt} V_t
+        \end{align*}
+        Now substituting these identities into the Langevin equation, we
+        get
+        \begin{align*}
+          m \frac{dV_t}{dt} + \gamma V_t + \nabla U(X_t)
+          = \sqrt{2}\sigma \eta(t)
+        \end{align*}
+        Multiplying through by $dt$ and rearranging, we can rewrite in
+        SDE form as a system of equations
+        \begin{align*}
+          m \; dV_t &+ \gamma V_t dt + \nabla U(X_t) dt
+          = \sqrt{2}\sigma dW_t \\\\
+          \Rightarrow\qquad
+          dV_t &=
+          -\frac{1}{m}
+          (\gamma V_t + \nabla U(X_t)) dt
+          + \frac{\sqrt{2}\sigma}{m} dW_t \\
+          dX_t &= V_t dt
+        \end{align*}
+        Writing in more convenient vector notation, this is equivalent
+        to
+        \begin{align}
+          d
+          \begin{pmatrix}
+            V_t \\ X_t
+          \end{pmatrix}
+          =
+          \begin{pmatrix}
+            -\frac{1}{m} (\gamma V_t + \nabla U(X_t)) \\
+            V_t
+          \end{pmatrix}
+          dt
+          +
+          \begin{pmatrix}
+            \frac{\sqrt{2}\sigma}{m} \\ 0
+          \end{pmatrix}
+          dW_t
+          \label{q4a.1}
+        \end{align}
+
+      \item % Question 4b
+        Using (\ref{q4a.1}), we can write down the Fokker-Planck
+        Equation:
+        \begin{align}
+          \frac{\partial \rho}{\partial t}
+          &=
+          -\nabla \cdot (b \rho)
+          + \frac{1}{2} \nabla^2 : (a\rho)
+          \label{q4b.1}
+        \end{align}
+        where $b$ is the drift vector in (\ref{q4a.1}) and $a$
+        represesnts
+        \begin{align*}
+          a = \sigma \sigma^T
+          =
+          \begin{pmatrix}
+            \frac{2\sigma^2}{m^2} & 0 \\
+            0 & 0
+          \end{pmatrix}
+        \end{align*}
+        We can start simplifying terms:
+        \begin{align*}
+          -\nabla \cdot (b \rho)
+          &=
+          \frac{\partial}{\partial v}
+          \left(\frac{1}{m} (\gamma v + \nabla U(x)) \rho\right)
+          - \frac{\partial}{\partial x} (v\rho) \\
+          &=
+          \frac{\partial}{\partial v}
+          \left(
+          \frac{1}{m} \gamma v \rho
+          \right)
+          +
+          \frac{\partial}{\partial v}
+          \left(
+          \frac{1}{m} \nabla U(x) \rho
+          \right)
+          - v\frac{\partial\rho}{\partial x} \\
+          &=
+          \frac{\gamma}{m}\frac{\partial}{\partial v}
+          \left( v \rho \right)
+          +
+          \frac{\nabla U(x)}{m} \frac{\partial \rho}{\partial v}
+          - v\frac{\partial\rho}{\partial x}
+        \end{align*}
+        Next, the component with the diffusion terms, which is easy
+        since the zeros force all but one term to drop:
+        \begin{align*}
+          \frac{1}{2} \nabla^2 : (a\rho)
+          &= \frac{1}{2}\frac{\partial^2}{\partial v^2}
+          \left(\frac{2\sigma^2}{m^2}\rho\right)\\
+          &= \frac{\sigma^2}{m^2}\frac{\partial^2\rho}{\partial v^2}
+        \end{align*}
+        Putting this together, we have the following Fokker-Planck
+        Equation
+        \begin{align*}
+          \frac{\partial \rho}{\partial t}
+          &=
+          - v\frac{\partial\rho}{\partial x}
+          + \frac{1}{m}
+          \left(
+          \gamma \frac{\partial}{\partial v} \left( v \rho \right)
+          +
+          \nabla U(x)\frac{\partial \rho}{\partial v}
+          \right)
+          + \frac{\sigma^2}{m^2}\frac{\partial^2\rho}{\partial v^2}
+        \end{align*}
+
+      \item % Question 4c
+        By definition, the invariant distribution $\rho_s(x,v) =
+        Z^{-1} e^{-\beta H(x,v)}$ with $H(x,v)=\frac{mv^2}{2} + U(x)$
+        must be such that
+        \begin{align*}
+          \frac{\partial \rho_s}{\partial t}
+          &=
+          \mathscr{L}^* \rho_s = 0
+        \end{align*}
+        Applying $\mathscr{L}^*$ to $\rho_s$, we get:
+        \begin{align*}
+          \mathscr{L}^*\rho_s
+          &=
+          -\nabla \cdot
+          \begin{pmatrix}
+            -\frac{1}{m} (\gamma v + \nabla U(x)) \rho_s\\
+            v\rho_s
+          \end{pmatrix}
+          + \frac{1}{2}
+          \nabla^2 :
+          \begin{pmatrix}
+            \frac{2\sigma^2}{m^2}\rho_s & 0 \\
+            0 & 0
+          \end{pmatrix}
+        \end{align*}
+        Computing the relevant derivatives for this expression, we get
+        \begin{align*}
+          -\frac{d}{dv}
+          \left( -\frac{1}{m} (\gamma v + \nabla U(x)) \rho_s \right)
+          &=
+          \frac{1}{m}
+          \left(
+          \gamma \rho_s
+          +(\gamma v + \nabla U(x))
+          \frac{d}{dv} \rho_s
+          \right)\\
+          &=
+          \frac{1}{m}
+          \left( \gamma \rho_s
+          - (\gamma v + \nabla U(x))\beta mv\rho_s \right)\\
+          &=
+          \frac{1}{m}
+          \left(
+          \gamma \rho_s
+          -
+          (\gamma v + \nabla U(x))\frac{\gamma}{\sigma^2} mv\rho_s
+          \right)\\
+          &=
+          \frac{\gamma}{m}
+          \rho_s
+          -(\gamma v + \nabla U(x))
+          \frac{\gamma}{\sigma^2} v\rho_s
+        \end{align*}
+        Next, we compute
+        \begin{align*}
+          -\frac{d}{dx} (v\rho_s)
+          &= v\beta \nabla U(x)\rho_s\\
+          &= v\frac{\gamma}{\sigma^2} \nabla U(x)\rho_s
+        \end{align*}
+        Moving to the diffusion component, all that's left is
+        \begin{align*}
+          \frac{1}{2}\frac{\partial^2}{\partial v^2}
+          \left(\frac{2\sigma^2}{m^2}\rho_s\right)
+          &=
+          \frac{\sigma^2}{m^2}
+          \frac{\partial}{\partial v}
+          \left( -\beta mv\rho_s \right)\\
+          &=
+          \frac{\sigma^2}{m^2}
+          \left( -\beta m\rho_s + (\beta mv)^2 \rho_s\right)\\
+          &=
+          \frac{\sigma^2}{m^2}
+          \left( -\frac{\gamma}{\sigma^2} m\rho_s
+            + \left(\frac{\gamma}{\sigma^2} mv\right)^2 \rho_s\right)\\
+          &=
+          \left( -\frac{\gamma}{m} \rho_s
+            + \frac{\gamma^2}{\sigma^2} v^2 \rho_s\right)
+        \end{align*}
+        Putting this all together:
+        \begin{align*}
+          \mathscr{L}^*\rho_s
+          &=
+          \left[
+            \left(
+            \frac{\gamma}{m}
+            \rho_s
+            -(\gamma v + \nabla U(x))
+            \frac{\gamma}{\sigma^2} v\rho_s
+            \right)
+            + v\frac{\gamma}{\sigma^2} \nabla U(x)\rho_s
+          \right]
+          +
+          \left( -\frac{\gamma}{m} \rho_s
+            + \frac{\gamma^2}{\sigma^2} v^2 \rho_s\right)\\
+          &=
+          \rho_s\left(
+            \frac{\gamma}{m}
+            -\frac{\gamma^2}{\sigma^2} v^2
+            - v\frac{\gamma}{\sigma^2} \nabla U(x)
+            + v\frac{\gamma}{\sigma^2} \nabla U(x)
+          -\frac{\gamma}{m}
+            + \frac{\gamma^2}{\sigma^2} v^2 \right)\\
+            &= 0
+        \end{align*}
+        Therefore $\rho_s(x,v)$ is the invariant distribution.
+
+      \item % Question 4d
+        We now calculate the steady-state flux, $\underaccent{\bar}{j}$.
+        \begin{align*}
+          \underaccent{\bar}{j}
+          =
+          b\rho_s - \frac{1}{2}\nabla \cdot(a\rho)
+          &=
+          \begin{pmatrix}
+            -\frac{1}{m} (\gamma v + \nabla U(x)) \rho_s\\
+            v\rho_s
+          \end{pmatrix}
+          - \frac{1}{2}
+          \nabla \cdot
+          \begin{pmatrix}
+            \frac{2\sigma^2}{m^2}\rho_s & 0 \\
+            0 & 0
+          \end{pmatrix}\\
+          &=
+          \begin{pmatrix}
+            -\frac{1}{m} (\gamma v + \nabla U(x)) \rho_s\\
+            v\rho_s
+          \end{pmatrix}
+          -
+          \begin{pmatrix}
+            -\beta mv \frac{\sigma^2}{m^2}\rho_s \\
+            0
+          \end{pmatrix}\\
+          &=
+          \begin{pmatrix}
+            -\frac{1}{m} (\gamma v + \nabla U(x)) \rho_s\\
+            v\rho_s
+          \end{pmatrix}
+          -
+          \begin{pmatrix}
+            mv \frac{\gamma}{m}\rho_s \\
+            0
+          \end{pmatrix}
+        \end{align*}
+        This is clearly non-zero.
+
+
+    \end{enumerate}
+\end{enumerate}
+
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% SAMPLE CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    %% BIBLIOGRAPHIES %%
+
+        \cite{LabelInSourcesFile}  %Use in text; cites
+        \citep{LabelInSourcesFile} %Use in text; cites in parens
+
+        \nocite{LabelInSourceFile} % Includes in refs w/o specific citation
+        \bibliographystyle{apalike}  % Or some other style
+
+        % To ditch the ``References'' header
+        \begingroup
+        \renewcommand{\section}[2]{}
+        \endgroup
+
+        \bibliography{sources} % where sources.bib has all the citation info
+
+    %% SPACING %%
+
+        \vspace{1in}
+        \hspace{1in}
+
+
+    %% INCLUDING PDF PAGE %%
+
+        \includepdf{file.pdf}
+
+
+    %% INCLUDING CODE %%
+
+        \verbatiminput{file.ext}
+            %---Includes verbatim text from the file
+        \texttt{text}
+            %---Renders text in courier, or code-like, font
+
+        \matlabcode{file.m}
+            %---Includes Matlab code with colors and line numbers
+
+
+    %% INCLUDING FIGURES %%
+
+        % Basic Figure with size scaling
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[scale=1]{file.pdf}
+            \end{figure}
+
+        % Basic Figure with specific height
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[height=5in, width=5in]{file.pdf}
+            \end{figure}
+
+        % Figure with cropping, where the order for trimming is  L, B, R, T
+            \begin{figure}
+               \centering
+               \includegraphics[trim={1cm, 1cm, 1cm, 1cm}, clip]{file.pdf}
+            \end{figure}
+
+
+        % Side by Side figures
+            \begin{figure}[h!]
+                \centering
+                \mbox{\subfigure{
+                    \includegraphics[scale=1]{file1.pdf}
+                }\quad\subfigure{
+                    \includegraphics[scale=1]{file2.pdf}
+                }
+                }
+            \end{figure}
+
+
