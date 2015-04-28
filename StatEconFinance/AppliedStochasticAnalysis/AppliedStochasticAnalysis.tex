@@ -156,9 +156,7 @@
 \tableofcontents
 
 \clearpage
-\section{Week 1: Probability Review}
-
-\subsection{Elements of Probability Theory}
+\section{Elements of Probability Theory}
 
 \begin{defn}
 The \emph{sample space} $\Omega$ is the set of all elementary outcomes
@@ -174,8 +172,7 @@ $N$ coins or tossing a coin $N$ times, in which case the elementary
 outcomes are $N$-tuples with each element in $\{H,T\}$.
 \end{rmk}
 
-
-
+\subsection{References}
 \begin{enumerate}
   \item Pavliotis Appendix B, p 303-319; Skip B.5.1 and B.4 is optional
   \item Lecture notes 1, 2 from 2014
@@ -186,35 +183,36 @@ outcomes are $N$-tuples with each element in $\{H,T\}$.
 
 \section{Markov Chains}
 
-\subsection{References}
-\begin{enumerate}
-  \item Koralev and Sinai Ch 5.1-5.5
-\end{enumerate}
+Intuitively, Markov Chains are ``forgetful processes.'' Their future
+values dependent only upon their present value, not their history. More
+precisely, conditional on the present, past values of a Markov Chain
+give you know more information about its future path.
+\begin{rmk}
+  Throughout this section, I will denote discrete-time Markov Chains by
+  $\{X_n\}$ rather than $\{X_t\}$ to suggest via notation that the time
+  domain is $\mathbb{N}$,
+not $\mathbb{R}$.
+\end{rmk}
 
 \subsection{Discrete Time, Discrete Space}
 
 \begin{defn}
-The process $\{X_n\}$ is a \emph{discrete time, discrete space Markov
-chain} if it satisfies the \emph{Markov Property}:
+The process $\{X_n\}$ is a \emph{discrete time, discrete space Markov chain} if it takes on an at-most-countable set of values $S$ and if it
+satisfies the \emph{Markov Property}:
 \begin{align*}
-  P(X_n = x_n | X_{n-1}=x_{n-1}, \ldots, X_0 =x_0)
+  \mathbb{P}(X_n = x_n | X_{n-1}=x_{n-1}, \ldots, X_0 =x_0)
 \end{align*}
 In words, the distribution for $X_{n+1}$ only depends upon its state at
 time $n$. All history prior to time $n$ is Duncan-Hines irrelevant.
 We can define the evolution of the states and probabilities of a Markov
 Chain in terms of transition matrix.
 \end{defn}
-\begin{rmk}
-I will denote discrete-time Markov Chains by $\{X_n\}$ rather than
-$\{X_t\}$ to suggest via notation that the time domain is $\mathbb{N}$,
-not $\mathbb{R}$.
-\end{rmk}
 
 \begin{defn}
-A \emph{stochastic matrix} $P=(p_{ij})_{n\times n}$ is a matrix the sum
-of each row (across columns) equals 1, i.e.
+A \emph{stochastic matrix} $P=(p_{ij})_{n\times n}$ is a matrix where
+the sum of each row (across columns) equals 1, i.e.
 \begin{align*}
-  \forall j \qquad \sum_j p_{ij} = 1
+  \forall i \qquad \sum_j p_{ij} = 1
 \end{align*}
 \end{defn}
 
@@ -239,23 +237,23 @@ probabilities, our two conditions for a transition matrix are:
 \begin{defn}
 The process $\{X_n\}$ is a \emph{homogenous Markov Chain} if
 \begin{align*}
-  P(n) = P(m) \qquad \forall m,n\geq 0
+  P(n) = P(m) \qquad \forall m,n\geq 0 \qquad m\neq n
 \end{align*}
-In words, transition probabilities do not depend upon the time of
-transition. In these cases, we drop time from the notation so that
-$P(n)$ becomes $P$ and $p_{ij}(n)$ becomes $p_{ij}$.
+In words, transition probabilities do not depend upon the time of the
+jump. In these cases, we drop time from the notation so that $P(n)$
+becomes $P$ and $p(n)_{ij}$ becomes $p_{ij}$.
 \end{defn}
 
 \begin{rmk}
 From here on, we will exclusively work with homogeneous Markov Chains.
 \end{rmk}
 
-\begin{thm}{\emph{(Chapman-Komogorov Equation)}}
+\begin{thm}{\emph{(Chapman-Komogorov Equation, Discrete Time and Space)}}
 For a homogeneous Markov Chain, we can compute $m$ step ahead transition
 probabilities as follows:
 \begin{align*}
-  P(X_{n+m}=j | X_{n}=i) = \sum_k P(X_{n+m}=j| X_\ell=k)
-    P(X_\ell = k| X_n=i)
+  \mathbb{P}(X_{n+m}=j | X_{n}=i) = \sum_k \mathbb{P}(X_{n+m}=j| X_\ell=k)
+    \mathbb{P}(X_\ell = k| X_n=i)
   \qquad
   n \leq \ell \leq n+m
 \end{align*}
@@ -271,6 +269,11 @@ probabilities summing to 1, then $\mu^{(n+1)}$, the distribution of
 $X_{n+1}$ can be computed
 \begin{align*}
   \mu^{(n+1)} = \mu^{(n)} P
+\end{align*}
+This also implies that we can compute the distribution of $X_n$ at any
+time if we know the transition matrix and initial distribution:
+\begin{align*}
+  \mu^{(n)} = \mu^{(0)} P^n
 \end{align*}
 \end{thm}
 
@@ -341,24 +344,25 @@ moments and functions of the state prior to some terminal time.
 
 \begin{defn}
 The process $X=\{X_t\}_{t\geq 0}$ is a \emph{continuous time, discrete
-space Markov Chain} if $X$ takes on only a discrete set of values in a finite or countable state space $S$ and if
+space Markov Chain} if $X$ takes on only a discrete set of values in a
+finite or countable state space $S$ and if
 \begin{align*}
-  P(X_{t_n} = i_{n} | X_{t_{n-1}} = i_{n-1}, \ldots X_{t_1} = i_{1})
+  \mathbb{P}\left(X_{t+h} = i_{t+h} | \left\{ X_{s}, s\leq t\right\}\right)
   =
-  P(X_{t_n} = i_{n} | X_{t_{n-1}} = i_{n-1})
+  \mathbb{P}(X_{t+h} = i_{t+h} | X_{t} )
+  \qquad \forall h \geq 0
 \end{align*}
-for all states $i_1,\ldots,i_n\in S$ and times $t_1<\cdots<t_n$.
 \end{defn}
 
-Now that time isn't neatly divide into discrete intervals, we can't
+Now that time isn't neatly divided into discrete intervals, we can't
 define a transition matrix since there's not necessarily a standard unit
 of time between jumps. There are then two approaches:
 \begin{enumerate}
-  \item Consider the \emph{generator} $Q$, which is like an limit of a
-    transition as the time step goes to~0.
-  \item Describe the distribution of jump times of $X_t$, defined as
-    $\tau_1, \tau_2,\ldots$, and then treat $X_t$ like a discrete time
-    Markov Chain jumping at these times.
+  \item Consider the \emph{generator} $Q$, which is like a limit of the
+    transition matrix as the time step goes to~0.
+  \item Describe the distribution of \emph{jump times} of $X_t$, defined
+    as $\tau_1, \tau_2,\ldots$, and then treat $X_t$ like a discrete
+    time Markov Chain, conditional on the jumping times.
 \end{enumerate}
 
 \begin{defn}{(Transition Probabilities in Cts. Time)}
@@ -368,7 +372,7 @@ probability} $p_{ij}(s,t)$ at time $s$ for time step $t$ is defined
   p_{ij}(s,t) = P(X_{t+s}=j|X_s=i)
 \end{align*}
 We can then collect these in a transition matrix $P(s,t) =
-(p_{ij}(s,t))$. Note that $P(s,0) = I$ for all $s$.
+(p_{ij}(s,t))$. Note that $P(s,0) = I$ for all $s$ for obvious reasons.
 
 If $X$ is a homogeneous Markov Chain, then we drop the argument $s$ and
 simply have $p_{ij}(t)$, the probability of transitioning from $i$ to
@@ -380,21 +384,83 @@ probabilities becomes simply $P(t)$.
 Again, we'll consider only homogeneous Markov Chains from now on.
 \end{rmk}
 
-\begin{defn}{(Chapman-Kolmorogov)}
+\begin{thm}{\emph{(Chapman-Kolmorogov)}}
 Similar to the discrete-time case, we have
-\begin{align*}
+\begin{align}
   p_{ij}(t+s) = \sum_k p_{ik}(t) p_{kj}(s)
   \quad \Leftrightarrow \quad
   P(t+s) = P(t)P(s)
+  \label{chapkolg2}
+\end{align}
+\end{thm}
+
+\begin{defn}
+We define the \emph{generator} of a discrete-space, continuous-time
+homogeneous Markov Chain $X_t$ as
+\begin{align*}
+  G = \lim_{h\rightarrow0} \frac{P(h)-I}{h}
+\end{align*}
+This is like the derivative of the transition matrix. This is useful in
+determining how $P(t)$ evolves in time:
+\begin{align*}
+  \frac{dP}{dt}
+  &= \lim_{h\rightarrow0} \frac{P(t+h)-P(t)}{h}\\
+  \text{By~(\ref{chapkolg2})}\qquad
+  &= \lim_{h\rightarrow0} P(t) \frac{P(h)-I}{h}\\
+  \Rightarrow\qquad
+  \frac{dP}{dt}
+  &= P(t) G
+\end{align*}
+Note also that we could have pulled $P(t)$ out on the righthand side,
+implying that the transition matrix commutes with the generator:
+\begin{align*}
+  \frac{dP}{dt}
+  = P(t) G
+  = GP(t)
+\end{align*}
+which bring us to the forward and backward equations. In both equations,
+we want to know how probabilities or moments change with time;
+therefore, it's not surprising that the generator should factor into the
+discussion.
+\end{defn}
+
+\begin{thm}{\emph{(Forward Kolmogorov Equation)}}
+As in discrete time and space, this tells us how to evolve
+probabilities, only now in continuous time:
+\begin{align*}
+  \frac{dP}{dt} = P_t G
+\end{align*}
+where $G$ is the generator. Elementwise, this is equivalent to
+\begin{align*}
+  \frac{dp_{ij}(t)}{dt} = \sum_k p_{ij}(t) g_{kj}
+\end{align*}
+\end{thm}
+
+\begin{thm}{\emph{(Backward Kolmogorov Equation)}}
+\end{thm}
+
+
+\subsection{Continuous Time, Continuous Space}
+
+\begin{defn}
+The process $X=\{X_t\}_{t\geq 0}$ is a \emph{continuous time, continuous
+space Markov Chain} if $X$ takes on values in $\mathbb{R}$ and if
+\begin{align*}
+  \mathbb{P}\left(X_{t+h} \in \Gamma | \left\{ X_{s}, s\leq t\right\}\right)
+  =
+  \mathbb{P}(X_{t+h} \in \Gamma | X_{t} )
+  \qquad \forall h \geq 0
 \end{align*}
 \end{defn}
 
-\section{Week 4: Stochastic Processes and Spectral Representation}
 
+
+\subsection{References}
 \begin{enumerate}
-  \item Pavliotis 1.1, 1.2
-  \item Koralev and Sinai, Ch 12, 15.3, 15.7, 16
+  \item Koralev and Sinai Ch 5.1-5.5
 \end{enumerate}
+
+\section{Spectral Representation of Stochastic Processes}
 
 \subsection{Stationary Processes}
 
@@ -469,119 +535,12 @@ interval $[\lambda_1,\lambda_2]$ in the integral above is
 $Z(\lambda_2)-Z(\lambda_1)$, not $W(\lambda_2)-W(\lambda_1)$.
 \end{rmk}
 
-\section{Week 5}
-
-\section{Week 6}
-
-\subsection{Generating Random Variables}
-
-Suppose that we can generate $U([0,1])$ RV's. Then we can generate a
-whole lot of other, more complex distributions with the methods in this
-section.
-
-\begin{thm}\emph{(Inverse Transform Method)}
-Suppose that random variable $Y$ has some invertible cumulative
-distribution $F_Y(y)$. Then if $X\sim U([0,1])$, the random variable
-$Y = F^{-1}(X)$ will have cumulative distribution function $F_Y$.
-\end{thm}
-
-\begin{proof}
-We can simply use definitions:
-\begin{align*}
-  P(Y\leq y) = P(F_Y^{-1}(X) \leq y) = P(X \leq F_Y(y)) = F_Y(y)
-\end{align*}
-\end{proof}
-
-\begin{rmk}
-Intuitively, we are choosing probabilities on $[0,1]$ by drawing $X\sim
-U([0,1])$, i.e.\ we are choosing values in the range of $F_Y(y)$. We
-then invert, using the fact that $F_Y$ is a one-to-one, to find the
-corresponding draw $Y$ in the domain of $F_Y(y)$ that would have given
-us $F_Y(y) = X$.
-
-Though exceedingly straightforward, this procedure has the following
-drawbacks: not all cdf's are easily invertible. In fact, most aren't.
-Only uniform, exponential, Cauchy, Weibull, logistic, and discrete RV's
-can use this approach.
-\end{rmk}
-
-\begin{thm}\emph{(Acceptance-Rejection)}
-Suppose that we want to draw from $p(x)$. Let $g(x)$ be a any function
-such that
+\subsection{References}
 \begin{enumerate}
-  \item $0 \leq p(x) \leq g(x)$, i.e. $g$ ``covers'' $p$.
-  \item $\int^\infty_{-\infty} g \; dx = M < \infty$.
-  \item We have an analytic expression for $G^{-1}(x)$, where $G(x) =
-    \int_{-\infty}^x g \; dx$.
+  \item Pavliotis 1.1, 1.2
+  \item Koralev and Sinai, Ch 12, 15.3, 15.7, 16
 \end{enumerate}
-Then we can generate draws $X_i$ for an arbitrary pdf $p(x)$ using the
-following algorithm:
-\begin{enumerate}
-  \item Draw $U_1\sim U([0,1])$
-  \item Set a proposed draw $X'_i = G^{-1}(MU_1)$, where $M$ (as defined
-    above) normalizes $g$ so that it is a proper probability
-    distribution.
-  \item Draw $U_2\sim U([0, g(X_i)])$.
-  \item If $U_2 \leq p(X'_i)$, set $X_i = X'_i$ (i.e.\ accept $X'_i$).
-    Otherwise, reject and try again.
-\end{enumerate}
-Proceed this way for $i=1,\ldots,N$.
-\end{thm}
-\begin{rmk}
-Intuitively, we're drawing (via the inverse transform method) from the
-distribution of $g(x)$ (properly normalized so it integrates to 1).
-We're then only retaining those draws that fall under the curve of the
-true distribution $p(x)$ so that the frequencies of draws match the
-distribution of $p(x)$, not that of $g(x)$.
-\end{rmk}
 
-This works well for low deimsions, but in higher dimensions, rejection
-sampling is actually pretty bad. Your covering $g(x)$ will leave a lot
-of gaps between itself and the true distribution $p(x)$, especially at
-the ``corners'', hence you will reject a lot. Instead, use MCMC methods.
-
-\subsection{Monte Carlo Integration}
-
-The general idea of Monte Carlo integration is to approximate the
-integral by discretizing over a grid. However, the grid of points is
-randomly chosen rather than deterministic and evenly spaced.
-
-Throughout this subsection, we will want to compute something like the
-following:
-\begin{equation}
-  I(f) = \int^b_a f(x) \; dx
-  \label{mcint}
-\end{equation}
-In small dimensions (like Expression~\ref{mcint} above), grid
-approximations work. In higher dimensions, The best approach will be
-Monte Carlo integration.
-
-\begin{thm}
-Suppose we would like to approximate Expression~\ref{mcint}. We can do so by drawing $X_i \sim U[a,b]$ for $i=1,\ldots,N$ (large) and computing
-\begin{align}
-  \label{mcintapprox}
-  \hat{I}(f) = \frac{1}{N} \sum^N_1 f(X_i)
-\end{align}
-In higher dimensions, we simply draw $X_i \sim U^d(D)$ where $d$ is the
-number of dimensions and $D$ is the domain. The variance of the error is
-\begin{align*}
-  E[\hat{I}(f) - I(f)]^2
-  &= E\left[ \left( \frac{1}{N}\sum^N_{i=1} f(X_i) \right)-I(f)\right]^2\\
-  &= \frac{1}{N^2}E\left[ \sum^N_{i=1} \left(f(X_i)-I(f)\right)\right]^2\\
-  \text{Since the $X_i$ are iid} \qquad
-  &= \frac{1}{N^2}\sum^N_{i=1} E\left[ f(X_i)-I(f)\right]^2\\
-  &= \frac{1}{N^2}\sum^N_{i=1} E\left[ \left( f(X_i) \right)- I(f)\right]^2\\
-\end{align*}
-\end{thm}
-
-Notice that we drew from a (possibly multi-dimensional) uniform
-distribution in computing $\hat{I}(f)$ in~\ref{mcintapprox}. But in the
-case where
-
-\begin{thm}
-\end{thm}
-
-\clearpage
 \section{Forward and Backward Equations}
 
 In the sections above, we considered SDEs of the form
@@ -730,6 +689,60 @@ We take each case separately:
 \end{enumerate}
 \end{proof}
 
+\begin{thm}{\emph{(Backward Komogorov Equation)}}
+There are 3 formulations. For each, let $p(x,t|y,s)$ denote the
+transition probability of $X_t$, and for a function $f\in
+C^2(\mathbb{R}^d)$, Then it is the case that
+\begin{enumerate}
+  \item Define $u_t^{(x)} := \mathbb{E}[f(X_t)|X_0=x]$. Then given
+    boundary condition $u^{(x)}_0=f(x)$,
+    \begin{align*}
+      \frac{\partial u^{(x)_t}}{\partial t} = \mathscr{L} u^{(x)}_t
+      \qquad t>0
+    \end{align*}
+  \item For a possibly time-inhomogeneous SDE with solution $X_t$,
+    define $v^{(y)}_t:=E[f(X_T)|X_t~=~y]$. Then given boundary
+    condition $v^{(y)}_T=f(y)$, we have
+    \begin{align*}
+      \frac{\partial v^{(y)}_t}{\partial t}
+      + \mathscr{L} v^{(y)}_t = 0
+      \qquad t < T
+    \end{align*}
+  \item For a Markov process solving a time-inhomogeneous SDE
+    and for boundary condition $p(y,t|x,s) = \delta(x-y)$,
+    \begin{align*}
+      \frac{\partial p}{\partial s} + \mathscr{L}_x p = 0
+      \qquad s<t
+    \end{align*}
+    where $\mathscr{L}_x$ denotes that the derivatives in $\mathscr{L}$
+    are with respect to variable $x$.
+\end{enumerate}
+\end{thm}
+\begin{rmk}
+The second and third formulations should be solved \emph{backward} in
+time, which gives the theorem its name.
+\end{rmk}
+\begin{proof}
+We prove each in turn:
+  \begin{enumerate}
+    \item Recall from Ito's Lemma that for some stochastic process $X_t$
+      and some twice-differentiable function $g: \mathbb{R}^d \times
+      [0,\infty) \rightarrow \mathbb{R}^d$ (a function of both $X_t$ and
+      $t$), we have
+      \begin{align*}
+        d\left(g(X_t,t)\right)
+        &=
+        \left(
+        \frac{\partial g}{\partial t}
+        + b \cdot \nabla_x g
+        + \frac{1}{2} \sigma \sigma^T : \nabla_x^2 g
+        \right)dt
+        +
+        \frac{\partial g}{\partial x} \sigma dW_t
+      \end{align*}
+  \end{enumerate}
+\end{proof}
+
 \subsection{Probability Flux}
 
 Let's write out the Fokker-Planck Equation (\ref{fpeqn}) as follows:
@@ -747,6 +760,8 @@ Let's write out the Fokker-Planck Equation (\ref{fpeqn}) as follows:
 This is a conservation law for $\rho$, showing that any increase in
 probability must be counterbalanced by $\nabla \cdot
 \underaccent{\bar}{j}$ and vice versa.
+
+
 
 %% APPPENDIX %%
 
