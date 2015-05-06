@@ -186,7 +186,7 @@ outcomes are $N$-tuples with each element in $\{H,T\}$.
 Intuitively, Markov Chains are ``forgetful processes.'' Their future
 values dependent only upon their present value, not their history. More
 precisely, conditional on the present, past values of a Markov Chain
-give you know more information about its future path.
+give you no more information about its future path.
 \begin{rmk}
   Throughout this section, I will denote discrete-time Markov Chains by
   $\{X_n\}$ rather than $\{X_t\}$ to suggest via notation that the time
@@ -201,9 +201,10 @@ The process $\{X_n\}$ is a \emph{discrete time, discrete space Markov chain} if 
 satisfies the \emph{Markov Property}:
 \begin{align*}
   \mathbb{P}(X_n = x_n | X_{n-1}=x_{n-1}, \ldots, X_0 =x_0)
+  =\mathbb{P}(X_n = x_n | X_{n-1}=x_{n-1})
 \end{align*}
-In words, the distribution for $X_{n+1}$ only depends upon its state at
-time $n$. All history prior to time $n$ is Duncan-Hines irrelevant.
+In words, the distribution for $X_{n}$ only depends upon its state at
+time $n-1$. All history prior to time $n-1$ is Duncan-Hines irrelevant.
 We can define the evolution of the states and probabilities of a Markov
 Chain in terms of transition matrix.
 \end{defn}
@@ -353,6 +354,15 @@ finite or countable state space $S$ and if
   \qquad \forall h \geq 0
 \end{align*}
 \end{defn}
+\begin{ex}
+The classic example is a time-homogeneous Poisson process with
+$\lambda$, which has conditional probability distributions
+\begin{align*}
+  \mathbb{P}(X_{t+h}=j|X_t=i)
+  &=
+  \frac{e^{-\lambda h}(\lambda h)^{j-i}}{(j-i)!}
+\end{align*}
+\end{ex}
 
 Now that time isn't neatly divided into discrete intervals, we can't
 define a transition matrix since there's not necessarily a standard unit
@@ -460,6 +470,7 @@ space Markov Chain} if $X$ takes on values in $\mathbb{R}$ and if
   \item Koralev and Sinai Ch 5.1-5.5
 \end{enumerate}
 
+\clearpage
 \section{Spectral Representation of Stochastic Processes}
 
 \subsection{Stationary Processes}
@@ -552,11 +563,15 @@ We then tried to solve these to find expressions for the \emph{paths} of $X_t$ a
   X_t = f(t,W_t)
 \end{align*}
 In this section, we try another approach. Here, we try instead to
-describe the evolution of the probability distribution of $X_t$ and of
-functions or moments of $X_t$ using PDE methods. Since $X_t$ is Markov
-(by the fact that it solves the above SDE with particular smoothness and
-growth conditions on $b$ and $\sigma$), we will often deal with the
-transition density:
+describe $X_t$ by describing the evolution of either
+\begin{enumerate}
+  \item The probability distribution of $X_t$ (leads to the Forward
+    Equation)
+  \item Functions or moments of $X_t$ (leads to the Backard Equation)
+\end{enumerate}
+Both use PDE methods. Since $X_t$ is Markov (by the fact that it solves
+the above SDE with particular smoothness and growth conditions on $b$
+and $\sigma$), we will often deal with the transition density:
 \begin{align*}
   p(x,t|y,s) := P(X_t\in [x,x+dx) \; | \; X_s=y)
 \end{align*}
@@ -565,23 +580,40 @@ transition density:
 Given a function $f\in C_c^\infty(\mathbb{R}^d)$ and a time-homogeneous
 process (multi-dimensional) stochastic process $X_t$, define the
 \emph{generator} of $X_t$
-\begin{align*}
+\begin{align}
   (\mathscr{A}f)(x)=
   \lim_{t\rightarrow0} \frac{E[f(X_t)|X_0=x]-f(x)}{t}
-  &= (\mathscr{L}f)(x)
-\end{align*}
-where $\mathscr{L}$ is the linear operator
+  \label{genA}
+\end{align}
+In words, the generator of a time-homogeneous process is the
+expected infinitesimal change of some function of that process.
+\end{defn}
+
+\begin{thm}
+Given a time homogeneous process $X_t$ satisfying SDE
 \begin{align*}
+  dX_t = b(X_t) dt + \sigma(X_t) dW_t
+\end{align*}
+the generator $\mathscr{A}$ of $X_t$ can be written via linear operator
+$\mathscr{L}$
+\begin{align}
+  \mathscr{A}f =
   \mathscr{L}f &= b \cdot \nabla f
-  + \frac{1}{2} \left(\sigma \sigma^T:\nabla^2 f\right)\\
+  + \frac{1}{2} \left(\sigma \sigma^T:\nabla^2 f\right)\label{genL} \\
   \Leftrightarrow \qquad
   &= \sum_i b_i \frac{\partial f}{\partial x_i}
   + \frac{1}{2} \sum_i \sum_j \left(\sigma \sigma^T\right)
-    \frac{\partial^2 f}{\partial x_i \partial x_j}
-\end{align*}
+    \frac{\partial^2 f}{\partial x_i \partial x_j}\notag
+\end{align}
 where $\nabla^2 f$ is the Hessian matrix of $f$, and $A:B :=
 \text{tr}(A^T B)$.
-\end{defn}
+\end{thm}
+\begin{rmk}
+Though $\mathscr{A}f = \mathscr{L}f$, we use separate notation to
+distinguish that $\mathscr{A}$ and $\mathscr{L}$ come from different
+places: a limit as in (\ref{genA}) versus a simple lifting of
+coefficients from an SDE as in (\ref{genL}), respectively.
+\end{rmk}
 \begin{proof}
 The result follows directly from Ito's Lemma. Therefore apply
 multi-dimensional Ito's Lemma to $f(X_t)$ for homogeneous process $X_t$:
@@ -600,27 +632,30 @@ multi-dimensional Ito's Lemma to $f(X_t)$ for homogeneous process $X_t$:
 \end{align*}
 Now take conditional expectation $E[\;\cdot\;|X_s=x]$ and use the fact
 that the Ito Integral has expectation of zero:
-\begin{align*}
+\begin{align}
   E[f(X_t)|f(X_s)=x] - f(x) &=
   E\left[
   \int^t_s
   \left(b\cdot \nabla f + \frac{1}{2}\sigma\sigma^T : \nabla^2 f\right)
   d\tau
-  |f(X_s)=x\right]\\
+  \; \big|\; f(X_s)=x\right]\notag\\
   &\qquad
   +
   E\left[
   \int^t_s
   \nabla f\cdot \sigma \;dW_\tau
-  |f(X_s)=x\right]
-  \\
+  \; \big|\;f(X_s)=x\right]
+  \notag\\
   &=
-  E\left[ \int^t_s (\mathscr{L} f)(X_\tau) d\tau \;\big|\:f(X_s)=x\right] + 0
-\end{align*}
-From there, we can compute the limit that defines the generator to get:
+  E\left[ \int^t_s (\mathscr{L} f)(X_\tau) d\tau
+    \;\big|\:f(X_s)=x\right] + 0
+  \label{genL.proof}
+\end{align}
+From there, form the limit that defines the generator:
 \begin{align*}
   (\mathscr{A}f)(x)
   &=\lim_{t\rightarrow0} \frac{E[f(X_t)\;|\;f(X_s)=x] - f(x)}{t}\\
+  \text{Sub in (\ref{genL.proof})} \Rightarrow\qquad
   &=\lim_{t\rightarrow0} \frac{1}{t}
   E\left[ \int^t_s (\mathscr{L} f)(X_\tau) d\tau \; \big|\:f(X_s)=x\right]\\
   &=(\mathscr{L}f)(x)
@@ -630,29 +665,19 @@ $f$ and all of its derivatives are bounded (K\&S p 323).
 \end{proof}
 
 \begin{thm}{(Forward Kolmogorov Equation and Fokker-Planck Equation)}
-There are two formulations:
+There are two formulations, both of which make use of $\mathscr{L}^*$,
+defined as
+\begin{align*}
+  \mathscr{L}^*f_x = -\nabla_x \cdot (b f)
+  +\frac{1}{2}\nabla^2_x : (a f)
+\end{align*}
+The two formulations are as follows:
 \begin{enumerate}
   \item The transition probability density $p(x,t|y,s)$ solves
     \begin{align*}
       \frac{\partial p}{\partial t} = \mathscr{L}^*_x p
       \qquad p(x,s|y,s) = \delta(x-y)
     \end{align*}
-    where $\mathscr{L}^*$ is defined
-    \begin{align*}
-      \mathscr{L}^*f_x = -\nabla_x \cdot (b f)
-      +\frac{1}{2}\nabla^2_x : (a f)
-    \end{align*}
-    This is the adjoint of $\mathscr{L}$ meaning that
-    on the Hilbert Space with inner product
-    $\langle\cdot,\cdot\rangle_{L^2}$,\footnote{%
-      The inner product $\langle\cdot,\cdot\rangle_{L^2}$ is defined as
-      \begin{align*}
-        \langle f,g\rangle_{L^2}
-        &= \int_X fg\;d\mu
-      \end{align*}
-    }
-    we have that $\langle\mathscr{L}f,g\rangle_{L^2} =\langle
-    f,\mathscr{L}^*g\rangle_{L^2}$
 
   \item If $\rho_0(x)$ is the initial probability desnity and
     $\rho(x,t)$ is the density at time $t$, then $\rho(x,t)$ solves
@@ -662,6 +687,19 @@ There are two formulations:
       \label{fpeqn}
     \end{align}
 \end{enumerate}
+\begin{rmk}
+$\mathscr{L}^*$ is the adjoint of $\mathscr{L}$ meaning that
+on the Hilbert Space with inner product
+$\langle\cdot,\cdot\rangle_{L^2}$,\footnote{%
+  The inner product $\langle\cdot,\cdot\rangle_{L^2}$ is defined as
+  \begin{align*}
+    \langle f,g\rangle_{L^2}
+    &= \int_X fg\;d\mu
+  \end{align*}
+}
+we have that $\langle\mathscr{L}f,g\rangle_{L^2} =\langle
+f,\mathscr{L}^*g\rangle_{L^2}$
+\end{rmk}
 \end{thm}
 \begin{proof}
 We take each case separately:
@@ -694,10 +732,11 @@ There are 3 formulations. For each, let $p(x,t|y,s)$ denote the
 transition probability of $X_t$, and for a function $f\in
 C^2(\mathbb{R}^d)$, Then it is the case that
 \begin{enumerate}
-  \item Define $u_t^{(x)} := \mathbb{E}[f(X_t)|X_0=x]$. Then given
-    boundary condition $u^{(x)}_0=f(x)$,
+  \item Define $u_t^{(x)} := \mathbb{E}[f(X_t)|X_0=x]$ for a
+    time-homogeneous process $X_t$. Then given boundary condition
+    $u^{(x)}_0=f(x)$,
     \begin{align*}
-      \frac{\partial u^{(x)_t}}{\partial t} = \mathscr{L} u^{(x)}_t
+      \frac{\partial u^{(x)}_t}{\partial t} = \mathscr{L} u^{(x)}_t
       \qquad t>0
     \end{align*}
   \item For a possibly time-inhomogeneous SDE with solution $X_t$,
@@ -711,11 +750,11 @@ C^2(\mathbb{R}^d)$, Then it is the case that
   \item For a Markov process solving a time-inhomogeneous SDE
     and for boundary condition $p(y,t|x,s) = \delta(x-y)$,
     \begin{align*}
-      \frac{\partial p}{\partial s} + \mathscr{L}_x p = 0
+      \frac{\partial p}{\partial s} + \mathscr{L}_y p = 0
       \qquad s<t
     \end{align*}
-    where $\mathscr{L}_x$ denotes that the derivatives in $\mathscr{L}$
-    are with respect to variable $x$.
+    where $\mathscr{L}_y$ denotes that the derivatives in $\mathscr{L}$
+    are with respect to variable $y$.
 \end{enumerate}
 \end{thm}
 \begin{rmk}
@@ -740,6 +779,8 @@ We prove each in turn:
         +
         \frac{\partial g}{\partial x} \sigma dW_t
       \end{align*}
+    \item Relabel time as $t' = t-s$ and consider the function
+      $u(x,t')$.
   \end{enumerate}
 \end{proof}
 
