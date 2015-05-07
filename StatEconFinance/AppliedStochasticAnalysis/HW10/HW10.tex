@@ -238,6 +238,21 @@
         is not defined.
 
       \item % Question 1c
+        To describe how the moments evolve, we want to use version 1 of
+        the backward equation. So let $u^{(n)}(x,t):=E[X^n|X_0=x]$. Then
+        \begin{align*}
+          \frac{\partial u^{(n)}}{\partial t} = \mathscr{L} u^{(n)}
+          \qquad
+          \text{where } u^{(n)}(x,0) = x^n
+        \end{align*}
+        Substituting in, we get
+        \begin{align*}
+          \frac{\partial u^{(n)}}{\partial t} =
+          (\lambda x) \frac{du^{(n)}}{dx}
+          + \frac{1}{2}(\sigma x)^2 \frac{\partial u^{(n)}}{\partial x^2}
+        \end{align*}
+
+
       \item % Question 1d
         Letting $f(X_t) = X_t^n$, we calculate the following derivatives
         necessary to apply Ito's formula:
@@ -336,9 +351,78 @@
             n \left( \lambda + \frac{1}{2}(n-1) \sigma^2 \right)t
           \right\}
         \end{align*}
+
+      \item % Question 1f
+        To answer this, we can look at the time evolution of $M_t$ again:
+        \begin{align*}
+          \frac{dM_t}{dt}
+          &=
+          \left(
+          \lambda n + \frac{\sigma^2}{2}n(n-1)
+          \right)M_n
+          %\\
+          %&=
+          %\left(
+          %n\left(\lambda-\frac{\sigma^2}{2}\right)  + \frac{\sigma^2}{2}n^2
+          %\right)M_n
+        \end{align*}
+        Since geometric Brownian motion is always positive, it's moments
+        $M_n$ must also be positive. Therefore, to get the moments to
+        decay to zero, we need
+        \begin{align*}
+          \lambda n + \frac{\sigma^2}{2}n(n-1)
+          &< 0 \\
+          \Leftrightarrow\qquad
+          \lambda + \frac{\sigma^2}{2}(n-1)
+          &< 0
+        \end{align*}
+        To get at least the first moment to decay to zero, it must be
+        the case that $\lambda<0$. Now, taking $\lambda<0$ and
+        $\sigma$ as given, we can find the maximal $N$ such that all
+        lower moments decay to zero by solving for $n$ in the above
+        expression:
+        \begin{align*}
+          n &< -\lambda \frac{2}{\sigma^2}+ 1
+        \end{align*}
+        Note that since $\lambda$ is negative, $-\lambda$ is actually a
+        positive number.  Intuitively, this says that the smaller the
+        diffusion term relative to the negative drift, the more moments
+        will decay to zero.
     \end{enumerate}
 
   \item % Question 2
+    \begin{enumerate}
+      \item % Question 2a
+
+      \item % Question 2b
+        To compute the evolution of the total probability, we use the
+        fact that
+        \begin{align*}
+          \frac{dP_{tot}}{dt}
+          =
+          \frac{d}{dt}
+          \int_D \rho
+          &= \int_{\partial D} -\underaccent{\bar}{j}\cdot \hat{n}
+        \end{align*}
+        Since the boundary is just a single point, $x=0$, and since
+        $\underaccent{\bar}{j}$ is given as
+        \begin{align*}
+          \underaccent{\bar}{j}\cdot \hat{n} = \kappa \rho
+        \end{align*}
+        we have that
+        \begin{align*}
+          \frac{dP_{tot}}{dt}
+          = \int_{x=0}
+          - \kappa \rho(x,t)
+          =
+          - \kappa \rho(0,t)
+        \end{align*}
+        Since the Ornstein-Uhlenbeck process is known to have the
+        following distribution based on its initial condition.
+
+        Total probability is not conserved. It is decreasing at a rate
+        equal to some fraction of the density at the boundary.
+    \end{enumerate}
 
   \item % Question 3
     \begin{enumerate}
@@ -350,6 +434,121 @@
             -F \; dt + \sigma dW_t & X_t \in [0,d]\\
             \sigma dW_t & X_t \in (d,L]\\
           \end{cases}
+        \end{align*}
+
+      \item % Question 3b
+        First, the forward equation:
+        \begin{align*}
+          \text{For $x\in[0,d]$}\qquad
+          \frac{\partial \rho}{\partial t}
+          &=
+          F\frac{\partial \rho}{\partial x}
+          + \frac{\sigma^2}{2} \frac{\partial^2 \rho}{\partial x^2}
+          \qquad
+          \rho(x,0) = \rho_0(x)
+          \\
+          \text{For $x\in(d,L]$}\qquad
+          \frac{\partial \rho}{\partial t}
+          &=
+          \frac{\sigma^2}{2} \frac{\partial^2 \rho}{\partial x^2}
+          \qquad\qquad\quad
+          \rho(x,0) = \rho_0(x)
+        \end{align*}
+        Next, the backward equation:
+        \begin{align*}
+          \text{For $x\in[0,d]$}\qquad
+          \frac{\partial u}{\partial t}
+          &= -F \frac{\partial u}{\partial x}
+          + \frac{\sigma^2}{2}\frac{\partial^2 u}{\partial x^2}
+          \qquad
+          u(x,0) = f(x)\\
+          \text{For $x\in(d,L]$}\qquad
+          \frac{\partial u}{\partial t}
+          &=
+          \frac{\sigma^2}{2}\frac{\partial^2 u}{\partial x^2}
+          \qquad\quad\qquad
+          u(x,0) = f(x)
+        \end{align*}
+        where $u(x,t) = E[f(X_t)|X_0=x]$.
+
+      \item % Question 3c
+        %To find the stationary distribution, first note that at the
+        %boundary $x=d$, we must match flows out of $[0,d]$ with flows
+        %into $(d,L]$:
+        %\begin{align*}
+          %F \rho + \frac{\sigma^2}{2} \frac{d\rho}{dx}
+          %&= - \frac{\sigma^2}{2} \frac{d\rho}{dx}\\
+          %\Rightarrow\qquad
+          %\frac{d\rho}{\rho}
+          %&=\frac{-F}{\sigma^2}{dx}\\
+          %\rho &= C_0e^{\frac{-F}{\sigma^2}x}|_d = C_0e^{\frac{-F}{\sigma^2}d}
+        %\end{align*}
+        %This relates the two solutions we will find on the
+        %sub-intervals.
+
+        Now let's look at the stationary distribution on the interval
+        $[0,d]$:
+        \begin{align*}
+          0 &= -F \rho - \frac{\sigma^2}{2} \frac{\partial \rho}{\partial x}\\
+          \frac{\partial \rho}{\rho } &= -\frac{2F }{\sigma^2} dx \\
+          \rho &= C_1e^{-\frac{2F }{\sigma^2} x}
+        \end{align*}
+        Next, let's look at the stationary distribution on $(d,L]$:
+        \begin{align*}
+          0 &= - \frac{\sigma^2}{2} \frac{\partial \rho}{\partial x}\\
+          \Rightarrow
+          \qquad
+          \rho &= C_2
+        \end{align*}
+        To get everything to match, we need at $d$
+        \begin{align*}
+          %C_0e^{\frac{-F}{\sigma^2}d} =
+          C_1e^{-\frac{2F }{\sigma^2} d} = C_2
+        \end{align*}
+        %We choose $C_1$ so that
+        %\begin{align*}
+          %C_1=
+          %C_0e^{\frac{F }{\sigma^2} d}
+        %\end{align*}
+        %We can choose $C_2$ so that
+        %\begin{align*}
+          %C_2 = C_0e^{\frac{-F}{\sigma^2}d}
+        %\end{align*}
+        Therefore, this gives
+        \begin{align*}
+          \rho =
+          \begin{cases}
+            C_1e^{-\frac{2F }{\sigma^2} x} & x\in[0,d] \\
+            C_1e^{-\frac{2F}{\sigma^2}d} & x\in(d,L]
+          \end{cases}
+        \end{align*}
+        Lastly, now that everything is a function of $C_1$, we choose
+        that so everything integrates to 1.
+        \begin{align*}
+          1 &= \int_0^L \rho\; dx\\
+          &= \int_0^d C_1e^{-\frac{2F }{\sigma^2} x}\;dx
+          + C_1e^{-\frac{2F}{\sigma^2}d}\int^L_d  dx\\
+          &= \left(-C_1\frac{\sigma^2}{2F}e^{-\frac{2F}{\sigma^2} x}\right)\big|_0^d
+          + C_1e^{-\frac{2F}{\sigma^2}d}(L-d)\\
+          1 &= C_1\frac{\sigma^2}{2F}\left(1-e^{-\frac{2F}{\sigma^2} d}\right)
+          + C_1e^{-\frac{2F}{\sigma^2}d}(L-d)\\
+          \Rightarrow
+          C_1
+          &= \left[\frac{\sigma^2}{2F}\left(1-e^{-\frac{2F}{\sigma^2} d}\right)
+          + e^{-\frac{2F}{\sigma^2}d}(L-d)\right]^{-1}
+        \end{align*}
+        Implying the stationary distribution is
+        \begin{align*}
+          \rho =
+          \begin{cases}
+            C_1e^{-\frac{2F }{\sigma^2} x} & x\in[0,d] \\
+            C_1e^{-\frac{2F}{\sigma^2}d} & x\in(d,L]
+          \end{cases}
+          \qquad
+          \text{where }
+          C_1
+          &= \left[\frac{\sigma^2}{2F}\left(1-e^{-\frac{2F}{\sigma^2} d}\right)
+          + e^{-\frac{2F}{\sigma^2}d}(L-d)\right]^{-1}
         \end{align*}
     \end{enumerate}
 
@@ -622,7 +821,99 @@
             0
           \end{pmatrix}
         \end{align*}
-        This is clearly non-zero.
+        This is non-zero.
+
+      \item % Question 4
+        %This will now all be multidimensional, i.e. $X_t, V_t \in
+        %\mathbb{R}^n$.
+
+        %First, the system of equations:
+        %\begin{align}
+          %d
+          %\begin{pmatrix}
+            %V_t \\ X_t
+          %\end{pmatrix}
+          %=
+          %\begin{pmatrix}
+            %-\frac{1}{m} (\gamma(X_t) V_t + \nabla U(X_t)) \\
+            %V_t
+          %\end{pmatrix}
+          %dt
+          %+
+          %\begin{pmatrix}
+            %\frac{\sqrt{2}\sigma(X_t)}{m} \\ 0
+          %\end{pmatrix}
+          %dW_t
+          %\label{q4a.1}
+        %\end{align}
+        %where the vector $(V_t X_t)'$ stacks the $n$-dimensional vectors
+        %$V_t$ and $X_t$.
+
+        %Now the Fokker-Planck Equation:
+        %\begin{align}
+          %\frac{\partial \rho}{\partial t}
+          %&=
+          %-\nabla \cdot (b \rho)
+          %+ \frac{1}{2} \nabla^2 : (a\rho)
+          %\label{q4b.1}
+        %\end{align}
+        %where $b$ is the drift vector in (\ref{q4a.1}) and $a$
+        %represesnts
+        %\begin{align*}
+          %a = \sigma \sigma^T
+          %=
+          %\begin{pmatrix}
+            %\frac{2\sigma^2}{m^2} & 0 \\
+            %0 & 0
+          %\end{pmatrix}
+        %\end{align*}
+        %We can start simplifying terms:
+        %\begin{align*}
+          %-\nabla \cdot (b \rho)
+          %&=
+          %\frac{\partial}{\partial v}
+          %\left(\frac{1}{m} (\gamma v + \nabla U(x)) \rho\right)
+          %- \frac{\partial}{\partial x} (v\rho) \\
+          %&=
+          %\frac{\partial}{\partial v}
+          %\left(
+          %\frac{1}{m} \gamma v \rho
+          %\right)
+          %+
+          %\frac{\partial}{\partial v}
+          %\left(
+          %\frac{1}{m} \nabla U(x) \rho
+          %\right)
+          %- v\frac{\partial\rho}{\partial x} \\
+          %&=
+          %\frac{\gamma}{m}\frac{\partial}{\partial v}
+          %\left( v \rho \right)
+          %+
+          %\frac{\nabla U(x)}{m} \frac{\partial \rho}{\partial v}
+          %- v\frac{\partial\rho}{\partial x}
+        %\end{align*}
+        %Next, the component with the diffusion terms, which is easy
+        %since the zeros force all but one term to drop:
+        %\begin{align*}
+          %\frac{1}{2} \nabla^2 : (a\rho)
+          %&= \frac{1}{2}\frac{\partial^2}{\partial v^2}
+          %\left(\frac{2\sigma^2}{m^2}\rho\right)\\
+          %&= \frac{\sigma^2}{m^2}\frac{\partial^2\rho}{\partial v^2}
+        %\end{align*}
+        %Putting this together, we have the following Fokker-Planck
+        %Equation
+        %\begin{align*}
+          %\frac{\partial \rho}{\partial t}
+          %&=
+          %- v\frac{\partial\rho}{\partial x}
+          %+ \frac{1}{m}
+          %\left(
+          %\gamma \frac{\partial}{\partial v} \left( v \rho \right)
+          %+
+          %\nabla U(x)\frac{\partial \rho}{\partial v}
+          %\right)
+          %+ \frac{\sigma^2}{m^2}\frac{\partial^2\rho}{\partial v^2}
+        %\end{align*}
 
 
     \end{enumerate}
