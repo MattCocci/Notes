@@ -2,6 +2,7 @@ import sympy as sp
 
 x, y, s2, a, gam, mu, C, c, d, alpha, sigma = sp.symbols('x y s2 a gam mu C c d alpha sigma')
 
+
 # Early
 rho  = sp.exp(-(1/(s2))*((x-y)**2))
 drho = rho.diff(x)
