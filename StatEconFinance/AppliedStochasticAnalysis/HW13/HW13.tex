@@ -1,0 +1,437 @@
+\documentclass[12pt]{article}
+\author{Matthew Cocci}
+\title{Homework 13}
+\date{\today}
+%% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % most detailed page formatting control
+\usepackage{fullpage} % Simpler than using the geometry package; std effect
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt}
+    %---Make the header bigger to avoid overlap
+
+%\renewcommand{\headrulewidth}{0.3pt}
+    %---Width of the line
+
+%\setlength{\headsep}{0.2in}
+    %---Distance from line to text
+
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{amsthm} %allows for labeling of theorems
+\usepackage{accents}
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+
+% Below supports left-right alignment in matrices so the negative
+% signs don't look bad
+\makeatletter
+\renewcommand*\env@matrix[1][c]{\hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols #1}}
+\makeatother
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %---For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %---Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+        %---This colors the links themselves, not boxes
+    citecolor=black,
+        %---Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{verbatim}
+    %---For including verbatim code from files, no colors
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{RGB}{28,172,0}
+\definecolor{mylilas}{RGB}{170,55,241}
+\newcommand{\matlabcode}[1]{%
+    \lstset{language=Matlab,%
+        basicstyle=\footnotesize,%
+        breaklines=true,%
+        morekeywords={matlab2tikz},%
+        keywordstyle=\color{blue},%
+        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+        identifierstyle=\color{black},%
+        stringstyle=\color{mylilas},%
+        commentstyle=\color{mygreen},%
+        showstringspaces=false,%
+            %---Without this there will be a symbol in
+            %---the places where there is a space
+        numbers=left,%
+        numberstyle={\tiny \color{black}},%
+            %---Size of the numbers
+        numbersep=9pt,%
+            %---Defines how far the numbers are from the text
+        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+            %---Some words to emphasise
+    }%
+    \lstinputlisting{#1}
+}
+    %---For including Matlab code from .m file with colors,
+    %---line numbering, etc.
+
+%% Bibliographies %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{natbib}
+    %---For bibliographies
+%\setlength{\bibsep}{3pt} % Set how far apart bibentries are
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{enumitem}
+    %---Has to do with enumeration
+\usepackage{appendix}
+\usepackage{pdfpages}
+    %---For including whole pdf pages as a page in doc
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+\maketitle
+
+%\tableofcontents
+
+
+\begin{enumerate}
+  \item % Question 1
+    This question deals with the system
+    \begin{align*}
+      \frac{dx}{dt} &= \frac{x}{\epsilon}y\\
+      dy &= -\frac{y}{\epsilon^2} dt + \frac{\sqrt{2\lambda}}{\epsilon} dW_t
+    \end{align*}
+    \begin{enumerate}
+      \item % Question 1a
+        To find an SDE that $x_t$ will satisfy asymptotically as
+        $\epsilon\rightarrow 0$, start by writing the generator of
+        $(x_t,y_t)$
+        \begin{align*}
+          \mathscr{L}^\epsilon
+          &=
+          \frac{1}{\epsilon^2}
+          \left(
+          -y\frac{\partial}{\partial y}
+          + \lambda\frac{\partial^2}{\partial y^2}
+          \right)
+          +
+          \frac{1}{\epsilon}
+          xy \frac{\partial}{\partial x}
+        \end{align*}
+        The backward equation is
+        \begin{align*}
+          \frac{\partial u^\epsilon}{\partial t}
+          &= \left(
+          \frac{1}{\epsilon^2} \mathscr{L}_0
+          + \frac{1}{\epsilon} \mathscr{L}_1
+          + \mathscr{L}_2
+          \right)
+          u^\epsilon
+        \end{align*}
+        where $\mathscr{L}_0= -y\frac{\partial}{\partial y} +
+        \lambda\frac{\partial^2}{\partial y^2}$,
+        $\mathscr{L}_1= xy \frac{\partial}{\partial x}$, and
+        $\mathscr{L}_2=0$.
+        Expand $u^\epsilon$ in an asymptotic expansion:
+        \begin{align*}
+          u^\epsilon(x,y,t)
+          &=
+          u_0(x,y,t)
+          + \epsilon u_1(x,y,t)
+          + \epsilon^2 u_2(x,y,t) + \cdots
+        \end{align*}
+        Substitute into the backward equation and equate terms of each
+        order:
+        \begin{alignat*}{3}
+          O(1/\epsilon^2)&&\qquad -\mathscr{L}_0u_0 &= 0 \\
+          O(1/\epsilon) && \qquad -\mathscr{L}_0u_1 &= \mathscr{L}_1u_0 \\
+          O(1) && \qquad -\mathscr{L}_0u_2 &=
+          \mathscr{L}_1u_1 + \mathscr{L}_2u_0
+          - \frac{\partial u_0}{\partial t}
+        \end{alignat*}
+        For $O\left(\frac{1}{\epsilon^2}\right)$, we have
+        \begin{align*}
+          -\mathscr{L}_0u_0 &= 0
+          \qquad\Rightarrow\qquad
+          -y \frac{\partial u_0}{\partial y}
+          + \lambda\frac{\partial^2 u_0}{\partial y^2}
+          = 0
+          \qquad\Rightarrow\qquad
+          u_0=u_0(x,t)
+        \end{align*}
+        i.e.\ a constant in $y$. Then at
+        $O\left(\frac{1}{\epsilon}\right)$,
+        \begin{align*}
+          -\mathscr{L}_0u_1 &= \mathscr{L}_1u_0
+          \quad\Rightarrow\quad
+          -y \frac{\partial u_1}{\partial y}
+          + \lambda\frac{\partial^2 u_1}{\partial y^2}
+          = xy \frac{\partial u_0}{\partial x}
+          \quad\Rightarrow\quad
+          u_1(x,y,t) = {xy} \frac{\partial u_0}{\partial x}
+          +\Psi_1(x,t)
+        \end{align*}
+        From there, handle the $O(1)$ condition
+        \begin{align*}
+          \int \pi(y) \frac{\partial u_0}{\partial t} dy
+          &=
+          \int \pi(y)
+          \left(
+          \mathscr{L}_1u_1 + \mathscr{L}_2u_2
+          \right) dy\\
+          \Leftrightarrow\qquad
+          \frac{\partial u_0}{\partial t}
+          &=
+          \int \pi(y) \mathscr{L}_1u_1 dy\\
+          &=
+          \int \pi(y) xy \frac{\partial u_1}{\partial x} dy\\
+          &=
+          \int \pi(y) xy \frac{\partial }{\partial x}
+          \left[
+          {xy} \frac{\partial u_0}{\partial x}
+          +\Psi_1(x,t)
+          \right]dy\\
+          &=
+           x\frac{\partial }{\partial x}
+          \left[ x\frac{\partial u_0}{\partial x} \right]
+           \int y^2\pi(y) dy
+          + x\frac{\partial \Psi_1}{\partial x}
+          \int  y\pi(y) dy\\
+          &=
+           x\frac{\partial }{\partial x}
+          \left[ x\frac{\partial u_0}{\partial x} \right]
+          \mathbb{E}^\pi[y^2]
+          + x\frac{\partial \Psi_1}{\partial x}
+          \mathbb{E}^\pi[y]
+        \end{align*}
+        Since $y$ is an Ornstein-Uhlenbeck process with drift
+        coefficient $-1$ and diffusion coefficient $\sqrt{2\lambda}$,
+        giving
+        \begin{align*}
+          \mathbb{E}^\pi[y] &= 0 \\
+          \mathbb{E}^\pi[y^2] &= \lambda
+        \end{align*}
+        Substituting in
+        \begin{align*}
+          \frac{\partial u_0}{\partial t}
+          &=
+           x\frac{\partial }{\partial x}
+          \left[ x\frac{\partial u_0}{\partial x} \right]
+          \left(\lambda\right)
+          + x\frac{\partial \Psi_1}{\partial x}
+          \cdot 0 \\
+          &=
+          \lambda x\frac{\partial u_0}{\partial x}
+          + \lambda x^2\frac{\partial^2 u_0}{\partial x^2}
+        \end{align*}
+        And this righthand side is the generator of the
+        Stratanovich SDE
+        \begin{align*}
+          dX_t &= X_t \sqrt{2\lambda} \circ dW_t
+        \end{align*}
+        Or in Ito form,
+        \begin{align*}
+          dX_t &= \lambda X_t \; dt + X_t \sqrt{2\lambda} \; dW_t
+        \end{align*}
+
+    \item % Question 1b
+      To understand how trajectories of $X_t$ behave as $t\rightarrow
+      \infty$, note that $X_t$ is Geometric Brownian motion (as is
+      evident from the Ito representation). The drift is $\lambda$ and
+      the diffusion is $\sqrt{2\lambda}$, giving a solution
+      \begin{align*}
+        S_t
+        &= S_0
+        \exp
+        \left\{
+          \left(\lambda - \frac{(\sqrt{2\lambda})^2}{2}\right)t
+          + \sqrt{2\lambda} \; W_t
+        \right\} \\
+        &= S_0
+        \exp
+        \left\{
+          \sqrt{2\lambda} \; W_t
+        \right\}
+      \end{align*}
+      This suggests that $X_t$ will oscillate between arbitrarily large
+      and small values as $t\rightarrow \infty$.
+
+    \item % Question 2c
+      We want to solve
+      \begin{align*}
+        \frac{dx}{dt}
+        &= \frac{1}{\varepsilon} xy \\
+        \Leftrightarrow \qquad
+        \frac{dx}{x}
+        &= \frac{1}{\varepsilon} y \; dt \\
+        \ln x
+          &= \frac{1}{\varepsilon} y t + C \\
+        x &= C\exp\left\{ \frac{1}{\varepsilon} y t \right\}
+      \end{align*}
+      To approximate $y$, we use an Ornstein-Uhlenbeck process
+      \begin{align*}
+        dy &=
+        -\frac{y}{\epsilon^2} dt + \frac{\sqrt{2\lambda}}{\epsilon} dW_t
+      \end{align*}
+      This has Gaussian solution
+      \begin{align*}
+        y &\sim N(0, \sigma^2) \\
+        \sigma^2 &=
+        \frac{\left(\frac{\sqrt{2\lambda}}{\epsilon}\right)^2}{%
+          2\left(\frac{1}{\epsilon^2}\right)}\\
+        &= \lambda:
+      \end{align*}
+      Substituting into the expression for $x$ gives
+      \begin{align*}
+        x &= C\exp\left\{ \frac{1}{\varepsilon} y t \right\}
+      \end{align*}
+      To get $y \sim N(0,\lambda)$, we can use Brownian Motion
+      $W_\lambda$, and then use the fact that
+      \begin{align*}
+      \end{align*}
+
+
+  \end{enumerate}
+
+
+\end{enumerate}
+
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% SAMPLE CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    %% BIBLIOGRAPHIES %%
+
+        \cite{LabelInSourcesFile}  %Use in text; cites
+        \citep{LabelInSourcesFile} %Use in text; cites in parens
+
+        \nocite{LabelInSourceFile} % Includes in refs w/o specific citation
+        \bibliographystyle{apalike}  % Or some other style
+
+        % To ditch the ``References'' header
+        \begingroup
+        \renewcommand{\section}[2]{}
+        \endgroup
+
+        \bibliography{sources} % where sources.bib has all the citation info
+
+    %% SPACING %%
+
+        \vspace{1in}
+        \hspace{1in}
+
+
+    %% INCLUDING PDF PAGE %%
+
+        \includepdf{file.pdf}
+
+
+    %% INCLUDING CODE %%
+
+        \verbatiminput{file.ext}
+            %---Includes verbatim text from the file
+        \texttt{text}
+            %---Renders text in courier, or code-like, font
+
+        \matlabcode{file.m}
+            %---Includes Matlab code with colors and line numbers
+
+
+    %% INCLUDING FIGURES %%
+
+        % Basic Figure with size scaling
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[scale=1]{file.pdf}
+            \end{figure}
+
+        % Basic Figure with specific height
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[height=5in, width=5in]{file.pdf}
+            \end{figure}
+
+        % Figure with cropping, where the order for trimming is  L, B, R, T
+            \begin{figure}
+               \centering
+               \includegraphics[trim={1cm, 1cm, 1cm, 1cm}, clip]{file.pdf}
+            \end{figure}
+
+
+        % Side by Side figures
+            \begin{figure}[h!]
+                \centering
+                \mbox{\subfigure{
+                    \includegraphics[scale=1]{file1.pdf}
+                }\quad\subfigure{
+                    \includegraphics[scale=1]{file2.pdf}
+                }
+                }
+            \end{figure}
+
+
