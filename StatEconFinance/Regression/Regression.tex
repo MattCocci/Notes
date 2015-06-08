@@ -1,82 +1,389 @@
-\documentclass[a4paper,12pt]{scrartcl}
+\documentclass[12pt]{article}
 
-\author{Matthew Cocci}
-\title{}
+\author{Matthew D. Cocci}
+\title{Regression}
 \date{\today}
-\usepackage{enumitem} %Has to do with enumeration	
-\usepackage{amsfonts}
+
+%% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % most detailed page formatting control
+\usepackage{fullpage} % Simpler than using the geometry package; std effect
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+%% Formatting %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[margin=1in]{geometry}
+    %   Adjust the margins with geometry package
+%\usepackage{pdflscape}
+    %   Allows landscape pages
+%\usepackage{layout}
+    %   Allows plotting of picture of formatting
+
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt}
+    %   Make the header bigger to avoid overlap
+
+%\fancyhf{}
+    %   Erase header settings
+
+%\renewcommand{\headrulewidth}{0.3pt}
+    %   Width of the line
+
+%\setlength{\headsep}{0.2in}
+    %   Distance from line to text
+
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
 \usepackage{amsthm} %allows for labeling of theorems
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{blindtext}
-\usepackage{graphicx}
-%\usepackage[hidelinks]{hyperref} % For internal/external linking. 
-				 % [hidelinks] removes boxes
-% \usepackage{url} % allows for url display, non-clickable
-%\numberwithin{equation}{section} 
-   % This labels the equations in relation to the sections 
-      % rather than other equations
-%\numberwithin{equation}{subsection} %This labels relative to subsections
+\theoremstyle{plain}
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{prop}[thm]{Proposition}
 \newtheorem{cor}[thm]{Corollary}
-\setkomafont{disposition}{\normalfont\bfseries}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+
+% Below supports left-right alignment in matrices so the negative
+% signs don't look bad
+\makeatletter
+\renewcommand*\env@matrix[1][c]{\hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols #1}}
+\makeatother
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+        %   This colors the links themselves, not boxes
+    citecolor=black,
+        %   Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{verbatim}
+    %   For including verbatim code from files, no colors
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{RGB}{28,172,0}
+\definecolor{mylilas}{RGB}{170,55,241}
+\newcommand{\matlabcode}[1]{%
+    \lstset{language=Matlab,%
+        basicstyle=\footnotesize,%
+        breaklines=true,%
+        morekeywords={matlab2tikz},%
+        keywordstyle=\color{blue},%
+        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+        identifierstyle=\color{black},%
+        stringstyle=\color{mylilas},%
+        commentstyle=\color{mygreen},%
+        showstringspaces=false,%
+            %   Without this there will be a symbol in
+            %   the places where there is a space
+        numbers=left,%
+        numberstyle={\tiny \color{black}},%
+            %   Size of the numbers
+        numbersep=9pt,%
+            %   Defines how far the numbers are from the text
+        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+            %   Some words to emphasise
+    }%
+    \lstinputlisting{#1}
+}
+    %   For including Matlab code from .m file with colors,
+    %   line numbering, etc.
+
+%% Bibliographies %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{natbib}
+    %---For bibliographies
+%\setlength{\bibsep}{3pt} % Set how far apart bibentries are
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{enumitem}
+    %   Has to do with enumeration
 \usepackage{appendix}
-\usepackage{subfigure} % For plotting multiple figures at once
-\usepackage{verbatim} % for including verbatim code from a file
-\usepackage{natbib} % for bibliographies
+%\usepackage{natbib}
+    %   For bibliographies
+\usepackage{pdfpages}
+    %   For including whole pdf pages as a page in doc
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 \begin{document}
-%\tableofcontents %adds it here
-\begin{center}
-    \LARGE
-    \textbf{Regression Basics}
-\end{center}
+\maketitle
 
-Suppose we have $n$ data points $(y_i, \; \mathbf{x}_i)$ where 
-$\mathbf{x}_i$ is a $k\times1$ vector, and 
-$\beta$ is a $k \times 1$ vector of coefficients.
-We then represent our model in matrix notation as 
-\begin{equation}
-    \mathbf{y} = \mathbf{X} \beta + \mathbf{e}
-\end{equation}
-where $\mathbf{y}$ is $n \times 1$, $\mathbf{X}$ is 
-$n\times k$ and $\mathbf{e}$ is $n\times 1$.  This
-implies coefficient estimates 
+\section{Basic Setup}
+
+\subsection{Potential Outcomes}
+
+Suppose that we want to consider outcome $Y_i$ for individual $i$.
+Let $D_i$ denote the treatment for this individual, where
+\begin{align*}
+  D_i =
+  \begin{cases}
+    1 & \text{Individual $i$ receives treatment} \\
+    0 & \text{otherwise} \\
+  \end{cases}
+\end{align*}
+Before you know whether this person received the treatment, you could
+imagine the two \emph{potential outcomes} for individual $i$:
+\begin{align*}
+  Y_{1i}
+  &= \text{Outcome if she receives the treatment ($D_i=1$)} \\
+  Y_{0i}
+  &= \text{Outcome if she does \emph{not} receive the treatment ($D_i=0$)}
+\end{align*}
+In practice, we will only observe one of these cases; the other is just
+a hypothetical counterfactual. But it helps us to pin down concepts and
+write the true, observed outcome $Y_i$ as a function of the treatment
+and potential outcomes:
+\begin{align}
+  Y_i = D_i Y_{1i} + (1 - D_i) Y_{0i}
+  \label{potential}
+\end{align}
+
+\subsection{Selection Bias}
+
+To measure the effect of some treatment, we might examine the difference
+in outcomes that we observe, comparing sample estimates of
+\begin{align*}
+  \mathbb{E}[Y_i | D_i = 1] - \mathbb{E}[Y_i | D_i = 0]
+\end{align*}
+But by writing $Y_i$ out in terms of potential outcomes as in
+Equation~\ref{potential}, we see the problem:
+\begin{align*}
+  \underbrace{\mathbb{E}[Y_i | D_i = 1]
+  - \mathbb{E}[Y_i | D_i = 0]}_{\text{Observed Effect}}
+  &=
+  \mathbb{E}[Y_{1i} | D_i = 1]
+  - \mathbb{E}[Y_{0i} | D_i = 0] \\
+  &=
+  \mathbb{E}[Y_{1i} | D_i = 1] - \mathbb{E}[Y_{0i} | D_i = 1]
+  + \mathbb{E}[Y_{0i} | D_i = 1] - \mathbb{E}[Y_{0i} | D_i = 0] \\
+  &=
+  \underbrace{\mathbb{E}[Y_{1i} - Y_{0i}| D_i = 1]}_{%
+    \text{Treatment Effect}}
+  + \underbrace{\mathbb{E}[Y_{0i} | D_i = 1]
+  - \mathbb{E}[Y_{0i} | D_i = 0]}_{\text{Selection Bias}}
+\end{align*}
+In words, the observed effect confounds two things:
+\begin{enumerate}
+  \item \emph{Selection Bias}: This pollutes our estimate. Selection
+    bias introduces into the observed effect the additional complication
+    that people who receive the treatment and who don't might
+    \emph{fundamentally} be different types of people. Examples:
+    \begin{enumerate}
+      \item People in the hospital are (tautologically) sicker than the
+        average person---that's why they're in the hospital. So don't be
+        surprised if they actually end up having \emph{worse} health
+        outcomes, despite their hospital stints, than the healthy people
+        visiting them.
+      \item Kids who get into elite schools would probably have made
+        more money anyway, even without an elite-school salary bump.
+    \end{enumerate}
+    The list goes on and on.
+  \item \emph{Treatment Effect}: This is genuine comparison of
+    counterfactuals, and really what we want to measure. It represents
+    the difference in potential outcomes under the treatment for
+    individual $i$. Returning to the examples above:
+    \begin{enumerate}
+      \item How much better off is a person for getting stitches, rather
+        than trying to walk it off?
+      \item How much do the connections and peer effects of Harvard
+        translate into more money for your son or daughter, relative to
+        four (plus maybe super-senior five) years at Party State? Is it
+        worth sacrificing better keg stand form?
+    \end{enumerate}
+\end{enumerate}
+
+\begin{defn}
+Selection Bias is \emph{correlation between treatment and
+  \textbf{potential} outcomes}.
+\end{defn}
+Selection bias is students with high potential being able to influence
+whether they get into an elite university and get ``the Harvard
+treatment'' and likely salary bump. Selection bias is smart children who
+
+will invest time in their kids' education ensuring that their children
+have receive ``the small class size'' treatment. Selection bias is a
+real son of a bitch.
+
+Often we hope or expect there to be
+correlation between treatment and outcomes (sans the ``potential''
+quantifier). We expect smaller class sizes to influence grades. But if smaller classes (the treatment) is correlated with the 
+
+But if people make choices and 
+, such that the selection bias term
+\begin{align*}
+  \text{Selection Bias} =
+  \mathbb{E}[Y_{0i} | D_i = 1] - \mathbb{E}[Y_{0i} | D_i = 0]
+\end{align*}
+does not cancel out
+
+Start with the most basic regression setup, where we try to estimate the
+effect $\rho$ of some treatment $D_i$ on individual $i$:
+\begin{align}
+  Y_i =
+  \underbrace{\alpha}_{\mathbb{E}Y_i}
+  + \underbrace{\rho}_{Y_{1i} - Y_{0i}} D_i
+  + \underbrace{\varepsilon_i}_{Y_{0i}-\mathbb{E}Y_{0i}}
+  \label{basic}
+\end{align}
+
+%\tableofcontents
 
 
-%%%% APPPENDIX %%%%%%%%%%%
 
-\appendix
+
+%% APPPENDIX %%
+
+% \appendix
+
+
 
 
 \end{document}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%% INCLUDING FIGURES %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% SAMPLE CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   % H indicates here 
-   %\begin{figure}[h!]
-   %   \centering
-   %   \includegraphics[scale=1]{file.pdf}
-   %\end{figure}
+    %% VIEW LAYOUT %%
 
-%   \begin{figure}[h!]
-%      \centering
-%      \mbox{
-%	 \subfigure{
-%	    \includegraphics[scale=1]{file1.pdf}
-%	 }\quad
-%	 \subfigure{
-%	    \includegraphics[scale=1]{file2.pdf} 
-%	 }
-%      }
-%   \end{figure}
- 
+        \layout
 
-%%%%% Including Code %%%%%%%%%%%%%%%%%%%%%5
-% \verbatiminput{file.ext}    % Includes verbatim text from the file
-% \texttt{text}	  % includes text in courier, or code-like, font
+    %% LANDSCAPE PAGE %%
+
+        \begin{landscape}
+        \end{landscape}
+
+    %% BIBLIOGRAPHIES %%
+
+        \cite{LabelInSourcesFile}  %Use in text; cites
+        \citep{LabelInSourcesFile} %Use in text; cites in parens
+
+        \nocite{LabelInSourceFile} % Includes in refs w/o specific citation
+        \bibliographystyle{apalike}  % Or some other style
+
+        % To ditch the ``References'' header
+        \begingroup
+        \renewcommand{\section}[2]{}
+        \endgroup
+
+        \bibliography{sources} % where sources.bib has all the citation info
+
+    %% SPACING %%
+
+        \vspace{1in}
+        \hspace{1in}
+
+
+    %% INCLUDING PDF PAGE %%
+
+        \includepdf{file.pdf}
+
+
+    %% INCLUDING CODE %%
+
+        \verbatiminput{file.ext}
+            %   Includes verbatim text from the file
+        \texttt{text}
+            %   Renders text in courier, or code-like, font
+
+        \matlabcode{file.m}
+            %   Includes Matlab code with colors and line numbers
+
+
+    %% INCLUDING FIGURES %%
+
+        % Basic Figure with size scaling
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[scale=1]{file.pdf}
+            \end{figure}
+
+        % Basic Figure with specific height
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[height=5in, width=5in]{file.pdf}
+            \end{figure}
+
+        % Figure with cropping, where the order for trimming is  L, B, R, T
+            \begin{figure}
+               \centering
+               \includegraphics[trim={1cm, 1cm, 1cm, 1cm}, clip]{file.pdf}
+            \end{figure}
+
+
+        % Side by Side figures
+            \begin{figure}[h!]
+                \centering
+                \mbox{\subfigure{
+                    \includegraphics[scale=1]{file1.pdf}
+                }\quad\subfigure{
+                    \includegraphics[scale=1]{file2.pdf}
+                }
+                }
+            \end{figure}
+
+
