@@ -3,7 +3,7 @@
 \author{Matthew Cocci}
 \title{Linear and Discrete Optimization}
 \date{}
-\usepackage{enumitem} %Has to do with enumeration	
+\usepackage{enumitem} %Has to do with enumeration
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{amsthm} %allows for labeling of theorems
@@ -11,7 +11,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{blindtext}
 \usepackage{graphicx}
-\usepackage{hyperref} % For internal/external linking. 
+\usepackage{hyperref} % For internal/external linking.
 				 % [hidelinks] removes boxes
 \hypersetup{
     colorlinks=true,
@@ -21,14 +21,22 @@
     urlcolor=black,
 }
 % \usepackage{url} % allows for url display, non-clickable
-%\numberwithin{equation}{section} 
-   % This labels the equations in relation to the sections 
+%\numberwithin{equation}{section}
+   % This labels the equations in relation to the sections
       % rather than other equations
 %\numberwithin{equation}{subsection} %This labels relative to subsections
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{prop}[thm]{Proposition}
 \newtheorem{cor}[thm]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rmk}{Remark}
+\newtheorem*{note}{Note}
 \setkomafont{disposition}{\normalfont\bfseries}
 \usepackage{appendix}
 \usepackage{subfigure} % For plotting multiple figures at once
@@ -39,33 +47,243 @@
 
 %\tableofcontents %adds it here
 
-\section{Introduction to Linear Optimization}
+\section{Numerical Optimization}
 
-\subsection{Definition of a Linear Program}
+Suppose that we want to minimize some function $f$ to find
+\begin{align}
+  \label{statement}
+  x^* = \min_x f(x)
+\end{align}
+This note will focus on iterative algorithms that follow the same basic
+steps:
+\begin{enumerate}
+  \item Start with a guess for $x^*$, and call it $x_n$.
+  \item Use some update rule to get a better guess, $x_{n+1}$, and go
+    there.
+  \item Repeat Step 2 until some convergence criterion is met.
+\end{enumerate}
+The main difference is in the update step: How do we update so that
+$f(x_{n+1}) < f(x_n)$ (i.e.\ we get some improvement) and so that we
+converge \emph{quickly} to the minumum $x^*$.
 
-Linear optimization, also known as \emph{linear programming}, 
-consists of a linear \emph{objective function} and \emph{linear 
+Here are two possible update rules:
+\begin{enumerate}
+  \item Gradient Descent: The negative of the gradient $\nabla f(x_n)$
+    points in the direction of steepest descent. To get $x_{n+1}$, just
+    take a step in that direction.
+  \item Newton's Method: Approximate $f$ about $x_n$ with a second-order
+    Taylor expansion. Set $x_{n+1}$ to be the minimum of that approximation.
+\end{enumerate}
+
+
+\subsection{Gradient Descent}
+
+\subsubsection{Single Dimension}
+
+Suppose that $f$ is differentiable, and that we have some initial guess
+$x_n$. The update according to
+\begin{align*}
+  x_{n+1} = x_n - \alpha f'(x_n)
+\end{align*}
+for some chosen scaling parameter $\alpha$.
+
+\paragraph{Intuition}
+If $f'(x_n)$ is large, then we can decrease $f$ a lot by moving in the
+$-f'(x_n) = -\frac{df(x_n)}{dx_n}$ direction.  So let's update $x_n$ at
+some rate $\alpha$ proportional to $f'(x_n)$.
+
+\paragraph{Choice of $\alpha$}
+Moreover, notice how this process self-adjusts in the
+magnitude of the update.  In particular, as you get close to
+the minimum, the derivatives approach zero.  So even with 
+$\alpha$ constant, the shrinking derivative means that the gradient
+descent algorithm will take smaller steps, reducing the likelihood that
+you'll blow past the minimum on update.
+
+
+\subsubsection{Multiple Dimensions}
+
+To minimize differentiable objective function $f$, update according to
+\begin{align*}
+   x_{n+1}^{(1)} &= x_n^{(1)}
+    - \alpha \frac{\partial f(x_n)}{\partial x_n^{(1)}}\\
+   \vdots \quad & \qquad \vdots \\
+   x_{n+1}^{(k)} &= x_n^{(k)}
+    - \alpha \frac{\partial f(x_n)}{\partial x_n^{(k)}}
+\end{align*}
+where $x^{(i)}$ denotes the $i$th element of $k$-length vector $x$.
+
+In matrix notation, we can write this more compactly as
+\begin{align*}
+  \label{eq:multigradesc}
+  x_{n+1} = x_n - \alpha [\nabla f(x_n)]
+\end{align*}
+where $\nabla f(x)$ denotes the gradient of $f$ at $x$.
+
+\begin{rmk}
+At each iteration, we update all the components of $x$
+\emph{simultaneously}.  We don't update each component, one at a time,
+as one does in Gibbs Sampling.
+
+So in one step, we update all parameters in the direction of their
+respective largest changes. (That's just the definition of the
+gradient.) We don't take account of any curvature in the objective
+function (though Newton's method, detailed below, does).
+\end{rmk}
+
+\paragraph{Sensible Scaling}
+If the entries of $x$ lie on vastly different scales, normalize so that
+all entries of $x$ lie on common support, or adapt update
+Equation~\ref{eq:multigradesc} to
+\begin{align}
+  x_{n+1} = x_n - \alpha w^T [\nabla f(x_n)]
+\end{align}
+where $w$ is another scaling vector whose $i$th entry is small when
+$x_i$ has an especially large support.
+
+To motivate, suppose $x_1$ lies on $[0,1]$, and if $x_2$ lies on
+$[-1000, 1000]$. If we choose a reasonable $\alpha$ for convergence of
+$x_1$, it will be \emph{way} too small for $x_2$. Convergence will take
+forever. Normalizing the input vector $x$ or scaling elements of the
+gradient vector (via $w$) avoids this issue.
+
+
+\subsection{Newton's Method in One Dimension}
+
+\subsubsection{Original Application}
+
+Originally, Newton's method was used to find roots $f(x)=0$, so let's
+start there.
+\begin{enumerate}
+  \item Use a Taylor Series expansion to write an approximation $f(x)$
+    about $x_n$:
+    \begin{align*}
+      f(x) \approx f(x_n) + f'(x_n)(x-x_n)
+    \end{align*}
+
+  \item Find the zero of this simpler, linear approximation, and set
+    that as our new guess:
+    \begin{align}
+      0 &= f(x_n) + f'(x_n)(x_{n+1}-x_n)\notag\\
+      \Rightarrow \quad x_{n+1} &= x_n - \frac{f(x_n)}{f'(x_n)}
+      \label{eq:newtonupdate1}
+    \end{align}
+
+\end{enumerate}
+Repeat until convergence, but note that there might not be a single
+root. In fact the Newton-Raphson algorithm is very sensitive to the
+starting point. So just be aware of that.
+
+\subsubsection{Single Dimension}
+
+Now the question is how do we apply this to Problem~(\ref{statement})?
+Simple: instead of trying finding a zero of $f(x)$, find a zero of
+$f'(x)$.
+
+Thus, we adapt update Equation~\ref{eq:newtonupdate1} to be
+\begin{align*}
+  x_{n+1} &= x_n - \frac{f'(x_n)}{f''(x_n)}
+\end{align*}
+Again, be aware that you might find a local minimum only, not a global
+minimum.
+
+
+\subsection{Newton's Method in Multiple Dimensions}
+
+Again, let's start with the general case, then move to our special case
+of finding parameters. So we have a vector valued function, and
+want to expand it into a Taylor Series approximation.:
+   \[ f(x+h) = f(x) + f'(x)h + O(h^2) \]
+   \[ x = (x_1,\ldots, x_n)^T, \qquad h = (h_1, \ldots, h_n)^T, \qquad
+      f(x) = (f_1(x), \ldots, f_n(x) )^T\]
+   \[ f'(x) = J = \begin{pmatrix} \frac{\partial f_1}{\partial x_1}
+      & \cdots & \frac{\partial f_1}{\partial x_n} \\
+      \vdots & \ddots & \vdots \\ \frac{\partial f_n}{\partial x_1}
+      & \cdots & \frac{\partial f_n}{\partial x_n}
+      \end{pmatrix} \]
+Then, you use
+\begin{align*}
+   0 &= f(x) + J h \\
+   x_{k+1} &= x_k - J^{-1} f(x_k)
+\end{align*}
+Now let's adopt this to our problem of a two-parameter optimization.
+Suppose we are faced with
+\begin{align}
+   \label{jacobian}
+   (\hat{\alpha}, \hat{\beta}) &= \arg \max_{\alpha, \beta} L(
+   \alpha, \beta) = \arg \max_{\alpha, \beta} \ell(
+   \alpha, \beta)\notag \\
+\text{Solve} \qquad 0 &= \frac{\partial\ell(
+   \hat{\alpha}, \hat{\beta})}{\partial\alpha}, \qquad 0 =
+   \frac{\partial\ell(\hat{\alpha}, \hat{\beta})}{\partial\beta}
+\end{align}
+Awesome, so we have a vector valued function that we wish to find
+a root for. So let's do it:
+\begin{align*}
+   \ell(\alpha, \beta) &= \begin{pmatrix}
+      \frac{\partial\ell({\alpha}, {\beta})}{\partial\alpha} &
+      \frac{\partial\ell({\alpha}, {\beta})}{\partial\beta}
+   \end{pmatrix}\\
+   J = \ell'(\alpha, \beta) &= \begin{pmatrix}
+      \frac{\partial^2\ell({\alpha}, {\beta})}{\partial\alpha^2} &
+      \frac{\partial^2\ell({\alpha}, {\beta})}{\partial\alpha\partial
+      \beta} \\
+      \frac{\partial^2\ell({\alpha}, {\beta})}{\partial\alpha\partial
+      \beta}&
+      \frac{\partial^2\ell({\alpha}, {\beta})}{\partial\beta^2}
+   \end{pmatrix}
+\end{align*}
+From there, we get an estimate by iteration over
+   \[ (\alpha_{k+1}, \beta_{k+1}) = (\alpha_{k}, \beta_{k}) -
+      J^{-1} \ell(\alpha_{k}, \beta_{k}) \]
+For more general cases, where the number of parameters is greater
+than one or two, simply expand the number partial derivatives and
+maximization criteria that we labeled Equations \ref{jacobian}.
+The only difference is that the Jacobian and function of the parameters
+would have a higher dimension.
+
+Suppose that we want to minimize the function $f(y)$, where $y$ is a
+vector of parameters.
+
+Now recall the second order Taylor Expansion of $f(y)$ about vector $x$:
+\begin{align*}
+  f(y) = f(x) + (y-x)^T \left[\nabla f(x)\right]
+  + \frac{1}{2} (y-x)^T \left[\nabla^2 f(x)\right](y-x)
+\end{align*}
+where $\nabla f(x)$ is the gradient at $x$ and $\nabla^2 f(x)$ the
+Hessian.
+
+
+
+\section{Linear Programming}
+
+\subsection{Introduction to Linear Optimization}
+
+\subsubsection{Definition of a Linear Program}
+
+Linear optimization, also known as \emph{linear programming},
+consists of a linear \emph{objective function} and \emph{linear
 inequalities}:
 \begin{align*}
    \max \; \;& c_1 x_1 + \cdots + c_n x_n \\
    \text{s.t.} \; \;&a_{11} x_1 + \cdots + a_{1n} x_n \leq b_n \\
    & \qquad\qquad \vdots \\
-   &a_{m1} x_1 + \cdots + a_{mn} x_n \leq b_m 
+   &a_{m1} x_1 + \cdots + a_{mn} x_n \leq b_m
 \end{align*}
 So we want to find the values of the \emph{variables}
 $x_1, \ldots, x_n \in \mathbb{R}$ such that
-the objective function is maximized while still satisfying the 
+the objective function is maximized while still satisfying the
 linear inequalities. Using more convenient matrix notation,
 our linear program above can be rewritten more compactly as
 \begin{equation}
    \label{lp}
-   \max \{ c^T x \; : \; x \in \mathbb{R}^n , \; Ax \leq b \} 
+   \max \{ c^T x \; : \; x \in \mathbb{R}^n , \; Ax \leq b \}
 \end{equation}
 If we want to find the minimum instead of the max, we can easily
 use the fact that the minimum of some set $S$ ($\min S$) is equivalent
 to $-\max S$.
 
-\subsection{Feasability, Optimality, Boundedness}
+\subsubsection{Feasability, Optimality, Boundedness}
 
 We call a solution $x \in \mathbb{R}^n$ \emph{feasible} if $x$
 satisfies all the linear inequalities.  We call a linear program
@@ -77,10 +295,10 @@ of a linear program if $c^T x \geq c^T y $ for all $y\in \mathbb{R}^n$.
 \\
 \\
 A linear program is \emph{bounded} if there exists a constant $M\in
-\mathbb{R}$ such that $c^T x \leq \mathbb{R}$ for all feasible 
+\mathbb{R}$ such that $c^T x \leq \mathbb{R}$ for all feasible
 $x \in \mathbb{R}^n$.
 
-\subsection{Linear Algebra Defintions}
+\subsubsection{Linear Algebra Defintions}
 
 Recall that for $A \in \mathbb{R}^{m\times n}$, the \emph{kernel}
 of $A$, the \emph{image} of $A$, and the \emph{rowspace}
@@ -98,9 +316,9 @@ rows of $A$.
 \\
 \\
 {\sl Result:}
-With these definitions in hand, we can show that a solution to the 
+With these definitions in hand, we can show that a solution to the
 linear program in Equation \ref{lp} is feasible and unbounded if
-$b \in \text{im}(A)$ and if $c \in \text{ker} A \setminus \{ 0 \}$. 
+$b \in \text{im}(A)$ and if $c \in \text{ker} A \setminus \{ 0 \}$.
 \begin{proof}
    First, $b \in \text{im}(A)$ proves feasibility. It also implies that
    $\exists\; x^* \in \mathbb{R}^n$ such that $A x^* = b$. This
@@ -119,10 +337,10 @@ $b \in \text{im}(A)$ and if $c \in \text{ker} A \setminus \{ 0 \}$.
    Since $x^* + \lambda c$ is feasible, then it should also be bounded:
    \begin{align*}
       \Rightarrow \quad c^T (x^* + \lambda c ) &\leq M\\
-      c^T x^* + \lambda c^T c \leq M 
+      c^T x^* + \lambda c^T c \leq M
    \end{align*}
    Now since $c \neq 0$, we know that $c^T c$ will be greater than
-   0. Now let's rearrange and choose 
+   0. Now let's rearrange and choose
       \[ \lambda \geq \frac{M - c^T x^*}{c^T c} \]
    in which case $c^T ( x^* + \lambda c) > M$.
 \end{proof}
@@ -130,43 +348,43 @@ $b \in \text{im}(A)$ and if $c \in \text{ker} A \setminus \{ 0 \}$.
 
 
 \newpage
-\section{The Geometry of Linear Programming}
+\subsection{The Geometry of Linear Programming}
 
-\subsection{General Definitions}
+\subsubsection{General Definitions}
 
 {\sl Polyhedron:}
 A set $P$ of vectors in $\mathbb{R}^n$ is a polyhedron
 if $P=\{ x\in \mathbb{R}^n \; | \; Ax \leq b \}$ for some matrix $A$
-and some vector $b$.  By our definition of a linear program in 
-Equation \ref{lp}, we see that the set of feasible solutions is 
+and some vector $b$.  By our definition of a linear program in
+Equation \ref{lp}, we see that the set of feasible solutions is
 a polyhedron.\footnote{Just one quick note for generality: The empty
-set, $\emptyset$, is also a polyhedron as $\emptyset = \{ x \in 
-\mathbb{R}^n \; |\; \mathbf{0}^T x \leq -1 \}$, 
-satisfying the definition of a polyhedron.} 
+set, $\emptyset$, is also a polyhedron as $\emptyset = \{ x \in
+\mathbb{R}^n \; |\; \mathbf{0}^T x \leq -1 \}$,
+satisfying the definition of a polyhedron.}
 \\
 \\
 {\sl Half space:} This is defined as $\{ x \in \mathbb{R}^n
-   \; | \; a^T x \leq \beta \}$, where $a \in \mathbb{R}^n \setminus 
+   \; | \; a^T x \leq \beta \}$, where $a \in \mathbb{R}^n \setminus
    \mathbf{0}$.
 \\\\
 {\sl Hyperplane:} This is defined as $\{ x \in \mathbb{R}^n
-   \; | \; a^T x = \beta \}$, where $a \in \mathbb{R}^n \setminus 
+   \; | \; a^T x = \beta \}$, where $a \in \mathbb{R}^n \setminus
    \mathbf{0}$.
 \\\\
-{\sl Valid:} An inequality $a^T x \leq \beta$ is valid for a 
-   polyhedron, $P$, if each $x^* \in P$ satisfies $a^T x^* \leq 
+{\sl Valid:} An inequality $a^T x \leq \beta$ is valid for a
+   polyhedron, $P$, if each $x^* \in P$ satisfies $a^T x^* \leq
    \beta$.
 \\\\
-{\sl Active:} An inequality $a^T x \leq \beta$ is active 
-   at $x^* \in \mathbb{R}^n$ if $a^T x^* = \beta$. 
+{\sl Active:} An inequality $a^T x \leq \beta$ is active
+   at $x^* \in \mathbb{R}^n$ if $a^T x^* = \beta$.
 
 
-\subsection{Vertices}
+\subsubsection{Vertices}
 
 We'll offer three equivalent definitions, each of which offers some
 different intuition or an additional operational advantage:
 \begin{enumerate}
-   \item A point $x^* \in P$ is a \emph{vertex} of $P$ if 
+   \item A point $x^* \in P$ is a \emph{vertex} of $P$ if
       there exists an inequality $a^T x \leq \beta$ such that
       \begin{enumerate}
 	 \item $a^T x \leq \beta$ is valid for $P$.
@@ -174,33 +392,33 @@ different intuition or an additional operational advantage:
 	    at any other point in $P$.
       \end{enumerate}
    \item There's also an equivalent definition which says $x^* \in P$
-      is a vertex if and only if there exists a vector $c \in 
+      is a vertex if and only if there exists a vector $c \in
       \mathbb{R}^n$ such that $x^*$ is the unique optimal solution of
       the linear program $\max \{ c^T x \; | \; x \in P \}$.
    \item Suppose we have $x^* \in P = \{ x \in \mathbb{R}^n \; | \;
-      Ax \leq b \}$ as a vertex of $P$. 
+      Ax \leq b \}$ as a vertex of $P$.
       Then this vertex satisfies a smaller number of active contraints
-      (relative to all of the constraints that define the linear 
-      program and $P$). Therefore, we express those active constraints 
-      that we want to enforce with $\bar{A}x \leq \bar{b}$. 
-      
+      (relative to all of the constraints that define the linear
+      program and $P$). Therefore, we express those active constraints
+      that we want to enforce with $\bar{A}x \leq \bar{b}$.
+
       Now since $x^*$ is a vertex satisfying those
-      certain active constraints, that means $x^*$ is the unique 
-      solution of $\bar{A} x = \bar{b}$. That's equivalent to the 
-      statement that $\text{rank}(\bar{A}) = n$, which is equivalent 
+      certain active constraints, that means $x^*$ is the unique
+      solution of $\bar{A} x = \bar{b}$. That's equivalent to the
+      statement that $\text{rank}(\bar{A}) = n$, which is equivalent
       to the columns of $\bar{A}$ being linearly independent.
 
-      So if we suspect that $x^*$ is a vertex of our linear program, 
-      then we examine the subsystem, $\bar{A} x \leq \bar{b}$, 
-      of our LP that $x^*$ satisfies with equality, and we look 
+      So if we suspect that $x^*$ is a vertex of our linear program,
+      then we examine the subsystem, $\bar{A} x \leq \bar{b}$,
+      of our LP that $x^*$ satisfies with equality, and we look
       at the rank of $\bar{A}$. If $x^*$ really is a vertex of $P$,
-      the the rank of $\bar{A}$ equals $n$ and the columns will 
+      the the rank of $\bar{A}$ equals $n$ and the columns will
       be linearly independent.
-      
+
 \end{enumerate}
 
 
-   
+
 
 
 \end{document}
@@ -209,7 +427,7 @@ different intuition or an additional operational advantage:
 
 %%%% INCLUDING FIGURES %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   % H indicates here 
+   % H indicates here
    %\begin{figure}[h!]
    %   \centering
    %   \includegraphics[scale=1]{file.pdf}
@@ -222,11 +440,11 @@ different intuition or an additional operational advantage:
 %	    \includegraphics[scale=1]{file1.pdf}
 %	 }\quad
 %	 \subfigure{
-%	    \includegraphics[scale=1]{file2.pdf} 
+%	    \includegraphics[scale=1]{file2.pdf}
 %	 }
 %      }
 %   \end{figure}
- 
+
 
 %%%%% Including Code %%%%%%%%%%%%%%%%%%%%%5
 % \verbatiminput{file.ext}    % Includes verbatim text from the file
