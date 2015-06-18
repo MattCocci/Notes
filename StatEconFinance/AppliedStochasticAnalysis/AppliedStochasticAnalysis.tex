@@ -4,6 +4,7 @@
 \title{Applied Stochastic Analysis}
 \date{\today}
 
+
 %% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % most detailed page formatting control
@@ -207,7 +208,7 @@ satisfies the \emph{Markov Property}:
 In words, the distribution for $X_{n}$ only depends upon its state at
 time $n-1$. All history prior to time $n-1$ is Duncan-Hines irrelevant.
 We can define the evolution of the states and probabilities of a Markov
-Chain in terms of transition matrix.
+Chain in terms of a transition matrix.
 \end{defn}
 
 \begin{defn}
@@ -220,18 +221,18 @@ the sum of each row (across columns) equals 1, i.e.
 
 \begin{defn}
 A \emph{transition matrix} $P(n)$ is a non-negative stochastic matrix
-where entry $p(n)_{ij}$ denotes the probability of transitioning from
-state $i$ to state $j$ from time $n$ to $n+1$:
+where entry $p_{ij}(n)$ denotes the probability of
+transitioning from state $i$ to state $j$ between time $n$ and $n+1$:
 \begin{align*}
-  p(n)_{ij} = P(X_{n+1}=j | X_n=i)
+  p_{ij}(n) = \mathbb{P}(X_{n+1}=j | X_n=i)
 \end{align*}
 It is clear that $P(n)$ must be a stochastic matrix, because by summing
 across columns, we're summing across the states $X_n$ could move to.
-Since it has to move somewhere and probabilities sum to 1, the row-sums
-of $P(n)$ must equal 1. Combining this with the non-negativity of
-probabilities, our two conditions for a transition matrix are:
+Since $X_N$ has to move somewhere and since probabilities sum to 1, the
+row-sums of $P(n)$ must equal 1. Combining this with the non-negativity
+of probabilities, our two conditions for a transition matrix are:
 \begin{enumerate}
-  \item $p(n)_{ij}>0$ for all $i,j$.
+  \item $p_{ij}(n)>0$ for all $i,j$.
   \item $P(n)$ is stochastic.
 \end{enumerate}
 \end{defn}
@@ -241,9 +242,9 @@ The process $\{X_n\}$ is a \emph{homogenous Markov Chain} if
 \begin{align*}
   P(n) = P(m) \qquad \forall m,n\geq 0 \qquad m\neq n
 \end{align*}
-In words, transition probabilities do not depend upon the time of the
-jump. In these cases, we drop time from the notation so that $P(n)$
-becomes $P$ and $p(n)_{ij}$ becomes $p_{ij}$.
+In words, the distribution of \emph{where} you jump does not depend upon
+the \emph{time} you jump. In such cases, we drop time from the notation
+so that $P(n)$ becomes $P$ and $p_{ij}(n)$ becomes $p_{ij}$.
 \end{defn}
 
 \begin{rmk}
@@ -260,20 +261,19 @@ probabilities as follows:
   n \leq \ell \leq n+m
 \end{align*}
 In words, break the probability of moving from $i$ to $j$ in $m$ steps
-into a smaller problem: $i$ to $m$ then $m$ to $i$ for some intermediate
-step $m$.
+into a smaller problem: $i$ to $m$ then $m$ to $i$.
 \end{thm}
 
 \begin{thm}{\emph{(Forward Kolmorogov Equation)}}
 This relationship tells us how to evolve distributions. In particular,
 if $X_n\sim \mu^{(n)}$ where $\mu^{(n)}$ is a row vector or
-probabilities summing to 1, then $\mu^{(n+1)}$, the distribution of
-$X_{n+1}$ can be computed
+probabilities summing to 1, then $\mu^{(n+1)}$ can be computed
 \begin{align*}
   \mu^{(n+1)} = \mu^{(n)} P
 \end{align*}
-This also implies that we can compute the distribution of $X_n$ at any
-time if we know the transition matrix and initial distribution:
+This also implies that we can compute the distribution of
+time-homogeneous $X_n$ at any time if we know the transition matrix and
+initial distribution:
 \begin{align*}
   \mu^{(n)} = \mu^{(0)} P^n
 \end{align*}
@@ -300,14 +300,17 @@ Law of Iterated Expectations:
 \begin{align*}
   u_{n+1}^{(i)} &= \mathbb{E}[f(X_{n+1})|X_0=i]\\
   \text{By definition}\qquad
-  &= \sum_j f(j) P(X_{n+1}=j |X_0=i)\\
+  &= \sum_j f(j) \mathbb{P}(X_{n+1}=j |X_0=i)\\
   \text{Chapman-Komogorov}\qquad
-  &= \sum_j f(j) \left(\sum_k P(X_{n+1}=j |X_1 = k) P(X_1=k|X_0=i)\right)\\
-  &= \sum_k \left(\sum_j f(j) P(X_{n+1}=j |X_1 = k)\right) P(X_1=k|X_0=i)\\
+  &= \sum_j f(j) \left(\sum_k \mathbb{P}(X_{n+1}=j |X_1 = k)
+              \mathbb{P}(X_1=k|X_0=i)\right)\\
+  &= \sum_k \left(\sum_j f(j) \mathbb{P}(X_{n+1}=j |X_1 = k)\right)
+          \mathbb{P}(X_1=k|X_0=i)\\
   \text{By Homogeneity}\qquad
-  &= \sum_k \left(\sum_j f(j) P(X_{n}=j |X_0 = k)\right) P(X_1=k|X_0=i)\\
-  &= \sum_k \mathbb{E}[f(X_n)|X_0=k] \cdot P(X_1=k|X_0=i)\\
-  &= \sum_k u^{(k)}_n \cdot P(X_1=k|X_0=i)\\
+  &= \sum_k \left(\sum_j f(j) \mathbb{P}(X_{n}=j |X_0 = k)\right)
+          \mathbb{P}(X_1=k|X_0=i)\\
+  &= \sum_k \mathbb{E}[f(X_n)|X_0=k] \cdot \mathbb{P}(X_1=k|X_0=i)\\
+  &= \sum_k u^{(k)}_n \cdot \mathbb{P}(X_1=k|X_0=i)\\
   &= P_{i,\cdot} u_n
 \end{align*}
 where $P_{i,\cdot}$ denotes the $i$th row. Stacking this result across
@@ -339,7 +342,7 @@ the starting time is fixed, while we can vary the time \emph{from} or
 time is fixed and $v$ varies as function of some time \emph{before} or
 \emph{until} that terminal time. It is, therefore, from $v$ that the
 name ``Backward Equation'' arises, as we can solve \emph{backwards}
-moments and functions of the state prior to some terminal time.
+moments and functions of $X_n$ prior to some terminal time.
 \end{rmk}
 
 \subsection{Continuous Time, Discrete Space}
@@ -360,8 +363,8 @@ The classic example is a time-homogeneous Poisson process with
 $\lambda$, which has conditional probability distributions
 \begin{align*}
   \mathbb{P}(X_{t+h}=j|X_t=i)
-  &=
-  \frac{e^{-\lambda h}(\lambda h)^{j-i}}{(j-i)!}
+  &= e^{-\lambda h} \;
+  \frac{(\lambda h)^{j-i}}{(j-i)!}
 \end{align*}
 \end{ex}
 
@@ -373,14 +376,14 @@ of time between jumps. There are then two approaches:
     transition matrix as the time step goes to~0.
   \item Describe the distribution of \emph{jump times} of $X_t$, defined
     as $\tau_1, \tau_2,\ldots$, and then treat $X_t$ like a discrete
-    time Markov Chain, conditional on the jumping times.
+    time Markov Chain with the jump times given.
 \end{enumerate}
 
 \begin{defn}{(Transition Probabilities in Cts. Time)}
 For a continuous time, discrete space Markov Chain, the \emph{transition
 probability} $p_{ij}(s,t)$ at time $s$ for time step $t$ is defined
 \begin{align*}
-  p_{ij}(s,t) = P(X_{t+s}=j|X_s=i)
+  p_{ij}(s,t) = \mathbb{P}(X_{t+s}=j|X_s=i)
 \end{align*}
 We can then collect these in a transition matrix $P(s,t) =
 (p_{ij}(s,t))$. Note that $P(s,0) = I$ for all $s$ for obvious reasons.
@@ -552,6 +555,22 @@ $Z(\lambda_2)-Z(\lambda_1)$, not $W(\lambda_2)-W(\lambda_1)$.
   \item Pavliotis 1.1, 1.2
   \item Koralev and Sinai, Ch 12, 15.3, 15.7, 16
 \end{enumerate}
+
+\section{Brownian Motion}
+
+\begin{defn}
+Brownian motion is the real-valued continuous time, continuous space
+stochastic process $W_t$ for $t\geq 0$ (with $W_0=0$) satisfying
+\begin{enumerate}
+  \item \emph{Independent Increments}: For non-overlapping itervals
+    $[t_1,t_2]$ and $[t_3,t_4]$, we have
+    $W_{t_2}~-~W_{t_1}~\perp~W_{t_4}~-~W_{t_3}$,
+    which of course generalizes to multiple independent increments.
+  \item \emph{Stationary Gaussian Increments}: For all $s,t\geq 0$, we
+    have $W_{s+t}-W_s\sim N(0,t)$
+  \item \emph{Continuous Sample Paths}.
+\end{enumerate}
+\end{defn}
 
 \section{Forward and Backward Equations}
 
@@ -823,6 +842,18 @@ probability must be counterbalanced by $\nabla \cdot
 
 \end{document}
 
+- What is a diffusion, time homogeneous, dZ^t = dt
+- Ito's Lemma: Do second order expansions, keep dW_t and dW_t^2 - dt terms
+- Ito's Lemma puts diffusion terms in the drift: *Convex* functions of
+some process will affect the drift. If $f$ is not convex, no impact
+- For X_t GBM, log(X_t) will grow slower than mu. Volatility draws down
+drift; drift adjustment
+- For processes X_t, Y_t, we have d(X_tY_t) = Y_t dX_t + X_t dY_t + dX_t dY_t
+- In discrete time, we can ``solve'' a process by expressing it as a
+function of it's past values and random shocks. ``Solving SDEs'' does
+precisely this
+- BM, GBM, Ornstein Uhlenbeck (and the discrete time formula)
+- Ito Isometry
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
