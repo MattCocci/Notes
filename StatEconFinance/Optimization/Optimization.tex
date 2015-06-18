@@ -148,12 +148,94 @@ forever. Normalizing the input vector $x$ or scaling elements of the
 gradient vector (via $w$) avoids this issue.
 
 
-\subsection{Newton's Method in One Dimension}
+\subsection{Newton's Method}
 
-\subsubsection{Original Application}
+The basic idea behind Newton's Method is not to minimize the objective
+function $f$ \emph{per~se}. Instead, minimize a second-order Taylor
+approximation about some initial point $x_n$. Call that approximation
+minimum $x_{n+1}$ and repeat the process until you converge.
 
-Originally, Newton's method was used to find roots $f(x)=0$, so let's
-start there.
+You're simply solving a  sequence of easier optimization problems that
+get successively closer to the true objective function you really want
+to minimize.
+
+
+\subsubsection{Single Dimension}
+
+The basic recursive procedure proceeds as follows:
+\begin{enumerate}
+  \item Suppose that we have some initial guess $x_n$ for the minimum of
+    $f$. Then write the second-order Taylor expansion of $f$ about
+    $x_n$, and call that approximation $f_n$:
+    \begin{align}
+      f_n(x) &= f(x_n) + f'(x_n)(x-x_n) + \frac{1}{2} f''(x_n) (x-x_n)^2\\
+      \text{where} \qquad
+      f(x) &= f_n(x) + O(x^3)\notag
+    \end{align}
+  \item Do the easy thing and minimize this approximating function $f_n$
+    rather than $f$. Then set that as your next guess, $x_{n+1}$. In
+    other words:
+    \begin{align*}
+      x_{n+1} = \min_x f_n(x)
+    \end{align*}
+    This is equivalent to setting $x_{n+1}$ such that $f'_n(x_{n+1})=0$,
+    so solve
+    \begin{align*}
+      0 &= f'_n(x_{n+1})\\
+      &= f'(x_n) + f''(x_n)(x_{n+1}-x_n) \\\\
+      \Rightarrow \quad
+      x_{n+1} &= x_n - \frac{f'(x_n)}{f''(x_n)}
+    \end{align*}
+\end{enumerate}
+Repeate that process until convergence.
+
+
+\subsubsection{Newton's Method in Multiple Dimensions}
+
+The procedure is identical, save some more general matrix and vector
+notation:
+\begin{enumerate}
+  \item Start with an initial guess $x_n$ (now a vector), and write a
+    second-order Taylor expansion of $f$ about $x_n$:
+    \begin{align*}
+      f_n(x) = f(x_n) + (x-x_n)^T \left[\nabla f(x_n)\right]
+        + (x-x_n)^T \left[\nabla^2 f(x_n)\right](x-x_n)
+    \end{align*}
+    Letting $g_n$ denote gradient $\nabla f(x_n)$ and $H_n$ the Hessian
+    $\nabla^2 f(x_n)$, we can rewrite this
+    \begin{align}
+      f_n(x) = f(x_n) + (x-x_n)^T g_n + (x-x_n)^T H_n(x-x_n)
+      \label{eq:newtonapprox}
+    \end{align}
+  \item Set $x_{n+1}$ as the minimum of this approximating function
+    $f_n$. In other words, set $x_{n+1}$ such that $f'_n(x_{n+1})=0$:
+    \begin{align}
+      0 &= f'_n(x_{n+1}) = \nabla f_n(x_{n+1})\notag\\
+      &= g_n + H_n (x_{n+1}-x_n)\notag\\\notag\\
+      \Rightarrow \quad
+      x_{n+1} &= x_n - H_n^{-1} g_n \label{eq:newtonupdate1}
+    \end{align}
+\end{enumerate}
+Note that the update step in Equation~\ref{eq:newtonupdate1} can be
+modified to
+\begin{align}
+  x_{n+1} &= x_n - \alpha H_n^{-1} g_n \label{eq:newtonupdate2}
+\end{align}
+for an $\alpha$ such that $f(x_{n+1})$ is sufficiently smaller than
+$f(x_n)$. Intuitively, we use the direction implied by the Hessian and
+gradient, but scale that direction by $\alpha$ so that we get a big
+enough improvement. To choose $\alpha$, we might start at 1 and keep
+increasing until we reach an acceptable improvement.
+
+\subsubsection{A Note on Finding Roots}
+
+Sometimes, rather than finding a minimum of some objective function,
+Newton's method is presented as a way to find zeros of some function
+$f$--i.e.\ to find $x$ such that $f(x)=0$.
+
+The basic idea is the same; just tweak the goal from minimizing a
+sequence of approximations to finding zeros of a sequence of
+approximations. In particular,
 \begin{enumerate}
   \item Use a Taylor Series expansion to write an approximation $f(x)$
     about $x_n$:
@@ -166,93 +248,111 @@ start there.
     \begin{align}
       0 &= f(x_n) + f'(x_n)(x_{n+1}-x_n)\notag\\
       \Rightarrow \quad x_{n+1} &= x_n - \frac{f(x_n)}{f'(x_n)}
-      \label{eq:newtonupdate1}
     \end{align}
-
 \end{enumerate}
-Repeat until convergence, but note that there might not be a single
-root. In fact the Newton-Raphson algorithm is very sensitive to the
-starting point. So just be aware of that.
+What's more, this can all be tied back to the optimization problems
+above, minimizing $f$ is equivalent to finding zeros of $f'$.
 
-\subsubsection{Single Dimension}
+\section{Quasi-Newton Methods}
 
-Now the question is how do we apply this to Problem~(\ref{statement})?
-Simple: instead of trying finding a zero of $f(x)$, find a zero of
-$f'(x)$.
+Newton's method is all well and good with a few parameters, but it's a
+pain in many dimensions, which requires computing and storing a large
+inverse Hessian matrix $H_n$ every time we update. What's more, we don't
+even really care about the Hessian matrix \emph{itself} when we update.
+Just look at Equation~\ref{eq:newtonupdate2}. We only care about the
+\emph{product} of the Hessian and gradient $H_n^{-1} g_n$. That's a
+sufficient statistic for the update.
 
-Thus, we adapt update Equation~\ref{eq:newtonupdate1} to be
-\begin{align*}
-  x_{n+1} &= x_n - \frac{f'(x_n)}{f''(x_n)}
-\end{align*}
-Again, be aware that you might find a local minimum only, not a global
-minimum.
+That thinking brings us to Quasi-Newton methods, which try to find a
+smart, efficient way to \emph{updating} the Hessian recursively (from
+some starting value), rather than recomputing every update.
 
+\subsection{Secant Conditions}
 
-\subsection{Newton's Method in Multiple Dimensions}
-
-Again, let's start with the general case, then move to our special case
-of finding parameters. So we have a vector valued function, and
-want to expand it into a Taylor Series approximation.:
-   \[ f(x+h) = f(x) + f'(x)h + O(h^2) \]
-   \[ x = (x_1,\ldots, x_n)^T, \qquad h = (h_1, \ldots, h_n)^T, \qquad
-      f(x) = (f_1(x), \ldots, f_n(x) )^T\]
-   \[ f'(x) = J = \begin{pmatrix} \frac{\partial f_1}{\partial x_1}
-      & \cdots & \frac{\partial f_1}{\partial x_n} \\
-      \vdots & \ddots & \vdots \\ \frac{\partial f_n}{\partial x_1}
-      & \cdots & \frac{\partial f_n}{\partial x_n}
-      \end{pmatrix} \]
-Then, you use
-\begin{align*}
-   0 &= f(x) + J h \\
-   x_{k+1} &= x_k - J^{-1} f(x_k)
-\end{align*}
-Now let's adopt this to our problem of a two-parameter optimization.
-Suppose we are faced with
+Suppose that we want to update from $x_n$ to $x_{n+1}$. We will now
+replace the true Hessian in $H_n$ with a approximate Hessian $B_n$ to
+rewrite Equation~\ref{eq:newtonapprox} and form a \emph{new}
+approximating function
 \begin{align}
-   \label{jacobian}
-   (\hat{\alpha}, \hat{\beta}) &= \arg \max_{\alpha, \beta} L(
-   \alpha, \beta) = \arg \max_{\alpha, \beta} \ell(
-   \alpha, \beta)\notag \\
-\text{Solve} \qquad 0 &= \frac{\partial\ell(
-   \hat{\alpha}, \hat{\beta})}{\partial\alpha}, \qquad 0 =
-   \frac{\partial\ell(\hat{\alpha}, \hat{\beta})}{\partial\beta}
+  b_n(x) = f(x_n) + (x-x_n)^Tg_n + (x-x_n)^T B_n (x-x_n)
+  \label{eq:quasinewtonapprox}
 \end{align}
-Awesome, so we have a vector valued function that we wish to find
-a root for. So let's do it:
+Now for the main question: How to choose $B_n$? Well, one reasonable
+choice of $B_n$ would be one that preserves the gradient of $f$ at $x_n$
+and $x_{n-1}$.
+
+Therefore, we say that our choice of $B_n$ satsifies the \emph{secant
+conditions} if
+\begin{align}
+  \nabla b_n(x_n) &= \nabla f(x_n) = g_n \label{eq:secant}\\
+  \nabla b_n(x_{n-1}) &= \nabla f(x_{n-1}) = g_{n-1}\notag
+\end{align}
+We compute the gradient of $b_n$ from
+Equation~\ref{eq:quasinewtonapprox} to be
 \begin{align*}
-   \ell(\alpha, \beta) &= \begin{pmatrix}
-      \frac{\partial\ell({\alpha}, {\beta})}{\partial\alpha} &
-      \frac{\partial\ell({\alpha}, {\beta})}{\partial\beta}
-   \end{pmatrix}\\
-   J = \ell'(\alpha, \beta) &= \begin{pmatrix}
-      \frac{\partial^2\ell({\alpha}, {\beta})}{\partial\alpha^2} &
-      \frac{\partial^2\ell({\alpha}, {\beta})}{\partial\alpha\partial
-      \beta} \\
-      \frac{\partial^2\ell({\alpha}, {\beta})}{\partial\alpha\partial
-      \beta}&
-      \frac{\partial^2\ell({\alpha}, {\beta})}{\partial\beta^2}
-   \end{pmatrix}
+  \nabla b_n &= g_n + B_n(x-x_n)
 \end{align*}
-From there, we get an estimate by iteration over
-   \[ (\alpha_{k+1}, \beta_{k+1}) = (\alpha_{k}, \beta_{k}) -
-      J^{-1} \ell(\alpha_{k}, \beta_{k}) \]
-For more general cases, where the number of parameters is greater
-than one or two, simply expand the number partial derivatives and
-maximization criteria that we labeled Equations \ref{jacobian}.
-The only difference is that the Jacobian and function of the parameters
-would have a higher dimension.
-
-Suppose that we want to minimize the function $f(y)$, where $y$ is a
-vector of parameters.
-
-Now recall the second order Taylor Expansion of $f(y)$ about vector $x$:
+Together with Equations~\ref{eq:secant}, this implies
 \begin{align*}
-  f(y) = f(x) + (y-x)^T \left[\nabla f(x)\right]
-  + \frac{1}{2} (y-x)^T \left[\nabla^2 f(x)\right](y-x)
+  \nabla b_n(x_n) - \nabla b_n(x_{n-1})
+    &= g_n - g_{n-1} \\
+  (g_n + B_n(x_n-x_n)) - (g_n + B_n(x_{n-1}-x_n))
+  &= g_n - g_{n-1} \\
+  B_n(x_{n}-x_{n-1}) &= g_n - g_{n-1}
 \end{align*}
-where $\nabla f(x)$ is the gradient at $x$ and $\nabla^2 f(x)$ the
-Hessian.
+Switching to more compact, standard notation and expressing the
+conditions in terms of the Hessian \emph{inverse}, the secant conditions
+become where $s_n$ and $y_n$ are standard notation
+\begin{align}
+  s_n &= B_n^{-1}y_n \label{eq:secant_compact}\\\notag\\
+  \text{where} \qquad
+  s_n &= (x_{n}-x_{n-1}) \notag \\
+  y_n &= (g_{n}-g_{n-1}) \notag
+\end{align}
+We want this to hold for our choice of $B^{-1}_n$, the approximation to
+the inverse Hessian.
 
+\subsection{BFGS Recursive Update}
+
+Suppose that we have a starting, symmetric Hessian approximation $B^{-1}_n$,
+that satisfies the secant conditions above in
+Equation~\ref{eq:secant_compact}. How can we update to get $B^{-1}_{n+1}$
+such that
+\begin{enumerate}
+  \item $B^{-1}_{n+1}$ also satisfies the secant conditions.
+  \item $B^{-1}_{n+1}$ is symmetric.
+  \item $B^{-1}_{n+1}$ is as close to $B^{-1}_n$ as possible, where
+    ``closeness'' is defined using the weighted Frobenius norm.
+\end{enumerate}
+In notation, we want
+\begin{align*}
+  \min_{B^{-1}} &\quad ||B^{-1} - B^{-1}_n||^2_W \\
+  \text{s.t.} &\quad s_{n+1} = B^{-1}y_{n+1} \\
+              &\quad B^{-1} \text{\;symmetric}
+\end{align*}
+After some math, we can show that the Broyden, Fletcher, Goldfarb,
+Shanno (BFGS) update satisfies this condition:
+\begin{align}
+  B_{n+1}^{-1} = B^{-1}_n
+  + \frac{(y_n^T s_n + y_n^T B^{-1}_n y_n)(s_n s_n^T)}{(y_n^T s_n)^2}
+  - \frac{s_n (B^{-1}_n y_n)^T + B^{-1}_n y_n s_n^T}{y_n^T s_n}
+  %H = H0 + (1+(dg'*Hdg)/dgdx)*(dx*dx')/dgdx - (dx*Hdg'+Hdg*dx')/dgdx;
+  \label{eq:bfgs}
+\end{align}
+This update will also ensure that $B^{-1}_{n+1}$ is positive
+semi-definite whenever $B^{-1}_n$ is. It's not a condition we need to
+impose a priori, since it follows from this updating procedure.
+
+Given this, we don't have to compute the true Hessians $H_n$ every time.
+Instead, we have reasonable (i.e.\ satisfying the secant conditions)
+approximations $B_n$ that are updated via recurrence relation. To choose
+the initial approximate Hessian $B_0$, we have a few options:
+\begin{enumerate}
+  \item Compute the true Hessian $H_0$, and then just apply this
+    updating scheme from there.
+  \item Use a diagonal approximation to the true Hessian.
+  \item Use a scalar multiple of the identity matrix.
+\end{enumerate}
 
 
 \section{Linear Programming}
