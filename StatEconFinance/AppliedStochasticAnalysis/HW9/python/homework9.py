@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 
+
 # Define classes and updating schemes
 execfile("setup.py")
 
