@@ -301,13 +301,13 @@ effect $\rho$ of some treatment $D_i$ on individual $i$:
   Y_i =
   \underbrace{\alpha}_{\mathbb{E}Y_i}
   + \underbrace{\rho}_{Y_{1i} - Y_{0i}} D_i
-  + \underbrace{\varepsilon_i}_{Y_{0i}-\mathbb{E}Y_{0i}}
+  + \underbrace{\eta_i}_{Y_{0i}-\mathbb{E}Y_{0i}}
   \label{basic}
 \end{align}
 
 \begin{thm}
 In the context of the basic regression setup, selection bias is
-correlation between the error term $\varepsilon_i$ and the treatment
+correlation between the error term $\eta_i$ and the treatment
 regressor $D_i$.
 \end{thm}
 \begin{rmk}
@@ -315,28 +315,28 @@ This is very similar to our earlier Definition~\ref{defn:selbias}, only
 recast in the terms of regression. To square with that earlier
 definition, we need to show that correlation of the error term and $D_i$
 is isomorphic to correlation of potential outcomes and $D_i$. Therefore,
-the proof will demonstrate that $\varepsilon_i$ \emph{contains} all the
+the proof will demonstrate that $\eta_i$ \emph{contains} all the
 information about potential outcomes here.
 \end{rmk}
 \begin{proof}
 Evaluating (\ref{basic}) under no treatment and treatment:
 \begin{align*}
   \mathbb{E}[Y_i | D_i = 1]
-    &= \alpha + \rho + \mathbb{E}[\varepsilon_i | D_i = 1]\\
+    &= \alpha + \rho + \mathbb{E}[\eta_i | D_i = 1]\\
   \mathbb{E}[Y_i | D_i = 0]
-    &= \alpha + 0 + \mathbb{E}[\varepsilon_i | D_i = 0] \\\\
+    &= \alpha + 0 + \mathbb{E}[\eta_i | D_i = 0] \\\\
   \Rightarrow\qquad
   \mathbb{E}[Y_i | D_i = 1] - \mathbb{E}[Y_i | D_i = 0]
     &= \underbrace{\rho}_{\text{Treatment Effect}} +
-    \underbrace{\mathbb{E}[\varepsilon_i | D_i = 1]
-      -\mathbb{E}[\varepsilon_i | D_i = 0]}_{\text{Selection Bias}}
+    \underbrace{\mathbb{E}[\eta_i | D_i = 1]
+      -\mathbb{E}[\eta_i | D_i = 0]}_{\text{Selection Bias}}
 \end{align*}
 Therefore, we see that the term labeled ``Selection Bias'' will equal
 zero if and only if the error terms and the treatment are uncorrelated.
 This is equivalent to our earlier definition of Selection Bias if we use
 the definition of the error term in (\ref{basic}) to write out
 \begin{align*}
-  \mathbb{E}[\varepsilon_i | D_i = 1] -\mathbb{E}[\varepsilon_i | D_i = 0]
+  \mathbb{E}[\eta_i | D_i = 1] -\mathbb{E}[\eta_i | D_i = 0]
   &=
   \left(\mathbb{E}[Y_{0i} | D_i = 1] - \mathbb{E}Y_{i0}\right)
   -\left(\mathbb{E}[Y_{0i} | D_i = 0] - \mathbb{E}Y_{i0} \right)\\
@@ -357,9 +357,72 @@ relationship between treatment and outcomes. Often, the cure is to include addit
   \underbrace{\alpha}_{\mathbb{E}Y_i}
   + \underbrace{X_i' \beta}_{\text{Controls}}
   + \underbrace{\rho}_{Y_{1i} - Y_{0i}} D_i
-  + \underbrace{\varepsilon_i}_{Y_{0i}-\mathbb{E}Y_{0i}}
+  + \underbrace{\eta_i}_{Y_{0i}-\mathbb{E}Y_{0i}}
   \label{longreg}
 \end{align}
+
+\section{Fundamentals}
+
+\subsection{The Conditional Expectation Function}
+
+\begin{defn}
+The \emph{conditional expectation function} (CEF) is a random function
+of $X$ defined for the population as
+\begin{align*}
+  \mathbb{E}[Y_i|X_i=x] = \int y f_y(y|X_i=x) dy
+\end{align*}
+where $f_y$ is the conditional desnity of $Y_i$.
+\end{defn}
+
+\begin{thm}
+The CEF is useful because it is the best \emph{minimum mean squared
+error} (MMSE) predictor of $Y_i$ given $X_i$. That is
+\begin{align*}
+  \mathbb{E}[Y_i|X_i]
+  &= \arg \min_g \mathbb{E}\left[(Y_i-g(X_i))^2\right]
+\end{align*}
+\end{thm}
+
+\begin{rmk}
+The fact that the CEF is the best MMSE predictor of $Y_i$ given $X_i$ follows from the next thoerem.
+\end{rmk}
+
+\begin{thm}
+\label{thm:cefdecomp}
+The \emph{CEF Decomposition Property} says that we can break up any
+$Y_i$ into
+\begin{align*}
+  Y_i &= \mathbb{E}[Y_i|X_i] + \varepsilon_i\\
+  \\
+  \text{\emph{where}}\quad
+  E[\varepsilon_i|X_i] = 0 \quad &\text{\emph{and}}\quad
+  E[g(X_i)\varepsilon_i] = 0 \qquad \forall g
+\end{align*}
+In words, we can decompose any random variable into the contribution
+from $X_i$, captured by the CEF, plus random noise that is independent
+of $X_i$.
+\end{thm}
+
+\begin{thm}
+A directon consequence of Theorem~\ref{thm:cefdecomp} is the \emph{ANOVA
+Theorem}, which states that
+\begin{align*}
+  \text{\text{\emph{Var}}}(Y_i)
+  &= \text{\text{\emph{Var}}}\left(E[Y_i|X_i]\right)
+  + E\left[\text{\text{\emph{Var}}}(Y_i|X_i)\right]
+\end{align*}
+\end{thm}
+
+\begin{thm}
+The \emph{Law of Iterated Expectations} says
+\begin{align*}
+  \mathbb{E}[Y_i] = \mathbb{E}\left\{\mathbb{E}[Y_i|X_i]\right\}
+\end{align*}
+where the outer expectation is taken with respect to $X_i$, since the
+CEF inside is a function of $X_i$.
+\end{thm}
+
+\subsection{Linear Regression and the CEF}
 
 
 %\tableofcontents
