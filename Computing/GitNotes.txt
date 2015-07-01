@@ -131,7 +131,7 @@ Notes based on: www.atlassian.com/git/tutorial/
   push the most recent commit, run from the normal working tree
   directory
 
-    git push -u origin
+    git push -u origin master
 
   where the -u denotes "upstream."
 
@@ -468,5 +468,66 @@ Notes based on: www.atlassian.com/git/tutorial/
   area, and then run
 
     git rebase --continue
+
+
+-- Merging Git Repos --
+
+  This method is based on the tutorial
+
+    scottwb.com/blog/2012/07/14/merge-git-repositories-and-preserve-commit-history
+
+  Changes include updating the example to a better TV show, writing it like a
+  bash loop (*that has not actually been tested yet* so don't try to run it as
+  is, without closer inspection). Otherwise, it's the same. Written here
+  simply in case that guy takes down his page.
+
+  -- Process --
+
+  Say you want to merge repos Jerry, George, Elaine, and Kramer into a new
+  repo "Seinfeld" and preserve the commit history.
+
+  Without loss of generality, assume that Jerry, George, Elaine, and Kramer
+  are in the home directory, and that Seinfeld should be in the home directory
+  too. Below assumes that all the files in those directories have been
+  committed (nothing left in staging area or untracked).
+
+  Commands:
+
+    # New directory to merge into; make it, init a git repo there
+    newDir="Seinfeld"
+    mkdir ~/$newDir
+    cd ~/$newDir
+    git init
+    cd ..
+
+    # Directories to merge
+    toMerge="Jerry Elaine George Kramer"
+    for dir in $toMerge
+    do
+
+      # Create a directory named "$dir" *IN* directory "$dir"
+      cd $dir
+      mkdir $dir
+
+      # Remove remote origin so you don't transmit errors upstream
+      git remote rm origin
+
+      # Move everything into the $dir subdir of $dir
+      git mv *.* $dir
+      git commit -m "Prepare $dir for merging into $newDir/"
+
+      # Go to the folder your merging into, make a new remote named $dir
+      # pointing to $dir and pull it
+      cd ~/$newDir
+      git remote add $dir ~/$dir/
+      git pull $dir master
+
+      # Remove that remote and that repo entirely
+      git remote rm $dir
+      cd ~/
+      rm $dir
+
+    done
+
 
 
