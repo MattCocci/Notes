@@ -1,31 +1,414 @@
----------------------------------------------------------------
----------------------------------------------------------------
----------------------------------------------------------------
+========================================================================
+== Misc ================================================================
+========================================================================
 
-To start an IJulia session
-ipython notebook --profile=julia
+- To start an IJulia session
 
+    ipython notebook --profile=julia
 
-typeof(x)   Checks type
-['x', 3, false]   Create a mixed-type array
+- Run a code file
 
-Mutating Methods: They change the object passed; end in ! to highlight that they mutate
-  pop!(x)
-  push!(x, 'bar')
+    include("file.jl")
 
 
-Array(Float64, 10)    Creates a 10-long array of type Float64
+========================================================================
+== Style Conventions ===================================================
+========================================================================
 
-for i = 1:10
-  x[i] = randn()
-end
-for word in ["foo", "bar"]
-  println(word)
-end
+- Variable names all lower case, possibly with underscores, but sparingly
+- Types start with a capital letter, camelcase
+- Functions all lower case
+- Mutating function names end in !
 
-function f(x)
+
+========================================================================
+== Math ================================================================
+========================================================================
+
+WORD_SIZE   Internal var, checks whether target system is 32, 64 bit
+eps()       Distance between floating point numbers
+
+Oddities
+--------
+isequal(NaN,NaN)  yields true
+NaN == NaN        yields false
+isequal(-0.0,0.0) yields false (-0 is negative zero, 0 positive zero)
+-0.0 == 0.0       yields true
+
+Rounding
+--------
+round(x)
+floor(x)
+ceil(x)
+trunc(x)   Round towards zero
+
+Division
+--------
+div(x,y)  Truncated division, quotient rounded towards zero
+fld(x,y)  Floored division, rounded towards -Inf
+cld(x,y)  Ceiling division, rounded towards Inf
+gcd(x,y)  Greatest common divisoro
+lcm(x,y)  Least common multiple
+
+
+Special Functions
+-----------------
+expm1(x)  More accurate exp(x)-1 when x near zero
+log1p(x)  More accurate log(1+x) for x near zero
+
+
+Special Number Types
+--------------------
+im    Imaginary number
+2//3  Rational number
+
+
+========================================================================
+== Strings =============================================================
+========================================================================
+
+str[6]    returns type char object at location 6
+str[6:6]  returns type string object at location 6
+"x = $x"  Substitutes the value of x in for $x (use \$ for an actual $)
+
+search(aString, 'x')    Find location of character x in aString
+contains(aString, str)  Checks if str is contained in aString
+repeat("xyz", 10)
+join                    For joining an array of strings
+
+Regex
+-----
+r"^\s*(?:#|$)"    Object of type regex
+ismatch           For checking regexs, return true/false
+match             Return a match object given a regex and string
+
+========================================================================
+== Functions ===========================================================
+========================================================================
+
+- Functions are first class objects that can be passed around
+- "Pass by sharing", no copying
+- Most operators are functions so +(x,y) works like x+y. INTO IT.
+  Examples:
+
+  [A B C]     hcat()
+  [A,B,C]     vcat()
+  [A B; C D]  hvcat()
+  A'          ctranspose()
+  A.'         transpose()
+  1:n         colon()
+  A[i]        getindex()
+  A[i]=x      setindex!()
+  A(x)        call(x)
+
+- Functions take a tuple of input arguments and return a tuple of output
+  arguments that can be unpacked as in Python
+
+    x,y = foo(2,3)
+
+Function Definition (3 Ways)
+----------------------------
+
+  # Usual
+  function f(x,y)
+    z = x + y
+    return z
+  end
+
+  # Terse
+  f(x,y) = x + y
+
+  # Anonymous
+  x -> x^2 + 2x + 1
+
+
+map()
+-----
+map(fcn, array)
+map(x -> x^2 + 2x, Array)
+
+
+Variable Arguments
+------------------
+
+  fcn(a,b,x,...)
+
+The above binds a and b to the first two arguments, and x bound to a
+tuple that holds everything that comes after (which might be nothing,
+resulting in an empty x tuple)
+
+You can also splice in arguments (to any function) as follows
+
+  x = (1,2)
+  fcn('a', 'b', x...)
+
+which is like fcn('a', 'b', args{:}) in Matlab
+
+
+Optional and Keyword Arguments
+------------------------------
+Optional Arguments:
+
+  function foo(a, b, c='default')
+    return c
+  end
+
+Keyword Arguments: For when the order doesn't matter, and you want to be
+able to name arguments specifically
+
+  function plot(x, y; width=2, color="black")
+    ###
+  end
+
+For optional arguments, all previous arguments are in scope. For keyword
+arguments, all arguments are in scope.
+
+
+Passing Functions as Arguments
+------------------------------
+Since its sometimes awkward when passing fcns as arguments to other
+fcns, use syntax
+
+  acceptingFcn(args) do x
+    # annonymous passedFcn
+  end
+
+This is equivalent to acceptingFcn(x -> passedFcn(x), args)
+
+
+========================================================================
+== Control Flow ========================================================
+========================================================================
+
+Compound Expressions
+--------------------
+The following two examples of expression definition will both return 3
+
+z = begin
   x = 1
-  return x
+  y = 2
+  x + y
 end
+
+z = (x=1; y=2; x+y)
+
+
+If-Else
+-------
+Really strict in that the conditions must evaluate to a Boolean value
+(not ints like in Matlab)
+
+  if cond1
+    #
+  elseif cond2
+    #
+  else
+    #
+  end
+
+Another way to get if-else behavior:
+
+  cond ? retIfCondTrue : retIfCondFlase
+
+Only one of the expressions after ? will be evaluated, and that happens
+after ? "chooses" which to use.
+
+
+Short-Circuit Operators
+-----------------------
+Use && and ||
+
+Can also be used to do shit, evaluate expressions, and return things (as a kind of abbreviated if-statement):
+
+  n >= 0 || error("n negative")
+  n == 0 && return 1
+
+
+Loops
+-----
+While loops look like this
+
+  while cond
+    # Do stuff
+    if someDealBreaker
+      break
+    end
+  end
+
+For loops look like this
+
+  for i = 1:N
+    # Do stuff
+    if someDealBreaker
+      break
+    end
+    if somethingLessSerious
+      continue
+    end
+  end
+
+  for i = 1:N, j = 1:T
+    # Do stuff with i,j
+  end
+
+  for i in ["foo", "bar"]
+    #
+  end
+
+NOTE: If the iterator was not defined outside the loop,
+it will *NOT* be available after the loop, so the following would throw
+an error:
+
+  for i = 1:N
+    println(i)
+  end
+  i+1
+
+
+Exceptions, Errors, etc.
+------------------------
+Define your own exceptions with
+
+  type MyCustomException <: Exception end
+
+Call them as functions, and throw them with
+
+  MyCustomException()
+  throw(SomeException())
+
+Create error exceptions with
+
+  error("Error msg")
+
+Other built-ins that do not stop execution:
+
+  info("Information")
+  warn("Warning")
+
+
+Try-Catch
+---------
+Simple, without exception
+
+  try
+    # something
+  catch
+    # something else
+  end
+
+To save the exception as a variable
+
+  try
+    # something
+  catch x
+    if isa(x, DomainError)
+      #
+    elseif isa(x, BoundsError)
+      #
+    end
+  end
+
+
+Try-Finally
+-----------
+To run a bunch of code whether or not the try block fails (esp. useful
+for closing files and cleaning up at the end)
+
+  try
+    # Code
+  finally
+    # Whether error or not, do this stuff
+  end
+
+
+Tasks
+-----
+Useful when some function needs to consume output, but another function
+producing that output is not done running.
+
+Example: An estimation might be producing parameter draws, and you
+could, at the same time, run a program that consumes those paramater
+draws to produce forecasts given a parameter vector.
+
+Define Producer function: Calls produce()
+
+  function producer()
+    produce("start")
+    for n = 1:4
+      produce(2n)
+    end
+    produce("stop")
+  end
+
+Wrap that producer in a "Task":
+
+  p = Task(producer)
+
+To consume values, call consume() repeatedly on the task
+
+  consume(p)
+  ...
+  consume(p)
+
+Between calls to produce(), the producer's execution is suspended, and
+the consumer has control.
+
+Can iterator like
+
+  for x in Task(producer)
+    println(x)
+  end
+
+Note that Task requires a zero-argument function. Can parameterize
+producer. See docs.
+
+
+========================================================================
+== Scoping =============================================================
+========================================================================
+
+Julia uses lexical scoping, so a function's scope does not inherit from
+its caller's scope but from the scope in which the function was defined.
+
+You can do crazy things with scoping
+
+  function f(x)
+    x+y
+  end
+  y = 2
+  f(3)
+
+^That bitch works and gives back 5, even though you didn't define y (an
+object used *IN* the function!!!) until after the function declaration.
+Julia just needs you to have everything defined by the time the function
+is *called*, not necessarily by the time the function is defined.
+
+Declaring constants:
+
+  const e = 2.71828
+
+
+For-loop scoping
+----------------
+The following, where i is not defined initially, will throw an error
+since the i only exists until the end of the loop, then is thrown away
+
+  for j = 1:5
+    j
+  end
+  j
+
+BUT, if the thing was defined first, before the for loop, you get a 5:
+
+  j = 3
+  for j = 1:5
+    j
+  end
+  j
+
+For loops *reuse existing variables* for iterations.
+
+BUT comprehensions do not do this.
+
 
 
