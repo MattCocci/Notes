@@ -28,7 +28,6 @@ function [] = StateSpaceGeometry()
   end
 
 
-
   %% Function to draw arrow and add annote
   function [H] = myarrow(base, point, color)
     if ~exist('color', 'var')
@@ -45,7 +44,7 @@ function [] = StateSpaceGeometry()
     fig = figure();
     hold on
 
-    plot([0 v.a(1)*10], [0 v.a(2)*10], ':', 'Color', gray);
+    plot([0 v.a(1)*10], [0 v.a(2)*10], '--', 'Color', gray);
     myarrow(v.o,v.a);
 
     if hoff
@@ -83,7 +82,7 @@ function [] = StateSpaceGeometry()
   function [fig] = Fig4(hoff)
     fig = Fig3(0);
 
-    plot([0 xintercept.b], [yintercept.b 0], ':', 'Color', gray)
+    plot([0 xintercept.b], [yintercept.b 0], '--', 'Color', gray)
 
     if hoff
       hold off
@@ -94,7 +93,7 @@ function [] = StateSpaceGeometry()
   function [fig] = Fig5(hoff)
     fig = Fig2(0);
 
-    plot([0 xintercept.b], [yintercept.b 0], ':', 'Color', gray)
+    plot([0 xintercept.b], [yintercept.b 0], '--', 'Color', gray)
     myarrow(v.o, proj.b, blue);
     for w = -3:1:2
       myarrow(v.o, w*proj.b+(1-w)*v.b, blue);
@@ -112,7 +111,7 @@ function [] = StateSpaceGeometry()
     myarrow(v.o, v.c, green);
     myarrow(v.o, proj.c, green);
     myarrow(v.c, proj.c, orange);
-    plot([0 xintercept.c], [yintercept.c 0], ':', 'Color', gray)
+    plot([0 xintercept.c], [yintercept.c 0], '--', 'Color', gray)
 
     if hoff
       hold off
@@ -134,6 +133,10 @@ function [] = StateSpaceGeometry()
     figure(fig.(f{n}))
     axis([lim, lim])
     set(gca(), 'FontSize', 16)
+
+    print(gcf(), '-dpdf', ['../Plots/StateSpaceGeometry' num2str(n) '.pdf']);
   end
+
+
 
 end
