@@ -411,4 +411,140 @@ For loops *reuse existing variables* for iterations.
 BUT comprehensions do not do this.
 
 
+========================================================================
+== Types ===============================================================
+========================================================================
+
+Julia is dynamically typed, but allows for some typing before run time.
+You don't have to provide types, but you can very easily, and it helps.
+
+Vocabulary:
+- Abstract types
+- Concerete types
+- Parameterized types
+
+Only values not variables have types. Variables are simply names bound
+to values.
+
+Using :: to assert types
+------------------------
+- In function declarations
+
+    function foo(x::Int8)
+      return 2x
+    end
+
+- To require a variable always to be of a certain type (so any time you
+  try to assign a value to that name, the value will be converted to the
+  specified type). This is very much like types in C
+
+    function foo()
+      x::Int8 = 1
+    end
+
+Abstract vs. Concrete Types
+---------------------------
+Big difference:
+- You instantiate instances of concrete types: Things like Int8, Int32,
+  Int64, etc.
+- You can never instantiate an instant of an abstract type.
+
+Abstract types simply let you say "Hey, all Ints are kind of alike and
+you probably want to do the same kinds of things with them, without
+really caring whether something is Int8, Int32, Int64, etc."
+
+Abstract types are about creating a sensible heirarchy of types.
+
+Declare new abstract types with
+
+  abstract newType
+  abstract newType <: Supertype
+
+If a Supertype is not specified, the supertype is, by default, "Any."
+
+
+User-Defined Composite Types
+----------------------------
+Like structs in C, a collection of named fields that can be treated as a
+single value.
+
+Julia isn't so object-oriented that "methods"/functions-for-objects live
+inside the object. Rather, Julia uses multiple-dispatch and the types of
+all arguments to select a method to run, not just the type of the first
+argument ("self" in Python).
+
+They can be defined as follows:
+
+  type NewType
+    a  # Will default to type Any
+    b::Int64
+    c::Float64
+  end
+
+Here's how you work with this new type:
+
+  x = NewType("Bob", 3,   2.14) # Create instance of NewType
+  y = NewType("Bob", 3.0, 2)    # Same, but second and third arguments
+                                #   will be converted to the correct
+                                #   type
+  fieldnames(x)                 # Fieldnames of the type: :a,:b,:c
+  x.a, x.b                      # Accessing field values
+  x.a = 27                      # Changing the field values
+
+
+Immutable Types
+---------------
+
+immutable NewType <: SuperType
+  a
+  b::Int32
+end
+
+
+Parametric Types
+----------------
+Example
+
+  type Point{T}
+    x::T
+    y::T
+  end
+
+This allows x and y to be of different types so that you could very
+easily use Point for ints, floats, etc. "T" is just a dummy for a type
+that will be substituted in when you instantiate a new Point object.
+
+Moreover, this will create an abstract type "Point" where Point{Int64}
+and Point{Float32} are concrete subtypes of Point.
+
+You can construct instances of type Point by
+
+  Point{Float64}(1.0,2.0)
+  Point(1.0,2.0)
+  Point(1,2)
+
+In the latter two examples, the type will be inferred from the
+arguments.
+
+
+Type Aliases
+------------
+New names for already expressible types. Useful when a few of the
+parameter choices are fixed:
+
+  typealias Vector{T} Array{T,1}
+  typealias Matrix{T} Array{T,2}
+
+
+Functions for Working with types
+---------------------------------
+isa(someValue, aType)   Test if something is a particular type
+typeof(anything)        Type of anything
+
+
+
+
+
+
+
 

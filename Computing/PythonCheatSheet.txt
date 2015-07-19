@@ -747,7 +747,95 @@
 
 
 
+--------------------------------------------------------------------
+----- Parallel Python ----------------------------------------------
+--------------------------------------------------------------------
+
+Summary of http://nealhughes.net/parallelcomp/
+
+In general, two forms of parallel computing
+1.  threading: multiple cores operating on shared memory
+2.  processes: message passing with each core running an essentially
+               independent task, requiring its own copy of the input
+               data
+
+This section will focus on the Python "multiprocessing" module. Steps:
+1. What to put in the header
+
+    from multiprocessing import Process
+    from multiprocessing.queues import Queue
+
+2. Create a function you want to call in parallel. Rather than return
+   output via "return", pass a queue object as an argument and "put" the
+   output there.
+
+   Below is a function that can work in parallel or not, depending on
+   whether or not a queue object is passed
+
+    def myfcn(a,b,c,queue=None)
+      # Do stuff
+      if queue == None:
+        return output
+      else:
+        queue.put(output)
+
+   Note that this function must be a pure Python function, NOT function
+   with Cython in it. If you want to use Cython, you wrap that Cython
+   code in a pure Python function.
+
+3. But of course, to pass a queue object to the function, you need to
+   create the queue objects. Here's how to do that.
+
+   This function is a wrapper to call myfcn in parallel, repeating the
+   same function call with a,b,c "cores" times. You might instead add
+   aditional code to split up a,b,c inputs among the cores, but I leave
+   that out for simplicity.
+
+    def mywrapper(cores, a, b, c)
+
+      queues = []; jobs = []; results = [];
+      for i in range(cores)
+        # Init the queues for each core
+        queues.append(Queue())
+
+        # Create a process, passing in the just-created queue object as
+        # an argument to myfcn
+        jobs.append( Process(target=myfcn, args=(a,b,c,queues[i])) )
+
+        # Start/submit all processes
+        for j in jobs: j.start()
+
+        # Force mywrapper function to wait until all jobs have completed
+        for j in jobs: j.join()
+
+        # Collect the output
+        for q in queues: results.append(q.get())
+
+        # Maybe do stuff on results
+
+        return results
 
 
+Note: You might need to set the seed with an argument when doing
+anything stochastic, since the seed will be the same for each process.
+In other words, if you don't set the seed, you'll be generating the same
+output "cores" times.
 
+Wrapper for eliminating stability issues
+----------------------------------------
 
+def retry_on_eintr(fcn, *args, **kw):
+  while True:
+    try:
+      return fcn(*args, **kw)
+    except IOError, e:
+      if e.errno == errno.EINTR:
+        continue
+      else:
+        raise
+
+class RetryQueue(Queue):
+  def get(self, block=True, timeout=None):
+    return retry_on_eintr(Queue.get, self, block, timeout)
+
+Now use "RetryQueue()" class instead of "Queue()" about to initialize.
