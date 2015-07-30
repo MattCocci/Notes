@@ -1,55 +1,430 @@
-\documentclass[a4paper,12pt]{scrartcl}
+\documentclass[12pt]{article}
 
-\author{Matthew Cocci}
-\title{Econometrics}
+\author{Matthew D. Cocci}
+\title{Generalized Method of Moments}
 \date{\today}
-\usepackage{enumitem} %Has to do with enumeration	
-\usepackage{amsfonts}
+
+%% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % most detailed page formatting control
+\usepackage{fullpage} % Simpler than using the geometry package; std effect
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+%% Formatting %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[margin=1in]{geometry}
+    %   Adjust the margins with geometry package
+%\usepackage{pdflscape}
+    %   Allows landscape pages
+%\usepackage{layout}
+    %   Allows plotting of picture of formatting
+
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt}
+    %   Make the header bigger to avoid overlap
+
+%\fancyhf{}
+    %   Erase header settings
+
+%\renewcommand{\headrulewidth}{0.3pt}
+    %   Width of the line
+
+%\setlength{\headsep}{0.2in}
+    %   Distance from line to text
+
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
 \usepackage{amsthm} %allows for labeling of theorems
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{blindtext}
-\usepackage{graphicx}
-%\usepackage[hidelinks]{hyperref} % For internal/external linking. 
-				 % [hidelinks] removes boxes
-% \usepackage{url} % allows for url display, non-clickable
-%\numberwithin{equation}{section} 
-   % This labels the equations in relation to the sections 
-      % rather than other equations
-%\numberwithin{equation}{subsection} %This labels relative to subsections
+\theoremstyle{plain}
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{prop}[thm]{Proposition}
 \newtheorem{cor}[thm]{Corollary}
-\setkomafont{disposition}{\normalfont\bfseries}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+
+% Below supports left-right alignment in matrices so the negative
+% signs don't look bad
+\makeatletter
+\renewcommand*\env@matrix[1][c]{\hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols #1}}
+\makeatother
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref}
+\hypersetup{%
+    colorlinks,
+        %   This colors the links themselves, not boxes
+    citecolor=black,
+        %   Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Colors %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{color}
+\definecolor{codegreen}{RGB}{28,172,0}
+\definecolor{codelilas}{RGB}{170,55,241}
+
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{verbatim}
+    %   For including verbatim code from files, no colors
+\usepackage{listings}
+    %   For including code snippets written directly in this doc
+
+\lstdefinestyle{bash}{%
+  language=bash,%
+  basicstyle=\ttfamily,%
+  showstringspaces=false,%
+  commentstyle=\color{gray},%
+  keywordstyle=\color{blue},%
+  xleftmargin=0.25in,%
+  xrightmargin=0.25in
+}
+
+\definecolor{codegreen}{RGB}{28,172,0}
+\definecolor{codelilas}{RGB}{170,55,241}
+\newcommand{\matlabcode}[1]{%
+    \lstset{language=Matlab,%
+        basicstyle=\footnotesize,%
+        breaklines=true,%
+        morekeywords={matlab2tikz},%
+        keywordstyle=\color{blue},%
+        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+        identifierstyle=\color{black},%
+        stringstyle=\color{codelilas},%
+        commentstyle=\color{codegreen},%
+        showstringspaces=false,%
+            %   Without this there will be a symbol in
+            %   the places where there is a space
+        numbers=left,%
+        numberstyle={\tiny \color{black}},%
+            %   Size of the numbers
+        numbersep=9pt,%
+            %   Defines how far the numbers are from the text
+        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+            %   Some words to emphasise
+    }%
+    \lstinputlisting{#1}
+}
+    %   For including Matlab code from .m file with colors,
+    %   line numbering, etc.
+
+%% Bibliographies %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{natbib}
+    %---For bibliographies
+%\setlength{\bibsep}{3pt} % Set how far apart bibentries are
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{enumitem}
+    %   Has to do with enumeration
 \usepackage{appendix}
-\usepackage{subfigure} % For plotting multiple figures at once
-\usepackage{verbatim} % for including verbatim code from a file
-\usepackage{natbib} % for bibliographies
+%\usepackage{natbib}
+    %   For bibliographies
+\usepackage{pdfpages}
+    %   For including whole pdf pages as a page in doc
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
 
 \begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \maketitle
 
-%\tableofcontents %adds it here
+\tableofcontents %adds it here
 
-\section{Notation}
+\clearpage
+\section{Delta Method}
 
-The most general type of data we'll consider is  panel data, where the outcome of interest is denoted $Y_{it}$, the outcome for individual $i$ at time $t$.
+Suppose we have a sample of $\left\{\boldsymbol{y}_i\right\}_{i=1}^N$ of
+some random variable $\boldsymbol{y}\sim
+N(\boldsymbol{\mu},\boldsymbol{\Sigma})$. We construct an estimator
+$\boldsymbol{\hat{\mu}}$ for $\boldsymbol{\mu}$ whose sampling
+distribution we can easily characterize. Then, we form a more
+complicated function of the moments, $\boldsymbol{g}(\boldsymbol{\mu})$.
+We want a sampling distribution for that guy too (mean and standard
+errors). The \emph{delta method} allows us to do that. That's the delta
+method in a nutshell.
 
-\emph{Cross-sectional data} is just a special case of panel data where there is only one time period.  Similarly, univariate time series have no ``individual'' or $i$ dimension; we just consider variation over time.
+\subsection{Notation}
 
-Therefore, in using this notation, we can be explicit about the way we introduce independent predictors, also known as covariates or independent variables. Righthand side variables with only an $i$ subscript only will be assumed constant over time, as in the case of individual fixed effects.  Similarly, anything with a $t$ subscript only will be assumed fixed across individuals, as in time fixed effects.
+Suppose that we have random variable $\boldsymbol{y}\in \mathbb{R}^m$,
+with mean and variance-covariance matrix as follows:
+\begin{align*}
+  \boldsymbol{\mu} &:= \mathbb{E}(\boldsymbol{y}) =
+  \begin{pmatrix}
+    \mathbb{E}(y_1)\\\mathbb{E}(y_2)\\\vdots\\\mathbb{E}(y_m)
+  \end{pmatrix}
+  \in \mathbb{R}^m
+  \\
+  \boldsymbol{\Sigma}
+  &:=
+  \mathbb{E}\left[
+    (\boldsymbol{y}-\boldsymbol{\mu})
+    (\boldsymbol{y}-\boldsymbol{\mu})'
+  \right]
+  \in \mathbb{R}^{m\times m}
+\end{align*}
+Given sample $\{\boldsymbol{y}_i\}_{i=1}^N$, we can form an estimator
+for $\boldsymbol{\mu}$ as follows:
+\begin{align*}
+  \boldsymbol{\hat{\mu}}
+  &=
+  \frac{1}{N}
+  \sum^N_{i=1}
+  \boldsymbol{y}_i\\
+  \sqrt{N}(\boldsymbol{\hat{\mu}} - \boldsymbol{\mu})
+  &\sim N(0,\Sigma)
+\end{align*}
+That's the easy sampling distribution to characterize. The point of the
+delta method is to characterize the sampling distribution of
+transformations of $\boldsymbol{\mu}$. In particular, we want a sampling
+distribution for an estimator of the arbitrary transformation
+$\boldsymbol{g}(\boldsymbol{\mu})$.
 
-This particularly expressive notation will be very helpful as we consider different classes of models.
+\paragraph{Note}
+The fact that $\boldsymbol{g}(\boldsymbol{\mu})$ is only a function of
+the first moment of $\boldsymbol{y}$ isn't that restrictive if we're
+willing to generalize our notion of $\boldsymbol{y}$. We can easily
+accommodate more complicated moments with a minor tweak.
+
+To see this, suppose that we have some base random variable
+$\boldsymbol{x}\in\mathbb{R}^n$
+\begin{align*}
+  \boldsymbol{x} =
+  \begin{pmatrix}
+    x_1\\x_2\\\vdots\\x_n
+  \end{pmatrix}
+  \in \mathbb{R}^n
+\end{align*}
+along with sample $\{\boldsymbol{x}_i\}_{i=1}^N$. If we want second
+moments or cross-correlations of elements in $\boldsymbol{x}$, simply
+define a function $\boldsymbol{h}: \mathbb{R}^n \rightarrow
+\mathbb{R}^m$ to do the transformations you want and set
+\begin{align*}
+  \boldsymbol{y}
+  :=\boldsymbol{h}(\boldsymbol{x})
+  =
+  \begin{pmatrix}
+    h_1(\boldsymbol{x})\\h_2(\boldsymbol{x})\\\vdots\\h_m(\boldsymbol{x})
+  \end{pmatrix}
+  \in\mathbb{R}^m
+\end{align*}
+Then, to generate the sample for $\boldsymbol{y}$, just take
+\begin{align*}
+  \{\boldsymbol{y}_i\}_{i=1}^N &:=
+  \left\{\boldsymbol{h}\left(\boldsymbol{x}_i\right)\right\}_{i=1}^N
+\end{align*}
+From there, proceed exactly as above. In this way, we can always use a
+``first moment representation'', leaving open the possibility that
+$\boldsymbol{y}$ is actually a transformation or function of some base
+random variable.
+
+
+\subsection{Delta Method Statement}
+
+\begin{thm}
+Suppose that for random variable $\boldsymbol{y}$ with mean
+$\boldsymbol{\mu}$, we take a sample $\{\boldsymbol{y}_i\}$ of size $N$
+and form estimator $\boldsymbol{\hat{\mu}}_N$. Then the central limit
+theorem tells us
+\begin{align*}
+  \sqrt{N}\left(
+  \boldsymbol{\hat{\mu}}_N
+  -\boldsymbol{{\mu}}
+  \right)
+  \xrightarrow{d} N(0, \boldsymbol{\Sigma})
+\end{align*}
+Now for continous transformation
+$\boldsymbol{g}:\mathbb{R}^m\rightarrow \mathbb{R}^p$, the delta method
+tells us that
+\begin{align*}
+  \sqrt{N}\left(
+  \boldsymbol{g}(\boldsymbol{\hat{\mu}}_N)
+  -
+  \boldsymbol{g}(\boldsymbol{\mu})
+  \right)
+  &\xrightarrow{d} N\left(
+    0, \boldsymbol{G} \boldsymbol{\Sigma} \boldsymbol{G'}
+  \right)\\\\
+  \text{where}\quad
+  \boldsymbol{G}(\boldsymbol{u})
+  &:=\frac{\partial}{\partial \boldsymbol{u'}}
+  \left[\boldsymbol{g}(\boldsymbol{u})\right]\\
+  \text{and} \quad
+  \boldsymbol{G} &:= \boldsymbol{G}(\boldsymbol{\mu})
+\end{align*}
+%More explicitly, $\boldsymbol{G}$ is the Jacobian of $\boldsymbol{g}$
+%evaluated at the true value $\boldsymbol{\mu}$.
+\end{thm}
+\begin{proof}
+Start with a Taylor Series expansion of
+$\boldsymbol{g}(\boldsymbol{\hat{\mu}}_N)$ about the true value
+$\boldsymbol{\mu}$:
+\begin{align*}
+  \boldsymbol{g}(\boldsymbol{\hat{\mu}}_N)
+  &\approx
+  \boldsymbol{g}(\boldsymbol{\mu})
+  + \boldsymbol{G}
+  \left(
+  \boldsymbol{\hat{\mu}}_N - \boldsymbol{\mu}
+  \right)\\
+  \Rightarrow\qquad
+  \text{Var}\left(\boldsymbol{g}(\boldsymbol{\hat{\mu}}_N)\right)
+  &\approx
+  \text{Var}\left(\boldsymbol{g}(\boldsymbol{\mu})
+  + \boldsymbol{G}
+  \left(
+  \boldsymbol{\hat{\mu}}_N - \boldsymbol{\mu}
+  \right)
+  \right)
+\end{align*}
+Since $\boldsymbol{\mu}$ and $\boldsymbol{G}$ are
+constants,\footnote{Frequentist alert! Dogmatic Bayesians please avert
+eyes and forgive my impurity.} we can drop the variance of all
+$\boldsymbol{\mu}$ and $\boldsymbol{G}$ terms to get:
+\begin{align*}
+  \text{Var}\left(\boldsymbol{g}(\boldsymbol{\hat{\mu}}_N)\right)
+  &\approx
+  \text{Var}\left(
+  \boldsymbol{G}
+  \boldsymbol{\hat{\mu}}_N
+  \right)
+  \approx
+  \boldsymbol{G}\;
+  \text{Var}\left(
+  \boldsymbol{\hat{\mu}}_N
+  \right)
+  \boldsymbol{G'}
+  = \frac{1}{\sqrt{N}}
+  \boldsymbol{G}
+  \boldsymbol{\Sigma}
+  \boldsymbol{G'}
+\end{align*}
+where the last inequality followed by substituting in our assumed
+distribution for $\boldsymbol{\hat{\mu}}_N$. This gives us everything we
+need.
+\end{proof}
+
+\subsection{Delta Method Intuition}
+
+
+
 
 
 
 
 %%%% APPPENDIX %%%%%%%%%%%
 
+\clearpage
 \appendix
 
+\section{Matrix Calculus}
+
+Here, I lay down a few conventions for with respect to vectors and of
+vector-valued functions.
+
+For scalar-valued function $f: \mathbb{R}^n \rightarrow \mathbb{R}$
+which takes column vector $\boldsymbol{\theta}$ as an argument, we have
+\begin{align*}
+  \frac{\partial f}{\partial \boldsymbol{\theta}}
+  &=
+  \begin{pmatrix}
+    \frac{\partial f}{\partial \theta_1} \\
+    \vdots\\
+    \frac{\partial f}{\partial \theta_n} \\
+    \end{pmatrix} \in \mathbb{R}^n\\
+  \frac{\partial f}{\partial \boldsymbol{\theta}'}
+  &=
+  \begin{pmatrix}
+    \frac{\partial f}{\partial \theta_1} &
+    \cdots&
+    \frac{\partial f}{\partial \theta_n}
+  \end{pmatrix}\in \mathbb{R}^n
+\end{align*}
+For vector-valued function $\boldsymbol{g}:
+\mathbb{R}^n\rightarrow\mathbb{R}^m$,
+\begin{align*}
+  \boldsymbol{g}(\boldsymbol{\theta})
+  &=
+  \begin{pmatrix}
+    g_1(\boldsymbol{\theta}) \\
+    \vdots \\
+    g_m(\boldsymbol{\theta}) \\
+  \end{pmatrix}\in \mathbb{R}^m\\
+  \frac{\partial \boldsymbol{g}}{\partial \boldsymbol{\theta'}}
+  &=
+  \begin{pmatrix}
+    \frac{\partial g_1}{\partial \theta_1}
+      & \cdots & \frac{\partial g_1}{\partial \theta_n}\\
+    \vdots & \ddots & \vdots\\
+    \frac{\partial g_m}{\partial \theta_1}
+      & \cdots & \frac{\partial g_m}{\partial \theta_n}\\
+  \end{pmatrix}
+  \in \mathbb{R}^{m\times n}
+\end{align*}
+We also have, in general,
+\begin{align*}
+  \frac{\partial\boldsymbol{g'}}{\partial \boldsymbol{\theta}}
+  =
+  \left(
+  \frac{\partial\boldsymbol{g}}{\partial \boldsymbol{\theta'}}
+  \right)'
+\end{align*}
 
 \section{Adjusted R-Squared}
 
