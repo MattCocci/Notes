@@ -1,4 +1,4 @@
-function [] = StateSpaceGeometry()
+function [] = LinearProjections()
 
   close all
 
