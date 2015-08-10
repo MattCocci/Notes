@@ -1,0 +1,498 @@
+\documentclass[12pt]{article}
+
+\author{Matthew D. Cocci}
+\title{Differential Equations}
+\date{\today}
+
+%% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % most detailed page formatting control
+\usepackage{fullpage} % Simpler than using the geometry package; std effect
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+%% Formatting %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[margin=1in]{geometry}
+    %   Adjust the margins with geometry package
+%\usepackage{pdflscape}
+    %   Allows landscape pages
+%\usepackage{layout}
+    %   Allows plotting of picture of formatting
+
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt}
+    %   Make the header bigger to avoid overlap
+
+%\fancyhf{}
+    %   Erase header settings
+
+%\renewcommand{\headrulewidth}{0.3pt}
+    %   Width of the line
+
+%\setlength{\headsep}{0.2in}
+    %   Distance from line to text
+
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{amsthm} %allows for labeling of theorems
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+
+% Below supports left-right alignment in matrices so the negative
+% signs don't look bad
+\makeatletter
+\renewcommand*\env@matrix[1][c]{\hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols #1}}
+\makeatother
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref}
+\hypersetup{%
+    colorlinks,
+        %   This colors the links themselves, not boxes
+    citecolor=black,
+        %   Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Colors %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{color}
+\definecolor{codegreen}{RGB}{28,172,0}
+\definecolor{codelilas}{RGB}{170,55,241}
+
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{verbatim}
+    %   For including verbatim code from files, no colors
+\usepackage{listings}
+    %   For including code snippets written directly in this doc
+
+\lstdefinestyle{bash}{%
+  language=bash,%
+  basicstyle=\ttfamily,%
+  showstringspaces=false,%
+  commentstyle=\color{gray},%
+  keywordstyle=\color{blue},%
+  xleftmargin=0.25in,%
+  xrightmargin=0.25in
+}
+
+\definecolor{codegreen}{RGB}{28,172,0}
+\definecolor{codelilas}{RGB}{170,55,241}
+\newcommand{\matlabcode}[1]{%
+    \lstset{language=Matlab,%
+        basicstyle=\footnotesize,%
+        breaklines=true,%
+        morekeywords={matlab2tikz},%
+        keywordstyle=\color{blue},%
+        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+        identifierstyle=\color{black},%
+        stringstyle=\color{codelilas},%
+        commentstyle=\color{codegreen},%
+        showstringspaces=false,%
+            %   Without this there will be a symbol in
+            %   the places where there is a space
+        numbers=left,%
+        numberstyle={\tiny \color{black}},%
+            %   Size of the numbers
+        numbersep=9pt,%
+            %   Defines how far the numbers are from the text
+        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+            %   Some words to emphasise
+    }%
+    \lstinputlisting{#1}
+}
+    %   For including Matlab code from .m file with colors,
+    %   line numbering, etc.
+
+%% Bibliographies %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{natbib}
+    %---For bibliographies
+%\setlength{\bibsep}{3pt} % Set how far apart bibentries are
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{enumitem}
+    %   Has to do with enumeration
+\usepackage{appendix}
+%\usepackage{natbib}
+    %   For bibliographies
+\usepackage{pdfpages}
+    %   For including whole pdf pages as a page in doc
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+\maketitle
+
+%\tableofcontents
+
+\section{First Order Ordinary Differential Equations}
+
+This section focuses on methods for solving and anlyzing first order
+ordinary differential equations (ODEs). These equations relate the value
+of a function $y = f(t)$ to expressions involving its derivatives and
+the independing variable. Quite generally, they can be written
+\begin{align}
+  y' = f(y,t)
+  \label{eq:ode1}
+\end{align}
+We might write Equation~\ref{eq:ode1} a bit differential (i.e.\ moving
+parts of $f(y,t)$ to the lefthand side) or we might suppose $y'$ is only
+a function of $y$ or $t$, but the representation above is sufficient
+general to capture all of this.
+
+A first order \emph{initial value problem} (IVP) is an ODE like
+Equation~\ref{eq:ode1} paird with initial conditions on the function
+such as
+\begin{align*}
+  y(0) = y_0
+  \qquad
+  y_0 \in \mathbb{R}
+\end{align*}
+This will help us pin down a \emph{specific} solution to a differential
+equation, since solving the ODE leaves us with a function that is
+parameterized by an arbitrary constant. An initial value \emph{implies}
+a value for the constant and resolves this free parameter.
+
+Most of the time, the goal is to \emph{solve} the ODE. There are two
+general approaches
+\begin{enumerate}
+  \item Analytic: Manipulate the ODE and integrate to find a satisfying
+    function, or make an educated guess and check that it satisfies the
+    ODE. This is usually what we mean when we say ``solve a differential
+    equation.''
+  \item Geometric: Use pictures; draw a direction field and find
+    integral curves.
+\end{enumerate}
+
+\subsection{Geometric Method}
+
+For any point on $(t,y)$ on the plane, the ODE written as in
+Equation~\ref{eq:ode1} tells you the slope at that point. Therefore, we
+can visualize the ODE using the following steps:
+\begin{enumerate}
+  \item Choose a grid of points
+  \item Compute the slope at each point on the grid.
+  \item Draw tiny lines, centered at each point, with the appropriate
+    slope.
+\end{enumerate}
+This is called a \emph{direction field}.
+
+We graphically ``solve'' the ODE by finding an \emph{integral curve},
+through the direction field. The defining feature of an integral curve
+is that it is everywhere tangent to line elements in the direction field
+(including those we didn't plot). The slope of the curve at every point
+equals the slope of the direction field at that point.
+
+A few things about integral curves:
+\begin{enumerate}
+  \item $y_1$ is a solution to the ODE in Equation~\ref{eq:ode1} if and
+    only if it is an integral curve.
+  \item They cannot cross at an angle (tangency case handled below).
+    Crossing at an angle would imply two different slopes at the same
+    point, which is clearly nuts.
+  \item If $\frac{\partial f}{\partial t}$ is continuous in the
+    neighborhood of a point, then two integral curves cannot even touch
+    and be tangent  at that point because of the ``existence and
+    uniqueness theorem'' (covered below). So an ODE must have one and
+    only solution through that point
+  \item In the same way that there are infinitely many solutions that
+    differ by a constant in the ``analytic'' approach, there are
+    infinitely many integral curves that we might draw on the graph.
+    Only an initial value could pin them down.
+\end{enumerate}
+While I specified a sequence of (computer friendly) steps to draw a
+direction field above, there's a more clever way.
+\begin{enumerate}
+  \item Pick a constant $c$.
+  \item By Equation~\ref{eq:ode1}, the formula $c=f(y,t)$ defines an
+    \emph{isocline}---a curve in the plane along which the line elements
+    of the direction field all have the same slope (namely, $c$).
+    Just rearrange $c=f(y,t)$ to get a function $y=g(c,t)$ for the
+    isocline. You can also think about the isocline as a contour line
+    for the function $f(y,t)$.
+  \item Draw the isocline, and along that isocline, fill in line
+    elements of slope $c$.
+  \item Repeat this process for different choices of $c$. Often,
+    choosing nice slopes like $-1,0,1,\ldots$ is a smart thing to do.
+\end{enumerate}
+
+\clearpage
+\subsection{First Order Linear ODEs}
+
+This is a special case of Representation~\ref{eq:ode1} where the ODE can
+be written
+\begin{align}
+  y' + p(t) y = q(t)
+  \label{eq:linear}
+\end{align}
+If there are no outside signals (if $q(t)=0$), then we call the ODE
+\emph{homogeneous} and can be solved by separation of variables.  Of
+course, not every first order ODE can be written this way, but for those
+that can, we will develop a method to solve them very easily.
+
+On top of that, ODEs in this form have a very nice ``system and
+signals'' physical interpretation:
+\begin{enumerate}
+  \item The \emph{system} is on the LHS, and it's some combination of
+    the dependent variable $y$ and its derivatives.
+  \item A \emph{signal} is any dependent variable---any function of the
+    independent variable $t$.
+  \item The RHS describes the \emph{input signal}---outside influences
+    \emph{driving} the system on the LHS.
+  \item The solution $y$ is called the \emph{output signal} or
+    \emph{system response}. It depends upon $t$ so it too is a signal.
+\end{enumerate}
+
+We solve ODEs in form Equation~\ref{eq:linear} by defining an
+\emph{integrating factor} $u(t)$ that will multiply both sides of
+Equation~\ref{eq:linear}:
+\begin{align*}
+  u(t) y' + u(t)p(t) y = u(t) q(t)
+\end{align*}
+The integrating factor should be such that the LHS is the derivative of
+something:
+\begin{align*}
+  u(t) y' + u(t) p(t) y = \left( u(t) y\right)'
+\end{align*}
+In other words, to express the LHS as the derivative of $u(t)y$, it
+should be the case that
+\begin{align*}
+  u' = u(t) p(t)
+\end{align*}
+which can be solved by separation of variables:
+\begin{align*}
+  u(t) = e^{\int p(t) \; dt}
+\end{align*}
+With this in hand, you can solve Equation~\ref{eq:linear} as follows:
+\begin{align*}
+  y' + p(t) y &= q(t) \\
+  u(t) y' + u'(t) y &= q(t)u(t)\\
+  \left(u(t) y\right)' &= q(t)u(t) \\
+  \int \left(u(t) y\right)' &= \int q(t)u(t) \\
+  u(t) y &= \int q(t)u(t) + c\\
+\end{align*}
+
+
+\clearpage
+\section{Numerical Methods}
+
+Often, we can't solve ODE's analytically or geometrically, so we resort
+to numerical approximations.
+
+\subsection{Euler's Method}
+
+We have first order ODE
+\begin{align}
+  y' = f(y,t)
+  \label{eq:euler}
+\end{align}
+Here's the basic scheme
+\begin{enumerate}
+  \item Start with the initial value $(t_0, y_0)$.
+  \item Choose a step size $h$.
+  \item Given starting point, $(t_n, y_n)$ compute $y'_n = f(t_n, y_n)$.
+  \item Set $(t_{n+1}, y_{n+1}) = (t_n + h, t_n + y'_n*h)$
+  \item Go back to Step 3 and repeat, starting with $(t_{n+1},y_{n+1}$.
+\end{enumerate}
+Of course, we want to evaluate the numerical method. That means asking
+``How close is the numerical method to the actual?'' Well it's quite
+easy to see that
+\begin{enumerate}
+  \item If the solution is convex ($y'' > 0$), the approximation will be
+    too low
+  \item If the solution is concave ($y'' < 0$), the approximation will
+    be too high
+\end{enumerate}
+But this seems like we need to \emph{solve} the equation to determine if
+$y$ is concave or convex, and the whole point of Euler is that we
+\emph{couldn't} solve Equation~\ref{eq:euler}. But actually we can. Just
+\emph{use} Equation~\ref{eq:euler} to analyze the higher derivatives.
+
+   %1. You can determine if the solution is concave or convex by
+   %differentiating the first-order ODE itself to get at second
+   %derivatives
+%1. Errors depend upon step size
+   %1. error ~ c*h (on the order of h)
+   %2. If you halve the step size, you approximately halve the error
+%1. Heun’s Method, aka RK2 (Runge-Kutta)
+   %1. This is a second order method, so e ~ c*(h^2)
+   %2. Halve the step size, goes down by a factor of 4
+   %3. Process
+      %1. x_{n+1} = x_n + h still
+      %2. Call a_{n} the slope at (x_n, y_n)
+      %3. Call b_n the slope at (x_n+h, y_n + h*a_n)
+      %4. Set y_{n+1} = y_n + h*(a_n + b_n)/2
+   %1. Intuition: Like Euler’s method but you average the slope over the next two steps of the usual Euler method to get the slope for this jump
+   %2. Requires computing the function twice
+%1. RK4
+   %1. Requires 4 evaluations of the function
+   %2. Very accurate; standard method
+   %3. Errors on the order e ~ c*(h^4); so you halve the step size, reduce the error by a factor of 16
+   %4. (A_n + 2*B_n + 2*C_n + D_n)/6
+%1. Pitfalls
+   %1. must watch out for pitfalls when the function blows up
+   %2. You often can’t predict singularities
+
+
+
+%% APPPENDIX %%
+
+% \appendix
+
+
+
+
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% SAMPLE CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    %% VIEW LAYOUT %%
+
+        \layout
+
+    %% LANDSCAPE PAGE %%
+
+        \begin{landscape}
+        \end{landscape}
+
+    %% BIBLIOGRAPHIES %%
+
+        \cite{LabelInSourcesFile}  %Use in text; cites
+        \citep{LabelInSourcesFile} %Use in text; cites in parens
+
+        \nocite{LabelInSourceFile} % Includes in refs w/o specific citation
+        \bibliographystyle{apalike}  % Or some other style
+
+        % To ditch the ``References'' header
+        \begingroup
+        \renewcommand{\section}[2]{}
+        \endgroup
+
+        \bibliography{sources} % where sources.bib has all the citation info
+
+    %% SPACING %%
+
+        \vspace{1in}
+        \hspace{1in}
+
+    %% URLS, EMAIL, AND LOCAL FILES %%
+
+      \url{url}
+      \href{url}{name}
+      \href{mailto:mcocci@raidenlovessusie.com}{name}
+      \href{run:/path/to/file.pdf}{name}
+
+
+    %% INCLUDING PDF PAGE %%
+
+        \includepdf{file.pdf}
+
+
+    %% INCLUDING CODE %%
+
+        %\verbatiminput{file.ext}
+            %   Includes verbatim text from the file
+
+        \texttt{text}
+            %   Renders text in courier, or code-like, font
+
+        \matlabcode{file.m}
+            %   Includes Matlab code with colors and line numbers
+
+        \lstset{style=bash}
+        \begin{lstlisting}
+        \end{lstlisting}
+            % Inline code rendering
+
+
+    %% INCLUDING FIGURES %%
+
+        % Basic Figure with size scaling
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[scale=1]{file.pdf}
+            \end{figure}
+
+        % Basic Figure with specific height
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[height=5in, width=5in]{file.pdf}
+            \end{figure}
+
+        % Figure with cropping, where the order for trimming is  L, B, R, T
+            \begin{figure}
+               \centering
+               \includegraphics[trim={1cm, 1cm, 1cm, 1cm}, clip]{file.pdf}
+            \end{figure}
+
+        % Side by Side figures: Use the tabular environment
+
+
