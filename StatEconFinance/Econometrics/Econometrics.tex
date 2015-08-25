@@ -193,12 +193,12 @@
 Suppose we have a sample of $\left\{\boldsymbol{y}_i\right\}_{i=1}^N$ of
 some random variable $\boldsymbol{y}\sim
 N(\boldsymbol{\mu},\boldsymbol{\Sigma})$. We construct an estimator
-$\boldsymbol{\hat{\mu}}$ for $\boldsymbol{\mu}$ whose sampling
-distribution we can easily characterize. Then, we form a more
-complicated function of the moments, $\boldsymbol{g}(\boldsymbol{\mu})$.
-We want a sampling distribution for that guy too (mean and standard
-errors). The \emph{delta method} allows us to do that. That's the delta
-method in a nutshell.
+$\boldsymbol{\hat{\mu}}$ for the first moment vector $\boldsymbol{\mu}$
+whose sampling distribution we can easily characterize. Then, we form a
+more complicated function of the first moment vector,
+$\boldsymbol{g}(\boldsymbol{\mu})$.  We want a sampling distribution for
+that guy too (mean and standard errors). The \emph{delta method} allows
+us to do that.
 
 \subsection{Notation}
 
@@ -232,8 +232,8 @@ for $\boldsymbol{\mu}$ as follows:
 \end{align*}
 That's the easy sampling distribution to characterize. The point of the
 delta method is to characterize the sampling distribution of
-transformations of $\boldsymbol{\mu}$. In particular, we want a sampling
-distribution for an estimator of the arbitrary transformation
+\emph{transformations} of $\boldsymbol{\mu}$. In particular, we want a
+sampling distribution for an estimator of arbitrary transformation
 $\boldsymbol{g}(\boldsymbol{\mu})$.
 
 \paragraph{Note}
@@ -269,19 +269,18 @@ Then, to generate the sample for $\boldsymbol{y}$, just take
   \{\boldsymbol{y}_i\}_{i=1}^N &:=
   \left\{\boldsymbol{h}\left(\boldsymbol{x}_i\right)\right\}_{i=1}^N
 \end{align*}
-From there, proceed exactly as above. In this way, we can always use a
-``first moment representation'', leaving open the possibility that
-$\boldsymbol{y}$ is actually a transformation or function of some base
-random variable.
+From there, proceed exactly as before. In this way, we can always use
+the ``first moment representation'' above, leaving open the possibility
+that $\boldsymbol{y}$ is actually a transformation or function of some
+base random variable.
 
 
 \subsection{Delta Method Statement}
 
 \begin{thm}
-Suppose that for random variable $\boldsymbol{y}$ with mean
-$\boldsymbol{\mu}$, we take a sample $\{\boldsymbol{y}_i\}$ of size $N$
-and form estimator $\boldsymbol{\hat{\mu}}_N$. Then the central limit
-theorem tells us
+Let $\boldsymbol{\hat{\mu}}_N$ denote the mean of iid sample
+$\{\boldsymbol{y}_i\}^N_{i=1}$ for random variable $\boldsymbol{y}$.
+The central limit theorem tells us that as $N\rightarrow\infty$,
 \begin{align*}
   \sqrt{N}\left(
   \boldsymbol{\hat{\mu}}_N
@@ -289,9 +288,9 @@ theorem tells us
   \right)
   \xrightarrow{d} N(0, \boldsymbol{\Sigma})
 \end{align*}
-Now for continous transformation
-$\boldsymbol{g}:\mathbb{R}^m\rightarrow \mathbb{R}^p$, the delta method
-tells us that
+For continous transformation
+$\boldsymbol{g}:\mathbb{R}^m\rightarrow \mathbb{R}^p$, the
+\emph{delta method} states that
 \begin{align*}
   \sqrt{N}\left(
   \boldsymbol{g}(\boldsymbol{\hat{\mu}}_N)
@@ -350,22 +349,675 @@ $\boldsymbol{\mu}$ and $\boldsymbol{G}$ terms to get:
   \boldsymbol{\hat{\mu}}_N
   \right)
   \boldsymbol{G'}
-  = \frac{1}{\sqrt{N}}
+  = \frac{1}{{N}}
   \boldsymbol{G}
   \boldsymbol{\Sigma}
   \boldsymbol{G'}
 \end{align*}
-where the last inequality followed by substituting in our assumed
-distribution for $\boldsymbol{\hat{\mu}}_N$. This gives us everything we
-need.
+where the last inequality followed by substituting in the distribution
+of $\boldsymbol{\hat{\mu}}_N$. This gives us everything we need.
 \end{proof}
 
 \subsection{Delta Method Intuition}
 
+\clearpage
+\section{Generalized Method of Moments (GMM)}
+
+GMM is often done in the context of time series models, and so I will
+use $T$ to denote sample size rather than $N$.
+
+\subsection{Notation}
+
+Suppose that we have vector random variable $\boldsymbol{y}_t$ with
+population mean $\mathbb{E}(\boldsymbol{y}_t)$. Given a sample
+$\{\boldsymbol{y}_t\}^T_{t=1}$, we can form an estimator of the mean
+\begin{align*}
+  \mathbb{E}_T(\boldsymbol{y}_t)
+  := \frac{1}{T} \sum^T_{t=1} \boldsymbol{y}_t
+\end{align*}
+Oten, however, we have a model and want to estimate a vector of
+parameters, $\boldsymbol{b}$. When this is the goal, we define a function
+that suppresses some of the notation above and makes the focus on
+parameters more explicit:
+\begin{align*}
+  \boldsymbol{g}(\boldsymbol{b})
+  &:= \mathbb{E}[\boldsymbol{f}(\boldsymbol{y}_t,\boldsymbol{b})]\\
+  \boldsymbol{g}_T(\boldsymbol{b})
+  &:= \mathbb{E}_T[\boldsymbol{f}(\boldsymbol{y}_t,\boldsymbol{b})]
+  = \frac{1}{T}\sum^T_{t=1}
+      \boldsymbol{f}(\boldsymbol{y}_t,\boldsymbol{b})
+\end{align*}
+where $\boldsymbol{f}$ is some function that mixes data and parameters
+according to model-implied structure. We'll see more clearly how this is
+used below.
+
+But in general, note the convention: For a population concept like
+$\mathbb{E}(\cdot)$ or $\boldsymbol{g}(\cdot)$, we form the sample
+estimators (given $T$ observations) of $\mathbb{E}_T(\cdot)$ and
+$\boldsymbol{g}_T(\cdot)$.
+
+This convention might seem a little odd at first since
+$\mathbb{E}_T(\cdot)$ is often used to denote the expectation
+conditional on time $T$ information. But that's not going to be a
+problem here, since GMM will deal pretty much exclusively with
+\emph{unconditional} moments (or at least unconditional with respect to
+time).\footnote{%
+To take a quick example, consider the simple de-meaned, stationary AR(1)
+model
+\begin{align*}
+  y_t = \rho y_{t-1} + \varepsilon_t
+  \qquad \varepsilon_t \sim N(0,\sigma^2)
+\end{align*}
+You might reasonably care about \emph{either} the unconditional or (on
+time $t-1$ information) mean and variance of $y_t$.
+\begin{alignat*}{3}
+  \mathbb{E}(y_t) &= 0 &\mathbb{E}_t(y_{t}) &= \rho y_{t-1}\\
+  \text{Var}(y_t) &= \frac{\sigma^2}{1-\rho^2}
+  \qquad
+  &\text{Var}_t(y_t) &= \sigma^2
+\end{alignat*}
+In GMM, we'll be talking about the unconditional estimates on the left.
+}
+Plus, the convention has the added benefit of connecting estimators to
+their sample estimates in about the most explicit way possible (i.e.\
+just add ${}_T$ to go from estimator to estimate).
 
 
+\subsection{Distribution of Sample Mean}
+\label{sec:mean}
 
+This is a rather straightfoward exercise, but it allows us to derive a
+few important concepts in GMM notation. So let's go ahead.
 
+Given a sample $\{\boldsymbol{y}_t\}^T_{t=1}$ of stationary (typically
+autocorrelated) random variable $\boldsymbol{y}_t$, we defined an
+estimator of the sample mean, $\mathbb{E}_T(\boldsymbol{y}_t)$. Now
+let's characterize that estimator's distribution, since it too is a
+random variable.
+
+First, the mean:
+\begin{align*}
+  \mathbb{E}\left(\mathbb{E}_T(\boldsymbol{y}_t)\right)
+  &= \mathbb{E}\left(\frac{1}{T}\sum^T_{t=1} \boldsymbol{y}_t\right)
+  = \frac{1}{T}\sum^T_{t=1} \mathbb{E}\left(\boldsymbol{y}_t\right)
+  = \frac{1}{T} \times T \; \mathbb{E}\left(\boldsymbol{y}_t\right)\\
+  &= \mathbb{E}\left(\boldsymbol{y}_t\right)
+\end{align*}
+So $\mathbb{E}_T(\boldsymbol{y}_t)$ is an unbiased estimator of the
+unconditional mean of $\boldsymbol{y}_t$.
+
+Now we get the variance of the estimator, accounting for the fact that
+the sample $\{\boldsymbol{y}_t\}_{t=1}^T$ is not necessarily iid (though
+assumed stationary):
+\begin{align}
+  \text{Var}(\mathbb{E}_T(\boldsymbol{y}_t))
+  &=
+  \text{Var}\left(
+  \frac{1}{T}\sum^T_{t=1} \boldsymbol{y}_t
+  \right)
+  =
+  \frac{1}{T^2}\text{Var}\left(
+  \sum^T_{t=1} \boldsymbol{y}_t
+  \right)\notag\\
+  &=
+  \frac{1}{T^2}
+  \sum^T_{j=-T} (T-|j|)\text{Cov}\left(
+    \boldsymbol{y}_t, \boldsymbol{y}_{t-j}
+  \right) \notag\\
+  &=
+  \frac{1}{T^2}
+  \left[
+    \sum^T_{t=1} \text{Var}(\boldsymbol{y_t})
+    +
+    2\sum^T_{j=1} (T-|j|)\text{Cov}(\boldsymbol{y}_t,\boldsymbol{y}_{t-j})
+  \right]\notag\\
+  \Rightarrow\quad
+  \text{Var}(\mathbb{E}_T(\boldsymbol{y}_t))
+  &=
+  \frac{1}{T}
+  \left[
+    \text{Var}(\boldsymbol{y_t})
+    +
+    2\sum^T_{j=1} \frac{T-|j|}{T}
+    \text{Cov}(\boldsymbol{y}_t,\boldsymbol{y}_{t-j})
+  \right]
+  \label{eq:estvar}
+\end{align}
+A few things to note about this last result:
+\begin{enumerate}
+  \item In the case of iid observations,
+    $\text{Cov}(\boldsymbol{y}_t,\boldsymbol{y}_{t-j})$ will be zero for
+    all $j\neq 0$, in which case we get the classic ``$\sqrt{T}$
+    result'' for the standard deviation:
+    \begin{align*}
+      \text{Var}(\mathbb{E}_T(\boldsymbol{y}_t))
+      &=
+      \frac{\text{Var}(\boldsymbol{y_t})}{T}\\
+      \Rightarrow\quad
+      \sigma(\mathbb{E}_T(\boldsymbol{y}_t))
+      &=
+      \frac{\sigma(\boldsymbol{y_t})}{\sqrt{T}}
+    \end{align*}
+    In words, ``The average of any sample always gives a unbiased
+    estimate of the mean. And when the data is uncorrelated, the
+    precision of that estimate increases at a rate of $\sqrt{T}$.''
+
+  \item When the observations are \emph{not} iid (when there is serial
+    correlation in the sample), Equation~\ref{eq:estvar} says that you
+    don't really have $T$ observations. The serial correlation decreases
+    the number of \emph{effective} observations you have. So crank up
+    the variance of your estimate, depending upon how strong that serial
+    correlation is.
+
+  \item
+    You can see from Equation~\ref{eq:estvar} that when $T$ get's large,
+    $\frac{T-|j|}{T}$ approaches unity, which gives
+    \begin{align*}
+      \lim_{T\rightarrow\infty}
+      \text{Var}(\mathbb{E}_T(\boldsymbol{y}_t))
+      &=
+      \frac{1}{T}
+      \left[
+        \text{Var}(\boldsymbol{y_t})
+        +
+        2\sum^\infty_{j=1}
+        \text{Cov}(\boldsymbol{y}_t,\boldsymbol{y}_{t-j})
+      \right]
+      =
+      \frac{\boldsymbol{S}}{T}
+    \end{align*}
+    where $\boldsymbol{S}$ is the spectral density of $\boldsymbol{y}_t$
+    at frequency at zero.
+\end{enumerate}
+From there, we can use the Central Limit Theorem to state the following
+result.
+
+\begin{thm}
+Given a sample $\{\boldsymbol{y}_t\}_{t=1}^T$ for random variable
+$\boldsymbol{y}_t$
+\begin{align*}
+  \sqrt{T}\left(
+    \mathbb{E}_T(\boldsymbol{y}_t) -\mathbb{E}(\boldsymbol{y}_t)
+  \right)
+  \xrightarrow{d} N(0,\boldsymbol{S})
+\end{align*}
+where $\boldsymbol{S}$ is the spectral density at frequency zero defined
+\begin{align*}
+  \boldsymbol{S} :=
+  \sum^\infty_{j=-\infty}
+    \text{\normalfont Cov}(\boldsymbol{y}_t, \boldsymbol{y}_{t-j})
+  =
+  \text{\normalfont Var}(\boldsymbol{y}_t)
+  + 2 \sum^\infty_{j=1}
+  \text{\normalfont Cov}(\boldsymbol{y}_t,\boldsymbol{y}_{t-j})
+\end{align*}
+This holds regardless of whether or not the data are iid or serially
+correlated (since you're using the correct covariance matrix,
+$\boldsymbol{S}$).
+\end{thm}
+
+\clearpage
+\subsection{Casting the Model in GMM Form}
+
+The first step is to write your model in standard GMM form:
+\begin{align}
+  0 &= \boldsymbol{g}(\boldsymbol{b})\label{eq:stdform}\\
+  \Leftrightarrow\qquad
+  0 &= \mathbb{E}[\boldsymbol{f}(\boldsymbol{y}_t,\boldsymbol{b})]
+  \notag
+\end{align}
+where $\boldsymbol{b}\in\mathbb{R}^p$,
+$\boldsymbol{y}_t\in\mathbb{R}^n$, and $\boldsymbol{f},
+\boldsymbol{g}\in\mathbb{R}^m$.  Equation~\ref{eq:stdform} states the
+\emph{moment conditions} of the model, since it encapsulates
+restrictions the model imposes on the moments.
+\\
+\\
+Examples
+\begin{enumerate}
+  \item An asset pricing model of asset ruturns for $N$ assets can be
+    expressed
+    \begin{align*}
+      1 &= \mathbb{E}(m_{t+1}(b) \boldsymbol{R}_{t+1}) \\
+      \Leftrightarrow \qquad
+      0 &= \mathbb{E}(m_{t+1}(b) \boldsymbol{R}_{t+1}-1)\\
+      \boldsymbol{R}_{t+1} &=
+      \begin{pmatrix}
+        R^1_{t+1}
+        &\cdots&
+        R^N_{t+1}
+      \end{pmatrix}'
+    \end{align*}
+    where the discount factor $m_{t+1}(b)$ is a scalar that depends on
+    data and model parameters.
+  \item Let $\boldsymbol{f}(\boldsymbol{y}_t,\boldsymbol{b})$ represent
+    forecast or regression errors at time $t$ for a vector of different
+    data series that we're trying to predict or describe with the model.
+    Then Equation~\ref{eq:stdform} expresses the natural idea ``Set
+    errors to zero.''
+  \item Take a typical regression equation:
+    \begin{align*}
+    \end{align*}
+\end{enumerate}
+So it's usually very easy to write any model (linear or nonlinear) in
+standard form. Your model's structure is going to consist of a bunch of
+equations that place restrictions on data and parameters.  Simply figure
+out what combination of data and parameters should be zero in
+expectation, and the shift terms in those equations around as necessary
+until you work your model's restrictions/implications into the standard
+representation of Equation~\ref{eq:stdform}.
+
+\clearpage
+\subsection{Estimating the Model}
+
+Suppose that your model is the correct model of the world. Then by
+assumption, if we can find the \emph{true} parameter vector
+$\boldsymbol{b}_0\in \mathbb{R}^p$, it must be the case that
+\begin{align}
+  \boldsymbol{g}(\boldsymbol{b}_0) = 0
+  \label{eq:gmmtrue}
+\end{align}
+This suggests how to find an estimate $\boldsymbol{\hat{b}}$ of true
+parameter vector $\boldsymbol{b}_0$: just find the vector that sets the
+the function $\boldsymbol{g}(\boldsymbol{b})$ to zero---i.e.\ solve the
+system.  But in practice, we need to overcome two very obvious issues
+with that recommendation.
+
+First, we don't have access to the population moment conditions
+$\boldsymbol{g}(\boldsymbol{b})$. Remember that the function
+$\boldsymbol{g}$ depends upon random variable $\boldsymbol{y}_t$ under
+the hood, and we work with samples like $\{\boldsymbol{y}_t\}_{t=1}^T$
+in real life.  But we have an easy fix for that: just set the sample
+equivalent $\boldsymbol{g}_T(\boldsymbol{b})=0$ instead. Done, this
+problem is solved.  \emph{However}, that leads us right to our next
+issue.
+
+We won't be able to simply set $\boldsymbol{g}_T(\boldsymbol{b})=0$
+since the model The model probably isn't \emph{actually} the true model
+of the world. And in general, we're not going to be able set all $m$
+elements of vector $\boldsymbol{g}_T(\boldsymbol{b})$ to zero with a
+misspecified model when $p<m$ (when the number of free parameters $p$ is
+less than the number of moment conditions $m$).  Now of course, we want
+$p<m$ because models should be parsimonious with less degress of freedom
+than data points, but the consequence is that you can't cleanly solve
+the system to set $\boldsymbol{g}_T(\boldsymbol{b})=0$.
+
+So how exactly do you estimate the $p$ parameters given these issues,
+sample $\{\boldsymbol{y}_t\}_{t=1}^T$, and corresponding vector-valued
+function $\boldsymbol{g}_T(\boldsymbol{b})\in \mathbb{R}^m$? There are
+two approaches:
+\begin{enumerate}
+  \item Choose a matrix $\boldsymbol{a}_T\in\mathbb{R}^{p\times m}$ and
+    set only $p$ linear combinations of the
+    moments to zero, i.e.\ solve the system of $p$ equations for the
+    $\boldsymbol{\hat{b}}$ that satisfies
+    \begin{align}
+      \boldsymbol{a}_T
+      \;
+      \boldsymbol{g}_T(\boldsymbol{\hat{b}}) = 0
+      \label{eq:bhatdef}
+    \end{align}
+    Most of the time, $\boldsymbol{a}_T$ will be a matrix of ones and
+    zeros to pick out the moments in $\boldsymbol{g}_T(b)$ (or form
+    linear combination of moments) we want to force to zero. But it
+    really can be as complicated as you want or depend upon sample size
+    (hence the ${}_T$ subscript). We'll see an example just below.
+
+    The main idea: $p<m$ means we can't set \emph{all} of the $m$
+    moments to zero, so focus on $p$ important ones.\footnote{Of course,
+      this might all be pointless if $r > g$ and patrimonial capitalism
+    kills us all. ``Piketty!!! [Shakes fist at sky]''}
+
+  \item If we don't want to take a stance on the important moments, form
+    a weighting matrix $\boldsymbol{W}\in \mathbb{R}^{m\times m}$ and
+    choose the parameter vector that gets the squared (weighted)
+    elements of $\boldsymbol{g}_T(\boldsymbol{b})$ as close to zero as
+    possible:
+    \begin{align}
+      \boldsymbol{\hat{b}} = \arg\min_{\boldsymbol{b}}\;
+      \boldsymbol{g}_T(\boldsymbol{b})' \boldsymbol{W}
+      \boldsymbol{g}_T(\boldsymbol{b})
+      \label{eq:bhatmin}
+    \end{align}
+    We're minimizing a weighted sum of squared ``errors'' (i.e.\
+    differences of $\boldsymbol{g}_T(b)$ from its target of zero), which
+    is both conceptually and computationally straightfoward.
+
+    And, just to tie things together, this is actually equivalent to
+    Approach 1, if you set
+    \begin{align}
+      \boldsymbol{a}_T =
+      \frac{\partial \boldsymbol{g}'_T}{\partial \boldsymbol{b}}
+      \boldsymbol{W}
+      =
+      \boldsymbol{d}'
+      \boldsymbol{W}
+      \label{eq:equivrep}
+    \end{align}
+    where $\boldsymbol{d}
+    :=\frac{\partial \boldsymbol{g}'_T}{\partial \boldsymbol{b}}
+    \in \mathbb{R}^{p\times m}$.
+    This follows from the first order conditions to the minimization
+    defined by Equation~\ref{eq:bhatmin}:
+    \begin{align*}
+      0
+      = \frac{\partial \boldsymbol{g}'_T}{\partial \boldsymbol{b}}
+      \boldsymbol{W} \boldsymbol{g}_T(\boldsymbol{b})
+      = \boldsymbol{d}'
+      \boldsymbol{W} \boldsymbol{g}_T(\boldsymbol{b})
+    \end{align*}
+    We'll talk about choices of the weighting matrix
+    $\boldsymbol{W}$ later on. For now though, you might reasonably just
+    choose $\boldsymbol{W}=\boldsymbol{I}$, treating all moments
+    equally.
+\end{enumerate}
+
+\subsection{Standard Errors}
+
+Next, suppose we have a sample $\{\boldsymbol{y}_t\}^T_{t=1}$. To get
+standard errors for the various objects we will estimate, we proceed in
+a sequence of steps
+\begin{enumerate}
+  \item Define $\boldsymbol{S}$, the spectral density matrix of
+    population moment vector
+    $\boldsymbol{g}(
+    \boldsymbol{b})=\mathbb{E}[\boldsymbol{f}(\boldsymbol{y},
+    \boldsymbol{b})]$ for fixed $\boldsymbol{b}$.
+
+    Given fixed $\boldsymbol{b}$, the vector
+    $\boldsymbol{g}(\boldsymbol{b})
+    =\mathbb{E}[\boldsymbol{f}(\boldsymbol{y}_t,\boldsymbol{b})]$
+    is simply the mean of object
+    $\boldsymbol{f}(\boldsymbol{y}_t,\boldsymbol{b})$.
+    We recall the definition from Section~\ref{sec:mean} for
+    the spectral density at frequency zero:
+    \begin{align*}
+      \boldsymbol{S} = \sum^\infty_{j={-\infty}}
+        \text{Cov}(\boldsymbol{f}(\boldsymbol{y}_t,\boldsymbol{b}),
+          \boldsymbol{f}(\boldsymbol{y}_t,\boldsymbol{b}))
+        =
+        \mathbb{E}\left[
+        \boldsymbol{f}(\boldsymbol{y}_t,\boldsymbol{b})
+        \boldsymbol{f}(\boldsymbol{y}_t,\boldsymbol{b})'
+        \right]
+    \end{align*}
+    Nothing deep there, just applying our definition from earlier. Of
+    course, eventually, we'll have to talk about estimating this beast
+    given a sample (since we usually won't know $\boldsymbol{S}$), but
+    for now, let's just take it as given and work through the math for
+    everything else. We'll return to it later.
+
+  \item Use $\boldsymbol{S}$ to derive the standard error of sample mean
+    $\boldsymbol{a}_T\boldsymbol{g}_T(\boldsymbol{b})$ for fixed
+    $\boldsymbol{b}$.\footnote{We compute standard errors for
+      $\boldsymbol{a}_T\boldsymbol{g}_T(\boldsymbol{b})$, not just
+      $\boldsymbol{g}_T(\boldsymbol{b})$ because we impose that the
+      former equals zero, but we don't know anything about the latter.
+      And we will need to use the equality
+      $\boldsymbol{a}_T\boldsymbol{g}_T(\boldsymbol{b})=0$,
+      Taylor-expand the lefthand side, shuffle things around, and get
+      results in the next step.}
+
+    Just like in Section~\ref{sec:mean}, we have a sample estimate
+    $\boldsymbol{g}_T(\boldsymbol{b})$ for a population mean vector
+    $\boldsymbol{g}(\boldsymbol{b})$. We also have $\boldsymbol{S}$, the
+    spectral density at frequency zero. Put this together to get
+    \begin{align*}
+      \sqrt{T}\left(\boldsymbol{g}_T(\boldsymbol{b})
+      - \boldsymbol{g}(\boldsymbol{b})\right)
+      &\xrightarrow{d} N(0,\boldsymbol{S})\\
+      \Rightarrow \quad
+      \text{Var}\left(
+        \boldsymbol{a}
+        \boldsymbol{g}_T(\boldsymbol{b})
+      \right)
+      &=
+      \frac{\boldsymbol{a}\boldsymbol{S}\boldsymbol{a}'}{T}
+    \end{align*}
+    where $\boldsymbol{a}= \text{plim}\;\boldsymbol{a}_T$.
+
+  \item Use the delta method to derive standard errors for
+    $\boldsymbol{\hat{b}}$.
+
+    We know the distribution of $\boldsymbol{g}_T(\boldsymbol{b})$
+    for any fixed $\boldsymbol{b}$,
+    so we can do the usual delta function math,\footnote{%
+    Note, I could have used the delta method formula above, but the
+    notation makes it
+    tricky to apply here since this derivation treats
+    $\boldsymbol{g}_T(\boldsymbol{b})$ as the sampling distribution we
+    \emph{know}, and $\boldsymbol{b}$ as the transformation of
+    $\boldsymbol{g}_T(\boldsymbol{b})$ whose sampling distribution we
+    \emph{want to know}.  Now that's fine since $\boldsymbol{b}$ really
+    is a function of $\boldsymbol{g}_T(\boldsymbol{b})$ (it's the
+    inverse), but it's not conducive to the notation in the delta method
+    section. So I just opt for the more direct approach this one time.%
+    }
+    writing out a Taylor Series expansion of $\boldsymbol{a}
+    \boldsymbol{g}_T(\boldsymbol{\hat{b}})$ about the true parameter
+    vector $\boldsymbol{b}_0$ to get
+    \begin{align}
+      \boldsymbol{a} \boldsymbol{g}_T(\boldsymbol{\hat{b}})
+      &= 0\notag\\
+      \boldsymbol{a} \boldsymbol{g}_T(\boldsymbol{b}_0)
+      + \boldsymbol{a}
+      \frac{\partial \boldsymbol{g}_T}{\partial \boldsymbol{b}'}
+      (\boldsymbol{\hat{b}}-\boldsymbol{b}_0)
+      &= 0\notag\\
+      (\boldsymbol{\hat{b}}-\boldsymbol{b}_0)
+      &=
+      -(\boldsymbol{a} \boldsymbol{d})^{-1}
+      \boldsymbol{a} \boldsymbol{g}_T(\boldsymbol{b}_0)
+      \label{eq:bhat_b0}\\
+      \text{Var}\left(\boldsymbol{\hat{b}}-\boldsymbol{b}_0\right)
+      &=
+      (\boldsymbol{a} \boldsymbol{d})^{-1}
+      \; \left[\text{Var}\left(
+        \boldsymbol{a} \boldsymbol{g}_T(\boldsymbol{b}_0)
+      \right)
+      \right]
+      {(\boldsymbol{a} \boldsymbol{d})^{-1}}'\notag\\
+      \text{Var}\left(\boldsymbol{\hat{b}}-\boldsymbol{b}_0\right)
+      &=
+      \frac{1}{T}
+      (\boldsymbol{a} \boldsymbol{d})^{-1}
+      \boldsymbol{a} \boldsymbol{S} \boldsymbol{a}'
+      {(\boldsymbol{a} \boldsymbol{d})^{-1}}'\notag
+    \end{align}
+    where we defined
+    \begin{align*}
+      \boldsymbol{d} &:=
+      \mathbb{E}\left[
+        \frac{\partial \boldsymbol{f}}{\partial \boldsymbol{b}'}
+      \right]
+      =
+      \frac{\partial \boldsymbol{g}_T(\boldsymbol{b})}{%
+        \partial \boldsymbol{b}'}
+    \end{align*}
+
+  \item Use the delta method to derive standard errors for
+    $\boldsymbol{g}_T(\boldsymbol{\hat{b}})$.
+
+    We just got the distribution of $\boldsymbol{\hat{b}}$, now let's
+    get the distribution of $\boldsymbol{g}_T(\boldsymbol{\hat{b}}$,
+    which incorporates both variation in our sample \emph{and} in our
+    parameter estimates). Again, delta method
+    \begin{align}
+      \boldsymbol{g}_T(\boldsymbol{\hat{b}})
+      &\approx
+      \boldsymbol{g}_T(\boldsymbol{b}_0)
+      + \boldsymbol{d}
+      \left(\boldsymbol{\hat{b}}-\boldsymbol{b}_0\right)\notag\\
+      \text{From (\ref{eq:bhat_b0})}
+      \qquad\qquad
+      &=
+      \boldsymbol{g}_T(\boldsymbol{b}_0)
+      -\boldsymbol{d}(\boldsymbol{a} \boldsymbol{d})^{-1}
+      \boldsymbol{a} \boldsymbol{g}_T(\boldsymbol{b}_0)\notag \\
+      \boldsymbol{g}_T(\boldsymbol{\hat{b}})
+      &\approx
+      \left(\boldsymbol{I}
+      -\boldsymbol{d}(\boldsymbol{a} \boldsymbol{d})^{-1}
+      \boldsymbol{a} \right)
+      \boldsymbol{g}_T(\boldsymbol{b}_0)\notag\\
+      \Rightarrow\quad
+      \text{Var}\left(
+      \boldsymbol{g}_T(\boldsymbol{\hat{b}})
+      \right)
+      &\approx
+      \frac{1}{T}
+      \left(\boldsymbol{I}
+      -\boldsymbol{d}(\boldsymbol{a} \boldsymbol{d})^{-1}
+      \boldsymbol{a} \right)
+      \boldsymbol{S}
+      \left(\boldsymbol{I}
+      -\boldsymbol{d}(\boldsymbol{a} \boldsymbol{d})^{-1}
+      \boldsymbol{a} \right)'
+      \label{eq:vargtbhat}
+    \end{align}
+    And lastly, just a quick word about this variance.
+
+    Recall that there are $m$ moments, and we set $p$ linear
+    combinations of them to zero. Hence, $p$ elements of
+    $\boldsymbol{g}_T(\boldsymbol{b})$ will have zero variance
+    for \emph{all} choices of $b$, by construction. That means the
+    variance-covariance matrix for
+    $\boldsymbol{g}_T(\boldsymbol{\hat{b}})$ given by
+    Equation~\ref{eq:vargtbhat} will be \emph{singular}.  Since some
+    formulas require us to invert this object, we will need to use a
+    pseudo-inverse.\footnote{Here's one quick way to do that given
+      variance-covariance matrix $\Sigma$. Do an eigenvalue
+      decomposition $\Sigma = Q\Lambda Q'$. Construct $\Lambda_*$, which
+      simply inverts all non-zero eigenvalues on the diagonal of
+      $\Lambda$, and set $\Sigma^{-1}=Q\Lambda_*Q'$.}
+
+\end{enumerate}
+
+\subsection{Test of Overidentifying Restrictions}
+
+We're trying to set $\boldsymbol{g}_T(\boldsymbol{b})$ to zero, but
+again, we have to make some tradeoffs and set only a few moments (or
+linear combinations of moments) to zero. We might then run tests to see
+if the remaining moments we didn't force to zero are statistically
+large---i.e.\ far from zero, so bad news for the model.
+
+To that end, form the $J_T$ statistic
+\begin{align}
+  J_T =
+  T
+  \boldsymbol{g}_T(\boldsymbol{\hat{b}})'
+  \left[
+  \left(
+    \boldsymbol{I}-\boldsymbol{d}(\boldsymbol{a}\boldsymbol{d})^{-1}
+    \boldsymbol{a}
+  \right)
+  \boldsymbol{S}
+  \left(
+    \boldsymbol{I}-\boldsymbol{d}(\boldsymbol{a}\boldsymbol{d})^{-1}
+    \boldsymbol{a}
+  \right)'
+  \right]^{-1}
+  \boldsymbol{g}_T(\boldsymbol{\hat{b}})
+  \label{eq:jtest}
+\end{align}
+Ignore the details and focus on the intution of the line above: We're
+just squaring and adding up each elements of
+$\boldsymbol{g}_T(\boldsymbol{\hat{b}})$, but weighting those elements
+by the object in brackets, which is precisely the inverse
+variance-covaraince matrix of $\boldsymbol{g}_T(\boldsymbol{\hat{b}})$
+from Equation~\ref{eq:vargtbhat} above.  In other words, we're dividing
+the size of each squared ``deviation from zero'' by its variance (to
+standardize), and then adding all of them up to evaluate the deviations
+\emph{jointly}.
+
+Finally, we just need to specify what distribution $J_T$ follows. By the
+central limit theorem, $\boldsymbol{g}_T(\boldsymbol{\hat{b}})$ should
+be multivariate normal. We standardized all the elements by their
+variance, squared them, and added them up, so we have a sum of squared
+standard normals: $\Chi^2$ distribution
+\begin{align*}
+  J_T \sim \Chi^2_{m-p}
+\end{align*}
+where $m$ is the number of moments and $p$ is the number of parameters
+we estimated. We're used to this kind of degrees of freedom calculation,
+but in the GMM context, it has additional meaning. In particular, we can
+think of the $m-p$ degrees of freedom as a consequence of setting $p$
+elements of $\boldsymbol{g}_T(\boldsymbol{\hat{b}})$ to zero
+\emph{always}. Recall that this meant zero variance for those elements,
+hence a singular variance-covariance matrix for
+$\boldsymbol{g}_T(\boldsymbol{\hat{b}})$ of rank $m-p$. So there are
+only $m-p$ squared standard normals to add up for our $\Chi^2$
+distribution.
+
+\clearpage
+\subsection{Efficient Estimates}
+
+I've so far been agnostic about the choice of $\boldsymbol{a}_T$ or
+weighting matrix $\boldsymbol{W}$ in our two alternative definitions of
+estimate $\boldsymbol{\hat{b}}$:
+\begin{align}
+  \boldsymbol{\hat{b}} &= \arg\min_{\boldsymbol{b}}\;
+  \boldsymbol{g}_T(\boldsymbol{b})' \boldsymbol{W}
+  \boldsymbol{g}_T(\boldsymbol{b})
+  \label{eq:bhatmin2}\\
+  0 &= \boldsymbol{a}_T
+    \;
+    \boldsymbol{g}_T(\boldsymbol{\hat{b}})
+  \label{eq:bhatdef2}
+\end{align}
+There is a a statistically \emph{efficient} choice:
+\begin{align}
+  \boldsymbol{W} &= \boldsymbol{S}^{-1} \label{eq:efficient1}\\
+  \Leftrightarrow \quad
+  \boldsymbol{a} &= \boldsymbol{d}' \boldsymbol{S}^{-1}
+  \label{eq:efficient2}
+\end{align}
+I'll start with the very intuitive choice of weighting matrix in
+Equation~\ref{eq:efficient1}.
+
+Remember that $\boldsymbol{S}$ is the variance-covariance matrix of
+$\boldsymbol{g}(\boldsymbol{b})$. So if we weight each element of vector
+$\boldsymbol{g}(\boldsymbol{b})$ by the \emph{inverse} variance, we're
+mechanically forcing the minimization in Equation~\ref{eq:bhatmin2} to
+pay more attention to the low-variance elements. That's because low
+variance means large inverse variance, so we heavily weight those
+elements of $\boldsymbol{g}(\boldsymbol{b})$ that are \emph{more
+precisely measured}. So the weighting will make these elements of
+$\boldsymbol{g}(\boldsymbol{b})$ more sensitive to choice of parameters.
+
+To understand the choice of $\boldsymbol{a}$ matrix in
+Equation~\ref{eq:efficient2}, recall Equation~\ref{eq:equivrep}, which
+showed how to translate the $\boldsymbol{W}$ matrix in
+Representation~\ref{eq:bhatmin2} into an equivalent $\boldsymbol{a}$
+matrix in Representation~\ref{eq:bhatdef2}.
+
+A bonus to all of this is that many of the formulas simplify
+considerably. By plugging Equation~\ref{eq:efficient2} into the formulas
+we had for the various estimates we had, they reduce to the following
+with a little bit of algebra:
+\begin{align*}
+  \sqrt{T}\left(\boldsymbol{\hat{b}}-\boldsymbol{b}_0\right)
+  &\xrightarrow{d}
+  N\left(0,
+  (\boldsymbol{d}' \boldsymbol{S}^{-1} \boldsymbol{d})^{-1}
+  \right)\\
+  \sqrt{T}\boldsymbol{g}_T(\boldsymbol{\hat{b}})
+  &\xrightarrow{d}
+  N\left(
+  0,
+  \boldsymbol{S}
+  -\boldsymbol{d}(\boldsymbol{d}' \boldsymbol{S}^{-1} \boldsymbol{d})^{-1}
+  \boldsymbol{d}'
+  \right)\\
+  T
+  \boldsymbol{g}_T(\boldsymbol{\hat{b}})'
+  \boldsymbol{S}^{-1}
+  \boldsymbol{g}_T(\boldsymbol{\hat{b}})
+  &\xrightarrow{d} \Chi^2_{m-p}
+\end{align*}
+where the last line follows from Hansen's paper (the result is not an
+immediately clear simplification of the more general formula above, at
+least to me).
 
 
 %%%% APPPENDIX %%%%%%%%%%%
@@ -428,11 +1080,11 @@ We also have, in general,
 
 \section{Adjusted R-Squared}
 
-Adjusted R-squared, $R^2_A$, is computed 
+Adjusted R-squared, $R^2_A$, is computed
 \[ R^2_A = 1 - \frac{e'e }{(n-k) s_y^2} \]
-where $e$ is the vector of error/residual terms resulting from a 
+where $e$ is the vector of error/residual terms resulting from a
 model estimate,
-$n$ is the number of observations, $k$ equals the number of 
+$n$ is the number of observations, $k$ equals the number of
 independent variables on the right hand side of the equation, and
 $s_y^2$ is the unbiased variance estimate of the dependent variable.
 
@@ -444,7 +1096,7 @@ $s_y^2$ is the unbiased variance estimate of the dependent variable.
 
 %%%% INCLUDING FIGURES %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-   % H indicates here 
+   % H indicates here
    %\begin{figure}[h!]
    %   \centering
    %   \includegraphics[scale=1]{file.pdf}
@@ -457,11 +1109,11 @@ $s_y^2$ is the unbiased variance estimate of the dependent variable.
 %	    \includegraphics[scale=1]{file1.pdf}
 %	 }\quad
 %	 \subfigure{
-%	    \includegraphics[scale=1]{file2.pdf} 
+%	    \includegraphics[scale=1]{file2.pdf}
 %	 }
 %      }
 %   \end{figure}
- 
+
 
 %%%%% Including Code %%%%%%%%%%%%%%%%%%%%%5
 % \verbatiminput{file.ext}    % Includes verbatim text from the file
