@@ -1,4 +1,12 @@
 ========================================================================
+== Introduction ========================================================
+========================================================================
+
+These are my Julia notes. They are a summary and, in many cases,
+verbatim transcription of the official documentation.
+
+
+========================================================================
 == Misc ================================================================
 ========================================================================
 
@@ -415,13 +423,30 @@ BUT comprehensions do not do this.
 == Types ===============================================================
 ========================================================================
 
-Julia is dynamically typed, but allows for some typing before run time.
-You don't have to provide types, but you can very easily, and it helps.
+Julia is dynamically typed (so the code strictly need to know the type
+before run time), but does allow for some typing before run time.  You
+don't have to provide types, but you can very easily, and it helps.
 
 Vocabulary:
 - Abstract types
-- Concerete types
-- Parameterized types
+- Concerete types: Cannot have subtypes. They are always the end of some
+  branch in a type heirarchy.
+- Parameterized types: From documentation, "Both abstract and concrete
+  types can be parameterized by other types.  They can also be
+  parameterized by symbols, by values of any type for which isbits()
+  returns true (essentially, things like numbers and bools that are
+  stored like C types or structs with no pointers to other objects), and
+  also by tuples thereof. Type parameters may be omitted when they do
+  not need to be referenced or restricted."
+
+Lifted directly from the documentation:
+
+  There is no division between object and non-object values: all values
+  in Julia are true objects having a type that belongs to a single,
+  fully connected type graph, all nodes of which are equally first-class
+  as types.
+
+There is an explicit heirarchy of types.
 
 Only values not variables have types. Variables are simply names bound
 to values.
@@ -434,13 +459,20 @@ Using :: to assert types
       return 2x
     end
 
-- To require a variable always to be of a certain type (so any time you
-  try to assign a value to that name, the value will be converted to the
-  specified type). This is very much like types in C
+- At initial assignment, to force a variable always to be of a certain
+  type (so any time you try to assign a value to that name, the value
+  will be converted to the specified type). This is very much like types
+  in C
 
     function foo()
       x::Int8 = 1
     end
+
+- In an expressian to ensure that the computed value is of a certain
+  type:
+
+    (1+2)::Int
+
 
 Abstract vs. Concrete Types
 ---------------------------
@@ -463,10 +495,25 @@ Declare new abstract types with
 If a Supertype is not specified, the supertype is, by default, "Any."
 
 
+Example
+-------
+A great example of abstract types is all the diferent types of numbers
+you might have:
+
+  abstract Number
+  abstract Real     <: Number
+  abstract FloatingPoint <: Real
+  abstract Integer  <: Real
+  abstract Signed   <: Integer
+  abstract Unsigned <: Integer
+
+
 User-Defined Composite Types
 ----------------------------
 Like structs in C, a collection of named fields that can be treated as a
-single value.
+single value. Those fields have different types, so the single
+collection that bundles them is said to be an object of "Composite
+Type."
 
 Julia isn't so object-oriented that "methods"/functions-for-objects live
 inside the object. Rather, Julia uses multiple-dispatch and the types of
@@ -487,9 +534,15 @@ Here's how you work with this new type:
   y = NewType("Bob", 3.0, 2)    # Same, but second and third arguments
                                 #   will be converted to the correct
                                 #   type
-  fieldnames(x)                 # Fieldnames of the type: :a,:b,:c
+  names(x)                      # Fieldnames of the type: :a,:b,:c
   x.a, x.b                      # Accessing field values
   x.a = 27                      # Changing the field values
+
+
+Constructors
+------------
+When a type is applied like a function (i.e. NewType("Bob", 3, 2.14)),
+it's called a constructor.
 
 
 Immutable Types
@@ -499,6 +552,19 @@ immutable NewType <: SuperType
   a
   b::Int32
 end
+
+Note, the objects stored in a field of an immutable type might be
+mutable, .e.g. field "a" might hold an array whose elements you can
+change, though you can't change field "a" so that it points to another
+type of object (Float, Dict, function) or another array.
+
+From the docs: "Ask whether two instances with the same field values
+would be considered identical, or if they might need to change
+independently over time. If they would be considered identical, the type
+should probably be immutable."
+
+Immutable objects are passed by copying, while mutable type objects are
+passed by reference.
 
 
 Parametric Types
@@ -526,20 +592,471 @@ You can construct instances of type Point by
 In the latter two examples, the type will be inferred from the
 arguments.
 
+NOTE: Special attention to this
+
+    julia> Float64 <: Real
+    true
+
+    julia> Point{Float64} <: Point{Real}
+    false
+
+Parameteric abstract types:
+
+  abstract Pointy{T}
+
+Can restrict the parameters of concrete and abstract parametric types
+
+  type Point{T<:Real}
+    x::T
+    y::T
+  end
+  abstract Pointy{T<:Real}
+
+
+Singleton Types
+---------------
+Let T be a type like Float64 or Int. Then Type{T} is an abstract type
+whose only instance is object T.
+
+  julia> isa(Float64, Type{Float64})
+  true
+
+  julia> isa(Real, Type{Float64})
+  false
+
+  julia> isa(Type{Float64}, Type)
+  true
+
+  julia> isa(Float64, Type)
+  true
+
+  julia> isa(1, Type)
+  false
+
+Examples are really the only way I have to understand this. I don't have
+a very deep understanding of what's going on here yet.
+
 
 Type Aliases
 ------------
 New names for already expressible types. Useful when a few of the
 parameter choices are fixed:
 
+  # Arrays are of type Array{T,N} where T is type and N is ndim
   typealias Vector{T} Array{T,1}
   typealias Matrix{T} Array{T,2}
 
 
 Functions for Working with types
 ---------------------------------
-isa(someValue, aType)   Test if something is a particular type
-typeof(anything)        Type of anything
+isa(someValue, aType)   # Test if something is a particular type
+typeof(anything)        # Type of anything
+super(aType)            # The supertype of a type
+
+
+========================================================================
+== Methods =============================================================
+========================================================================
+
+Functions map a tuple of arguments into a return value.
+
+The implementation of a function might be different depending upon the
+types of objects given in the argument tuple, though the high level
+human interpretation of the function is the same. (Example + might be
+defined different for ints, floats, etc. though it's still just
+addition). Multiple dispatch to the rescue.
+
+"A definition of one possible behavior for a function is called a
+method." A function is a collection of methods. When a function is
+applied to arguments, "the most specific method applicable to those args
+is applied."
+
+"Multiple dispatch" is when you use all of the functions arguments to
+determine the method to use.
+
+  methods(f)  # Show all methods defined for function f.
+
+Example
+-------
+Bind these two methods to function "f". You can define the
+function as many times as you would like for different combinations of
+argument types.
+
+  f(x::FloatingPoint, y::FloatingPoint) = x + y
+  f(x::Int, y::Int) = x + y
+  f(x::Number, y::Number) = x - y
+  f(x::Any, y::Any) = println("Da fuck you doin?")
+
+The above is a little crazy, but it's useful to illustrate the fact that
+Julia always shoots for the most *specific* method. So you'd see this
+behavior
+
+  # It can match the first method, so use that
+  julia> f(2.0, 3.0)
+  5
+
+  # It can match the second method so use that
+  julia> f(2, 3)
+  5
+
+  # It cannot match either of the first two methods, so use the third
+  julia> f(2.0, 3)
+  -1
+
+  # Catch everything else
+  julia> f(f, "aldfkjadklf")
+  Da fuck you doin?
+
+So although (2.0,3.0) is a tuple of objects with a supertype of Numbers,
+that's not the most specific method. (2.0,3.0) causes you to use the
+float method.
+
+
+Parameteric Methods
+-------------------
+You can define methods to take parameters
+
+  my_method{T}(x::T, y::T) = ...
+  my_append{T}(v::Vector{T}, x::T) = [v ..., x]
+
+Again, you're generating a whole family of methods parameterized by T.
+The second function/method has the benefit of doing type-checking before
+trying to append.
+
+
+Note on Optional and Keyword Arguments
+--------------------------------------
+From the docs:
+
+  Keyword arguments behave quite differently from ordinary positional
+  arguments. In particular, they do not participate in method dispatch.
+  Methods are dispatched based only on positional arguments, with
+  keyword arguments processed after the matching method is identified.
+
+
+========================================================================
+== Constructors ========================================================
+========================================================================
+
+Constructs are functions that create new instances of composite types.
+Composite type objects, when applied to an argument list as a functions
+(like myType("a", 1.0, 3)) can serve as constructors.
+
+Outer Constructor Methods
+-------------------------
+A constructor is a function. Like all functions in Julia, you can define
+additional methods for that function. Example:
+
+  type myType
+    a
+    b
+  end
+  myType(a) = myType(a,a)
+  myType()  = myType(1)
+
+The type definition let's you inialize new instances of that type by
+writing myType(1,2) or myType("a", "b"). Below that, we provide a way to
+construct objects of that type when passing only one argument. Below
+that, we provide another method to construct without *any* arguments
+(invoking the just defined one-argument method in this new method
+definition).
+
+These are kind of like bootstrapping constructors from the originally
+defined one.
+
+Inner Constructor Methods
+-------------------------
+Suppose you want to enforce that the first field is less than the
+second. Then write
+
+  type myType
+    x::Real
+    y::Real
+
+    myType(x,y) = x > y ? error("Out of order") : new(x,y)
+  end
+
+This makes use of the special and local "new" function. We check that x
+is greater than y. If not, error. If yes, return a *new* instance of the
+type. We can think of the default constructor method as an automaically
+defined inner constructor method that has a call to "new" under the
+hood.
+
+Once the type is instantiated, you can only add new outer constructor
+methods; you can't add new inner constructor methods.
+
+NOTE: If you define *any* inner constructor methods, no default
+constructor method is created. Julia assumes you created all of the
+inner constructor methods that you need.
+
+GOOD FORM: Use as few inner constructor methods as possible, only the
+essential ones for transformation and error-checking. Everything else,
+use outer constructor methods.
+
+Self Referential types can be created as follows
+
+  type SelfRef
+    obj::SelfRef
+
+    SelfRef() = (x = new(); x.obj = x)
+  end
+
+This works because the function "new" can be called with fewer arguments
+than the number of fields for the type. Unspecified fields are
+uninitialized. So the above will instantiate an uninitialized object of
+that type and assign it to the field obj.
+
+========================================================================
+== Modules =============================================================
+========================================================================
+
+Modules in Julia are separate global variable workspaces. They allow the
+programmer not to worry about namespace conflicts since the programmer
+has direct control over the functions imported for use in the module and
+exported for use by other programmers.
+
+include("file.jl") statements are totally legal within modules. So you
+can use the same chunk of code in multiple modules. Great for testing
+purposes.
+
+Example Syntax
+--------------
+# Start defining the module
+module MyModule
+
+  # Import function "show" from module "Base" for use within MyModule.
+  # We need to import any functions that we want to add methods to.
+  import Base.show
+
+  # Shortcut for import Base.show, Base.println
+  import Base: show, println
+
+  # Import all functions within module "OtherLib". It's like using
+  # on all functions within OtherLib individually
+  importall OtherLib
+
+  # When a global variable is encountered that is not defined in the
+  # current module (i.e. between "module MyModule" and "end"), the
+  # system will search among variables exported by Lib and import if
+  # found there.
+  #
+  # This differs from import in that it only imports as
+  # needed; you just add a searchable module and things will be imported
+  # on the fly from that module as needed.
+  #
+  # NOTE: If you plan to add methods to functions, you *need* to use
+  # import. Using won't work
+  using Lib
+
+  # Shortcut for using BigLib.thing1, BigLib.thing2
+  using BigLib: thing1, thing2
+
+  # Export these things so other modules can use them
+  export MyType, foo
+
+  # This will be exported
+  type MyType
+    a
+  end
+
+  # This will be local to the module since it's not exported
+  bar(x) = 2x
+
+  # This will be exported
+  foo(a::MyType) = bar(a.x) + 1
+
+  # Add method to imported function show
+  show(io, a::MyType) = print(io, "MyType $(a.x)")
+
+end
+
+How to use MyModule
+-------------------
+This is a great table from the docs for fictional MyModule defined
+
+  module MyModule
+    export x, y
+    x() = "x"
+    y() = "y"
+    p() = "p"
+  end
+
+Import Command                | What is brought into scope            | Available for method extension
+------------------------------+---------------------------------------+--------------------------------------
+using MyModule                | All exported names (x and y),         | MyModule.x, MyModule.y and MyModule.p
+                              |   MyModule.x, MyModule.y, MyModule.p  |
+using MyModule.x, MyModule.p  | x and p                               |
+using MyModule: x, p          | x and p                               |
+import MyModule               | MyModule.x, MyModule.y and MyModule.p | MyModule.x, MyModule.y and MyModule.p
+import MyModule.x, MyModule.p | x and p                               | x and p
+import MyModule: x, p         | x and p                               | x and p
+importall MyModule            | All exported names (x and y)          | x and y
+
+
+Standard Modules
+----------------
+- Main: Top level module. Variables defined in prompt go here.
+- Core: Implicitly included in all modules. Can't do anything without
+        these definitions.
+- Base: Implicitly included in all modules
+
+If you don't want to automatically include these in your module, use
+keyword "baremodule" in place of "module" in your module definition.
+
+
+***** Section: Default top-level definitions and bare modules in Modules
+should have "implicitly" instead of "explicitly"
+
+
+========================================================================
+== Metaprogramming: Expressions ========================================
+========================================================================
+
+Julia represents its own code as a data structure of the language
+itself---an object of "Expression" type that can be created and
+manipulated from within the language itself.
+
+Every program in Julia starts as a string. That string can be "parsed"
+and turned into an object called an "Expression"
+
+  julia> prog = "1+1"
+  "1+1"
+
+  julia> ex1 = parse(prog)
+  :(1+1)
+
+  julia> typeof(ex1)
+  Expr
+
+  julia> dump(ex1)
+  Expr
+  head: Symbol call
+  args: Array(Any,(3,))
+    1: Symbol +
+    2: Int64 1
+    3: Int64 1
+  typ: Any
+
+  julia> ex2 = Expr(:call, :+, 1, 1) # Another way to create ex1
+  :(1+1)
+
+  julia> ex3 = :(1+1) # Yet another way to create ex1
+  :(1+1)
+
+If the colon usage looks a bit weird, hang on. More on that below.
+
+The construction of ex2 offers a way to build expressions directly using
+prefix notation.
+
+The call to function "dump" shows that Expression objects are composite
+types with three fields:
+- symbol                  This identifies the *kind* of expression you have.
+- expression arguments    May be symbols, other expressions, literal vals
+- result type
+
+
+Symbols
+-------
+A symbol is an interned string used as one building block of
+expressions. Two ways to create them
+
+  julia> symbol("foo")
+  :foo
+
+  julia> :foo
+  :foo
+
+Within an expression, symbols are used to denote access to variables.
+When an expression is evaluated, a symbol is replaced with the value
+bound to that symbol in the appropriate scope.
+
+Note that the colon : is used another way, detailed below in quoting.
+
+Quoting
+-------
+Quoting let's you create expressions more easily without explicit use of
+the Expression constructor, as we saw above:
+
+  julia> a = :(a+b*c+1)
+  :(a+b*c+1)
+
+  julia> typeof(a)
+  Expr
+
+You can also generate "quote blocks" as follows
+
+  julia> ex = quote
+          x = 1
+          y = 2
+          x + y
+         end
+
+
+Building Expressions
+--------------------
+Just to recap and extend some of what we saw above for ex1, ex2, and
+ex3, we can create expressions in one of three ways:
+
+  :(a + b*c + 1)
+  parse("a + b*c + 1")
+  Expr(:call, :+, :a, Expr(:call, :*, :b, :c), 1)
+
+
+Interpolation
+-------------
+Interpolation of literals or expressions into quoted expressions
+
+  julia> a = 1
+  1
+
+  julia> ex = :($a + b)
+  :(1 + b)
+
+
+Evaluation with "eval"
+----------------------
+Given an Expression object, use "eval" to evaluate or execute it at
+global scope
+
+  julia> eval(:(1+2))
+  3
+
+
+========================================================================
+== Metaprogramming: Macros =============================================
+========================================================================
+
+If you put "@mymacro(args)" in your code, the macro called "mymacro" will
+use the arguments to generate an expression and evaluate that expression
+at runtime (so you don't need to call "eval" on the expression).
+
+Macros execute when code is parsed (before the full program is run), so
+they let the programmer generate and include fragments of customized
+code *before* the full program is run.
+
+Example:
+
+  julia> macro sayhello(name)
+           return :( println("Hello ", $name) )
+         end
+
+  julia> @sayhello("world")
+  Hello world
+
+  julia> @sayhello "world" # Alternate way to call
+  Hello world
+
+To view the quoted expression generated by a macro (which is SUPER
+useful for debugging), use the function "macroexpand()":
+
+  julia> ex = macroexpand( :(@sayhello("world")) )
+  :(println("Hello ", "world"))
+
+
+Within macro definitions, specify local in front of variable assignment
+to avoid naming conflicts.
+
+
 
 
 
