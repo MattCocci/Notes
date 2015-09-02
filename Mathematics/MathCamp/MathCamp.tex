@@ -182,6 +182,18 @@
 \newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
     %   Bigger Chi
 
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% My additions for math shorthand
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\N}{\mathbb{N}}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -198,37 +210,44 @@
 \section{Basic Building Blocks}
 
 \begin{defn}{(Supremum)}
+\label{defn:supdef1}
 Given a set $A\subseteq X$, the \emph{supremum} denoted $\sup(A)$ is the
-smallest possible upper bound for $A$. It might be in $A$, or it might
-be $X\setminus A$.
-\\
-\\
+smallest possible upper bound for $A$.
 More precisely, the supremum satisfies the following two properties
 \begin{enumerate}
   \item $a\leq \sup(A)$ for all $a\in A$.
-  \item If $x<\sup(A)$, then $x$ is not an upper bound for $A$.
+  \item If $x<\sup(A)$, then $x\in X$ is not an upper bound for $A$.
     Otherwise, we would have just taken $x$ as the supremum.
 \end{enumerate}
-In practice, the way we use the supremum in proofs is informed by two
-alternative representations of the supremum, which are equivalent to the
-above conditions:
-\begin{enumerate}
-  \item Given any $a\in A$, there exists an $\varepsilon>0$ such that
-    \begin{align*}
-      a = \sup(A) - \varepsilon
-    \end{align*}
-  \item Given any $\varepsilon>0$, there exists an $a\in A$ such that
-    \begin{align*}
-      a > \sup(A) -\varepsilon
-    \end{align*}
-\end{enumerate}
+It might be in $A$, in which case $\sup A = \max A$, or it might be
+$X\setminus A$, in which case $\max A$ is undefined.
 \end{defn}
 
 \begin{ax}{(Axiom of Completeness)}
 \label{ax:completeness}
-Suppose that $A\subset \mathbb{R}^n$ is bounded above and $A\neq
+Suppose that $A\subset \R^n$ is bounded above and $A\neq
 \emptyset$. Then $\sup A$ exists and is finite.
 \end{ax}
+
+\begin{defn}{(Space of Bounded Functions)}
+Here's a more general space than simple $\R^n$: the set of all
+bounded functions in $\R^n$,
+\begin{align*}
+  \mathscr{B}(A,\R^n)
+  :=
+  \left\{
+    f:A\rightarrow \R^n \; \big| \; \sup_{x\in A} |f(x)|<\infty
+  \right\}
+\end{align*}
+Notice that this is a lot tougher to visualize than $X=\R^n$.
+Here, elements of $X$ are functions, not vectors.
+
+Notice also that this is a vector space, as
+\begin{align*}
+  (f+g)(x) &= f(x) + g(x)\\
+  (cf)(x) &= cf(x)
+\end{align*}
+\end{defn}
 
 
 
@@ -240,18 +259,18 @@ close'' any two points in $X$ are. By defining the concept of
 ``closeness'', we can then talk about convergence of sequences within
 $X$.
 
-The most common space is $\mathbb{R}^k$; however, the treatment below
+The most common space is $\R^k$; however, the treatment below
 will be sufficiently general to capture any set $X$ for which a distance
 function or \emph{metric} (satisfying certain properties) can be
 defined.
 
 
-\subsection{Metrics and Norms}
+\subsection{Metrics, Norms, and Metric Spaces}
 
-\begin{defn}
+\begin{defn}{(Metric Space)}
 \label{defn:metric}
 A \emph{metric space} is a pair $\mathscr{M}=(X,d)$ where $X$ is some
-space and $d:X\times X\rightarrow \mathbb{R}$ is a function
+space and $d:X\times X\rightarrow \R$ is a function
 called a \emph{metric} that satisfies the following conditions for all
 ``points'' $x,y,z\in X$
 \begin{enumerate}
@@ -265,11 +284,18 @@ The triangle inequality enforces the idea that the distance function
 represents the \emph{shortest path} between points, i.e.\ you can't have
 an intermediate pit stop somewhere that reduces the total trip length.
 \end{defn}
+\begin{defn}{(Metric Subspace)}
+We say that $(Y,d_Y)$ is a metric subspace of $(X,d_x)$ if and only if
+\begin{enumerate}
+  \item $Y\subseteq X$
+  \item $d_Y(x,y) = d_X(x,y)$ for all $x,y$.
+\end{enumerate}
+\end{defn}
 
-\begin{ex}{(Distance Functions in $\mathbb{R}^n$)}
-There are some standard distance functions in $\mathbb{R}^n$ that show
+\begin{ex}{(Distance Functions in $\R^n$)}
+There are some standard distance functions in $\R^n$ that show
 up a lot and have a nice geometric representation. So for $x,y\in
-\mathbb{R}^n$, define
+\R^n$, define
 \begin{enumerate}
   \item Manhattan Taxi Distance
     \begin{align*}
@@ -294,7 +320,7 @@ up a lot and have a nice geometric representation. So for $x,y\in
 \end{enumerate}
 \end{ex}
 \begin{rmk}
-The ``max'' distance is useful when $x\in\mathbb{R}^n$ doesn't represent
+The ``max'' distance is useful when $x\in\R^n$ doesn't represent
 real location. Rather, $n$-dimensional $x$ might represent $n$ different
 attributes or characteristics of some object (like height, weight, hair
 length, etc.) that aren't directly comparable. In that case, to compare
@@ -305,7 +331,7 @@ sharply.
 
 Distance functions are commonly built up from another special type of
 function called a \emph{norm}. Often, we first encounter \emph{norms} as
-functions that measure the length of vectors in $\mathbb{R}^n$, although
+functions that measure the length of vectors in $\R^n$, although
 the definition permits much more general functions over much more
 general spaces (as we'll see). But we really care about them here
 because given a norm, you can always construct a distance function from
@@ -313,7 +339,7 @@ that norm. So let's define them.
 
 \begin{defn}
 \label{defn:norm}
-Given a space $X$, a function $N:X\rightarrow \mathbb{R}$ is called a
+Given a space $X$, a function $N:X\rightarrow \R$ is called a
 \emph{norm} if it satisfies the following properties:
 \begin{enumerate}
   \item $N(x)\geq 0$
@@ -321,12 +347,12 @@ Given a space $X$, a function $N:X\rightarrow \mathbb{R}$ is called a
   \item $N(\alpha x)= |\alpha| N(x)$
   \item $N(x+y) \leq N(x) + N(y)$
 \end{enumerate}
-Occaisionally, you see the notation $||x||$ instead of $N(x)$ to denote
-the norm of $x$.
+Often, you see the notation $||x||$ instead of $N(x)$ to denote the norm
+of $x$.
 \end{defn}
 
 \begin{ex}
-One common norm for $x\in \mathbb{R}^n$ is
+One common norm for $x\in \R^n$ is
 \begin{align*}
   N_1(x) = \sum^n_{i=1} |x_i|
 \end{align*}
@@ -337,7 +363,7 @@ proof is omitted.
 
 
 \begin{prop}
-If $N$ is a norm, then $d:X \times X\rightarrow \mathbb{R}$ defined as
+If $N$ is a norm, then $d:X \times X\rightarrow \R$ defined as
 $d(x,y):=N(x-y)$ is a metric for space $X$.
 \end{prop}
 \begin{proof}
@@ -371,46 +397,26 @@ the four properties of Definition~\ref{defn:metric}:
 \end{enumerate}
 \end{proof}
 
-\begin{defn}{(Space of Bounded Functions)}
-Here's a more general space than simple $\mathbb{R}^n$: the set of all
-bounded functions in $\mathbb{R}^n$,
-\begin{align*}
-  \mathscr{B}(A,\mathbb{R}^n)
-  :=
-  \left\{
-    f:A\rightarrow \mathbb{R}^n \; \big| \; \sup_{x\in A} |f(x)|<\infty
-  \right\}
-\end{align*}
-Notice that this is a lot tougher to visualize than $X=\mathbb{R}^n$.
-Here, elements of $X$ are functions, not vectors.
-
-Notice also that this is a vector space, as
-\begin{align*}
-  (f+g)(x) &= f(x) + g(x)\\
-  (cf)(x) &= cf(x)
-\end{align*}
-\end{defn}
-
-\begin{ex}{(Norms and Metrics for $\mathscr{B}(A,\mathbb{R}^n)$)}
+\begin{ex}{(Norms and Metrics for $\mathscr{B}(A,\R^n)$)}
 Start by defining a norm $N$ for any bounded function $f:A
-\rightarrow \mathbb{R}^n$
+\rightarrow \R^n$
 \begin{align*}
   N(f) = \sup_{x\in A} |f(x)|
 \end{align*}
 By ``bounded function'', I mean that $N(f)<\infty$.  Since
 Axiom~\ref{ax:completeness} states that the sup always exists for any
-function bounded in $\mathbb{R}^n$, this norm is well
+function bounded in $\R^n$, this norm is well
 defined, and it is called the \emph{sup norm}.
 
 %With this norm, we can define our space $X$ as the set of all bounded
 %functions
 %\begin{align*}
   %X = \left\{
-      %f: A \rightarrow \mathbb{R}^n
+      %f: A \rightarrow \R^n
       %\; \big|\; N(f) < \infty
       %\right\}
 %\end{align*}
-Given the space $X=\mathscr{B}(A,\mathbb{R}^n)$, we just need a distance
+Given the space $X=\mathscr{B}(A,\R^n)$, we just need a distance
 function to construct the metric space $(X,d)$. As is always the case
 with norms, we use the norm and define a metric:
 \begin{align*}
@@ -428,7 +434,7 @@ above to hold.
 Consider the space of $L_p$ integrable functions:
 \begin{align*}
   X = \left\{
-    f:A\rightarrow \mathbb{R} \; \big|\;
+    f:A\rightarrow \R \; \big|\;
     \int_{x\in A} |f(x)|^p dx <\infty
   \right\}
 \end{align*}
@@ -438,50 +444,17 @@ On this space, we can define the metric
 \end{align*}
 \end{ex}
 
-\subsection{Topologically Equivalent Metric Spaces}
+\subsection{Sequences, Subsequences, Limits, and Convergence}
 
-This section can be skipped entirely, and all other sections will still
-make sense. It's included simply for reference.
+Now that we have defined the notions of metrics and metric spaces, which
+let us talk about ``closeness'' in sets, we present a general treatment
+of sequences and convergence within a metric space.
 
-\begin{defn}
-Two metric spaces $(X,d_1)$ and $(X,d_2)$ using different metrics for
-the same underlying space $X$, we say that $d_1$ is \emph{finer} than
-$d_2$ if $(X,d_1)$ has all of the open sets of $(X,d_2)$ and possibly
-more. Mathematically, we write
-\begin{align*}
-  d_1 \succeq d_2
-  \quad \Leftrightarrow \quad
-  \left(
-  \text{$A$ open in $(X,d_2)$}
-  ; \Rightarrow\;
-  \text{$A$ open in $(X,d_1)$}
-  \right)
-\end{align*}
-\end{defn}
-
-\begin{defn}
-Metric space $(X,d_1)$ is \emph{topologically equivalent} to $(X,d_2)$
-if and only if $d_1 \succeq d_2$ and $d_1 \preceq d_2$. This can be
-written more compactly as $d_1\sim d_2$.
-\end{defn}
-
-\begin{prop}
-If $d_1 \sim d_2$, $C$ is closed in $(X,d_1)$ if and only if $C$ is
-closed in $(X,d_2)$.
-\end{prop}
-
-
-\subsection{Sequences and Complete Metric Spaces}
-
-Now that we have defined the notion of a metric and metric spaces, which
-let's us talk about ``closeness'' in sets, we present a general
-treatment of sequences and convergence within a metric space.
-
-Now for some conventions for this section that will be used unless
-othwerwise noted.  When dealing with sequences, this section will assume
-that the sequence $\{x_n\}$ lives in a metric space $(X,d)$. Any
-functions in this section are assumed to be of the form
-$f:(X,d_X)\rightarrow (Y,d_Y)$.
+Now for some conventions that this section will use unless othwerwise
+noted.  When dealing with sequences, this section will assume that the
+sequence $\{x_n\}$ lives in a metric space $(X,d)$. Any functions in
+this section are assumed to be of the form $f:(X,d_X)\rightarrow
+(Y,d_Y)$.
 
 \begin{defn}{(Sequence)}
 A \emph{sequence} in space $X$ is an enumeration of points in $X$,
@@ -509,140 +482,6 @@ there exists an $N$ where
 Convergence is often abbreviated $x_n\rightarrow x$ or
 $\{x_n\}\rightarrow x$ and $x$ is called the \emph{limit point}.
 \end{defn}
-
-\begin{prop}
-\label{prop:supseq}
-Suppose that $A\subseteq \mathbb{R}$ and that $A$ is bounded. Then there
-exist sequences $\{\bar{a}_n\} \subseteq A$ and $\{\underbar{a}_n\}
-\subseteq A$ such that
-\begin{align*}
-\{\bar{a}_n\} \rightarrow \sup(A)
-\qquad
-\{\underbar{a}_n\}\rightarrow \inf(A)
-\end{align*}
-\end{prop}
-\begin{proof}
-Since $A$ is bounded, $\sup A$ exists and is well defined by
-Axiom~\ref{ax:completeness}.  Now use the existence of $\sup A$ to
-define a particular sequence, $\{\bar{a}_n\}$. We choose the elements by
-recalling the definition of $\sup A$, which says
-\begin{align*}
-  \forall \varepsilon = \frac{1}{n} >0
-  \quad
-  \exists \; \bar{a}_n\in A \;\; \text{s.t.} \;\;
-  \sup A - \frac{1}{n} \leq \bar{a}_n \leq \sup A
-\end{align*}
-Clearly, if we choose elements this way, all the $\bar{a}_n$ terms are
-in $A$ and
-\begin{align*}
-  \lim_{n\rightarrow \infty} \bar{a}_n &= \sup A
-\end{align*}
-The proof for $\inf A$ is similar.
-\end{proof}
-
-\begin{prop}
-Suppose that $\{x_n\}$ is a nondecreasing sequence in $\mathbb{R}$. If
-$\{x_n\}$ is bounded then
-\begin{align*}
-  \lim_{n\rightarrow \infty} x_n = \sup A
-\end{align*}
-where $A=\{x_1,x_2,\ldots\}$ is the image of the sequence.
-\end{prop}
-\begin{proof}
-By Axiom~\ref{ax:completeness}, $\sup A$ exists and is well defined
-since $A$ is bounded.
-
-Now, given $\varepsilon>0$, we want an $N$ such that
-\begin{align*}
-  n>N\quad\Rightarrow\quad
-  \sup A - x_n < \varepsilon
-\end{align*}
-Now by the definition of $\sup A$, given $\varepsilon>0$, there exists a
-\begin{align*}
-  x_m \in A
-  \quad \text{s.t.} \quad
-  \sup A - \varepsilon &< x_m\\
-  \Leftrightarrow\quad
-  \sup A - x_m&< \varepsilon
-\end{align*}
-Finally, note that
-\begin{align*}
-  x_{m+i} &\geq x_m
-  \qquad \forall i \geq 0 \\
-  \Leftrightarrow\quad
-  -x_{m+i} &\leq -x_m \\
-  \sup A -x_{m+i} &\leq \sup A-x_m \\
-  \Rightarrow \qquad
-  \sup A -x_{m+i} &\leq \sup A-x_m < \varepsilon
-  \qquad \forall i \geq 0
-\end{align*}
-So if we take $N=m$, we ensure that $\sup A - x_n< \varepsilon$ for all
-$n>N$.
-\end{proof}
-
-\begin{cor}
-\label{cor:nonincreasing}
-Suppose that $\{x_n\}$ is a nonincreasing sequence in $\mathbb{R}$. If
-$\{x_n\}$ is bounded then
-\begin{align*}
-  \lim_{n\rightarrow \infty} x_n = \inf A
-\end{align*}
-where $A=\{x_1,x_2,\ldots\}$ is the image of the sequence.
-\end{cor}
-\begin{proof}
-Consider $\{y_n\}$ where $y_n = -x_n$ for all $n$. Then $\{y_n\}$ is a
-nondecreasing sequence, so
-\begin{align*}
-  \lim_{n\rightarrow \infty} y_n = \sup -A
-\end{align*}
-But $\sup -A = \inf A$, so $\lim_{n\rightarrow \infty} x_n = \inf A$
-\end{proof}
-
-\begin{defn}
-Given a bounded sequence $\{x_n\}$, define the limit superior and limit
-inferior as
-\begin{align*}
-  \limsup_{n\rightarrow \infty} x_n
-  &= \lim_{n\rightarrow \infty} \bar{x}_n
-  \qquad \text{where} \; \bar{x}_n = \sup_{k\geq n} x_k\\
-  \liminf_{n\rightarrow \infty} x_n
-  &= \lim_{n\rightarrow \infty} \underbar{x}_n
-  \qquad \text{where} \; \underbar{x}_n = \inf_{k\geq n} x_k
-\end{align*}
-\end{defn}
-
-\begin{prop}
-Given a bounded sequence $\{x_n\}$,
-both the limit superior and limit inferior always have well defined
-limits (i.e.\ they always exist), and
-\begin{align*}
-  \limsup_{n\rightarrow \infty} x_n
-  &= \inf_{n\in \mathbb{N}} \left(\sup_{k\geq n} x_k\right)\\
-  \liminf_{n\rightarrow \infty} x_n
-  &= \sup_{n\in \mathbb{N}} \left(\inf_{k\geq n} x_k\right)
-\end{align*}
-This makes clear that the limsup is the smallest of suprema, and the
-liminf the largest of the infima.
-\end{prop}
-\begin{proof}
-Given a sequence $\{x_n\}$, define $\bar{x}_n$ as
-\begin{align*}
-  \bar{x}_n = \sup_{k\geq n} x_k
-\end{align*}
-Since $\{x_n\}$ is bounded, the supremum taken to form $\bar{x}_n$
-exists for each $n$ by Axiom~\ref{ax:completeness}. Moreover,
-$\{\bar{x}_n\}$ is a nonincreasing sequence because, in moving from
-$\bar{x}_n$ to $\bar{x}_{n+1}$, you lose a candidate ($x_n$
-specifically) for the supremum. So $\bar{x}_n$ either gets smaller or
-stays the same. You can only do ``worse.'' Hence by
-Corollary~\ref{cor:nonincreasing}
-\begin{align*}
-  \lim_{n\rightarrow \infty}\bar{x}_n
-  = \inf_{n\in \mathbb{N}} \bar{x}_n
-  = \inf_{n\in \mathbb{N}} \left( \sup_{k\geq n} x_k\right)
-\end{align*}
-\end{proof}
-
 
 \begin{ex}
 Importantly, the definition of convergence requires that the
@@ -700,14 +539,323 @@ rather than the infinite number of functions that exist.
 \end{rmk}
 
 \begin{prop}{\emph{(Uniqueness of Limits)}}
-If a sequence $\{x_n\}\rightarrow x$ and $\{x_n\}\rightarrow y$, then $x=y$.
+If a sequence $\{x_n\}\rightarrow x$ and $\{x_n\}\rightarrow x'$,
+then $x=x'$.
 \end{prop}
+\begin{proof}
+Suppose that $\{x_n\}\rightarrow x$ and $\{x_n\} \rightarrow x'$ such
+that $x\neq x'$. Then given $\varepsilon>0$, there exists a $N_x$ and
+$N_{x'}$ such that
+\begin{align*}
+  n > N_x
+  &\quad\Rightarrow\quad
+  d(x_n,x) \leq \frac{\varepsilon}{2} \\
+  n > N_{x'}
+  &\quad\Rightarrow\quad
+  d(x_n,x') \leq \frac{\varepsilon}{2}
+\end{align*}
+Now take $n>\max\{N_x, N_{x'}\}$ and use the triangle inequality to get
+\begin{align*}
+  d(x,x') \leq d(x,x_n) + d(x_n, x')
+  < \frac{\varepsilon}{2} + \frac{\varepsilon}{2} = \varepsilon
+\end{align*}
+Since this is true for all $\varepsilon$, we must have $d(x,x')=0$ which
+means $x=x'$.
+\end{proof}
+
+\begin{prop}{\emph{(Close Together Sequences)}}
+Consider two sequences $\{x_n\}$ and $\{y_n\}$.
+Suppose that one sequence converges to some limit and that the two
+sequences get arbitrarily close together, i.e.
+\begin{align*}
+  x_n\rightarrow x
+  \quad\text{and}\quad
+  d(x_n,y_n)\rightarrow 0
+\end{align*}
+Then $y_n\rightarrow x$ as well.
+\end{prop}
+\begin{proof}
+Suppose that $\varepsilon>0$ is given. Since $x_n\rightarrow x$, there
+exists an $N_x$ such that
+\begin{align*}
+  n > N_x
+  \quad\Rightarrow\quad
+  d(x_n,x) < \frac{\varepsilon}{2}
+\end{align*}
+Next, since $d(x_n,y_n)\rightarrow 0$, there exists an $N_y$ such that
+\begin{align*}
+  n > N_y
+  \quad\Rightarrow\quad
+  d(x_n,y_n) < \frac{\varepsilon}{2}
+\end{align*}
+By the triangle inequality
+\begin{align*}
+  n>\max\{N_x,N_y\}
+  \quad\Rightarrow\quad
+  d(y_n,x) \leq
+  d(y_n,x_n) + d(x_n,x)
+  < \frac{\varepsilon}{2} + \frac{\varepsilon}{2} = \varepsilon
+\end{align*}
+Hence $\{y_n\}\rightarrow x$ as well.
+
+\end{proof}
+
 \begin{prop}{\emph{(Limits of Subsequences for Convergent Sequences)}}
 \label{prop:subseq}
 The sequence $\{x_n\}$ converges to $x$ if and only if every subsequence
 also converges to $x$.
 \end{prop}
 
+
+\subsection{Sequences in $\R$: Supremum, Infimum, Limit Superior, and
+Limit Inferior}
+
+This section provides further tools for dealing with suprema and infima,
+along with definition of the \emph{lim sup} and \emph{lim inf}, which
+are extremely useful in the study of sequences and limits.
+I restrict this section to $\R$ space since the Axiom of Completeness
+(Axiom~\ref{ax:completeness}) furnishes the existence of sups and infs
+for bounded sequences. Much of what follows wouldn't be true or sensible
+without completeness of the space.
+
+But first, I reproduce the definition of the supremum and provide some
+more ways to use and think about it, since it will be extremely
+important from here on.
+
+\begin{defn}{(Supremum)}
+\label{defn:supdef2}
+Given a set $A\subseteq X$, the \emph{supremum} denoted $\sup(A)$ is the
+smallest possible upper bound for $A$.
+More precisely, the supremum satisfies the following two properties
+\begin{enumerate}
+  \item $a\leq \sup(A)$ for all $a\in A$.
+  \item If $x<\sup(A)$, then $x\in X$ is not an upper bound for $A$.
+    Otherwise, we would have just taken $x$ as the supremum.
+\end{enumerate}
+The sup might be in $A$, in which case $\sup(A) = \max(A)$, or it might
+be in $X\setminus A$, in which case $\max(A)$ is undefined.
+\end{defn}
+
+In practice, we often use the supremum in proofs by writing it in
+special representations that are equivalent to
+Definition~\ref{defn:supdef2}. We now lay those out.
+\begin{prop}
+Given some $A\subseteq X$, we have the following results for the
+supremum:
+\begin{enumerate}
+  \item Given any $a\in A$, there exists an $\varepsilon\geq 0$ such
+    that
+    \begin{align*}
+      a = \sup(A) - \varepsilon
+    \end{align*}
+    Moreover, $\varepsilon=0$ if and only if $\sup(A) \in A$, which is
+    not always the case.
+  \item Given any $\varepsilon>0$, there exists an $a\in A$ such that
+    \begin{align*}
+      a > \sup(A) -\varepsilon
+    \end{align*}
+\end{enumerate}
+\end{prop}
+\begin{proof}
+We just want to show that the two representations above match
+Definition~\ref{defn:supdef2}.
+
+To prove (1), suppose that no such $\varepsilon\geq 0$ existed. Then $a
+> \sup(A)$, which violates the definition of $\sup(A)$ as the biggest
+$x\in X$ such that $x\geq a$ for all $a\in A$.
+
+To prove(2), suppose $\varepsilon>0$ is given and that there is no $a$
+such that $a>\sup(A)-\varepsilon$. Then $\sup(A)-\varepsilon$ is an
+upper bound of $A$ smaller than $\sup(A)$, which violates the definition
+of $\sup(A)$ as the \emph{smallest} upper bound.
+\end{proof}
+\begin{rmk}
+This proposition is very useful. We often use (2) by taking
+$\varepsilon=1/n$ and choosing elements of $A$ to build up a sequence,
+as we'll do in the next proposition.
+\end{rmk}
+
+\begin{prop}
+\label{prop:supseq}
+Suppose that $A\subseteq \R$. We have the following results:
+\begin{enumerate}
+  \item If $A$ is bounded from above, then
+    $\exists \; \{\bar{a}_n\} \subseteq A$ such that
+    $\{\bar{a}_n\} \rightarrow \sup(A)$
+  \item If $A$ is bounded from below, then
+    $\exists \; \{\munderbar{a}_n\} \subseteq A$ such that
+    $\{\munderbar{a}_n\} \rightarrow \inf(A)$
+\end{enumerate}
+\end{prop}
+\begin{proof}
+Since $A$ is bounded from above, $\sup A$ exists and is well defined by
+Axiom~\ref{ax:completeness}.  Now use the existence of $\sup A$ to
+define a particular sequence, $\{\bar{a}_n\}$. We choose the elements by
+recalling the definition of $\sup A$, which says
+\begin{align*}
+  \forall \varepsilon = \frac{1}{n} >0
+  \quad
+  \exists \; \bar{a}_n\in A \;\; \text{s.t.} \;\;
+  \sup A - \frac{1}{n} \leq \bar{a}_n \leq \sup A
+\end{align*}
+Clearly, if we choose elements this way, all the $\bar{a}_n$ terms are
+in $A$ and
+\begin{align*}
+  \lim_{n\rightarrow \infty} \bar{a}_n &= \sup A
+\end{align*}
+The proof for $\inf A$ is similar.
+\end{proof}
+
+\begin{prop}
+Suppose that $\{x_n\}$ is a nondecreasing sequence in $\R$, $x_n \leq
+x_{n+1}$. If $\{x_n\}$ is bounded then
+\begin{align*}
+  \lim_{n\rightarrow \infty} x_n = \sup A
+\end{align*}
+where $A=\{x_1,x_2,\ldots\}$ is the image of the sequence.
+\end{prop}
+\begin{proof}
+By Axiom~\ref{ax:completeness}, $\sup A$ exists and is well defined
+since $A$ is bounded.
+
+Now, given $\varepsilon>0$, we want an $N$ such that
+\begin{align*}
+  n>N\quad\Rightarrow\quad
+  \sup A - x_n < \varepsilon
+\end{align*}
+Now by the definition of $\sup A$, given $\varepsilon>0$, there exists a
+\begin{align*}
+  x_m \in A
+  \quad \text{s.t.} \quad
+  \sup A - \varepsilon &< x_m\\
+  \Leftrightarrow\quad
+  \sup A - x_m&< \varepsilon
+\end{align*}
+Next, note that
+\begin{align*}
+  x_{m+i} &\geq x_m
+  \qquad \forall i \geq 0 \\
+  \Leftrightarrow\quad
+  -x_{m+i} &\leq -x_m \\
+  \sup A -x_{m+i} &\leq \sup A-x_m \\
+  \Rightarrow \qquad
+  \sup A -x_{m+i} &\leq \sup A-x_m < \varepsilon
+  \qquad \forall i \geq 0
+\end{align*}
+So if we take $N=m$, we ensure that $\sup A - x_n< \varepsilon$ for all
+$n>N$.
+\end{proof}
+
+\begin{cor}
+\label{cor:nonincreasing}
+Suppose that $\{x_n\}$ is a nonincreasing sequence in $\R$. If
+$\{x_n\}$ is bounded then
+\begin{align*}
+  \lim_{n\rightarrow \infty} x_n = \inf A
+\end{align*}
+where $A=\{x_1,x_2,\ldots\}$ is the image of the sequence.
+\end{cor}
+\begin{proof}
+Consider $\{y_n\}$ where $y_n = -x_n$ for all $n$. Then $\{y_n\}$ is a
+nondecreasing sequence, so
+\begin{align*}
+  \lim_{n\rightarrow \infty} y_n = \sup -A
+\end{align*}
+But $\sup -A = \inf A$, so $\lim_{n\rightarrow \infty} x_n = \inf A$
+\end{proof}
+
+\begin{ex}
+Next, we'll see a definition that can help make sense of sequences that
+look like the following
+\begin{align*}
+  x_n = (-1)^n + \frac{1}{n}
+\end{align*}
+By taking $n\rightarrow\infty$, you can kind of see that the series has
+two ``limits'', -1 and 1. Of course, the series doesn't converge since
+there is no single number that $x_n$ converges to, but it does seem to
+accumulate around the points 1 and -1 in the tail. The next definitions
+will help us talk about and make sense of that idea.
+\end{ex}
+
+\begin{defn}
+Given a bounded sequence $\{x_n\}$, define the limit superior and limit
+inferior as
+\begin{align*}
+  \bar{x}=
+  \limsup_{n\rightarrow \infty} x_n
+  &= \lim_{n\rightarrow \infty} \bar{x}_n
+  \qquad \text{where} \; \bar{x}_n = \sup_{k\geq n} x_k
+  = \sup \{x_n, x_{n+1}, \ldots \}\\
+  \munderbar{x}=
+  \liminf_{n\rightarrow \infty} x_n
+  &= \lim_{n\rightarrow \infty} \munderbar{x}_n
+  \qquad \text{where} \; \munderbar{x}_n = \inf_{k\geq n} x_k
+  = \inf \{x_n, x_{n+1}, \ldots \}
+\end{align*}
+\end{defn}
+\begin{rmk}
+It's important to note that elements of the sequences $\{\bar{x}_n\}$
+and $\{\munderbar{x}_n\}$ are not necessarily elements of the original
+sequence $\{x_n\}$. Since we're taking sup's and inf's of sets, it's
+always possible that the sup's and inf's are outside the set.
+
+For example, consider
+\begin{align*}
+  \{x_n\} =
+  \left\{
+    \frac{1}{n}
+  \right\}=
+  \left\{
+    1, \frac{1}{2}, \frac{1}{3}, \ldots
+  \right\}
+\end{align*}
+In that case,
+\begin{align*}
+  \bar{x}_n &= \sup \left\{ \frac{1}{n}, \frac{1}{n+1},\ldots \right\}
+  = \frac{1}{n} \qquad \forall n\\
+  \munderbar{x}_n &= \inf \left\{ \frac{1}{n}, \frac{1}{n+1},\ldots \right\}
+  = 0\qquad \forall n
+\end{align*}
+Though $\{\bar{x}_n\}$ consists of elements in the series,
+$\{\munderbar{x}_n\}$ does not since the series is constant at zero,
+something not in $\{x_n\}$.
+\end{rmk}
+
+\begin{prop}
+Given a bounded sequence $\{x_n\}$,
+both the limit superior and limit inferior always have well defined
+limits (i.e.\ they always exist), and
+\begin{align*}
+  \limsup_{n\rightarrow \infty} x_n
+  &= \inf_{n\in \mathbb{N}} \left(\sup_{k\geq n} x_k\right)\\
+  \liminf_{n\rightarrow \infty} x_n
+  &= \sup_{n\in \mathbb{N}} \left(\inf_{k\geq n} x_k\right)
+\end{align*}
+In a sense, the $\limsup$ is the ``largest limit'' of the sequence,
+while the $\liminf$ is the ``smallest limit'' of the sequence.
+\end{prop}
+\begin{proof}
+Given a sequence $\{x_n\}$, define $\bar{x}_n$ as
+\begin{align*}
+  \bar{x}_n = \sup_{k\geq n} x_k
+\end{align*}
+Since $\{x_n\}$ is bounded, the sup taken to form $\bar{x}_n$ exists for
+each $n$ by Axiom~\ref{ax:completeness}. Moreover, $\{\bar{x}_n\}$ is a
+nonincreasing sequence because, in moving from $\bar{x}_n$ to
+$\bar{x}_{n+1}$, you lose a candidate ($x_n$ specifically) for the
+supremum. So $\bar{x}_n$ either gets smaller or stays the same. You can
+only do ``worse'' with the additional constraint of $k\geq n+1$ versus
+$k\geq n$. Hence by Corollary~\ref{cor:nonincreasing}, the $\bar{x}_n$
+converges to the following well-defined object
+\begin{align*}
+  \lim_{n\rightarrow \infty}\bar{x}_n
+  = \inf_{n\in \mathbb{N}} \bar{x}_n
+  = \inf_{n\in \mathbb{N}} \left( \sup_{k\geq n} x_k\right)
+\end{align*}
+\end{proof}
+
+
+\subsection{Cauchy Sequences and Complete Metric Spaces}
 
 \begin{defn}{(Cauchy Sequence)}
 Suppose we have a sequence $\{x_n\}\subseteq X$. That sequence is a
@@ -717,12 +865,25 @@ exists an $N$ such that
   n,m>N \quad\Rightarrow\quad
   d(x_n,x_m) <\varepsilon
 \end{align*}
+Here's a general recipe for proving that a sequence $\{x_n\}$ is
+Cauchy.
+
+Given $\varepsilon$, simply write out write out $d(x_n,x_m)$
+for arbitrary $x_n$ and $x_m$. Try to bound that expression for the
+distance as
+\begin{align*}
+  d(x_n,x_m) < G(\max\{n,m\})
+\end{align*}
+where $G$ is some function that depends only upon the max of $n$ and
+$m$. If that's possible, then equate $G(N)=\varepsilon$ and solve for
+$N$.
 \end{defn}
 \begin{rmk}
-Notice the difference from Definition~\ref{defn:convergence}. For Cauchy
-sequences, you don't have to know the limit point, while traditional
-convergence a la Defintion~\ref{defn:convergence} requires you to know
-limit point. Cauchy sequences require simply that points in the tail are
+Notice the difference from Definition~\ref{defn:convergence} of
+convergence. For Cauchy sequences, you don't have to know the limit
+point, while traditional convergence a la
+Defintion~\ref{defn:convergence} requires you to know limit point.
+Cauchy sequences require simply that points in the tail are
 ``close together.''
 
 In fact, the main use of Cauchy sequences is precisely this. We might be
@@ -738,8 +899,8 @@ implies convergent. The next theorem concerns the other direction:
 whether a convergent series is Cauchy.
 \end{rmk}
 
-\begin{thm}
-Though Cauchy does \textbf{not} imply convergent, in general,
+\begin{thm}{\emph{(Convergent $\Rightarrow$ Cauchy)}}
+Though Cauchy does \textbf{not} imply convergent,
 a convergent sequence is \textbf{always} Cauchy.
 \end{thm}
 \begin{proof}
@@ -853,18 +1014,39 @@ say that
 Metric space $(X,d)$ is called a \emph{complete} metric space if and
 only if all Cauchy sequences are convergent.
 
-In $\mathbb{R}^n$, this is a statement that can be proved by starting
+In $\R^n$, this is a statement that can be proved by starting
 with Axiom~\ref{ax:completeness}.
 \end{defn}
 
 \begin{ex}
 The most common example of a compelte metric space is
-$(\mathbb{R},d_2)$.
+$(\R,d_2)$.
 \end{ex}
+
 \begin{ex}
-The metric space $\left(\mathscr{B}(A,\mathbb{R}^n), d_\infty\right)$,
-where $\mathscr{B}(A,\mathbb{R}^n)$ is the set of all bounded functions
-$f:A\rightarrow \mathbb{R}^n$.
+\label{ex:Ncomplete}
+Metric space $(\N,d_1)$ is a complete metric space.
+\end{ex}
+
+\begin{ex}
+Given any set $X$ and the \emph{discrete} metric
+\begin{align*}
+  d(x,y) =
+  \begin{cases}
+    1 & x\neq y \\
+    0 & x= y \\
+  \end{cases}
+\end{align*}
+the metric space $(X,d)$ is complete.
+Moreover, this is ``equivalent'' to Example~\ref{ex:Ncomplete} in some
+since since in that example and in this one, all convergent sequences
+must be constant in the tail.
+\end{ex}
+
+\begin{ex}
+The metric space $\left(\mathscr{B}(A,\R^n), d_\infty\right)$,
+where $\mathscr{B}(A,\R^n)$ is the set of all bounded functions
+$f:A\rightarrow \R^n$, is a complete metric space.
 \end{ex}
 
 \begin{prop}
@@ -877,9 +1059,9 @@ suppose that the \emph{Bolzano-Weierstrass} property is true:
   \quad\Rightarrow\quad
   \exists \{x_{n_k}\}\rightarrow x \in X
 \end{align}
-where $\{x_{n_k}\}$ is a convergent subsequence of $X$.  In other words,
-any bounded sequence has a convergent subsequence. If this is true, then
-$(X,d)$ is a complete metric space.
+where $\{x_{n_k}\}$ is a convergent subsequence of $\{x_n\}$.  In other
+words, any bounded sequence has a convergent subsequence. If this is
+true, then $(X,d)$ is a complete metric space.
 \end{prop}
 \begin{proof}
 Suppose that we have a Cauchy sequence $\{x_n\}$. By
@@ -930,7 +1112,7 @@ differences
 \begin{rmk}
 (Relation to Traditional Bolzano-Weierstrass Theorem) This is different
 than Theorem~\ref{thm:bolzano-weierstrass}, the Bolzano-Weierstrass
-Theorem we will see in a bit. That specifically concerns $\mathbb{R}^n$,
+Theorem we will see in a bit. That specifically concerns $\R^n$,
 which just so happens satisfy the Bolzano-Weierstrass property. This
 statement is more general and just says that \emph{if} a metric space
 satisfies the property, then the space is complete.
@@ -1091,7 +1273,8 @@ it is the case that
 Since we assumed that $p\in C$ when it is the limit of some sequence, we
 can conclude $\bar{C}=C$.
 \end{proof}
-\begin{ex}
+
+\begin{ex}{(Set of Bounded Nondecreasing Functions)}
 The Proposition~\ref{prop:closed} characterization of closed sets is
 very useful for function spaces in particular. In fact, this proof will
 use it twice: once for a sequence of functions and another time for a
@@ -1100,11 +1283,11 @@ numerical sequence of points. Here it goes.
 Consider the set of bounded nondecreasing functions:
 \begin{align*}
   C = \{
-    f:A\rightarrow \mathbb{R} \; | \;
+    f:A\rightarrow \R \; | \;
     x\geq y
     \;\Rightarrow\;
     f(x) \geq f(y)
-  \}\subset \mathscr{B}(A,\mathbb{R})
+  \}\subset \mathscr{B}(A,\R)
 \end{align*}
 Suppose that we take some sequence $\{f_n\}\subseteq C$ such that
 $f_n\rightarrow f$ uniformly.  By Proposition~\ref{prop:closed}, we want
@@ -1214,6 +1397,52 @@ Infinite intersections of closed sets are closed.
 De Morgan's law. To do.
 \end{proof}
 
+\subsection{Topologically Equivalent Metric Spaces}
+
+This section can be skipped entirely, and all other sections will still
+make sense. It's included simply for reference.
+
+\begin{defn}
+Two metric spaces $(X,d_1)$ and $(X,d_2)$ using different metrics for
+the same underlying space $X$, we say that $d_1$ is \emph{finer} than
+$d_2$ if $(X,d_1)$ has all of the open sets of $(X,d_2)$ and possibly
+more. Mathematically, we write
+\begin{align*}
+  d_1 \succeq d_2
+  \quad \Leftrightarrow \quad
+  \left(
+  \text{$A$ open in $(X,d_2)$}
+  ; \Rightarrow\;
+  \text{$A$ open in $(X,d_1)$}
+  \right)
+\end{align*}
+\end{defn}
+
+\begin{defn}
+Metric space $(X,d_1)$ is \emph{topologically equivalent} to $(X,d_2)$
+if and only if $d_1 \succeq d_2$ and $d_1 \preceq d_2$. This can be
+written more compactly as $d_1\sim d_2$.
+\end{defn}
+
+\begin{prop}
+If $d_1 \sim d_2$, $C$ is closed in $(X,d_1)$ if and only if $C$ is
+closed in $(X,d_2)$.
+\end{prop}
+
+
+\begin{prop}{\emph{(Equivalence of Distance Functions from Norms)}}
+For space $X$, suppose that $\hat{N}$ and $\tilde{N}$ are two norms and
+we define corresponding distance functions
+\begin{align*}
+  \hat{d}(x,y) = \hat{N}(x-y)
+  \qquad
+  \tilde{d}(x,y) = \tilde{N}(x-y)
+  \qquad \forall x,y\in X
+\end{align*}
+Then the open sets of $(X,\hat{d})$ are the same as the open sets of
+$(X,\tilde{d})$. The distance functions are equivalent.
+\end{prop}
+
 \subsection{Compactness}
 
 \begin{defn}{(Open Cover)}
@@ -1269,13 +1498,13 @@ closed.
 
 \begin{thm}{\emph{(Bolzano-Weierstrass)}}
 \label{thm:bolzano-weierstrass}
-Every bounded sequence in Euclidean space $(\mathbb{R}^n,d_2)$ has at
+Every bounded sequence in Euclidean space $(\R^n,d_2)$ has at
 least one convergent subsequence.
 \end{thm}
 
 \begin{thm}{\emph{(Heine-Borel)}}
 \label{thm:heine-borel}
-Within metric space $(\mathbb{R},d_1)$, a set $K\subseteq \mathbb{R}$ is
+Within metric space $(\R,d_1)$, a set $K\subseteq \R$ is
 compact if and only if $K$ is closed and bounded.
 \end{thm}
 \begin{proof}
@@ -1284,11 +1513,11 @@ Closed is easy. Proposition~\ref{prop:compact-closed} tells us that
 compact implies closed. Now for ``compact implies bounded.''
 
 The following is certainly an open cover for compact
-$K\subseteq \mathbb{R}$:
+$K\subseteq \R$:
 \begin{align*}
   \{ A_n &= B_n(0) \; | \; n \in \mathbb{N}\}\\
   \Rightarrow\quad
-   \mathbb{R} &= \bigcup_{n\in \mathbb{N}} A_n
+   \R &= \bigcup_{n\in \mathbb{N}} A_n
 \end{align*}
 By compactness, there then exists a finite subcover
 $\{A_{n_k}\}_{k=1}^N$ such that
@@ -1299,7 +1528,7 @@ $\{A_{n_k}\}_{k=1}^N$ such that
 \end{align*}
 Therefore, the set $B_r(0)$ bounds $K$.
 
-($\Leftarrow$) Suppose $K\subseteq \mathbb{R}$ closed and bounded. Let's
+($\Leftarrow$) Suppose $K\subseteq \R$ closed and bounded. Let's
 show $K$ is compact.
 
 Let $\{x_n\}$ be any sequence in $K$. Since $K$ is bounded,
@@ -1351,8 +1580,8 @@ upon $\varepsilon$ and $x$, two ``givens'' within the problem.
 \end{rmk}
 
 \begin{ex}
-Consider an affine function $f:(\mathbb{R},d_1) \rightarrow
-(\mathbb{R},d_1)$ written as follows:
+Consider an affine function $f:(\R,d_1) \rightarrow
+(\R,d_1)$ written as follows:
 \begin{align*}
   f(x) = ax + b
 \end{align*}
@@ -1376,7 +1605,7 @@ though this isn't always the case. We see this in the next example.
 \end{ex}
 
 \begin{ex}
-Consider $f: (\mathbb{R},d_1)\rightarrow(\mathbb{R},d_1)$ where
+Consider $f: (\R,d_1)\rightarrow(\R,d_1)$ where
 $f=\sqrt{x}$. Before getting into it, we establish the following fact:
 \begin{align}
   (a-b)(a+b)
@@ -1476,6 +1705,7 @@ Below, we again reformulate the definition of continuity from the
 $\varepsilon$-$\delta$ or topological definition into one concerning
 convergence of sequences.
 \begin{thm}{\emph{(Continuity, Sequential)}}
+\label{thm:cts-sequential}
 Suppose that we have a function $f:X\rightarrow Y$ and a sequence
 $\{x_n\}\subset X$ where $x_n\rightarrow x$.  A function is continuous
 if and only if
@@ -1493,8 +1723,8 @@ $\{f(x_n)\}$ is a sequence in metric space $(Y,d_Y)$.
 
 \begin{prop}
 \label{prop:XtoR}
-Given continuous function $f:(X,d_X)\rightarrow (\mathbb{R},d_1)$, for
-any $a\in \mathbb{R}$,
+Given continuous function $f:(X,d_X)\rightarrow (\R,d_1)$, for
+any $a\in \R$,
 \begin{align*}
   A &= \{x\in X \; |\; f(x) > a\} \; \text{\emph{is open}} \\
   C &= \{x\in X \; |\; f(x) \geq a\} \; \text{\emph{is closed}}
@@ -1514,7 +1744,7 @@ set is closed, $(f^{-1}((-\infty,a)))^C$ is closed.
 \begin{rmk}
 Proposition~\ref{prop:XtoR} is great since continuous functions that
 look like $f$ in the proposition come up a lot. We can then use this
-proposition, our knowledge of open sets in $\mathbb{R}$, and
+proposition, our knowledge of open sets in $\R$, and
 Definition~\ref{defn:topcts} to generate open sets in arbitrary space
 $X$.\footnote{Copyright Elon Musk.}
 
@@ -1579,24 +1809,88 @@ compact $K\subseteq X$, the function $f$ is \emph{uniformly} continuous
 on $K$.
 \end{thm}
 
-\begin{thm}
-Let $\{f_n\}$ be a sequence of continuous bounded functions in
-$\mathscr{B}(A,\mathbb{R}^n)$. If $f_n$ is continuous for all $n$ and
-$f_n\rightarrow f$, then $f$ is continuous as well.
+\begin{thm}{\emph{(Limit of Sequence of Bounded Continuous Real Functions)}}
+\label{thm:ctslimit}
+Consider the sequence $\{f_n\}$ of bounded continuous functions
+$f_n:A\rightarrow \R$. If $f_n\rightarrow f$, then $f$ is continuous as
+well (where $\R$ is equipped with one of the usual metrics).
 \end{thm}
+\begin{proof}
+We want to show that $f$ is continuous according to the usual
+$\varepsilon$-$\delta$ definition, so take $x\in A$ and $\varepsilon>0$
+as given. Let $d$ denote one of the usual distance functions for $\R$.
+We now use the triangle inequality to bound the desired distance
+$d(f(x),f(y))$ by objects we know more about
+\begin{align}
+ \forall n \qquad d(f(x),f(y))
+  &\leq d(f(x),f_n(x)) + d(f_n(x),f(y)) \notag \\
+  &\leq d(f(x),f_n(x)) + d(f_n(x),f_n(y)) + d(f_n(y),f(y))\notag\\
+  &\leq 2 \; d_\infty(f,f_n) + d(f_n(x),f_n(y))
+  \label{Cclosed}
+\end{align}
+where the last line follows because $d_\infty$ is defined as $\sup_{z\in
+A} d(f_n(z), f(z))$.
+
+Now Inequality~\ref{Cclosed} holds for all $n$. The trick will
+be to find a particular $N$ so that we can then bound $d_\infty(f,f_N)$
+and $d(f_N(x),f_N(y))$. That will then also allow us to use the
+continuity of $f_N$ to find a suitable $\delta$ for $f$. Let's do it.
+
+Since $f_n\rightarrow f$ uniformly (or in the $d_\infty$ metric), there
+exists an $N$ such that
+\begin{align*}
+  d_\infty(f_N, f) < \frac{\varepsilon}{4}
+\end{align*}
+Using that $N$, consider $f_N$. Since it is continuous, there is a
+$\delta_N$ such that
+\begin{align*}
+  d(x,y) < \delta_N
+  \quad\Rightarrow\quad
+  d(f_N(x),f_N(y)) < \frac{\varepsilon}{2}
+\end{align*}
+If we use $\delta = \delta_N$ for $f$, then we can use
+Inequality~\ref{Cclosed} to conclude
+\begin{align*}
+  d(x,y) < \delta_N
+  \quad\Rightarrow\quad
+  d(f(x),f(y))
+  &\leq 2 \; d_\infty(f,f_N) + d(f_N(x),f_N(y))\\
+  &\leq 2 \cdot \frac{\varepsilon}{4} + \frac{\varepsilon}{2}
+  =\varepsilon
+\end{align*}
+Therefore $f$ is continuous.
+\end{proof}
+
+\begin{cor}{\emph{(The Space of Bounded Continuous Functions)}}
+The set of bounded continuous functions $\mathscr{C}(A,\R)\subset
+\mathscr{B}(A,\R)$ is a closed set in metric space $(\mathscr{B}(A,\R),
+d_\infty)$.
+\end{cor}
+
+\begin{proof}
+To prove that this set is closed, we again use
+Proposition~\ref{prop:closed}.
+
+Suppose that we have some sequence of bounded continuous functions
+$\{f_n\}\subseteq \mathscr{C}(A,\R)$ converging uniformly to $f$.
+Theorem~\ref{thm:ctslimit} says that $f$ is continuous, i.e.  $f\in
+\mathscr{C}(A,\R)$ as well. Since $\mathscr{C}(A,\R)$ contains its limit
+points, the set is closed by Proposition~\ref{prop:closed}.
+\end{proof}
+
 
 
 \begin{thm}{\emph{(Weierstrass)}}
 \label{thm:weierstrass}
-Given metric space $(X,d_X)$, function $f:X\rightarrow \mathbb{R}$, and
+Given metric space $(X,d_X)$, function $f:X\rightarrow \R$, and
 compact $K\subseteq X$, there exist maximum and minimum points for
 $f$ on $K$
 \begin{align*}
   \bar{x} &= \arg \max_{x\in K} f(x) \\
-  \underbar{x} &= \arg \min_{x\in K} f(x) \\
+  \munderbar{x} &= \arg \min_{x\in K} f(x) \\
 \end{align*}
 \end{thm}
-i.e.\ $\bar{x}$ and $\underbar{x}$ are well-defined.
+i.e.\ $\bar{x}$ and $\munderbar{x}$ are well-defined.
 \begin{rmk}
 Compactness is so important because it ensures that the set is ``finite
 enough'' is some sense. We know that the max always exists for finite
@@ -1606,11 +1900,11 @@ open covers of some set have finite subcovers. It's in the same spirit.
 \begin{proof}
 (Theorem~\ref{thm:weierstrass})
 Since $K\subseteq X$ is compact, Theorem~\ref{thm:contcompact} says that
-the set $f(K)$ is compact in $\mathbb{R}$.  By
+the set $f(K)$ is compact in $\R$.  By
 Theorem~\ref{thm:heine-borel}, the set $f(K)$ is therefore closed and
 bounded.
 
-Since $f(K)\subseteq \mathbb{R}$ is bounded, we can apply
+Since $f(K)\subseteq \R$ is bounded, we can apply
 Proposition~\ref{prop:subseq}, which furnishes a sequence
 $\{x_n\}\subseteq f(K)$ that converges to $\sup f(K)$.
 
@@ -1625,6 +1919,7 @@ can find $\bar{x}$ such that
 
 \section{Optimization}
 
+\subsection{Contraction Mapping Theorem and Brouwer's Fixed Point Theorem}
 \begin{defn}{(Operator)}
 If $X$ is some function space
 \begin{align*}
@@ -1637,20 +1932,313 @@ then an \emph{operator}, denoted $T$, is a function
   \qquad \forall f\in X
 \end{align*}
 It is a ``function of functions'', taking elements $f\in X$ and mapping
-them to some other element $Tf\in X$. To avoid overly cumbersome
-notation, I write $Tf$ rather than $T(f)$ when applying operator $T$ to
-function $f$.
+them to some other element $Tf\in X$. Though of course $T$ is a
+function, the word ``operator'' is used to distinguish $T$ from the
+functions it acts on.
+
+To avoid overly cumbersome notation, I follow convention and write $Tf$
+rather than $T(f)$ when applying operator $T$ to function $f$.
 \end{defn}
+
+\begin{ex}
+Here's a simple example of an operator $T:X\rightarrow \R$. It acts on
+the space of bounded and integrable functions
+\begin{align*}
+  X = \{f: A\subseteq \R \rightarrow \R\}
+\end{align*}
+where $A$ is bounded.
+The operator is defined
+\begin{align*}
+  Tf = \int_A f(x) \; dx
+\end{align*}
+It takes a function $f$, integrates it, and returns a number.
+Therefore, $T$ is an operator.
+\end{ex}
 
 \begin{defn}{(Contraction Map)}
 In metric space $(X,d)$, the function $T: X\rightarrow X$ is a
 \emph{contraction map} if and only there exists a $\beta \in (0,1)$ such
 that
 \begin{align*}
-  d(T(x), T(y)) < \beta d(x,y)
+  d(T(x), T(y)) < \beta \; d(x,y)
   \qquad x,y\in X
 \end{align*}
+$\beta$ is called the \emph{modulus} of $T$.
 \end{defn}
+
+\begin{prop}{\emph{(Contraction Maps are Continuous)}}
+If $T$ is a contraction map, then $T$ is continuous.
+\end{prop}
+\begin{proof}
+Suppose $\varepsilon>0$ given. Then
+\begin{align*}
+  d(T(x),T(y)) < \beta \; d(x,y)
+\end{align*}
+Sub in $\delta$ for $d(x,y)$ and solve for $\delta$
+\begin{align*}
+  \beta \delta = \varepsilon
+  \quad\Rightarrow\quad
+  \delta = \frac{\varepsilon}{\beta}
+\end{align*}
+\end{proof}
+
+\begin{thm}{\emph{(Banach Fixed Point, Contraction Mapping Theorem)}}
+\label{thm:banach}
+Suppose that $T:X\rightarrow X$ is a contraction map and $(X,d)$ is a
+complete metric space. Then
+\begin{enumerate}
+  \item $\exists! \; x^*$ such that $T(x^*)=x^*$.\footnote{%
+      $\exists!$ means ``there exists a unique''}
+  \item For all $x_0 \in X$,
+    \begin{align}
+      \label{thm:fixed-bound1}
+      d(T^n(x_0), x^*) \leq \beta^n d(x_0,x^*)
+    \end{align}
+    where $T^n$ is the contraction map applied $n$ times.
+
+    So applying the contraction map many, many times to any starting
+    point $x_0$ will get you closer and closer to the fixed point at
+    each iteration.
+\end{enumerate}
+\end{thm}
+
+\begin{proof}
+First, given $x_0$, construct sequence $\{x_n\}$ by defining the $n$th
+term to be
+\begin{align}
+  \label{contraction-map-seq}
+  x_n = T^n(x_0)
+\end{align}
+Now for the proof. It's long, so we do it in parts
+\begin{enumerate}
+\item
+\emph{Show $\{x_n\}$ Converges}:
+Let's first prove that $x_n$ converges to \emph{something}. Since the
+space $(X,d)$ is complete, it's enough to show that the sequence is
+Cauchy.  And to show that $\{x_n\}$ is Cauchy we want to find a bound of
+the form
+\begin{align*}
+  d(x_n,x_m) < G(\min\{m,n\})
+\end{align*}
+Without loss of generality, suppose that $m\geq n$, or equivalently
+$m=n+p$ for some integer $p\geq 0$. Then we can use the triangle
+inequality $p$ times to write
+\begin{align}
+  d(x_n,x_m) = d(x_n,x_{n+p})
+  &\leq d(x_n,x_{n+1}) + d(x_{n+1},x_{n+p}) \notag \\
+  &\leq d(x_n,x_{n+1}) + d(x_{n+1},x_{n+2}) + d(x_{n+2},x_{n+p})\notag\\
+  &\;\; \vdots\notag\\
+  &\leq \sum^{p-1}_{i=0} d(x_{n+i},x_{n+i+1})
+  \label{fixedpt-series}
+\end{align}
+Now let's take a look at each of the constituent terms in the
+Series~\ref{fixedpt-series} for $i>0$, using the fact that $T$ is a
+contraction map:
+\begin{alignat*}{3}
+  d(x_{n+1},x_{n+2}) &=
+  d(T(x_{n}),T(x_{n+1}))
+  &&\leq
+  \beta d(x_{n},x_{n+1}) \\
+  d(x_{n+2},x_{n+3}) &=
+  d(T(x_{n+1}),T(x_{n+2}))
+  &&\leq
+  \beta d(x_{n+1},x_{n+2}) \\
+  \vdots \quad & \quad\qquad \vdots
+\end{alignat*}
+In general, the inequalities above can be summarized as follows:
+\begin{align*}
+  d(x_{n+i},x_{n+i+1}) &=
+  d(T(x_{n+i-1}),T(x_{n+i}))
+  \leq
+  \beta d(x_{n+i-1},x_{n+i})
+  \qquad i = 1,\ldots,p-1
+\end{align*}
+By recursive substitution for each $i$, we can even bound each term by a
+function of $\beta$ and $d(x_n,x_{n+1})$, the first term in
+Series~\ref{fixedpt-series}:
+\begin{align*}
+  d(x_{n+i},x_{n+i+1})
+  &\leq
+  \beta^i d(x_{n},x_{n+1})
+  \qquad i = 1,\ldots,p-1
+\end{align*}
+This allows us to rewrite Series~\ref{fixedpt-series} and the inequality
+for $d(x_n,x_{n+p})$ as
+\begin{align}
+  d(x_n,x_{n+p})
+  \leq \sum^{p-1}_{i=0} d(x_{n+i},x_{n+i+1})
+  &\leq \sum^{p-1}_{i=0} \beta^i d(x_{n},x_{n+1})\notag\\
+  &\leq  d(x_{n},x_{n+1})\sum^{\infty}_{i=0} \beta^i\notag \\
+  \Rightarrow
+  d(x_n,x_{n+p})
+  &\leq  d(x_{n},x_{n+1})\times \frac{1}{1-\beta}
+  \label{fixedpt-ineq}
+\end{align}
+Okay, that's pretty good. Let's just bound $d(x_n,x_{n+1})$, again using
+recursive substitution
+\begin{align*}
+  d(x_n,x_{n+1})
+  = d(T(x_{n-1}), T(x_n))
+  &\leq \beta d(x_{n-1}, x_n)\\
+  &\leq \beta \cdot \beta d(x_{n-2}, x_{n-1})\\
+  &\;\; \vdots \\
+  \Rightarrow\quad
+  d(x_n,x_{n+1})
+  &\leq \beta^n d(x_{0}, x_1)
+\end{align*}
+Substituting this back into Inequality~\ref{fixedpt-ineq}, we get
+\begin{align*}
+  d(x_n,x_{n+1})
+  &\leq \frac{\beta^n}{1-\beta} d(x_0,x_1)
+\end{align*}
+Since we want to bound the LHS of the last inequality by $\varepsilon$,
+equate and solve for $N$:
+\begin{align*}
+  \varepsilon &= \frac{\beta^N}{1-\beta} d(x_0,x_1) \\
+  \Rightarrow\quad
+  N &=
+  \frac{1}{\ln \beta}
+  \left[
+  \ln(1-\beta)+ \ln \varepsilon - \ln(d(x_0,x_1))
+  \right]
+\end{align*}
+This is the choice of $N$ with $\varepsilon$ given.
+Therefore $\{x_n\}$ is Cauchy and, since $X$ is complete, convergent.
+
+\item
+\emph{Show $x^*$ Exists}: Call $x$ the limit of $\{x_n\}$, which we just
+showed exists. In notation, that means
+\begin{align*}
+  x = \limn x_n = \limn T(x_{n-1})
+\end{align*}
+By Theorem~\ref{thm:cts-sequential}, the continuity of $T$ means we can
+exchange the limit and the function:
+\begin{align*}
+  x = \limn T(x_{n-1})
+  =
+  T\left(\limn x_{n-1}\right)
+  =
+  T\left(x\right)
+\end{align*}
+Hence, the limit of the sequence $\{x_n\}$ is the fixed point, i.e.\
+$x^*=x = \limn x_n$.
+
+\item
+\emph{Show Uniqueness}:
+Suppose that there were two fixed points $x^*$ and $y^*$. Then
+\begin{align*}
+  d(x^*, y^*) &= d(T(x^*), T(y^*))
+  \quad\text{Since fixed points} \\
+  \Rightarrow\quad
+  d(x^*, y^*) &\leq \beta d(x^*, y^*)
+  \; \quad
+  \qquad\text{Since $d(T(x^*), T(y^*)) \leq \beta d(x^*, y^*)$}
+\end{align*}
+But since $\beta\in (0,1)$, this is impossible unless $d(x^*,y^*)=0$.
+
+\item
+\emph{Bound $d(T^n(x_0),x^*)$}:
+Similar to what we did above
+\begin{align*}
+  d(x_n, x^*) = d(T(x_{n-1},T(x^*))
+  &\leq \beta d(x_{n-1},x^*)\\
+  & \;\; \vdots\\
+  &\leq \beta^n d(x_0,x^*)
+\end{align*}
+\end{enumerate}
+\end{proof}
+
+The last theorem is a very useful bit of theory, but we can do a bit
+better than the bound given by Inequality~\ref{thm:fixed-bound1}.
+Specifically, to be able to tell how far $T^n(x_0)$ is from the fixed
+point $x^*$, Theorem~\ref{thm:banach} requires that we know
+$d(x_0,x^*)$. Well, a lot of times we don't know. And a lot of times,
+we use the contraction mapping theorem to motivate forming a sequence
+$T^n(x_0)$ that converges to some fixed point we don't know.
+So can we bound $d(T^n(x_0),x^*)$ with stuff we do know?
+
+In fact, we can bound $d(T^n(x_0), x^*)$ by a function of $d(T^n(x_0),
+T^{n+1}(x_0))$ instead, which is the change in the sequence
+$\{T^n(x_0)\}$. In practical terms, that means ``Keep iterating on the
+sequence $\{T^n(x_0)\}$, and if you see that the change in the sequence
+from element to element is pretty small, you can be confident that
+you're close to the fixed point.'' You don't have to know what the fixed
+point is. You just need to compute $T^{n+1}(x_0) - T^n(x_0)$, which is
+always feasible, in general. This is the next result.
+\begin{cor}
+Consider contraction map $T:X\rightarrow X$ with modulus $\beta$ in
+complete metric space $(X,d)$. Given any starting point $x_0\in X$,
+\begin{align*}
+  d(T^n(x_0), x^*)
+  \leq \frac{d(T^n(x_0),T^{n+1}(x_0))}{1-\beta}
+\end{align*}
+\end{cor}
+\begin{proof}
+Again, form the sequence $\{x_n\}$ as we did above in
+(\ref{contraction-map-seq}).
+\begin{align*}
+  x_n = T^n(x_0)
+\end{align*}
+The goal is to bound the distance between $T^n(x_0)$ and $x^*$ using
+only information about the change
+\begin{align*}
+  d(T^n(x_0), x^*)
+  &\leq
+  G\left(\;d(T^n(x_0), T^{n+1}(x_0))\;\right)\\
+  \Leftrightarrow\qquad
+  d(x_n, x^*)
+  &\leq
+  G\left(\;d(x_n, x_{n+1})\;\right)
+\end{align*}
+Using the triangle inequality, the fact that $T$ is a contraction map,
+and the fact that $x^*$ is a fixed point,
+\begin{align*}
+  d(x_n, x^*)
+  &\leq d(x_n,x_{n+1}) + d(x_{n+1},x^*) \\
+  &\leq d(x_n,x_{n+1}) + d(T(x_n),T(x^*)) \\
+  &\leq d(x_n,x_{n+1}) + \beta d(x_n,x^*) \\
+  \Rightarrow\quad
+  d(x_n, x^*)
+  &\leq \frac{d(x_n,x_{n+1})}{1-\beta}
+\end{align*}
+Since $d(x_n,x^*)=d(T^n(x_0),x^*)$, we have the desired result.
+\end{proof}
+
+\begin{defn}{($T$-Invariant Sets)}
+Given an operator/function $T:X\rightarrow X$ and some set $C\subseteq
+X$, we say that the set $C$ is \emph{$T$-invariant} if
+\begin{align*}
+  T(C)\subseteq C
+\end{align*}
+\end{defn}
+
+\begin{prop}
+Suppose that $T: X\rightarrow X$ is a contraction map for complete space
+$X$. Let $x^*$ denote the unique fixed point. Then
+\begin{enumerate}
+  \item If $C\subseteq X$ is a closed, nonempty, $T$-invariant set, then
+    $x^* \in C$.
+  \item If $C' \subseteq C \subseteq X$ where $C$ is closed but $C'$ is
+    an arbitrary subset such that $T(C) \subseteq C'$, then $x^* \in
+    C'$.
+\end{enumerate}
+\end{prop}
+\begin{proof}
+(Part 1) Start with some $x_0\in C$. Since $C$ is $T$-invariant,
+$T^n(x_0) \in C$ for all $n$. Moreover, by Theorem~\ref{thm:banach},
+the sequence $\{T^n(x_0)\}\subseteq C$ converges to $x^*$. Since $C$ is
+closed, the set must contain its limit point by
+Proposition~\ref{prop:closed}, hence $x^*\in C$.
+
+(Part 2) Again, the assumptions of this part imply that $C$ is
+$T$-invariant since $T(C)\subseteq C' \subseteq C$.  And since $C$ is
+closed, $x^*\in C$ by Part 1.
+
+Finally, by assumption $T(x) \in C'$ for all $x \in C$, and we just said
+$x^*\in C$. So $T(x^*)\in C'$ too.
+\end{proof}
+
+
 
 
 %% APPPENDIX %%
