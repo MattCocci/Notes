@@ -191,6 +191,7 @@
 % My additions for math shorthand
 \newcommand{\limn}{\lim_{n\rightarrow\infty}}
 \newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\N}{\mathbb{N}}
 
@@ -206,8 +207,313 @@
 
 \tableofcontents
 
+
 \clearpage
-\section{Basic Building Blocks}
+\section{Linear Algebra}
+
+\subsection{Definitions and Vocabulary}
+
+Here are some words we use to describe matrices. Unless otherwise
+specified, the matrices are assumed to be complex $m\times n$ matrices
+so that we can capture the most general cases.
+
+\begin{defn}{(Hermitian Transpose)}
+Given matrix $A$, the \emph{Hermitian transpose} is the conjugate
+transpose of $A$ denoted $A^*$.
+\end{defn}
+
+\begin{defn}{(Hermitian)}
+Matrix $A$ is a \emph{Hermitian matrix} if $A=A^*$.
+\end{defn}
+
+\begin{defn}{(Symmetric)}
+Matrix $A$ is \emph{symmetric} if it is a real Hermitian matrix:
+$A=A^T$.
+\end{defn}
+
+\begin{defn}{(Invertible)}
+Matrix $A$ is \emph{invertible} if there exists a matrix $A^{-1}$ such
+that $A A^{-1} = A^{-1}A=I$
+\end{defn}
+
+\begin{defn}{(Unitary)}
+Matrix $A$ is \emph{unitary} if $A^{-1} = A^*$.
+\end{defn}
+
+\begin{defn}{(Orthogonal)}
+Matrix $A$ is \emph{orthogonal} if $A$ is a \emph{real} unitary matrix:
+$A^{-1} = A^T$ so that $AA^T = A^T A = I$.
+\end{defn}
+
+\begin{defn}{(Normal)}
+Matrix $A$ is \emph{normal} if $A^* A = A^*$. Hermitian and unitary
+matrices are normal.
+\end{defn}
+
+\begin{defn}{(Sparse)}
+Matrix $A$ is \emph{sparse} if its entries are mostly zeroes.
+\end{defn}
+
+\begin{defn}{(Diagonal)}
+Matrix $D=(d_{ij})_{n\times n}$ is a \emph{diagonal} matrix if and only
+if $d_{ij}=0$ for all $i\neq j$. That is, the only positive entries are
+on the diagonal, $d_{ii}$ for all $i$.
+\end{defn}
+
+\begin{defn}{(Tridiagonal)}
+Matrix $A$ is \emph{tridiagonal} if it has three diagnoals, for example
+\begin{align*}
+  A =
+  \begin{bmatrix}[r]
+   2 & -1 &  0 &  0 \\
+  -1 & 2 & -1 &  0 \\
+   0 & -1 &  2 & -1 \\
+   0 &  0 & -1 &  2 \\
+  \end{bmatrix}
+\end{align*}
+\end{defn}
+
+Next, we want to generalize the concepts of ``positive'' and
+``negative'' to matrices. We could go element by element and require a
+matrix to have all positive elements. But that's a bit too restrictive.
+So let's look at what it means for a scalar to be positive and work from
+there. Specifically, scalar $a$ is positive if
+\begin{align*}
+  a \geq 0
+  \quad\Leftrightarrow\quad
+  \forall x\in \R
+  \quad
+  x^2 a = x a x\geq 0
+\end{align*}
+Now for matrices, we'll employ a similar idea, suitably modified to
+handle matrices.
+
+\begin{defn}{(Positive- and Negative-(Semi)definite Matrices)}
+Suppose that we have a Hermitian matrix $A \in \C^{n\times n}$ or simply
+symmetric if $A \in \R^{n\times n}$. We classify it as follows, with
+each classification defined for $A$ complex or real
+\begin{itemize}
+  \item \emph{Positive-Semidefinite}
+    \begin{itemize}
+      \item $A \in \C^{n\times n}$:
+          $\qquad x^* A x \geq 0
+          \qquad \forall x\in \C^n
+          \quad \text{and} \quad x^* A x\in \R$
+      \item $A \in \R^{n\times n}$:
+          $\qquad x^T A x\geq 0
+          \qquad \forall x\in \R^n$
+    \end{itemize}
+  \item \emph{Positive-Definite}: Inequalities in the
+    positive-semidefinite case are strict.
+  \item \emph{Negative-Semidefinite}
+    \begin{itemize}
+      \item $A \in \C^{n\times n}$:
+          $\qquad x^* A x \leq 0
+          \qquad \forall x\in \C^n
+          \quad \text{and} \quad x^* A x\in \R$
+      \item $A \in \R^{n\times n}$:
+          $\qquad x^T A x\leq 0
+          \qquad \forall x\in \R^n$
+    \end{itemize}
+  \item \emph{Negative-Definite}: Inequalities in the
+    negative-semidefinite case are strict.
+\end{itemize}
+\end{defn}
+
+\begin{defn}{(Rank)}
+For matrix $A\in \R^{m \times n}$, the rank is the number of linearly
+independent columns or, alternatively, rows of $A$.\footnote{Whether you
+check rows or columns doesn't matter, those numbers will be equal.} The
+rank $r$ is such that $r \leq n$ and $r\leq m$.
+\end{defn}
+
+\subsection{The Determinant}
+
+\begin{defn}{(Multilinear Function)}
+A function $f:\R^n\rightarrow \R$ is \emph{multilinear} if the following
+functions are linear:
+\begin{align*}
+  f_1 &:= f(x,x_2,\ldots,x_n)\\
+  f_2 &:= f(x_1,x,\ldots,x_n)\\
+  \vdots\; & \qquad \vdots\\
+  f_n &:= f(x_1,x_2,\ldots,x)
+\end{align*}
+That is, to construct function $f_i$, fix all but the $i$th argument of
+$f$. If the $f_i$ are linear for all $i = 1,\ldots, n$, then $f$ is
+multilinear.
+\end{defn}
+
+Next, I present a rather unusual definition of the determinant relative
+to Linear Algebra 101. Rather than simply describe how to compute the
+determinant, this definition specifies the properties that the
+determinant must satisfy. Surprisingly, that's enough to generate the
+usual determinant that arrives at the same number for each matrix
+compared to the usual computational definition. The determinant will in
+fact be the \emph{only} function satisfying the following properties.
+
+\begin{defn}{(Determinant)}
+The determinant is a real-valued function mapping $n$ vectors of size
+$n\times 1$
+\begin{align*}
+  \det: \underbrace{\R^n \times \cdots \times \R^n}_{n \;\text{times}}
+  \rightarrow \R
+\end{align*}
+and satisfying the following properties
+\begin{enumerate}
+  \item Multilinearity
+  \item Asymmetry so that swapping input arguments $i$ and $j$ for any
+    $i,j=1,\ldots,n$ changes the sign of the determinant. Example for
+    $n=3$ and $x,y,z\in \R^3$:
+    \begin{align*}
+      \det(x,y,z) = -\det(y,x,z) = - \det(x,z,y)
+      = \det(z,x,y) = -\det(z,y,x)
+    \end{align*}
+  \item $\det(e_1,e_2,\ldots,e_n)=1$ where the set
+    $\mathcal{B}=\{e_1,\ldots,e_n\}$ represents the canonical base for
+    $\R^n$. This states how we normalize the determinant.
+\end{enumerate}
+\end{defn}
+
+
+\begin{prop}{\emph{(Facts about Determinants)}}
+Given square matrices $A,B\in \R^{n\times n}$, it follows that
+\begin{enumerate}
+  \item $\det(AB) = \det(A) \det(B)$
+  \item Matrix $A$ is invertible if and only if $\det(A) \neq 0$.
+  \item $\det(A^{-1}) = \frac{1}{\det(A)}$
+  \item $\det(A) = \det(A^T)$
+\end{enumerate}
+\end{prop}
+
+\subsection{The Eigenvalue Problem}
+
+\begin{defn}{(Eigenvalue Problem)}
+For a square matrix $A \in \R^{n\times n}$, a \emph{right eigenvector}
+(or, more commonly, simply an \emph{eigenvector}) is a vector $x\neq 0$
+satisfying
+\begin{equation}
+  Ax = \lambda x
+  \qquad \Leftrightarrow \qquad
+  (A-\lambda I) x = 0
+\end{equation}
+where $\lambda$ is some scalar, called an \emph{eigenvalue}.  A
+\emph{left eigenvector} of matrix $A$ is a right eigenvector of $A^*$.
+The restriction that $x\neq 0$ is important since zero is always a
+solution, but it's a dumb trivial one we don't really care about.  In
+other words, eigenvectors are those non-zero vectors that are simply
+\emph{rescaled} by matrix $A$.
+\end{defn}
+
+\begin{defn}
+Given a matrix $A\in \R^{n\times n}$, define the characteristic
+polynomial $P_A(\lambda)$ as
+\begin{align}
+  \label{chareqn}
+  P_A(\lambda) = \det(A-\lambda I)
+\end{align}
+This polynomial has at most $n$ distinct roots.
+\end{defn}
+
+\begin{thm}\emph{(Solving the Eigenvalue Problem)}
+For a matrix $A$, the scalar $\lambda$ is an eigenvalue if and only if
+it is a root of the characteristic polynomial, i.e.\ if
+$P_A(\lambda)=0$.  Given an eigenvalue, its corresponding eigenvector(s)
+is (are) elements in the null space of the matrix $A-\lambda I$.
+\end{thm}
+\begin{proof}
+By definition, an eigenvector $x$ satisfies
+\begin{align}
+  A x &= \lambda x\notag\\
+  (A- \lambda I)x &= 0
+  \label{eq:eigprob}
+\end{align}
+We want this to have a non-trivial solution. That is, we want
+Equation~\ref{eq:eigprob} to have a non-trivial solution. But that only
+happens if $(A-\lambda I)$ is not invertible. And a matrix is not
+invertible if and only if it's determinant is zero. Therefore we need to
+solve for $\lambda$ that imply
+\begin{align*}
+  \det(A-\lambda I)=0
+\end{align*}
+
+
+\end{proof}
+
+
+\begin{defn}{(Multiplicities)}
+The multiplicity of eigenvalue $\lambda$ as a solution to the
+characteristic polynomial is called the \emph{algebraic multiplicity of
+$\lambda$}, denoted $m(\lambda)$.
+
+The number of eigenvectors corresponding to a given eigenvalue $\lambda$
+is called the \emph{geometric multiplicty of $\lambda$}, denoted
+$g(\lambda)$.
+\end{defn}
+
+\begin{defn}{(Eigenspace)}
+Given an eigenvalue $\lambda$ of some matrix $A$, the set of all
+eigenvectors corresponding to $\lambda$ and the zero vector form a
+linear subspace called the \emph{eigenspace of $\lambda$}.
+\end{defn}
+
+\subsection{The Generalized Eigenvalue Problem}
+
+\begin{defn}{(The Generalized Eigenvalue Problem)}
+For square $n\times n$ matrices $A$ and $B$, an \emph{eigenvector of
+$A$ relative to $B$} is a vector satisfying
+\begin{equation}
+  Ax = \lambda B x
+  \qquad \Leftrightarrow \qquad
+  (A - \lambda B) x = 0
+\end{equation}
+where $\lambda$ is some scalar, called an \emph{eigenvalue of $A$
+relative to $B$}.
+
+We see also that the Eigenvalue Problem introduced above is simply a
+special case where $B=I_n$.
+\end{defn}
+
+\subsection{Singular vs. Nonsingular Reference Chart}
+
+Suppose we have an $n\times n$ matrix $A$. The singular vs.\ nonsingular
+distinction entails a whole host of consequences, summarized below:
+\begin{table}[h!]
+\centering
+\begin{tabular}{lll}
+\textbf{Nonsingular}                     && \textbf{Singular} \\
+$A$ invertible                           && $A$ not invertible \\
+Columns independent                      && Columns dependent \\
+Rows independent                         && Rows dependent \\
+$\det(A)\neq0$                           && $\det(A)=0$ \\
+$Ax = 0$ has one solution, $x = 0$       && $Ax=0$ has infinitely many solutions\\
+$Ax = b$ has one solution, $x = A^{-1}b$ && $Ax = b$ has no solution or infinitely many \\
+$A$ has $n$ (nonzero) pivots             && $A$ has $r<n$ pivots \\
+$A$ has full rank                        && $A$ has rank $r<n$ \\
+Reduced row echelon form is $R = I$      && $R$ has at least one zero row \\
+Column space is all of $\mathbb{R}^n$    && Column space has dimension $r<n$ \\
+Row space is all of $\mathbb{R}^n$       && Row space has dimension $r<n$ \\
+All eigenvalues are non-zero             && Zero is an eigenvalue of $A$ \\
+$A^T A$ is symmetric positive definite   && $A^T A$ is only semidefinite \\
+$A$ has $n$ (positive) singular values   && $A$ has $r<n$ singular values
+\end{tabular}
+\end{table}
+
+
+\section{Metric Spaces and Sequences}
+
+Take any arbitrary set $X$. Metric spaces are simply some pair $(X,d)$
+of an arbitrary set and some distance function $d$ that tells you ``how
+close'' any two points in $X$ are. By defining the concept of
+``closeness'', we can then talk about convergence of sequences within
+$X$.
+
+The most common space is $\R^k$; however, the treatment below
+will be sufficiently general to capture any set $X$ for which a distance
+function or \emph{metric} (satisfying certain properties) can be
+defined.
+
+\subsection{Basic Building Blocks}
+
 
 \begin{defn}{(Supremum)}
 \label{defn:supdef1}
@@ -248,21 +554,6 @@ Notice also that this is a vector space, as
   (cf)(x) &= cf(x)
 \end{align*}
 \end{defn}
-
-
-
-\section{Metric Spaces and Sequences}
-
-Take any arbitrary set $X$. Metric spaces are simply some pair $(X,d)$
-of an arbitrary set and some distance function $d$ that tells you ``how
-close'' any two points in $X$ are. By defining the concept of
-``closeness'', we can then talk about convergence of sequences within
-$X$.
-
-The most common space is $\R^k$; however, the treatment below
-will be sufficiently general to capture any set $X$ for which a distance
-function or \emph{metric} (satisfying certain properties) can be
-defined.
 
 
 \subsection{Metrics, Norms, and Metric Spaces}
@@ -1917,9 +2208,45 @@ can find $\bar{x}$ such that
 \end{proof}
 
 
-\section{Optimization}
+\section{Convexity, Optimization, and Fixed Points}
+
+\subsection{Convex Optimization}
+
+Convex Optimization is the study of convex sets and functions.
+
+\begin{defn}{(Convex Set)}
+A set $C\subseteq X$ is \emph{convex} if
+\begin{align*}
+  z = \lambda x + (1-\lambda) y \in C
+  \qquad \forall x,y\in C\quad \forall \lambda \in [0,1]
+\end{align*}
+In words, any point on the straight line connecting $x,y\in C$ is also
+in $C$.
+\end{defn}
+
+\begin{defn}{(Path Connected)}
+A set $C\subseteq X$ is \emph{path connected} if, for any pair $x,y\in
+C$, there exists a continuous function $\phi(\lambda):[0,1]\rightarrow
+C$ such that
+\begin{align*}
+  \varphi(\lambda) &\in C \qquad \forall \lambda \in [0,1]\\
+  \varphi(0) &= x\\
+  \varphi(1) &= y
+\end{align*}
+Note that $\varphi$ is depended upon choice of $x$ and $y$.
+
+This simply generalizes the idea of convexity. Instead of connecting $x$
+and $y$ by a straight line in $C$, you can connect them by any
+continuous path in $C$.
+\end{defn}
+
+\begin{defn}{(Convex Hull)}
+Given any set $A\subseteq X$, the \emph{convex hull} is the smallest
+convex set containing $A$.
+\end{defn}
 
 \subsection{Contraction Mapping Theorem and Brouwer's Fixed Point Theorem}
+
 \begin{defn}{(Operator)}
 If $X$ is some function space
 \begin{align*}
