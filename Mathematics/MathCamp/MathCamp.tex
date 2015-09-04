@@ -211,11 +211,87 @@
 \clearpage
 \section{Linear Algebra}
 
+\subsection{Matrix Multiplication and Solving Linear Systems}
+
+{\sl Matrix multiplication $Ax$ is the combination of the columns of
+$A$. Each column scaled by the corresponding element of $x$.}\ This is,
+hands down, one of the simplest, most important, and most practical ways
+of thinking about matrix multiplication.
+
+Being more explicit, and letting $A_{\cdot i}$ denote the $i$th column of $A$ (an $m\times n$ matrix), and letting $x_j$ denote the $j$th element of $n\times 1$ vector $x$, we can express
+\[
+  A x = x_1 A_{\cdot 1}  + \cdots + x_n A_{\cdot n}
+\]
+Since the result is a combination of the columns of $A$---each an $m\times 1$ vector---we can easily see that the result will also be an $m\times 1$ column vector.
+
+This intuition also provides a convenient way to ``pick out'' the $i$th column of matrix $A$ via matrix multiplication: just right-multiply $A$ by an $n \times 1$ vector whose elements are all zero, except for the $i$th element, which equals 1. Example,
+\begin{align*}
+  \begin{bmatrix}
+  8 & 1 & 6 \\
+  3 & 5 & 7 \\
+  4 & 9 & 2
+  \end{bmatrix}
+  \begin{bmatrix}
+  0 \\ 1 \\ 0
+  \end{bmatrix}
+  = 0
+  \begin{bmatrix} 8 \\ 3 \\ 4 \\ \end{bmatrix}
+  + 1  \begin{bmatrix} 1 \\ 5 \\ 9 \\ \end{bmatrix}
+  + 0  \begin{bmatrix} 6 \\ 7 \\ 2 \\ \end{bmatrix}
+  =
+  \begin{bmatrix} 1 \\ 5 \\ 9 \\ \end{bmatrix}
+\end{align*}
+Linear algebra's founding problem is likely the task of solving the
+simple system of linear equations:
+\begin{equation}
+    \label{canonical}
+    Ax = b
+\end{equation}
+For now, assume $A$ is $p\times p$. There are two ways to think of this
+equation:
+\begin{enumerate}
+    \item {\sl Row Interpretation}: We think of each row in the equation
+      as defining a line in $p$ dimensional place. The solution is where
+      those lines intersect.
+    \item {\sl Column Interpretation}: A solution to the equation exists
+      if and only if $b$ is in the column space of $A$. More explicitly,
+      there is a solution if and only if $b$ can be written as a linear
+      combination of the $p$ vectors defined by the columns of $A$.
+\end{enumerate}
+The latter interpretation is very powerful. We see that the column space
+of $A$---the set of all linear combinations of the columns of $A$---is
+crucial to characterizing the matrix $A$.
+
+For example, if the columns of $A$ are linearly independent, then the
+matrix, in a sense, ``covers'' the entire $p$-dimensional space. We can
+thus solve \emph{any} equation like Equation \ref{canonical} because $b$
+will certainly lie within the column space of $A$. Thus, we can find
+some $x$ such that $Ax=b$.
+
+We only potentially run into problems if the columns aren't linearly
+independent. So if the rank of the matrix is $k<p$, only a
+$k$-dimensional hyperplance embedded within $\mathbb{R}^p$ is covered by
+the columns of $A$. And $b$ might not lie in that subspace. This very
+possibility manifests itself in the non-invertability of $A$, which
+prevents us from trivially solving the system via $x = A^{-1}b$, for the
+very reasons just discussed.
+
 \subsection{Definitions and Vocabulary}
 
-Here are some words we use to describe matrices. Unless otherwise
-specified, the matrices are assumed to be complex $m\times n$ matrices
-so that we can capture the most general cases.
+Here are some terms we use to describe matrices and operations with
+matrices. Unless otherwise specified, the matrices are assumed to be
+complex $m\times n$ matrices so that we can capture the most general
+cases.
+
+\begin{defn}
+The \emph{nullspace} of a matrix $A$ ($m\times n$), which is denoted
+$N(A)$, is the set of all $x \in \mathbb{R}^n$ such that $Ax=0$.
+Intuitively, the nullspace consists of all vectors that can linearly
+combine the columns of $A$ to get the zero vector.
+
+It is \emph{always} the case that the zero vector is in $N(A)$, so the
+set can never be empty.
+\end{defn}
 
 \begin{defn}{(Hermitian Transpose)}
 Given matrix $A$, the \emph{Hermitian transpose} is the conjugate
@@ -362,8 +438,8 @@ and satisfying the following properties
 \begin{enumerate}
   \item Multilinearity
   \item Asymmetry so that swapping input arguments $i$ and $j$ for any
-    $i,j=1,\ldots,n$ changes the sign of the determinant. Example for
-    $n=3$ and $x,y,z\in \R^3$:
+    $i\neq j$ in $\{1,\ldots,n\}$ changes the sign of the determinant.
+    Example for $n=3$ and $x,y,z\in \R^3$:
     \begin{align*}
       \det(x,y,z) = -\det(y,x,z) = - \det(x,z,y)
       = \det(z,x,y) = -\det(z,y,x)
@@ -415,8 +491,8 @@ This polynomial has at most $n$ distinct roots.
 \end{defn}
 
 \begin{thm}\emph{(Solving the Eigenvalue Problem)}
-For a matrix $A$, the scalar $\lambda$ is an eigenvalue if and only if
-it is a root of the characteristic polynomial, i.e.\ if
+The scalar $\lambda$ is an eigenvalue of square matrix $A$ if and only
+if it is a root of the characteristic polynomial, i.e.\ if
 $P_A(\lambda)=0$.  Given an eigenvalue, its corresponding eigenvector(s)
 is (are) elements in the null space of the matrix $A-\lambda I$.
 \end{thm}
@@ -497,6 +573,212 @@ $A^T A$ is symmetric positive definite   && $A^T A$ is only semidefinite \\
 $A$ has $n$ (positive) singular values   && $A$ has $r<n$ singular values
 \end{tabular}
 \end{table}
+
+
+\subsection{Matrix Decompositions}
+
+Matrix decompositions are useful for a few key reasons
+\begin{enumerate}
+\item They express an arbitrary matrix $A$ in some canonical form, allowing
+  the application of standard, more efficient algorithms and procedures
+  to invert the matrix $A$, solve a system $Ax =b$, etc.
+\item They more explicitly express the properties of $A$ 
+\end{enumerate}
+
+\subsubsection{Background Intuition}
+
+Often, for any arbitrary matrix $A$, we want to consider the geometric
+interpretation of $Ax$ for some vector $x$. because they often often
+attempt to express the matrix $A$ as simpler matrices with more explicit
+geometric intepretations. 
+
+matrix multiplication
+When considering matrix decompositions, it often helps to consider the
+geometric interpretation of matrices and matrix multiplication. Often,
+decompositions simply take arbitrary matrices and express them in a way
+more amenable to direct geometric interpretation
+
+\subsubsection{Schur and QZ Decomposition}
+
+\begin{defn}{(Schur Decomposition)}
+For any square matrix $A$, there exists a matrix $Q$ such that
+\begin{align*}
+  A = Q U Q^{-1} = Q U Q^*
+\end{align*}
+where $Q$ is a unitary matrix (hence $Q^{-1} = Q^*$) and $U$ is an upper
+triangular matrix with the the eigenvalues of $A$ on the diagonal of
+$U$. (This follows from $U$ being similar to $A$.)
+\end{defn}
+
+\begin{defn}{(QZ or Generalized Schur Decomposition)}
+For square matrices $A$ and $B$, there exist unitary matrices $Q$ and
+$Z$ such that
+\begin{align*}
+  A &= Q S Z^* = QSZ^{-1} \\
+  B &= Q T Z^* = QTZ^{-1} \\
+\end{align*}
+where $S$ and $T$ are upper-triangular matrices.
+\end{defn}
+
+\begin{thm}
+The $i$the generalized eigenvalue for matrices $A$ and $B$, denoted
+satsfies $\lambda_i = S_{ii} / T_{ii}$ where $S$ and $T$ are the upper
+triangular matrices from the QZ decomposition.
+\end{thm}
+
+\subsubsection{$LU$ Decomposition}
+
+\subsubsection{Cholesky Decomposition}
+
+The Cholesky Decomposition applies to all positive definite matrices;
+therefore, it finds a number of applications in dealing with covariance
+matrices.
+
+\begin{thm}
+Suppose that $A$ is a positive definite matrix. Then it
+can be decomposed
+\begin{equation}
+  A = L L^T
+\end{equation}
+where $L$ is a lower triagular matrix with positive diagonal elements.
+It represents something like the ``square root'' of $A$.
+\end{thm}
+
+\subsubsection{Applications}
+
+\paragraph{Solving $Ax=b$} The Cholesky decomposition allows us to
+quickly solve systems of equations because of the triangular
+structure. Specifically, we can solve the problem as follows
+\begin{align*}
+  Ax = LL^Tx&=b\\
+  \Leftrightarrow \quad \quad Lz&=b \qquad \text{where }z = L^T x
+\end{align*}
+Once we have it in this form, we have a system that is very easy to
+solve by exploiting the structure using \emph{forward substitution}:
+\begin{align*}
+  \begin{pmatrix}
+    l_{11} & 0      & 0 & \cdots & 0 \\
+    l_{21} & l_{22} & 0 & \cdots & 0\\
+    l_{31} & l_{32} & l_{33}& \cdots & 0\\
+    \vdots & \vdots & \vdots & \ddots & \vdots\\
+    l_{n1} & l_{n2} & l_{n3} &\cdots & l_{nn}\\
+  \end{pmatrix}
+  \begin{pmatrix}
+    z_1 \\ z_2 \\ z_3 \\ \vdots \\ z_n
+  \end{pmatrix}
+  &=
+  \begin{pmatrix}
+    b_1 \\ b_2 \\ b_3 \\ \vdots \\ b_n
+  \end{pmatrix}
+\end{align*}
+\begin{align*}
+  \Rightarrow \qquad
+  z_1 &= b_1/l_{11} \\
+  z_2 &= (b_2 - l_{21}z_1)/l_{22} \\
+  \vdots \; &= \quad \vdots\\
+  z_n &= (b_n - l_{n1}z_1 - \cdots - l_{n,n-1}z_{n-1})/l_{nn}
+\end{align*}
+Then, to get from $z$ to $x$, we again solve a triangular system $L^Tx =
+z$, doing something very similar, just in reverse, called \emph{backward
+substitution}:
+\begin{align*}
+  \begin{pmatrix}
+    l_{11} & l_{21}  & l_{31} & \cdots & l_{n1}  \\
+    0 & l_{22} &  l_{32} & \cdots & l_{n2}\\
+    0 & 0 & l_{33}& \cdots & l_{n3}\\
+    \vdots & \vdots & \vdots & \ddots & \vdots\\
+    0 & 0 & 0 &\cdots & l_{nn}\\
+  \end{pmatrix}
+  \begin{pmatrix}
+    x_1 \\ x_2 \\ x_3 \\ \vdots \\ x_n
+  \end{pmatrix}
+  &=
+  \begin{pmatrix}
+    z_1 \\ z_2 \\ z_3 \\ \vdots \\ z_n
+  \end{pmatrix}
+\end{align*}
+\begin{align*}
+  \Rightarrow \qquad
+  x_n &= z_n/l_{nn} \\
+  x_{n-1} &= (z_{n-1} - l_{n,n-1}x_n)/l_{n-1,n-1} \\
+  \vdots \; &= \quad \vdots\\
+  x_1 &= (z_1 - l_{n1}x_n - \cdots - l_{21}x_{2})/l_{11}
+\end{align*}
+
+\paragraph{Generating Multivariate Random Normals}
+We know how to draw the following multivariate random normal $Z$:
+\begin{align*}
+  Z \sim N(0,I)
+\end{align*}
+Just draw a bunch of iid $N(0,1)$ RV's and stack them into a vector.
+
+But suppose we want to draw from more complicated MVN RV's with
+arbitrary mean and covariance matrix
+\begin{align*}
+  X \sim N(\mu, \Sigma)
+\end{align*}
+We do this by the Cholesky decomposition and some simple results for
+Normal RVs. Namely,
+\begin{align}
+  Z \sim N(0,I) \quad \Rightarrow \quad
+  \mu+LZ \sim N(\mu, LL^T)
+  \label{cholalg}
+\end{align}
+{\sl Algorithm}\: Result~\ref{cholalg} suggests a straightforward way
+to draw $X\sim N(\mu,\Sigma)$.
+\begin{enumerate}
+  \item Since $\Sigma$ is a covariance matrix, it is positive definite.
+    So we can compute the Cholesky decomposition $\Sigma=LL^T$.
+  \item Draw $Z\sim N(0,I)$.
+  \item Set $X=\mu+LZ$.
+\end{enumerate}
+
+\subsubsection{Singular Value Decomposition (SVD)}
+
+The singular value decomposition is a useful decomposition that works
+for \emph{any} matrix. Moreover, given the singular value decomposition
+of some matrix $A$, many of properties of $A$ can be read off directly
+from the decomposition.
+
+\begin{thm}
+For an arbitrary $m\times n$ matrix $A$, there exist orthogonal matrices
+$U$ ($m\times m$) and $V$ ($n\times n)$ plus a diagonal matrix
+$\Sigma=diag(\sigma_1, \ldots,\sigma_p)$ where $p=\min\{m,n\}$ such
+that
+\begin{align*}
+  A = U\Sigma V^T
+\end{align*}
+Moreover, supposing that we order the singular values $\sigma_1 \geq
+\sigma_2\geq\cdots\geq \sigma_r\geq \sigma_{r+1}=\cdots = \sigma_p=0$,
+we have that
+\begin{enumerate}
+\item $rank(A)=r$
+\item $null(A)=span\{v_{r+1},\ldots,v_n\}$
+\item $range(A)=span\{u_{1},\ldots,u_r\}$
+\item $\sigma_i = \sqrt{\lambda_i}$ for $i=1,\ldots,p$ where $\lambda_i$
+  is the $i$th largest eigenvalue of $A^TA$.
+\item $v_i$ are orthonormal basis for the domain of $A$.
+\item $u_i$ are orthonormal basis for the range of $A$.
+\end{enumerate}
+\end{thm}
+
+\subsubsection{SVD Intuition}
+
+Geometrically, given an $n\times 1$ vector $x$, the SVD of a matrix $A$
+says that the multiplication $Ax = U\Sigma V^T x$ is a sequence of three
+operations on $x$:
+\begin{enumerate}
+\item Express $x$ in terms of the orthonormal basis defined by the
+  columns of $V$. The multiplication $V^T x$ does this, resulting
+  effectively in a rotation of $x$ from the standard basis for
+  $\mathbb{R}^n$ onto the basis defined by $V$.
+\item Stretch the result of the first step along the $i$th dimension or
+  axis by $\sigma_i$, for $i=1,\ldots,p$. This is a stretching along the
+  axes defined by $V$.
+\item Rotate one final time by $U$, expressing $\Sigma V^Tx$ in terms of
+  the orthonormal basis defined by columns $U$ (rather than $V$ or the
+  standard basis).
+\end{enumerate}
 
 
 \section{Metric Spaces and Sequences}
