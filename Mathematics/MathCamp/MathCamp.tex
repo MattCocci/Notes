@@ -46,9 +46,11 @@
 %% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{amsfonts}
 \usepackage{mathrsfs}
 \usepackage{amsthm} %allows for labeling of theorems
+\numberwithin{equation}{section} % Number equations by section
 \theoremstyle{plain}
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{lem}[thm]{Lemma}
@@ -87,6 +89,8 @@
 
 %% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing,arrows}
 \usepackage{graphicx}
 \usepackage{subfigure}
     %   For plotting multiple figures at once
@@ -111,6 +115,12 @@
 \usepackage{color}
 \definecolor{codegreen}{RGB}{28,172,0}
 \definecolor{codelilas}{RGB}{170,55,241}
+
+% David4 color scheme
+\definecolor{d4blue}{RGB}{100,191,255}
+\definecolor{d4gray}{RGB}{175,175,175}
+\definecolor{d4black}{RGB}{85,85,85}
+\definecolor{d4orange}{RGB}{255,150,100}
 
 
 %% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -191,9 +201,20 @@
 % My additions for math shorthand
 \newcommand{\limn}{\lim_{n\rightarrow\infty}}
 \newcommand{\R}{\mathbb{R}}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
 \newcommand{\C}{\mathbb{C}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\N}{\mathbb{N}}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\Lg}{\mathscr{L}}
 
 
 
@@ -207,24 +228,64 @@
 
 \tableofcontents
 
+\clearpage
+\section{Introduction}
+
+These notes were taken to accompany Princeton's Math Camp for PhD
+students in Economics, Summer 2015. The course was taught by Juan
+Pablo-Xandri; therefore, a decent portion of document reflects his own
+(excellent) notes for the course, as well as many intuitive in-class
+explanations.
+
+However, one key difference is the order and grouping of topics, which
+differs from that of the class. First, I've organized the sections so
+that you can progress (more or less) linearly through the document.
+Second, I typically do examples and applications only once. I could have
+revisited each multiple times and over many sections, adding additional
+complexity and explanations as I hit each new topic. In general, I tried
+to avoid that. Instead, I only work out an example after covering all
+topics and results necessary to understand the most general case.
+That's why you see optimization and dynamic programming at the end.
+That's also why I use this document more like a reference book---you
+only have to look in one place for each application or example.
+
+Lastly, I've included things not covered during Math Camp. This seemed
+like a great opportunity to consolidate notes that I had spread over
+multiple documents on topics such as Linear Algebra, Numerical
+Optimization, differential equations, etc. In some cases, the result is
+disjointed. For example, the linear algebra definitions often cover
+$\Cn$, while I otherwise deal mostly with $\Rn$. These things should be
+smoothed out eventually.
 
 \clearpage
 \section{Linear Algebra}
 
+In this section, we will study vector spaces in $\Rn$ and $\Cn$.  That
+means that we will have space $\Rn$ or $\Cn$ along with some definition
+of sums and products.
+
 \subsection{Matrix Multiplication and Solving Linear Systems}
 
-{\sl Matrix multiplication $Ax$ is the combination of the columns of
-$A$. Each column scaled by the corresponding element of $x$.}\ This is,
+\paragraph{Matrix Multiplication}
+Matrix multiplication $Ax$ is the combination of the columns of $A$,
+with each column scaled by the corresponding element of $x$. This is,
 hands down, one of the simplest, most important, and most practical ways
 of thinking about matrix multiplication.
 
-Being more explicit, and letting $A_{\cdot i}$ denote the $i$th column of $A$ (an $m\times n$ matrix), and letting $x_j$ denote the $j$th element of $n\times 1$ vector $x$, we can express
-\[
+Being more explicit, let $A_{\cdot i}$ denote the $i$th column of $A \in
+\C^{m\times n}$ and let $x_j$ denote the $j$th element of $n\times 1$
+vector $x$. We can express
+\begin{align*}
   A x = x_1 A_{\cdot 1}  + \cdots + x_n A_{\cdot n}
-\]
-Since the result is a combination of the columns of $A$---each an $m\times 1$ vector---we can easily see that the result will also be an $m\times 1$ column vector.
+\end{align*}
+Since the result is a combination of the columns of $A$---each an
+$m\times 1$ vector---we can easily see that the result will also be an
+$m\times 1$ column vector.
 
-This intuition also provides a convenient way to ``pick out'' the $i$th column of matrix $A$ via matrix multiplication: just right-multiply $A$ by an $n \times 1$ vector whose elements are all zero, except for the $i$th element, which equals 1. Example,
+This intuition also provides a convenient way to ``pick out'' the $i$th
+column of matrix $A$ via matrix multiplication: just right-multiply $A$
+by an $n \times 1$ vector whose elements are all zero, except for the
+$i$th element, which equals 1. Example,
 \begin{align*}
   \begin{bmatrix}
   8 & 1 & 6 \\
@@ -241,36 +302,39 @@ This intuition also provides a convenient way to ``pick out'' the $i$th column o
   =
   \begin{bmatrix} 1 \\ 5 \\ 9 \\ \end{bmatrix}
 \end{align*}
+
+\paragraph{Solving Systems of Linear Equations}
 Linear algebra's founding problem is likely the task of solving the
 simple system of linear equations:
 \begin{equation}
     \label{canonical}
     Ax = b
+    \qquad x,b\in \Rn
+    \quad A \in \Rnn
 \end{equation}
-For now, assume $A$ is $p\times p$. There are two ways to think of this
-equation:
+There are two ways to think of this equation:
 \begin{enumerate}
-    \item {\sl Row Interpretation}: We think of each row in the equation
-      as defining a line in $p$ dimensional place. The solution is where
-      those lines intersect.
-    \item {\sl Column Interpretation}: A solution to the equation exists
-      if and only if $b$ is in the column space of $A$. More explicitly,
-      there is a solution if and only if $b$ can be written as a linear
-      combination of the $p$ vectors defined by the columns of $A$.
+  \item {\sl Row Interpretation}: We think of each row in the equation
+    as defining a line in $n$ dimensional place. The solution is where
+    those lines intersect.
+  \item {\sl Column Interpretation}: A solution to the equation exists
+    if and only if $b$ is in the column space of $A$. More explicitly,
+    there is a solution if and only if $b$ can be written as a linear
+    combination of the $n$ vectors defined by the columns of $A$.
 \end{enumerate}
-The latter interpretation is very powerful. We see that the column space
-of $A$---the set of all linear combinations of the columns of $A$---is
-crucial to characterizing the matrix $A$.
+The latter interpretation is especially powerful. We see that the column
+space of $A$---the set of all linear combinations of the columns of
+$A$---is crucial to characterizing the matrix $A$.
 
 For example, if the columns of $A$ are linearly independent, then the
-matrix, in a sense, ``covers'' the entire $p$-dimensional space. We can
-thus solve \emph{any} equation like Equation \ref{canonical} because $b$
-will certainly lie within the column space of $A$. Thus, we can find
-some $x$ such that $Ax=b$.
+matrix ``spans'' the entire $n$-dimensional space. We can thus solve
+\emph{any} equation like Equation~\ref{canonical} because $b$ will
+certainly lie within the column space of $A$. Thus, we can find some $x$
+that combines the columns of $A$ in such a way that $Ax=b$.
 
 We only potentially run into problems if the columns aren't linearly
-independent. So if the rank of the matrix is $k<p$, only a
-$k$-dimensional hyperplance embedded within $\mathbb{R}^p$ is covered by
+independent. So if the rank of the matrix is $k<n$, only a
+$k$-dimensional hyperplance embedded within $\mathbb{R}^n$ is covered by
 the columns of $A$. And $b$ might not lie in that subspace. This very
 possibility manifests itself in the non-invertability of $A$, which
 prevents us from trivially solving the system via $x = A^{-1}b$, for the
@@ -282,6 +346,73 @@ Here are some terms we use to describe matrices and operations with
 matrices. Unless otherwise specified, the matrices are assumed to be
 complex $m\times n$ matrices so that we can capture the most general
 cases.
+
+\begin{defn}{(Subspace)}
+$V\subseteq \Rn$ is a \emph{vector subspace} of $\Rn$ if and only if
+\begin{enumerate}
+  \item $0 \in V$
+  \item $x,y\in V$ implies that $\alpha x + \beta y \in V$ for all
+    $\alpha,\beta\in \R$.
+\end{enumerate}
+\end{defn}
+
+\begin{defn}{(Base)}
+A \emph{base} for vector space $\Cn$ is a set of vectors
+$\mathcal{B}=\{b_1,\ldots,b_n\}$ such that for any $x\in \Cn$, there
+exist $\{\alpha_i\}_{i=1}^n \subset \C$ such that we can express $x$ as
+\begin{align}
+  x = \sum^n_{i=1} \alpha_i b_i
+  \label{defn:basis}
+\end{align}
+Of course, we can always restrict everything from $\Cn$ and $\C$ to
+simply $\Rn$ and $\R$.
+
+To determine if $\mathcal{B}$ is a base for $\Cn$, arrange the vectors
+as columns in a matrix
+\begin{align*}
+  V_\mathcal{B} = \begin{pmatrix} b_1 & b_2 &\cdots & b_n \end{pmatrix}
+\end{align*}
+The vectors in $\mathcal{B}$ form a basis for $\Cn$ if and only if
+$V_\mathcal{B}$ is invertible. If that's the case, then we can always
+solve
+\begin{align*}
+  V_\mathcal{B} \;\alpha = x
+  \qquad\Leftrightarrow\qquad
+  \alpha = V_\mathcal{B}^{-1} x
+  \qquad \forall x\in \Rn
+\end{align*}
+and determine the $\alpha_i$ terms as in Equation~\ref{defn:basis} such
+that $x \in \Rn$ can always be expressed as a linear combination of
+elements in $\mathcal{B}$.
+\end{defn}
+
+\begin{defn}{(Canonical Base)}
+For $\Rn$, we define the \emph{canonical base}
+$\mathcal{B}=\{e_1,\ldots,e_n\}$ as
+\begin{align*}
+  e_1 =
+  \begin{pmatrix}
+  1 \\ 0 \\ \vdots \\ 0 \\ 0
+  \end{pmatrix}
+  \qquad
+  e_2 =
+  \begin{pmatrix}
+  0 \\ 1 \\ \vdots \\ 0 \\ 0
+  \end{pmatrix}
+  \quad \cdots \quad
+  e_{n-1} =
+  \begin{pmatrix}
+  0 \\ 0 \\ \vdots \\ 1 \\ 0
+  \end{pmatrix}
+  \qquad
+  e_n =
+  \begin{pmatrix}
+  0 \\ 0 \\ \vdots \\ 0 \\ 1
+  \end{pmatrix}
+\end{align*}
+That is, base vector $e_i$ is zero everywhere except for the $i$the
+element, which equals unity.
+\end{defn}
 
 \begin{defn}
 The \emph{nullspace} of a matrix $A$ ($m\times n$), which is denoted
@@ -334,20 +465,102 @@ Matrix $A$ is \emph{sparse} if its entries are mostly zeroes.
 Matrix $D=(d_{ij})_{n\times n}$ is a \emph{diagonal} matrix if and only
 if $d_{ij}=0$ for all $i\neq j$. That is, the only positive entries are
 on the diagonal, $d_{ii}$ for all $i$.
+
+Diagonal matrices are exceptionally nice to work with since they permit
+us to calculate higher powers of the matrix very easily. In particular,
+\begin{align*}
+  D =
+  \begin{pmatrix}
+    d_1 & 0 & \cdots & 0 \\
+      0 & d_2 & \cdots & 0 \\
+    \vdots & \vdots & \ddots & \vdots \\
+    0 & 0 & \cdots & d_n \\
+  \end{pmatrix}
+  \quad\Rightarrow\quad
+  D^k =
+  \begin{pmatrix}
+    d_1^k & 0 & \cdots & 0 \\
+      0 & d_2^k & \cdots & 0 \\
+    \vdots & \vdots & \ddots & \vdots \\
+    0 & 0 & \cdots & d_n^k \\
+  \end{pmatrix}
+  \qquad
+  \forall k \in \R
+\end{align*}
+This even allows us to define $\sqrt{D}$ for $k=1/2$.
+
+Moreover, although matrix multiplication does \emph{not} commute in
+general, it does when dealing with diagonal matrices:
+\begin{align*}
+  C =
+  \begin{pmatrix}
+    c_1 & \cdots & 0 \\
+    \vdots & \ddots & \vdots \\
+    0 & \cdots & c_n \\
+  \end{pmatrix}
+  \quad
+  D =
+  \begin{pmatrix}
+    d_1 & \cdots & 0 \\
+    \vdots & \ddots & \vdots \\
+    0 & \cdots & d_n \\
+  \end{pmatrix}
+  \quad\Rightarrow\quad
+  CD =
+  \begin{pmatrix}
+    c_1d_1 & \cdots & 0 \\
+    \vdots & \ddots & \vdots \\
+    0 & \cdots & c_n d_n \\
+  \end{pmatrix}
+\end{align*}
 \end{defn}
 
 \begin{defn}{(Tridiagonal)}
 Matrix $A$ is \emph{tridiagonal} if it has three diagnoals, for example
 \begin{align*}
   A =
-  \begin{bmatrix}[r]
+  \begin{pmatrix}[r]
    2 & -1 &  0 &  0 \\
   -1 & 2 & -1 &  0 \\
    0 & -1 &  2 & -1 \\
    0 &  0 & -1 &  2 \\
-  \end{bmatrix}
+  \end{pmatrix}
 \end{align*}
 \end{defn}
+
+\begin{defn}{(Similar)}
+\label{defn:similar}
+Matrices $A,B \in \Rnn$ are \emph{similar}, denoted $A\sim B$, if there
+exists an invertible matrix $V\in \Rnn$ such that
+\begin{align*}
+  B = V^{-1} A V
+\end{align*}
+Calculating higher powers of matrix $B$ also have a nice relationship to
+higher powers of $A$:
+\begin{align*}
+  B^k &= \left(V^{-1} A V\right)^k \\
+      &= \underbrace{\left(V^{-1} A V\right)\left(V^{-1} A V\right)
+      \cdots  \left(V^{-1} A V\right)}_{k \;\text{times}} \\
+      &= V^{-1} A^k V
+\end{align*}
+This will prove extremely useful in the next definition.
+\end{defn}
+
+\begin{defn}{(Diagonalizable)}
+Matrix $A$ is \emph{diagonalizable} if it is similar to some diagonal
+matrix $D$.
+\end{defn}
+\begin{rmk}
+This is hugely important for calculating powers of matrices. We saw that
+powers of diagonal matrices are extremely easy to compute, while
+Definition~\ref{defn:similar} also showed a nice and easy way to relate
+powers of $A$ to powers of $D$. So we can bypass the tougher problem of
+computing $A^k$ and simply calculate $V^{-1} D^k V$.
+
+The question of whether matrices $V$ and $D$ exist for arbitrary $A$
+will be answered in Section~\ref{subsec:eigenvaluedecomp}, which covers
+the Eigenvalue Decomposition.
+\end{rmk}
 
 Next, we want to generalize the concepts of ``positive'' and
 ``negative'' to matrices. We could go element by element and require a
@@ -451,15 +664,39 @@ and satisfying the following properties
 \end{defn}
 
 
-\begin{prop}{\emph{(Facts about Determinants)}}
+\begin{prop}{\emph{(Properties of Determinants)}}
 Given square matrices $A,B\in \R^{n\times n}$, it follows that
 \begin{enumerate}
   \item $\det(AB) = \det(A) \det(B)$
   \item Matrix $A$ is invertible if and only if $\det(A) \neq 0$.
   \item $\det(A^{-1}) = \frac{1}{\det(A)}$
   \item $\det(A) = \det(A^T)$
+  \item For similar matrices $A\sim B$, we have $\det(A) = \det(B)$.
+  \item For diagonal matrix $D=\diag\{\lambda_1,\ldots,\lambda_n\}$,
+    $\det(D) = \prod^n_{i=1} \lambda_i$.
 \end{enumerate}
 \end{prop}
+\begin{proof}
+We prove each in turn
+\begin{enumerate}
+  \item
+  \item
+  \item
+  \item
+  \item Since $A\sim B$, there exists an invertible $V$ such that
+    \begin{align*}
+      B &= V^{-1} A V\\
+      \Rightarrow\quad
+      \det(B) &= \det(V^{-1} A V)\\
+      \text{By (1)} \quad\quad
+      \det(B) &= \det(V^{-1}) \det(A) \det(V)\\
+      \text{By (3)} \quad\quad
+      \det(B) &= \frac{1}{\det(V)} \det(A) \det(V)\\
+      \Rightarrow\quad
+      \det(B) &= \det(A)
+    \end{align*}
+\end{enumerate}
+\end{proof}
 
 \subsection{The Eigenvalue Problem}
 
@@ -477,7 +714,8 @@ where $\lambda$ is some scalar, called an \emph{eigenvalue}.  A
 The restriction that $x\neq 0$ is important since zero is always a
 solution, but it's a dumb trivial one we don't really care about.  In
 other words, eigenvectors are those non-zero vectors that are simply
-\emph{rescaled} by matrix $A$.
+\emph{rescaled} by matrix $A$. They're kind of like fixed points where
+you don't care about changes in proportionality.
 \end{defn}
 
 \begin{defn}
@@ -526,11 +764,34 @@ is called the \emph{geometric multiplicty of $\lambda$}, denoted
 $g(\lambda)$.
 \end{defn}
 
-\begin{defn}{(Eigenspace)}
-Given an eigenvalue $\lambda$ of some matrix $A$, the set of all
-eigenvectors corresponding to $\lambda$ and the zero vector form a
-linear subspace called the \emph{eigenspace of $\lambda$}.
-\end{defn}
+\begin{prop}{\emph{(Eigenspace)}}
+Given eigenvalue $\lambda$ of some matrix $A\in\Rnn$, define the set of
+all eigenvectors corresponding to $\lambda$:
+\begin{align*}
+  V_\lambda = \{ x\in \Rn \; | \; Ax = \lambda x \}
+\end{align*}
+Then $V_\lambda$ is a linear subspace called the \emph{eigenspace of
+$\lambda$}. Hence, linear combinations of eigenvectors are also
+eigenvectors.
+\end{prop}
+\begin{proof}
+First, we know that $0\in V_\lambda$ since it is always the case that
+$A\cdot 0=\lambda \cdot 0$ for any $\lambda$.
+
+Next, suppose $x,y \in V_\lambda$ and $\alpha,\beta\in\R$. Then
+\begin{align*}
+  A(\alpha x + \beta y)
+  &= \alpha Ax + \beta Ay \\
+  &= \alpha \lambda x + \beta \lambda y
+  \qquad \text{since $x,y\in V_\lambda$} \\
+  \Rightarrow\quad
+  A(\alpha x + \beta y)
+  &= \lambda (\alpha x + \beta y)
+\end{align*}
+which implies that $\alpha x + \beta y \in V_\lambda$ so that
+$V_\lambda$ is a subspace of $\Rn$.
+\end{proof}
+
 
 \subsection{The Generalized Eigenvalue Problem}
 
@@ -576,27 +837,104 @@ $A$ has $n$ (positive) singular values   && $A$ has $r<n$ singular values
 
 
 \subsection{Matrix Decompositions}
+\label{subsec:decomp}
 
 Matrix decompositions are useful for a few key reasons
 \begin{enumerate}
+\item They more explicitly express properties of matrices
+\item They often suggest a geometric intepretation of matrix properties
+  or operations.
 \item They express an arbitrary matrix $A$ in some canonical form, allowing
   the application of standard, more efficient algorithms and procedures
-  to invert the matrix $A$, solve a system $Ax =b$, etc.
-\item They more explicitly express the properties of $A$ 
+  to invert the matrix, solve a system like $Ax =b$, etc.
 \end{enumerate}
 
-\subsubsection{Background Intuition}
+\subsubsection{Eigenvalue Decomposition}
+\label{subsec:eigenvaluedecomp}
 
-Often, for any arbitrary matrix $A$, we want to consider the geometric
-interpretation of $Ax$ for some vector $x$. because they often often
-attempt to express the matrix $A$ as simpler matrices with more explicit
-geometric intepretations. 
+\begin{thm}
+\label{thm:eigendecomp}
+Matrix $A\in \Rnn$ is diagonalizable if and only if there exist $n$
+linearly independent eigenvectors of $A$. Then, we can decompose matrix
+$A$ as follows:
+\begin{align*}
+  D = V^{-1} A V
+\end{align*}
+where $D$ is a diagonal matrix of the eigenvalues and $V$ is a matrix
+whose columns are the corresponding eigenvectors of $A$.
+\end{thm}
+\begin{note}
+The matrix $D$ is allowed to have repeated eigenvalues. It's only matrix
+$V$ where we require ``distinctness'' by having the eigenvectors be
+linearly independent.
+\end{note}
 
-matrix multiplication
-When considering matrix decompositions, it often helps to consider the
-geometric interpretation of matrices and matrix multiplication. Often,
-decompositions simply take arbitrary matrices and express them in a way
-more amenable to direct geometric interpretation
+\begin{proof}
+Suppose that we have eigenvalues $\{\lambda_1,\ldots,\lambda_n\}$ and
+corresponding eigenvectors $\{v_1,\ldots,v_n\}$.
+Construct $D$ and $V$ as
+\begin{align*}
+  D &= \diag\{\lambda_1, \ldots, \lambda_n\} \\
+  V &=
+  \begin{pmatrix}
+    v_1 & \cdots & v_n
+  \end{pmatrix}
+\end{align*}
+where the eigenvectors of $A$ are used as separate columns in matrix
+$V$.  Since we assumed that the eigenvectors are linearly independent,
+$V$ is full rank and invertible. Therefore, $V^{-1}$ is well-defined.
+
+So we are left with the task of proving
+\begin{align*}
+  D = V^{-1} A V
+  \quad\Leftrightarrow\quad
+  VD = A V
+\end{align*}
+To prove, simply write things out
+\begin{align*}
+  AV = A
+  \begin{pmatrix}
+    v_1 & \cdots & v_n
+  \end{pmatrix}
+  &=
+  \begin{pmatrix}
+    Av_1 & \cdots & Av_n
+  \end{pmatrix} \\
+  &=
+  \begin{pmatrix}
+    \lambda_1 v_1 & \cdots & \lambda_n v_n
+  \end{pmatrix} \\
+  &=
+  \begin{pmatrix}
+    v_1 & \cdots & v_n
+  \end{pmatrix}
+  \begin{pmatrix}
+    \lambda_1 & \cdots & 0 \\
+    \vdots & \ddots & \vdots \\
+    0 & \cdots & \lambda_n
+  \end{pmatrix}\\
+  \Rightarrow\quad
+  AV &= VD
+\end{align*}
+\end{proof}
+
+\begin{cor}
+$A$ is diagonalizable if and only if, for all $\lambda$ eigenvalues,
+\begin{align}
+  \label{cond:dimmult}
+  \dim(V_\lambda)=m(\lambda)
+\end{align}
+Repeating condition~\ref{cond:dimmult} in words: if eigenvalue $\lambda$
+is a $k$-time repeated root of characteristic polynomial $P_A(\lambda)$,
+there are $k$ eigenvectors. Only if this is true for all eigenvalues
+will $A$ be diagonalizable.
+\end{cor}
+\begin{proof}
+If this is true, there will be $n$ linearly independent eigenvectors for
+$A\in \Rnn$. Then we can diagonalize $A$ according to
+Theorem~\ref{thm:eigendecomp}.
+\end{proof}
+
 
 \subsubsection{Schur and QZ Decomposition}
 
@@ -780,7 +1118,168 @@ operations on $x$:
   standard basis).
 \end{enumerate}
 
+\subsection{Symmetric Matrices}
 
+Symmetric matrices are a very special class of matrices. They come up a
+lot since covariance matrices and Hessian matrices are symmetric.
+Therefore, this section will detail many nice results that are unique to
+symmetric matrices.
+
+\begin{thm}
+\label{thm:symmetric-diag}
+If $A$ is a symmetric matrix, then $A$ is diagonalizable. Moreover,
+there exists a orthogonal $V$ such that $V^T = V$ so that
+\begin{align*}
+  D = V^T A V
+\end{align*}
+\end{thm}
+
+\begin{thm}
+\label{thm:possemidef-eigenval}
+Symmetric matrix $A\in\Rnn$ is positive semi-definite if and only if all
+eigenvalues are nonnegative. The matrix is positive definite if and only
+if all eigenvalues are strictly positive.
+\end{thm}
+
+\begin{proof}
+First, some setup that will be useful for both directions of the proof.
+
+By Theorem~\ref{thm:symmetric-diag}, we can diagonalize matrix $A$ via
+an eigenvalue decomposition
+\begin{align*}
+  A = V^T D V
+\end{align*}
+where $D=\diag\{\lambda_1,\ldots,\lambda_n\}$ is a matrix of the
+eigenvalues of $A$.  Since diagonal matrices are dope, we can define
+$\sqrt{D}=\diag\{\sqrt{\lambda_1},\ldots,\sqrt{\lambda_n}\}$ such that
+$\sqrt{D}\sqrt{D}=D$. This allows us to write
+\begin{align*}
+  A &= V^T \sqrt{D} \sqrt{D} V
+  = \left(\sqrt{D} V\right)^T \sqrt{D} V
+\end{align*}
+Positive semi-definiteness turns on the behavior of
+\begin{align*}
+  x^T A x &=
+  x^T  \left[\left(\sqrt{D} V\right)^T \sqrt{D} V\right] x
+\end{align*}
+So define $z = \sqrt{D}Vx$, which implies
+\begin{align*}
+  z^T z &:=x^T  \left[\left(\sqrt{D} V\right)^T \sqrt{D} V\right] x
+  = x^T A x\\
+  \Leftrightarrow \qquad
+  &=  \sum^n_{i=1} z_i^2 = \left[N_2(z)\right]^2
+\end{align*}
+where and $N_2$ is the standard Euclidean norm. We'll
+use this shorthand $z\in\Rn$ for both directions of the proof.
+
+(Semidefinite $\Rightarrow$)
+%To draw a contradiction, suppose $A$ is
+%positive semi-definite, but there exists a negative eigenvalue,
+%$\lambda_i$. Then choose $x = e_i$, the $i$th basis vector with a one
+%where the negative eigenvalue is and zeros everywhere else.
+
+%Characteristic of assumed positive semi-definiteness
+%\begin{align*}
+%x^T A x &\geq 0 \qquad \forall x\in\R\\
+%\Leftrightarrow\quad
+%z^T z = \sum^n_{i=1} z^2_i = \left[N_2(z)\right]^2&\geq 0
+%\end{align*}
+%where $N_2$ is the standard Euclidean norm.
+
+%Now by the definition of a norm,
+
+
+(Semidefinite $\Leftarrow$)
+Since all eigenvalues are nonnegative, $\sqrt{D}$ is a matrix of only
+real (rather than complex) numbers. Therefore, $z = \sqrt{D} Vx$ is a
+real vector in $\Rn$ for an $x\in\Rn$, implying that
+\begin{align*}
+  x^T A x = z^T z =
+  \sum^n_{i=1} z_i^2 &\geq 0
+\end{align*}
+That is precisely the definition of positive semi-definite.
+
+(Definite $\Leftrightarrow$)
+For both direction of the positive definite proof, the matrix is known
+to be at least positive semi-definite.  If we take the $\Rightarrow$
+direction, it's assumed positive definite, and is therefore trivially
+positive semidefinite. In the $\Leftarrow$ direction, we assume positive
+(hence nonnegative) eigenvalues, which implies that $A$ is positive
+semidefinite by the first part of this proof.
+
+So regardless of the direction, we know that $A$ is at least positive
+semi-definite, which means $x^TAx\geq 0$ for all $x\in\Rn$. Now we ask
+``When is it the case that $x^T A x= 0$?'' Well, we have that whenever
+\begin{align*}
+  x^T A x = z^T z = \sum^n_{i=1} z^2_i = 0
+  \quad\Leftrightarrow\quad
+  z=0
+\end{align*}
+And we get $z=0$ whenever
+\begin{align}
+  \label{eq:posdefz}
+  z = \sqrt{D}V x = 0
+\end{align}
+So our question is now ``Which $x\in\Rn$ satisfy
+Equation~\ref{eq:posdefz}?'' Obviously $x=0$ satisfies it. Are there any
+other candidates?
+
+Well, there is another candidate if and only if $\sqrt{D}V$ is singular
+(non-invertible). That would imply
+\begin{align*}
+  0 = \det\left(\sqrt{D}V\right)
+  = \det\left(\sqrt{D}\right) \det\left(V\right)
+\end{align*}
+Now we know that $V$ is invertible by Theorem~\ref{thm:eigendecomp}, the
+Eigenvalue Decomposition Theorem, so $\det(V)>0$. When will we
+have $\det\left(\sqrt{D}\right)=0$:
+\begin{align*}
+  \det\left(\sqrt{D}\right)= \prod_{i=1}^n \sqrt{\lambda_i} =0
+  \quad\Leftrightarrow\quad
+  \exists \lambda_i = 0
+\end{align*}
+And that guarantees the eigenvalues are strictly positive if and only if
+$A$ is positive definite.
+
+So just to recap and spell that out more clearly. Regardless of the
+proof direction, we know that $A$ is positive semidefinite which insures
+that the eigenvalues are nonnegative. For the $\Rightarrow$ direction,
+if $A$ is positive definite, it must be the case that all eigenvalues
+are strictly positive, otherwise $\sqrt{D}$ would be singular and we
+could find a nonzero $x\in\Rn$ such that Equation~\ref{eq:posdefz}
+holds. That would violate the definite of positive definite.
+For the $\Leftarrow$ direction, if the eigenvalues are strictly
+positive, then $\sqrt{D}$ is invertible (nonsingular) just like $V$, so
+there would be only a single unique solution to
+Equation~\ref{eq:posdefz}, $x=0$. That's the definition of positive
+definite.
+\end{proof}
+
+\begin{cor}
+Negative semi-definite matrices have nonpositive eigenvalues. Negative
+definite matrices have strictly negative eigenvalues.
+\end{cor}
+
+\subsection{Quadratic Forms}
+
+Quadratic functions map $f:\R\rightarrow\R$ and look like $f(x)=ax^2 +
+bx+c$. Quadratic forms are a generalization that expand the domain from
+$\R$ to $\Rn$.
+
+\begin{defn}{(Quadratic Form)}
+A \emph{quadratic form} is a function $f:\Rn\rightarrow\R$ of the form
+\begin{align*}
+  f(x) = (x-b)^TA(x-b)
+  \qquad x,b\in\Rn \quad A\in\Rnn
+\end{align*}
+\end{defn}
+
+Now this is a very short subsection, but we'll see in later sections
+that quadratic forms are extremely useful for characterizing convex
+functions and differentiability via function approximations.
+
+
+\clearpage
 \section{Metric Spaces and Sequences}
 
 Take any arbitrary set $X$. Metric spaces are simply some pair $(X,d)$
@@ -794,7 +1293,7 @@ will be sufficiently general to capture any set $X$ for which a distance
 function or \emph{metric} (satisfying certain properties) can be
 defined.
 
-\subsection{Basic Building Blocks}
+\subsection{Supremum, Infimum, and Completeness of $\R$}
 
 
 \begin{defn}{(Supremum)}
@@ -2489,22 +2988,414 @@ can find $\bar{x}$ such that
 \end{align*}
 \end{proof}
 
+\clearpage
+\section{Differentiability}
 
-\section{Convexity, Optimization, and Fixed Points}
+Note that we mostly use open sets because the derivative needs to be
+defined from both sides of the point.
 
-\subsection{Convex Optimization}
+\subsection{Differentiability: $\R\rightarrow\R$}
 
-Convex Optimization is the study of convex sets and functions.
+\begin{defn}{(Derivative in $\R$)}
+\label{defn:derivative}
+Given a function $f:X\rightarrow\R$, we define define the
+\emph{derivative} of $f$ at $x\in X$ as
+\begin{align*}
+  f'(x) := \lim_{\delta\rightarrow0}
+  \frac{f(x+\delta)-f(x)}{\delta}
+\end{align*}
+provided that this limit exists. If the limit does not exist, the
+derivative is not defined.
+\end{defn}
+
+\begin{defn}{(Differentiable in $\R$)}
+\label{defn:diffable}
+The function $f:\R\rightarrow\R$ is \emph{differentiable} at $x\in\R$ if
+there exists an $m_x\in\R$, an $\varepsilon>0$, and a \emph{remainder}
+function $r_x:(-\varepsilon,\varepsilon)\rightarrow\R$ such that
+\begin{align}
+  \label{eq:diffapprox}
+  f(x+\delta)-f(x) = m_x \delta + r_x(\delta)
+  \qquad \forall \delta\in(-\varepsilon,\varepsilon), \; \delta \neq 0
+\end{align}
+with remainder function $r_x$ such that
+\begin{align}
+  \label{lim:remainder}
+  \lim_{\delta\rightarrow 0}
+  \frac{r_x(\delta)}{\delta}=0
+\end{align}
+Whereas Definition~\ref{defn:derivative} provided the usual analysis
+definition of a derivative, this definition provides more of a
+``function approximation'' definition. Specifically, a function is
+differentiable at $x$ if it is approximately linear in some neighborhood
+of $x$.  Line~\ref{lim:remainder} tells us that ``approximately'' here
+means that the remainder or approximation error be much smaller than
+the size of the increment around $x$. In other words, the remainder is
+quantitatively unimportant, and the linear approximation is (Larry David
+voice) pretty, pretty good.
+
+Of course, this definition is equivalent to
+Definition~\ref{defn:derivative} in the sense that ``differentiability
+at $x$'' is equivalent to ``the derivative exists $x$'', in accordance
+with colloquial usage. And that equivalence is precisely the next
+theorem.
+\end{defn}
+
+\paragraph{Main Idea} The whole point of differentiability is to
+approximate increments of the function $f(x+\delta)-f(x)$ by functions
+of the increment $(x+\delta)-x=\delta$. We see this clearly in
+Equation~\ref{eq:diffapprox}.
+
+\begin{thm}
+$f$ is differentiable at $x$ if and only if the derivative $f'(x)$
+exists. Moreover, $f'(x)=m_x$ where $m_x\in\R$ is the slope used in the
+approximation.
+\end{thm}
+\begin{proof}
+($\Rightarrow$) Suppose that $f$ is differentiable at $x$. Then there
+exist $m_x$ and $r_x$ such that
+\begin{align*}
+  f(x+\delta)-f(x) = m_x\delta + r_x(\delta)
+\end{align*}
+Dividing by $\delta$ and taking the limit,
+\begin{align*}
+  f'(x)=\lim_{\delta\rightarrow 0}
+  \frac{f(x+\delta)-f(x)}{\delta}
+  &= \frac{m_x\delta + r_x(\delta)}{\delta}\\
+  &= m_x + \lim_{\delta\rightarrow 0} \frac{r_x(\delta)}{\delta}\\
+  \text{By assumption}\quad
+  &= m_x + 0 = m_x
+\end{align*}
+Hence, the limit exists and equals $m_x$, therefore $f'(x)=m_x$.
+
+
+($\Leftarrow$) Suppose that the derivative $f'(x)$ exists.  Then
+Equation~\ref{eq:diffapprox} suggests how to back out and define
+$r_x(\delta)$:
+\begin{align*}
+  r_x(\delta) := f(x+\delta)-f(x) - f'(x)\delta
+\end{align*}
+Now let's check that this thing goes to zero more quickly than $\delta$:
+\begin{align*}
+  \lim_{\delta\rightarrow 0}
+  \frac{r_x(\delta)}{\delta}
+  &=
+  \frac{f(x+\delta)-f(x) - f'(x)\delta}{\delta}\\
+  &=
+  \lim_{\delta\rightarrow 0}
+  \frac{f(x+\delta)-f(x)}{\delta}
+  -f'(x) \\
+  &= f'(x) -f'(x)=0
+\end{align*}
+So we just take $m_x=f'(x)$.
+\end{proof}
+
+\subsection{Differentiability: $\Rn\rightarrow\R$}
+
+
+We want to define derivatives for functions from $\Rn$ to $\R$, similar
+to what we did in the last subsection. But things are slightly more
+complicated.  Specifically, in $\R$, it's quite clear how to define the
+derivative. Pick a point like $x=1$ and see how much the graph of the
+function changes for small steps to the left and right of $x$. But that
+simplicity follows from the domain being $\R$ rather than $\Rn$. In
+$\Rn$, we'll see that we can move in more than one direction within the
+domain.
+
+Take a simple case, and consider a function $f:\R^2\rightarrow \R$.
+Notice that you can step in \emph{any} direction from $x$. Of course,
+there are a few ``natural'' directions to step, like in the direction of
+the $x$ or $y$ axes. These are like the north, south, east, west
+directions. But really, you can step in \emph{any} direction in between.
+So when talking about the derivative, we need to specify not only how
+the function is changing, but the \emph{direction} that we're stepping
+in when we compute that change. That leads us to the definition of the
+\emph{directional} derivative.
+\begin{figure}[htpb!]
+\centering
+\begin{tikzpicture}[xscale=2, shorten >= -3pt, shorten <= -3pt]
+  \draw[d4black, <->] (0,5.5) node[left] {$f(x)$} -- (0,0) -- (3.5,0) node[below] {$x$};
+  \draw[d4blue, ultra thick, domain=0.05:3] plot (\x, {-pow(\x,2)+3.5*\x+1});
+  \draw[d4gray, thick, domain=0.05:2] plot (\x, {1.5*\x+2});
+  \draw[d4gray, thick, dashed] (1,0.1) -- (1,3.4);
+  \node[d4black] at (1,-0.3) {$x=1$};
+\end{tikzpicture}
+\end{figure}
+
+\begin{defn}{(Directional Derivative in $\Rn$)}
+Given function $f:\Rn\rightarrow\R$, vector $v\in\Rn$, and point $x\in
+\Rn$, define a function of one variable only
+\begin{align*}
+  \varphi_v(t) = f(x+tv)
+\end{align*}
+You can think of this function as starting at point $f(x)$ and tracing
+out points on the graph or surface of $f$ in the direction of vector
+$v$, for \emph{any} possible direction.
+
+From there, define the \emph{directional derivative} of $f$ at point $x$
+in direction $v$ as
+\begin{align*}
+  T_x(v) := \varphi_v'(0)
+  = \lim_{t\rightarrow 0} \frac{\varphi_v(t)-\varphi_v(0)}{t}
+\end{align*}
+Again, this holds for \emph{any} direction $v\in\Rn$. In the next
+definition, we define the familiar concept of partial derivatives, which
+are directional derivatives in the direction of the principal axes or
+``canonical base.''
+\end{defn}
+
+\begin{defn}{(Partial Derivatives)}
+Given $f:\Rn\rightarrow\R$, the \emph{partial derivative} at $x\in\Rn$
+in canonical basis direction $i$ is defined as
+\begin{align*}
+  f_i(x) := T_x(e_i) = \frac{\partial f}{\partial x_i}
+\end{align*}
+Intuitively, move only in direction $e_i$ and see how the function
+changes. Hold all other function arguments fixed. This is equivalent to
+movement in the direction of the axes.
+\end{defn}
+
+\begin{defn}{(Gradient)}
+For function $f:\Rn\rightarrow\R$, define the \emph{gradient} of $f$ as
+\begin{align*}
+  \nabla f :=
+  \begin{pmatrix}
+    f_1(x) & \cdots & f_n(x)
+  \end{pmatrix}^T \in \Rn
+\end{align*}
+\end{defn}
+
+We now want to consider the subject of ``differentiability,'' which, as
+in the last subsection, refers to whether we can construct a good
+approximation of a function in the neighborhood of some point---this
+time using a \emph{hyperplane} in $\Rn$ around that point (rather than
+just a line) or using a quadratic form.  Approximation by a hyperplane
+is possible if the function is at least 1st order differentiable;
+approximation by quadratic form if it is at least 2nd order
+differentiable.  Again, we will ensure that the approximations are
+``good'' by requiring the approximation error to vanish relative to size
+of the increment $\delta$.
+
+\begin{defn}{(1st Order Differentiable in $\Rn$)}
+\label{defn:diffableRn}
+The function $f:\Rn\rightarrow\R$ is \emph{1st order differentiable} at
+$x\in\R$ if there exists a vector $m_x\in\Rn$, an $\varepsilon>0$, and a
+\emph{remainder} function $r_x:B_0(\varepsilon)\rightarrow\R$ such that
+\begin{align}
+  \label{eq:diffapproxRn}
+  f(x+\delta)-f(x) = m_x^T \delta + r_x(\delta)
+  \qquad \forall \delta\in B_0(\varepsilon), \; \delta \neq 0
+\end{align}
+with remainder function $r_x$ such that
+\begin{align}
+  \label{lim:remainderRn}
+  \lim_{\delta\rightarrow 0}
+  \frac{r_x(\delta)}{N_2(\delta)}=0
+\end{align}
+with the key difference from the earlier definition being $N_2(\delta)$
+in the denominator, rather than just $\delta$.
+\end{defn}
+
+\begin{defn}{(2nd Order Differentiable in $\Rn$)}
+\label{defn:2diffableRn}
+The function $f:\Rn\rightarrow\R$ is \emph{2nd order differentiable} at
+$x\in\R$ if there exists a vector $m_x\in\Rn$, a matrix $H\in\Rnn$, an
+$\varepsilon>0$, and a \emph{remainder} function
+$r_x:B_0(\varepsilon)\rightarrow\R$ such that
+\begin{align}
+  \label{eq:2diffapproxRn}
+  f(x+\delta)-f(x)
+  = m_x^T \delta
+  + \frac{1}{2}\delta^T H \;\delta
+  + r_x(\delta)
+  \qquad \forall \delta\in B_0(\varepsilon), \; \delta \neq 0
+\end{align}
+with remainder function $r_x$ such that
+\begin{align}
+  \label{lim:2remainderRn}
+  \lim_{\delta\rightarrow 0}
+  \frac{r_x(\delta)}{[N_2(\delta)]^2}=0
+\end{align}
+Notice that we square the denominator in Limit~\ref{lim:2remainderRn}
+relative to the case of first order differentiability.
+
+Moreover, it can be proved that $m=\nabla f$ and that $H$ has entries
+$H_{ij} = f_{ij}(x) = \frac{\partial^2 f}{\partial x_i\partial x_j}$,
+i.e.\ it is a symmetric matrix of second derivatives called the
+\emph{Hessian Matrix}.
+\end{defn}
+
+\begin{prop}{\emph{(Homogeneity of Directional Derivatives)}}
+Given function $f:\Rn\rightarrow\R$ and point $x\in\Rn$, if directional
+derivative $T_x(v)$ exists, then
+\begin{align*}
+  T_x(\alpha v) = \alpha T_x(v)
+  \qquad\forall\alpha\in\R
+\end{align*}
+\end{prop}
+
+\begin{thm}
+Suppose that $f:\Rn\rightarrow\R$ is 1st order differentiable at $x$.
+Then $T_x(v)$ is a linear function
+\begin{align*}
+  T_x(\alpha v_1 + \beta v_2)
+  = \alpha T_x(v_1) + \beta T_x(v_2)
+  \qquad \forall v_1,v_2\in\Rn
+\end{align*}
+Moreover, $m=\nabla f$.
+\end{thm}
+\begin{proof}
+First, we assume that $f$ is 1st order differentiable at $x\in\Rn$, so
+there exists an $m_x\in\Rn$, an $\varepsilon>0$, and a function
+$r_x(\delta)$ such that
+\begin{align*}
+  \delta\in B_0(\varepsilon)
+  \implies
+  f(x+\delta) - f(x) = m_x^T \delta + r_x(\delta)
+\end{align*}
+Now we want to show $T_x(v)$ is linear for $v\neq 0$. By definition,
+that object equals
+\begin{align*}
+  T_x(v) = \lim_{t\rightarrow 0} \frac{f(x+tv) - f(x)}{t}
+\end{align*}
+But for $t$ small enough so that $\delta=tv\in B_0(\varepsilon)$,
+assumed differentiability tells us that we can rewrite the numerator as
+\begin{align}
+  T_x(v)
+  = \lim_{t\rightarrow 0} \frac{f(x+tv) - f(x)}{t}
+  &= \lim_{t\rightarrow 0} \frac{m_x^T [tv] + r_x(tv)}{t}\notag\\
+  &= m_x^T v + \lim_{t\rightarrow 0} \frac{r_x(tv)}{t}
+  \label{eq:Tlinear}
+\end{align}
+That's true for any $v\in\Rn$, since $t\rightarrow 0$ ensures that there
+will always be a $t$ small enough such that $tv\in B_0(\varepsilon)$.
+
+Now it would be great if we can make that remainder term in the
+expression above disappear. Then $T_x(v)=m_x^Tv$, which is definitely a
+linear function. But does the remainder term disappear?
+Well we know by assumed differentiability that
+\begin{align*}
+  0
+  &= \lim_{t\rightarrow 0} \frac{r_x(tv)}{N_2(tv)}
+  = \lim_{t\rightarrow 0} \frac{r_x(tv)}{|t| \; N_2(v)}\\
+  &= \frac{1}{N_2(v)}
+  \left(\lim_{t\rightarrow 0} \frac{r_x(tv)}{|t|}\right)
+\end{align*}
+Now since $v\neq 0$, we know by the properties of norms that $N_2(v)\neq
+0$, so our manipulations were valid and $\frac{1}{N_2(v)}$ is a
+constant, nonzero number. Therefore, we have
+\begin{align*}
+  \lim_{t\rightarrow 0} \frac{r_x(tv)}{N_2(tv)} = 0
+  \quad\iff\quad
+  \lim_{t\rightarrow 0} \frac{r_x(tv)}{|t|} = 0
+\end{align*}
+Therefore the remainder term does indeed go to zero and drops out of
+Equation~\ref{eq:Tlinear}, leaving us with
+\begin{align*}
+  T_x(v) = m_x^T v
+\end{align*}
+This is definitely a linear function of $v$.
+
+Moreover, we can calculate the elements of vector $m$ by plugging in the
+basis elements:
+\begin{align*}
+  f_i(x) = T_x(e_i) = m^T_x e_i = m_i
+\end{align*}
+In words, the $i$th partial derivative of $f$ is the $i$th element of
+$m$. Hence $m = \nabla f$.
+\end{proof}
+
+\begin{thm}{\emph{(Schwartz)}}
+Given a function $f:\Rn\rightarrow\R$, suppose that
+$f_i(x)=\frac{\partial f}{\partial x_i}$ exists and
+$f_{ij}(x)=\frac{\partial^2 f}{\partial x_i\partial x_j}$ is continuous.
+Then
+\begin{align*}
+  f_{ji} \; \text{exists and} \quad
+  f_{ij}(x)=\frac{\partial^2 f}{\partial x_i\partial x_j}
+  = \frac{\partial^2 f}{\partial x_j\partial x_i} = f_{ji}(x)
+\end{align*}
+\end{thm}
+
+\section{Convexity}
+
+\subsection{Convex Sets}
 
 \begin{defn}{(Convex Set)}
+\label{defn:convexset}
 A set $C\subseteq X$ is \emph{convex} if
 \begin{align*}
-  z = \lambda x + (1-\lambda) y \in C
+  z_\lambda = \lambda x + (1-\lambda) y \in C
   \qquad \forall x,y\in C\quad \forall \lambda \in [0,1]
 \end{align*}
 In words, any point on the straight line connecting $x,y\in C$ is also
-in $C$.
+in $C$. By convention, the empty set $\emptyset$ is also a convex set.
 \end{defn}
+
+\begin{lem}
+$C$ is convex if and only if
+for all $\{x_i\}_{i=1}^m \subseteq C$ and $\{\lambda_i\}_{i=1}^m$ where
+\begin{align*}
+  \sum^{m}_{i=1} \lambda_i = 1
+  \quad \text{and} \quad \lambda_i \geq 0 \quad \forall i
+\end{align*}
+we have
+\begin{align*}
+  \sum^m_{i=1} \lambda_i x_i \in C
+\end{align*}
+This is a generalization of the the two-point, single-lambda notion of
+convexity in Definition~\ref{defn:convexset}.
+\end{lem}
+
+\begin{ex}{(Set of Solutions to Linear Inequalities and Equations)}
+Given $A \in \R^{m\times n}$, $a\in \R^m$ and $B \in \R^{k \times n}$,
+$b\in \R^k$, consider the set of solutions to linear inequalities and
+equations:
+\begin{align*}
+  \mathscr{P}
+  &= \{
+  x\in \Rn \; | \; Ax \leq a, \; Bx = b
+  \}
+\end{align*}
+Amazingly, this is a convex set.
+
+To see this, we need to show that
+\begin{align*}
+  z_\lambda \in \mathscr{P}
+  \quad \text{where} \quad
+  z_\lambda = \lambda x + (1-\lambda)y
+  \qquad
+  \text{for}
+  \begin{cases}
+  x,y\in \mathscr{P}\\
+  \lambda \in [0,1]
+  \end{cases}
+\end{align*}
+So first, establish the following facts
+\begin{alignat}{3}
+  Ax &\leq a \quad \Rightarrow \quad
+  k Ax &&\leq k a
+  \qquad \forall k \in \R_+ \label{ex:lineq1}\\
+  Bx &= b \quad \Rightarrow \quad
+  k Bx &&= k b
+  \qquad \forall k \in \R_+
+  \label{ex:lineq2}
+\end{alignat}
+So given $\lambda \in [0,1]$ and $x,y\in \mathscr{P}$, we can easily
+show that
+\begin{align*}
+  Az_\lambda
+  = A\left[\lambda x + (1-\lambda) y\right]
+  &= \lambda Ax + (1-\lambda) Ay \\
+  &\leq \lambda a + (1-\lambda) a
+  \quad\qquad \text{By~(\ref{ex:lineq1})} \\
+  \Rightarrow \quad
+  Az_\lambda
+  &\leq a
+\end{align*}
+The proof that $Bz_\lambda = b$ is exactly analogous. Therefore
+$z_\lambda\in \mathscr{P}$.
+\end{ex}
 
 \begin{defn}{(Path Connected)}
 A set $C\subseteq X$ is \emph{path connected} if, for any pair $x,y\in
@@ -2522,12 +3413,600 @@ and $y$ by a straight line in $C$, you can connect them by any
 continuous path in $C$.
 \end{defn}
 
+\begin{thm}{\emph{(Intersections of Convex Sets are Convex)}}
+Let $\{C_\alpha\}_{\alpha \in J}$ be any arbitrary (possibly
+uncountable) collection of convex sets in $\Rn$. Define the intersection
+\begin{align*}
+  C_* = \bigcap_{\alpha \in J} C_\alpha
+\end{align*}
+The set $C_*$ is convex.
+\end{thm}
+\begin{rmk}
+In general, unions of convex sets will not be convex unless they are
+nested like $C_n \subseteq C_{n+1}$.
+\end{rmk}
+
+\begin{proof}
+Suppose that $C_* = \emptyset$. Since the empty set is convex by
+convention, done. Similarly trivial, suppose that $C_*$ is nonempty and
+consists of a single element, $C_* = \{x\}$. Then $\lambda x +
+(1-\lambda) x = x$ will be in $C_*$, implying $C_*$ convex.
+
+Finally, suppose that $C_*$ has more than one element, and take $x,y\in
+C_*$. Since $C_*$ was constructed by intersection, we know that
+$x,y\in C_\alpha$ for all $\alpha \in J$. Since all of the $C_\alpha$
+are convex,
+\begin{align*}
+  z_\lambda = \lambda x + (1-\lambda)y \in C_\alpha
+  \qquad \forall \alpha \in J
+\end{align*}
+Since $z_\lambda \in C_\alpha$ for all $\alpha$, it is clear that
+$z_\lambda \in C_*$.
+\end{proof}
+
 \begin{defn}{(Convex Hull)}
 Given any set $A\subseteq X$, the \emph{convex hull} is the smallest
-convex set containing $A$.
+convex set containing $A$. This is often denoted $\ch(A)$.
 \end{defn}
 
-\subsection{Contraction Mapping Theorem and Brouwer's Fixed Point Theorem}
+\begin{thm}
+Given $A\subseteq X$, let $\mathscr{F}_A$ denote the family of all
+convex sets containing $A$:
+\begin{align*}
+  \mathscr{F}_A &= \{C\text{\emph{convex}} \;|\; A \subseteq C \; \}
+\end{align*}
+Then we can alternatively define the convex hull $\ch(A)$ as
+\begin{align*}
+  \ch(A) = \bigcap_{C \in \mathscr{F}_A} C
+\end{align*}
+\end{thm}
+
+\begin{prop}
+Given some set $A$, $A \subseteq C \subsetneq ch(A)$ implies that $C$ is
+not convex, since we defined $\ch(A)$ to be the smallest convex set
+containing $A$.
+\end{prop}
+
+\subsection{Separating Hyperplane Theorem}
+
+\begin{defn}{(Hyperplane)}
+We define a \emph{hyperplane} in $\Rn$, denoted $\mathcal{H}(a,b)$
+for some $a\in \Rn$ and $b\in \R$, as
+\begin{align*}
+  \mathcal{H}(a,b) = \{x\in\Rn \; | \; a^Tx = b\}
+\end{align*}
+\end{defn}
+
+\begin{defn}{(Half-Spaces)}
+Given hyperplane $\mathcal{H}(a,b)$, we define the \emph{positive} and
+\emph{negative half-spaces} of $\mathcal{H}(a,b)$, respectively, as
+\begin{align*}
+  \mathcal{S}^+(a,b)
+  &:= \{ x \in \Rn \; |\; a^T x \geq b\} \\
+  \mathcal{S}^-(a,b)
+  &:= \{ x \in \Rn \; |\; a^T x \leq b\}
+\end{align*}
+The hyperplane splits $\Rn$ into two groups, the positive half-space is
+``on or above above'' the hyperplane, while the negative half-space is
+``on or below'' in a very, very loose sense.
+\end{defn}
+
+\begin{thm}{\emph{(Separating Hyperplane)}}
+Given any two disjoint, nonenempty convex sets $C,D\subseteq\Rn$, there
+exist constants $a\in\Rn$ and $b\in\R$ such that
+\begin{align*}
+  C &\subseteq \mathcal{S}^+(a,b) \\
+  D &\subseteq \mathcal{S}^-(a,b)
+\end{align*}
+In words, we can draw a hyperplane between the convex sets and
+``separate'' them entirely into the halfspaces defined by that
+hyperplane.
+\end{thm}
+
+
+\subsection{Convex and Concave Functions}
+
+\begin{defn}{(Convex and Concave Functions)}
+Suppose we have a function $f:C\rightarrow \R$ defined on \emph{convex
+set} $C$. We say the function is \emph{convex} if, for all $x,y\in C$
+and $\lambda \in[0,1]$,
+\begin{align}
+  \label{ineq:convex}
+  \lambda f(x) + (1-\lambda) f(y) \geq f(\lambda x + (1-\lambda)y) =
+  f(z_\lambda)
+\end{align}
+The function is \emph{concave} if Inequality~\ref{ineq:convex} is
+reversed. We say a function is \emph{strictly} concave or convex if the
+corresponding inequality is strict.
+
+Proving that functions are convex will mostly consist of just writing
+out $f(z_\lambda) = f(\lambda x + (1-\lambda)y)$ and using assumed
+properties of the function $f$ to break that up into $\lambda f(x) +
+(1-\lambda)f(y)$.
+\end{defn}
+\begin{rmk}
+We require that the domain $C$ be a convex set.  In order to test
+convexity or concavity of the function, we need $z_\lambda$ to be in the
+domain $C$, so that $f(z_\lambda)$ makes sense and we can check/test
+Inequality~\ref{ineq:convex}. Otherwise, $f(z_\lambda)$ would be
+nonsensical.
+\end{rmk}
+
+\begin{prop}
+Function $f:C\subseteq\Rn\rightarrow \R$ defined on convex domain $C$ is
+a convex function if and only if, for all $\{x_i\}_{i=1}^m\subseteq C$
+and $\{\lambda_i\}_{i=1}^m$ where
+\begin{align*}
+  \sum^{m}_{i=1} \lambda_i = 1
+  \quad \text{and} \quad \lambda_i \geq 0 \quad \forall i
+\end{align*}
+we have
+\begin{align*}
+  \sum^m_{i=1} \lambda_i f(x_i)
+  \geq
+  f\left(\sum^m_{i=1} \lambda_i x_i\right)
+\end{align*}
+\end{prop}
+
+\begin{lem}
+\label{lem:unique-invertible}
+Suppose $A\in\Rnn$. Then
+\begin{align*}
+  x\neq y\;\Rightarrow\;
+  Ax \neq Ay
+  \quad \forall x,y\in\Rn
+  \quad\iff\quad
+  \text{$A$ invertible}
+\end{align*}
+\end{lem}
+\begin{proof}
+($\Rightarrow$) Suppose that $A$ is not invertible. Then there must
+exist a vector $z\in\Rn$ such that
+\begin{align*}
+  Az = 0
+  \qquad \text{where} \; z\neq 0
+\end{align*}
+Now pick any $x\in\Rn$ and choose $y\in\Rn$ as $y=x-z$. Then
+$x-y=z$ so that
+\begin{align*}
+  A(x-y) = Az &= 0 \\
+  \Rightarrow\quad
+  Ax &= Ay
+  \qquad x\neq y
+\end{align*}
+But this is a contradiction of what we assumed.
+
+($\Leftarrow$) Suppose that there exists a pair $x\neq y$ such that
+$Ax=Ay$. Then
+\begin{align*}
+  A(x-y) &= 0
+  \quad\iff\quad
+  (x-y) = A^{-1}0 = 0
+  \quad\iff\quad
+  x =y
+\end{align*}
+\end{proof}
+
+\begin{prop}{\emph{(Invariance to Coordinate Changes)}}
+\label{prop:coordinvariance}
+Given function $f:\Rn\rightarrow\R$, matrix $A\in\Rnn$, and vector
+$b\in\Rn$, define function $g:\Rn\rightarrow\R$ as follows:
+\begin{align*}
+  g(x) = f(Ax+b)
+\end{align*}
+Then
+\begin{enumerate}
+  \item If $f$ is convex (or concave), then so is $g$.
+  \item If $f$ is strictly convex (or strictly concave) and $A$ is
+    invertible, then $g$ is strictly convex.
+\end{enumerate}
+\end{prop}
+\begin{proof}
+(Part 1)
+Suppose that $f$ is convex. We want to show that $g$ is convex. So take
+any $x,y\in\Rn$ and $\lambda\in[0,1]$ and define $z_\lambda =
+\lambda x + (1-\lambda) y$. Then
+\begin{align*}
+  g(z_\lambda) =
+  f(Az_\lambda + b)
+  &= f\left( \;
+    A\left[
+      \lambda x + (1-\lambda) y
+    \right]
+    +b
+  \; \right)\\
+  &= f\left( \;
+    \lambda \left[Ax + b\right]
+    + (1-\lambda)
+    \left[Ay + b\right]
+  \; \right)\\
+  \text{By convexity of $f$}\Rightarrow\qquad
+  g(z_\lambda)
+  &\leq \lambda f\left( Ax + b \right)
+    + (1-\lambda)
+    f\left( Ay + b \right)
+\end{align*}
+By the definitions of $z_\lambda$ and $g$, this simplifies to
+\begin{align*}
+  g(\lambda x + (1-\lambda)y)
+  &\leq \lambda g(x)
+    + (1-\lambda) g(y)
+\end{align*}
+which is precisely the definition of convexity. So $g$ is convex as
+well.
+
+(Part 2)
+Suppose $f$ strictly convex and $A$ invertible. Choose distinct
+$x,y\in\Rn$ and $\lambda\in(0,1)$ (not including the boundary this
+time). Then, similar to what we saw above,
+\begin{align*}
+  g(z_\lambda) =
+  f(Az_\lambda + b)
+  &= f\left( \;
+    \lambda \left[Ax + b\right]
+    + (1-\lambda)
+    \left[Ay + b\right]
+  \; \right)\\
+  g(z_\lambda)
+  &< \lambda f\left( Ax + b \right)
+    + (1-\lambda)
+    f\left( Ay + b \right)
+\end{align*}
+This time, a strict inequality followed for two reasons. First,
+Lemma~\ref{lem:unique-invertible} ensures that $A$ invertible implies
+$Ax+b\neq Ay+b$ for any $x\neq y$. Second, strict convexity of $f$
+ensures that the inequality will be strict when dealing with distinct
+points like $Ax+b$ and $Ay+b$ in the domain for $\lambda\in(0,1)$.
+
+Therefore, by the definitions of $z_\lambda$ and $g$, the above
+simplifies to
+\begin{align*}
+  g(\lambda x + (1-\lambda)y)
+  &< \lambda g(x)
+    + (1-\lambda) g(y)
+\end{align*}
+Hence $g$ is strictly convex.
+\end{proof}
+
+
+\begin{prop}{\emph{(Concave-Convex Relationship)}}
+Suppose that $f:C\subseteq\Rn\rightarrow \R$ is a function defined on
+convex domain $C$. Then
+\begin{align*}
+  f \; \text{concave}
+  \iff
+  -f \; \text{convex}
+\end{align*}
+\end{prop}
+
+
+\begin{defn}{(Level, Upper-Contour, and Lower-Contour Sets)}
+Given $t\in\R$ and \emph{any} function $f:C\rightarrow \R$ where $C$ is
+a convex set, define
+\begin{align*}
+  \text{Upper Contour Set:}
+  \qquad C_f^+(t)
+  &:= \{ x\in C \; | \; f(x) \geq t\} = f^{-1}([t,\infty)) \\
+  \text{Lower Contour Set:}
+  \qquad C_f^-(t)
+  &:= \{ x\in C \; | \; f(x) \leq t\} = f^{-1}((-\infty,t]) \\
+  \text{Level Set:}
+  \qquad L_f(t) \;
+  &:= \{ x\in C \; | \; f(x) = t\} = f^{-1}(t) \\
+  &= C^+_f(t) \cap C^-_f(t)
+\end{align*}
+We now relate these to statements about convex and quasi-convex
+functions, along with their concave counterparts. In particular, they
+provide a convenient way to relate convex sets and functions.
+\end{defn}
+
+\begin{prop}{\emph{(Relationship between Convex Functions and Sets)}}
+\label{prop:convexfcnset}
+Given function $f:C\rightarrow \R$ with convex domain $C$,
+\begin{enumerate}
+  \item Function $f$ convex $\; \Rightarrow$ $C_f^-(t)$ is a convex set
+    for all $t\in\R$.
+  \item Function $f$ concave $\Rightarrow$ $C_f^+(t)$ is a convex set
+    for all $t\in\R$.
+\end{enumerate}
+\end{prop}
+
+\begin{defn}{((Quasi-Convex and Concave)}
+\label{defn:quasiconvex}
+Given $f:C\rightarrow \R$ on convex domain $C$,
+\begin{enumerate}
+  \item Function $f$ is \emph{quasi-convex} if and only if $C^-_f(t)$ is
+    a convex set for all $t\in\R$.
+  \item Function $f$ is \emph{quasi-concave} if and only if $C^+_f(t)$
+    is a convex set for all $t\in\R$.
+\end{enumerate}
+\end{defn}
+\begin{rmk}
+Proposition~\ref{prop:convexfcnset} and
+Definition~\ref{defn:quasiconvex} give us the two directions between
+convex functions and convex sets. Namely,
+Proposition~\ref{prop:convexfcnset} says that concave or convex
+functions automatically imply convex upper and lower contour sets,
+respectively. How about the other direction?
+
+Well, Definition~\ref{defn:quasiconvex} suggests that convex upper or
+lower contour sets do not \emph{necessarily} imply the function is
+concave or convex, respectively. So we just call functions satisfying
+each property ``quasi-concave'' or ``quasi-convex'', knowing that the
+set of quasi-concave and quasi-convex functions is strictly larger than
+the set of simply concave or convex functions.  We'll see this in the
+next example.
+\end{rmk}
+
+\begin{ex}{(Quasi-Concave Example)}
+A classic example for quasi-concave functions is the normal pdf.
+
+To show that it's quasi-concave, pick $t = 0.3$ and cut a line at $t$
+through the graph of the function. That's the horizontal line in the
+figure below. The upper contour-set $C^-_f(t)$ is the preimage of all
+points \emph{above} the line at $t$ (hence ``upper''-contour). So we can
+follow the vertical dashed lines to the set $C^+_f(t)$, which is clearly
+convex. Moreover, the upper contour set will continue to be convex for
+all values of $t$ that we might choose, i.e.\ as we move the $t$-line up
+and down and look at all the resulting preimage $C^+_f(t)$ sets.
+\begin{figure}[htpb!]
+\centering
+\begin{tikzpicture}[xscale=2,yscale=8]
+  % Axes
+  \draw[d4black, <->] (-2.5,0) -- (0,0) -- (0,0.5);
+  \draw[d4black, ->]  (0,0) -- (2.5,0);
+  % Normal PDF
+  \draw[d4blue, ultra thick, domain=-2.5:2.5] plot (\x, {(1/sqrt(2*pi))*exp(-pow(\x,2)/2)});
+  % Convex set
+  \node at (1.3,0.33) {$t=0.3$};
+  \draw[d4gray, -]  (-2.5,0.3) -- (2.5,0.3);
+  \draw[d4gray, dashed, -]  (-0.76,0.3) -- (-0.76,0);
+  \draw[d4gray, dashed, -]  (0.76,0.3) -- (0.76,0);
+  \draw[d4black, decorate, decoration={brace, amplitude=10pt, mirror}] (-0.76,0) -- (0.76,0) %
+    node[black,midway,yshift=-20pt] {$C_f^+(t) = f^{-1}([t,\infty))$};
+\end{tikzpicture}
+\end{figure}
+\end{ex}
+
+Next, we define the relationship between convex or concave functions and
+continuity. In fact, the concepts are deeply related. As the next
+theorem will state, convex or concave functions are continuous on the
+interior of the domain. This can be seen intuitively enough by looking
+at a picture of a convex function with a discontinuity on the domain's
+interior.
+\begin{figure}[htpb!]
+\centering
+\begin{tikzpicture}[xscale=2, shorten >= -3pt, shorten <= -3pt]
+  % Axes
+  \draw[d4black, <->] (0,5.5) -- (0,0) -- (3.5,0);
+
+  \draw[d4blue, ultra thick, domain=0.05:0.051, -*] plot (\x, {pow(\x,2)-2.5*\x+2});
+  \draw[d4blue, ultra thick, domain=0.05:2, o-o] plot (\x, {pow(\x,2)-2.5*\x+3});
+  \draw[d4blue, ultra thick, domain=2:3, *-o] plot (\x, {pow(\x,2)-2.5*\x+2});
+  \draw[d4blue, ultra thick, domain=2.99:3, *-] plot (\x, {pow(\x,2)-2.5*\x+3});
+
+  \draw[d4gray, -]  (1,1.5) -- (2,1);
+
+  \node at (0.15,1.60) {$A$};
+  \node at (2.75,4.2) {$B$};
+\end{tikzpicture}
+\end{figure}
+
+As you can see in the figure, around where you have the discontinuity,
+you can draw a straight line that lies entirely below the function (in
+gray), violating the convexity of the function. Moreover, you can also
+see that discontinuities at the \emph{edge} of the domain in the
+``appropriate'' direction (like at $B$ rather than $A$) can avoid this
+problem. We now make this more explicit in a theorem.
+
+\begin{thm}{\emph{(Convexity/Concavity and Continuity)}}
+Given a function $f:C\rightarrow\R$ on convex domain $C$, the function
+$f$ is continuous for all $x \in \mathring{C}$, the interior of the
+domain.
+\end{thm}
+
+\begin{cor}
+Given a function $f:C\rightarrow\R$ on convex domain $C$, if $C$ is
+open, then $f$ is continuous.
+\end{cor}
+
+\subsection{Convexity and Quadratic Forms}
+
+\begin{prop}
+Given symmetric matrix $A\in\Rnn$, and quadratic form
+$f:\Rn\rightarrow\R$,
+\begin{enumerate}
+  \item $A$ positive semidefinite $\Rightarrow$ $f$ convex.
+  \item $A$ negative semidefinite $\Rightarrow$ $f$ concave.
+\end{enumerate}
+If you change ``semidefinite'' to ``definite'' in the statements above,
+the functions become \emph{strictly} convex or concave.
+\end{prop}
+\begin{proof}
+Suppose that symmetric matrix $A$ is positive semidefinite. By
+Theorem~\ref{thm:symmetric-diag}, we can do an eigendecomposition of
+matrix $A$ as follows
+\begin{align*}
+  A = V^T D V = \left(\sqrt{D}V\right)^T \left(\sqrt{D} V\right)
+\end{align*}
+where $V$ is a matrix of orthogonal eigenvectors and $D$ is a diagonal
+matrix of eigenvalues. The matrix $\sqrt{D}$ is simply a real matrix
+(because positive semidefinite, see
+Theorem~\ref{thm:possemidef-eigenval}) with the roots of the
+eigenvalues of $A$ on the diagonal.
+
+We an redefine the function as
+\begin{align*}
+  f(x) &= (x-b)^T A (x-b) \\
+  &= (x-b)^T \left(\sqrt{D}V\right)^T \left(\sqrt{D} V\right)(x-b) \\
+  \Rightarrow\quad
+  f(x)
+  &= \left[N_2\left( \sqrt{D} V(x-b) \right)\right]^2
+  := g(N_2(Ax+b'))
+\end{align*}
+where $N_2$ is the usual Euclidean norm, $g(x)=x^2$, $A=\sqrt{D}V$, and
+$b'=-\sqrt{D}Vb$.
+
+Now as a norm, $N_2$ is a convex function. By
+Proposition~\ref{prop:coordinvariance}, changing the coordinates
+coordinates from $N_2(x)$ to $N_2(Ax+b')$ will still result in a convex
+function. Lastly, by Theorem~(TK), taking $g(N_2(Ax+b'))$ for increasing
+and convex $g$ will also result in a convex function. So all told, $f$
+is convex.
+\end{proof}
+
+
+\subsection{Convexity and Differentiability}
+
+\begin{thm}{\emph{(First Order Condition for Convexity)}}
+\label{thm:diffconvex}
+Given $f:C\rightarrow \R$ differentiable over its entire open and convex
+domain $C\subseteq\Rn$, it follows that the function $f$ is convex if
+and only if
+\begin{align*}
+  f(y) \geq f(x) + [\nabla f(x)]^T (y-x)
+  \qquad\forall x,y\in\Rn
+\end{align*}
+\end{thm}
+\begin{proof}
+($\Rightarrow$, $n=1$) We want to show that $f$ convex implies that
+\begin{align*}
+  f(y) \geq f(x) + f'(x)(y-x)
+\end{align*}
+Since $f$ is convex, for any $\lambda\in(0,1)$ and $x,y\in C$, we have
+\begin{align*}
+  f(\lambda y + (1-\lambda)x)
+  &\leq
+  \lambda f(y) + (1-\lambda)f(x) \\
+  %\Leftrightarrow \quad
+  %f(x + \lambda (y -x))
+  %&\leq
+  %\lambda f(y) + (1-\lambda)f(x)\\
+  \text{Rearranging} \Rightarrow \quad
+  f(x + \lambda (y -x))
+  - f(x)
+  &\leq
+  \lambda \left[f(y) - f(x) \right]
+\end{align*}
+Now divide that last line through by $\lambda(y-x)$ to make this look
+more like a derivative, and take the limit as $\lambda\rightarrow 0$:
+\begin{align*}
+  \lim_{\lambda\rightarrow 0}
+  \frac{f(x + \lambda (y -x)) - f(x)}{\lambda(y-x)}
+  &\leq
+  \frac{f(y) - f(x)}{y-x} \\
+  f'(x)
+  &\leq
+  \frac{f(y) - f(x)}{y-x}\\
+  \Leftrightarrow\quad
+  f'(x)(y-x) + f(x)
+  &\leq
+  f(y)
+\end{align*}
+
+($\Rightarrow$, $n>1$)
+Suppose we have $x,y\in C$. Define the function
+\begin{align}
+  g(\lambda) = f(\lambda y + (1-\lambda)x)
+  \label{eq:gdef}
+\end{align}
+Then $g(\lambda)$ is a convex function for $\lambda\in [0,1]$.
+To see this, you need to dive into some really messy algebra, so
+probably don't read this next block of equations.
+\begin{align*}
+  g(\gamma \lambda_1 + (1-\gamma) \lambda_2)
+  &=
+  f\big(\; \big[\gamma \lambda_1 + (1-\gamma) \lambda_2\big] \; y
+  + \big\{1 - [\gamma \lambda_1 + (1-\gamma) \lambda_2]\big\} x
+  \;\big)\\
+  \text{Rearranging} \qquad
+  &=
+  f\big(\;
+  \gamma \big[\lambda_1 y - \lambda_1 x\big] \;
+  +(1-\gamma)\big[ \lambda_2 y -\lambda_2 x \big]
+  +  x
+  \;\big)\\
+  &=
+  f\big(\;
+  \gamma \big[\lambda_1 y - \lambda_1 x\big] \;
+  +(1-\gamma)\big[ \lambda_2 y -\lambda_2 x \big]
+  +  \gamma x + (1-\gamma) x
+  \;\big)\\
+  &=
+  f\big(\;
+  \gamma \big[\lambda_1 y + (1- \lambda_1 )x\big] \;
+  +(1-\gamma)\big[ \lambda_2 y + (1-\lambda_2) x \big]
+  \;\big)\\
+  \text{By convexity of $f$}\qquad
+  &\leq
+  \gamma f(\lambda_1 y + (1- \lambda_1 )x)
+  +(1-\gamma)f(\lambda_2 y + (1-\lambda_2) x)
+  \\
+  \text{By definition of $g$}\qquad
+  &\leq
+  \gamma g(\lambda_1)
+  +(1-\gamma)g(\lambda_2)
+\end{align*}
+So $g$ is convex.
+
+Now since $g$ is convex, it is the case that
+\begin{align}
+  g(\lambda_2) - g(\lambda_1)
+  \geq g'(\lambda_1)(\lambda_2-\lambda_1)
+  \label{ineq:glambda}
+\end{align}
+To compute $g'(\lambda)$, take $v=\lambda y + (1-\lambda) x$ and apply
+the chain rule:
+\begin{align}
+  g(\lambda) &= f(v)\notag\\
+  \Rightarrow\quad
+  g'(\lambda)
+  &= \sumin f_i(v) \frac{dv_i}{d\lambda}\notag \\
+  &= \sumin f_i(\lambda y + (1-\lambda)x) \cdot (y_i-x_i) \notag\\
+  \Leftrightarrow \quad
+  g'(\lambda)
+  &= [\nabla f(\lambda y + (1-\lambda)x)]^T\cdot (y-x)
+  \label{eq:gprimelambda}
+\end{align}
+Okay, so we know how to compute $g'(\lambda)$.
+
+But how do we turn all of this information into a statement about $f$?
+Well, notice that Equation~\ref{eq:gdef} relates $g$ to $f$, and in such
+a way that we have $g(1)=f(y)$ and $g(0)=f(x)$. So let's take
+$\lambda_1=0$ and $\lambda_2=1$, plug into Inequality~\ref{ineq:glambda}
+and see what we get:
+\begin{align*}
+  g(1) - g(0)
+  &\geq g'(0)(1-0) \\
+  \text{By Equation~\ref{eq:gdef}}\qquad
+  f(y)-f(x)
+  &\geq g'(0) \\
+  \text{By Equation~\ref{eq:gprimelambda}}\qquad
+  f(y)-f(x)
+  &\geq [\nabla f(x)]^T (y-x) \\
+\end{align*}
+
+($\Leftarrow$)
+\end{proof}
+
+\begin{thm}{(Second Order Condition for Convexity)}
+Given twice-differentiable $f:C\rightarrow\R$ on open and convex domain
+$C\rightarrow\R$, we have
+\begin{enumerate}
+  \item $f$ convex $\iff$ $H_f(x)$ is positive semidefinite for all
+    $x\in S$.
+  \item $f$ concave $\iff$ $H_f(x)$ is negative semidefinite for all
+    $x\in S$.
+\end{enumerate}
+where $H_f(x)$ is the Hessian matrix of second-order partial derivatives
+at $x$. The functions are \emph{strictly} convex or concave if you
+swap ``semidefinite'' for ``definite'' in the conditions above.
+\end{thm}
+
+\clearpage
+\section{Fixed Points}
+
+\subsection{Contraction Mapping Theorem}
 
 \begin{defn}{(Operator)}
 If $X$ is some function space
@@ -2847,14 +4326,589 @@ Finally, by assumption $T(x) \in C'$ for all $x \in C$, and we just said
 $x^*\in C$. So $T(x^*)\in C'$ too.
 \end{proof}
 
+\subsection{Brouwer's Fixed Point Theorem}
 
+\begin{thm}
+Suppose that $T:K\rightarrow K$ is a continuous function and $K\subseteq
+\Rn$ is compact and convex.  Then there exists a fixed point
+such that $x^*=T(x^*)$.
+\end{thm}
+\begin{rmk}
+There are three key differences from Theorem~\ref{thm:banach}---the
+Contraction Mapping or Banach Fixed Point Theorem.
+\begin{enumerate}
+  \item $T$ need not be a contraction map. It only needs to be a
+    continuous function (which is weaker).
+  \item We provide no way to construct a sequence that converges to the
+    fixed point.
+  \item The fixed point need not be unique. The theorem just furnishes
+    existence.
+\end{enumerate}
+\end{rmk}
+
+
+\clearpage
+\section{Optimization in $\Rn$}
+
+\subsection{The Canonical Optimization Problem}
+
+Throughout this section, we will consider optimization problems for
+scalar-valued functions on domain $\Rn$. The problems we consider will
+be of the form
+\begin{alignat}{3}
+  \text{Objective Function:} \qquad
+    && \max_{x\in\mathcal{D}} \; &f_0(x) \label{prob:max}\\
+  \text{Inequality Constraints:} \qquad
+    && \text{s.t.} \; &f_i(x) \geq 0 \qquad i = 1,\ldots, m\notag \\
+  \text{Equality Constraints:} \qquad
+    && &g_i(x) = 0 \qquad i = 1,\ldots,k\notag
+\end{alignat}
+where the domain of the problem $\mathcal{D}$ is defined as the
+intersection of the domains of all constituent functions
+\begin{align*}
+  \mathcal{D} = \dom(f_0)
+  \cap \left( \bigcap^m_{i=1} \dom(f_i)\right)
+  \cap \left( \bigcap^k_{i=1} \dom(g_i)\right)
+\end{align*}
+where $\dom(f)$ refers to the domain of function $f$. Generally, I will
+assume that the domains of $f_0$, $f_i$, and $g_i$ are open for all $i$,
+which implies that $\mathcal{D}$---a finite intersection of open
+sets---is open as well.
+
+\paragraph{Terminology and Notation}
+\begin{enumerate}
+  \item \emph{Feasible Point}: Any point $x\in\mathcal{D}$ that
+    satisfies all of the inequality and equality constraints.
+  \item \emph{Feasible Set}, $\mathscr{F}$: The set of all feasible
+    points.
+  \item \emph{Optimal Value}, $p^*$: The maximal value of the problem,
+    $\sup_{x\in \mathscr{F}} f_0(x)$
+  \item \emph{Optimal Point}, $x^*$: Any feasible point
+    $x^*\in\mathscr{F}$ such that $f_0(x^*)=p^*$.
+\end{enumerate}
+
+I will collectively refer to this entire problem as
+Problem~\ref{prob:max} or the ``Canonical Optimization Problem'', and
+solving it will be the goal of this entire section. I will proceed by
+starting with some general results about extrema, which correspond to
+Problem~\ref{prob:max} without any constraints---simple unconstrained
+optimization over a function's entire domain. I will then add on the
+equality constraints, and then the inequality constraints.
+
+But it's important to note that I am currently assuming nothing about
+the underlying functions that define the problem---not continuity,
+differentiability, concavity, convexity, etc. Of course, they will
+occasionally factor in later, since we often use continuity to ensure
+existence of a maximum or concavity/convexity to ensure uniqueness.
+\emph{However}, we will also derive many useful results where we impose
+no assumptions on the problem. So any assumptions will generally be made
+very explicit, and in each iteration of
+Problem~\ref{prob:max}---unconstrained, equality constrained, equality
+and inequality constrained---I will present a mix assumption-free and
+assumption-heavy results.
+
+
+\subsection{Extrema: Definitions and Facts}
+\label{sec:extrema}
+
+In this section, I cover some basic results about extrema of functions.
+Note that I do not assume that functions are differentiable. Unless I
+specifically say the function is differentiable, it holds generally.
+
+\begin{defn}{(Local Maximum)}
+For function $f:S\subseteq\Rn\rightarrow \R$, we say that $\bar{x} \in
+S$ is a \emph{local maximum} if there exists an $\varepsilon>0$ such
+that
+\begin{align*}
+  f(\bar{x})\geq f(y)
+  \qquad \forall y \in B_\varepsilon(x) \cap S
+\end{align*}
+\end{defn}
+
+\begin{prop}{\emph{(Derivatives at Extrema)}}
+Given function $f:S\subseteq \Rn\rightarrow \R$ on open set $S$, suppose
+that $\bar{x}$ is a local max of $f$ and that the partial derivative
+$f_i(\bar{x})$ exists.  Then $f_{i}(\bar{x})=0$.
+\end{prop}
+
+\begin{note}
+First, the converse does not hold. Saddle points have $f_i(x)=0$ for all
+partial derivatives, but they are not extrema. In other words, the
+condition $f_i(\bar{x})=0$ is necessary but not sufficient for $\bar{x}$
+to be a local maximum.
+
+Second, I'm not saying that the partial derivative \emph{will} exist or
+that the function is differentiable. I'm saying that \emph{if it is
+differentiable} or \emph{if the partial does exist}, then it must equal
+zero.
+The next definition concerns itself with functions that are, in
+fact, differentiable everywhere in the domain.
+\end{note}
+
+\begin{defn}{(Critical Point)}
+Suppose that $f:\Rn\rightarrow\R$ is a differentiable function. The
+point $x^*\in\Rn$ is called a \emph{critical point} of $f$ if
+\begin{align*}
+  \nabla f(x^*) = 0
+  \iff
+  f_i(x^*)=0
+  \quad\forall i=1,\ldots,n
+\end{align*}
+Take note, critical points as defined above are a concept dependent upon
+differentiability.
+\end{defn}
+
+\subsection{Extrema and Concave Functions}
+\label{sec:extrema-concave}
+
+\begin{prop}{\emph{(Extrema of Differentiable Concave Functions)}}
+Suppose that $f:C\rightarrow\R$ is a differentiable and concave function
+on convex and open domain $C\subseteq\Rn$. Then if $x^*$ is a critical
+point of $f$ (i.e.\ $\nabla f(x^*)=0$), we have
+\begin{align*}
+  x^* \in \arg\max_{x\in C} f(x)
+\end{align*}
+For $f$ is \emph{strictly} concave, $x^*$ is is a \emph{unique} global
+max.
+\end{prop}
+\begin{proof}
+By Theorem~\ref{thm:diffconvex} (but flipped since $f$ is now concave),
+we know that
+\begin{align*}
+  f(y) \leq f(x) + [\nabla f(x)]^T (y-x)
+  \qquad \forall x,y\in C
+\end{align*}
+Since $x^*$ is a critical point, $\nabla f(x^*)=0$. Now use that as $x$
+in the inequality above to get, for all $y\in C$,
+\begin{align*}
+  f(y) &\leq f(x^*) + [\nabla f(x^*)]^T (y-x^*)
+  = f(x^*) + 0\\
+  \Rightarrow\; \forall y\in C\qquad
+  f(y) &\leq f(x^*)
+\end{align*}
+Hence $x^*$ is a maximum.
+\end{proof}
+
+\begin{prop}{\emph{(Extrema of Arbitrary Concave Functions)}}
+Suppose that we have a concave function $f:C\rightarrow \R$ defined on
+convex domain $C$. Define $X^*\subseteq C$ as the set of ``maximizing
+points'' in $C$.
+\begin{align*}
+  X^* = \arg\max_{x\in C} f(x)
+  = \{ x \in C \; | \; f(y) \leq f(x) \quad \forall y \in C\}
+\end{align*}
+Then
+\begin{enumerate}
+  \item $X^*$ is a convex set.
+  \item $f$ strictly concave and $X^*\neq \emptyset$ implies that $X^*$
+    consists of a single point, a \emph{unique} maximizer.
+\end{enumerate}
+\end{prop}
+\begin{proof}
+%($X^*$ Convex) Suppose $X^*=\emptyset$. The empty set is convex so done.
+%Now suppose that $X^*$ is nonempty. Choose any $x,y\in X^*$.  It must be
+%the case that $f(x) = f(y)$, otherwise the smaller of the two would not
+%be a maximizer of the function and, therefore, not in $X^*$. So define
+%$f^* = f(x) = f(y)$.
+
+%Now to draw a contradiction, suppose that $X^*$ is not convex. That
+%means there exists a $\lambda$ such that
+%\begin{align*}
+  %z_\lambda = \lambda x + (1-\lambda)y \not\in X^*
+%\end{align*}
+%Since $z_\lambda \not\in X^*$, it is not a maximizer. Therefore
+%\begin{align*}
+  %f(z_\lambda) &< f^* = \lambda f^* + (1-\lambda)f^* \\
+  %\Rightarrow\quad
+  %f(\lambda x + (1-\lambda)y) &< \lambda f(y) + (1-\lambda)f(y) \\
+%\end{align*}
+%But that's a contradiction since we assumed $f$ is concave.
+
+(Part 1, $X^*$ Convex) Suppose $X^*=\emptyset$. The empty set is convex
+so done.  Now suppose that $X^*$ is nonempty. Choose any $x,y\in X^*$.
+It must be the case that $f(x) = f(y)$, otherwise the smaller of the two
+would not be a maximizer of the function and, therefore, not in $X^*$.
+So define $f^* = f(x) = f(y)$.  Then $X^* = C^+_f(f^*)$, which is a
+convex set whenever $f$ is concave by
+Proposition~\ref{prop:convexfcnset}.
+
+(Part 2, Uniqueness for Strictly Concave $f$)
+Suppose $X^*$ consists of more than one distinct point. Then take any
+two $x,y\in X^*$. As before $f(x)=f(y)=f^*$ for some $f^*$, othwerise
+the smaller of the two would not be a maximizer.
+
+Now take any $\lambda\in(0,1)$ and construct
+\begin{align*}
+  z_\lambda = \lambda x + (1-\lambda)y
+\end{align*}
+Since $X^*$ is convex by the first part of the proof, $z_\lambda\in
+X^*$. Moreover, since $f$ is strictly concave, by the definition of
+strict concavity,
+\begin{align*}
+  f(\lambda x + (1-\lambda) y)
+  &>
+  \lambda f(x) + (1-\lambda) f(y) \\
+  \Leftrightarrow \quad
+  f(z_\lambda) &> \lambda f^* + (1-\lambda) f^* = f^* \\
+  \Rightarrow\quad
+  f(z_\lambda) &> f^*
+\end{align*}
+In summary, $z_\lambda \in X^*$ and it's bigger than both $x$ and $y$.
+That contradicts our definitions of $X^*$ and $f^*$.
+\end{proof}
+
+\subsection{The Lagrangian and the Dual}
+
+\begin{defn}{(Lagrangian)}
+Given Problem~\ref{prob:max}, define the \emph{Lagrangian}
+\begin{align*}
+    \Lg(x,\lambda,\mu)
+    := f_0(x)
+    + \sum^m_{i=1} \lambda_i f_i(x)
+    + \sum^k_{i=1} \mu_i g_i(x)
+\end{align*}
+where vectors $\lambda$ and $\mu$ are called the \emph{Lagrange
+multipliers}. Overall, $\Lg$ is a function of $n+m+k$ variables since
+$x\in\Rn$, $\lambda\in\mathbb{R}^m$, and $\mu\in\mathbb{R}^k$
+\end{defn}
+
+As explained in Boyd,\footnote{This is reproduced essentially verbatim
+because I liked their explanation so much. Go read their book for an
+even better and more detailed explanation}.  we can interpret the
+Lagrangian as a linear approximation of Problem~\ref{prob:max}.
+Specifically, we want to maximize $f_0$ subject to the constraints.
+Well, if we introduce functions that impose an infinite penalty to
+violating the constraints, we can write the maximization problem in one
+line:
+\begin{align}
+  \label{prob:linapprox}
+  \max_{x\in\mathcal{D}} \;
+  f_0(x) + \sum^m_{i=1} I_+(f_i(x))
+  + \sum^k_{i=1} I_0(g_i(x))
+\end{align}
+where
+\begin{align*}
+  I_+(y) =
+  \begin{cases}
+    -\infty & y < 0 \\
+    0 & y \geq 0
+  \end{cases}
+  \qquad
+  I_0(y) =
+  \begin{cases}
+    -\infty & y \neq 0 \\
+    0 & y = 0
+  \end{cases}
+\end{align*}
+In other words, if you violate the constraints, you get an infinite
+penalty.  So in trying to maximize objection function of our new
+Problem~\ref{prob:linapprox}, we see that the optimization will result
+in an $x\in\mathcal{D}$ that satisfies the constraints and avoids the
+infinite penalties.
+
+The Lagrangian is quite similar. But instead of using an infinite
+penalty, it introduces a \emph{linear} penalty for some vectors
+$\lambda$ and $\mu$.
+
+\begin{defn}{(Lagrange Dual Function)}
+Given Lagrangian $\Lg(x,\lambda,\mu)$, define the \emph{Lagrange dual
+function}, or simply the \emph{dual}, as
+\begin{align*}
+  g(\lambda,\mu) = \sup_{x\in\mathcal{D}} \; \Lg(x,\lambda,\mu)
+  = \sup_{x\in\mathcal{D}}
+    \left\{ f_0(x)
+    + \sum^m_{i=1} \lambda_i f_i(x)
+    + \sum^k_{i=1} \mu_i g_i(x)
+    \right\}
+\end{align*}
+If the sup does not exist, simply define $g(\lambda,\mu)=+\infty$.
+Here, $\lambda$ and $\mu$ are parameters.
+\end{defn}
+
+The Lagrange dual function is hugely important. While we generally have
+no guarantees about the shape of the objective function or the
+Lagrangian (unless we impose restrictive assumptions on the functions
+$f_0$, $f_i$, and $g_i$), we will see that the Lagrange dual function is
+\emph{always} convex for canonical Problem~\ref{prob:max}. So we can
+apply many of the nice results that we saw in
+Section~\ref{sec:extrema-concave} for extrema of convex and concave
+functions without assuming anything.  Moreover, we can use the dual to
+bound from above the value of the objective function at the optimum.
+This follows because the dual is a family of upper bounds for the
+objective function, parameterized by the vectors $\lambda$ and $\mu$.
+Now let's make all of these formal statements.
+
+\begin{thm}{\emph{(Dual as Upper Bound)}}
+\label{thm:dual-bound}
+For any feasible points $x\in\mathscr{F}$ in the domain $\mathcal{D}$,
+and $\lambda\geq 0$, we have
+\begin{align}
+  f_0(x) \leq g(\lambda,\mu)
+  \label{ineq:dual-bound-f}
+\end{align}
+Moreover, given optimal value $p^*$,
+\begin{align}
+  p^* \leq g(\lambda,\mu)
+  \label{ineq:dual-bound-p}
+\end{align}
+So even if we don't know the max $p^*$, we can bound it.
+\end{thm}
+
+\begin{proof}
+Take feasible point $x\in \mathscr{F}$. By the definition of feasibility
+it satisfies the constraints. So first,
+\begin{align*}
+  g_i(x)=0 \; \forall i
+  \implies
+  \sum_{i=1}^k g_i(x) = 0
+\end{align*}
+Next, since $\lambda\geq 0$,
+\begin{align*}
+  f_i(x) \geq 0 \; \forall i
+  \implies
+  \sum_{i=1}^m f_i(x) \geq 0
+\end{align*}
+So in adding this two things to $f_0(x)$, we can only increase the value
+of the sum:
+\begin{align*}
+  f_0(x) \leq f_0(x)
+  + \underbrace{\sum_{i=1}^m f_i(x)}_{\geq 0}
+  + \underbrace{\sum_{i=1}^k g_i(x)}_{=0}
+\end{align*}
+Finally, take the sup of the object on the righthand side of the
+inequality---which can only increase the value---and you end up with
+$g(\lambda,\mu)$, proving Inequality~\ref{ineq:dual-bound-f}. Taking the
+sup over $f_0(x)$ on the lefthand side too gives $p^*$, proving
+Inequality~\ref{ineq:dual-bound-p}.
+\end{proof}
+
+\begin{thm}
+Given Canonical Optimization Problem~\ref{prob:max}, the Lagrange dual
+function $g(\lambda,\mu)$ is \emph{convex}, even without any additional
+assumtions on functions $f_0$, $f_i$, or $g_i$.
+\end{thm}
+
+\subsection{The Dual Canonical Optimization Problem}
+
+Suppose you have Canonical Optimization Problem~\ref{prob:max}. You can
+always write down and solve the \emph{dual} problem which, not
+surprisingly, involves working with the dual function for the problem.
+Often, this is much easier to solve, so I now lay out that problem
+explicitly, just like Problem~\ref{prob:max}.
+
+Given Canonical optimization Problem~\ref{prob:max} and corresponding
+dual function $g(\lambda,\mu)$, define the \emph{Dual Problem}
+\begin{align}
+  \label{prob:dual}
+  \min_{\lambda,\mu} \; &g(\lambda,\mu) \\
+  \text{s.t.} \; &\lambda \geq 0\notag
+\end{align}
+where $\lambda\in\R^m$ and $\mu\in\R^k$.
+
+\paragraph{Terminology and Notation}
+\begin{enumerate}
+  \item \emph{Dual Feasible}: Pair $(\lambda,\mu)$ is ``dual feasible''
+    if $\lambda\geq 0$.
+  \item \emph{Dual Value}, $d^*$: The optimum of
+    Problem~\ref{prob:dual}, $d^* = \inf_{(\lambda,\mu), \lambda\geq 0}
+    g(\lambda,\mu)$
+  \item \emph{Weak Duality}, $p^*\leq d^*$: This follows from
+    Theorem~\ref{thm:dual-bound}, where $p^*$ is the optimal point of
+    corresponding canonical Problem~\ref{prob:max}.
+  \item \emph{Strong Duality}, $p^*=d^*$: This does not hold in general,
+    but we care about precisely those cases where it does.
+\end{enumerate}
+Now let's see some theorems about when strong duality holds.
+
+
+
+\subsection{Equality Constraints}
+
+\subsubsection{Single Constraint}
+Suppose that for vector $x$ and scalar-valued differentiable functions
+$f$ and $g$, we are faced with the problem
+\begin{align}
+  \max_x &f(x) \label{prob:eqconst}\\
+  \text{s.t. } &g(x) = 0 \notag
+\end{align}
+If this were an \emph{unconstrained} optimization, we'd just find the
+point(s) in the domain of $f$ where $f'(x)=0$, i.e.\ where $f$ doesn't
+change in a small neighborhood about $x$.
+\\
+\\
+But since this is a \emph{constrained} optimization problem, we can't do
+quite that, but we will do something close: Find the point(s) where $f$
+doesn't increase/change in a small neighborhood about $x$
+\emph{restricted to the domain} where $g(x)=0$.
+\\
+\\
+The intuition is quite simple. Whether the problem is constrained or
+not, you want to find points where $f$ doesn't increase much in the
+neighborhood of $x$---otherwise, you'd take a tiny step to an $x^*$ such
+that $f(x^*) > f(x)$, and get an improvement.
+\\
+\\
+So how do we find $x$ when constrained by $g(x)=0$?
+\begin{enumerate}
+  \item Walk along the contour line of $g$ such that $g(x)=0$. In other
+    words, stay on the equality constraint.
+  \item Look for points where $f$ does not change as we walk, which
+    happens when either
+    \begin{enumerate}
+      \item There's a portion of your walk along $g(x)=0$ (i.e. there is
+        a small neighborhood) that also has you walking along a contour
+        of $f$. By definition, walking along a contour of $f$ means that
+        $f$ is not changing. Since $f$ is not changing and you're still
+        on $g(x)=0$, you have a candidate.
+
+        Now in math, it must be the case that in this small
+        neighborhood, $f$ and $g$ have the same directional gradient,
+        since (1) gradients are always perpendicular to contour lines
+        and (2) the contour $g(x)=0$ and some contour of $f$ are
+        \emph{the same} (at least in this small neighborhood). That
+        implies
+        \begin{align}
+          \nabla f = -\lambda \nabla g
+          \label{eq:lag1}
+        \end{align}
+        where $\lambda$ is a constant that simply scales the gradient of
+        $g$. We need to include that because while the gradients point
+        in the same direction, there is no guarantee their magnitude is
+        the same.
+
+      \item You actually found an extremum of $f$ such that $g(x)=0$
+        \emph{and} $f'(x)=0$. That's the best case scenario: even with
+        the constraint, you can still hit an unconstrained extremum of
+        $f$.
+
+        In math, we can also use Equation~\ref{eq:lag1} since
+        $\nabla f=0$ in this case, and we can just set $\lambda=0$.
+    \end{enumerate}
+  \end{enumerate}
+Therefore, we can solve constrained optimization
+Problem~\ref{prob:eqconst} by defining the Lagrangian $\mathscr{L}$
+and finding $x$ such that
+\begin{align}
+  g(x) &= 0\label{lagrangeSingle}\\
+  \nabla \mathscr{L}(x,\lambda) &= 0 \notag\\\notag\\
+  \text{where} \quad
+  \mathscr{L}(x,\lambda) &:= f(x) + \lambda g(x) \notag
+\end{align}
+We see that differentiating $\mathscr{L}$ with respect to $\lambda$ and
+setting it equal to zero just gives us the constraint $g(x)=0$, while
+differentiating with respect to elements of $x$ gives (\ref{eq:lag1}).
+Hence, the maximization of $\mathscr{L}$ is equivalent to all of the
+conditions and setup described above.
+
+\subsubsection{Multiple Constraints}
+
+In the case where we have multiple constraints $g_1(x)=\cdots=g_K(x)=0$,
+solve
+\begin{align}
+  g_k(x) &= 0 \qquad\qquad k=1,\ldots,K\label{lagrangeMultiple}\\
+  \nabla \mathscr{L}(x,\lambda) &= 0 \notag\\\notag\\
+  \text{where} \quad
+  \mathscr{L}(x,\lambda)
+  &:= f(x) + \lambda \cdot g(x) \notag\\
+  \lambda &:=
+  \begin{pmatrix}\lambda_1 & \cdots & \lambda_k\end{pmatrix} \notag\\
+  g(x) &=
+  \begin{pmatrix}g_1(x) & \cdots & g_K(x)\end{pmatrix}^T \notag
+\end{align}
+Note that the gradient $\nabla \mathscr{L}$ is taken with respect to
+\emph{all} arguments of $\mathscr{L}$: all elements of vector $x$ and
+$\lambda_1,\ldots,\lambda_K$.
+
+Much of the intuition from the last section holds, but now for each
+$g_k$: We want to find points that are on $g_k(x)$---but now for
+multiple $k$---where $f$ doesn't change very much.
+
+\subsubsection{Interpretation of the Multipliers}
+
+Suppose that our constraints take the form
+\begin{align*}
+  h_k(x) = c_k
+  \qquad \Rightarrow \qquad
+  g_k(x) := c_k-h_k(x) = 0
+\end{align*}
+where the $g_k$ match those above in
+Representation~\ref{lagrangeMultiple}.
+
+Well then by the definition of $\mathscr{L}$, we can differentiate with respect to the constraint $c_k$ to find
+\begin{align*}
+  \frac{\partial\mathscr{L}}{\partial c_k}
+  &= \lambda_k
+\end{align*}
+Therefore, the Lagrange multiplier $\lambda_k$ represents the amount by
+which the Lagrange function $\mathscr{L}$ changes when you relax
+constraint constant $c_k$ a little bit.
+
+Even more, since $g_k(x^*)=0$ at the optimum $x^*$, this is not just the
+change in $\mathscr{L}$, but the change in the objective function $f$:
+\begin{align*}
+  \frac{\partial f(x^*)}{\partial c_k} = \lambda^*_k
+\end{align*}
+where $\lambda^*_k$ is the value of the multiplier at the extremum.
+
+This is important in economics, since often $f$ is utility or profits,
+in which case $\lambda^*_k$ tells you the amount by which profits or
+utility would increase if you had a little more $c_k$ (often cash money
+or consumption or something).
+
+\subsection{Inequality Constraints}
+
+Now suppose that for vector $x$ and scalar-valued differentiable
+functions $f$, $g_k$ ($k~=~1,\ldots,K$), and $h_j$ ($j~=~1,\ldots,J$),
+we are faced with the problem
+\begin{align}
+  \max_x &f(x) \label{prob:ineqconst}\\
+  \text{s.t. } &g_k(x) \leq 0 \qquad k=1,\ldots,K\notag\\
+               &h_j(x) =0 \qquad j=1,\ldots,J\notag
+\end{align}
+Then the optimum $x^*$ satisfies
+\begin{align*}
+\end{align*}
+
+\subsection{The Concave Programming Problem}
+
+In this section, I cover a special case of Problem~\ref{prob:max} that
+is particularly well behaved. Specifically, the problem is as before
+with additional assumptions on the constraints:
+\begin{alignat}{3}
+  \text{Concave Objective Function:} \qquad
+    && \max_{x\in\mathcal{D}} \; &f_0(x) \label{prob:maxconcave}\\
+  \text{Concave Inequality Constraints:} \qquad
+    && \text{s.t.} \; &f_i(x) \geq 0 \qquad i = 1,\ldots, m\notag \\
+  \text{Affine Equality Constraints:} \qquad
+    && &a_i^T x = b_i \qquad i = 1,\ldots,k\notag
+\end{alignat}
 
 
 %% APPPENDIX %%
-
 % \appendix
 
+% Optimization problem
+% - KKT Conditions: These are necessary conditions for an optimum
+% - When some x* satisfies the KKT conditions
+%   - If x* is regular and a soln
+% - Strong Duality: Slater and regularity
+% - Regularity
+% - How to solving this shit
 
+% Dynamic programming
+% - correspondences
+% - hemi continuity
+% - canonical problem: stokey vs sarget notation
+% - Bellman Operator
+
+
+%Basic results about Derivatives
+  %- Implicit function
+  %- inverse function
+  %- Leibnitz
+  % Rn\rightarrow\Rm
+%Function spaces as an up front section
+%Norms in an up front section with basics
 
 
 \end{document}
