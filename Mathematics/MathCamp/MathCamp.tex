@@ -61,6 +61,7 @@
 \newtheorem{ax}[thm]{Axiom}
 \newtheorem{defn}[thm]{Definition}
 \newtheorem{ex}[thm]{Example}
+\newtheorem{assump}[thm]{Assumption}
 
 \theoremstyle{remark}
 \newtheorem*{rmk}{Remark}
@@ -202,6 +203,7 @@
 \newcommand{\limn}{\lim_{n\rightarrow\infty}}
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\Rk}{\mathbb{R}^n}
 \newcommand{\Rnn}{\mathbb{R}^{n\times n}}
 \newcommand{\C}{\mathbb{C}}
 \newcommand{\Cn}{\mathbb{C}^n}
@@ -213,9 +215,14 @@
 \newcommand{\sumin}{\sum^n_{i=1}}
 \newcommand{\sumkn}{\sum^n_{k=1}}
 \newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
 \newcommand{\dom}{\text{dom}}
 \newcommand{\Lg}{\mathscr{L}}
-
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -749,8 +756,6 @@ solve for $\lambda$ that imply
 \begin{align*}
   \det(A-\lambda I)=0
 \end{align*}
-
-
 \end{proof}
 
 
@@ -2206,7 +2211,7 @@ might differ, hence the subscripted $d_X$ and $d_Y$.
 I will sometimes write the function's metric spaces explicitly as
 $f:(X,d_X)\rightarrow(Y,d_Y)$.
 
-\subsection{Primitives}
+\subsection{Open and Closed Sets}
 
 \begin{defn}{(Open Ball)}
 Given space $X$ and real number $r>0$, we define an \emph{open ball}
@@ -3548,6 +3553,46 @@ we have
 \end{align*}
 \end{prop}
 
+\begin{prop}{\emph{(Concave-Convex Relationship)}}
+Suppose that $f:C\subseteq\Rn\rightarrow \R$ is a function defined on
+convex domain $C$. Then
+\begin{align*}
+  f \; \text{concave}
+  \iff
+  -f \; \text{convex}
+\end{align*}
+\end{prop}
+
+\begin{prop}
+\label{prop:supconvex}
+Given a (possibly uncountable) family of functions
+$\mathscr{F}=\{f_\alpha\}_{\alpha\in J}$, define
+\begin{align*}
+  f^*(x) &:= \sup_{\alpha\in J} f(x)\\
+  f_*(x) &:= \inf_{\alpha\in J} f(x)
+\end{align*}
+If $\mathscr{F}$ is a family of convex functions, then $f^*$ is also
+convex. If $\mathscr{F}$ is a family of concave functions, then $f_*$ is
+also concave.
+\end{prop}
+\begin{proof}
+For the convex case, not that
+\begin{align*}
+  f^*(\lambda x + (1-\lambda)y)
+  &= \sup_{\alpha \in J}
+  f_\alpha(\lambda x + (1-\lambda)y)\\
+  \text{$\forall \alpha\in J$ by convexity} \qquad
+  &\leq \sup_{\alpha \in J}
+  \lambda f_\alpha(x) + (1-\lambda)f_\alpha(y)
+  \leq \lambda \sup_{\alpha \in J} f_\alpha(x)
+  + (1-\lambda)\sup_{\alpha \in J} f_\alpha(y)\\
+  \Leftrightarrow\quad
+  &\leq \lambda f^*(x)
+  + (1-\lambda) f^*(y)\\
+\end{align*}
+Hence $f^*$ is convex. The proof is analogous for the convex case.
+\end{proof}
+
 \begin{lem}
 \label{lem:unique-invertible}
 Suppose $A\in\Rnn$. Then
@@ -3668,16 +3713,6 @@ simplifies to
 Hence $g$ is strictly convex.
 \end{proof}
 
-
-\begin{prop}{\emph{(Concave-Convex Relationship)}}
-Suppose that $f:C\subseteq\Rn\rightarrow \R$ is a function defined on
-convex domain $C$. Then
-\begin{align*}
-  f \; \text{concave}
-  \iff
-  -f \; \text{convex}
-\end{align*}
-\end{prop}
 
 
 \begin{defn}{(Level, Upper-Contour, and Lower-Contour Sets)}
@@ -4006,7 +4041,7 @@ swap ``semidefinite'' for ``definite'' in the conditions above.
 \clearpage
 \section{Fixed Points}
 
-\subsection{Contraction Mapping Theorem}
+\subsection{Preliminaries: Operators}
 
 \begin{defn}{(Operator)}
 If $X$ is some function space
@@ -4043,6 +4078,8 @@ It takes a function $f$, integrates it, and returns a number.
 Therefore, $T$ is an operator.
 \end{ex}
 
+\subsection{Contraction Maps}
+
 \begin{defn}{(Contraction Map)}
 In metric space $(X,d)$, the function $T: X\rightarrow X$ is a
 \emph{contraction map} if and only there exists a $\beta \in (0,1)$ such
@@ -4069,6 +4106,25 @@ Sub in $\delta$ for $d(x,y)$ and solve for $\delta$
   \delta = \frac{\varepsilon}{\beta}
 \end{align*}
 \end{proof}
+
+
+\begin{thm}{\emph{(Blackwell's Sufficient Conditions for a Contraction)}}
+Suppose that we have some operator
+$T:\mathscr{B}(X,\R)\rightarrow\mathscr{B}(X,\R)$ on the space of
+bounded functions under the sup norm $d_\infty$.
+Suppose that $T$ satisfies
+\begin{enumerate}
+  \item \emph{Monotonicity}: $f(x) \leq g(x)$ for all $x$
+    $\implies$ $T[f(x)] \leq T[g(x)]$.
+  \item \emph{Discounting}: $T[f(x)+a] \leq T[f(x)] + \beta a$ for some
+    $\beta\in(0,1)$.
+\end{enumerate}
+Then $T$ is a contraction map of modulus $\beta$.
+\end{thm}
+
+
+
+\subsection{Contraction Mapping Theorem}
 
 \begin{thm}{\emph{(Banach Fixed Point, Contraction Mapping Theorem)}}
 \label{thm:banach}
@@ -4377,43 +4433,62 @@ sets---is open as well.
 
 \paragraph{Terminology and Notation}
 \begin{enumerate}
-  \item \emph{Feasible Point}: Any point $x\in\mathcal{D}$ that
-    satisfies all of the inequality and equality constraints.
-  \item \emph{Feasible Set}, $\mathscr{F}$: The set of all feasible
+  \item \emph{Feasible Point}, $x\in\mathscr{F}_p$: Any point
+    $x\in\mathcal{D}$ satisfying all of the inequality and equality
+    constraints.
+  \item \emph{Feasible Set}, $\mathscr{F}_p$: The set of all feasible
     points.
   \item \emph{Optimal Value}, $p^*$: The maximal value of the problem,
-    $\sup_{x\in \mathscr{F}} f_0(x)$
+    over the feasible set $\max_{x\in \mathscr{F}_p} f_0(x)$.
   \item \emph{Optimal Point}, $x^*$: Any feasible point
-    $x^*\in\mathscr{F}$ such that $f_0(x^*)=p^*$.
+    $x^*\in\mathscr{F}_p$ such that $f_0(x^*)=p^*$.
 \end{enumerate}
-
-I will collectively refer to this entire problem as
-Problem~\ref{prob:max} or the ``Canonical Optimization Problem'', and
-solving it will be the goal of this entire section. I will proceed by
-starting with some general results about extrema, which correspond to
+I will collectively refer to this entire problem as either
+Problem~\ref{prob:max}, the ``Canonical Optimization Problem'', or the
+``Primal Problem'' (in contrast to the ``Dual Problem'' which will be
+introduced later). Solving Problem~\ref{prob:max} will be the goal of
+this entire section. I will proceed by starting with some general
+results about extrema, which correspond to solving
 Problem~\ref{prob:max} without any constraints---simple unconstrained
-optimization over a function's entire domain. I will then add on the
-equality constraints, and then the inequality constraints.
+optimization over a function's entire domain, given particular
+assumptions about $f$. I will then introduce the notion of the ``Dual
+Problem'', which simply turns Problem~\ref{prob:max} into a different
+(often simpler and equivalent) optimization problem. I will then offer
+some intuition, examples, and applications under equality and inequality
+constraints.
 
 But it's important to note that I am currently assuming nothing about
 the underlying functions that define the problem---not continuity,
-differentiability, concavity, convexity, etc. Of course, they will
-occasionally factor in later, since we often use continuity to ensure
-existence of a maximum or concavity/convexity to ensure uniqueness.
-\emph{However}, we will also derive many useful results where we impose
-no assumptions on the problem. So any assumptions will generally be made
-very explicit, and in each iteration of
-Problem~\ref{prob:max}---unconstrained, equality constrained, equality
-and inequality constrained---I will present a mix assumption-free and
-assumption-heavy results.
+differentiability, concavity, convexity, etc. Of course, these
+assumptions will factor in later, since we often use continuity to
+ensure existence of a maximum or concavity/convexity to ensure
+uniqueness. \emph{However}, we will also derive many useful results
+where we impose no assumptions on the problem. So any assumptions will
+generally be made very explicit, and I will present throughout this
+section a mix assumption-free and assumption-heavy results.
 
+\subsection{Concave Programming Problem}
+
+In this section, I introduce a special case of Problem~\ref{prob:max}
+that is particularly well behaved. Specifically, the problem is as
+before with additional assumptions on the constraints:
+\begin{alignat}{3}
+  \text{Concave Objective Function:} \qquad
+    && \max_{x\in\mathcal{D}} \; &f_0(x) \label{prob:maxconcave}\\
+  \text{Concave Inequality Constraints:} \qquad
+    && \text{s.t.} \; &f_i(x) \geq 0 \qquad i = 1,\ldots, m\notag \\
+  \text{Affine Equality Constraints:} \qquad
+    && &a_i^T x = b_i \qquad i = 1,\ldots,k\notag
+\end{alignat}
+I will collectively refer to this as Problem~\ref{prob:maxconcave}, or
+the ``Concave Programming Problem.''
 
 \subsection{Extrema: Definitions and Facts}
 \label{sec:extrema}
 
 In this section, I cover some basic results about extrema of functions.
-Note that I do not assume that functions are differentiable. Unless I
-specifically say the function is differentiable, it holds generally.
+Note that I do not necessarily assume functions are differentiable.
+Unless differentiability is explicitly stated, a result holds generally.
 
 \begin{defn}{(Local Maximum)}
 For function $f:S\subseteq\Rn\rightarrow \R$, we say that $\bar{x} \in
@@ -4435,7 +4510,8 @@ $f_i(\bar{x})$ exists.  Then $f_{i}(\bar{x})=0$.
 First, the converse does not hold. Saddle points have $f_i(x)=0$ for all
 partial derivatives, but they are not extrema. In other words, the
 condition $f_i(\bar{x})=0$ is necessary but not sufficient for $\bar{x}$
-to be a local maximum.
+to be a local maximum. Only if we impose regularity conditions on the
+function will this be sufficient.
 
 Second, I'm not saying that the partial derivative \emph{will} exist or
 that the function is differentiable. I'm saying that \emph{if it is
@@ -4446,11 +4522,12 @@ fact, differentiable everywhere in the domain.
 \end{note}
 
 \begin{defn}{(Critical Point)}
-Suppose that $f:\Rn\rightarrow\R$ is a differentiable function. The
-point $x^*\in\Rn$ is called a \emph{critical point} of $f$ if
+Suppose that $f:S\rightarrow\R$ is a differentiable function on open set
+$S\in\Rn$. The point $x^*\in\Rn$ is called a \emph{critical
+point} of $f$ if
 \begin{align*}
   \nabla f(x^*) = 0
-  \iff
+  \quad\text{or equivalently}\quad
   f_i(x^*)=0
   \quad\forall i=1,\ldots,n
 \end{align*}
@@ -4468,8 +4545,7 @@ point of $f$ (i.e.\ $\nabla f(x^*)=0$), we have
 \begin{align*}
   x^* \in \arg\max_{x\in C} f(x)
 \end{align*}
-For $f$ is \emph{strictly} concave, $x^*$ is is a \emph{unique} global
-max.
+For $f$ \emph{strictly} concave, $x^*$ is is a \emph{unique} global max.
 \end{prop}
 \begin{proof}
 By Theorem~\ref{thm:diffconvex} (but flipped since $f$ is now concave),
@@ -4557,7 +4633,7 @@ In summary, $z_\lambda \in X^*$ and it's bigger than both $x$ and $y$.
 That contradicts our definitions of $X^*$ and $f^*$.
 \end{proof}
 
-\subsection{The Lagrangian and the Dual}
+\subsection{The Lagrangian and the Lagrange Dual Function}
 
 \begin{defn}{(Lagrangian)}
 Given Problem~\ref{prob:max}, define the \emph{Lagrangian}
@@ -4600,19 +4676,20 @@ where
     0 & y = 0
   \end{cases}
 \end{align*}
-In other words, if you violate the constraints, you get an infinite
-penalty.  So in trying to maximize objection function of our new
-Problem~\ref{prob:linapprox}, we see that the optimization will result
-in an $x\in\mathcal{D}$ that satisfies the constraints and avoids the
-infinite penalties.
+So if you violate the constraints, you get an infinite penalty.  In
+trying to maximize objection function of Problem~\ref{prob:linapprox},
+we see that the optimization will result in an $x\in\mathcal{D}$ that
+avoids the infinite penalties, and so satisfies the constraints.
 
-The Lagrangian is quite similar. But instead of using an infinite
-penalty, it introduces a \emph{linear} penalty for some vectors
-$\lambda$ and $\mu$.
+The Lagrangian is quite similar to the objective function in
+Problem~\ref{prob:linapprox}. But instead of using an infinite penalty,
+it introduces a \emph{linear} penalty for some vectors $\lambda$ and
+$\mu$.
 
 \begin{defn}{(Lagrange Dual Function)}
-Given Lagrangian $\Lg(x,\lambda,\mu)$, define the \emph{Lagrange dual
-function}, or simply the \emph{dual}, as
+Given canonical Problem~\ref{prob:max} and corresponding Lagrangian
+$\Lg(x,\lambda,\mu)$, define the \emph{Lagrange dual function}, or
+simply the \emph{dual}, as
 \begin{align*}
   g(\lambda,\mu) = \sup_{x\in\mathcal{D}} \; \Lg(x,\lambda,\mu)
   = \sup_{x\in\mathcal{D}}
@@ -4625,23 +4702,24 @@ If the sup does not exist, simply define $g(\lambda,\mu)=+\infty$.
 Here, $\lambda$ and $\mu$ are parameters.
 \end{defn}
 
-The Lagrange dual function is hugely important. While we generally have
-no guarantees about the shape of the objective function or the
-Lagrangian (unless we impose restrictive assumptions on the functions
-$f_0$, $f_i$, and $g_i$), we will see that the Lagrange dual function is
-\emph{always} convex for canonical Problem~\ref{prob:max}. So we can
-apply many of the nice results that we saw in
+The Lagrange dual function is hugely important because it is
+well-behaved and extrema of the dual provide a lot of information about
+the problem we really want to solve, Problem~\ref{prob:max}.  First,
+while we generally have no guarantees \emph{a priori} about the shape of
+the objective function or the Lagrangian (unless we impose restrictive
+assumptions on $f_0$, $f_i$, and $g_i$), we will see that the Lagrange
+dual function is \emph{always} convex. So we can find extrema of the
+dual by applying many of the nice results that we saw in
 Section~\ref{sec:extrema-concave} for extrema of convex and concave
-functions without assuming anything.  Moreover, we can use the dual to
-bound from above the value of the objective function at the optimum.
-This follows because the dual is a family of upper bounds for the
-objective function, parameterized by the vectors $\lambda$ and $\mu$.
-Now let's make all of these formal statements.
+functions without assuming anything. Second, we can use the dual to
+bound from above the optimal vlaue $p^*$ of Problem~\ref{prob:max}.
+Now let's turn all of these wildly ludicrous and unbelievable claims
+into formal statements.
 
-\begin{thm}{\emph{(Dual as Upper Bound)}}
+\begin{thm}{\emph{(Dual as Bound)}}
 \label{thm:dual-bound}
-For any feasible points $x\in\mathscr{F}$ in the domain $\mathcal{D}$,
-and $\lambda\geq 0$, we have
+For any point $x\in\mathscr{F}_p$ in the feasible set of
+Problem~\ref{prob:max} and $\lambda\geq 0$, we have
 \begin{align}
   f_0(x) \leq g(\lambda,\mu)
   \label{ineq:dual-bound-f}
@@ -4655,8 +4733,8 @@ So even if we don't know the max $p^*$, we can bound it.
 \end{thm}
 
 \begin{proof}
-Take feasible point $x\in \mathscr{F}$. By the definition of feasibility
-it satisfies the constraints. So first,
+Take feasible point $x\in \mathscr{F}_p$. By the definition of
+feasibility it satisfies the constraints. So first,
 \begin{align*}
   g_i(x)=0 \; \forall i
   \implies
@@ -4668,8 +4746,8 @@ Next, since $\lambda\geq 0$,
   \implies
   \sum_{i=1}^m f_i(x) \geq 0
 \end{align*}
-So in adding this two things to $f_0(x)$, we can only increase the value
-of the sum:
+So in adding these two things to $f_0(x)$, we can only increase the
+value of the sum:
 \begin{align*}
   f_0(x) \leq f_0(x)
   + \underbrace{\sum_{i=1}^m f_i(x)}_{\geq 0}
@@ -4682,19 +4760,38 @@ sup over $f_0(x)$ on the lefthand side too gives $p^*$, proving
 Inequality~\ref{ineq:dual-bound-p}.
 \end{proof}
 
-\begin{thm}
+\begin{thm}{\emph{(Dual Convex)}}
+\label{thm:dual-convex}
 Given Canonical Optimization Problem~\ref{prob:max}, the Lagrange dual
-function $g(\lambda,\mu)$ is \emph{convex}, even without any additional
-assumtions on functions $f_0$, $f_i$, or $g_i$.
+function $g(\lambda,\mu)$ is \emph{convex}, even without any assumtions
+on functions $f_0$, $f_i$, or $g_i$.
 \end{thm}
+\begin{proof}
+Given $x\in\mathcal{D}$, define
+\begin{align*}
+  \varphi_x(\lambda,\mu) = f_0(x)
+    + \sum^m_{i=1} \lambda_i f_i(x)
+    + \sum^k_{i=1} \mu_i g_i(x)
+\end{align*}
+This function is an affine function of $\lambda$ and $\mu$. Therefore,
+it is both concave and convex. So we are correct in saying that
+$\{\varphi_x\}_{x\in\mathcal{D}}$ is a family of concave functions, so
+\begin{align*}
+  g(\lambda,\mu) = \sup_{x\in\mathcal{D}} \varphi_x(\lambda,\mu)
+\end{align*}
+will be convex by Proposition~\ref{prop:supconvex} since
+$g(\lambda,\mu)$ is the the supremum of a family of convex functions.
 
-\subsection{The Dual Canonical Optimization Problem}
+\end{proof}
 
-Suppose you have Canonical Optimization Problem~\ref{prob:max}. You can
-always write down and solve the \emph{dual} problem which, not
-surprisingly, involves working with the dual function for the problem.
-Often, this is much easier to solve, so I now lay out that problem
-explicitly, just like Problem~\ref{prob:max}.
+\subsection{The Dual Problem to the Canonical Optimization Problem}
+
+Suppose you have Canonical Optimization Problem~\ref{prob:max}. If that
+is the \emph{primal} problem, you can always write down and solve the
+\emph{dual} problem which, not surprisingly, involves working with the
+Lagrange dual function for the problem. Often, this is much easier to
+solve, so I now lay out that problem explicitly, just like
+Problem~\ref{prob:max}.
 
 Given Canonical optimization Problem~\ref{prob:max} and corresponding
 dual function $g(\lambda,\mu)$, define the \emph{Dual Problem}
@@ -4704,22 +4801,290 @@ dual function $g(\lambda,\mu)$, define the \emph{Dual Problem}
   \text{s.t.} \; &\lambda \geq 0\notag
 \end{align}
 where $\lambda\in\R^m$ and $\mu\in\R^k$.
+Since $g(\lambda,\mu)$ is convex by Theorem~\ref{thm:dual-convex}, this
+is a nice, well-behaved optimization problem to solve.
 
 \paragraph{Terminology and Notation}
 \begin{enumerate}
-  \item \emph{Dual Feasible}: Pair $(\lambda,\mu)$ is ``dual feasible''
-    if $\lambda\geq 0$.
+  \item \emph{Dual Feasible}, $(\lambda,\mu)\in\mathscr{F}_d$: Pair
+    $(\lambda,\mu)$ is ``dual feasible'' if $\lambda\geq 0$.
   \item \emph{Dual Value}, $d^*$: The optimum of
-    Problem~\ref{prob:dual}, $d^* = \inf_{(\lambda,\mu), \lambda\geq 0}
+    Problem~\ref{prob:dual}, $d^* = \min_{(\lambda,\mu)\in\mathscr{F}_d}
     g(\lambda,\mu)$
-  \item \emph{Weak Duality}, $p^*\leq d^*$: This follows from
-    Theorem~\ref{thm:dual-bound}, where $p^*$ is the optimal point of
-    corresponding canonical Problem~\ref{prob:max}.
+  \item \emph{Weak Duality}, $p^*\leq d^*$: This follows immediately
+    from Theorem~\ref{thm:dual-bound}, where $p^*$ is the optimal point
+    of primal Problem~\ref{prob:max}.
   \item \emph{Strong Duality}, $p^*=d^*$: This does not hold in general,
-    but we care about precisely those cases where it does.
+    but we care about precisely those cases where it does because of the
+    next theorem.
+  \item \emph{Duality Gap}, $p^*-d^*$: Positive number corresponding to
+    difference of primal and dual optimal values. No duality gap if and
+    only if strong duality.
 \end{enumerate}
-Now let's see some theorems about when strong duality holds.
 
+\begin{thm}{\emph{(Bounding Suboptimality)}}
+Given Canonical Problem~\ref{prob:max}, corresponding Lagrange dual
+function $g(\lambda,\mu)$, the primal and dual optimal values $p^*,
+d^*$, and any primal and dual feasible triplet $(x,\lambda,\mu)$ with
+$x\in\mathscr{F}_p$ and $(\lambda,\mu)\in\mathscr{F}_d$, we can bound
+suboptimality as follows
+\begin{align*}
+  0 \leq \underbrace{p^* - f_0(x)}_{\text{Suboptimality}}
+  \leq d^* - f_0(x)
+  \leq g(\lambda,\mu) - f_0(x)
+\end{align*}
+Hence $p^*\in [f_0(x), d^*]$, and $d^*\in[f_0(x),g(\lambda,\mu)]$.
+\end{thm}
+\begin{rmk}
+This theorem is incredible! Without knowing $p^*$---the optimal value of
+the primal problem that you really want to find---you can bound how far
+away you are. For any (repeat: \emph{any}) problem in Canonical
+Representation~\ref{prob:max} (with zero assumptions), if I know the
+dual $g(\lambda,\mu)$ and the objective function $f_0(x)$, I can tell
+how far away $f_0(x)$ is from the optimal value $p^*$ that I am trying
+to find. And in general, we \emph{always} know $g(\lambda,\mu)$ and
+$f_0(x)$. Moreover, we can establish the tightest bound by solving the
+convex Dual Problem~\ref{prob:dual} for $d^*$.
+
+Moreover, this provides a nice stopping-criterion when solving
+Problem~\ref{prob:max} with a computer. Specifically, if we want to find
+an $x^*$ such that $f_0(x^*)$ is
+no more than $\varepsilon$ units away from  optimum $p^*$, try different
+values of $x$ (hopefully in some algorithmic, intelligent, sequential
+way). At each step, compute $f_0(x)$ and $d^*$ (or $g(\lambda,\mu)$) at
+each iteration, check the bound $p^*-f_0(x)$, and stop if this is
+guaranteed to be less than $\varepsilon$.
+\end{rmk}
+
+\begin{defn}{(Slater's Condition)}
+Given Canonical Problem~\ref{prob:max}, we say that the problem
+satisfies \emph{Slater's condition} if there exists at least one
+$\hat{x}\in\mathscr{F}_p$ such that
+\begin{align*}
+  f_i(\hat{x})>0
+  \quad \forall i=1,\ldots,m
+\end{align*}
+In words, there exists at least one point interior to the feasible set
+of the problem (i.e.\ not on the boundary for any inequality
+constraint).
+\end{defn}
+
+\begin{thm}{\emph{(Slater's Theorem)}}
+If you have Concave Programming Problem~\ref{prob:maxconcave} and it
+satisfies Slater's Condition, then you have strong duality, i.e.\
+$p^*=d^*$.
+
+In words, the existence of at least one point interior to the primal
+feasible set (not on the boundary for any primal constraint) guarantees
+strong duality.
+\end{thm}
+
+\subsection{KKT Conditions}
+
+Suppose that you have a point $x^*$ in the domain of
+Problem~\ref{prob:max}.  How can you easily check if it is optimal, or
+rule it out as suboptimal? In other words, what are some necessary or
+sufficient conditions that $x^*$ must satisfy if it really is an
+optimum?  In some cases, the answer is the Karush-Kuhn-Tucker (KKT)
+Conditions.
+
+The KKT conditions are a set of sometimes-necessary, sometimes-sufficent
+conditions that are useful for characterizing solutions to nonlinear
+optimization problems in the form of Problem~\ref{prob:max}. When
+exactly they are necessary and when exactly they are sufficient is
+complicated, so special care will be taken to note this explicitly.
+But first, we state the KKT conditions (along with some intuition),
+before deriving them explicitly.
+
+%, but there are also certain ``Constraint Qualifications''
+%(CQ) or regularity conditions that the point must meet for the KKT
+%Conditions to be necessary.  More compactly
+%\begin{align*}
+  %\text{$x^*$ satisfies CQ}
+  %\implies
+  %\text{KKT conditions necessary for $x^*$ to be an optimum}
+%\end{align*}
+%``Constraint Qualifications'' (CQ) are restrictions that rule out weird
+%irregular cases where $x^*$ is an optimal point at the boundary of the
+%constraint set but $x^*$ \emph{does not} satisfy the KKT conditions.
+%Again, if CQ are satisfied, then the Karush-Kuhn-Tucker (KKT) Conditions
+%are a set of \emph{first order} \emph{necessary} conditions that must
+%hold for $x^*$ to be an optimal point of Problem~\ref{prob:max}.
+
+%This suggests a way to test if $x^*$ is an optimal point of
+%Problem~\ref{prob:max}. Specifically, $x^*$ is an optimum if either
+%\begin{enumerate}
+  %\item Point $x^*$ satisfies some constraint qualifications and the
+    %consequently necessary KKT conditions.
+  %\item Point $x^*$ does not satisfy some constraint qualifications, so
+    %$x^*$ could still be an optimum though the KKT conditions might not
+    %be satisfied.
+%\end{enumerate}
+%Therefore, to find optima, examine points where both the KKT conditions
+%\emph{hold} and points where CQ fails.
+
+%Note, that I've said nothing about sufficiency. Constraint
+%qualifications and the KKT conditions only concern necessary conditions.
+%We'll have to say more to guarantee sufficiency (and I will below).
+
+\begin{defn}{(KKT Conditions)}
+Given optimal canonical optimization Problem~\ref{prob:max},
+$(x^*,\lambda^*,\mu^*)$ satisfies the KKT conditions if all of the
+following hold:
+\begin{enumerate}
+  \item \emph{$x^*$ Stationary point of Lagrangian}:
+    \begin{align*}
+      0 &= \nabla_x \Lg(x^*,\mu^*,\lambda^*)
+        = \nabla_x f_0(x^*)
+        + \sum^m_{i=1} \lambda_i^* \; \nabla_x f_i(x^*)
+        + \sum^k_{i=1} \mu_i^* \; \nabla_xg_i(x^*)
+    \end{align*}
+  \item \emph{Primal feasibility}, $x^*\in \mathscr{F}_p$: $x^*$ is a
+    feasibile point, satisfying all constraints of primal
+    Problem~\ref{prob:max}
+    \begin{align*}
+      x^*\in \mathscr{F}
+      \implies
+      \begin{cases}
+        f_i(x^*)\geq 0 & i = 1,\ldots,m\\
+        g_i(x^*)= 0 & i = 1,\ldots,k
+      \end{cases}
+    \end{align*}
+
+  \item \emph{Dual Feasibility}, $(\lambda^*,\mu^*)\in\mathscr{F}_d$:
+    Pair $(\lambda^*,\mu^*)$ is a feasible point, satisfying all
+    constraints of Dual Problem~\ref{prob:dual}
+    \begin{align*}
+      \lambda^*_i \geq 0
+      \qquad i=1,\ldots,m
+    \end{align*}
+
+  \item \emph{Complementary Slackness}: For inequality constraint $i$,
+    either the inequality is binding so $f_i(x^*)=0$, or it's not
+    binding and multiplier $\lambda^*_i=0$. That can be encapsulated in
+    one line as
+    \begin{align}
+      \label{kkt:slackness}
+      \lambda_i^* f_i(x^*) =0
+      \qquad i=1,\ldots,m
+    \end{align}
+     %Recall the interpretation of the multipliers: $\lambda_i^*$ is how
+     %much the objective function would increase if constraint $i$ were
+     %relaxed.  Well, if the constraint is non-binding, $f_i(x^*)>0$ and
+     %the objective function wouldn't change after relaxing that
+     %constraint.  So $\lambda_i^*$ should be zero. And if inequality
+     %constraint $i$ binds, then $f_i(x^*)=0$ so $\lambda^*_i$ can be any
+     %finite number So Equation~\ref{kkt:slackness} provides a nice
+     %one-line encapsulation of these two possibilities.
+\end{enumerate}
+Now we move on to some theorems and results that tell us about when the
+conditions are necessary, sufficient, or both.
+\end{defn}
+
+\begin{thm}{\emph{(Primal Solution $+$ Strong Duality $\implies$ Dual
+Solution Satisfying KKT)}}
+Suppose that strong duality holds.  If $x^*\in\mathscr{F}_p$ solves
+Problem~\ref{prob:max}, then there exist
+$(\lambda^*,\mu^*)\in\mathscr{F}_d$ solving the Dual
+Problem~\ref{prob:dual} such that $(x^*,\lambda^*,\mu^*)$ satisfy the
+KKT conditions.
+\end{thm}
+\begin{proof}
+Since $x^*\in\mathscr{F}_p$ solves the problem, it trivially satisfies
+KKT Condition 2, Primal Feasibility.
+
+Next, since $x^*$ solves the primal problem, $f_0(x^*)=p^*$. By strong
+duality, $d^*=p^*$ exists so the dual problem has a solution. Since
+$d^*$ exists and the dual problem has a solution, we can choose
+\begin{align}
+  \label{eq:pick-lambda-mu}
+  (\lambda^*,\mu^*) \in \mathscr{F}_d
+  \quad \text{such that}
+  \quad g(\lambda^*,\mu^*) = d^*
+\end{align}
+Since $(\lambda^*,\mu^*)\in\mathscr{F}_d$, we also know $\lambda^*\geq
+0$, satisfying KKT Condition 3, Dual Feasibility.
+
+Next, we can chain together
+%since $\lambda^*\geq 0$ and $x^*\in\mathscr{F}_p$ satisifies all
+%of the constraints,
+\begin{align*}
+  \text{Since $x^*$ solves primal} \qquad p^* &= f_0(x^*) \\
+  \text{Since $x^*\in\mathscr{F}_p$ and $\lambda^*\geq 0$} \qquad
+  &\leq f(x^*) + \sum^m_{i=1} \lambda^* f_i(x^*)
+  + \sum^k_{i=1} \mu_i^* g_i(x^*) \\
+  \text{By definition of sup} \qquad
+  &\leq \sup_{x\in D} f(x) + \sum^m_{i=1} \lambda^* f_i(x)
+  + \sum^k_{i=1} \mu_i^* g_i(x) \\
+  \text{By definition of $g(\lambda,\mu)$} \qquad
+  &= g(\lambda^*,\mu^*) \\
+  \text{By Equation~\ref{eq:pick-lambda-mu}'s
+    choice of $(\lambda^*,\mu^*)$} \qquad &= d^* \\
+  \text{By strong duality}\qquad
+  &= p^*\\
+  \text{Since $x^*$ solves primal}\qquad
+  &= f_0(x^*)
+\end{align*}
+Buried in that chain is the squeezing
+\begin{align*}
+  p^*
+  &\leq f_0(x^*) + \sum^m_{i=1} \lambda^* f_i(x^*)
+  + \sum^k_{i=1} \mu_i^* g_i(x^*)
+  \leq p^*
+\end{align*}
+Since $f(x^*)=p^*$ and the equality constraints are defined to equal
+zero for feasible $x^*$ (i.e.\ $\sum^k_{i=1}\mu^*_ig_i(x^*)=0$), it must
+also be the case that
+\begin{align*}
+  \sum^m_{i=1} \lambda^* f_i(x^*)
+  =0
+\end{align*}
+Hence, we satisfy KKT Condition 4, Complementary Slackness.
+
+Lastly, also buried in that chain is
+\begin{align}
+  f_0(x^*)
+  = f_0(x^*) + \sum^m_{i=1} \lambda^* f_i(x^*)
+  + \sum^k_{i=1} \mu_i^* g_i(x^*)
+  = \sup_{x\in D} f_0(x) + \sum^m_{i=1} \lambda^* f_i(x)
+  + \sum^k_{i=1} \mu_i^* g_i(x)
+  \label{kkt:criticalproof}
+\end{align}
+Now think of the guy on the very right as a function of $x$ only, where
+$(\lambda^*,\mu^*)$ are fixed---call it
+$\Lg_{\lambda^*,\mu^*}(x):=\Lg(x,\lambda^*,\mu^*)$.
+Equation~\ref{kkt:criticalproof} effectively says that
+$x^*\in\mathcal{D}$ maximizes $\Lg_{\lambda^*,\mu^*}(x)$, so the sup is
+really a max. Since the domain $\mathcal{D}$ is an open set and since
+the point maximizes the function, it must be the case that
+\begin{align*}
+  0 &= \nabla_x \Lg_{\lambda^*,\mu^*}(x^*)
+  =:
+  \nabla_x \Lg(x^*,\lambda^*,\mu^*)
+\end{align*}
+And that's precisely KKT Condition 1, implying $x^*$ is a stationary
+point of the Lagrangian.
+
+\end{proof}
+
+
+\begin{thm}
+If canonical optimization Problem~\ref{prob:max} satisfies strong
+duality ($p^*=d^*$)
+\begin{enumerate}
+  \item $x^*$ is a solution of Problem~\ref{prob:max} implies that there
+    exist $(\lambda^*,\mu^*)$ such that $(x^*,\lambda^*,\mu^*)$ satisfy
+    the KKT Conditions.
+  \item $g(\lambda^*,\mu^*)=d^*$, i.e. the multipliers associated with
+    $x^*$ are solve the dual problem.
+  \item If Problem~\ref{prob:max} is concave, satisfying
+    Problem~\ref{prob:maxconcave}, then the converse is also true. In
+    other words, the KKT conditions are sufficient.
+\end{enumerate}
+\end{thm}
+\begin{proof}
+(Part 1)
+\end{proof}
 
 
 \subsection{Equality Constraints}
@@ -4866,52 +5231,1145 @@ we are faced with the problem
                &h_j(x) =0 \qquad j=1,\ldots,J\notag
 \end{align}
 Then the optimum $x^*$ satisfies
+
+\clearpage
+\section{Discrete-Time Deterministic Dynamic Programming}
+\label{sec:discrete-dynamic}
+
+In the last section, we saw how to find optimal points for optimization
+problems with a finite number of constraints. In this section, we tackle
+optimization problems that require choosing allocations over
+time---especially into the infinite future---subject to certain
+constraints.
+
+\subsection{Preliminaries: Correspondences}
+
+\begin{defn}{(Correspondence)}
+A \emph{Correspondence} $\Gamma:X\rightrightarrows Y$ is a function that
+maps any element of $X$ into a subset of $Y$. Moreover, if
+$\Gamma(x)\subseteq Y$ is \emph{compact} for all $x\in Y$, then we say
+that $\Gamma$ is a \emph{compact correspondence}.
+\end{defn}
+
+\begin{ex}
+Here's an example of a correspondence $\Gamma: \R\rightrightarrows\R$.
+\begin{figure}[htpb!]
+\centering
+\begin{tikzpicture}[xscale=1.5]
+  % Upper bound of region
+  \draw[d4blue, ultra thin, domain=0.1:4, fill=d4blue, opacity=0.4] %
+    (0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+3}) -- (4,0);
+
+  % Lower bound of region
+  \draw[white, ultra thick, domain=0.1:4, fill=white] %
+    (0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+1}) -- (4,0);
+
+  % Axis
+  \draw[d4black, <->] (0,5) -- (0,0) -- (4,0);
+
+  % Dashed Line at x
+  \draw[d4black, ultra thick, dashed, -] %
+    (2,0) node[below, yshift=-5pt] {$x$} -- (2,1.8);
+
+  % Vertical \Gamma(x) line
+  \draw[d4black, ultra thick, -] (2,1.8) -- (2,3) -- (2,3.8);
+
+  % Brace marking Gamma(x)
+  \draw[%
+      d4black, decorate, %
+      decoration={brace, amplitude=10pt, mirror}, xshift=2pt
+    ] %
+    (2,1.8) -- (2,3.8) node[midway, right, xshift=12pt] {$\Gamma(x)$};
+\end{tikzpicture}
+\end{figure}
+
+As shown, numbers in $\R$ on the $x$-axis map into intervals along the
+$y$-axis (rather than just a single point as they would for a curve).
+An example is shown for one particular $x$.
+\end{ex}
+
+\begin{defn}{(Lower Hemi-Continuous)}
+Correspondence $\Gamma:X\rightrightarrows Y$ is \emph{lower
+hemi-continuous} (LHC) if and only if points don't ``pop up out of
+nowhere'' in the limit.
+
+Formally, choose $x\in X$. Note that we require
+$\Gamma(x)\neq\emptyset$. Now let $\{x_n\}\subseteq X$ be any arbitrary
+sequence converging to $x\in X$. Now choose any $y\in\Gamma(x)$.  For
+$\Gamma$ to be LHC at $x$, you need to be able to construct a sequence
 \begin{align*}
+  \{y_n\}\rightarrow y
+  \quad\text{s.t.}\quad
+  y_n \in \Gamma(x_n) \quad\forall n
+\end{align*}
+Now the informal definition makes sense. If $y$ popped up out of
+nowhere in the limit, then you could not construct a sequence $\{y_n\}$
+converging to it whose elements stayed inside the sets
+$\{\Gamma({x_n})\}$ the whole time.
+\end{defn}
+\begin{figure}[htpb!]
+\centering
+\begin{tikzpicture}[xscale=1.5]
+  % Upper bound of region
+  \draw[d4blue, ultra thin, domain=0.1:4, fill=d4blue, opacity=0.4] %
+    (0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+3}) -- (4,0);
+
+  % Left segment
+  \draw[white, ultra thick, domain=0.1:1, fill=white] %
+    (0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+1}) -- (1,0);
+
+  % Middle segment
+  \draw[white, ultra thick, domain=0.1:4, fill=white] %
+    (0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x}) -- (4,0);
+
+  %% Lower bound of region
+  %\draw[white, ultra thick, domain=0.1:4, fill=white] %
+    %(0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+1}) -- (4,0);
+
+  % Axis
+  \draw[d4black, <->] (0,5) -- (0,0) -- (4,0);
+
+  %% Dashed Line at x
+  %\draw[d4black, ultra thick, dashed, -] %
+    %(2,0) node[below, yshift=-5pt] {$x$} -- (2,1.8);
+
+  %% Vertical \Gamma(x) line
+  %\draw[d4black, ultra thick, -] (2,1.8) -- (2,3) -- (2,3.8);
+
+  %% Brace marking Gamma(x)
+  %\draw[%
+      %d4black, decorate, %
+      %decoration={brace, amplitude=10pt, mirror}, xshift=2pt
+    %] %
+    %(2,1.8) -- (2,3.8) node[midway, right, xshift=12pt] {$\Gamma(x)$};
+\end{tikzpicture}
+\end{figure}
+
+\begin{defn}{(Upper Hemi-Continuous)}
+The \emph{compact} correspondence $\Gamma:X\rightrightarrows Y$ is
+\emph{upper hemi-continuous} (UHC) if and only if points don't
+``disappear'' in the limit.
+
+Formally, choose $x\in X$. Note that we require
+$\Gamma(x)\neq\emptyset$. Now let $\{x_n\}\subseteq X$ be any arbitrary
+sequence converging to $x$. Also let $\{y_n\}$ be any sequence where
+\begin{align*}
+  y_n \in \Gamma(x_n) \quad\forall n
+\end{align*}
+For $\Gamma$ to be UHC at $x$, it must the case that $\{y_n\}$ has a
+convergent subsequence that converges to some $y\in \Gamma(x)$.
+
+Now the informal definition makes sense. If there were some $y'\in Y$
+such that $y_n = y' \in \Gamma(x_n)$ for all $n$ (implying
+$y_n\rightarrow y'$), then we also want $y'\in \Gamma(x)$. It shouldn't
+disappear in the limit.
+\end{defn}
+
+\begin{defn}{(Continuous Correspondence)}
+Compact-valued correspondence $\Gamma:X\rightrightarrows Y$ is
+\emph{continuous} at $x\in X$ if it is both UHC and LHC at $x$.
+\end{defn}
+
+\subsection{Preliminaries: Theorem of the Maximum}
+
+Next, suppose we want to solve an optimizaton problem of the form
+\begin{align*}
+  \max_{y\in \Gamma(x)} f(x,y)
+\end{align*}
+given objective function $f:X\times Y\rightarrow\R$ and correspondence
+$\Gamma:X\rightrightarrows Y$ that describes the feasible sets for some
+initial condition or parameter, $x\in X$.
+
+\begin{thm}
+If $f$ is continuous and $\Gamma$ is continuous and compact-valued, then
+\begin{align*}
+  y^*(x) = \argmax_{y\in\Gamma(x)} f(x,y)
+\end{align*}
+is nonempty, compact-valued, and UHC.
+\end{thm}
+
+\begin{cor}
+If $y^*(x)$ is unique for all $x$, it's just continuous rather than UHC.
+\end{cor}
+
+\begin{thm}{\emph{(Theorem of the Maximum)}}
+If $f$ is continuous and $\Gamma$ is continuous and compact-valued, then
+the function
+\begin{align}
+  \label{prob:thm-max}
+  v(x) = \max_{y\in\Gamma(x)} f(x,y)
+\end{align}
+is well-defined and continuous.
+\end{thm}
+
+
+
+\subsection{Canonical Sequential Problem and its Bellman Formulation}
+
+
+\begin{defn}{(Canonical Sequential Problem)}
+We want to solve problems of the form
+\begin{align}
+  \label{prob:sequential-short}
+  \max_{\{x_{t+1}\}_{t=0}^\infty}
+  \quad &\sumtinfz \beta^t F(x_t,x_{t+1})\\
+  &x_{t+1} \in \Gamma(x_t) \qquad \forall t\notag\\
+  &x_0 \; \text{given}\notag
+\end{align}
+This the \emph{Canonical Sequential Problem}, since the task involves
+choosing a sequence $\{(x_{t+1})\}_{t=1}^\infty$ that maximizes the
+value of the objective function.
+\begin{enumerate}
+  \item \emph{State}, $x_t$: At each time $t$, the variable
+    $x_t$---called the state---is something like a ``sufficient
+    statistic'' for the problem, encoding information about feasible
+    sets for $x_{t+1}$ or ``continuation sequences.''
+  \item \emph{Control}, $x_{t+1}$: At time $t$, taking the current state
+    $x_t$ as given, the agent chooses tomorrow's state $x_{t+1}$
+    directly (since this world is deterministic). Since this object is
+    chosen and controlled by the agent, $x_{t+1}$ is called the
+    \emph{control}.
+  \item \emph{Feasibility Constraints}, $\Gamma(x_t)$: The
+    correspondence $\Gamma(x_t)$ returns a set of possible values that
+    $x_{t+1}$ can take on.
+\end{enumerate}
+\end{defn}
+
+\begin{defn}{(Alternate Representation: Canonical Sequential Problem)}
+\label{defn:sequential-altrep}
+For completeness, here's another, perfectly equivalent way the canonical
+representation problem might be written. This corresponds to the Sargent
+representation.
+\begin{align}
+  \label{prob:altrep}
+  \max_{\{(y_t,x_{t+1})\}_{t=0}^\infty}
+  \quad &\sumtinfz \beta^t F(x_t,x_{t+1},y_t)\\
+  &x_{t+1} \in \Gamma(x_t,y_t) \qquad \forall t\notag\\
+  &x_0 \; \text{given}\notag
+\end{align}
+Everything is the same except for the introduction of $y_t$ and a slight
+change in terminology. Rather than choosing the state $x_{t+1}$ directly
+at time $t$ (and calling \emph{that} the control), the agent chooses
+$y_t$ at time $t$, which we now call the control in
+Problem~\ref{prob:altrep}.  This choice of $y_t$ then influences or
+determines the next period's state, $x_{t+1}$, according to some
+deterministic law of motion. Of course, the key insight is that we can
+always use this deterministic law of motion to write $y_t =
+g(x_t,x_{t+1})$ for some deterministic function $g$ and have the agent
+choose $x_{t+1}$---dispensing with the need to include $y_t$ at all.
+
+Therefore, I will mostly stick to the representation in
+Problem~\ref{prob:sequential-short} throughout this section. It's an
+equivalent but more compact way to write these problems, and that seems
+desirable for the upcoming proofs.
+But I wanted to mention the more verbose representation in
+Problem~\ref{prob:altrep} since it's also standard, and since this
+representation generalizes most naturally when we go to continuous time
+dynamic programming problems in Section~\ref{sec:continuous-dynamic}.
+\end{defn}
+\begin{note}
+Function $F$ and correspondence $\Gamma$ in Problem~\ref{prob:altrep}
+are different from that of Problem~\ref{prob:sequential-short}.  I used
+identical notation purely for simplicitly.
+\end{note}
+
+%\begin{defn}{(Set of Feasible Plans)}
+%Given Problem~\ref{prob:sequential-short} and starting value $x_0$,
+%define the set of all feasible sequences
+%\begin{align*}
+  %\Pi(x_0)
+  %&:= \{ \{x_{t+1}\}^\infty_{t=0} \; | \;
+  %x_{t+1}\in \Gamma(x_t) \; \forall t, \; x_0 \,\text{given}\}
+%\end{align*}
+%Therefore, a plan or sequence $\tilde{x}:=\{x_{t+1}\}_{t=0}^\infty$ is
+%feasible for Problem~\ref{prob:sequential-short} if
+%$\tilde{x}\in\Pi(x_0)$, implying that is satisfies all feasibility
+%constraints.
+%\end{defn}
+
+\begin{defn}{(Bellman Equation Formulation and Value Function)}
+\label{defn:bellman}
+Suppose that we face Problem~\ref{prob:sequential-short}.  Also suppose
+that we have access to a function $v_B(x_0)$ called the \emph{value
+function} that returns the value of the objective function in
+Problem~\ref{prob:sequential-short} \emph{after} maximizing over the set
+of all feasible plans for starting point $x_0$. (We'll prove that such a
+function does exist later. For now, just take it as given.) This
+function can be written
+\begin{align*}
+  v_B(x_0) :=
+  \max_{\{x_{t+1}\}^\infty_{t=1}}\;
+  \sumtinfz \beta^t F(x_t,x_{t+1})
+  \qquad x_{t+1}\in\Gamma(x_t)\;\forall t
+\end{align*}
+But this can instead be written recursively as
+\begin{align*}
+  v_B(x_0)
+  %&=
+  %\max_{\{x_{t+1}\}^\infty_{t=1}}\;
+  %F(x,x_1) +
+  %\sum^\infty_{t=1} \beta^t F(x_t,x_{t+1})\\
+  &=
+  \max_{\{x_{t+1}\}^\infty_{t=1}}\;
+  F(x_0,x_1) +
+  \beta \sum^\infty_{t=0} \beta^{t+1} F(x_{t+1},x_{t+2})\\
+  \Leftrightarrow\qquad
+  &=
+  \max_{x_1\in\Gamma(x_0)}\;
+  F(x_0,x_1) +
+  \beta v_B(x_1)
+\end{align*}
+Generalizing notation a bit, we have what's called the \emph{Bellman
+Equation}
+\begin{align}
+  \label{eq:vB}
+  v_B(y) &=
+  \max_{y\in\Gamma(x)}\;
+  F(x,y) +
+  \beta v_B(y)
+\end{align}
+This formulation exploits the symmetry of the problem over time to
+produce a recursive representation.  Given today's starting value $x$,
+rather than choose an infinite sequence $\{x_{t+1}\}_{t=0}^\infty$, I
+need only choose tomorrow's starting value $y$.  Since the value
+function tells me how much the starting value $y$ is worth, I can frame
+the problem as a tradeoff between $F(x,y)$ today and the discounted
+value of tomorrow's $v_B(y)$.
+
+So we've amazingly turned an infinite-dimensional sequential problem of
+finding $\{x_{t+1}\}^\infty_{t=0}$ into something much simpler, provided
+that $v_B$ exists (we'll still have to prove it does).  That means
+solving Functional Equation~\ref{eq:vB} for fixed point $v_B$. Then,
+once we have $v_B$, we can think about determining the optimal sequence.
+\end{defn}
+
+\begin{defn}{(Optimal Value)}
+\label{defn:vstar}
+Given Problem~\ref{prob:sequential-short}, define the optimal value as
+\begin{align}
+  v^*(x_0) := \sup_{\{x_{t+1}\}_{t=0}^\infty}
+  \; &\sumtinfz \beta^t F(x_t,x_{t+1})
+  \qquad \text{where}\;
+  \forall t, \; x_{t+1} \in \Gamma(x_t)
+\end{align}
+Note that I changed the max to a sup since the latter always exists, so
+this is well-defined. That's in stark contrast to $v_B$ in the Bellman
+Equation formulation, which was merely assumed to exist and also implied
+existence of a feasible plan $\{x_t\}_{t=0}^\infty$ that maximized the
+objective function. Now we'll show under what conditions $v^*$ and $v_B$
+are equal---i.e.\ the conditions under which the optimal value is
+obtained.
+\end{defn}
+
+\subsection{Principal of Optimality: Equivalence of Sequential and
+Bellman Formulations}
+
+In this section we look at conditions under which the optimal value
+function $v^*$ is also the function $v_B$ satisfying the Bellman
+Equation, and vice versa.
+
+\begin{assump}{(Nonempty Feasible Sets)}
+\label{assump:feasible}
+$\Gamma(x)\neq\emptyset$ for all $x\in X$, so we can always find a
+feasible sequence given any starting point.
+\end{assump}
+
+\begin{assump}{(Finite Objective Function)}
+\label{assump:finite}
+For all feasible sequences $\{x_{t+1}\}_{t=0}^\infty$ such that
+$x_{t+1}\in \Gamma(x_t)$ for all $t$, we have
+\begin{align*}
+  \lim_{T\rightarrow\infty} \sum_{t=0}^T \beta^t F(x_t,x_{t+1})
+  < \infty
+\end{align*}
+Note, this is assured if $F(x,y)$ is a bounded function and
+$\beta\in[0,1)$.
+\end{assump}
+
+\begin{thm}
+\label{thm:vstar-solves-bellman}
+Given Problem~\ref{prob:sequential-short}, if
+Assumptions~\ref{assump:feasible} and~\ref{assump:finite} hold, then
+$v^*$ from Definition~\ref{defn:vstar} satisfies the Bellman Equation
+\begin{align}
+  \label{vstar-solves-bellman}
+  v^*(x) = \sup_{y\in\Gamma(x)} F(x,y) + \beta v^*(y)
+\end{align}
+\end{thm}
+\begin{proof}
+For arbitrary $x\in X$, we want to show that the value $v^*(x)$ equals
+the RHS of Equation~\ref{vstar-solves-bellman}---i.e.\ that it is indeed
+the RHS sup. By the definition of sup, that's true if and only if
+\begin{enumerate}
+  \item[A1.] $v^*(x) \geq F(x,y) + \beta v^*(y)$ for all $y\in\Gamma(x)$.
+  \item[A2.] For any $\varepsilon>0$, we can find a
+    $y_\varepsilon\in\Gamma(x)$ such that
+    $
+      v^*(x) < F(x,y_\varepsilon) + \beta v^*(y_\varepsilon) + \varepsilon
+    $
+\end{enumerate}
+That's what we need to show. Now onto what we know.
+Specifically, we know that $v^*$ is the sup over the sequential problem
+as defined in Definition~\ref{defn:vstar}. So again, by the definition
+of the sup, we know that
+\begin{enumerate}
+  \item[B1.] $v^*(x) \geq \sumtinfz \beta^t F(x_t,x_{t+1})$ for all
+    feasible sequences satisfying $x_{t+1}\in\Gamma(x_t)$ with starting
+    value $x_0=x$.
+  \item[B2.] For any $\varepsilon>0$, there exists feasible
+    $\{\tilde{x}_{t+1}\}_{t=0}^\infty$ such that
+      $
+      v^*(x) < \sumtinfz \beta^t
+      F(\tilde{x}_{t}, \tilde{x}_{t+1}) + \varepsilon
+      $
+      with starting value $x_0=x$.
+\end{enumerate}
+Our task is to show that (B1) and (B2) together imply (A1) and (A2).
+
+(Show A1) Let $x_0$ and $\varepsilon>0$ be given.
+Let $x_1$ be any point in $\Gamma(x_0)$. Then by (B2)
+and some index renumbering, there exists a feasible sequence
+$\{x_{t+2}\}_{t=0}^\infty$ such that
+\begin{align}
+  v^*(x_1) &< \sumtinfz \beta^t
+  F(x_{t+1}, x_{t+2}) + \varepsilon \notag \\
+  \Leftrightarrow\quad
+  v^*(x_1) - \varepsilon &< \sumtinfz \beta^t
+  F(x_{t+1}, x_{t+2})
+  \label{seqchoice}
+\end{align}
+Onto this just-chosen sequence, prepend
+$x_1\in\Gamma(x_0)$ so we now have sequence
+$\{x_{t+1}\}_{t=0}^\infty$. All elements were chosen to be
+feasible.  So by (B1), we know that for feasible sequence
+$\{x_{t+1}\}_{t=0}^\infty$
+\begin{align*}
+  v^*(x_0)
+  &\geq \lim_{T\rightarrow\infty} \sumtTz \beta^t F(x_t,x_{t+1}) \\
+  \text{Pop off first element} \qquad
+  &= F(x_0, x_1) + \lim_{T\rightarrow\infty} \sumtT \beta^t F(x_t,x_{t+1}) \\
+  \text{Renumbering indices} \qquad
+  &= F(x_0, x_1) + \beta \lim_{T\rightarrow\infty} \sumtTz \beta^{t} F(x_{t+1},x_{t+2}) \\
+  \text{By Inequality~\ref{seqchoice}} \qquad
+  &= F(x_0, x_1)
+  + \beta \left[ v^*(x_1) - \varepsilon\right]
+\end{align*}
+Since $\varepsilon>0$, starting point $x_0$, and
+$x_1\in\Gamma(x_0)$ were arbitrary
+\begin{align*}
+  v^*(x_0)
+  &\geq F(x_0, x_1)
+  + \beta  v^*(x_1)
+\end{align*}
+which is the same as (A1), provided you replace $x_0$ and $x_1$ with $x$
+and $y$.
+
+(Show A2)
+Suppose that $x$ and $\varepsilon>0$ are given.
+By (B2), there exists a feasible sequence with $x_0=x$ such that
+\begin{align*}
+  v^*(x) &< \lim_{T\rightarrow\infty} \sumtTz \beta^t
+  F(x_{t}, x_{t+1}) + \varepsilon \\
+  \Leftrightarrow\quad
+  v^*(x) &< F(x, x_1)
+  + \lim_{T\rightarrow\infty}
+  \sumtT \beta^t
+  F(x_{t}, x_{t+1}) + \varepsilon \\
+  \Rightarrow\quad
+  v^*(x) &< F(x, x_1)
+  + \beta v^*(x_1)
+  + \varepsilon \\
+\end{align*}
+Note, we were able to replace the series $\sumtT \beta^t F(x_{t},
+x_{t+1})$ with $\beta v^*(x_1)$ by using B1.
+So now, just choose $y=x_1$. We know $x_1\in\Gamma(x_0)$ is feasible
+and $x_0=x$. This means A2 holds.
+\end{proof}
+
+Now we move onto the other direction: Does a function $v_B$ satisfying
+the Bellman Formulation also match the optimal value function $v^*$. For
+that, we need one additional assumption beyond
+Assumptions~\ref{assump:feasible} and~\ref{assump:finite} that we made
+before.
+
+\begin{assump}{(Transversality Condition)}
+\label{assump:transversality}
+For value function $v$ and all feasible sequences
+$\{x_{t+1}\}_{t=0}^\infty$ such that $x_{t+1}\in \Gamma(x_t)$ for all
+$t$, we have
+\begin{align*}
+  \lim_{t\rightarrow\infty} \beta^t v(x_t) = 0
+\end{align*}
+In words, ``The value of stuff in the infinite future doesn't matter.''
+\end{assump}
+
+\begin{thm}
+Given Problem~\ref{prob:sequential-short}, suppose
+Assumptions~\ref{assump:feasible},~\ref{assump:finite},
+and~\ref{assump:transversality} hold and that function $v_B$ satisfies
+Bellman Equation
+\begin{align}
+  \label{eq:bellmansup}
+  v_B(x) = \sup_{y\in\Gamma(x)} F(x,y) + \beta v_B(y)
+\end{align}
+Then $v_B = v^*$, the optimal value function for the sequential problem,
+which was defined in Definition~\ref{defn:vstar}.
+\end{thm}
+\begin{rmk}
+Though the Bellman formulation above used max rather than sup, I use sup
+here so I don't have to worry about existence.
+\end{rmk}
+\begin{proof}
+%In this proof, I'll be using statements similar to A1, A2, B1, and B2
+%from the proof of Theorem~\ref{thm:vstar-solves-bellman}. So let's
+%restate them appropriately for this problem.
+
+For arbitrary $x\in X$, we want to show that $v_B(x)=v^*(x)$, with the
+latter representing the optimal value---the supremum over all sequences.
+That only occurs if
+\begin{enumerate}
+  \item[A1.] $v_B(x) \geq \sumtinfz \beta^t F(x_t,x_{t+1})$ for all
+    feasible sequences satisfying $x_{t+1}\in\Gamma(x_t)$ with starting
+    value $x_0=x$.
+  \item[A2.] For any $\varepsilon>0$, there exists feasible
+    $\{\tilde{x}_{t+1}\}_{t=0}^\infty$ such that
+      $
+      v_B(x) < \sumtinfz \beta^t
+      F(\tilde{x}_{t}, \tilde{x}_{t+1}) + \varepsilon
+      $
+      with starting value $x_0=x$.
+\end{enumerate}
+That's what we need to show. Now onto what we know.  Specifically, we
+know that $v_B$ solves the Bellman Equation, so it equals the RHS of
+Equation~\ref{eq:bellmansup}. Since it's a supremum, by definition
+\begin{enumerate}
+  \item[B1.] $v_B(x) \geq F(x,y) + \beta v_B(y)$ for all $y\in\Gamma(x)$.
+  \item[B2.] For any $\varepsilon>0$, we can find a
+    $y_\varepsilon\in\Gamma(x)$ such that
+    $
+      v_B(x) < F(x,y_\varepsilon) + \beta v_B(y_\varepsilon) + \varepsilon
+    $
+\end{enumerate}
+Our task is to show that (B1) and (B2) together imply (A1) and (A2).
+
+(Show A1) Let $\{x_{t+1}\}_{t=0}^\infty$ be a feasible sequence. We can
+use B1 to recursively substitute:
+\begin{align*}
+  v_B(x) &\geq F(x,x_1) + \beta v_B(x_1) \\
+  v_B(x) &\geq F(x,x_1) + \beta F(x_1, x_2) + \beta^2 v_B(x_2) \\
+  \vdots \quad & \quad \qquad \vdots \\
+  v_B(x) &\geq \sumtTz \beta^t F(x_t,x_{t+1}) + \beta^{T+1} v_B(x_{T+1}) \\
+  \lim_{T\rightarrow\infty}
+  v_B(x) &\geq
+    \lim_{T\rightarrow\infty}
+    \left\{
+    \sumtTz \beta^t F(x_t,x_{t+1}) + \beta^{T+1} v_B(x_{T+1})
+    \right\}\\
+  v_B(x) &\geq
+    \sumtinfz \beta^t F(x_t,x_{t+1})
+    + 0
+\end{align*}
+Where we needed Assumption~\ref{assump:transversality} on transversality
+to ensure that the term $\beta^{T+1}v(x_{T+1})$ goes to zero.
+
+(Show A2) Next,
+\end{proof}
+
+\begin{ex}{(Why We Need Transversality)}
+In this example, we set up a problem whose Bellman Equation formulation
+has a solution, while the sequential problem has no optimal value
+function solution. Now onto the problem.
+
+Consider a simple consumption/investment decision:
+\begin{align*}
+  \max_{\{c_t\}_0^\infty} \; &\sumtinfz \beta^t c_t \\
+  & c_t + a_{t+1} = (1+r)a_t\\
+  & c_t \geq 0
+\end{align*}
+where $a_0$ is given as initial endowment. We can express this problem
+in standard form with $a_t$ as the state variable
+\begin{align*}
+  \max_{\{a_{t+1}\}_0^\infty} \;
+  &\sumtinfz \; \beta^t [(1+r)a_t - a_{t+1}] \\
+  & (1+r)a_t - a_{t+1} \geq 0
+\end{align*}
+where $F(a_t,a_{t+1}) = (1+r)a_t - a_{t+1}$.
+We place \emph{no restrictions} on each $a_t$---they can be arbitrarily
+negative, and that will be important.
+Under some assumptions $1+r = \frac{1}{\beta}$.
+
+So now we can write the Bellman Equation formulation:
+\begin{align*}
+  v(a) = \max_{a'} \; \left(\frac{a}{\beta} - a'\right) + \beta \, v(a')
+\end{align*}
+Now we use the guess and verify method. The guess is $v(a) = a/\beta$.
+\begin{align*}
+  \text{Check} \qquad
+  \frac{a}{\beta}
+  &= \max_{a'} \;
+  \left(\frac{a}{\beta} - a'\right)
+  + \beta \left(\frac{a'}{\beta}\right)\\
+  \frac{a}{\beta}
+  &= \max_{a'} \;
+  \frac{a}{\beta}
+  =
+  \frac{a}{\beta}
+\end{align*}
+So this solves the Bellman Equation.
+
+Time to see why this won't work. Pick initial consumption $c_0$ to be
+\emph{huge}. That is, borrow a lot so you consume a lot in the first
+period, consuming $c_0 >> a_0$.
+Thereafter, consume nothing: $c_t=0$ for $t>0$. This results in an
+investment profile of
+\begin{align*}
+  a_{1} &= \frac{a_0}{\beta} - c_0 < 0 \\
+  \Rightarrow \quad
+  a_{t+1} &= \frac{a_t}{\beta}
+  = \frac{a_0}{\beta^{t+1}} - \frac{c_0}{\beta^t}
+\end{align*}
+Since $a_1$ is negative and $\beta<1$, we see that $a_{t+1}$ will blow
+up to negative infinity.
+Now in each period, $a_{t+1}$ is a finite, very negative, but
+still-feasible number since we didn't put any borrowing constraints on.
+And that's exactly the problem. The agent could go on borrowing forever.
+
+Let's now make the violation of the transversality condition more
+explicit, checking the limit in Assumption~\ref{assump:transversality}.
+To simplify the math, let $a_0=0$. Recall that $v(a) = a/\beta$.
+\begin{align*}
+  \lim_{t\rightarrow\infty} \beta^t v(a_t)
+  = \lim_{t\rightarrow\infty} \beta^t \left(\frac{a_t}{\beta}\right)
+  = \lim_{t\rightarrow\infty} \beta^t
+  \left(
+  \frac{-c_0/\beta^{t-1}}{\beta}
+  \right)
+  = \lim_{t\rightarrow\infty}
+  -c_0
+  = -c_0 \neq 0
+\end{align*}
+In other words, the value function is not ``small'' in the infinite
+future.
+
+So in summary, there is no optimal value function $v^*$, though we were
+able to find a function satisfying the Bellman equation. In general,
+only checking the transversality condition catches this kind of problem.
+\end{ex}
+
+
+\subsection{Bellman Operator}
+
+How do you actually go about solving a Bellman Equation? In this
+section, we describe the Bellman Operator and some results about it
+which answer that question.
+
+\begin{defn}
+Define the Bellman operator
+$T:\mathscr{B}(X,\R)\rightarrow\mathscr{B}(X,\R)$
+acting on the set of bounded real-valued functions as
+\begin{align*}
+  T[v(x)]
+  &= \sup_{y\in\Gamma(x)}
+  F(x,y) + \beta v(y)
+\end{align*}
+This takes in a function $v$ and spits out another function of $x$.
+\end{defn}
+
+\begin{prop}{\emph{(Bellman Operator is a Contraction Map)}}
+\end{prop}
+
+
+\subsection{Solving by Guess and Verify}
+
+Suppose that we have Bellman Equation
+\begin{align*}
+  v(x) = \max_{y\in\Gamma(x)} F(x,y) + \beta v(y)
+\end{align*}
+The method of ``guess and verify'' involves choosing some function $v$,
+substituting it into the RHS and maximizing the RHS over all feasible
+$y\in\Gamma(x)$. The result is a function, and you check that it is
+identical to the original $v$ on the LHS.
+
+Often, everything is differentiable, so this means differentiate the
+RHS, set equal to zero, solve for $y$, plug in the result, and check
+\begin{align*}
+  0 &= \frac{\partial}{\partial y}
+  \left[
+    F(x,y) + \beta\, v(y)
+  \right] \\
+  \text{Solve for $y$}
+  \quad \qquad \;
+  0 &= F_y(x,y) + \beta \, v_y(x) \\
+  \text{Plug in result $y^*$ and check} \qquad
+  v(x) &= F(x,y^*) + \beta\, v(y^*)
 \end{align*}
 
-\subsection{The Concave Programming Problem}
+\begin{ex}
+Suppose that we face problem
+\begin{align*}
+  v(k) = \max_{k'\in[0,f(k)]} u(f(k)-k') + \beta\, v(k')
+\end{align*}
+where $u=\log(c)$ and $f(k)=k^\alpha$.
 
-In this section, I cover a special case of Problem~\ref{prob:max} that
-is particularly well behaved. Specifically, the problem is as before
-with additional assumptions on the constraints:
-\begin{alignat}{3}
-  \text{Concave Objective Function:} \qquad
-    && \max_{x\in\mathcal{D}} \; &f_0(x) \label{prob:maxconcave}\\
-  \text{Concave Inequality Constraints:} \qquad
-    && \text{s.t.} \; &f_i(x) \geq 0 \qquad i = 1,\ldots, m\notag \\
-  \text{Affine Equality Constraints:} \qquad
-    && &a_i^T x = b_i \qquad i = 1,\ldots,k\notag
-\end{alignat}
+First step: divine inspiration says guess $v(k) = a + b \; \log(k)$ for
+some constants $a$ and $b$ that we'll pin down later.
+Now, differentiate the RHS:
+\begin{align*}
+  \frac{\partial}{\partial k'}
+  \left[
+  u(f(k)-k') + \beta\, v(k')
+  \right]
+  &=
+  \frac{\partial}{\partial k'}
+  \left[
+    \log\left(
+    k^\alpha - k'
+    \right)
+    + \beta (a + b\, \log(k'))
+  \right] \\
+  &= -\frac{1}{k^\alpha-k'}
+  + \frac{b\beta}{k'}
+\end{align*}
+Set that equal to zero and solve for $k'$
+\begin{align*}
+  0
+  &= -\frac{1}{k^\alpha-k'}
+  + \frac{b\beta}{k'}\\
+  \Rightarrow\quad
+  k' &= \frac{b\beta}{1+b\beta} k^\alpha
+\end{align*}
+Now substitute this into the RHS, and try to work it into something that
+looks like $v(k) = a + b\,\log(k)$:
+\begin{align*}
+  RHS = u(f(k)-k') + \beta \, v(k')
+  &=
+  \log\left(
+    k^\alpha - \frac{b\beta}{1+b\beta} k^\alpha
+  \right)
+  + \beta
+    \left[
+      a + b\,\log\left(\frac{b\beta}{1+b\beta} k^\alpha\right)
+    \right] \\
+  &=
+  \log\left(
+    \frac{k^\alpha}{1+b\beta}
+  \right)
+  + a\beta + b\beta\,\log\left(\frac{b\beta}{1+b\beta} k^\alpha\right) \\
+  &=
+  [a\beta
+  + b\beta\,\log\left(b\beta\right)
+  - (1+b\beta)\log\left( 1+b\beta \right)]
+  +\alpha(1+b\beta)\log\left( k \right)
+\end{align*}
+Bit of a monster, but we have isolated a bunch of constants and a
+constant times $\log k$. We just need to match up constants, so start
+with the coefficient on $\log k$:
+\begin{align*}
+  b\log(k)
+  &= \alpha(1+b\beta) \log(k) \\
+  \Rightarrow\quad
+  b &= \frac{\alpha}{1-\alpha \beta}
+\end{align*}
+Next, match up the constants to $a$ and solve for $a$ (leaving $b$ as
+is):
+\begin{align*}
+  a
+  &=
+  a\beta + b\beta\,\log\left(b\beta\right)
+  - (1+b\beta)\log\left( 1+b\beta \right) \\
+  \Rightarrow\qquad
+  a
+  &=
+  \frac{1}{1-\beta}
+  \left[
+    b\beta\,\log\left(b\beta\right)
+  - (1+b\beta)\log\left( 1+b\beta \right) \right]\\
+\end{align*}
+For this choice of constants, $v(k) = a + b\,\log(k)$ solves the Bellman
+Equation.
+\end{ex}
+
+\clearpage
+\section{Continuous-Time Deterministic Dynamic Programming}
+\label{sec:continuous-dynamic}
+
+In this section, we extend the work of
+Section~\ref{sec:discrete-dynamic} on discrete-time dynamic programming
+into continuous time. In practice, that means sums become integrals and
+difference equations become \emph{differential} equations.  The
+formulation we generalize is Problem~\ref{prob:altrep} rather than the
+equivalent and more compact Problem~\ref{prob:sequential-short}.
+
+\subsection{Canonical Problem and the Hamiltonian}
+
+Give some objective function $F(x,y,t)$, we want to choose functions
+of time, $x_t$ and $y_t$, to solve
+%of time, $x_t$ with range $\Rn$ and $y_t$ with range $\R^k$, to solve
+\begin{align}
+  \max_{x_t,y_t} \; &\int^{t_1}_{0} F(x_t,y_t,t) \; dt
+  \label{prob:cts-dynamic} \\
+  \text{s.t.} \;
+  & \dot{x}_t = G(x_t,y_t,t) \notag \\
+  %& y_t \in Y_t \subseteq \R^k \quad \forall t\notag \\
+  & y_t \in Y_t \quad \forall t\notag \\
+  & x_0 \; \text{given} \notag
+\end{align}
+We will consider problems where the terminal time $t_1$ is finite and
+where it is infinite.
+Again, the key features of this problem are
+\begin{enumerate}
+  \item \emph{State}, $x_t$:
+    %A ``sufficient statistic'' encoding information about feasible sets.
+    Its evolution is summarized by a differential equation, where
+    $\dot{x}_t := \frac{\partial x_t}{\partial t}$. The evolution of the
+    state is influenced by the current state, the choice of control, and
+    time.
+  \item \emph{Control}, $y_t$: Chosen by the agent in response to the
+    state $x_t$. This influences the evolution of the state in the
+    future.
+  \item \emph{Feasibility Constraints}, $y_t\in Y_t$: At each time
+    period, there is some feasible set $Y_t$ in $\R$ or $\Rk$ (if there
+    are multiple control variables). We require the choice of control
+    $y_t$ lies in $Y_t$ at each period.
+\end{enumerate}
+
+We now look for the optimal solution by using the \emph{variational
+principle} of the calculus of variations. Assume there exists some
+continuous, feasible function $\hat{y}_t$.
+
+\begin{defn}{(Hamiltonian)}
+Given Problem~\ref{prob:cts-dynamic}, define the \emph{Hamiltonian}
+\begin{align*}
+  H(x,y,\lambda,t) := F(x,y,t) + \lambda G(x,y,t)
+\end{align*}
+where $\lambda$ is called the \emph{co-state}.
+This is very much like the static-optimizaton Lagrangian, only now,
+we're doing dynamic optimization that involves more than one time
+period.
+\end{defn}
+
+\begin{defn}{(Necessary Conditions)}
+Given $x_t,\lambda_t$, the function $y\in \argmax_{y\in Y}
+H(x,y,\lambda,t)$ is a maximum satisfying the necessary conditions
+\begin{enumerate}
+  \item $H_y (x_t,y_t,\lambda_t,t) = 0$
+  \item $\dot{x}_t = H_\lambda(x_t,y_t,\lambda_t,t) = G(x_t, y_t, t)$
+  \item $\dot{\lambda}_t = - H_x(x_t, y_t, \lambda_t, t)$
+  \item $x(0) = x_0$ given
+  \item $\lambda(t_1)=0$ if $t_1< \infty$
+\end{enumerate}
+\end{defn}
+
+\end{document}
+
+
+%Suppose that an infinitely-lived agent gets utility in period $t$ from
+%consuming $y_t$. The variable $y_t$ is called the \emph{control}; its
+%value is chosen by the agent at time $t$ given some pre-determined
+%value, $x_t$, called the \emph{state}.  Between periods, the future
+%state $x_{t+1}$ is a deterministic function of $x_t$ and $y_t$, i.e.
+%\begin{align}
+  %\label{xevol}
+  %x_{t+1} = g(x_t, y_t)
+  %\qquad
+  %\text{$x_0$ given}
+%\end{align}
+%Typically, the function $g$ will involve some tradeoff between $y_t$ and
+%$x_{t+1}$. For example, given $x_t$, the more $y_t$ (perhaps
+%consumption) an agent chooses today, the less $x_{t+1}$ he gets next
+%period (perhaps capital from investment).
+
+%Next, our problem is to maximize discounted lifetime utility:
+%\begin{align}
+  %\label{toughproblem}
+  %\sum^\infty_{t=0} \beta^t u(y_t)
+  %\qquad \beta\in (0,1)
+%\end{align}
+%by choosing a feasible and optimal path $\{ y_t \}_0^\infty$, again
+%subject to an initial condition $x_0$.  Here,
+%``optimal'' means utility maximizing. Typically, feasibility
+%will be determined by some sort of resource constraint
+%(such as $y_t\leq x_t$ or $y_t\leq f(x_t)$) or some
+%restriction to non-negativity of the sequence(s) $\{ y_t
+%\}$ and/or $\{x_t\}$.
+
+%To make things simpler, we will now define a bit of
+%notation for feasibility. At time $t$, the set of all
+%feasible $y_t$ is denoted $\mathcal{F}_t$. Therefore, $y_t$
+%is feasible if $y_t\in \mathcal{F}_t$. More generally, a
+%sequence $\{y_t\}^\infty_0$, abbreviated $\{y_t\}$, is
+%feasible if $\{y_t\} \subset \mathcal{F}$.
+
+
+%\subsection{Value Function and Bellman Equation}
+
+%For reasons that we'll see soon, we'll want to define the
+%Bellman Equation for our optimization problem. That first
+%entails defining the value function, $v^*$:
+%\begin{align*}
+  %v^*(x_0) = \sup_{ \{y_t\} \subset \mathcal{F}}
+  %\sum^\infty_{t=0} \beta^t u(y_t)\;
+  %\qquad
+  %\text{$x_0$ given}
+%\end{align*}
+%In words, the value function $v^*(x_0)$ describes that
+%maximum discounted value that can be obtained from initial
+%state $x_0$.
+
+%With the value function defined, we can now write the
+%Bellman Equation, which looks very similar to what we had
+%for the Shortest Path problem described above:
+%\begin{align}
+  %v^*(x_t) &= \max_{y_t \in \mathcal{F}_t}
+  %\left\{ u(y_t) + \beta \; v^*\big(g(x_t, y_t)\big) \right\} \\
+    %\text{By (} \quad \Leftrightarrow \quad
+  %&= \max_{y_t \in \mathcal{F}_t}
+    %\left\{ u(y_t) + \beta v^*(x_{t+1}) \right\} \notag
+%\end{align}
+%Intuitively, this equation says that you maximize the value from the
+%current state, $x_t$, by trading off current reward, $u(y_t)$, in
+%exchange for the discounted future value of the resulting state,
+%$\beta v^*(x_{t+1})$.
+
+%Since we've formulated the problem in Bellman terms, it's
+%clear that we'll eventually want to apply dynamic
+%programming methods to solve for the value function $v^*$.
+%That's what we did in the Shortest Path problem above; it's
+%likely what we'll want to do again.
+
+
+%\emph{However}, solving for the value function $v^*$ above
+%doesn't \emph{quite} give us what we want. We don't just
+%want to know the maximum lifetime utility of an agent; we
+%want to know what path they will choose for the control.
+%In other words, we want to know $\{y_t\}_0^\infty$.
+
+%To solve for this sequence, we now discuss the policy function approach,
+%which allows us to answer this question while also redefining the
+%motivating problem and the Bellman Equation in simpler, more practical
+%terms.
+
+
+%\subsection{The Policy Function Approach}
+
+%To start, note that even if we can solve for the value function,
+%$v^*(x_0)$ (and we can't yet), our real goal of directly specifying the
+%optimal path $\{y_t\}_0^\infty$ is hard. It amounts to selecting a point
+%in infinite-dimensional space.  So we'll do something easier.
+%Specifically, we'll seek a \emph{policy function}---some function or
+%``decision rule'' $\sigma$ that depends only upon the current state such
+%that
+%\begin{align}
+  %\label{markov}
+  %y_t = \sigma(x_t) = \sigma(g(x_{t-1}, y_{t-1}))
+  %\qquad \sigma \in \Sigma
+%\end{align}
+%where $\Sigma$ is the set of all feasible policies. So rather than
+%trying to say \emph{what} an agent will choose, we'll describe
+%\emph{how} that agent will choose.
+
+%Now a well-known result from dynamic programming says that, in the types
+%of problems we want to consider, an optimal consumption sequence must be
+%Markov just as in Equation \ref{markov} above, so that a policy function
+%$\sigma$ will, indeed, exist.  This function $\sigma$ will also be
+%time-homogeneous, so it will remain the same for all $t$.  This is all
+%just to say that we're doing something reasonable that will allow us to
+%find the optimal path $\{y_t\}$.
+
+%\subsubsection{Adapting the Problem and Objective}
+
+%So first, we can rewrite our motivating problem as
+%expressed in () and () in
+%terms of the policy function:
+%\begin{align}
+  %\label{policyapproach}
+  %\max_{\sigma \in \Sigma}
+  %&\left\{ \sum^\infty_{t=0} \beta^t u(\sigma(x_t)) \right\}\\
+  %\text{where} &\quad
+  %x_{t+1} = g(x_t, \sigma(x_t))
+  %\qquad \text{$x_0$ given}
+  %\notag
+%\end{align}
+%Since $g$ is assumed deterministic, we see that the only
+%unknown in the problem written above is the policy
+%function, $\sigma$. We have everything else we need.
+
+%This is the crux of the policy function approach.
+%Rather than having our unknown be a utility-maximizing
+%infinite sequence $\{y_t\}^\infty_0$, we find a single
+%function $\sigma$ that provides a map or decision rule to
+%go from the state ($x_t$) to the optimal choice for the
+%control ($y_t$).  This choice then propagates to the next
+%period via deterministic $g$ to define the state next
+%period.
+
+%\subsubsection{Adapting the Value Function}
+
+%Now that we've translated the basic problem into policy
+%function terms, let's see what that means for the value
+%function and Bellman equation we defined above.
+
+%So first, for each feasible policy $\sigma\in
+%\Sigma$, define a \emph{policy value
+%function}: \begin{align*}
+  %v_\sigma(x_0) :=
+  %\left\{ \sum^\infty_{t=0} \beta^t u(\sigma(x_t)) \right\}
+%\end{align*}
+%This gives the utility conditional on a policy and an initial
+%condition.  Our goal will be to choose an \emph{optimal} policy,
+%i.e. a policy function that yields the highest utility over the
+%set of all $\sigma \in \Sigma$.
+
+%Therefore, our definition of the \emph{value function} $v^*$ can
+%be rewritten as
+%\begin{align}
+  %\label{valfn}
+  %v^*(x_0) := \sup_{\sigma\in\Sigma} \; v_\sigma(x_0)
+%\end{align}
+%A policy is called ``optimal'' if it attains the supremum in
+%(\ref{valfn}) for all $x_0$.
+
+%\subsubsection{Policies and the Bellman Equation}
+
+%Finally, let's finish off the last link in the chain and consider the
+%Bellman Equation in terms of a policy function. As we'll see in the next
+%section, we'll actually
+
+%First, let's define a concept: Consider some continuous function $w$.
+%We say that a policy $\sigma\in\Sigma$ is \emph{$w$-greedy} if
+%$\sigma(x)$ solves
+%\begin{align*}
+  %\max_{y_t \in F_t}
+  %\left\{ u(y_t) + \beta w\big(g(x_t, y_t)\big)\right\}
+%\end{align*}
+%There might be many policies that solve this; therefore, there might be
+%a set of $w$-greedy policies given any initial state $x_t$ and functions
+%$u$, $g$, and $w$.
+
+%Now this works for \emph{any} continuous function $w$. The function $w$ could even
+%be our value function $v^*$, provided it's continuous. We'll talk about
+%the conditions under which
+
+%\subsection{Dynamic Programming Solution}
+
+%In this subsection, we now solve the problem as formulated in policy
+%function terms since, for the reasons given above, that will be
+%easiest.
+
+
+
+
+
+
+
+%%%% APPPENDIX %%%%%%%%%%%
+
+% \appendix
+
+%\cite{LabelInSourcesFile}
+%\citep{LabelInSourcesFile} Cites in parens
+%\nocite{LabelInSourceFile} includes in refs w/o specific citation
+%\bibliographystyle{apalike}
+%\bibliography{sources.bib} where sources.bib is file
+
+
+
+
 
 
 %% APPPENDIX %%
 % \appendix
 
-% Optimization problem
-% - KKT Conditions: These are necessary conditions for an optimum
-% - When some x* satisfies the KKT conditions
-%   - If x* is regular and a soln
-% - Strong Duality: Slater and regularity
-% - Regularity
-% - How to solving this shit
-
 % Dynamic programming
-% - correspondences
-% - hemi continuity
-% - canonical problem: stokey vs sarget notation
-% - Bellman Operator
-
+% - Continuous time dynamic programming and hamiltonian
+% - Bellman operator and algorithm
+% - Properties of the value function
+% - Euler equations
+% - Finish v_B -> v^*
+% - Properties of the value function
+% - Envelope
+% - Blackwell and check bellman
 
 %Basic results about Derivatives
   %- Implicit function
   %- inverse function
   %- Leibnitz
-  % Rn\rightarrow\Rm
-%Function spaces as an up front section
-%Norms in an up front section with basics
+  %- Rn\rightarrow\Rm
+% - Function spaces as an up front section
+% - Norms in an up front section with basics
+
+%\subsection{Shortest Path Problem}
+
+%To get the intuition for the Bellman Equation, we will consider the shortest path problem, which has the following features:
+%\begin{enumerate}
+
+    %\item You want to get from point $1$ to $N$.
+
+    %\item There are a number of possible nodes in between $1$ and $N$,
+	%permitting a number of different possible paths you might take.
+
+    %\item The paths from node to node have different costs.
+
+%\end{enumerate}
+
+%Therefore, we want a general solution to the problem that
+%provides us with the \emph{least cost} path to travel from
+%$1$ to $N$.
 
 
-\end{document}
+%\subsection{The Bellman Equation}
+
+%Suppose that at every single node, $i \in \{1, \ldots, N\}$, we \emph{knew}
+%the least-cost path to get from node $i$ to node $N$. Of course we don't,
+%unless we're trivially already at node $N$, but just suspend disbelief for
+%a second and suppose we do.
+
+%Now since we know the least-cost paths, we know the ``best-case'' cost to
+%get from node $i$ to $N$, for all $i$. Denote that ``best-case'' cost
+%by $J(i)$. Now it makes sense that this function
+%$J$, for each $i$, should also satisfy what's called the
+%\emph{Bellman Equation}:
+%\begin{equation}
+    %\label{bellman}
+    %J(i) = \min_{j \in F_i} \left\{ c(i, j) + J(j) \right\}
+%\end{equation}
+%In words, this equation says
+%\begin{enumerate}
+    %\item To find the best-case cost to go from $i$
+	%to $N$, consider the set of nodes that you can reach from node $i$,
+	%denoted $F_i$.
+
+    %\item Next, consder the cost of jumping from node $i$ to node $j$,
+	%denoted $c(i,j)$.
+
+    %\item Finally, since you know the best-case cost,
+	%$J(j)$ for $j \in F_i$, pick the minimum of $c(i,j)$ plus $J(j)$.
+%\end{enumerate}
+
+%The best solution to our problem must, therefore, satisfy Equation
+%\ref{bellman}.
+
+%\subsection{Solving for the Minimum Cost Function, $J$}
+
+%We now detail the standard algorithm to find $J$.
+%\begin{enumerate}
+    %\item For some large $M$, set
+	%\begin{equation}
+			%J_0(i) = \begin{cases} M & i \neq N \\
+						%0 & \text{otherwise}
+				%\end{cases}
+	%\end{equation}
+
+    %\item Next, set
+	%$J_{n+1}(i) = \min_{j \in F_i} \left\{ c(i,j) + J_n(j)\right\}$
+	%for all $i$.
+
+    %\item If $J_{n+1} \neq J_n$, increment $n$ and return to step 2.
+
+%\end{enumerate}
+%The solution thus propagates back from the destination node, $N$.
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
