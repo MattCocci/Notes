@@ -4041,7 +4041,7 @@ swap ``semidefinite'' for ``definite'' in the conditions above.
 \clearpage
 \section{Fixed Points}
 
-\subsection{Preliminaries: Operators}
+\subsection{Operators}
 
 \begin{defn}{(Operator)}
 If $X$ is some function space
@@ -4982,7 +4982,7 @@ conditions are necessary, sufficient, or both.
 \end{defn}
 
 \begin{thm}{\emph{(Primal Solution $+$ Strong Duality $\implies$ Dual
-Solution Satisfying KKT)}}
+Solution \& KKT Necessary)}}
 Suppose that strong duality holds.  If $x^*\in\mathscr{F}_p$ solves
 Problem~\ref{prob:max}, then there exist
 $(\lambda^*,\mu^*)\in\mathscr{F}_d$ solving the Dual
@@ -5065,25 +5065,6 @@ the point maximizes the function, it must be the case that
 And that's precisely KKT Condition 1, implying $x^*$ is a stationary
 point of the Lagrangian.
 
-\end{proof}
-
-
-\begin{thm}
-If canonical optimization Problem~\ref{prob:max} satisfies strong
-duality ($p^*=d^*$)
-\begin{enumerate}
-  \item $x^*$ is a solution of Problem~\ref{prob:max} implies that there
-    exist $(\lambda^*,\mu^*)$ such that $(x^*,\lambda^*,\mu^*)$ satisfy
-    the KKT Conditions.
-  \item $g(\lambda^*,\mu^*)=d^*$, i.e. the multipliers associated with
-    $x^*$ are solve the dual problem.
-  \item If Problem~\ref{prob:max} is concave, satisfying
-    Problem~\ref{prob:maxconcave}, then the converse is also true. In
-    other words, the KKT conditions are sufficient.
-\end{enumerate}
-\end{thm}
-\begin{proof}
-(Part 1)
 \end{proof}
 
 
@@ -6006,15 +5987,16 @@ Give some objective function $F(x,y,t)$, we want to choose functions
 of time, $x_t$ and $y_t$, to solve
 %of time, $x_t$ with range $\Rn$ and $y_t$ with range $\R^k$, to solve
 \begin{align}
-  \max_{x_t,y_t} \; &\int^{t_1}_{0} F(x_t,y_t,t) \; dt
-  \label{prob:cts-dynamic} \\
+  \max_{x_t,y_t} \; W(x_t,y_t) &=
+  \max_{x_t,y_t} \; \int^{T}_{0} F(x_t,y_t,t) \; dt
+  \label{prob:cts-dynamic} \\\notag\\
   \text{s.t.} \;
-  & \dot{x}_t = G(x_t,y_t,t) \notag \\
+   \dot{x}_t &= G(x_t,y_t,t) \notag \\
   %& y_t \in Y_t \subseteq \R^k \quad \forall t\notag \\
-  & y_t \in Y_t \quad \forall t\notag \\
-  & x_0 \; \text{given} \notag
+   y_t &\in Y_t \quad \forall t\notag \\
+   x_0  &\;\text{given} \notag
 \end{align}
-We will consider problems where the terminal time $t_1$ is finite and
+We will consider problems where the terminal time $T$ is finite and
 where it is infinite.
 Again, the key features of this problem are
 \begin{enumerate}
@@ -6031,34 +6013,155 @@ Again, the key features of this problem are
     period, there is some feasible set $Y_t$ in $\R$ or $\Rk$ (if there
     are multiple control variables). We require the choice of control
     $y_t$ lies in $Y_t$ at each period.
+  \item \emph{Admissable Pair}, $(x_t,y_t)$: The pair of functions
+    $(x_t,y_t)$ is called an admissable pair if they satisfy both
+    $\dot{x}_t = G(x_t,y_t,t)$ and $y_t\in Y_t$ for all $t$.
 \end{enumerate}
-
-We now look for the optimal solution by using the \emph{variational
-principle} of the calculus of variations. Assume there exists some
-continuous, feasible function $\hat{y}_t$.
 
 \begin{defn}{(Hamiltonian)}
 Given Problem~\ref{prob:cts-dynamic}, define the \emph{Hamiltonian}
 \begin{align*}
-  H(x,y,\lambda,t) := F(x,y,t) + \lambda G(x,y,t)
+  H(x,y,\lambda,t) := F(x_t,y_t,t) + \lambda_t G(x_t,y_t,t)
 \end{align*}
-where $\lambda$ is called the \emph{co-state}.
+where $\lambda_t$ is a function called the \emph{co-state}.
 This is very much like the static-optimizaton Lagrangian, only now,
 we're doing dynamic optimization that involves more than one time
 period.
 \end{defn}
 
 \begin{defn}{(Necessary Conditions)}
-Given $x_t,\lambda_t$, the function $y\in \argmax_{y\in Y}
-H(x,y,\lambda,t)$ is a maximum satisfying the necessary conditions
+Suppose that we are faced with Problem~\ref{prob:cts-dynamic} where
+$T<\infty$ and $F$ and $G$ are continuously differentiable functions.
+Suppose that the problem has an interior continuous solution
+$y_t$---i.e.\ $y_t$ is continuous and $y_t\in \text{int} \, Y_t$ for all
+$t$---with corresponding state variable $x_t$ such that $W(x_t,y_t) \geq
+W(\hat{x}_t,\hat{y}_t)$ for all admissable pairs
+$(\hat{x}_t,\hat{y}_t)$.\footnote{%
+The assumptions that $y$ is an ``interior continuous function''
+eliminates the possibility that $y$ is a corner case or discontinuous.
+}
+
+Then there exists a continuously differentiable co-state function
+$\lambda_t$ such that $(y_t,x_t,\lambda_t)$ satisfy the following
+necessary conditions:
 \begin{enumerate}
   \item $H_y (x_t,y_t,\lambda_t,t) = 0$
-  \item $\dot{x}_t = H_\lambda(x_t,y_t,\lambda_t,t) = G(x_t, y_t, t)$
   \item $\dot{\lambda}_t = - H_x(x_t, y_t, \lambda_t, t)$
-  \item $x(0) = x_0$ given
-  \item $\lambda(t_1)=0$ if $t_1< \infty$
+  \item $\dot{x}_t = H_\lambda(x_t,y_t,\lambda_t,t) = G(x_t, y_t, t)$
+  \item $x_0=x_0$ given
+  \item $\lambda_T=0$
 \end{enumerate}
+for all $t\in[0,T]$.
 \end{defn}
+\begin{rmk}
+In the ``proof,'' we will look for the necessary conditions of an
+optimal solution by using the \emph{variational principle} of the
+calculus of variations.  This will work by assuming that we have an
+optimal solution, perturbing that supposedly-optimal solution by small
+amounts to get a family of new candidate solutions, and seeing what
+necessary conditions we need to place on the original supposedly-optimal
+solution so that none of the new candidate solution are any better.
+
+Given that description, it's maybe not surprising that the necessary
+conditions are for a \emph{local} optimum rather than a global optimum.
+We're simply specifying necessary conditions on some solution $y_t$ that
+will rule out better solutions in the neighborhood of $y_t$. We saw a
+similar result in the KKT section. But also as in the KKT conditions, a
+few extra conditions having to do with convexity can guarantee the
+solution is globablly optimal.
+\end{rmk}
+
+\begin{proof}{(Kinda)}
+Let $y_t$ represent the assumed interior continuous solution, with $x_t$
+representing the corresponding state variable. The pair $(y_t,x_t)$ is
+assumed optimal so that $W(x_t,y_t) \geq W(\hat{x}_t,\hat{y}_t)$ for all
+admissable pairs $(\hat{x}_t,\hat{y}_t)$.
+
+(Construct the Variations)
+To generate a family of other ``nearby'' continuous solutions, choose
+and fix a continuous function $\eta_t$ and define
+\begin{align*}
+  y_t(\varepsilon) := y_t + \varepsilon\eta_t
+\end{align*}
+\end{proof}
+For each fixed $\varepsilon$, the \emph{variation} $y_t(\varepsilon)$ is
+a continuous function. By varying $\varepsilon$, we generate a
+\emph{family} of continuous variations. Given each variation of the
+control $y_t(\varepsilon)$, define corresponding $x_t(\varepsilon)$
+satisfying
+\begin{align}
+  \dot{x}_t(\varepsilon)
+  = G(x_t(\varepsilon), y_t(\varepsilon), t)
+  \qquad x_0(\varepsilon)=x_0
+  \label{xvardef}
+\end{align}
+Given admissable pair $(x_t(\varepsilon), y_t(\varepsilon))$, let's also
+define
+\begin{align}
+  W(\varepsilon) := W(x_t(\varepsilon), y_t(\varepsilon))
+  = \int^{T}_0 F(x_t(\varepsilon), y_t(\varepsilon), t) \, dt
+  &\underbrace{\leq W(0)} \label{Weps} \\
+  &\;\text{Since $(x_t,y_t)$ optimal}
+  \notag
+\end{align}
+Lastly, to ensure feasibility of the variations, note that for fixed
+$\eta_t$, the function is continuous on a compact interval, hence
+$\eta_t$ is bounded.  Therefore, you can always choose an
+$\varepsilon_\eta$ such that
+\begin{align*}
+  |\varepsilon| < \varepsilon_\eta
+  \implies
+  y_t(\varepsilon) \in \text{int} \, Y_t \quad\forall t
+\end{align*}
+For the reasons mentioned in the remark about, this restriction to
+variations with $\varepsilon<\varepsilon_\eta$ is not a problem.
+
+Now that we have this family of variations, let's derives the necessary
+conditions we need to put on $y_t$ so that none of the
+$y_t(\varepsilon)$ are better.
+
+(Prove the Conditions)
+By definition of Equation~\ref{xvardef}
+\begin{alignat}{3}
+  0 &= G(x_t(\varepsilon), y_t(\varepsilon), t) - \dot{x}_t(\varepsilon)
+  &&\forall t\in[0,T] \notag \\
+  \Rightarrow \quad
+  0 &= \int^{T}_0
+  \lambda_t \; [
+    G(x_t(\varepsilon), y_t(\varepsilon), t) -
+    \dot{x}_t(\varepsilon)
+  ] \, dt
+  \qquad&&\forall \lambda_t:[0,T]\rightarrow \R
+  \label{lambdadef}
+\end{alignat}
+where $\lambda_t$ is any function. Assume it is continuously
+differentiable.\footnote{%
+Did I cool you down with that hand wave. I'm just going to assume that
+for now.}
+If we choose it correctly (with a few conditions on the function), it
+will be called the \emph{co-state} and will behave like a Lagrange
+multiplier.
+
+Now do the following addition
+\begin{align*}
+  W(\varepsilon) &= W(\varepsilon) + 0
+  = W(\varepsilon) +\text{(RHS of \ref{lambdadef})} \\
+  \Rightarrow \quad
+  W(\varepsilon) &=
+  \int^{t_1}_0
+  \left\{
+  F(x_t(\varepsilon), y_t(\varepsilon), t)
+  + \lambda_t [
+    G(x_t(\varepsilon), y_t(\varepsilon), t) -
+    \dot{x}_t(\varepsilon)
+  ]
+  \right\}\, dt
+\end{align*}
+Integrating the $\int \lambda_t \dot{x}_t(\varepsilon)$ by parts to turn
+the $\lambda$ into $\dot{\lambda}$ and $x$ into $\dot{x}$, you get
+\begin{align*}
+  \int^{t_1}_0 \lambda_t \dot{x}_t(\varepsilon) \, dt
+\end{align*}
 
 \end{document}
 
@@ -6282,13 +6385,15 @@ H(x,y,\lambda,t)$ is a maximum satisfying the necessary conditions
 
 % Dynamic programming
 % - Continuous time dynamic programming and hamiltonian
-% - Bellman operator and algorithm
+% - Bellman operator
+%   - Contraction: Monotonicity, Discounting
+%   - Fixed point and completeness of the space
 % - Properties of the value function
+%   - bounded
+%   - cts
 % - Euler equations
 % - Finish v_B -> v^*
-% - Properties of the value function
 % - Envelope
-% - Blackwell and check bellman
 
 %Basic results about Derivatives
   %- Implicit function
