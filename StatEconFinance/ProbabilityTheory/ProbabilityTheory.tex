@@ -1,7 +1,7 @@
-\documentclass[a4paper,12pt]{article}
+\documentclass[12pt]{article}
 
-\author{Matt Cocci}
-\title{Stochastic Analysis}
+\author{Matthew D. Cocci}
+\title{Title}
 \date{\today}
 
 %% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -46,9 +46,11 @@
 %% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{amsfonts}
 \usepackage{mathrsfs}
 \usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
 \theoremstyle{plain}
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{lem}[thm]{Lemma}
@@ -78,10 +80,13 @@
 \usepackage{lmodern}
 \usepackage[utf8]{inputenc}
 %\usepackage{blindtext}
+\usepackage{courier}
 
 
 %% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
 \usepackage{graphicx}
 \usepackage{subfigure}
     %   For plotting multiple figures at once
@@ -91,7 +96,7 @@
 
 %% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{hyperref}
-\hypersetup{
+\hypersetup{%
     colorlinks,
         %   This colors the links themselves, not boxes
     citecolor=black,
@@ -101,36 +106,59 @@
     urlcolor=black
 }
 
+%% Colors %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{color}
+\definecolor{codegreen}{RGB}{28,172,0}
+\definecolor{codelilas}{RGB}{170,55,241}
+
+% David4 color scheme
+\definecolor{d4blue}{RGB}{100,191,255}
+\definecolor{d4gray}{RGB}{175,175,175}
+\definecolor{d4black}{RGB}{85,85,85}
+\definecolor{d4orange}{RGB}{255,150,100}
+
 %% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \usepackage{verbatim}
     %   For including verbatim code from files, no colors
-
 \usepackage{listings}
-\usepackage{color}
-\definecolor{mygreen}{RGB}{28,172,0}
-\definecolor{mylilas}{RGB}{170,55,241}
+    %   For including code snippets written directly in this doc
+
+\lstdefinestyle{bash}{%
+  language=bash,%
+  basicstyle=\footnotesize\ttfamily,%
+  showstringspaces=false,%
+  commentstyle=\color{gray},%
+  keywordstyle=\color{blue},%
+  xleftmargin=0.25in,%
+  xrightmargin=0.25in
+}
+
+\lstdefinestyle{matlab}{%
+  language=Matlab,%
+  basicstyle=\footnotesize\ttfamily,%
+  breaklines=true,%
+  morekeywords={matlab2tikz},%
+  keywordstyle=\color{blue},%
+  morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+  identifierstyle=\color{black},%
+  stringstyle=\color{codelilas},%
+  commentstyle=\color{codegreen},%
+  showstringspaces=false,%
+    %   Without this there will be a symbol in
+    %   the places where there is a space
+  numbers=left,%
+  numberstyle={\tiny \color{black}},%
+    %   Size of the numbers
+  numbersep=9pt,%
+    %   Defines how far the numbers are from the text
+  emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+    %   Some words to emphasise
+}
+
 \newcommand{\matlabcode}[1]{%
-    \lstset{language=Matlab,%
-        basicstyle=\footnotesize,%
-        breaklines=true,%
-        morekeywords={matlab2tikz},%
-        keywordstyle=\color{blue},%
-        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
-        identifierstyle=\color{black},%
-        stringstyle=\color{mylilas},%
-        commentstyle=\color{mygreen},%
-        showstringspaces=false,%
-            %   Without this there will be a symbol in
-            %   the places where there is a space
-        numbers=left,%
-        numberstyle={\tiny \color{black}},%
-            %   Size of the numbers
-        numbersep=9pt,%
-            %   Defines how far the numbers are from the text
-        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
-            %   Some words to emphasise
-    }%
+    \lstset{style=matlab}%
     \lstinputlisting{#1}
 }
     %   For including Matlab code from .m file with colors,
@@ -159,6 +187,59 @@
 \newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
     %   Bigger Chi
 
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% My additions for math shorthand
+\newcommand{\ra}{\rightarrow}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\Prb}{\mathrm{P}}
+\newcommand{\F}{\mathscr{F}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\Rk}{\mathbb{R}^n}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\Lg}{\mathscr{L}}
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+\newenvironment{rcases}
+  {\left.\begin{aligned}}
+  {\end{aligned}\right\rbrace}
+
+% Redefine real and imaginary from fraktur to plain text
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Var}{\operatorname{Var}}
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -213,6 +294,17 @@ simples ones.
 \end{rmk}
 
 \begin{defn}{(Finite Probability Space)}
+A \emph{finite probability space} is a finite sample space
+$\Omega=\{\omega_1,\ldots,\omega_N\}$ of elementary events together with
+probabilities $\{p_1,\ldots,p_N\}$ satisfying
+\begin{align*}
+  \sumnN p_n
+  \quad\text{and}\quad
+  p_n \in [0,1] \quad \forall n=1,\ldots,N
+\end{align*}
+\end{defn}
+\begin{defn}{(Event)}
+An \emph{event} is any subset $A\subseteq \Omega$ of the sample space.
 \end{defn}
 
 
