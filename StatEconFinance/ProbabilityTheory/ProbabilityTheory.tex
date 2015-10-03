@@ -1,7 +1,7 @@
 \documentclass[12pt]{article}
 
 \author{Matthew D. Cocci}
-\title{Title}
+\title{Probability Theory}
 \date{\today}
 
 %% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -193,11 +193,35 @@
 \def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
 \makeatother
 
-% My additions for math shorthand
-\newcommand{\ra}{\rightarrow}
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
 \newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Misc Math
 \newcommand{\Prb}{\mathrm{P}}
-\newcommand{\F}{\mathscr{F}}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}{\boldsymbol{1}}
+
+% Script
+\newcommand{\sF}{\mathscr{F}}
+\newcommand{\sB}{\mathscr{B}}
+\newcommand{\sL}{\mathscr{L}}
+\newcommand{\sM}{\mathscr{M}}
+\newcommand{\sT}{\mathscr{T}}
+\newcommand{\sA}{\mathscr{A}}
+
+% Mathcal
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calG}{\mathcal{G}}
+
+% Blackboard
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\Rn}{\mathbb{R}^n}
 \newcommand{\Rk}{\mathbb{R}^n}
@@ -207,10 +231,7 @@
 \newcommand{\Cnn}{\mathbb{C}^{n\times n}}
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\N}{\mathbb{N}}
-\newcommand{\diag}{\text{diag}}
-\newcommand{\ch}{\text{ch}}
-\newcommand{\dom}{\text{dom}}
-\newcommand{\Lg}{\mathscr{L}}
+
 \DeclareMathOperator*{\argmin}{arg\;min}
 \DeclareMathOperator*{\argmax}{arg\;max}
 \newenvironment{rcases}
@@ -219,7 +240,14 @@
 
 % Redefine real and imaginary from fraktur to plain text
 \newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Corr}{\operatorname{Corr}}
 \newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
 
 % Redefine real and imaginary from fraktur to plain text
 \renewcommand{\Re}{\operatorname{Re}}
@@ -260,17 +288,15 @@ measure theory, and stochastic calculus useful for the anlysis of
 stochastic process that have particular relevance in finance and
 economics.
 
-\section{Measure Theory Foundations}
-
-
 \section{Finite Probability Spaces}
+
+\subsection{Finite Probability Space}
 
 \begin{defn}{(Sample Space)}
 The \emph{sample space} $\Omega=\{\omega_1,\ldots,\omega_N\}$ is the set
 of all \emph{elementary} outcomes of some statistical experiment. For a
 given experiment, only one $\omega \in \Omega$ can occur when we conduct
-and observe that experiment.  So that if we know $\omega \in \Omega$
-happened, then no other $\omega' \in \Omega$ can have occurred.
+and observe that experiment.
 \end{defn}
 \begin{ex}
 If our experiment consists of flipping a single coin, the sample space
@@ -288,36 +314,487 @@ bit of nomenclatural confusion.
 Of course, we'll fix this quite soon when we encounter \emph{product
 spaces}, which resolve a lot of this subtlety. In particular, product
 spaces will let us define a narrow product space like $\Omega=\{H,T\}$
-and then construct a richer probability space like $\Omega\times \Omega
-= \{HH,HT,TH,TT\}$ or even $\Omega^N$, building up from relatively
-simples ones.
+and then construct a richer probability space like
+$\Omega\times \Omega = \{HH,HT,TH,TT\}$ or even $\Omega^N$, building up
+from relatively simples ones.
 \end{rmk}
 
 \begin{defn}{(Finite Probability Space)}
-A \emph{finite probability space} is a finite sample space
-$\Omega=\{\omega_1,\ldots,\omega_N\}$ of elementary events together with
-probabilities $\{p_1,\ldots,p_N\}$ satisfying
+A \emph{finite probability space} is a pair $(\Omega,P)$ consisting of a
+finite sample space $\Omega=\{\omega_1,\ldots,\omega_N\}$ of elementary
+events together with probabilities $\{p_1,\ldots,p_N\}$ satisfying
 \begin{align*}
-  \sumnN p_n
+  \sumnN p_n = 1
   \quad\text{and}\quad
   p_n \in [0,1] \quad \forall n=1,\ldots,N
 \end{align*}
+where $p_n$ is the probability of elementary event $\omega_n\in\Omega$
+occurring.
 \end{defn}
+
 \begin{defn}{(Event)}
 An \emph{event} is any subset $A\subseteq \Omega$ of the sample space.
 \end{defn}
+\begin{ex}
+Given sample space $\Omega=\{HH,HT,TH,TT\}$ for an experiment where we
+toss two coins, we might consider the event $A=\{HH,HT\}$ which is
+``heads tossed first.''
+\end{ex}
+
+
+\begin{defn}{(Set Algebra)}
+A collection $\calF$ of subsets of $\Omega$ (i.e.\ a collection of
+events) is called a \emph{set algebra}, or simply \emph{algebra}, if it
+satisfies the following three properties:
+\begin{enumerate}
+  \item $\Omega\in\calF$
+  \item $A,B\in\calF \implies A\cup B\in\calF$
+  \item $A\in\calF\implies A^c\in\calF$.
+\end{enumerate}
+\end{defn}
+\begin{rmk}
+This is not to be confused with a $\sigma$-algebra, which we'll see
+later. A set algebra is closed only under finite unions, which is not
+going to be a problem in a finite probability space. Once we move to
+infinite probability spaces, we will need $\sigma$-algebras, which are
+closed under \emph{infinite} unions. But more on that later.
+
+At any rate, the reason we care about algebras is that they collect and
+contain the sets---the events---to which we will assign probabilities.
+Our notion of a probability will be defined for elements in this
+collection, as we see in the next definition.
+\end{rmk}
+
+
+\begin{defn}{(Probability Measure)}
+\label{defn:finitemeasure}
+Given a finite probability space, define the \emph{probability measure}
+on $\Omega$ as the mapping
+\begin{align*}
+  \Prb&: 2^\Omega \rightarrow [0,1] \\
+  \Prb[A] &:= \sum_{\{n|\omega_n\in A\}} p_n
+\end{align*}
+In this way, we use the probabilities $\{p_1,\ldots,p_n\}$ over the
+elementary events to construct the probabilites of any event
+$A\subseteq \Omega$ or $A\in\calF$.
+
+Probability measures display the following properties
+\begin{enumerate}
+  \item $\Prb[\omega_n]=p_n$ for $\omega_n\in\Omega$
+  \item $\Prb[\emptyset] = 0$
+  \item $\Prb[\Omega] = 1$
+  \item $\Prb[A\cup B] = \Prb[A] + \Prb[B] - \Prb[A\cap B]$ for any
+    events $A,B$.
+\end{enumerate}
+\end{defn}
+
+
+\begin{defn}{(Random Variable)}
+A \emph{random variable} on finite probability space $\Omega$ is a
+function
+\begin{align*}
+  X: \Omega\ra \R
+\end{align*}
+Since it's inconvenient to deal with sets and $\omega$'s in $\Omega$
+directly, we use random variables that map these elements into the real
+line. But in general, we only know how to assign probabilities to
+events in $\Omega$. How can assign probabiilities to random variables?
+That leads us to the next definition.
+\end{defn}
+
+\begin{defn}{($\calF$-Measurable)}
+A random variable $X$ is $\calF$-measurable if
+\begin{align*}
+  \{X=x\} :=
+  X^{-1}(x) =
+  \{\omega\in\Omega \; | \; X(\omega)=x\}
+  \in \calF
+\end{align*}
+for all $x\in\R$. The idea is that Definition~\ref{defn:finitemeasure}
+tells us how to assign probabilities to events or ``measure'' events in
+$\calF$. To ``measure'' or assign probabilities to random variables
+taking values on the real line, we need to be able to map those values
+back into the events in $\calF$ that we do know how to measure.
+
+Not surprisingly, we differentiate between algebras and say
+$\calF$-measurable because random variables might be measurable with
+respect to some algebras and not others.
+\end{defn}
+
+\subsection{Product Spaces}
+
+\begin{defn}{(Product Space)}
+Given two finite probability spaces $(\Omega,P)$ and $(\Omega',P')$,
+define a new probability space called the \emph{product space}
+$(\Omega\times\Omega', P \otimes P')$ as
+\begin{align*}
+  \Omega\times\Omega'
+  &= \{(\omega,\omega') \; |\; \omega\in\Omega, \; \omega'\in\Omega'\}
+  \\
+  (P \otimes P')(\omega, \omega')
+  &= \Prb[\omega]\cdot \Prb[\omega']
+\end{align*}
+\end{defn}
+
+\begin{defn}{(Lifting Random Variables to a Product Space)}
+Suppose that we have events $A\subseteq \Omega$ and
+$B\subseteq \Omega'$. We want to make sure that the same events are
+defined on product space $\Omega\times \Omega'$. Then we can define new
+sets
+\begin{align*}
+  \hat{A} &:= A\times \Omega' \\
+  \hat{B} &:= \Omega \times B
+\end{align*}
+The probabilities of these events will be exactly the same on $\Omega
+\times \Omega'$ as they were on just $\Omega$ or just $\Omega'$ because
+notice
+\begin{align*}
+  (\Prb\otimes \Prb')[\hat{A}] &= \Prb(A) \cdot \Prb'(\Omega') = \Prb(A) \cdot 1\\
+  (\Prb\otimes \Prb')[\hat{B}] &= \Prb(\Omega) \cdot \Prb'(B) = 1\cdot \Prb'(B)
+\end{align*}
+Moreover, $\hat{A}$ and $\hat{B}$ will be independent events, which
+makes sense given that they started by having nothing to do with each
+other, hanging out completely on their own in $\Omega$ or $\Omega'$.
+\end{defn}
+
+\begin{defn}{(Lifting Random Variables to a Product Space)}
+We can easily ``lift'' random variables on $\Omega$ or $\Omega'$ into
+the new product space $\Omega\times \Omega'$. To do so, suppose that we
+have random variables $X:\Omega\ra\R$ and $Y:\Omega'\ra\R$. Then define
+\begin{align*}
+  \forall (\omega,\omega') \in \Omega\times \Omega' \qquad
+  \begin{cases}
+  \hat{X}(\omega, \omega') &= X(\omega) \\
+  \hat{Y}(\omega, \omega') &= Y(\omega')
+  \end{cases}
+\end{align*}
+Then $\hat{X}$ and $\hat{Y}$ are RVs $X$ and $Y$ suitably adapted to
+live on probability space $(\Omega,\Omega')$.
+\end{defn}
+
+\clearpage
+\section{Inequalities}
+
+\begin{prop}{\emph{(Jensen's Inequality)}}
+Let $g$ be a function and let $X$ be some random variable. Then
+\begin{align*}
+  \text{$g$ convex} &\implies \E[g(X)] \geq g\left(\E[X]\right) \\
+  \text{$g$ concave} &\implies \E[g(X)] \leq g\left(\E[X]\right) \\
+\end{align*}
+\end{prop}
+\begin{proof}
+Since $g$ is a convex function, given any $x$, there is a constant $a$
+such that
+\begin{align*}
+  g(y) \geq g(x) + a (y-x)
+\end{align*}
+Choose $x=\E[X]$. Then we can say that there is an $a$ such that
+\begin{align*}
+  g(y) &\geq g(\E[X]) + a (y-\E[X])
+\end{align*}
+But this must also be true for $y=X$, so
+\begin{align*}
+  g(X) &\geq g(\E[X]) + a (X-\E[X])
+\end{align*}
+Now take expectation
+\begin{align*}
+  \E[g(X)]
+  &\geq \E[g(\E[X]) + a (X-\E[X])] \\
+  &= \E[g(\E[X])] + a \E[(X-\E[X])] \\
+  &= g(\E[X]) + a (\E[X]-\E[X]) \\\\
+  \implies \quad
+  \E[g(X)] &\geq g(\E[X])
+\end{align*}
+Concave proof is analogous.
+\end{proof}
+
+\begin{thm}{\emph{(Markov's Inequality)}}
+\label{thm:markov}
+Given random variable $X$,
+\begin{equation}
+    \label{markov}
+    \Prb\left[
+      \left\lvert X\right\rvert
+      \geq \varepsilon\right]
+    \leq \frac{\E\left[|X|^p\right]}{|\varepsilon|^p}
+\end{equation}
+\end{thm}
+
+\begin{proof}
+Write out the expectation in the numerator, where $F$ is the cdf of $X$:
+\begin{align*}
+  \E\left[|X|^p\right]
+  &= \int^\infty_{-\infty} |X|^p \; dF \\
+  &= \int^{\varepsilon}_{-\infty} |X|^p \; dF
+    + \int^\infty_{\varepsilon} |X|^p \; dF
+\end{align*}
+Next, let's just throw out the first term in the sum above to get an
+inequality. Since $|X|^p$ and the cdf are always positive, we know that
+we're throwing out a positive portion, which gives us inequality
+\begin{align*}
+  \E\left[|X|^p\right]
+  &\geq \int^\infty_{\varepsilon} |X|^p \; dF
+\end{align*}
+Next, notice that a lower bound for $|X|^p$ over this support will be
+$|\varepsilon|^p$, so we can modify the inequality again to get
+\begin{align*}
+  \E\left[|X|^p\right]
+  &\geq  |\varepsilon|^p \int^\infty_{\varepsilon} \; dF
+  = |\varepsilon|^p \; \Prb[X\geq \varepsilon] \\
+  \implies \quad
+  \frac{\E\left[|X|^p\right]}{|\varepsilon|^p}
+  &\geq \Prb(X\geq \varepsilon)
+\end{align*}
+\end{proof}
+
+\begin{cor}{\emph{(Chebyshev's Inequality)}}
+Given random variable $X$, we have
+\begin{equation}
+  \label{chebyshev1}
+  \Prb\left[
+    \left\lvert X\right\rvert
+    \geq \varepsilon\right]
+  \leq \frac{\E\left[X^2\right]}{\varepsilon^2}
+\end{equation}
+or equivalently
+\begin{equation}
+  \label{chebyshev2}
+  \Prb\left[
+    \big\lvert X-\E[X]\big\rvert
+    \geq \varepsilon\right]
+  \leq \frac{\Var(X)}{\varepsilon^2}
+\end{equation}
+\end{cor}
+\begin{proof}
+The proof of Statement~\ref{chebyshev1} follows by taking $p=2$ in
+Markov's Inequality (Theorem~\ref{markov}).
+To prove Statement~\ref{chebyshev2}, define $Z=X-\E[X]$ and use that in
+Markov's inequality with $p=2$ on $Z$.
+\end{proof}
+
+\clearpage
+\section{Large Sample Theory}
+
+\subsection{Convergence Results}
+
+Recall the usual Analysis definition of convergence of a sequence: A
+sequence $\{x_n\}$ converges to limit $x$ if for all $\varepsilon> 0$,
+there exists a finite $N$ such that
+\begin{align*}
+  n > N \implies ||x_n - x|| < \varepsilon
+\end{align*}
+But this, of course, is for a sequence of numbers $\{x_n\}$ in some
+metric space. There's no randomness there. So what about a sequence of
+random variables---something non-deterministic?
+
+There are a few options when talking about convergence of random
+variables, but all involve resolving the randomness somehow and checking
+convergence of functions, probabilities, or expectations---all of which
+are possible given the usual analysis machinary.
+\begin{enumerate}
+  \item \emph{Almost Sure Convergence}: Check if the sequence of
+    functions $\{X_n\}$ on sample space $\Omega$ converge to some
+    function $X$ on $\Omega$, i.e. $X_n(\omega)=X(\omega)$ for all
+    $\omega\in\Omega$ that have nonzero probability.
+  \item \emph{Convergence in Probability}: The sequence of probabilities
+    that $X_n(\omega)$ is far from $X(\omega)$ over all $\omega$ goes to
+    zero.
+  \item \emph{Converge in $p$-Norm}: The sequence of expected distances
+    $\E[|X_n-X|^p]$ goes to zero.
+\end{enumerate}
+In all of these cases, we've framed convergence of random variables in
+terms of convergence of functions or numerical sequences. Now onto the
+complete definitions.
+
+\begin{defn}{(Almost Sure or Strong Convergence)}
+Given a sequence of random variables $\{X_n\}$ and a random variable
+$X$, we say that ``$X_n$ \emph{converges almost surely} to $X$'' written
+\begin{align*}
+  X_n\asto X
+  \quad \iff \quad
+  \limn \Prb[X_n = X]
+  = \limn \Prb[\,\omega \,|\,X_n(\omega) = X(\omega)] = 1
+\end{align*}
+This checks that $X_n(\omega)\ra X(\omega)$ for each elementary event
+$\omega$ in the sample space $\Omega$ that has nonzero probability.
+(Though the functions can differ arbitrarily on elementary events that
+will never occur.) If $X_n$ and $X$ are vectors, we need almost surely
+convergence element-by-element.
+
+This notion is called ``strong convergence'' because it it computes the
+probability of the limit of a sequence of random variables, rather than
+the limit of a sequence of probabilities. We're effectively asking that
+the random variable \emph{itself}, which is a function on sample space
+$\Omega$, converges pointwise to another function on $\Omega$---the
+random variable $X$.
+\end{defn}
+
+
+\begin{defn}{(Convergence in Probability)}
+We say that a sequence of random variables $\{ X_n \}$ on measure space
+$(\Omega,\calF,\Prb)$ \emph{converges in probability} to $X$ if
+\begin{equation}
+  \label{plim}
+  X_n\pto X
+  \quad\iff\quad
+  \limn p_n(\varepsilon) :=
+  \limn
+  \Prb(\left\lvert X_n - X \right\rvert > \varepsilon) = 0
+  \qquad \forall  \varepsilon> 0
+\end{equation}
+This is someetimes written as $\plim X_n = X$.
+ If $X_n$ and $X$ are vectors, we need convergence in probability
+ element-by-element.
+
+
+Convergence in probability is also known as \emph{weak convergence}
+because it doesn't ask the random variables (functions) $X_n$ to
+converge to the random variable (function) $X$, i.e.\ that
+$X_n(\omega)=X(\omega)$ identically for all $\omega\in\Omega$.  Instead,
+we just stipulate that the realizations are very close to $X$ as
+$n\rightarrow\infty$.
+\end{defn}
+
+\begin{defn}{(Mean Square and $p$-Norm Convergence)}
+We say that a sequence of random variables $\{ X_n \}$
+\emph{converges in $p$-Norm} to $X$, written
+\begin{align*}
+  X_n \Lpto X
+  \quad\iff\quad
+  \limn \E\left[|X_n-X|^p\right] = 0
+\end{align*}
+The special case where $p=2$ is called \emph{mean square convergence} or
+\emph{convergence in quadratic mean}, and is often written $X_n\msto X$.
+If $X_n$ and $X$ are vectors, we need convergence in $p$-norm
+element-by-element.
+\end{defn}
+
+
+\begin{defn}{(Convergence in Distribution)}
+\label{defn:convergeInDistribution}
+We say that a sequence of random variables $\{X_n\}$
+\emph{converges in distribution} to random variable $X$, written
+\begin{align*}
+  X_n\dto X
+  \quad\iff\quad
+  \limn F_{X_n}(x) = F_X(x)
+\end{align*}
+for all values of $x$ where $F_x$ is continuous,
+where $F_{X_n}$ and $F_X$ are the cdfs of $X_n$ and $X$, respectively.
+
+If $X_n$ and $X$ are vectors, then the joint cdf of $X_n$ must converge
+to the joint CDF of $X$. In that case, $a'X_n \dto a'X$ for any
+non-stochastic vector $a$ (which is called the Cramer-Wold device).
+\end{defn}
+\begin{ex}
+To see why we need to restrict convergence to points of continuity on
+$F_X(x)$, consider the following example:
+\begin{align*}
+  F_{X_n}(x) &= \one_{\left\{x\geq \frac{1}{n}\right\}}\\
+  F_{X}(x) &= \one_{\left\{x\geq 0\right\}}
+\end{align*} In other words, random variable $X_n$ takes on value
+$\frac{1}{n}$ with probability one, while $X$ takes on value zero with
+probability one.  So if we check convergence at $x=0$, we have a
+sequence $\{F_{X_n}(0)\}=\{0\}$, which clearly does not converge to
+$F_X(0)=1$.
+
+However, it is the case that $F_{X_n}$ is well-approximated by $F_X$ at
+all other points, so we'd like to be able to say $X_n\dto X$. And we
+can, if we simply restrict ourselves to points where $F_X$ is
+continuous.
+\end{ex}
+
+\begin{prop}
+Sequence of random variables $\{X_n\} \dto X$ if and only if
+\begin{align*}
+  \E[g(X_n)] = \E[g(X)]
+\end{align*}
+\end{prop}
+\begin{rmk}
+This is another useful way to characterize to characterize convergence
+in distribution aside from Definiton~\ref{defn:convergeInDistribution}.
+It's extremely handy for a lot of results.
+\end{rmk}
+
+\begin{prop}
+Given a sequence of random variables $\{X_n\}$ and random variable $X$,
+the various convergence concepts are related in the following way:
+\begin{enumerate}
+  \item $X_n\asto X \implies X_n\pto X$. Converse not true in general.
+  \item $X_n\Lpto X \implies X_n\pto X$
+  \item Any one of
+    \begin{align*}
+      \begin{rcases}
+        X_n&\asto &X \\
+        X_n&\pto &X \\
+        X_n&\Lpto &X
+      \end{rcases}
+      \implies X_n\dto X
+    \end{align*}
+    We see here even more explicitly that converge in distribution is
+    \textsc{super weak}.
+  \item Almost Surely and $p$-norm, undecidable.
+  \item $X_n\pto X \implies$ There's a deterministic subsequence such
+    that $X_{n_k}\asto X$ (but does not imply almost sure convergence
+    for the original sequence).
+\end{enumerate}
+\end{prop}
+\begin{proof}
+We prove each in turn.
+\begin{enumerate}
+  \item
+    %Suppose that we are given arbitrary $\delta,\varepsilon>0$. We
+    %need to show that we can find an $N$ such that
+    %\begin{align*}
+      %n>N
+      %\implies
+      %P(|X_n-X|>\varepsilon) < \delta
+    %\end{align*}
+    %Since $X_n$ converges to $X$ almost surely, for any $\omega$, there
+    %is an $N_\omega$ such that
+    %\begin{align*}
+      %n > N_\omega
+      %\implies
+      %|X_n(\omega)-X(\omega)| < \varepsilon
+    %\end{align*}
+
+  \item Define random variable $Z=X_n-X$. Suppose that $\varepsilon$ is
+    given. From Markov's inequality,
+    \begin{align*}
+      P(|Z| \geq \varepsilon) \leq \frac{\E[|Z|^p]}{|\varepsilon|^p}
+      \implies
+      P(|X_n-X| \geq \varepsilon) \leq \frac{\E[|X_n-X|^p]}{|\varepsilon|^p}
+    \end{align*}
+    As $n\ra\infty$, the righthand side of the inequality goes to zero
+    since $X_n$ converges to $X$ in $p$-norm. Hence, the lefthand side
+    holds.
+
+\end{enumerate}
+\end{proof}
+
+
+%Now for some final notes. Convergence in probability
+%is \textbf{not} convergence in expectation. The former
+%concerns a sequence of probabilities, while the latter a
+%sequence of expectations. Finally, the probability limit
+%$X$ must be free of all dependence upon the sample size $n$.
+
+
+
+\section{Related Concepts}
+
+\paragraph{Consistency} A sequence of estimators $\{ \hat{\theta}_n \}$
+where $n=1,2,\ldots$ is \emph{consistent} for parameter $\theta$ if
+$\hat{\theta}_n$ converges \emph{In Probability} to $\theta$.
+
+\paragraph{Strongly Consistent} If convergence of $\hat{\theta}_n$
+to $\theta$ holds with probability 1.
 
 
 
 \section{Probability with Measure Theory}
 
 
-\begin{defn}
-For a given sample space, $\Omega$, we can define a $\sigma$-algebra
-$\mathscr{F}$ on $\Omega$ that contains subsets of $\Omega$ called
-\emph{events}. Taken together, the double $(\Omega,\mathscr{F})$ define
-a measurable space that we can attach a probability measure to.
-\end{defn}
 \begin{rmk}
 Because a $\sigma$-algebra is closed under countable unions,
 interesections, and complements, it provides a natural way to think
@@ -326,77 +803,15 @@ another way, the definition of a $\sigma$-algebra results gives us
 pretty much all of the sets we'd like to assign probabilities to.
 \end{rmk}
 
-\subsection{The Notion of a $\sigma$-algebra}
-
-Next, we define a $\mathbf{\sigma}$-\textbf{algebra},
-which I'll denote as
-$\mathcal{F}$ to be a collection of subsets of the sample space, a
-collection of events, which
-exhibits the following properties:
-\begin{itemize}
-   \item[i.] $\Omega \in \mathcal{F}$ and $\emptyset \in \mathcal{F}$.
-      Intuitively, it ensures something will happen.
-   \item[ii.] If the set $B \subset \Omega$ is in $\mathcal{F}$,
-      then so is it's complement, i.e. $\Omega \setminus B \in
-      \mathcal{F}$.
-   \item[iii.] Countable unions and intersections of elements of
-      $\mathcal{F}$ are also in the $\mathcal{F}$.  Mathematically,
-      \[ B_i \in \mathcal{F} \; \forall i \; \Rightarrow
-	 \bigcup_{i=1}^{\infty} B_i \in \mathcal{F} \]
-      \[ B_i \in \mathcal{F} \; \forall i \; \Rightarrow
-	 \bigcap_{i=1}^{\infty} B_i \in \mathcal{F} \]
-\end{itemize}
-Any set $X \in \mathcal{F}$ is called a
-\textbf{measurable set}.\footnote{Just as Topology is based on open
-sets, which are members of some $\sigma$-algebra, so too is Measure
-Theory baed on measurable sets which are members of some
-$\sigma$-algebra.} Note by the way we defined a $\sigma$-algebra,
-the measurable sets, or events, in $\mathcal{F}$ will fail to be
-disjoint.
-
-
-
-\subsection{Simplest Example}
-
+\begin{ex}
 For an even simpler example than die rolling of something that is
 a perfectly valid $\sigma$-algebra, we
 sometimes take the power set of $\Omega$---the collection of all
 possible subsets of $\Omega$---to be our $\sigma$-algebra.  It will
 surely satisfy the necessary properties, and it happens to be very easy
 to denote.
+\end{ex}
 
-\subsection{Big Picture}
-
-One of the reasons why we employ two levels of complexity in having
-\emph{both} a sample space, $\Omega$,
-and a $\sigma$-algebra, $\mathcal{F}$, is that it allows us to
-properly make sense of complements of sets.  Specifically, if $A \in
-\mathcal{F}$ represents rolling a 1, it's a natural thing in
-probability to want to talk about the chances of \emph{not} rolling
-a 1---the complement of $A$. The preceding definitions make that a
-little more tractable.
-
-Specifically, if we try to talk about $A$'s complement, that only
-makes sense if $\mathcal{F}$ is built upon the foundation of a
-more ``meta'' set. \footnote{I use ``meta'' to avoid using a term
-like ``higher'' or ``bigger'' because, typically, the $\sigma$-algebra
-will be bigger than or at least as big as $\Omega$ in cardinality,
-and I don't want to cause any confusion. And
-in addition, I wanted to talk about using the word ``meta'' so that
-I can reasonably call this footnote ``meta-meta.''}
-For example, if we want to talk about
-the complement, $A^C$, without specifying that ``meta'' set, we could
-technically say that aliens landing on Earth tomorrow is in the
-complement of $A$---for it's definately not the event where you
-roll a 1. But it's not very relevant, and our upcoming definition of
-probability would force us to attach a probability to this as
-well---something not as easily quantified as rolling a die.
-
-Therefore using a ``meta'' set, called the sample space $\Omega$
-reduces the class of outcomes or events to what's relevant. We can
-just specify $\Omega$ to be the outcomes from rolling a die, and we
-rid ourselves of many headaches, additional considerations, and
-inter-planetary considerations.
 
 \subsection{Measure}
 
@@ -687,6 +1102,7 @@ because of some mathematical technicalities, we can't really define
 $\xi_t$ this way since it is like a derivative, but one that cannot
 exist. So we'll need to move to a definition with integrals that can be
 properly defined.)
+
 
 
 
