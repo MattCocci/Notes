@@ -193,11 +193,40 @@
 \def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
 \makeatother
 
-% My additions for math shorthand
-\newcommand{\ra}{\rightarrow}
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
 \newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Misc Math
 \newcommand{\Prb}{\mathrm{P}}
-\newcommand{\F}{\mathscr{F}}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+
+% Script
+\newcommand{\sF}{\mathscr{F}}
+\newcommand{\sB}{\mathscr{B}}
+\newcommand{\sL}{\mathscr{L}}
+\newcommand{\sM}{\mathscr{M}}
+\newcommand{\sT}{\mathscr{T}}
+\newcommand{\sA}{\mathscr{A}}
+
+% Mathcal
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calG}{\mathcal{G}}
+\newcommand{\calH}{\mathcal{H}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+
+% Blackboard
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\Rn}{\mathbb{R}^n}
 \newcommand{\Rk}{\mathbb{R}^n}
@@ -207,19 +236,23 @@
 \newcommand{\Cnn}{\mathbb{C}^{n\times n}}
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\N}{\mathbb{N}}
-\newcommand{\diag}{\text{diag}}
-\newcommand{\ch}{\text{ch}}
-\newcommand{\dom}{\text{dom}}
-\newcommand{\Lg}{\mathscr{L}}
+
 \DeclareMathOperator*{\argmin}{arg\;min}
 \DeclareMathOperator*{\argmax}{arg\;max}
 \newenvironment{rcases}
   {\left.\begin{aligned}}
   {\end{aligned}\right\rbrace}
 
-% Redefine real and imaginary from fraktur to plain text
+% Various probability and statistics commands
 \newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Corr}{\operatorname{Corr}}
 \newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
 
 % Redefine real and imaginary from fraktur to plain text
 \renewcommand{\Re}{\operatorname{Re}}
@@ -252,6 +285,79 @@
 
 %\tableofcontents
 
+\section{Utility Functions}
+
+\begin{defn}(Absolute Risk Aversion)
+Given twice-differentiable utility function $u$,
+\emph{absolute risk aversion} is defined
+\begin{align*}
+  A(c) = -\frac{u''(c)}{u'(c)}
+\end{align*}
+\end{defn}
+
+\begin{defn}(Relative Risk Aversion)
+Given twice-differentiable utility function $u$,
+\emph{relative risk aversion} is defined
+\begin{align*}
+  R(c) = cA(c) = -\frac{c u''(c)}{u'(c)}
+\end{align*}
+\end{defn}
+
+\begin{defn}(Intertemporal Elasticity of Substitution)
+Given differentiable utility function $u$,
+the \emph{intertemporal elasticity of substitution} is defined
+\begin{align*}
+  IES
+  = -\frac{\partial \ln(c_{t+1}/c_t)}{\partial r}
+  = -\frac{\partial \ln(c_{t+1}/c_t)}{%
+    \partial \ln(u'(c_{t+1})/u'(c_t))}
+\end{align*}
+High IES means that the the consumer will change her consumption
+dramatically given small changes in the interest rate---high elasticity,
+comfortable substituting across time.
+
+Low IES corresponds to a strong smoothing motive. The consumer is
+\emph{not} very responsive to changes in the interest rate.
+\end{defn}
+
+\begin{defn}(Power Utility or CRRA)
+We define the period power utility function as
+\begin{align*}
+  u(c) &= \frac{c^{1-\sigma}-1}{1-\sigma} \\
+  u'(c) &= c^{-\sigma} \\
+  u''(c) &= -\sigma c^{-\sigma-1}
+\end{align*}
+It has the feature that
+\begin{align*}
+  \lim_{\sigma\ra 1}
+  \frac{c^{1-\sigma}-1}{1-\sigma}
+  = \ln(c)
+\end{align*}
+It exhibits constant relative risk aversion
+\begin{align*}
+  R(c) &=
+  -\frac{c u''(c)}{u'(c)}
+  = -\frac{c (-\sigma c^{-\sigma-1})}{c^{-\sigma}}
+  = \sigma
+\end{align*}
+The IES is also tied to the coefficient of relative risk aversion:
+\begin{align*}
+  IES
+  = \frac{1}{\sigma}
+\end{align*}
+\end{defn}
+
+
+\section{Static Resource Allocation Problems}
+
+\begin{defn}{(Economy)}
+We define an \emph{economy} $E$ for $I$ individuals and $K$ goods as a
+list
+\begin{align*}
+  E = \{(X_i,u_i,\omega_i)\}^I_{i=1}
+\end{align*}
+\end{defn}
+
 
 \section{Solow Model}
 
@@ -263,6 +369,407 @@ according to
 \end{align*}
 Unique positive steady state, $k^*$
 
+\clearpage
+\section{Competitive Equilibrium}
+
+\subsection{Arrow-Debreu Competetive Equilibrium (ADCE): Household
+Ownership of Capital}
+
+In this subsection, we formulate an
+\emph{Arrow-Debreu Competetive Equilibrium} (ADCE) for a simple
+production-based economy involving households that consume output,
+supply labor, and own capital along with firms that produce output by
+buying labor and renting capital from the households (paying a rate of
+return).
+
+Note that there will be no real link between time periods for capital.
+You can change capital a lot from $k_t$ to $k_{t+1}$. You could link up
+time periods by adding adjustment costs, a feature we ignore for now.
+
+In this context, and ADCE is a list of sequences of
+$\{c_t^*\}$  Consumption,
+$\{k_t^*\}$  Capital,
+$\{h_t^*\}$  Hours,
+$\{p_t^*\}$  Prices,
+$\{w_t^*\}$  Wages, and
+$\{r_t^*\}$  Rate of return on capital,
+that satisfy the following conditions:
+\begin{enumerate}
+  \item \emph{Household Optimization}: The household---taking prices,
+    wages, and the rate of return on capital
+    ($\{p^*_t\}$, $\{w^*_t\}$, $\{r^*_t\}$) as given---chooses
+    sequences for consumption, capital, and hours of labor
+    ($\{c_t\}$, $\{k_t\}$, and $\{h_t\}$)
+    to maximize the present discounted value of utility, which happen to
+    exactly match equilibrium sequences
+    ($\{c_t^*\}$, $\{k_t^*\}$, and $\{h_t^*\}$)
+    \begin{align}
+      (\{c_t^*\}, \{k_t^*\}, \{h_t^*\})
+      =
+      \argmax_{\{c_t\}, \{k_t\}, \{h_t\}}
+        \; &\sumtinfz \beta^t u(c_t)
+        \label{defn:adce-hh-objfcn}\\
+      \text{s.t.} \; &
+        \sumtinfz p^*_t(c_t + k_{t+1}-(1-\delta)k_t) \leq
+        \sumtinfz (r^*_t k_t + w^*_t h_t)
+        \label{defn:adce-hh-budget}\\
+      c_t &\geq 0 \notag\\
+      h_t &\in [0,1] \notag\\
+      k_0 &= \bar{k}_0 \; \text{given} \notag
+    \end{align}
+    A few remarks:
+    \begin{enumerate}
+      \item Inequality~\ref{defn:adce-hh-budget} acts as a budget
+        constraint that stipulates total lifetime spending on
+        consumption and capital must be less than or equal to total
+        lifetime capital-rental income and labor income. Note that it is
+        a single budget constraint for time zero, not a sequence of
+        budget constraints each period.
+
+      \item Outside of the budget constraint, the remaning constraints
+        enforce nonnegative consumption, supply of hours limited by
+        hours in the day (normalized to one), and capital given.
+
+      \item There is no non-negativity constraint on capital since the
+        firm's production function will be defined for positive capital
+        values only. Hence they will never demand negative capital, so
+        we can leave it out of the constraints here.
+
+      \item Labor $h_t$ is not in the utility function, so it is pretty
+        obvious that the household would choose to supply $h_t=1$ units
+        of labor for all $t$. That earns housholds the most consumption
+        (which they value) at the cost of leisure (which we assume they
+        don't care about).
+
+        So it might seem like we could have left the $\{h_t\}$ out of
+        the definition of equilibrium altogether. However, that is not
+        the case. Even though households will choose to supply one unit
+        of labor, firms don't know that. We must keep the labor decision
+        in the model because that will allow us to pin down the wage
+        rate.
+    \end{enumerate}
+
+  \item \emph{Firm Optimization}: The firm---taking
+    prices, wages, and the rate of return on capital
+    ($\{p^*_t\}$, $\{w^*_t\}$, $\{r^*_t\}$) as given---chooses
+    the amount of capital to rent and labor hours to buy
+    ($\{k_t\}$, $\{h_t\}$)
+    that maximizes the present discount value of profits, which happens
+    to exactly match equilibrium sequences
+    ($\{k_t^*\}$ and $\{h_t^*\}$)
+    \begin{align}
+      (\{k_t^*\}, \{h_t^*\})
+      =
+      \argmax_{\{k_t\}, \{h_t\}}
+        \; &\sumtinfz \beta^t (p^*_t F(k_t,h_t) - w^*_t h_t - r^*_t k_t)
+        \label{defn:adce-firm-objfcn}\\
+      \text{s.t.} \;
+      &k_t \geq 0 \notag\\
+      &h_t \geq 0 \notag
+    \end{align}
+    A few remarks:
+    \begin{enumerate}
+      \item Firms don't worry about the fact that we must have
+        $h_t\leq 1$. To them, they can buy as many labor hours as they
+        want at rate $w^*_t$. In reality, the household optimization
+        side of the equilibrium will enforce $h_t\leq 1$.
+
+      \item Though there does not appear to be any discounting in the
+        firm's objective function, it is implicit in the prices. As
+        we'll see below, $p_t\ra 0$, which will take care of the
+        discounting.
+    \end{enumerate}
+
+  \item \emph{Market Clearing}: Production is used up as either
+    consumption or investment
+    \begin{align*}
+      F(k^*_t,h_t^*) = c_t^* + k_{t+1}^* - (1-\delta) k_t^*
+    \end{align*}
+\end{enumerate}
+
+We are now in a position to characterize equilibrium. Rather than appeal
+to the welfare theorem to say that the outcome is Pareto optimal (hence
+it looks exactly like the outcome of the planning problem), we will look
+at the first order conditions to the different optimization problems we
+have. It turns out that they \emph{will} match the planning problem,
+which will offer a kind of proof of the first welfare theorem.
+\begin{enumerate}
+  \item \emph{Household FOCs}: Again there is a single budget
+    constraint at time zero, not one for each period. So
+    Inequality~\ref{defn:adce-hh-budget} has only one associated
+    multiplier, $\mu$. Therefore, differentiating with respect to
+    consumption and capital, we get FOCs for time $t$ as:
+    \begin{align}
+      \beta^t u'(c_t) &= \mu p_t^* \label{hhfoc1}\\
+      \mu[r_t^* + p_t^* (1-\delta)]
+      &= \mu p_{t-1}^* \label{hhfoc2}
+    \end{align}
+    while clearly $h_t=1$.
+
+    These are necessary conditions for optimal $c_t$ that follow from
+    the fact that $u'(0)=\infty$, so we have an interior solution,
+    implying the KKT conditions are necessary.
+
+  \item \emph{Firm FOCs}: We have
+    \begin{align}
+      p^*_t F_1(k_t,h_t) &= r_t^* \label{firmfoc1}\\
+      p^*_t F_2(k_t,h_t) &= w_t^* \notag
+    \end{align}
+    Notice that capital appears nowhere in those equations.
+    We instead have Equation~\ref{firmfoc1} relating \emph{prices},
+    rather than quantities of capital. This is called a
+    \emph{no arbitrage condition}.
+
+  \item \emph{Transversality Condition}:
+    Think about a finite-time version of this problem. The household has
+    to choose consumption and investment for the last period, denoted
+    time $T$. At $T$, the household can either consume output in the
+    form of $c_T$ or invest to keep a positive $k_{T+1}$. But since $T$
+    is the last period, investing output to keep $k_{T+1}>0$ looks
+    pretty dumb when you could instead use that output for higher
+    consumption $c_T$.  So it must be that \emph{either} $k_{T+1}=0$
+    (i.e.\ you consume all output in the last period and invest nothing)
+    or the value of consumption---the marginal utility
+    $u'(c_T)$---equals zero so that more consumption $c_T$ isn't
+    actually worth shit. In math, you'd need
+    \begin{align*}
+      \beta^{T} u'(c_T) k_{T+1} = 0
+    \end{align*}
+    The transversality condition is the infinite horizon analog to this
+    problem, written
+    \begin{align*}
+      \limt \beta^t u'(c_t) k_{t+1}=0
+    \end{align*}
+
+  \item \emph{Pareto Optimality}: We want to show the competetive
+    equilibrium matches the solution to the planning problem. Since
+    we're considering the equilibrium sequences, everything will have
+    ${}^*$s.
+
+    Start by dividing Equation~\ref{hhfoc1} at time $t-1$ by its time
+    $t$ analog to get
+    \begin{align}
+      \frac{u'(c_{t-1}^*)}{\beta u'(c_{t}^*)} = \frac{p_{t-1}^*}{p_t^*}
+      \label{pratio1}
+    \end{align}
+    Take household FOC Equation~\ref{hhfoc2}, cancel $\mu$'s, and divide
+    by $p_t^*$:
+    \begin{align*}
+      \frac{r_t^*}{p_t^*} + (1-\delta)
+      &= \frac{p_{t-1}^*}{p_t^*}
+    \end{align*}
+    Into the above equation, substitute Equation~\ref{firmfoc1} in for
+    $r_t^*$:
+    \begin{align}
+      F_1(k_t,h_t) + (1-\delta)
+      &= \frac{p_{t-1}^*}{p_t^*}
+      \label{pratio2}
+    \end{align}
+    How equate Equations~\ref{pratio1} and \ref{pratio2}:
+    \begin{align*}
+      \frac{u'(c_{t-1}^*)}{\beta u'(c_{t}^*)}
+      = F_1(k_t,h_t) + (1-\delta)
+    \end{align*}
+    So we have this, together with market clearing, $h_t=1$, the
+    transversality condition, and an initial capital level:
+    \begin{align*}
+      \frac{u'(c_{t-1}^*)}{\beta u'(c_{t}^*)}
+      &= F_1(k_t,h_t) + (1-\delta) \\
+      F(k_t,h_t) &= c_t + k_{t+1} - (1-\delta) k_t \\
+      h_t &= 1\\
+      \limt \beta^t u'(c_t) k_{t+1}&=0\\
+      k_0 &= \bar{k}_0 \; \text{given}
+    \end{align*}
+    These are exactly the conditions that characterized the Pareto
+    efficient allocations from the planning problem.
+
+  \item \emph{Prices}: Normalize $p_0^*=1$, which will also remove
+    indeterminacy problems. We get the wage and capital rental rates
+    from the firm's first order conditions:
+    \begin{align*}
+      r_t^* &= p_t^* F_1(k^*_t,h^*_t) \\
+      w_t^* &= p_t^* F_2(k^*_t,h^*_t)
+    \end{align*}
+    We get tomorrow's price by Solving Equation~\ref{pratio1} for
+    $p_{t+1}$:
+    \begin{align}
+       p_t^*
+       = p_{t-1}^*\beta \frac{u'(c_{t}^*)}{u'(c_{t-1}^*)}
+    \end{align}
+\end{enumerate}
+Lastly, a \emph{steady state ADCE} is a value $k^*$ and an ADCE for the
+economy with $\bar{k}_0=k^*$ and $\{k_t^*\}$ satisfying $k^*_t=k^*$ for
+all $t$. Consumption must be a constant $c^*$ because solving the market
+clearing equation for consumption expresses consumption as a function of
+constants:
+\begin{align*}
+  c^* := c_t^* = F(k^*,1) - \delta k^*
+  \qquad \forall t
+\end{align*}
+Therefore, by Equation~\ref{pratio1}
+\begin{align*}
+  \frac{u'(c^*)}{\beta u'(c^*)} &= \frac{p_{t-1}^*}{p_t^*} \\
+  \implies \quad p_t &= \beta p_{t-1}^* = \beta^t p_0^*
+\end{align*}
+Hence, prices are \emph{not} constant---they are falling. The same logic
+can be used to show that wages and rental rates are falling
+monotonically in steady state:
+\begin{align*}
+  r_t^* &= p_t^* F_1(k^*,1) = \beta^t p_0^* F_1(k^*,1) = \beta^t r_0^*\\
+  w_t^* &= p_t^* F_2(k^*,1) = \beta^t p_0^* F_2(k^*,1) = \beta^t w_0^*
+\end{align*}
+Hence we have justified the earlier claim that ``prices embed
+discounting'' within the firm's optimization problem.
+
+\subsection{Arrow-Debreu Competetive Equilibrium (ADCE): Taxation}
+
+In this subsection, we suppose that there is a permanent proportional
+tax on capital income at rate $\tau_k$, where the revenues fund a
+lump-sum transfer to households, subject to a period-by-period budget
+constraint.
+
+In this context, and ADCE is a list of sequences of
+$\{c_t^*\}$  Consumption,
+$\{k_t^*\}$  Capital,
+$\{h_t^*\}$  Hours,
+$\{p_t^*\}$  Prices,
+$\{w_t^*\}$  Wages,
+$\{r_t^*\}$  Rate of return on capital, and
+$\{T_t^*\}$ Transfers
+that satisfy the following conditions:
+
+\begin{enumerate}
+  \item \emph{Household Optimization}: The household---taking prices,
+    wages, the rate of return on capital, and transfers
+    ($\{p^*_t\}$, $\{w^*_t\}$, $\{r^*_t\}$, $\{T_t^*\}$) as
+    given---chooses sequences for consumption, capital, and hours of
+    labor
+    ($\{c_t\}$, $\{k_t\}$, and $\{h_t\}$)
+    to maximize the present discounted value of utility, which happen to
+    exactly match equilibrium sequences
+    ($\{c_t^*\}$, $\{k_t^*\}$, and $\{h_t^*\}$)
+    \begin{align}
+      (\{c_t^*\}, \{k_t^*\}, \{h_t^*\})
+      =
+      \argmax_{\{c_t\}, \{k_t\}, \{h_t\}}
+        \; &\sumtinfz \beta^t u(c_t)
+        \label{defn:adce-hh-objfcn-taxes}\\\notag\\
+      \text{s.t.} \;
+        \sumtinfz p^*_t(c_t + k_{t+1}-(1-\delta)k_t) &\leq
+        \sumtinfz ((1-\tau_k)r^*_t k_t + w^*_t h_t + T^*_t)
+        \label{defn:adce-hh-budget-taxes}\\
+      c_t &\geq 0 \notag\\
+      h_t &\in [0,1] \notag\\
+      k_0 &= \bar{k}_0 \; \text{given} \notag
+    \end{align}
+
+  \item \emph{Firm Optimization}: The firm---taking
+    prices, wages, and the rate of return on capital
+    ($\{p^*_t\}$, $\{w^*_t\}$, $\{r^*_t\}$) as given---chooses
+    the amount of capital to rent and labor hours to buy
+    ($\{k_t\}$, $\{h_t\}$)
+    that maximizes the present discount value of profits, which happens
+    to exactly match equilibrium sequences
+    ($\{k_t^*\}$ and $\{h_t^*\}$)
+    \begin{align}
+      (\{k_t^*\}, \{h_t^*\})
+      =
+      \argmax_{\{k_t\}, \{h_t\}}
+        \; &\sumtinfz \beta^t (p^*_t F(k_t,h_t) - w^*_t h_t - r^*_t k_t)
+        \label{defn:adce-firm-objfcn-taxes}\\
+      \text{s.t.} \;
+      &k_t \geq 0 \notag\\
+      &h_t \geq 0 \notag
+    \end{align}
+
+  \item \emph{Government}: For each $t$:
+    \begin{align}
+      \tau_k r^*_t k^*_t = T^*_t
+      \label{taxes-govt}
+    \end{align}
+
+  \item \emph{Market Clearing}: For each $t$:
+    \begin{align}
+      F(k^*_t,h_t^*) = c_t^* + k^*_{t+1} - (1-\delta)k_t^*
+      \label{taxes-clear}
+    \end{align}
+\end{enumerate}
+As before, we can characterize the necessary conditions of the ADCE:
+
+\begin{enumerate}
+  \item \emph{Household FOCs}: Again there is a single budget
+    constraint at time zero, not one for each period. So
+    Inequality~\ref{defn:adce-hh-budget-taxes} has only one associated
+    multiplier, $\mu$. Therefore, differentiating with respect to
+    consumption and capital, we get FOCs for time $t$ as:
+    \begin{align}
+      \beta^t u'(c_t) &= \mu p_t^* \label{taxes-hhfoc1}\\
+      \mu[(1-\tau_k)r_t^* + p_t^* (1-\delta)]
+      &= \mu p_{t-1}^* \label{taxes-hhfoc2}
+    \end{align}
+    while clearly $h_t=1$.
+
+  \item \emph{Firm FOCs}: These will be the same as in the no taxation
+    case:
+    \begin{align}
+      p^*_t F_1(k_t,h_t) &= r_t^* \label{taxes-firmfoc1}\\
+      p^*_t F_2(k_t,h_t) &= w_t^* \notag
+    \end{align}
+    Notice that capital appears nowhere in those equations.
+    We instead have Equation~\ref{taxes-firmfoc1} relating
+    \emph{prices}, rather than quantities of capital. This is called a
+    \emph{no arbitrage condition}.
+
+  \item \emph{Transversality Condition}:
+    \begin{align*}
+      \limt \beta^t u'(c_t) k_{t+1}=0
+    \end{align*}
+
+  \item \emph{Euler Equation}: As before, we can derive an Euler
+    equation
+    \begin{align}
+      \frac{u'(c_{t-1}^*)}{\beta u'(c_{t}^*)}
+      = (1-\tau_k) r_t^* + (1-\delta)
+    \end{align}
+
+  \item \emph{Steady State ADCE}: The steady state level of capital
+    satisfies
+    \begin{align*}
+      (1-\tau_k) f'(k^*) &= \frac{1}{\beta} - (1-\delta)
+    \end{align*}
+    which is decreasing in $\tau_k$.
+
+  \item \emph{Government Waste}: Suppose that the government did not
+    lump-sum capital income taxes back to households. Suppose instead
+    that the government just buries the output. Then there will be
+    changes to equilibrium.
+
+    Specifically, if the government wastes taxes revenue, replace
+    sequence $\{T^*_t\}$ with $\{G^*_t\}$, and remove $T^*_t$ terms from
+    the household budget constraint, since they never see the tax
+    revenue.  Equation~\ref{defn:adce-hh-budget-taxes} becomes
+    \begin{align*}
+        \sumtinfz p^*_t(c_t + k_{t+1}-(1-\delta)k_t) &\leq
+        \sumtinfz ((1-\tau_k)r^*_t k_t + w^*_t h_t)
+    \end{align*}
+    We also modify the Government Budget Equation~\ref{taxes-govt} and
+    Market Clearing Equation~\ref{taxes-clear}
+    \begin{align*}
+      G^*_t &=  \tau_k r^*_t k^*_t \\
+      F(k^*_t,h_t^*) &= c_t^* + k^*_{t+1} - (1-\delta)k_t^* + G^*_t
+    \end{align*}
+    Of the key equations summarizing the ADCE allocation, only the
+    market clearing constraint (which pins down the level of
+    consumption) is affected. We see that the government waste reduces
+    consumption.
+    Notably, however, the consumption Euler equation does not change. In
+    other words, households don't change how they allocate cash money
+    across time---they just need to reduce their consumption by the
+    amount of waste in each period.
+\end{enumerate}
+
+\subsection{Sequence of Markets Competetive Equilibrium}
+\subsection{Recursive Competetive Equilibrium}
 
 %% APPPENDIX %%
 
