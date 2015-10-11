@@ -199,8 +199,44 @@
 \def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
 \makeatother
 
-% My additions for math shorthand
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
 \newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Misc Math
+\newcommand{\Prb}{\mathrm{P}}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+
+% Script
+\newcommand{\sF}{\mathscr{F}}
+\newcommand{\sB}{\mathscr{B}}
+\newcommand{\sL}{\mathscr{L}}
+\newcommand{\sM}{\mathscr{M}}
+\newcommand{\sT}{\mathscr{T}}
+\newcommand{\sA}{\mathscr{A}}
+
+% Mathcal
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calG}{\mathcal{G}}
+\newcommand{\calH}{\mathcal{H}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+\newcommand{\dz}{\dot{z}}
+\newcommand{\ddz}{\ddot{z}}
+
+% Blackboard
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\Rn}{\mathbb{R}^n}
 \newcommand{\Rk}{\mathbb{R}^n}
@@ -210,19 +246,43 @@
 \newcommand{\Cnn}{\mathbb{C}^{n\times n}}
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\N}{\mathbb{N}}
-\newcommand{\diag}{\text{diag}}
-\newcommand{\ch}{\text{ch}}
+
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+\newenvironment{rcases}
+  {\left.\begin{aligned}}
+  {\end{aligned}\right\rbrace}
+
+% Various probability and statistics commands
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
 \newcommand{\sumin}{\sum^n_{i=1}}
 \newcommand{\sumkn}{\sum^n_{k=1}}
 \newcommand{\sumtT}{\sum^T_{t=1}}
-\newcommand{\sumtTz}{\sum^T_{t=0}}
 \newcommand{\sumninf}{\sum^\infty_{n=1}}
 \newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
 \newcommand{\sumtinfz}{\sum^\infty_{t=0}}
-\newcommand{\dom}{\text{dom}}
-\newcommand{\Lg}{\mathscr{L}}
-\DeclareMathOperator*{\argmin}{arg\;min}
-\DeclareMathOperator*{\argmax}{arg\;max}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1282,6 +1342,37 @@ A \emph{quadratic form} is a function $f:\Rn\rightarrow\R$ of the form
 Now this is a very short subsection, but we'll see in later sections
 that quadratic forms are extremely useful for characterizing convex
 functions and differentiability via function approximations.
+
+\clearpage
+\section{Differential Equations}
+
+\subsection{System of Differential Equations}
+
+Suppose that we have a system of differential equations that can be
+written
+\begin{align*}
+  \dx_t = Ax_t
+\end{align*}
+Suppose that we can do an eigenvalue decomposition on $A$ so that it can
+be written $A = VD V^{-1}$. Then we can rewrite the system as
+\begin{align*}
+  \dz_t = Dz_t
+\end{align*}
+where $z_t:= V^{-1}x_t$ and $\dz_t=V^{-1}\dx_t$. Then we are solving a
+diagonal system in $z_t$ which has solution
+\begin{align*}
+  z_t =
+  \begin{pmatrix}
+    c_1 e^{\lambda_1 t} \\
+    c_2 e^{\lambda_2 t} \\
+    \vdots \\
+    c_n e^{\lambda_n t} \\
+  \end{pmatrix}
+  \implies
+  x_t = V z_t
+\end{align*}
+where the constants $c_i$ are determined by the initial condition and
+the $\lambda_i$ represent the eigenvalues in $D$.
 
 
 \clearpage
@@ -4638,13 +4729,14 @@ That contradicts our definitions of $X^*$ and $f^*$.
 \begin{defn}{(Lagrangian)}
 Given Problem~\ref{prob:max}, define the \emph{Lagrangian}
 \begin{align*}
-    \Lg(x,\lambda,\mu)
+    \sL(x,\lambda,\mu)
     := f_0(x)
     + \sum^m_{i=1} \lambda_i f_i(x)
     + \sum^k_{i=1} \mu_i g_i(x)
 \end{align*}
+
 where vectors $\lambda$ and $\mu$ are called the \emph{Lagrange
-multipliers}. Overall, $\Lg$ is a function of $n+m+k$ variables since
+multipliers}. Overall, $\sL$ is a function of $n+m+k$ variables since
 $x\in\Rn$, $\lambda\in\mathbb{R}^m$, and $\mu\in\mathbb{R}^k$
 \end{defn}
 
@@ -4688,10 +4780,10 @@ $\mu$.
 
 \begin{defn}{(Lagrange Dual Function)}
 Given canonical Problem~\ref{prob:max} and corresponding Lagrangian
-$\Lg(x,\lambda,\mu)$, define the \emph{Lagrange dual function}, or
+$\sL(x,\lambda,\mu)$, define the \emph{Lagrange dual function}, or
 simply the \emph{dual}, as
 \begin{align*}
-  g(\lambda,\mu) = \sup_{x\in\mathcal{D}} \; \Lg(x,\lambda,\mu)
+  g(\lambda,\mu) = \sup_{x\in\mathcal{D}} \; \sL(x,\lambda,\mu)
   = \sup_{x\in\mathcal{D}}
     \left\{ f_0(x)
     + \sum^m_{i=1} \lambda_i f_i(x)
@@ -4934,7 +5026,7 @@ following hold:
 \begin{enumerate}
   \item \emph{$x^*$ Stationary point of Lagrangian}:
     \begin{align*}
-      0 &= \nabla_x \Lg(x^*,\mu^*,\lambda^*)
+      0 &= \nabla_x \sL(x^*,\mu^*,\lambda^*)
         = \nabla_x f_0(x^*)
         + \sum^m_{i=1} \lambda_i^* \; \nabla_x f_i(x^*)
         + \sum^k_{i=1} \mu_i^* \; \nabla_xg_i(x^*)
@@ -5052,15 +5144,15 @@ Lastly, also buried in that chain is
 \end{align}
 Now think of the guy on the very right as a function of $x$ only, where
 $(\lambda^*,\mu^*)$ are fixed---call it
-$\Lg_{\lambda^*,\mu^*}(x):=\Lg(x,\lambda^*,\mu^*)$.
+$\sL_{\lambda^*,\mu^*}(x):=\sL(x,\lambda^*,\mu^*)$.
 Equation~\ref{kkt:criticalproof} effectively says that
-$x^*\in\mathcal{D}$ maximizes $\Lg_{\lambda^*,\mu^*}(x)$, so the sup is
+$x^*\in\mathcal{D}$ maximizes $\sL_{\lambda^*,\mu^*}(x)$, so the sup is
 really a max. Since the domain $\mathcal{D}$ is an open set and since
 the point maximizes the function, it must be the case that
 \begin{align*}
-  0 &= \nabla_x \Lg_{\lambda^*,\mu^*}(x^*)
+  0 &= \nabla_x \sL_{\lambda^*,\mu^*}(x^*)
   =:
-  \nabla_x \Lg(x^*,\lambda^*,\mu^*)
+  \nabla_x \sL(x^*,\lambda^*,\mu^*)
 \end{align*}
 And that's precisely KKT Condition 1, implying $x^*$ is a stationary
 point of the Lagrangian.
