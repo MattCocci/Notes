@@ -225,6 +225,12 @@
 % Dot over
 \newcommand{\dx}{\dot{x}}
 \newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% Derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
 
 % Blackboard
 \newcommand{\R}{\mathbb{R}}
@@ -274,6 +280,11 @@
 \newcommand{\sumninfz}{\sum^\infty_{n=0}}
 \newcommand{\sumtinfz}{\sum^\infty_{t=0}}
 
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -283,9 +294,13 @@
 \begin{document}
 \maketitle
 
-%\tableofcontents
+\tableofcontents
 
-\section{Utility Functions}
+\clearpage
+
+\section{Building Blocks}
+
+\subsection{Utility Functions}
 
 \begin{defn}(Absolute Risk Aversion)
 Given twice-differentiable utility function $u$,
@@ -333,6 +348,10 @@ It has the feature that
   \frac{c^{1-\sigma}-1}{1-\sigma}
   = \ln(c)
 \end{align*}
+which is why we have $-1$ in the numerator (so we can apply L'Hospital),
+though it's just a constant that doesn't really affect $u$.
+\\
+\\
 It exhibits constant relative risk aversion
 \begin{align*}
   R(c) &=
@@ -347,6 +366,89 @@ The IES is also tied to the coefficient of relative risk aversion:
 \end{align*}
 \end{defn}
 
+\begin{prop}
+The Power Utility Function characterizes the class of all utility
+functions with Constant Relative Risk Aversion.
+\end{prop}
+\begin{proof}
+To have constant relative risk aversion, we need
+\begin{align*}
+  -\frac{cu''(c)}{u'(c)} = k
+  \quad\iff\quad
+  cu''(c) + ku'(c) = 0
+\end{align*}
+for some constant $k$. We want to solve for $u$ that satisfies this. To
+do so, define $v(c)=u'(c)$, substitute, and solve:
+\begin{align*}
+  v'(c) + \frac{k}{c}v(c) &= 0
+\end{align*}
+We will use an integrating factor
+\begin{align*}
+  e^{\int \frac{k}{c} \; dc}=e^{k\ln c} = (e^{\ln c})k = c^k
+\end{align*}
+Therefore, multiply through and solve
+\begin{align*}
+  c^k v'(c) + kc^{k-1}v(c) &= 0 \\
+  \left(c^k v(c)\right)' &= 0 \\
+  c^k v(c) &= 1 \\
+  \implies \quad v(c) = u'(c) &= c^{-k} \\
+  \implies \quad u(c) &= c^{1-k}
+\end{align*}
+where I left out constants in lots of spots because scaling by a
+constant or adding constants doesn't matter for utility. But otherwise,
+you see that this is exactly the form of power utility where $k=\sigma$.
+\end{proof}
+
+\begin{prop}
+Given a balanced growth path for consumption such that
+$c_{t+1} = (1+g) c_{t}$,
+Power Utility is the only functional form where the ratio of marginal
+utilty between periods satisfies
+\begin{align*}
+  \frac{u'(c_t)}{u'((1+g)c_t)} = k
+\end{align*}
+for some constant $k$ and all $t$.
+\end{prop}
+\begin{rmk}
+This is often super useful, because some balanced growth path results
+require that the ratio of marginal utility between periods is constant.
+This tells us that we have to use this form of utility.
+\end{rmk}
+\begin{proof}
+We want to prove that Power Utility is the \emph{only} functional form
+of utility displaying this property. Start with what we need to hold:
+\begin{align}
+  \frac{u'(c)}{u'((1+g)c)} = k
+  \quad\iff\quad
+  u'(c) = ku'((1+g)c)
+  \label{kexp}
+\end{align}
+Differentiate both sides:
+\begin{align*}
+  u''(c) &= ku''((1+g)c)(1+g)
+\end{align*}
+Sub in the expression for $k$ from Equation~\ref{kexp}:
+\begin{align*}
+  u''(c) &=
+  \frac{u'(c)}{u'((1+g)c)} u''((1+g)c)(1+g) \\
+  \iff \qquad
+  \frac{u''(c)}{u'(c)} &=
+  \frac{u''((1+g)c)(1+g)}{u'((1+g)c)}
+\end{align*}
+Mulitply through by $-c$
+\begin{align*}
+  -\frac{u''(c)c}{u'(c)} &=
+  -\frac{u''((1+g)c)(1+g)c}{u'((1+g)c)}
+\end{align*}
+But each ratio is relative risk aversion at either $c_t$ or $c_{t+1}$.
+So this says that relative risk aversion for all $t=1,2,\ldots$ even
+though consumption $c_t$ is growing at rate of $g$. In other words,
+relative risk aversion is constant no matter the level of $c_t$. But
+power utility is the only class of utility functions satisfying this
+property.
+\end{proof}
+
+
 
 \section{Static Resource Allocation Problems}
 
@@ -358,8 +460,103 @@ list
 \end{align*}
 \end{defn}
 
+\clearpage
 
-\section{Solow Model}
+\section{Neoclassical Growth Model}
+
+\subsection{Baseline Model Specification}
+We set up the model
+\begin{enumerate}
+  \item \emph{Preferences}: $\sumtinfz \beta^t u(c_t)$
+
+  \item \emph{Technology}: Output $y_t$ is produced by a CRS production
+    function that takes capital $k_t$ and labor $h_t$ as input:
+    \begin{align*}
+      y_t &= F(k_t,h_t)
+    \end{align*}
+    Output can be used for consumption $c_t$ or investment $i_t$:
+    \begin{align*}
+      y_t &= c_i + i_t
+    \end{align*}
+    Investment is how the household accumulate capital, though
+    depreciation eats away at the stock of capital at rate
+    $\delta\in[0,1]$:
+    \begin{align*}
+      k_{t+1} &= (1-\delta)k_t + i_t
+    \end{align*}
+
+  \item \emph{Endowments}: Each household has one unit of time for labor
+    each period, and initial capital level $k_0=\bar{k}_0$ is given.
+\end{enumerate}
+We place the following assumptions on the problem:
+\begin{itemize}
+  \item $u \in C^2$ (i.e.\ is continuously twice differentiable) with
+    $u' > 0$ and $u$ strictly concave. Moreover, $u'(0)=+\infty$, so the
+    consumer really hates zero consumption (which will guarantee an
+    interior solution)
+  \item $\beta\in(0,1)$
+  \item $F\in C^2$, strictly increasing, weakly concave in $(k,h)$
+    jointly, strictly concave in $k,h$ individually, plus CRS
+  \item \emph{Inada Conditions}
+    \begin{align*}
+      F(0,h) &= 0 \\
+      \lim_{k\ra 0} F_1(k,h) &= +\infty
+      \quad\iff \quad\text{As $k\ra 0$, it becomes super productive to get some} \\
+      \lim_{k\ra \infty} F_1(k,h) &= 0
+      \;\qquad\iff\quad\text{As $k\ra \infty$, diminishing marginal returns}
+    \end{align*}
+\end{itemize}
+The model has the following tradeoffs
+\begin{enumerate}
+  \item Consumption today vs. tomorrow
+  \item Consumption vs leisure today
+\end{enumerate}
+This leads to social planner problem.
+\begin{align*}
+  \max_{\{c_t\},\{k_t\},\{h_t\}}
+    &\sumtinfz \beta^t u(c_t) \\
+    \text{s.t.} &\quad
+    c_t + k_{t+1}
+    = F(k_t,h_t) + (1-\delta) k_t\\
+    &\quad c_t, k_t \geq 0 \\
+    &\quad k_0 = \bar{k}_0
+\end{align*}
+We can eliminate choice of $\{c_t\}$ and turn this into equivalent
+problem
+\begin{align*}
+  \max_{\{k_t\}}
+    &\sumtinfz \beta^t
+      u\left(F(k_t,h_t) + (1-\delta) k_t - k_{t+1}\right) \\
+    \text{s.t.} &\quad
+    F(k_t,h_t) + (1-\delta) k_t - k_{t+1} \geq 0 \\
+    & \quad k_t \geq 0 \\
+    &\quad k_0 = \bar{k}_0
+\end{align*}
+Then the pareto efficient allocation is completely characterized by
+\begin{align}
+  \frac{u'(c_{t-1})}{\beta u'(c_{t})}
+  &= F_1(k_t,1) + (1-\delta) \notag \\
+  c_t &= F(k_t,1) + (1-\delta)k_t - k_{t+1}\notag\\
+  \limt \beta^{t-1}u'(c_{t-1}) k_t &= 0 \notag\\
+  k_0 &= \bar{k}_0\notag
+\end{align}
+The first equation says MRS = MRT. On the LHS, it's clear that the
+quantity represents the marginal rate of substitution. On the RHS, it's
+less clear, but follows from the fact that decreasing consumption by one
+unit to but capital increases tomorrow's consumption by $F_1(k_t,1)$ and
+allows the individual to decrease investment by $(1-\delta)$ next period
+since we carried extra capital forward.
+
+If you start off steady state, you can examine evolution of $k_t$ and
+$c_t$ by using
+\begin{align*}
+  \frac{u'(c_t)}{u'(c_{t+1})} &= f'(k_{t+1}) + (1-\delta) \\
+  c_t &= f(k_t) + (1-\delta) k_t - k_{t+1}
+\end{align*}
+Given $c_t$ and $k_t$, you can solve the second equation for $k_{t+1}$
+and then use that to solve the first equation for $c_{t+1}$.
+
+\subsection{Solow Model}
 
 Fixed output-share of investment each period, $s$. Capital evolves
 according to
@@ -367,20 +564,392 @@ according to
   k_{t+1} &= sf(k_t) + (1-\delta)k_t \\
   k_0 &= \hat{k}_0
 \end{align*}
-Unique positive steady state, $k^*$
+By investment equation, steady state capital must satisfy
+\begin{align*}
+  k^* &= sf(k^*) + (1-\delta)k^*\\
+  \Leftrightarrow\quad
+  \frac{\delta}{s} k^* &= f(k^*)
+\end{align*}
+
+
+\clearpage
+\subsection{Leisure}
+
+We set up the model
+\begin{enumerate}
+  \item \emph{Preferences}: Both consumption and liesure enter the
+    utility function $u(c,1-h)$ which satisfy the following conditions
+    that will help us get an interior solution
+    \begin{align*}
+      \lim_{h\ra 0} \; u_2(c,1-h) &= 0 \\
+      \lim_{h\ra 1} \; u_2(c,1-h) &= +\infty
+    \end{align*}
+    The first says that the consumer gets less and less utility from a
+    life of increasing liesure, while the second says that a bit of
+    liesure is infinitely valuable if the household is working all of
+    the time.
+
+  \item \emph{Technology}: Output $y_t$ is produced by a CRS production
+    function that takes capital $k_t$ and labor $h_t$ as input:
+    \begin{align*}
+      y_t &= F(k_t,h_t)
+    \end{align*}
+    Output can be used for consumption $c_t$ or investment $i_t$:
+    \begin{align*}
+      y_t &= c_i + i_t
+    \end{align*}
+    Investment is how the household accumulate capital, though
+    depreciation eats away at the stock of capital at rate
+    $\delta\in[0,1]$:
+    \begin{align*}
+      k_{t+1} &= (1-\delta)k_t + i_t
+    \end{align*}
+
+  \item \emph{Endowments}: Each household has one unit of time to be
+    split among labor and leisure each period, and initial capital level
+    $k_0=\bar{k}_0$ is given.
+\end{enumerate}
+This leads to social planner problem.
+\begin{align*}
+  \max_{\{c_t\},\{k_t\},\{h_t\}}
+    &\sumtinfz \beta^t u(c_t,1-h_t) \\
+    \text{s.t.} &\quad
+    c_t + k_{t+1}
+    = F(k_t,h_t) + (1-\delta) k_t\\
+    &\quad c_t, k_t \geq 0 \\
+    &\quad h_t \in[0,1] \\
+    &\quad k_0 = \bar{k}_0
+\end{align*}
+We can eliminate choice of $\{c_t\}$ and turn this into equivalent
+problem
+\begin{align*}
+  \max_{\{k_t\},\{h_t\}}
+    &\sumtinfz \beta^t
+      u\left(F(k_t,h_t) + (1-\delta) k_t - k_{t+1}, \; 1-h_t\right) \\
+    \text{s.t.} &\quad
+    F(k_t,h_t) + (1-\delta) k_t - k_{t+1} \geq 0 \\
+    & \quad k_t \geq 0 \\
+    &\quad h_t \in[0,1] \\
+    &\quad k_0 = \bar{k}_0
+\end{align*}
+Then the pareto efficient allocation is now completely characterized by
+\begin{align}
+  \frac{u_1(c_{t-1},1-h_{t-1})}{\beta u_1(c_{t},1-h_t)}
+    &= F_1(k_t,h_t) + (1-\delta) \notag \\
+  \frac{u_2(c_t,1-h_t)}{u_1(c_t,1-h_t)}
+    &= F_2(k_t,h_t) \label{hchoice}\\
+  c_t &= F(k_t,h_t) + (1-\delta)k_t - k_{t+1}\notag\\
+  \limt \beta^{t-1}u'(c_{t-1},1-h_{t-1}) k_t &= 0 \notag\\
+  k_0 &= \bar{k}_0\notag
+\end{align}
+This looks like before, except we now have Equation~\ref{hchoice}, which
+says that the marginal rate of substitution between consumption and
+leisure should equal the marginal product of supplying an extra unit of
+labor.
+
+Now, we look for a steady state, which gives us
+\begin{align}
+  F_1(k^*,h^*) + (1-\delta)
+    &= \frac{1}{\beta} \notag \\
+  \frac{u_2(F(k^*,h^*) - \delta k^*,\; 1-h^*)}{%
+    u_1(F(k^*,h^*) - \delta k^*,\;1-h^*)}
+    &= F_2(k^*,h^*) \notag
+\end{align}
+which is two equations in two unknowns. We can use the CRS property of
+$F$, which implies that $F_1$ is homogeneous of degree zero, to simplify
+the consumption Euler Equation
+\begin{align*}
+  \frac{1}{\beta}
+    &= F_1\left(\frac{k^*}{h^*},1\right) + (1-\delta)
+\end{align*}
+This pins down the capital labor ratio $\frac{k^*}{h^*}$ at a unique
+value (by the Inada conditions). Next, notice that by the CRS property
+of $F$, we can simplify terms in the utility equations
+\begin{align*}
+  F(k^*,h^*) - \delta k^*
+  &= h^*\left[F\left(\frac{k^*}{h^*},1\right) - \delta \frac{k^*}{h^*}\right] \\
+  &= B_2h^*
+  \qquad \text{where} \quad
+  B_2:= F\left(\frac{k^*}{h^*},1\right) - \delta \frac{k^*}{h^*}
+\end{align*}
+Again, since $F_2$ is homogenous of degree zero, so define constant
+\begin{align*}
+  B_1
+  :=
+  F_2(k^*,h^*)
+  =
+  F_2\left(\frac{k^*}{h^*},1\right)
+\end{align*}
+So we can rewrite the second FOC as
+\begin{align*}
+  \frac{u_2(B_2h^*,1-h^*)}{%
+    u_1(B_2h^*,1-h^*)}
+    &= B_1 \notag
+\end{align*}
+There exists at least one solution, but in general, there is no unique
+solution unless we assume both $c_t$ and $1-h_t$ are normal goods.
+
+
+\clearpage
+\section{Endogenous Growth}
+
+We modify the time-homogeneous production function. There's three ways
+you can do it
+\begin{enumerate}
+  \item $y_t = F(A_t k_t,h_t)$: Capital augmenting
+  \item $y_t = F(k_t,A_t h_t)$: Labor augmenting
+  \item $y_t = A_t F(k_t,h_t)$: Neutral or factor neutral technological
+    change because it affects the production function generally---not
+    just one of the factors. It's as if the production function displays
+    constant returns to scale, so you augment both factors and the
+    constant $A_t$ gets pulled out in front.
+\end{enumerate}
+Note that for something like Cobb-Douglas, there's no difference.
+
+\subsection{Baseline Growth Model}
+
+We set up the model
+\begin{enumerate}
+  \item \emph{Preferences}: $\sumtinfz \beta^t u(c_t)$
+  \item \emph{Technology}: Assume $\{A_t\}$ given, so deterministic
+    technology growth at a constant rate (for now).\footnote{%
+      Add randomness and you get RBC models.}
+    We go for labor-augmenting technological change.
+    \begin{align*}
+      y_t &= F(k_t,A_th_t) \\
+      y_t &= c_i + i_t \\
+      k_{t+1} &= (1-\delta)k_t + i_t
+    \end{align*}
+  \item \emph{Endowments}: One unit of time for labor each period, and
+    $k_0=\bar{k}_0$.
+\end{enumerate}
+This leads to social planner problem.
+\begin{align*}
+  \max_{\{c_t\},\{k_t\}}
+    &\sumtinfz \beta^t u(c_t) \\
+    \text{s.t.} &\quad
+    c_t + k_{t+1}
+    = F(k_t,A_t) + (1-\delta) k_t\\
+    &\quad c_t \geq 0 \\
+    &\quad k_0 = \bar{k}_0
+\end{align*}
+Then the pareto efficient allocation is completely characterized by
+\begin{align}
+  \frac{u'(c_{t-1}}{\beta u'(c_{t})}
+  &= F_1(k_t,A_t) + (1-\delta) \label{eulerA}\\
+  c_t &= F(k_t,A_t) + (1-\delta)k_t - k_{t+1}\notag\\
+  \limt \beta^{t-1}u'(c_{t-1}) k_t &= 0 \notag\\
+  k_0 &= \bar{k}_0\notag
+\end{align}
+We will now attempt to find a \emph{balanced growth path}, which is the
+natural generalization of steady state that considers asymptotic
+behavior. A balanced growth path is a solution in which all of the
+variables grow at \emph{constant} rates, though \emph{not necessarily}
+the same rate.\footnote{%
+  For our simple model, it will be the case that things grow at the same
+  rate. But the concept of a ``balanced growth path'' is more general.
+}
+
+So we know that $A_t$ grows at some constant rate $g$. We want $k_t$ and
+$c_t$ to grow at a constant rates $g_k$ and $g_c$ as well, though they
+could differ from $g$. So we want
+\begin{align*}
+  c_t &= F(k_t,A_t) + (1-\delta) k_t - k_{t+1} \\
+  (1+g_c) c_0 &= F((1+g_k)k_t,(1+g)^tA_0) + (1-\delta) k_t - k_{t+1} \\
+\end{align*}
+For $c_t$ to grow at a constant rate, we need $g_k=g$. Then we can pull
+out $(1+g)$ from inside the production function and everything on the
+RHS grows at $g$. Then $c_t$ grows at rate $g$ too.
+
+Next, notice that since $k_t$ and $A_t$ are growing at $g$, the ratio
+between the goods is not changing. Hence $F_1(k_t,A_t)$ is constant
+since the derivative is homogeneous of degree zero (which follows from
+$F$ being HoD1).
+
+\subsection{Baseline with Change of Variables}
+
+Since everything is growing at rate $g$, define
+$\tilde{k}_t = \frac{k_t}{(1+g)^t}$ or equivalently
+$k_t=(1+g)^t\cdot \tilde{k}_t$. Moreover, normalize $A_0=1$ and
+substitute $A_t=(1+g)^t$. Substitute. Then the Social Planner's problem
+becomes
+\begin{align*}
+  \max_{\{k_t\}}
+    &\sumtinfz \beta^t u\left[F\left((1+g)^t\tilde{k}_t,(1+g)^{t}\right)
+      + (1-\delta) (1+g)^t\tilde{k}_t - (1+g)^t\tilde{k}_{t+1}\right] \\
+    \text{s.t.} &\quad
+    F((1+g)^t\tilde{k}_t,(1+g)^t) + (1-\delta) (1+g)^t\tilde{k}_t
+      - (1+g)^t\tilde{k}_{t+1}\geq 0\\
+    &\quad k_0 = \bar{k}_0
+\end{align*}
+We can pull out $(1+g)^t$ in both the objective function and the
+constraint to simplify to
+\begin{align*}
+  \max_{\{k_t\}}
+    &\sumtinfz \beta^t u\left[F\left(\tilde{k}_t,\right)
+      + (1-\delta) (1+g)^t\tilde{k}_t - (1+g)^t\tilde{k}_{t+1}\right] \\
+    \text{s.t.} &\quad
+    F((1+g)^t\tilde{k}_t,(1+g)^t) + (1-\delta) (1+g)^t\tilde{k}_t
+      - (1+g)^t\tilde{k}_{t+1}\geq 0\\
+    &\quad k_0 = \bar{k}_0
+\end{align*}
+
+Then the pareto efficient allocation is completely characterized by
+\begin{align}
+  \frac{u'(c_{t-1}}{\beta u'(c_{t})}
+  &= F_1(k_t,A_t) + (1-\delta) \\
+  c_t &= F(k_t,A_t) + (1-\delta)k_t - k_{t+1}\notag\\
+  \limt \beta^{t-1}u'(c_{t-1}) k_t &= 0 \notag\\
+  k_0 &= \bar{k}_0\notag
+\end{align}
+We will now attempt to find a \emph{balanced growth path}, which is the
+natural generalization of steady state that considers asymptotic
+behavior. A balanced growth path is a solution in which all of the
+variables grow at \emph{constant} rates, though \emph{not necessarily}
+the same rate.\footnote{%
+  For our simple model, it will be the case that things grow at the same
+  rate. But the concept of a ``balanced growth path'' is more general.
+}
+
+So we know that $A_t$ grows at some constant rate $g$. We want $k_t$ and
+$c_t$ to grow at a constant rates $g_k$ and $g_c$ as well, though they
+could differ from $g$. So we want
+\begin{align*}
+  c_t &= F(k_t,A_t) + (1-\delta) k_t - k_{t+1} \\
+  (1+g_c) c_0 &= F((1+g_k)k_t,(1+g)^tA_0) + (1-\delta) k_t - k_{t+1} \\
+\end{align*}
+For $c_t$ to grow at a constant rate, we need $g_k=g$. Then we can pull
+out $(1+g)$ from inside the production function and everything on the
+RHS grows at $g$. Then $c_t$ grows at rate $g$ too.
+
+Next, notice that since $k_t$ and $A_t$ are growing at $g$, the ratio
+between the goods is not changing. Hence $F_1(k_t,A_t)$ is constant
+since the derivative is homogeneous of degree zero (which follows from
+$F$ being HoD1).
+
+
+\clearpage
+\section{Romer Model}
+
+\subsection{Preferences, Technology, Endowments}
+
+Specialization drives productivity. Primitives
+\begin{enumerate}
+  \item \emph{Preferences}: $\sumtinfz \beta^t u(c_t)$ with
+    $u(c)=\frac{c^{1-\sigma}-1}{1-\sigma}$ for $\sigma>0$.
+  \item \emph{Technology}:
+    Output $y_t$ is produced by spreading out aggregate capital $k_t$
+    among a mass of $N_t$ production processes that all use capital
+    differently:
+    \begin{align*}
+      y_t &=
+      \left(
+      \int_{0}^{N_t} k_t(i)^\alpha \;di \right)
+      h_t^{1-\alpha} \\
+      k_t &= \int_0^{N_t} k_t(i) \; di
+    \end{align*}
+    where $N_t$ is an index of specialization that will grow over time
+    as additional (specialized) production processes come into
+    existence through R\&D. But given $N_t$ fixed, note that the
+    production function is CRS.
+
+    Output can be used for consumption, investment in aggregate
+    capital, or investment in finding more production processes
+    (i.e.\ R\&D).
+    \begin{align*}
+      y_t &= c_t + i_t^k + i_t^N \\
+      k_{t+1} &= (1-\delta)k_t + i_t^k \\
+      N_{t+1} &= N_t + i_t^N
+    \end{align*}
+
+  \item \emph{Endowments}: Each household has one unit of time, while
+    capital and the number of production processes start at
+    $k_0=\bar{k}_0$ and $N_0=\bar{N}_0$.
+\end{enumerate}
+Note that there are no irreversibilities, so the stock of knowledge can
+be turned back into consumption $c$, but that won't be a problem since
+we'll be finding a BGP.
+
+
+\subsection{Social Planner's Problem}
+
+First, we know that aggregate capital will be spread out equally among
+the production processes, so that $k_t(i) = \frac{k_t}{N_t}$. Therefore
+\begin{align*}
+  \int_0^{N_t} k_t(i)^\alpha \; di
+  &=
+  \int_0^{N_t} \left(\frac{k_t}{N_t}\right)^\alpha \; di
+  =
+  \left(\frac{k_t}{N_t}\right)^\alpha N_t
+  = k_t^\alpha N_t^{1-\alpha}
+\end{align*}
+Coupled with the fact that $h_t=1$, this allows us to write the
+production function more compactly as
+\begin{align*}
+  F(k_t,h_t)
+  &= \left( \int_0^{N_t} k_t(i)^\alpha \; di\right)
+    h_t^{1-\alpha}
+  = k_t^{\alpha} N_t^{1-\alpha}
+\end{align*}
+This allows us to write the social planner's problem
+\begin{align*}
+  \max_{\{k_t\},\{N_t\}} \; & \sumtinfz \beta^t u(c_t) \\
+  \text{s.t.} \; &
+    c_t =
+    k_t^\alpha N_t^{1-\alpha}
+    - [k_{t+1}-(1-\delta)k_t] + [N_{t+1}-N_t] \\
+    & k_0 = \bar{k}_0 \\
+    & N_0 = \bar{N}_0 \\
+    & c_t, k_t,N_t\geq 0
+\end{align*}
+Hence, first order conditions
+\begin{align*}
+  \frac{u'(c_{t-1})}{\beta u'(c_t)}
+  &=
+  \alpha \left(\frac{k_t}{N_t}\right)^{\alpha-1} + (1-\delta) \\
+  \frac{u'(c_{t-1})}{\beta u'(c_t)}
+  &=
+  (1-\alpha) \left(  \frac{k_t}{N_t} \right)^{\alpha} + 1
+\end{align*}
+Equating
+\begin{align*}
+  \alpha \left(\frac{k_t}{N_t}\right)^{\alpha-1} + (1-\delta)
+  &=
+  (1-\alpha) \left(  \frac{k_t}{N_t} \right)^{\alpha} + 1
+\end{align*}
+This needs to be true at each $t$, hence $\frac{k_t}{N_t}$ is a
+constant i.e.
+\begin{align*}
+  \frac{1}{\tilde{A}} = \frac{k_t}{N_t}
+  \quad\implies\quad
+  N_t = \tilde{A}k_t
+\end{align*}
+Moreover, there's a unique value for the ratio since the RHS is
+increasing in $\frac{k_t}{N_t}$, while the LHS is decreasing.
+\\
+\\
+And if we plug this back into the Euler Equation
+\begin{align*}
+  \frac{u'(c_{t-1})}{\beta u'(c_t)}
+  &=
+  \alpha \left(\frac{1}{\tilde{A}}\right)^{\alpha-1} + (1-\delta)
+\end{align*}
+which is exactly identical to the $Ak$ model where
+$A=\alpha \left(\frac{1}{\tilde{A}}\right)^{\alpha-1}$.
+
 
 \clearpage
 \section{Competitive Equilibrium}
 
-\subsection{Arrow-Debreu Competetive Equilibrium (ADCE): Household
-Ownership of Capital}
+\subsection{Arrow-Debreu Competetive Equilibrium (ADCE): Baseline
+Formulation}
 
 In this subsection, we formulate an
 \emph{Arrow-Debreu Competetive Equilibrium} (ADCE) for a simple
 production-based economy involving households that consume output,
 supply labor, and own capital along with firms that produce output by
-buying labor and renting capital from the households (paying a rate of
-return).
+buying labor and renting capital from the households (paying a rental
+rate).
 
 Note that there will be no real link between time periods for capital.
 You can change capital a lot from $k_t$ to $k_{t+1}$. You could link up
@@ -392,17 +961,15 @@ $\{k_t^*\}$  Capital,
 $\{h_t^*\}$  Hours,
 $\{p_t^*\}$  Prices,
 $\{w_t^*\}$  Wages, and
-$\{r_t^*\}$  Rate of return on capital,
+$\{r_t^*\}$  rental rate of capital,
 that satisfy the following conditions:
 \begin{enumerate}
-  \item \emph{Household Optimization}: The household---taking prices,
+  \item \emph{Household Optimization}: Taking prices,
     wages, and the rate of return on capital
-    ($\{p^*_t\}$, $\{w^*_t\}$, $\{r^*_t\}$) as given---chooses
+    ($\{p^*_t\}$, $\{w^*_t\}$, $\{r^*_t\}$) as given, the
     sequences for consumption, capital, and hours of labor
-    ($\{c_t\}$, $\{k_t\}$, and $\{h_t\}$)
-    to maximize the present discounted value of utility, which happen to
-    exactly match equilibrium sequences
     ($\{c_t^*\}$, $\{k_t^*\}$, and $\{h_t^*\}$)
+    solve the utility maximization problem
     \begin{align}
       (\{c_t^*\}, \{k_t^*\}, \{h_t^*\})
       =
@@ -417,6 +984,10 @@ that satisfy the following conditions:
       h_t &\in [0,1] \notag\\
       k_0 &= \bar{k}_0 \; \text{given} \notag
     \end{align}
+    In other words the ``star'' sequences correspond exactly to what the
+    household optimizing household would choose to do, taking things
+    outside of their control as given.
+
     A few remarks:
     \begin{enumerate}
       \item Inequality~\ref{defn:adce-hh-budget} acts as a budget
@@ -449,14 +1020,12 @@ that satisfy the following conditions:
         rate.
     \end{enumerate}
 
-  \item \emph{Firm Optimization}: The firm---taking
+  \item \emph{Firm Optimization}: Taking
     prices, wages, and the rate of return on capital
-    ($\{p^*_t\}$, $\{w^*_t\}$, $\{r^*_t\}$) as given---chooses
-    the amount of capital to rent and labor hours to buy
-    ($\{k_t\}$, $\{h_t\}$)
-    that maximizes the present discount value of profits, which happens
-    to exactly match equilibrium sequences
+    ($\{p^*_t\}$, $\{w^*_t\}$, $\{r^*_t\}$) as given,
+    the sequences for capital to rent and labor hours to buy
     ($\{k_t^*\}$ and $\{h_t^*\}$)
+    solve the profit maximization problem
     \begin{align}
       (\{k_t^*\}, \{h_t^*\})
       =
@@ -486,7 +1055,6 @@ that satisfy the following conditions:
       F(k^*_t,h_t^*) = c_t^* + k_{t+1}^* - (1-\delta) k_t^*
     \end{align*}
 \end{enumerate}
-
 We are now in a position to characterize equilibrium. Rather than appeal
 to the welfare theorem to say that the outcome is Pareto optimal (hence
 it looks exactly like the outcome of the planning problem), we will look
@@ -518,7 +1086,7 @@ which will offer a kind of proof of the first welfare theorem.
     Notice that capital appears nowhere in those equations.
     We instead have Equation~\ref{firmfoc1} relating \emph{prices},
     rather than quantities of capital. This is called a
-    \emph{no arbitrage condition}.
+    \emph{no arbitrage condition}. More on that later.
 
   \item \emph{Transversality Condition}:
     Think about a finite-time version of this problem. The household has
@@ -544,7 +1112,7 @@ which will offer a kind of proof of the first welfare theorem.
   \item \emph{Pareto Optimality}: We want to show the competetive
     equilibrium matches the solution to the planning problem. Since
     we're considering the equilibrium sequences, everything will have
-    ${}^*$s.
+    stars ${}^*$.
 
     Start by dividing Equation~\ref{hhfoc1} at time $t-1$ by its time
     $t$ analog to get
@@ -768,8 +1336,802 @@ As before, we can characterize the necessary conditions of the ADCE:
     amount of waste in each period.
 \end{enumerate}
 
-\subsection{Sequence of Markets Competetive Equilibrium}
-\subsection{Recursive Competetive Equilibrium}
+\clearpage
+\subsection{Rates of Return in an ADCE}
+
+There are two ways for the consumer to move money through time in an
+ACDE, with two corresponding rates of return:
+\begin{enumerate}
+  \item \emph{Real Rate of Return}, $R_t^*$: Give up one unit of
+    consumption today, saving $p_t^*$, and buy $\frac{p_t^*}{p_{t+1^*}}$
+    units of consumption tomorrow:
+    \begin{align}
+      1+R_t^* = \frac{p_t^*}{p_{t+1}^*} = \frac{1}{\beta}
+      \label{noarb1}
+    \end{align}
+    where the last equality followed from a steady relationship.
+
+  \item \emph{Real Rate of Return on Capital}: Give up one unit of
+    consumption today, invest in capital, and use all proceeds from the
+    capital to consume at time $t+1$
+    \begin{align}
+      \frac{r_{t+1}^* + (1-\delta)p_{t+1}^*}{p_{t+1}^*}
+      \label{noarb2}
+    \end{align}
+    In words, you give up one unit of consumption today and instead buy
+    one unit of capital for use tomorrow.
+    First, that extra unit of capital gets you extra rental income
+    $r_{t+1}^*$ tomorrow.
+    Second, you also get the liquidation value of that unit of capital
+    (net of depreciation) at tomorrow's price $(1-\delta)p_{t+1}^*$
+    The sum of these two things $r_{t+1}^* + (1-\delta)p_{t+1}^*$ is the
+    numerator.
+
+    Lastly, you gave up one unit of consumption today at price $p_t^*$,
+    but consumption will be priced differently tomorrow.  So we should
+    divide this extra consumption tomorrow by $p_{t+1}^*$ to make the
+    periods comparable. That's the denominator.
+\end{enumerate}
+So we've established two ways to move money through time: via simple
+reallocation of consumption and via investment. By any reasonable notion
+of equilibrium, we would expect no arbitrage, i.e.\ for
+Equation~\ref{noarb1} (in whichever of the three representations we
+choose) to equal Equation~\ref{noarb2}:
+\begin{align*}
+  \frac{p_t^*}{p_{t+1}^*}
+  &=
+  \frac{r_{t+1}^* + (1-\delta)p_{t+1}^*}{p_{t+1}^*} \\
+  \Leftrightarrow\quad
+  \frac{p_t^*}{p_{t+1}^*}
+  &=
+  \frac{r_{t+1}^*}{p_{t+1}^*} + (1-\delta)
+\end{align*}
+But recall that this equation popped out of the ADCE. It was also the
+reason why the FOC for capital didn't have the \emph{quantity} of
+capital involved, but rather this no arbitrage condition (implicitly).
+
+
+\clearpage
+\section{Static Model with Variety}
+
+\subsection{Preferences, Technology, Endowments}
+
+We define the usual trifecta of primitives for a macro problem:
+\begin{enumerate}
+  \item \emph{Preferences}:
+    Given mass of goods $N$ and the preference parameter $\rho\in(0,1)$,
+    define utility over consumption of a continuum of goods, captured by
+    function $c:[0,N]\ra \R$, as
+    \begin{align*}
+      U(c) &=
+      u\left(
+      \left[
+      \int_0^N c(i)^\rho \; di
+      \right]^{1/\rho}
+      \right)
+    \end{align*}
+    where $c(i)$ is consumption of the $i$th good and $u$ is some
+    standard utility function and $u$ is some standard utility function
+    defined for one good. In this way, big $U$ aggregates the utility of
+    consuming $c(i)$ units of each $i$th good.  The above has limiting
+    cases
+    \begin{itemize}
+      \item $\rho\ra 0$: Cobb-Douglas
+      \item $\rho\ra 1$: Perfect substitutes
+    \end{itemize}
+
+  \item \emph{Technology}:
+    There is a variety of goods to consume, each of which is produced by
+    a different firm, so we need to define the production function for
+    each firm:
+    \begin{align*}
+      y(i) = A h(i)
+    \end{align*}
+    where $y(i)$ is output of the $i$th good from the $i$th firm and
+    $h(i)$ is labor used to produce it. All of the firms have identical
+    technology in the sense that the same amount of labor produces the
+    same output of output for any good. We ignore capital for now.
+
+  \item \emph{Endowments}: Each household has one unit of labor to
+    supply to the firms.
+\end{enumerate}
+
+\clearpage
+\subsection{SP Problem, Fixed $N$}
+
+We have Social Planner's problem
+\begin{align*}
+  \max_{c(i), h(i)}
+    & \; u\left(
+      \left[ \int_0^N c(i)^\rho \; di \right]^{1/\rho}
+    \right)\\
+  \text{s.t} & \;
+  \intzN h(i) \; di = 1 \\
+  &\; c(i) = Ah(i) \\
+  &\; c(i),h(i) \geq 0
+\end{align*}
+Eliminate $c(i)$ from the problem by subbing in:
+\begin{align*}
+  \max_{h(i)}
+    & \; u\left(
+    \left[ \int_0^N (Ah(i))^\rho \; di \right]^{1/\rho}
+    \right)\\
+  \text{s.t} & \;
+  \intzN h(i) \; di = 1 \\
+  &\; h(i) \geq 0
+\end{align*}
+Differentiate with respect to $h(i)$ and this gives FOC:
+\begin{align*}
+  u'\left( \left[ \int_0^N (Ah(i))^\rho \; di \right]^{1/\rho} \right)
+  \cdot
+  \frac{1}{\rho}\left[ \int_0^N (Ah(i))^\rho \; di \right]^{1/\rho-1}
+  \cdot
+  \rho A^\rho h(i)^{\rho-1}
+  = \lambda
+\end{align*}
+Dividing the FOC for good $i$ by the FOC for good $j$, we get
+\begin{align*}
+  \left(
+  \frac{h(i)}{h(j)}
+  \right)^{\rho-1}
+  = 1
+  \quad&\implies\quad
+  h(i) = h(j)
+  \qquad \forall i,j \in[0,N] \\
+  &\implies\quad
+  h(i) = \frac{1}{N}
+\end{align*}
+Hence, in equilibrium, labor is split up equally among the firms as
+$h^*(i)=\frac{1}{N}$. As a result, consumption will be split evenly as
+well and will equal
+\begin{align*}
+  c(i)^* = \frac{A}{N}
+\end{align*}
+This will leady to totaly utility at the optimum of
+\begin{align*}
+  u\left( \left[ \int_0^N c(i)^\rho \; di \right]^{1/\rho} \right)
+  =
+  u\left( \left[ \int_0^N
+      \left[ \frac{A}{N} \right]^\rho \; di
+    \right]^{1/\rho} \right)
+  =
+  u\left( A N^{\frac{1}{\rho}-1}\right)
+\end{align*}
+Hence, since $\rho\in(0,1)$, utility is \emph{increasing} in $N$.
+There's a love of variety in the model.
+%That's because marginal utility at $c(i)=0$ is infinite.
+
+\clearpage
+\subsection{SP Problem, Endogenous $N$}
+
+As we saw in the last subsection, households love variety, so $N$ is
+substantive. But so far, we've just taken it as given. Where does it
+come from? Since it is important, we probably want to endogenize it.
+But notice that since consumers love variety, the social planner would
+just send $N\ra \infty$ if $N$ were a totally free variable. Therefore,
+we want to introduce costs to more variety to make sure this problem is
+well-defined.
+
+In this problem, we will assume that labor can be used to produce either
+new varieties or output of existing varieties. So the household
+effectively chooses $N$, but at a cost. Specifically, it costs $\bar{h}$
+units of labor to produce one mass unit of firms/variety. In other
+words, to have a total mass of $N$ firms, it costs $N\bar{h}$ units of
+labor.  The rest of the household's one unit of
+labor---i.e.\ the remaining $1-N\bar{h}$ units---goes towards producing
+the varieties. This leads to social planner's problem
+\begin{align*}
+  \max_{c(i),h(i),N}
+    & \; u\left(
+      \left[ \int_0^N c(i)^\rho \; di \right]^{1/\rho}
+    \right)
+  \\
+  \text{s.t.} & \;
+  \intzN h(i) \; di = 1 - N\bar{h}\\
+  &\; c(i) = Ah(i) \\
+  &\; c(i),h(i),N \geq 0
+\end{align*}
+Eliminate $c(i)$:
+\begin{align*}
+  \max_{h(i),N}
+    & \; u\left(
+      \left[ \int_0^N \left(Ah(i)\right)^\rho \; di \right]^{1/\rho}
+    \right)
+  \\
+  \text{s.t} & \;
+  \intzN h(i) \; di = 1 - N\bar{h}\\
+  &\; h(i),N \geq 0
+\end{align*}
+Notice that the labor supply problem hasn't really changed. If we get
+the FOCs with respect to $h(i)$, it will still be the case that the
+household should allocate labor evenly among the firms to consume evenly
+across varieties. Only now, there are only $1-N\bar{h}$ units of labor
+to allocate towards producing the varieties (by the constraint) so that
+$h(i)=\frac{1-N\bar{h}}{N}$. Hence, we can sub in to simplify
+\begin{align*}
+  \max_{N\geq 0}
+    & \; u\left(
+      \left[ \int_0^N \left(A\frac{1-N\bar{h}}{N}\right)^\rho \; di \right]^{1/\rho}
+    \right) \\
+  \Leftrightarrow\quad
+  \max_{N\geq 0}
+    & \; u\left(
+      A(1-N\bar{h})
+      N^{\frac{1}{\rho}-1}
+    \right)
+\end{align*}
+But since $u$ is an increasing function, we can just maximize
+\begin{align*}
+  \max_{N\geq 0}
+    & \;
+      A(1-N\bar{h})
+      N^{\frac{1}{\rho}-1}
+\end{align*}
+which has FOCs
+\begin{align*}
+  A\bar{h} N^{\frac{1}{\rho}-1}
+  &=
+  \left(\frac{1}{\rho}-1\right)
+  A(1-N\bar{h}) N^{\frac{1}{\rho}-2} \\
+  \Rightarrow\quad
+  N &= \frac{1-\rho}{\bar{h}}
+\end{align*}
+So as $\rho\ra 1$ and the consumer views the goods more as perfect
+substitutes, the social planner opts for fewer firms (and vice versa).
+Moreover, as the cost $\bar{h}$ of creating new firms decreases, the
+social planner opts for more firms.
+
+
+\clearpage
+\subsection{ADCE, Fixed $N$}
+
+We now characterize an ADCE in an economy with variety , which a list
+$c^*(i)$ consumption of each good, $h^*$ total labor supply, $h^*(i)$
+labor supply to each firm, and $p^*(i)$ price of each good (wages left
+out because normalized to one), that satisfy the following conditions:
+\begin{enumerate}
+  \item \emph{Household Optimization}: Taking prices $p^*(i)$ as given,
+    consumption $c^*(i)$, and total labor supply $h^*$ solve
+    \begin{align*}
+      (c^*(i), h^*)
+      = \max_{c(i), h}
+        & \; u\left(
+          \left[ \int_0^N c(i)^\rho \; di \right]^{1/\rho}
+        \right)\\
+      \text{s.t} & \;
+        \intzN p^*(i) c(i) \; di= h \\
+      &\; h\in[0,1] \\
+      &\; c(i) \geq 0
+    \end{align*}
+    Note that the household is not optimizing over $h(i)$. They don't
+    care which firm they work for. They just care amount the total level
+    of labor $h$ they supply since that's how they earn money to buy
+    consumption.
+
+  \item \emph{Firm Optimization}: With each firm taking prices $p^*(i)$
+    as given, $h^*(i)$ solves the profit maximization problem:
+    \begin{align*}
+      h^*(i)
+      &=
+      \max_{h(i)}
+      p^*(i) Ah(i) - h(i) \\
+      \text{s.t.} \;
+      & \; h(i) \geq 0
+    \end{align*}
+
+  \item \emph{Market Clearing}: All of the labor provided to the
+    different firms must aggregate to the amount of total labor
+    provided, and everything produced must be consumed:
+    \begin{align*}
+       h^* &= \intzN h^*(i) \; di \\
+       c^*(i) &= Ah^*(i)
+    \end{align*}
+\end{enumerate}
+We do the usual things
+\begin{enumerate}
+  \item \emph{Household FOCs}: First with respect to consumption of the
+    $i$th good $c(i)$:
+    \begin{align*}
+      u'\left(
+        \left[ \int_0^N c(i)^\rho \; di \right]^{1/\rho}
+      \right)
+      \frac{1}{\rho}
+      \left[ \int_0^N c(i)^\rho \; di \right]^{1/\rho-1}
+      \rho c(i)^{\rho-1}
+      = \lambda p^*(i)
+    \end{align*}
+    Dividing the FOC for $c(i)$ by the FOC for $c(j)$:
+    \begin{align}
+      \left(
+      \frac{c(i)}{c(j)}
+      \right)^{\rho-1}
+      =
+      \frac{p^*(i)}{p^*(j)}
+      \label{hhfoc-variety}
+    \end{align}
+
+  \item \emph{Firm}: It must be the case that profits are zero,
+    otherwise the firm would just make infinite profits. Therefore, we
+    need
+    \begin{align*}
+      p^*(i) = \frac{1}{A}
+      \qquad \forall i
+    \end{align*}
+
+  \item \emph{Market Clearing}: Since prices are all the same at
+    $\frac{1}{A}$, Equation~\ref{hhfoc-variety} tells us that
+    consumption of all goods must be equal since the prices are equal.
+    Therefore, by market clearing, labor must be distributed equally
+    among the firms, i.e. $h(i) = \frac{1}{N}$.
+\end{enumerate}
+Note that the firms are price takers in this market. They're not really
+exploiting consumer's desire for variety to make more cash money.  And
+since they're just price takers (so that there are no distortions in
+this market), the outcome is exactly the same as the Social Planner's
+problem---consumption and labor is divided equally among all firms. But
+that's not very interesting. We want to see what happens when firms are
+price-\emph{setters}, not price-takers.
+
+
+\subsection{Monopolistic Price Setting and Demand}
+
+First, firms will solve for the consumer's demand function. Since
+consumer's take prices as given, we return to their utility maximization
+problem given income $I$.\footnote{%
+  More generally, we'd model income as wage rate times hours supplied,
+  by it won't make much difference here, so we ignore it for now
+}
+We want to isolate how demand for good $i$ changes as price $p(i)$
+changes---holding all other prices and the consumer's wealth constant,
+which the firm takes as given. So firms consider the consumer's utility
+maximization problem:
+\begin{align*}
+  \max_{c(i) \geq 0}
+    & \; u\left(
+      \left[ \int_0^N c(i)^\rho \; di \right]^{1/\rho}
+    \right)\\
+  \text{s.t} & \;
+    \intzN p(i) c(i) \; di= I
+\end{align*}
+The consumer forms first order condition on $c(i)$ of
+\begin{align*}
+  u'\left(
+    \left[ \int_0^N c(i)^\rho \; di \right]^{1/\rho}
+  \right)
+  \frac{1}{\rho}
+  \left[ \int_0^N c(i)^\rho \; di \right]^{1/\rho-1}
+  \rho c(i)^{\rho-1}
+  = \lambda p(i)
+\end{align*}
+Dividing the FOC for $c(i)$ by the FOC for $c(j)$:
+\begin{align}
+  \left(
+  \frac{c(i)}{c(j)}
+  \right)^{\rho-1}
+  =
+  \frac{p(i)}{p(j)}
+  &\quad \iff \quad
+  c(i)
+  =
+  c(j)
+  \left(
+  \frac{p(i)}{p(j)}
+  \right)^{\frac{1}{\rho-1}}
+  \label{cidemand}
+\end{align}
+We can think of Equation~\ref{cidemand} as summarizing demand for the
+$i$th good (for any $i\in[0,N]$) as a function of demand for some fixed
+reference good $j$ and the price ratio between $i$ and $j$.
+So we can substitute this expression for $c(i)$ into the budget equation
+and simplify:
+\begin{align*}
+  I &= \intzN p(i) c(i) \; di
+  = \intzN p(i)
+    c(j)
+    \left(
+    \frac{p(i)}{p(j)}
+    \right)^{\frac{1}{\rho-1}} \notag
+    \; di \\
+  %&=
+    %\frac{c(j)}{p(j)^{\frac{1}{\rho-1}}}
+    %\intzN p(i)
+    %p(i)^{\frac{1}{\rho-1}} \notag
+    %\; di \\
+  \implies\quad
+  I
+  &=
+    \frac{c(j)}{p(j)^{\frac{1}{\rho-1}}}
+    \intzN
+    p(i)^{\frac{\rho}{\rho-1}} \notag
+    \; di
+\end{align*}
+Therefore, we can summarize demand for good $j$ as
+\begin{align*}
+  c(j)
+  =
+  p(j)^{\frac{1}{\rho-1}}
+  \cdot
+  \frac{I}{\intzN p(i)^{\frac{\rho}{\rho-1}} \notag \; di}
+\end{align*}
+And since our choice of reference good was arbitrary, this holds for any
+$j$. Notice that this is extremely tractable since the fraction is a
+constant from the perspective of firm $j$. So we have demand for good
+$j$ written quite simply as
+\begin{align*}
+  c(j) = B p(j)^{\frac{1}{\rho-1}}
+  \qquad\text{where} \quad B=
+  \frac{I}{\intzN p(i)^{\frac{\rho}{\rho-1}} \notag \; di}
+\end{align*}
+Now return to the firm's problem. Taking wages (normalized to one) as
+given, it's profit maximizing decision involves setting prices, choosing
+output, and choosing labor to hire
+\begin{align*}
+  \max_{p(i), \,h(i), \,y(i)} \; &p(i) y(i) - h(i)
+\end{align*}
+But by market clearing and our assumptions on technology,
+$c(i)=y(i)=Ah(i)$, so sub in
+\begin{align*}
+  \max_{p(i)} \; &p(i) c(i) - \frac{c(i)}{A} \\
+  \max_{p(i)}
+  \; &p(i) \left[B p(i)^{\frac{1}{\rho-1}}\right]
+    - \frac{1}{A} \left[B p(i)^{\frac{1}{\rho-1}}\right] \\
+  \max_{p(i)}
+  \; & B p(i)^{\frac{\rho}{\rho-1}}
+    - \frac{B}{A} \left[p(i)^{\frac{1}{\rho-1}}\right]
+\end{align*}
+Differentiating with respect to $p(i)$, this leads to FOC
+\begin{align*}
+  0&=
+  B {\frac{\rho}{\rho-1}} p(i)^{\frac{1}{\rho-1}}
+    - \frac{B}{A} \frac{1}{\rho-1}p(i)^{\frac{1}{\rho-1}-1} \\
+  \Rightarrow\quad
+  p(i) &= \frac{1}{\rho A}
+\end{align*}
+Note that this has a very nice form, as $\frac{1}{A}$ is the marginal
+cost of production, while $\frac{1}{\rho}$ is refers to how willing
+households are to substitute across varieties.
+
+
+\subsection{MCE, fixed $N$}
+
+We now characterize an MCE (monopolistic competitive equilibrium) in an
+economy with variety but no entry, which a list $c^*(i)$ consumption of
+each good, $h^*$ total labor supply, $h^*(i)$ labor supply to each firm,
+$d^*_i(p)$ demand for good $i$ given price $p$ (holding all other prices
+and profits constant), $p^*(i)$ prices for each good (wages left out
+because normalized to one), and $\pi^*(i)$ profits that satisfy the
+following conditions:
+\begin{enumerate}
+  \item \emph{Household Optimization}: Taking prices $p^*(i)$ and
+    profits $\pi^*(i)$ as given, consumption $c^*(i)$, and total labor
+    supply $h^*$ solve
+    \begin{align*}
+      (c^*(i), h^*)
+      = \max_{c(i), h}
+        & \; u\left(
+          \left[ \int_0^N c(i)^\rho \; di \right]^{1/\rho}
+        \right)\\
+      \text{s.t} & \;
+        \intzN p^*(i) c(i) \; di \leq h
+          + \intzN \pi^*(i) \; di \\
+      &\; h\in[0,1] \\
+      &\; c(i) \geq 0
+    \end{align*}
+    while also $d^*_i(p)$ is the optimal choice for good $i$ as a
+    function of price, holding all other prices and profits constant.
+
+  \item \emph{Firm Optimization}: With each firm taking \emph{demand}
+    (not prices this time) $d_i^*(p)$ as given, $p^*(i)$ and $h^*(i)$
+    solve the profit maximization problem:
+    \begin{align*}
+      (p^*(i),h^*(i))
+      &=
+      \max_{p(i),h(i)}
+      p(i) Ah(i) - h(i) \\
+      \text{s.t.} \;
+      & \; Ah(i) = d_i^*[p(i)] \\
+      & \; h(i) \geq 0\\
+      & \; \pi^*(i) = p^*(i) Ah^*(i) - h^*(i)
+    \end{align*}
+
+  \item \emph{Market Clearing}: All of the labor provided to the
+    different firms must aggregate to the amount of total labor
+    provided, and everything produced must be consumed:
+    \begin{align*}
+       h^* &= \intzN h^*(i) \; di \\
+       c^*(i) &= Ah^*(i)
+    \end{align*}
+\end{enumerate}
+
+\clearpage
+\subsection{Symmetric MCE with Entry}
+
+The goal here is to take everything the same, but let $N$ be endogenous.
+We know what the equilibrium looks like for fixed $N$. It will just be a
+matter of letting $N$ be a free parameter that adjusts until profits
+from entry are zero.
+
+So we now characterize a symmetric MCE in an economy with entry, which a
+list
+$c^*(i)$ consumption of each good,
+$h^*$ total labor supply,
+$h^{f*}$ labor for each producing firm,
+%$h^*(i)$ labor supply to each firm,
+$d^*(p)$ demand for each good $i$ given price $p$ (holding all other
+prices and profits constant),
+$p^*$ prices for each good (wages left out because normalized to one),
+and $N^*>0$ mass of firms that satisfy the following conditions:
+\begin{enumerate}
+  \item \emph{Household Optimization}: Taking prices $p^*$ as given,
+    consumption $c^*(i)$ and total labor supply $h^*$ solve
+    \begin{align*}
+      (c^*(i), h^*)
+      = \max_{c(i), h}
+        & \; u\left(
+          \left[ \int_0^N c(i)^\rho \; di \right]^{1/\rho}
+        \right)\\
+      \text{s.t} & \;
+        \intzN p^*(i) c(i) \; di \leq h \\
+      &\; h\in[0,1] \\
+      &\; c(i) \geq 0
+    \end{align*}
+    while also $d^*(p)$ is the optimal choice each good as a function of
+    price, holding all other prices and profits constant.
+
+  \item \emph{Firm Optimization}: With each firm taking \emph{demand}
+    (not prices this time) $d^*(p)$ as given, $p^*$ and $h^*(i)$
+    solve the profit maximization problem:
+    \begin{align*}
+      (p^*(i),h^*(i))
+      &=
+      \max_{p(i),h(i)}
+      p(i) Ah(i) - h(i) \\
+      \text{s.t.} \;
+      & \; Ah(i) = d_i^*[p(i)] \\
+      & \; h(i) \geq 0\\
+      & \; \pi^*(i) = p^*(i) Ah^*(i) - h^*(i)
+    \end{align*}
+
+  \item \emph{Market Clearing}: All of the labor provided to the
+    different firms must aggregate to the amount of total labor
+    provided, and everything produced must be consumed:
+    \begin{align*}
+       h^* &= \intzN h^*(i) \; di \\
+       c^*(i) &= Ah^*(i)
+    \end{align*}
+\end{enumerate}
+
+\clearpage
+\subsection{MCE with R\&D plus Entry}
+
+Output $y_t$ is the ``final good'' produced by mixing many intermediate
+goods $z_t(i)$ according to production function
+\begin{align*}
+  y_t = \left( \intzN z_t(i)^\alpha \; di \right) h_t^{1-\alpha}
+\end{align*}
+The intermediate goods are produced directly by capital, rather than the
+final good as we've had before.
+\begin{enumerate}
+  \item \emph{Firm Optimization}:
+    There are now three types of firms, each with their own optimization
+    problems:
+    \begin{enumerate}
+      \item \emph{Final Goods Producers}:
+        These take a variety of intermediate goods and produce a homo
+        \begin{align*}
+          \max_{z_t} \; & p^*_{z,t} z_t
+        \end{align*}
+
+      \item \emph{R\&D Sector}: These firms have linear technology in
+        producing new intermediate products. They are monopolists on
+        intermediate products---no other firm can create new
+        intermediate products. Profits must be zero,
+        \begin{align*}
+          p_t^* (p_{N,t}^*-1) &= 0 \\
+          N_0^* &= \bar{N}_0
+        \end{align*}
+        I multiplied by $p_t^*$ to normalize all prices. Within
+        parentheses, we see that it costs one unit to create a new where
+        $p_{N,t}^*$ is the price that it can be sold at.
+
+      \item \emph{Intermediate Goods Sector}:
+        \begin{align*}
+          \max_{k_{z,t}, \; p_{z,t}}
+          p_{z,t} \, k_{z,t}
+          - r_t^* k_{z,t}
+        \end{align*}
+
+    \end{enumerate}
+    With each firm taking \emph{demand}
+    (not prices this time) $d^*(p)$ as given, $p^*$ and $h^*(i)$
+    solve the profit maximization problem:
+    \begin{align*}
+      (p^*(i),h^*(i))
+      &=
+      \max_{p(i),h(i)}
+      p(i) Ah(i) - h(i) \\
+      \text{s.t.} \;
+      & \; Ah(i) = d_i^*[p(i)] \\
+      & \; h(i) \geq 0\\
+      & \; \pi^*(i) = p^*(i) Ah^*(i) - h^*(i)
+    \end{align*}
+
+  \item \emph{Household Optimization}: Taking prices $p^*$ as given,
+    consumption $c^*(i)$ and total labor supply $h^*$ solve
+    \begin{align*}
+      (c^*(i), h^*)
+      = \max_{c(i), h}
+        & \; u\left(
+          \left[ \int_0^N c(i)^\rho \; di \right]^{1/\rho}
+        \right)\\
+      \text{s.t} & \;
+        \intzN p^*(i) c(i) \; di \leq h \\
+      &\; h\in[0,1] \\
+      &\; c(i) \geq 0
+    \end{align*}
+    while also $d^*(p)$ is the optimal choice each good as a function of
+    price, holding all other prices and profits constant.
+
+  \item \emph{Market Clearing}: All of the labor provided to the
+    different firms must aggregate to the amount of total labor
+    provided, and everything produced must be consumed:
+    \begin{align*}
+       h^* &= \intzN h^*(i) \; di \\
+       c^*(i) &= Ah^*(i)
+    \end{align*}
+\end{enumerate}
+
+
+
+
+\clearpage
+\section{Static Model with Variety in Variety}
+
+
+We define the usual trifecta of primitives for a macro problem:
+\begin{enumerate}
+  \item \emph{Preferences}:
+    Given mass of goods $N$ and the preference parameter $\rho\in(0,1)$,
+    define utility over consumption of a continuum of goods, captured by
+    function $c:[0,N]\ra \R$, as
+    \begin{align*}
+      U(c) &=
+      u\left(
+      \left[
+      \int_0^N [a(i)c(i)]^\rho \; di
+      \right]^{1/\rho}
+      \right)
+    \end{align*}
+
+  \item \emph{Technology}:
+    There is a variety of goods to consume, each of which is produced by
+    a different firm, so we need to define the production function for
+    each firm:
+    \begin{align*}
+      y(i) = A(i) h(i)
+    \end{align*}
+    where $y(i)$ is output of the $i$th good from the $i$th firm, $A(i)$
+    is productivity in producing the $i$th good, and $h(i)$ is labor
+    used to produce the $i$th good.
+
+  \item \emph{Endowments}: Each household has one unit of labor to
+    supply to the firms.
+\end{enumerate}
+Social planner's problem
+\begin{align*}
+  \max_{c(i),h(i)}
+  &\;
+  u\left( \left[ \int_0^N [a(i)c(i)]^\rho \; di \right]^{1/\rho} \right)
+  \\
+  \text{s.t.}
+  &\; \intzN h(i) \; di = 1 \\
+  &\; c(i) = A(i) h(i) \\
+  &\; c(i),h(i)\geq 0
+\end{align*}
+Eliminate $h(i)$ and use the fact that $u$ is increasing to rewrite the
+problem as just the maximization of CES-weighted consumption:
+\begin{align*}
+  C=
+  \max_{c(i)\geq 0}
+  &\;
+  \left[ \int_0^N [a(i)c(i)]^\rho \; di \right]^{1/\rho}
+  \\
+  \text{s.t.}
+  &\; \intzN \frac{c(i)}{A(i)} \; di = 1
+\end{align*}
+where $C$ is CES-weighted consumption at the maximum.
+FOCs with respect to $c(i)$:
+\begin{align*}
+  \frac{\lambda}{A(i)}
+  &=
+  \frac{1}{\rho}\left[
+    \int_0^N [a(i)c(i)]^\rho \; di
+  \right]^{\frac{1}{\rho}-1}
+  \rho [a(i) c(i)]^{\rho-1} a(i)
+  \\
+  \frac{\lambda}{A(i)}
+  &=
+  C^{1-\rho}
+  a(i)^\rho c(i)^{\rho-1}
+  \\
+  \frac{1}{A(i)}
+  &=
+  \lambda^{-1}
+  C^{1-\rho}
+  a(i)^\rho c(i)^{\rho-1}
+\end{align*}
+Subbing this into the constraint
+\begin{align*}
+  1&=
+  \intzN \frac{c(i)}{A(i)} \; di
+  =
+  \intzN
+    c(i)
+    \lambda^{-1} C^{1-\rho} a(i)^\rho c(i)^{\rho-1}
+    \; di \\
+  \lambda &=
+  C^{1-\rho}
+  \intzN
+    [a(i)c(i)]^{\rho}
+    \; di \\
+  \lambda &= C^{1-\rho} C^\rho = C
+\end{align*}
+Therefore, we have identified $\lambda = C$. Using this and solving the
+FOC for $c(i)$, you get
+\begin{align*}
+  c(i)
+  &=
+  \left(
+  \frac{C^{\rho}}{A(i)a(i)^\rho}
+  \right)^{\frac{1}{\rho-1}}
+  %=
+  %\left(\frac{C}{a(i)}\right)^{\frac{\rho}{\rho-1}}
+  %A(i)^{\frac{1}{1-\rho}}
+  =
+  A(i)
+  \left(\frac{A(i)a(i)}{C}\right)^{\frac{\rho}{1-\rho}}
+\end{align*}
+Subbing this into the definition of $C$
+\begin{align*}
+  C
+  = \left[ \int_0^N [a(i)c(i)]^\rho \; di \right]^{1/\rho}
+  &=
+  \left[ \int_0^N
+    \left[a(i)
+    \left(
+    \frac{C^{\rho}}{A(i)a(i)^\rho}
+    \right)^{\frac{1}{\rho-1}}
+    \right]^\rho \; di \right]^{1/\rho} \\
+  C
+  &=
+  \left[ \int_0^N
+    \left[
+    A(i)a(i)
+    \right]^{\frac{\rho}{1-\rho}}
+    \; di \right]^{\frac{1-\rho}{\rho}}
+\end{align*}
+Hence, consumption can be written
+\begin{align*}
+  c(i)
+  &=
+  A(i)
+  \left(\frac{A(i)a(i)}{C}\right)^{\frac{\rho}{1-\rho}} \\
+  &=
+  A(i)
+  \frac{[A(i)a(i)]^{\frac{\rho}{1-\rho}}}{%
+    \int_0^N \left[ A(i)a(i) \right]^{\frac{\rho}{1-\rho}} \; di
+  }
+\end{align*}
+Hence, labor allocation is
+\begin{align*}
+  h(i) =
+  \frac{[A(i)a(i)]^{\frac{\rho}{1-\rho}}}{%
+    \int_0^N \left[ A(i)a(i) \right]^{\frac{\rho}{1-\rho}} \; di
+  }
+\end{align*}
+
+
+
 
 %% APPPENDIX %%
 
