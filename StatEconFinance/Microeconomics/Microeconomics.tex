@@ -998,6 +998,312 @@ function in expected utility form.
 \subsection{Expected Utility Theory over Monetary Prizes}
 
 
+\clearpage
+\section{Game Theory}
+
+\subsection{Normal Form Games}
+
+\begin{defn}(Normal Form Game)
+A game $G$ with $n$ players consists of
+\begin{enumerate}
+  \item Strategy Space Set $S_i$ for each player $i=1,\ldots,n$.
+    These need not be identical for each player.
+
+    We denote by $S_{-i}$ the set of all strategies available
+    to every player \emph{except} player $i$:
+    \begin{align*}
+      S_{-i}
+      =S_1\times\cdots\times S_{i-1} \times S_{i+1} \times\cdots \times S_n
+    \end{align*}
+  \item Payoff function for each player $u_i:S_1\times\cdots S_n\ra \R$.
+
+    Since player $i$'s payoff depends on his strategy $s_i\in S_i$ and
+    the strategy of every other player $s_{-i}\in S_{-i}$, we see why
+    the domain is $S_1\times\cdots S_n$ rather than just $S_i$.
+
+    For particular $s_i\in S_i$ and $s_{-i}\in S_{-i}$, we often denote
+    the payoff by $u_i(s_i,s_{-i})$.
+\end{enumerate}
+Therefore, we denote the game by $G=\{(S_i,u_i)\}^n_{i=1}$
+\end{defn}
+
+\begin{defn}(Strategy Profile)
+A \emph{strategy profile} is a set of strategies for all players
+\begin{align*}
+  (s_1,\ldots,s_n) \in S_1 \times \cdots \times S_n
+\end{align*}
+\end{defn}
+
+
+\begin{defn}(Strictly Dominated Strategy)
+A strategy $s_i\in S_i$ is strictly dominated if
+\begin{align*}
+  \exists s_i' \in S_i
+  \quad
+  u_i(s'_i,s_{-i})
+  >
+  u_i(s_i,s_{-i})
+  \qquad \forall s_{-i}\in S_{-i}
+\end{align*}
+In that case, we say that $s_i'$ \emph{strictly dominates} $s_i$.
+
+The \emph{for all} $s_{-i}\in S_{-i}$ is the key. To be strictly
+dominated, a strategy must always do strictly worse than some other
+strategy \emph{no matter what} any of what the other players choose.
+\end{defn}
+\begin{rmk}
+We can sometimes reduce games through the iterative removal of strictly
+dominated strategies that we know a player will never choose.
+\end{rmk}
+
+\begin{defn}(Strictly Dominant Strategy)
+A strategy $s^*_i\in S_i$ is strictly dominant if
+\begin{align*}
+  s^*_i\neq s_i \in S_i
+  \quad\implies\quad
+  u_i(s^*_i,s_{-i})
+  >
+  u_i(s_i,s_{-i})
+  \qquad \forall s_{-i}\in S_{-i}
+\end{align*}
+Again, the \emph{for all} $s_{-i}\in S_{-i}$ is the key.
+We can also equivalently say that a strategy is strictly dominant if it
+strictly dominates all other strategies in $S_i$.
+\end{defn}
+\begin{rmk}
+Strictly dominant strategies are often tougher to find than strictly
+dominated strategies. It's for that reason that we often don't find
+strictly dominant strategies, but can prune the much more common
+strictly dominated strategies.
+\end{rmk}
+
+\begin{defn}(Weakly Dominated Strategy)
+A strategy $s_i\in S_i$ is weakly dominated if
+\begin{align*}
+  \exists s_i' \in S_i
+  \quad
+  u_i(s'_i,s_{-i})
+  \geq
+  u_i(s_i,s_{-i})
+  \qquad \forall s_{-i}\in S_{-i}
+\end{align*}
+with the inequality strict for some $s_{-i}$.
+In this case, we say that $s_i'$ \emph{weakly dominates} $s_i$.
+\end{defn}
+\begin{rmk}
+We cannot rule out weakly dominated strategies by rationality like
+strictly dominated strategies because that weakly dominated strategy
+might be just as good if the bad outcomes never materialize.
+\end{rmk}
+
+
+\begin{defn}(Nash Equilibrium)
+A strategy profile
+$(s^*_1,\ldots,s^*_n) \in S_1 \times \cdots \times S_n$
+is a \emph{Nash Equilibrium} if
+\begin{align}
+  u_i(s^*_i,s^*_{-i})
+  \geq
+  u_i(s_i,s^*_{-i})
+  \qquad
+  \forall s_i \in S_i
+  \label{defn:nash}
+\end{align}
+for all players $i=1,\ldots,n$. In words, given the strategies of
+everyone else's strategies $s^*_{-i}$,  no player can do strictly better
+by deviating from their $s^*_i$ strategy.
+\end{defn}
+\begin{rmk}
+Condition~\ref{defn:nash} is \emph{not} really a means for finding a Nash
+Equilibrium. It doesn't give us an algorithm.
+Rather, it's a necessary condition that allows us to check whether a
+given strategy profile is a Nash Equilibrium.
+\end{rmk}
+
+\begin{defn}(Mixed and Pure Strategies)
+Given game $G=\{(S_i,u_i)\}^n_{i=1}$, a \emph{mixed strategy} for player
+$i$, denoted $p_i$, is a probability distribution over her strategies:
+\begin{align*}
+  p_i:S_i \ra [0,1]
+  \qquad \sum_{s_i\in S_i} p(s_i) = 1
+\end{align*}
+We let $P_i$ denote the set of all mixed strategies available to
+player $i$.
+
+A \emph{pure} strategy for player $i$ is any mixed strategy such that
+$p_i(s)=1$ for some $s \in S_i$. In words, it's the degenerate mixed
+strategy that plays strategy $s$ for sure. In this way, we embed all of
+the machinery we discussed above.
+\end{defn}
+
+\begin{defn}(Mixed Strategy Payoffs)
+Since player's now don't necessarily play a pure strategy, we want to
+extend the players' payoff functions $u_i(s_i,s_{-i})$ that let us work
+out which strategy they would choose. So for each player $i$, define the
+expected payoff functions over mixed strategies
+\begin{align*}
+  U_i:P_1\times\cdots\times P_n &\ra \R
+\end{align*}
+where
+\begin{align*}
+  U_i(p_i,p_{-i}) =
+  \sum_{s_1\in S_1}
+  \cdots
+  \sum_{s_n\in S_n}
+  u_i(s_1, \ldots, s_{n})
+  p_1(s_1)
+  \cdots
+  p_n(s_n)
+\end{align*}
+This is player $i$'s payoff for playing mixed strategy $p_i\in P_i$
+given all other players are playing mixed strategy
+\begin{align*}
+  \underbrace{%
+    p_{-i}
+  }_{(p_1,\ldots, p_{i-1}, p_{i+1},\ldots, p_n)}
+  \in
+  \underbrace{%
+  P_{-i}
+  }_{P_1\times\cdots\times P_{i-1} \times P_{i+1} \times\cdots \times P_n}
+\end{align*}
+$U_i(p_i,p_{-i})$ just computes the expected value of pure strategy
+combinations $u_i(s_i,s_{-i})$, weighting each combination by the
+joint probability $p_1(s_1)\cdots p_n(s_n)$ of that combination being
+chosen.
+
+From this formulation, it's clear that we're assuming the strategies are
+chosen \emph{independently} by the players since we can factor the joint
+probability of a strategy combination $p(s_1,\ldots,s_n)$ into
+the product of probabilities $p_1(s_1)\cdots p_n(s_n)$.
+\end{defn}
+
+\begin{defn}(Best Response)
+The mixed strategy $p^*_i$ is a \emph{best response} to strategy
+$p_{-i}$, denoted $p^*_i\in BR_i(p_{-i})$, if
+\begin{align*}
+  U_i(p^*_i,p_{-i})
+  \geq
+  U_i(p_i,p_{-i})
+  \qquad \forall p_i\in P_i
+\end{align*}
+Hence $BR(p_{-i})$ defines a \emph{best response correspondence} from
+$p_{-i}$ to strategies for Player $i$ in $P_i$.
+This is the generalization of dominant strategies to mixed strategy
+games. Note that We're not saying that $p_{-i}$ \emph{will} be played.
+We just conjecture ``If $p_{-i}$ were to be played, what is the set of
+best responses for player $i$.''
+\end{defn}
+
+\begin{prop}
+A pure strategy that is strictly dominated is never a best response.
+However, the set of ``never is a best response'' mixed strategies can be
+strictly larger than the set of strictly dominated strategies.
+\end{prop}
+
+\begin{defn}(Rationalizable Strategies)
+Suppose that $p_i\in P_i$ is a mixed strategy for player $i$. If there
+is no $p_{-i}\in P_{-i}$ such that $p_i$ is the best response, we can
+rule it out. Iterate on all strategies for all players and remove these
+from $P_1\times \cdots \times P_n$. The resulting set of surviving mixed
+strategies is called the set of \emph{rationalizable strategies}. These
+strategies can be rationalized by the players in the sense that each
+remaining strategy is a best response to \emph{some} strategy the
+opponents might reasonably play (because we can't rule it out).
+\end{defn}
+\begin{rmk}
+Often we use this to rule out pure strategies (degenerate mixed
+strategies) because we can typically find a mixed strategy that is
+always better that the pure strategy.
+\end{rmk}
+
+\begin{defn}(Expected Payoff to Pure Strategies)
+Let's define a special case of $U_i(p_i,p_{-i})$ that will be useful
+below. In particular, rather than compute the payoff to player $i$ for
+playing general mixed strategy $p_i$, we suppose that he plays pure
+strategy $s_i$ (the degenerate mixed strategy with $p_i(s_i)=1$).
+So define
+\begin{align*}
+  V(s_i, p_{-i})
+  =
+  \sum_{s_{-i}\in S_{-i}}
+  u_i(s_i,s_{-i})
+  \cdot
+  p_1(s_1)
+  \cdots
+  p_{i-1}(s_{i-1})
+  p_{i+1}(s_{i+1})
+  \cdots
+  p_n(s_n)
+\end{align*}
+That also allows us to express $U(p_i,p_{-i})$ equivalently as
+\begin{align*}
+  U_i(p_i,p_{-i})
+  =
+  \sum_{s_i\in S_i}
+  V(s_i,p_{-i}) p_i(s_i)
+\end{align*}
+\end{defn}
+
+\begin{defn}(Mixed Strategy Nash Equilibrium)
+Consider the mixed strategy profile
+\begin{align*}
+  (p_1^*,\ldots, p_n^*)
+  \in
+  P_1\times\cdots\times P_{n}
+\end{align*}
+This is a Nash Equilibrium if either
+\begin{enumerate}
+  \item
+    Everyone is playing a best response conditional on what everyone
+    else is doing:
+    \begin{align*}
+      p^*_i \in BR_i(p_{-i}^*)
+      \qquad\forall i = 1,\ldots,n
+    \end{align*}
+
+  \item
+    If for all $i$ and $s_i^*\in S_i$
+    \begin{align*}
+      p_i^*(s^*_i)>0
+      \quad\implies\quad
+      V_i(s_i^*,p_{-i}^*)
+      = \max_{s_i\in S_i} V_i(s_i,p_{-i}^*)
+    \end{align*}
+    In words, player $i$ only includes pure strategy $s_i^*$ in her
+    mixed strategy with positive probability if, conditional on the
+    other players' mixed strategies $p_{-i}^*$, it maximizes expected
+    payoff $V_i(s_i,p_{-i}^*)$, which averages over the other players'
+    strategies.
+
+    A consequence of this is the \emph{indifference condition}. Namely,
+    all of the pure strategies that player $i$ uses in her mixed
+    strategy with positive probability deliver the \emph{same} expected
+    payoff.
+\end{enumerate}
+The two definitions are equivalent.
+\end{defn}
+\begin{rmk}
+The concept of a Nash Equilibrium is generally silent about which
+equilibria you will reach given multiple Nash equilibria. It's more a
+``certificate of verification'' than a ``method to find.''
+
+Even more, if you were to start a game, there's really no reason you
+might expect to end up at the Nash Equilibrium. The definition of the
+Nash Equilibrium only says ``If you start there, you don't wan't to
+deviate.'' Rationality does not get you there. Rationality only says
+that all players will play rationalizable strategies, which is often a
+\emph{strictly larger} class of joint strategies than the set of Nash
+Equilibrium joint strategies (except in simple cases like the Prisoner's
+dilemma).
+\end{rmk}
+
+\begin{prop}
+Every mixed strategy Nash Equilibrium is rationalizable
+\end{prop}
+\begin{proof}
+Each player $i$ can rationalize $p^*_i$ in response to the Nash
+Equilibrium strategies $p^*_{-i}$.
+\end{proof}
 
 
 %% APPPENDIX %%
