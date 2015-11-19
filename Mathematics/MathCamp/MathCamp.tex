@@ -288,6 +288,15 @@
 \newcommand{\sumninfz}{\sum^\infty_{n=0}}
 \newcommand{\sumtinfz}{\sum^\infty_{t=0}}
 
+% Bounds/Limits
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -530,6 +539,10 @@ matrices are normal.
 
 \begin{defn}{(Sparse)}
 Matrix $A$ is \emph{sparse} if its entries are mostly zeroes.
+\end{defn}
+
+\begin{defn}(Idempotent)
+Matrix $A$ is \emph{idempotent} if $A = AA$.
 \end{defn}
 
 \begin{defn}{(Diagonal)}
@@ -1340,17 +1353,18 @@ Symmetric $A$ is positive definite iff and only if $A$ is positive
 
 \begin{prop}
 Suppose $A\in\Rnn$ is a symmetric positive definite matrix. Then for any
-$B\in\Rnk$ such that $\rank(B)=k$, the matrix $B'AB\in\Rkk$ will be
-positive semidefinite as well.
+$B\in\Rnk$ such that $\rank(B)=k$, the matrix $B^TAB\in\Rkk$ will be
+symmetric positive definite as well.
 \end{prop}
 \begin{proof}
-Suppose vector $x \neq 0$ in $\Rk$ is given. We need to show that
+Symmetric is obvious. To show positive definiteness,
+suppose vector $x \neq 0$ in $\Rk$ is given. We need to show that
 \begin{align*}
-  x' B'ABx >0
+  x^T B^TABx >0
 \end{align*}
 So define $y=Bx$ which is a $n\times 1$ vector. Then we can write
 \begin{align*}
-  x'B'ABx &= y'Ay
+  x^TB^TABx &= y^TAy
 \end{align*}
 Since $A$ is symmetric positive definite, we know this product will be
 strictly positive if $y=Bx\neq 0$. Since $x\neq 0$, we would have
@@ -4171,9 +4185,7 @@ swap ``semidefinite'' for ``definite'' in the conditions above.
 
 \begin{defn}{(Operator)}
 If $X$ is some function space
-\begin{align*}
-  X = \{f:A\rightarrow B\}
-\end{align*}
+$X = \{f:A\rightarrow B\}$
 then an \emph{operator}, denoted $T$, is a function
 \begin{align*}
   T:X&\rightarrow X \\
@@ -4216,20 +4228,22 @@ that
 \end{align*}
 $\beta$ is called the \emph{modulus} of $T$.
 \end{defn}
+\begin{rmk}
+A function $T$ is a contraction map \emph{on a metric space $(X,d)$}. If
+$T$ is a constraction map on $(X,d)$, it might \emph{not}
+be a contraction map on $(X,d')$ where $d'\neq d$.
+\end{rmk}
 
 \begin{prop}{\emph{(Contraction Maps are Continuous)}}
 If $T$ is a contraction map, then $T$ is continuous.
 \end{prop}
 \begin{proof}
-Suppose $\varepsilon>0$ given. Then
+Suppose $\varepsilon>0$ given. Choose $\delta=\varepsilon$. Then
 \begin{align*}
+  d(x,y) < \delta=\varepsilon
+  \quad\implies\quad
   d(T(x),T(y)) < \beta \; d(x,y)
-\end{align*}
-Sub in $\delta$ for $d(x,y)$ and solve for $\delta$
-\begin{align*}
-  \beta \delta = \varepsilon
-  \quad\Rightarrow\quad
-  \delta = \frac{\varepsilon}{\beta}
+  < \beta \varepsilon < \varepsilon
 \end{align*}
 \end{proof}
 
@@ -4241,15 +4255,59 @@ bounded functions under the sup norm $d_\infty$.
 Suppose that $T$ satisfies
 \begin{enumerate}
   \item \emph{Monotonicity}: $f(x) \leq g(x)$ for all $x$
-    $\implies$ $T[f(x)] \leq T[g(x)]$.
+    $\implies$ $T[f(x)] \leq T[g(x)]$ for all $f,g\in \sB(X,\R)$.
   \item \emph{Discounting}: $T[f(x)+a] \leq T[f(x)] + \beta a$ for some
     $\beta\in(0,1)$.
 \end{enumerate}
 Then $T$ is a contraction map of modulus $\beta$.
 \end{thm}
+\begin{proof}
+Start with
+\begin{align*}
+  f(x)-g(x) &\leq \sup_{y\in X} |f(y)-g(y)| = d_\infty(f,g) \\
+  \iff\qquad
+  f(x) &\leq g(x) + d_\infty(f,g) \\
+  \text{Monotonicity} \quad
+  \implies\quad
+  T[f(x)] &\leq T[g(x) + d_\infty(f,g)]
+  \\
+  \text{Discounting} \quad
+  \implies\quad
+  T[f(x)] &\leq T[g(x)] + \beta d_\infty(f,g)
+\end{align*}
+Rearranging,
+\begin{align*}
+  T[f(x)] - T[g(x)] &\leq \beta d_\infty(f,g)
+\end{align*}
+Taking the sup over $x$ on the LHS, we get
+\begin{align}
+  \sup_{x\in X} \; T[f(x)] - T[g(x)] &\leq \beta d_\infty(f,g)
+  \label{blackwell-fg}
+\end{align}
+We can repeat all of the steps above, swapping $f$ and $g$, to derive
+\begin{align}
+  \sup_{x\in X} \; T[g(x)] - T[f(x)] &\leq \beta d_\infty(g,f)
+  \label{blackwell-gf}
+\end{align}
+We can take Inequalities~\ref{blackwell-fg} and \ref{blackwell-gf} and
+use symmetry $d_\infty(f,g)=d_\infty(g,f)$ to conclude
+\begin{alignat*}{3}
+  \begin{rcases}
+  \sup_{x\in X} \; T[f(x)] - T[g(x)] &\leq \beta d_\infty(f,g)
+  \\
+  \sup_{x\in X} \; T[g(x)] - T[f(x)] &\leq \beta d_\infty(g,f)
+  \end{rcases}
+  \quad\implies&&\quad
+  \sup_{x\in X} \left\lvert T[f(x)] - T[g(x)]\right\rvert
+    &\leq \beta d_\infty(f,g) \\
+  \iff&&\qquad
+  d_\infty(T[f],T[g])
+  &\leq \beta d_\infty(f,g)
+\end{alignat*}
+Therefore, $T$ is a contraction map.
+\end{proof}
 
-
-
+\clearpage
 \subsection{Contraction Mapping Theorem}
 
 \begin{thm}{\emph{(Banach Fixed Point, Contraction Mapping Theorem)}}
@@ -4298,24 +4356,27 @@ inequality $p$ times to write
   &\leq d(x_n,x_{n+1}) + d(x_{n+1},x_{n+p}) \notag \\
   &\leq d(x_n,x_{n+1}) + d(x_{n+1},x_{n+2}) + d(x_{n+2},x_{n+p})\notag\\
   &\;\; \vdots\notag\\
+  d(x_n,x_{n+p})
   &\leq \sum^{p-1}_{i=0} d(x_{n+i},x_{n+i+1})
   \label{fixedpt-series}
 \end{align}
-Now let's take a look at each of the constituent terms in the
-Series~\ref{fixedpt-series} for $i>0$, using the fact that $T$ is a
-contraction map:
-\begin{alignat*}{3}
-  d(x_{n+1},x_{n+2}) &=
-  d(T(x_{n}),T(x_{n+1}))
-  &&\leq
-  \beta d(x_{n},x_{n+1}) \\
-  d(x_{n+2},x_{n+3}) &=
-  d(T(x_{n+1}),T(x_{n+2}))
-  &&\leq
-  \beta d(x_{n+1},x_{n+2}) \\
-  \vdots \quad & \quad\qquad \vdots
-\end{alignat*}
-In general, the inequalities above can be summarized as follows:
+%Now let's take a look at each of the constituent terms in the
+%Series~\ref{fixedpt-series} for $i>0$, using the fact that $T$ is a
+%contraction map:
+%\begin{alignat*}{3}
+  %d(x_{n+1},x_{n+2}) &=
+  %d(T(x_{n}),T(x_{n+1}))
+  %&&\leq
+  %\beta d(x_{n},x_{n+1}) \\
+  %d(x_{n+2},x_{n+3}) &=
+  %d(T(x_{n+1}),T(x_{n+2}))
+  %&&\leq
+  %\beta d(x_{n+1},x_{n+2})
+  %\\
+  %\vdots \quad & \quad\qquad \vdots
+%\end{alignat*}
+Since $T$ is a contraction map, the constituent terms of the sum in
+Inequality~\ref{fixedpt-series} for $i>0$ can be written as
 \begin{align*}
   d(x_{n+i},x_{n+i+1}) &=
   d(T(x_{n+i-1}),T(x_{n+i}))
@@ -4339,7 +4400,7 @@ for $d(x_n,x_{n+p})$ as
   \leq \sum^{p-1}_{i=0} d(x_{n+i},x_{n+i+1})
   &\leq \sum^{p-1}_{i=0} \beta^i d(x_{n},x_{n+1})\notag\\
   &\leq  d(x_{n},x_{n+1})\sum^{\infty}_{i=0} \beta^i\notag \\
-  \Rightarrow
+  \Rightarrow\quad
   d(x_n,x_{n+p})
   &\leq  d(x_{n},x_{n+1})\times \frac{1}{1-\beta}
   \label{fixedpt-ineq}
@@ -4482,31 +4543,48 @@ X$, we say that the set $C$ is \emph{$T$-invariant} if
 \end{align*}
 \end{defn}
 
-\begin{prop}
-Suppose that $T: X\rightarrow X$ is a contraction map for complete space
+\begin{cor}
+\label{cor:cmt}
+Suppose that $T: X\rightarrow X$ is a contraction map in complete space
 $X$. Let $x^*$ denote the unique fixed point. Then
 \begin{enumerate}
   \item If $C\subseteq X$ is a closed, nonempty, $T$-invariant set, then
     $x^* \in C$.
-  \item If $C' \subseteq C \subseteq X$ where $C$ is closed but $C'$ is
-    an arbitrary subset such that $T(C) \subseteq C'$, then $x^* \in
-    C'$.
+  \item If $T(C)\subseteq C' \subseteq C \subseteq X$ where $C$ is
+    closed but $C'$ arbitrary subset, then $x^* \in C'$.
 \end{enumerate}
-\end{prop}
+\end{cor}
 \begin{proof}
-(Part 1) Start with some $x_0\in C$. Since $C$ is $T$-invariant,
-$T^n(x_0) \in C$ for all $n$. Moreover, by Theorem~\ref{thm:banach},
-the sequence $\{T^n(x_0)\}\subseteq C$ converges to $x^*$. Since $C$ is
-closed, the set must contain its limit point by
-Proposition~\ref{prop:closed}, hence $x^*\in C$.
+(Part 1)
+Suppose $x^*\not\in C$. Take any $x_0\in C$. By Contraction Mapping
+Theorem~\ref{thm:banach}, $T^n(x_0)\ra x^*$. But since $C$ is $T$
+invariant, $T^n(x_0)\in C$ for all $n$. So we have a convergent
+sequence $\{T^n(x_0)\}\ninf$ in a closed set $C$.
+Then by Proposition~\ref{prop:closed}, $x^*\in C$, which is a
 
-(Part 2) Again, the assumptions of this part imply that $C$ is
-$T$-invariant since $T(C)\subseteq C' \subseteq C$.  And since $C$ is
-closed, $x^*\in C$ by Part 1.
-
-Finally, by assumption $T(x) \in C'$ for all $x \in C$, and we just said
-$x^*\in C$. So $T(x^*)\in C'$ too.
+(Part 2) Clearly, $C$ is $T$-invariant since
+$T(C)\subseteq C' \subseteq C$. By $C$ closed and then Part 1, we can
+conclude that $x^*\in C$.
+From that, we conclude that $T(x^*)\in C$ since we assumed that $T(x)
+\in C'$ for all $x \in C$. But since $x^*=T(x^*)$, that's equivalent to
+$x^*\in C'$.
 \end{proof}
+
+\begin{ex}
+Consider the metric space of all functions with the sup-norm metric.
+Call $C$ the set of weakly increasing functions. We know that this set
+is closed. Therefore, by Corollary~\ref{cor:cmt}, if the operator $T$
+maps weakly increasing functions to weakly increasing functions,
+Statement 1 says that the fixed point of the operator $T$ will be weakly
+increasing.
+
+Now consider Statement 2. Let $C'$ denote the set of all \emph{strictly}
+increasing functions. This is not a closed set, but it is a subset of
+$C$, the set of all weakly increasing functions. If the operator $T$
+maps weakly increasing functions to \emph{strictly} increasing
+functions, then the fixed point will be \emph{strictly} increasing by
+Statement 2 of Corollary~\ref{cor:cmt}
+\end{ex}
 
 \subsection{Brouwer's Fixed Point Theorem}
 
@@ -5415,52 +5493,54 @@ nowhere in the limit, then you could not construct a sequence $\{y_n\}$
 converging to it whose elements stayed inside the sets
 $\{\Gamma({x_n})\}$ the whole time.
 \end{defn}
-\begin{figure}[htpb!]
-\centering
-\begin{tikzpicture}[xscale=1.5]
-  % Upper bound of region
-  \draw[d4blue, ultra thin, domain=0.1:4, fill=d4blue, opacity=0.4] %
-    (0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+3}) -- (4,0);
+%\begin{figure}[htpb!]
+%\centering
+%\begin{tikzpicture}[xscale=1.5]
+  %% Upper bound of region
+  %\draw[d4blue, ultra thin, domain=0.1:4, fill=d4blue, opacity=0.4] %
+    %(0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+3}) -- (4,0);
 
-  % Left segment
-  \draw[white, ultra thick, domain=0.1:1, fill=white] %
-    (0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+1}) -- (1,0);
+  %% Left segment
+  %\draw[white, ultra thick, domain=0.1:1, fill=white] %
+    %(0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+1}) -- (1,0);
 
-  % Middle segment
-  \draw[white, ultra thick, domain=0.1:4, fill=white] %
-    (0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x}) -- (4,0);
-
-  %% Lower bound of region
+  %% Middle segment
   %\draw[white, ultra thick, domain=0.1:4, fill=white] %
-    %(0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+1}) -- (4,0);
+    %(0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x}) -- (4,0);
 
-  % Axis
-  \draw[d4black, <->] (0,5) -- (0,0) -- (4,0);
+  %%% Lower bound of region
+  %%\draw[white, ultra thick, domain=0.1:4, fill=white] %
+    %%(0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+1}) -- (4,0);
 
-  %% Dashed Line at x
-  %\draw[d4black, ultra thick, dashed, -] %
-    %(2,0) node[below, yshift=-5pt] {$x$} -- (2,1.8);
+  %% Axis
+  %\draw[d4black, <->] (0,5) -- (0,0) -- (4,0);
 
-  %% Vertical \Gamma(x) line
-  %\draw[d4black, ultra thick, -] (2,1.8) -- (2,3) -- (2,3.8);
+  %%% Dashed Line at x
+  %%\draw[d4black, ultra thick, dashed, -] %
+    %%(2,0) node[below, yshift=-5pt] {$x$} -- (2,1.8);
 
-  %% Brace marking Gamma(x)
-  %\draw[%
-      %d4black, decorate, %
-      %decoration={brace, amplitude=10pt, mirror}, xshift=2pt
-    %] %
-    %(2,1.8) -- (2,3.8) node[midway, right, xshift=12pt] {$\Gamma(x)$};
-\end{tikzpicture}
-\end{figure}
+  %%% Vertical \Gamma(x) line
+  %%\draw[d4black, ultra thick, -] (2,1.8) -- (2,3) -- (2,3.8);
+
+  %%% Brace marking Gamma(x)
+  %%\draw[%
+      %%d4black, decorate, %
+      %%decoration={brace, amplitude=10pt, mirror}, xshift=2pt
+    %%] %
+    %%(2,1.8) -- (2,3.8) node[midway, right, xshift=12pt] {$\Gamma(x)$};
+%\end{tikzpicture}
+%\end{figure}
 
 \begin{defn}{(Upper Hemi-Continuous)}
-The \emph{compact} correspondence $\Gamma:X\rightrightarrows Y$ is
-\emph{upper hemi-continuous} (UHC) if and only if points don't
-``disappear'' in the limit.
+The \emph{compact}-valued correspondence $\Gamma:X\rightrightarrows Y$
+is \emph{upper hemi-continuous} (UHC) if and only if points don't
+``disappear'' in the limit. Alternatively, we might informally say that
+the graph of $\Gamma$ is closed.
 
 Formally, choose $x\in X$. Note that we require
 $\Gamma(x)\neq\emptyset$. Now let $\{x_n\}\subseteq X$ be any arbitrary
-sequence converging to $x$. Also let $\{y_n\}$ be any sequence where
+sequence such that $x_n\ra x\in X$. Also let $\{y_n\}$ be any sequence
+where
 \begin{align*}
   y_n \in \Gamma(x_n) \quad\forall n
 \end{align*}
@@ -5472,6 +5552,10 @@ such that $y_n = y' \in \Gamma(x_n)$ for all $n$ (implying
 $y_n\rightarrow y'$), then we also want $y'\in \Gamma(x)$. It shouldn't
 disappear in the limit.
 \end{defn}
+\begin{rmk}
+A single-valued correspondence that is upper hemicontinuous is a
+continuous function.
+\end{rmk}
 
 \begin{defn}{(Continuous Correspondence)}
 Compact-valued correspondence $\Gamma:X\rightrightarrows Y$ is
@@ -5480,35 +5564,28 @@ Compact-valued correspondence $\Gamma:X\rightrightarrows Y$ is
 
 \subsection{Preliminaries: Theorem of the Maximum}
 
-Next, suppose we want to solve an optimizaton problem of the form
-\begin{align*}
-  \max_{y\in \Gamma(x)} f(x,y)
-\end{align*}
-given objective function $f:X\times Y\rightarrow\R$ and correspondence
+\begin{thm}{\emph{(Theorem of the Maximum)}}
+Given objective function $f:X\times Y\rightarrow\R$ and correspondence
 $\Gamma:X\rightrightarrows Y$ that describes the feasible sets for some
-initial condition or parameter, $x\in X$.
-
-\begin{thm}
+initial condition or parameter, $x\in X$, define
+\begin{align}
+  y^*(x) &= \argmax_{y\in \Gamma(x)} f(x,y) \notag\\
+  v^*(x) &:= \max_{y\in \Gamma(x)} f(x,y)
+  \label{prob:thm-max}
+\end{align}
 If $f$ is continuous and $\Gamma$ is continuous and compact-valued, then
-\begin{align*}
-  y^*(x) = \argmax_{y\in\Gamma(x)} f(x,y)
-\end{align*}
-is nonempty, compact-valued, and UHC.
+\begin{enumerate}
+  \item $y^*$ is nonempty (i.e.\ there is a maximizer), compact-valued,
+    and UHC
+  \item $v^*$ is well defined (i.e.\ the maximum is attained) and
+    continuous
+\end{enumerate}
 \end{thm}
 
 \begin{cor}
-If $y^*(x)$ is unique for all $x$, it's just continuous rather than UHC.
+If $y^*(x)$ is single valued for all $x$, then $y^*(x)$ is a continuous
+function.
 \end{cor}
-
-\begin{thm}{\emph{(Theorem of the Maximum)}}
-If $f$ is continuous and $\Gamma$ is continuous and compact-valued, then
-the function
-\begin{align}
-  \label{prob:thm-max}
-  v(x) = \max_{y\in\Gamma(x)} f(x,y)
-\end{align}
-is well-defined and continuous.
-\end{thm}
 
 
 
@@ -5531,14 +5608,15 @@ value of the objective function.
   \item \emph{State}, $x_t$: At each time $t$, the variable
     $x_t$---called the state---is something like a ``sufficient
     statistic'' for the problem, encoding information about feasible
-    sets for $x_{t+1}$ or ``continuation sequences.''
+    allocations and options for $x_{t+1}$ or ``continuation sequences.''
   \item \emph{Control}, $x_{t+1}$: At time $t$, taking the current state
     $x_t$ as given, the agent chooses tomorrow's state $x_{t+1}$
     directly (since this world is deterministic). Since this object is
     chosen and controlled by the agent, $x_{t+1}$ is called the
-    \emph{control}.
+    \emph{control} from the perspective of time $t$ (it then becomes the
+    \emph{state} at time $t+1$).
   \item \emph{Feasibility Constraints}, $\Gamma(x_t)$: The
-    correspondence $\Gamma(x_t)$ returns a set of possible values that
+    correspondence $\Gamma(x_t)$ returns a set of feasible values that
     $x_{t+1}$ can take on.
 \end{enumerate}
 \end{defn}
@@ -5577,8 +5655,9 @@ dynamic programming problems in Section~\ref{sec:continuous-dynamic}.
 \end{defn}
 \begin{note}
 Function $F$ and correspondence $\Gamma$ in Problem~\ref{prob:altrep}
-are different from that of Problem~\ref{prob:sequential-short}.  I used
-identical notation purely for simplicitly.
+are different in functional form from that of
+Problem~\ref{prob:sequential-short}.  I used identical notation purely
+for simplicitly and because they represent the same concepts.
 \end{note}
 
 %\begin{defn}{(Set of Feasible Plans)}
@@ -5636,7 +5715,10 @@ Equation}
   F(x,y) +
   \beta v_B(y)
 \end{align}
-This formulation exploits the symmetry of the problem over time to
+where $F$ is the \emph{period return function}, $x$ the state,
+$y$ the control, and $\Gamma(x)$ the constraint set.
+
+This formulation exploits the stationarity of the problem to
 produce a recursive representation.  Given today's starting value $x$,
 rather than choose an infinite sequence $\{x_{t+1}\}_{t=0}^\infty$, I
 need only choose tomorrow's starting value $y$.  Since the value
@@ -5647,8 +5729,9 @@ value of tomorrow's $v_B(y)$.
 So we've amazingly turned an infinite-dimensional sequential problem of
 finding $\{x_{t+1}\}^\infty_{t=0}$ into something much simpler, provided
 that $v_B$ exists (we'll still have to prove it does).  That means
-solving Functional Equation~\ref{eq:vB} for fixed point $v_B$. Then,
-once we have $v_B$, we can think about determining the optimal sequence.
+solving Functional Equation~\ref{eq:vB} for fixed point $v_B$, a
+real-valued function. Then, once we have $v_B$, we can think about
+determining the optimal sequence.
 \end{defn}
 
 \begin{defn}{(Optimal Value)}
@@ -5667,8 +5750,15 @@ existence of a feasible plan $\{x_t\}_{t=0}^\infty$ that maximized the
 objective function. Now we'll show under what conditions $v^*$ and $v_B$
 are equal---i.e.\ the conditions under which the optimal value is
 obtained.
+
+The reason we care \emph{at all} about the Bellman Formulation of
+Equation~\ref{eq:vB} is that a solution to that problem might give us a
+solution to Canonical Sequential Problem~\ref{prob:sequential-short}.
+There will be occasions when $v_B$ exists but $v^*$ does not, and in
+those cases, we really don't care about $v_B$.
 \end{defn}
 
+\clearpage
 \subsection{Principal of Optimality: Equivalence of Sequential and
 Bellman Formulations}
 
@@ -5980,7 +6070,7 @@ acting on the set of bounded real-valued functions as
   &= \sup_{y\in\Gamma(x)}
   F(x,y) + \beta v(y)
 \end{align*}
-This takes in a function $v$ and spits out another function of $x$.
+This takes in a function $v$ and spits out another function.
 \end{defn}
 
 \begin{prop}{\emph{(Bellman Operator is a Contraction Map)}}
@@ -5993,24 +6083,38 @@ Suppose that we have Bellman Equation
 \begin{align*}
   v(x) = \max_{y\in\Gamma(x)} F(x,y) + \beta v(y)
 \end{align*}
-The method of ``guess and verify'' involves choosing some function $v$,
-substituting it into the RHS and maximizing the RHS over all feasible
-$y\in\Gamma(x)$. The result is a function, and you check that it is
-identical to the original $v$ on the LHS.
+The method of ``guess and verify'' is a three-step procedure
+\begin{enumerate}
+  \item Come up with a guess for $v$.
 
-Often, everything is differentiable, so this means differentiate the
-RHS, set equal to zero, solve for $y$, plug in the result, and check
-\begin{align*}
-  0 &= \frac{\partial}{\partial y}
-  \left[
-    F(x,y) + \beta\, v(y)
-  \right] \\
-  \text{Solve for $y$}
-  \quad \qquad \;
-  0 &= F_y(x,y) + \beta \, v_y(x) \\
-  \text{Plug in result $y^*$ and check} \qquad
-  v(x) &= F(x,y^*) + \beta\, v(y^*)
-\end{align*}
+    Note that often, we merely guess and check a functional form like
+    $v(x)=a + b\log(x)$ (without specifying constant coefficients). And
+    so during the ``guess and check'' procedure, we need to solve for
+    the coefficient values as well. We see this in Step 3 and in the
+    next example.
+
+  \item Solve the RHS for the optimum $y^*$: Substitute your guess for
+    $v$ into the RHS and find the max over all feasible $y\in\Gamma(x)$.
+    Often, everything is differentiable, so this means differentiate the
+    RHS, set equal to zero, solve for $y^*$:
+    \begin{align*}
+      \text{$y^*$ solves} \qquad
+      0 &= \frac{\partial}{\partial y}
+      \left[
+        F(x,y) + \beta\, v(y)
+      \right]
+    \end{align*}
+
+  \item Evaluate the RHS at the optimum: Plug the optimum $y^*$
+    into the RHS. Check that the resulting function is identical to the
+    original $v$ on the LHS, i.e.\ check
+    \begin{align*}
+      v(x) &= F(x,y^*) + \beta\, v(y^*)
+    \end{align*}
+    It at is at this stage that you collect terms and identify any
+    undetermined coefficients.
+\end{enumerate}
+
 
 \begin{ex}
 Suppose that we face problem
@@ -6091,7 +6195,7 @@ is):
   \frac{1}{1-\beta}
   \left[
     b\beta\,\log\left(b\beta\right)
-  - (1+b\beta)\log\left( 1+b\beta \right) \right]\\
+  - (1+b\beta)\log\left( 1+b\beta \right) \right]
 \end{align*}
 For this choice of constants, $v(k) = a + b\,\log(k)$ solves the Bellman
 Equation.
