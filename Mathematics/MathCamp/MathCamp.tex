@@ -257,6 +257,7 @@
   {\end{aligned}\right\rbrace}
 
 % Various probability and statistics commands
+\newcommand{\interior}{\operatorname{int}}
 \newcommand{\Cov}{\operatorname{Cov}}
 \newcommand{\rank}{\operatorname{rank}}
 \newcommand{\Corr}{\operatorname{Corr}}
@@ -294,9 +295,11 @@
 \newcommand{\kinf}{_{k=1}^\infty}
 \newcommand{\ninf}{_{n=1}^\infty}
 \newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
 \newcommand{\kinfz}{_{k=0}^\infty}
 \newcommand{\ninfz}{_{n=0}^\infty}
 \newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -4223,7 +4226,7 @@ In metric space $(X,d)$, the function $T: X\rightarrow X$ is a
 \emph{contraction map} if and only there exists a $\beta \in (0,1)$ such
 that
 \begin{align*}
-  d(T(x), T(y)) < \beta \; d(x,y)
+  d(T(x), T(y)) \leq \beta \; d(x,y)
   \qquad x,y\in X
 \end{align*}
 $\beta$ is called the \emph{modulus} of $T$.
@@ -4242,17 +4245,18 @@ Suppose $\varepsilon>0$ given. Choose $\delta=\varepsilon$. Then
 \begin{align*}
   d(x,y) < \delta=\varepsilon
   \quad\implies\quad
-  d(T(x),T(y)) < \beta \; d(x,y)
+  d(T(x),T(y)) \leq \beta \; d(x,y)
   < \beta \varepsilon < \varepsilon
 \end{align*}
 \end{proof}
 
 
 \begin{thm}{\emph{(Blackwell's Sufficient Conditions for a Contraction)}}
-Suppose that we have some operator
-$T:\mathscr{B}(X,\R)\rightarrow\mathscr{B}(X,\R)$ on the space of
-bounded functions under the sup norm $d_\infty$.
-Suppose that $T$ satisfies
+Suppose that we consider the metric space $(\sB(X,\R),d_\infty)$
+of all bounded functions $f:X\ra\R$, and we
+have some operator
+$T:\mathscr{B}(X,\R)\rightarrow\mathscr{B}(X,\R)$ on that space.
+Suppose $T$ satisfies
 \begin{enumerate}
   \item \emph{Monotonicity}: $f(x) \leq g(x)$ for all $x$
     $\implies$ $T[f(x)] \leq T[g(x)]$ for all $f,g\in \sB(X,\R)$.
@@ -5612,6 +5616,7 @@ Compact-valued correspondence $\Gamma:X\rightrightarrows Y$ is
 \emph{continuous} at $x\in X$ if it is both UHC and LHC at $x$.
 \end{defn}
 
+\clearpage
 \subsection{Preliminaries: Theorem of the Maximum}
 
 \begin{thm}{\emph{(Theorem of the Maximum)}}
@@ -5623,7 +5628,8 @@ initial condition or parameter, $x\in X$, define
   v^*(x) &:= \max_{y\in \Gamma(x)} f(x,y)
   \label{prob:thm-max}
 \end{align}
-If $f$ is continuous and $\Gamma$ is continuous and compact-valued, then
+If $f$ is continuous and $\Gamma$ is a continuous and compact-valued
+correspondence, then
 \begin{enumerate}
   \item $y^*$ is nonempty (i.e.\ there is a maximizer), compact-valued,
     and UHC
@@ -5638,7 +5644,7 @@ function.
 \end{cor}
 
 
-
+\clearpage
 \subsection{Canonical Sequential Problem and its Bellman Formulation}
 
 
@@ -5808,303 +5814,8 @@ There will be occasions when $v_B$ exists but $v^*$ does not, and in
 those cases, we really don't care about $v_B$.
 \end{defn}
 
+
 \clearpage
-\subsection{Principal of Optimality: Equivalence of Sequential and
-Bellman Formulations}
-
-In this section we look at conditions under which the optimal value
-function $v^*$ is also the function $v_B$ satisfying the Bellman
-Equation, and vice versa.
-
-\begin{assump}{(Nonempty Feasible Sets)}
-\label{assump:feasible}
-$\Gamma(x)\neq\emptyset$ for all $x\in X$, so we can always find a
-feasible sequence given any starting point.
-\end{assump}
-
-\begin{assump}{(Finite Objective Function)}
-\label{assump:finite}
-For all feasible sequences $\{x_{t+1}\}_{t=0}^\infty$ such that
-$x_{t+1}\in \Gamma(x_t)$ for all $t$, we have
-\begin{align*}
-  \lim_{T\rightarrow\infty} \sum_{t=0}^T \beta^t F(x_t,x_{t+1})
-  < \infty
-\end{align*}
-Note, this is assured if $F(x,y)$ is a bounded function and
-$\beta\in[0,1)$.
-\end{assump}
-
-\begin{thm}
-\label{thm:vstar-solves-bellman}
-Given Problem~\ref{prob:sequential-short}, if
-Assumptions~\ref{assump:feasible} and~\ref{assump:finite} hold, then
-$v^*$ from Definition~\ref{defn:vstar} satisfies the Bellman Equation
-\begin{align}
-  \label{vstar-solves-bellman}
-  v^*(x) = \sup_{y\in\Gamma(x)} F(x,y) + \beta v^*(y)
-\end{align}
-\end{thm}
-\begin{proof}
-For arbitrary $x\in X$, we want to show that the value $v^*(x)$ equals
-the RHS of Equation~\ref{vstar-solves-bellman}---i.e.\ that it is indeed
-the RHS sup. By the definition of sup, that's true if and only if
-\begin{enumerate}
-  \item[A1.] $v^*(x) \geq F(x,y) + \beta v^*(y)$ for all $y\in\Gamma(x)$.
-  \item[A2.] For any $\varepsilon>0$, we can find a
-    $y_\varepsilon\in\Gamma(x)$ such that
-    $
-      v^*(x) < F(x,y_\varepsilon) + \beta v^*(y_\varepsilon) + \varepsilon
-    $
-\end{enumerate}
-That's what we need to show. Now onto what we know.
-Specifically, we know that $v^*$ is the sup over the sequential problem
-as defined in Definition~\ref{defn:vstar}. So again, by the definition
-of the sup, we know that
-\begin{enumerate}
-  \item[B1.] $v^*(x) \geq \sumtinfz \beta^t F(x_t,x_{t+1})$ for all
-    feasible sequences satisfying $x_{t+1}\in\Gamma(x_t)$ with starting
-    value $x_0=x$.
-  \item[B2.] For any $\varepsilon>0$, there exists feasible
-    $\{\tilde{x}_{t+1}\}_{t=0}^\infty$ such that
-      $
-      v^*(x) < \sumtinfz \beta^t
-      F(\tilde{x}_{t}, \tilde{x}_{t+1}) + \varepsilon
-      $
-      with starting value $x_0=x$.
-\end{enumerate}
-Our task is to show that (B1) and (B2) together imply (A1) and (A2).
-
-(Show A1) Let $x_0$ and $\varepsilon>0$ be given.
-Let $x_1$ be any point in $\Gamma(x_0)$. Then by (B2)
-and some index renumbering, there exists a feasible sequence
-$\{x_{t+2}\}_{t=0}^\infty$ such that
-\begin{align}
-  v^*(x_1) &< \sumtinfz \beta^t
-  F(x_{t+1}, x_{t+2}) + \varepsilon \notag \\
-  \Leftrightarrow\quad
-  v^*(x_1) - \varepsilon &< \sumtinfz \beta^t
-  F(x_{t+1}, x_{t+2})
-  \label{seqchoice}
-\end{align}
-Onto this just-chosen sequence, prepend
-$x_1\in\Gamma(x_0)$ so we now have sequence
-$\{x_{t+1}\}_{t=0}^\infty$. All elements were chosen to be
-feasible.  So by (B1), we know that for feasible sequence
-$\{x_{t+1}\}_{t=0}^\infty$
-\begin{align*}
-  v^*(x_0)
-  &\geq \lim_{T\rightarrow\infty} \sumtTz \beta^t F(x_t,x_{t+1}) \\
-  \text{Pop off first element} \qquad
-  &= F(x_0, x_1) + \lim_{T\rightarrow\infty} \sumtT \beta^t F(x_t,x_{t+1}) \\
-  \text{Renumbering indices} \qquad
-  &= F(x_0, x_1) + \beta \lim_{T\rightarrow\infty} \sumtTz \beta^{t} F(x_{t+1},x_{t+2}) \\
-  \text{By Inequality~\ref{seqchoice}} \qquad
-  &= F(x_0, x_1)
-  + \beta \left[ v^*(x_1) - \varepsilon\right]
-\end{align*}
-Since $\varepsilon>0$, starting point $x_0$, and
-$x_1\in\Gamma(x_0)$ were arbitrary
-\begin{align*}
-  v^*(x_0)
-  &\geq F(x_0, x_1)
-  + \beta  v^*(x_1)
-\end{align*}
-which is the same as (A1), provided you replace $x_0$ and $x_1$ with $x$
-and $y$.
-
-(Show A2)
-Suppose that $x$ and $\varepsilon>0$ are given.
-By (B2), there exists a feasible sequence with $x_0=x$ such that
-\begin{align*}
-  v^*(x) &< \lim_{T\rightarrow\infty} \sumtTz \beta^t
-  F(x_{t}, x_{t+1}) + \varepsilon \\
-  \Leftrightarrow\quad
-  v^*(x) &< F(x, x_1)
-  + \lim_{T\rightarrow\infty}
-  \sumtT \beta^t
-  F(x_{t}, x_{t+1}) + \varepsilon \\
-  \Rightarrow\quad
-  v^*(x) &< F(x, x_1)
-  + \beta v^*(x_1)
-  + \varepsilon \\
-\end{align*}
-Note, we were able to replace the series $\sumtT \beta^t F(x_{t},
-x_{t+1})$ with $\beta v^*(x_1)$ by using B1.
-So now, just choose $y=x_1$. We know $x_1\in\Gamma(x_0)$ is feasible
-and $x_0=x$. This means A2 holds.
-\end{proof}
-
-Now we move onto the other direction: Does a function $v_B$ satisfying
-the Bellman Formulation also match the optimal value function $v^*$. For
-that, we need one additional assumption beyond
-Assumptions~\ref{assump:feasible} and~\ref{assump:finite} that we made
-before.
-
-\begin{assump}{(Transversality Condition)}
-\label{assump:transversality}
-For value function $v$ and all feasible sequences
-$\{x_{t+1}\}_{t=0}^\infty$ such that $x_{t+1}\in \Gamma(x_t)$ for all
-$t$, we have
-\begin{align*}
-  \lim_{t\rightarrow\infty} \beta^t v(x_t) = 0
-\end{align*}
-In words, ``The value of stuff in the infinite future doesn't matter.''
-\end{assump}
-
-\begin{thm}
-Given Problem~\ref{prob:sequential-short}, suppose
-Assumptions~\ref{assump:feasible},~\ref{assump:finite},
-and~\ref{assump:transversality} hold and that function $v_B$ satisfies
-Bellman Equation
-\begin{align}
-  \label{eq:bellmansup}
-  v_B(x) = \sup_{y\in\Gamma(x)} F(x,y) + \beta v_B(y)
-\end{align}
-Then $v_B = v^*$, the optimal value function for the sequential problem,
-which was defined in Definition~\ref{defn:vstar}.
-\end{thm}
-\begin{rmk}
-Though the Bellman formulation above used max rather than sup, I use sup
-here so I don't have to worry about existence.
-\end{rmk}
-\begin{proof}
-%In this proof, I'll be using statements similar to A1, A2, B1, and B2
-%from the proof of Theorem~\ref{thm:vstar-solves-bellman}. So let's
-%restate them appropriately for this problem.
-
-For arbitrary $x\in X$, we want to show that $v_B(x)=v^*(x)$, with the
-latter representing the optimal value---the supremum over all sequences.
-That only occurs if
-\begin{enumerate}
-  \item[A1.] $v_B(x) \geq \sumtinfz \beta^t F(x_t,x_{t+1})$ for all
-    feasible sequences satisfying $x_{t+1}\in\Gamma(x_t)$ with starting
-    value $x_0=x$.
-  \item[A2.] For any $\varepsilon>0$, there exists feasible
-    $\{\tilde{x}_{t+1}\}_{t=0}^\infty$ such that
-      $
-      v_B(x) < \sumtinfz \beta^t
-      F(\tilde{x}_{t}, \tilde{x}_{t+1}) + \varepsilon
-      $
-      with starting value $x_0=x$.
-\end{enumerate}
-That's what we need to show. Now onto what we know.  Specifically, we
-know that $v_B$ solves the Bellman Equation, so it equals the RHS of
-Equation~\ref{eq:bellmansup}. Since it's a supremum, by definition
-\begin{enumerate}
-  \item[B1.] $v_B(x) \geq F(x,y) + \beta v_B(y)$ for all $y\in\Gamma(x)$.
-  \item[B2.] For any $\varepsilon>0$, we can find a
-    $y_\varepsilon\in\Gamma(x)$ such that
-    $
-      v_B(x) < F(x,y_\varepsilon) + \beta v_B(y_\varepsilon) + \varepsilon
-    $
-\end{enumerate}
-Our task is to show that (B1) and (B2) together imply (A1) and (A2).
-
-(Show A1) Let $\{x_{t+1}\}_{t=0}^\infty$ be a feasible sequence. We can
-use B1 to recursively substitute:
-\begin{align*}
-  v_B(x) &\geq F(x,x_1) + \beta v_B(x_1) \\
-  v_B(x) &\geq F(x,x_1) + \beta F(x_1, x_2) + \beta^2 v_B(x_2) \\
-  \vdots \quad & \quad \qquad \vdots \\
-  v_B(x) &\geq \sumtTz \beta^t F(x_t,x_{t+1}) + \beta^{T+1} v_B(x_{T+1}) \\
-  \lim_{T\rightarrow\infty}
-  v_B(x) &\geq
-    \lim_{T\rightarrow\infty}
-    \left\{
-    \sumtTz \beta^t F(x_t,x_{t+1}) + \beta^{T+1} v_B(x_{T+1})
-    \right\}\\
-  v_B(x) &\geq
-    \sumtinfz \beta^t F(x_t,x_{t+1})
-    + 0
-\end{align*}
-Where we needed Assumption~\ref{assump:transversality} on transversality
-to ensure that the term $\beta^{T+1}v(x_{T+1})$ goes to zero.
-
-(Show A2) Next,
-\end{proof}
-
-\begin{ex}{(Why We Need Transversality)}
-In this example, we set up a problem whose Bellman Equation formulation
-has a solution, while the sequential problem has no optimal value
-function solution. Now onto the problem.
-
-Consider a simple consumption/investment decision:
-\begin{align*}
-  \max_{\{c_t\}_0^\infty} \; &\sumtinfz \beta^t c_t \\
-  & c_t + a_{t+1} = (1+r)a_t\\
-  & c_t \geq 0
-\end{align*}
-where $a_0$ is given as initial endowment. We can express this problem
-in standard form with $a_t$ as the state variable
-\begin{align*}
-  \max_{\{a_{t+1}\}_0^\infty} \;
-  &\sumtinfz \; \beta^t [(1+r)a_t - a_{t+1}] \\
-  & (1+r)a_t - a_{t+1} \geq 0
-\end{align*}
-where $F(a_t,a_{t+1}) = (1+r)a_t - a_{t+1}$.
-We place \emph{no restrictions} on each $a_t$---they can be arbitrarily
-negative, and that will be important.
-Under some assumptions $1+r = \frac{1}{\beta}$.
-
-So now we can write the Bellman Equation formulation:
-\begin{align*}
-  v(a) = \max_{a'} \; \left(\frac{a}{\beta} - a'\right) + \beta \, v(a')
-\end{align*}
-Now we use the guess and verify method. The guess is $v(a) = a/\beta$.
-\begin{align*}
-  \text{Check} \qquad
-  \frac{a}{\beta}
-  &= \max_{a'} \;
-  \left(\frac{a}{\beta} - a'\right)
-  + \beta \left(\frac{a'}{\beta}\right)\\
-  \frac{a}{\beta}
-  &= \max_{a'} \;
-  \frac{a}{\beta}
-  =
-  \frac{a}{\beta}
-\end{align*}
-So this solves the Bellman Equation.
-
-Time to see why this won't work. Pick initial consumption $c_0$ to be
-\emph{huge}. That is, borrow a lot so you consume a lot in the first
-period, consuming $c_0 >> a_0$.
-Thereafter, consume nothing: $c_t=0$ for $t>0$. This results in an
-investment profile of
-\begin{align*}
-  a_{1} &= \frac{a_0}{\beta} - c_0 < 0 \\
-  \Rightarrow \quad
-  a_{t+1} &= \frac{a_t}{\beta}
-  = \frac{a_0}{\beta^{t+1}} - \frac{c_0}{\beta^t}
-\end{align*}
-Since $a_1$ is negative and $\beta<1$, we see that $a_{t+1}$ will blow
-up to negative infinity.
-Now in each period, $a_{t+1}$ is a finite, very negative, but
-still-feasible number since we didn't put any borrowing constraints on.
-And that's exactly the problem. The agent could go on borrowing forever.
-
-Let's now make the violation of the transversality condition more
-explicit, checking the limit in Assumption~\ref{assump:transversality}.
-To simplify the math, let $a_0=0$. Recall that $v(a) = a/\beta$.
-\begin{align*}
-  \lim_{t\rightarrow\infty} \beta^t v(a_t)
-  = \lim_{t\rightarrow\infty} \beta^t \left(\frac{a_t}{\beta}\right)
-  = \lim_{t\rightarrow\infty} \beta^t
-  \left(
-  \frac{-c_0/\beta^{t-1}}{\beta}
-  \right)
-  = \lim_{t\rightarrow\infty}
-  -c_0
-  = -c_0 \neq 0
-\end{align*}
-In other words, the value function is not ``small'' in the infinite
-future.
-
-So in summary, there is no optimal value function $v^*$, though we were
-able to find a function satisfying the Bellman equation. In general,
-only checking the transversality condition catches this kind of problem.
-\end{ex}
-
-
 \subsection{Bellman Operator}
 
 How do you actually go about solving a Bellman Equation? In this
@@ -6117,16 +5828,35 @@ $T:\mathscr{B}(X,\R)\rightarrow\mathscr{B}(X,\R)$
 acting on the set of bounded real-valued functions as
 \begin{align*}
   T[v(x)]
-  &= \sup_{y\in\Gamma(x)}
+  &= \max_{y\in\Gamma(x)}
   F(x,y) + \beta v(y)
 \end{align*}
 This takes in a function $v$ and spits out another function.
+Note that  the Bellman value function $v_B$ is a fixed point of the
+contraction map $T$ defined above, i.e. $T[v_B] = v_B$.
 \end{defn}
+\begin{rmk}
+We don't strictly need bounded functions $f:\R\ra\R$. We might take a
+closed subset $X\subseteq\R$ as the domain and consider $f:X\ra\R$,
+which will bounded if $f$ continuous.
+\end{rmk}
+
+\begin{prop}
+Suppose that $v$ is a continuous function in $\sB(X,\R)$, the set of
+bounded real-valued functions. Then $T[v]$ is a continuous function
+of $x$ and the optimal policy $y^*(x)$ is a UHC correspondence. If
+$y^*(x)$ is a function, then it is continuous.
+\end{prop}
 
 \begin{prop}{\emph{(Bellman Operator is a Contraction Map)}}
 \end{prop}
 
 
+
+
+
+
+\clearpage
 \subsection{Solving by Guess and Verify}
 
 Suppose that we have Bellman Equation
@@ -6250,6 +5980,466 @@ is):
 For this choice of constants, $v(k) = a + b\,\log(k)$ solves the Bellman
 Equation.
 \end{ex}
+
+
+\clearpage
+\subsection{Principal of Optimality: Equivalence of Sequential and
+Bellman Formulations}
+
+In this section we look at conditions under which the optimal value
+function $v^*$ for the sequential problem
+\begin{align}
+  v^*(x_0) :=& \;
+  \sup_{\{x_{t+1}\}_{t=0}^\infty}
+  \sumtinfz \beta^t F(x_t,x_{t+1})
+  \label{eq:vstar}
+  \\
+  \text{s.t.} & \quad x_{t+1}\in \Gamma(x_t) \notag \\
+  & \quad x_{0}\;\text{given}
+  \notag
+\end{align}
+matches the solution $v_B$ to the functional Bellman Equation
+\begin{align}
+  \label{eq:vB2}
+  v_B(y) &=
+  \sup_{y\in\Gamma(x)}\;
+  F(x,y) +
+  \beta v_B(y)
+\end{align}
+and vice versa, where
+\begin{itemize}
+  \item $x$: the state variable
+  \item $y$: the control, which is equivalent to the state tomorrow in
+    this formulation
+  \item $g(x)$: A policy function that maps the state $x$ into an
+    optimal choice of $y$. This is a byproduct of solving the functional
+    Bellman Equation~\ref{eq:vB2}.
+  \item $X$: the set of possible values the state today $x$ and the
+    contrl/state tomorrow can take on
+  \item $\Gamma:X \rightrightarrows X$: the constraint set, which
+    encodes information about the feasible sets and plans
+  \item Feasible Plans $\Pi(x_0)$:
+    Given $x_0$,
+    \begin{align*}
+      \Pi(x_0) :=
+      \big\{ \{x_t\}\tinfz \;|\; x_{t+1} \in \Gamma(x_t) \big\}
+    \end{align*}
+  \item $F:A\ra \R$: the period return function where $A$ is the
+    graph of $\Gamma$, defined
+    \begin{align*}
+      A:=\{(x,y) \in X\times X \;|\; y \in\Gamma(x)\}
+    \end{align*}
+\end{itemize}
+The primitives are $(X,F,\beta,\Gamma)$.
+
+\clearpage
+\begin{thm}
+\label{thm:vstar-solves-bellman}
+Consider the following assumptions:
+\begin{enumerate}
+  \item \emph{(Nonempty Feasible Sets)}:
+    $\forall x\in X$, we have $\Gamma(x)\neq\emptyset$
+    %so that we can
+    %always construct a feasible sequence given any starting point.
+
+  \item \emph{(Well-Defined Limit)}:
+    For all feasible sequences $\{x_{t+1}\}_{t=0}^\infty \in \Pi(x_0)$,
+    and the following limit exists\footnote{%
+      We don't necessarily need the limit to be \emph{finite}. It could
+      $\pm \infty$. We just need it to exist and not bounce around in
+      the tail.
+    }
+    \begin{align*}
+      \lim_{T\rightarrow\infty} \sum_{t=0}^T \beta^t F(x_t,x_{t+1})
+      %\quad\text{exists}
+    \end{align*}
+    We can ensure this limit exists if $F(x,y)$ is a bounded function
+    and $\beta \in (0,1)$.
+    % See Esteban week 1 slides, slide 54
+
+  \item \emph{(Transversality Condition)}:
+    Given function $v_B$,
+    %for all $x_0\in X$ and all feasible sequences
+    \begin{align*}
+      \lim_{t\rightarrow\infty} \beta^t v_B(x_t) = 0
+    \end{align*}
+    for all $x_0\in X$ and for all
+    $\{x_{t+1}\}_{t=0}^\infty \in \Pi(x_0)$.\footnote{%
+    Emphasis on double ``for all'' qualifiers.
+    In words, this condition says that the value of stuff in the
+    infinite future doesn't matter.}
+
+  \item
+    \emph{(Continuous $\Gamma$ on Convex $X$)}:
+    $X$ is a convex subset of $\R^L$ and the correspondence
+    $\Gamma:X\rightrightarrows X$ is compact-valued and continuous.
+
+  \item
+    \emph{(Bounded, Continuous $F$ plus Discounting)}:
+    The function $F:A\ra \R$ is continuous and bounded and
+    $\beta\in (0,1)$.
+
+  \item
+    \emph{(Monotone $\Gamma$)}:
+    If $x \leq x'$, then $\Gamma(x) \subseteq \Gamma(x')$.
+
+  \item
+    \emph{(Increasing $F$)}:
+    For fixed $y$, the function $F(\cdot,y)$ is strictly increasing in
+    each of the $L$ components of $x\in X\subseteq \R^L$.
+
+  \item
+    \emph{(Strictly Concave $F$)}:
+    If $F$ is strictly concave in $(x,y)\in A$, i.e.\ for all distinct
+    pairs $(x,y), (x',y') \in A$ and $\alpha \in (0,1)$
+    \begin{align*}
+      F\left(\alpha x + (1-\alpha)x', \; \alpha y + (1-\alpha)y'\right)
+      >
+      \alpha F(x,y) + (1-\alpha)F(x',y')
+    \end{align*}
+
+  \item
+    \emph{(Convex $\Gamma$)}:
+    For all $\alpha\in[0,1]$, we have
+    \begin{align*}
+      \begin{rcases}
+        x,x' &\in X \\
+        y&\in \Gamma(x) \\
+        y'&\in \Gamma(x')
+      \end{rcases}
+      \quad\implies\quad
+      \alpha y + (1-\alpha) y
+      \in \Gamma(\alpha x + (1-\alpha) x')
+      %\qquad\forall \alpha\in[0,1]
+    \end{align*}
+
+  \item
+    \emph{(Continuously Differentiable $F$)}:
+    The period return function $F$ is continuously differentiable on the
+    interior of $A$.
+\end{enumerate}
+We have the following results:
+\begin{enumerate}
+  \item
+    \emph{($v^*$ solves Bellman Equation)}:
+    If Assumptions 1 and 2 hold, then the solution $v^*$ to the
+    sequential problem in Equation~\ref{eq:vstar} satisfies the Bellman
+    Equation~\ref{eq:vB2}. i.e.\
+    \begin{align*}
+      v^*(x) =
+      \sup_{y \in \Gamma(x)}
+      F(x,y) + \beta v^*(y)
+    \end{align*}
+
+  \item
+    \emph{(Characterization of Optimal Policies)}:
+    If Assumptions 1 and 2 hold and we have sequence
+    $\{x^*_t\}\tinfz\in\Pi(x_0)$ that attains the supremum in sequential
+    problem Equation~\ref{eq:vstar} (not saying it will exist, but if it
+    does), then
+    \begin{align*}
+      v^*(x^*_t) = F(x^*_t,x^*_{t+1}) + \beta v^*(x^*_{t+1})
+      \qquad \forall t
+    \end{align*}
+    Conversely, given a feasible sequence
+    $\{\hat{x}_t\}\tinfz \in\Pi(x_0)$ satisfying
+    \begin{align}
+      v^*(\hat{x}_t)
+      &= F(\hat{x}_t,\hat{x}_{t+1})
+        + \beta v^*(\hat{x}_{t+1}) \qquad \forall t\notag\\
+      0 &\geq
+      \limsup_{t\ra\infty}
+      \beta^t v^*(\hat{x}_t)
+      \label{weak-tvc}
+    \end{align}
+    then $\{\hat{x}_t\}\tinfz$ attains the sup in Sequential
+    Problem Equation~\ref{eq:vstar} with $x_0$ given.\footnote{%
+      Again, not saying $\{\hat{x}_t\}$ will exist, but if it does.}
+
+  \item
+    \emph{($v^*=v_B$)}:
+    If Assumptions 1, 2, and 3 hold, then $v_B = v^*$, i.e.\
+    the solution $v_B$ to the functional Bellman Equation~\ref{eq:vB2}
+    equals $v^*$ the solution to the sequential problem in
+    Equation~\ref{eq:vstar}.
+
+    Moreover, since $v_B=v^*$ and since Assumption 3 implies
+    Condition~\ref{weak-tvc}, Result 2 tells us that the feasible plan
+    generated by policy function $g(x)$ as $\hat{x}_{t+1} =
+    g(\hat{x}_t)$ for $\hat{x}_0=x_0$ given is an optimal,
+    supremum-attaining plan.
+
+  \item
+    \emph{(Uniqueness of Solution $v_B$)}:
+    If Assumptions 1-5 hold, then for Bellman Operator $T$
+    \begin{enumerate}
+      \item $T$ maps the space of bounded continuous
+        functions $\sB(X,\R)$ into itself, i.e.\
+        we have
+        $T\left[\sB(X,\R)\right]\subseteq\sB(X,\R)$.
+      \item
+        $T$ has unique fixed point $v$, and
+        $\forall v_0 \in \sB(X,\R)$, we have
+        $d(T^n[v_0],v) \leq \beta^n d(v_0,v)$
+      \item
+        The policy correspondence $g$ is compact-valued and upper
+        hemicontinuous.
+    \end{enumerate}
+
+  \item
+    \emph{(Monotonicity of Value Function)}:
+    Under assumptions 1-7, the unique fixed point $v$ of $T$ is strictly
+    increasing.
+
+  \item
+    \emph{(Strict Concavity of Value Function and Uniqueness of Policy)}:
+    Under assumptions 1-5 and 8-9, the unique fixed point $v$ of $T$ is
+    strictly concave and the optimal policy $g$ is a single-valued
+    continuous function.
+
+  \item
+    \emph{(Benveniste-Scheinkman)}:
+    Under assumptions 1-5 and 8-10, if $x_0\in \interior(X)$ and
+    $g(x_0)\in\interior(\Gamma(x_0))$, then the unique fixed point $v$
+    of $T$ is continuously differentable at $x_0$ with
+    \begin{align*}
+      \frac{\partial v(x_0)}{\partial x^i}
+      =
+      \frac{\partial F(x_0, g(x_0))}{\partial x^i}
+    \end{align*}
+\end{enumerate}
+\end{thm}
+
+
+\clearpage
+%\begin{proof}
+%For arbitrary $x\in X$, we want to show that the value $v^*(x)$ equals
+%%the RHS of Equation~\ref{vstar-solves-bellman}---i.e.\ that it is indeed
+%the RHS sup. By the definition of sup, that's true if and only if
+%\begin{enumerate}
+  %\item[A1.] $v^*(x) \geq F(x,y) + \beta v^*(y)$ for all $y\in\Gamma(x)$.
+  %\item[A2.] For any $\varepsilon>0$, we can find a
+    %$y_\varepsilon\in\Gamma(x)$ such that
+    %$
+      %v^*(x) < F(x,y_\varepsilon) + \beta v^*(y_\varepsilon) + \varepsilon
+    %$
+%\end{enumerate}
+%That's what we need to show. Now onto what we know.
+%Specifically, we know that $v^*$ is the sup over the sequential problem
+%as defined in Definition~\ref{defn:vstar}. So again, by the definition
+%of the sup, we know that
+%\begin{enumerate}
+  %\item[B1.] $v^*(x) \geq \sumtinfz \beta^t F(x_t,x_{t+1})$ for all
+    %feasible sequences satisfying $x_{t+1}\in\Gamma(x_t)$ with starting
+    %value $x_0=x$.
+  %\item[B2.] For any $\varepsilon>0$, there exists feasible
+    %$\{\tilde{x}_{t+1}\}_{t=0}^\infty$ such that
+      %$
+      %v^*(x) < \sumtinfz \beta^t
+      %F(\tilde{x}_{t}, \tilde{x}_{t+1}) + \varepsilon
+      %$
+      %with starting value $x_0=x$.
+%\end{enumerate}
+%Our task is to show that (B1) and (B2) together imply (A1) and (A2).
+
+%(Show A1) Let $x_0$ and $\varepsilon>0$ be given.
+%Let $x_1$ be any point in $\Gamma(x_0)$. Then by (B2)
+%and some index renumbering, there exists a feasible sequence
+%$\{x_{t+2}\}_{t=0}^\infty$ such that
+%\begin{align}
+  %v^*(x_1) &< \sumtinfz \beta^t
+  %F(x_{t+1}, x_{t+2}) + \varepsilon \notag \\
+  %\Leftrightarrow\quad
+  %v^*(x_1) - \varepsilon &< \sumtinfz \beta^t
+  %F(x_{t+1}, x_{t+2})
+  %\label{seqchoice}
+%\end{align}
+%Onto this just-chosen sequence, prepend
+%$x_1\in\Gamma(x_0)$ so we now have sequence
+%$\{x_{t+1}\}_{t=0}^\infty$. All elements were chosen to be
+%feasible.  So by (B1), we know that for feasible sequence
+%$\{x_{t+1}\}_{t=0}^\infty$
+%\begin{align*}
+  %v^*(x_0)
+  %&\geq \lim_{T\rightarrow\infty} \sumtTz \beta^t F(x_t,x_{t+1}) \\
+  %\text{Pop off first element} \qquad
+  %&= F(x_0, x_1) + \lim_{T\rightarrow\infty} \sumtT \beta^t F(x_t,x_{t+1}) \\
+  %\text{Renumbering indices} \qquad
+  %&= F(x_0, x_1) + \beta \lim_{T\rightarrow\infty} \sumtTz \beta^{t} F(x_{t+1},x_{t+2}) \\
+  %\text{By Inequality~\ref{seqchoice}} \qquad
+  %&= F(x_0, x_1)
+  %+ \beta \left[ v^*(x_1) - \varepsilon\right]
+%\end{align*}
+%Since $\varepsilon>0$, starting point $x_0$, and
+%$x_1\in\Gamma(x_0)$ were arbitrary
+%\begin{align*}
+  %v^*(x_0)
+  %&\geq F(x_0, x_1)
+  %+ \beta  v^*(x_1)
+%\end{align*}
+%which is the same as (A1), provided you replace $x_0$ and $x_1$ with $x$
+%and $y$.
+
+%(Show A2)
+%Suppose that $x$ and $\varepsilon>0$ are given.
+%By (B2), there exists a feasible sequence with $x_0=x$ such that
+%\begin{align*}
+  %v^*(x) &< \lim_{T\rightarrow\infty} \sumtTz \beta^t
+  %F(x_{t}, x_{t+1}) + \varepsilon \\
+  %\Leftrightarrow\quad
+  %v^*(x) &< F(x, x_1)
+  %+ \lim_{T\rightarrow\infty}
+  %\sumtT \beta^t
+  %F(x_{t}, x_{t+1}) + \varepsilon \\
+  %\Rightarrow\quad
+  %v^*(x) &< F(x, x_1)
+  %+ \beta v^*(x_1)
+  %+ \varepsilon \\
+%\end{align*}
+%Note, we were able to replace the series $\sumtT \beta^t F(x_{t},
+%x_{t+1})$ with $\beta v^*(x_1)$ by using B1.
+%So now, just choose $y=x_1$. We know $x_1\in\Gamma(x_0)$ is feasible
+%and $x_0=x$. This means A2 holds.
+%\end{proof}
+
+%\begin{proof}
+%In this proof, I'll be using statements similar to A1, A2, B1, and B2
+%from the proof of Theorem~\ref{thm:vstar-solves-bellman}. So let's
+%restate them appropriately for this problem.
+
+%For arbitrary $x\in X$, we want to show that $v_B(x)=v^*(x)$, with the
+%latter representing the optimal value---the supremum over all sequences.
+%That only occurs if
+%\begin{enumerate}
+  %\item[A1.] $v_B(x) \geq \sumtinfz \beta^t F(x_t,x_{t+1})$ for all
+    %feasible sequences satisfying $x_{t+1}\in\Gamma(x_t)$ with starting
+    %value $x_0=x$.
+  %\item[A2.] For any $\varepsilon>0$, there exists feasible
+    %$\{\tilde{x}_{t+1}\}_{t=0}^\infty$ such that
+      %$
+      %v_B(x) < \sumtinfz \beta^t
+      %F(\tilde{x}_{t}, \tilde{x}_{t+1}) + \varepsilon
+      %$
+      %with starting value $x_0=x$.
+%\end{enumerate}
+%That's what we need to show. Now onto what we know.  Specifically, we
+%know that $v_B$ solves the Bellman Equation, so it equals the RHS of
+%%Equation~\ref{eq:bellmansup}. Since it's a supremum, by definition
+%\begin{enumerate}
+  %\item[B1.] $v_B(x) \geq F(x,y) + \beta v_B(y)$ for all $y\in\Gamma(x)$.
+  %\item[B2.] For any $\varepsilon>0$, we can find a
+    %$y_\varepsilon\in\Gamma(x)$ such that
+    %$
+      %v_B(x) < F(x,y_\varepsilon) + \beta v_B(y_\varepsilon) + \varepsilon
+    %$
+%\end{enumerate}
+%Our task is to show that (B1) and (B2) together imply (A1) and (A2).
+
+%(Show A1) Let $\{x_{t+1}\}_{t=0}^\infty$ be a feasible sequence. We can
+%use B1 to recursively substitute:
+%\begin{align*}
+  %v_B(x) &\geq F(x,x_1) + \beta v_B(x_1) \\
+  %v_B(x) &\geq F(x,x_1) + \beta F(x_1, x_2) + \beta^2 v_B(x_2) \\
+  %\vdots \quad & \quad \qquad \vdots \\
+  %v_B(x) &\geq \sumtTz \beta^t F(x_t,x_{t+1}) + \beta^{T+1} v_B(x_{T+1}) \\
+  %\lim_{T\rightarrow\infty}
+  %v_B(x) &\geq
+    %\lim_{T\rightarrow\infty}
+    %\left\{
+    %\sumtTz \beta^t F(x_t,x_{t+1}) + \beta^{T+1} v_B(x_{T+1})
+    %\right\}\\
+  %v_B(x) &\geq
+    %\sumtinfz \beta^t F(x_t,x_{t+1})
+    %+ 0
+%\end{align*}
+%Where we needed the Transversality assumption
+%to ensure that the term $\beta^{T+1}v(x_{T+1})$ goes to zero.
+
+%(Show A2) Next,
+%\end{proof}
+
+\begin{ex}{(Why We Need Transversality)}
+In this example, we set up a problem whose Bellman Equation formulation
+has a solution, while the sequential problem has no optimal value
+function solution. Now onto the problem.
+
+Consider a simple consumption/investment decision:
+\begin{align*}
+  \max_{\{c_t\}_0^\infty} \; &\sumtinfz \beta^t c_t \\
+  & c_t + a_{t+1} = (1+r)a_t\\
+  & c_t \geq 0
+\end{align*}
+where $a_0$ is given as initial endowment. We can express this problem
+in standard form with $a_t$ as the state variable
+\begin{align*}
+  \max_{\{a_{t+1}\}_0^\infty} \;
+  &\sumtinfz \; \beta^t [(1+r)a_t - a_{t+1}] \\
+  & (1+r)a_t - a_{t+1} \geq 0
+\end{align*}
+where $F(a_t,a_{t+1}) = (1+r)a_t - a_{t+1}$.
+We place \emph{no restrictions} on each $a_t$---they can be arbitrarily
+negative, and that will be important.
+Under some assumptions $1+r = \frac{1}{\beta}$.
+
+So now we can write the Bellman Equation formulation:
+\begin{align*}
+  v(a) = \max_{a'} \; \left(\frac{a}{\beta} - a'\right) + \beta \, v(a')
+\end{align*}
+Now we use the guess and verify method. The guess is $v(a) = a/\beta$.
+\begin{align*}
+  \text{Check} \qquad
+  \frac{a}{\beta}
+  &= \max_{a'} \;
+  \left(\frac{a}{\beta} - a'\right)
+  + \beta \left(\frac{a'}{\beta}\right)\\
+  \frac{a}{\beta}
+  &= \max_{a'} \;
+  \frac{a}{\beta}
+  =
+  \frac{a}{\beta}
+\end{align*}
+So this solves the Bellman Equation.
+
+Time to see why this won't work. Pick initial consumption $c_0$ to be
+\emph{huge}. That is, borrow a lot so you consume a lot in the first
+period, consuming $c_0 >> a_0$.
+Thereafter, consume nothing: $c_t=0$ for $t>0$. This results in an
+investment profile of
+\begin{align*}
+  a_{1} &= \frac{a_0}{\beta} - c_0 < 0 \\
+  \Rightarrow \quad
+  a_{t+1} &= \frac{a_t}{\beta}
+  = \frac{a_0}{\beta^{t+1}} - \frac{c_0}{\beta^t}
+\end{align*}
+Since $a_1$ is negative and $\beta<1$, we see that $a_{t+1}$ will blow
+up to negative infinity.
+Now in each period, $a_{t+1}$ is a finite, very negative, but
+still-feasible number since we didn't put any borrowing constraints on.
+And that's exactly the problem. The agent could go on borrowing forever.
+
+Let's now make the violation of the transversality condition more
+%explicit, checking the limit in Assumption~\ref{assump:transversality}.
+To simplify the math, let $a_0=0$. Recall that $v(a) = a/\beta$.
+\begin{align*}
+  \lim_{t\rightarrow\infty} \beta^t v(a_t)
+  = \lim_{t\rightarrow\infty} \beta^t \left(\frac{a_t}{\beta}\right)
+  = \lim_{t\rightarrow\infty} \beta^t
+  \left(
+  \frac{-c_0/\beta^{t-1}}{\beta}
+  \right)
+  = \lim_{t\rightarrow\infty}
+  -c_0
+  = -c_0 \neq 0
+\end{align*}
+In other words, the value function is not ``small'' in the infinite
+future.
+
+So in summary, there is no optimal value function $v^*$, though we were
+able to find a function satisfying the Bellman equation. In general,
+only checking the transversality condition catches this kind of problem.
+\end{ex}
+
+
 
 \clearpage
 \section{Continuous-Time Deterministic Dynamic Programming}
