@@ -8195,7 +8195,8 @@ immediately clear simplification of the more general formula above, at
 least to me).
 
 \clearpage
-\section{Classical Linear Regression}
+\section{Classical Linear Regression: The Exact Regression Model in
+Finite Samples}
 
 \subsection{Setup and Assumptions}
 
@@ -8972,6 +8973,140 @@ wrapped around a quadratic form.
 \end{proof}
 
 
+\clearpage
+\section{OLS Asymptotics}
+
+In the section on classical linear regression, we specified the joint
+distribution of $(\bsy,\bsX)$ for a fixed, finite sample size. In this
+seciton, we instead specify the underlying data generating process.
+From that, the joint distribution follows.
+
+\begin{defn}(Assumptions)
+Here, we state a few assumptions that will be referenced for different
+results:
+\begin{enumerate}
+  \item \emph{Linearity}: $y_n = \bsx_n' \bsbeta + \varepsilon_n$
+    where $\bsx_n$ and $\bsbeta$ are $(K\times 1)$ vectors
+  \item \emph{Ergodic Stationarity}:
+    The $(K+1)$-vector $(y_n, \bsx_n)$ is jointly stationary and
+    ergodic. Much weaker than iid.
+  \item \emph{Predetermined Regressors}:
+    $\E[\bsx_n (y_n - \bsx'_n \bsbeta)]=\E[\bsx_n \varepsilon_n]= \bso$
+    for all $n$.
+
+    This is weaker than requiring $\E[\varepsilon_n|\bsx_n]=0$.
+    It is also weaker than strict exogeneity, which requires
+    $\E[x_{ni}\varepsilon_m]=0$ for all $n,m$.
+    Here, we rule out only contemporaneous ($n=m$) correlation between
+    regressor $\bsx_n$ and error $\varepsilon_n$.
+    This allows us to accommodate the AR(1) model and other time series
+    models.
+
+  \item \emph{Rank and Finiteness Condition}:
+    $\bsSigma_{\bsx\bsx}:=\E[\bsx_n\bsx_n']$ exists, is finite, and has
+    full rank
+
+  \item \emph{Martingale Difference Sequence $\bsx_n\varepsilon_n$}:
+    We strengthen Assumption 3 above. In particular,
+    we suppose that $\bsx_n\varepsilon_n$ has finite second moment,
+    i.e.\ $\E[\bsx_n\varepsilon_n^2\bsx_n]<\infty$, and is is a
+    martingale difference sequence, i.e.\
+    \begin{align*}
+      \E[\bsx_n\varepsilon_n\;|\;
+      \bsx_{n-1}\varepsilon_{n-1},\bsx_{n-2}\varepsilon_{n-2},\ldots]
+      = \bso
+    \end{align*}
+    A sufficient condition for $\bsx_n\varepsilon_n$ to be a MDS is
+    \begin{align*}
+      \E[\varepsilon_n\;|\;
+      \varepsilon_{n-1},
+      \varepsilon_{n-2}, \ldots,
+      \bsx_n,
+      \bsx_{n-1}, \ldots]
+      = \bso
+    \end{align*}
+    %For later, we define
+    %\begin{align*}
+      %\bsS := \E[\bsx_n\varepsilon^2_n\bsx_n']
+    %\end{align*}
+\end{enumerate}
+\end{defn}
+\begin{rmk}
+This model permits conditional heteroskedasticity. Since $(y_n,\bsx_n)$
+is stationary, the error term $\varepsilon_n$ is also stationary so that
+$\E[\varepsilon^2_n]$ is constant across $n$. But the setup above
+allows $\E[\varepsilon_n^2|\bsx_n]$ to depend upon $\bsx_n$.
+\end{rmk}
+
+
+\begin{prop}\emph{(OLS Estimator)}
+The OLS estimator has the following properties
+\begin{enumerate}
+  \item \emph{Consistent}: Under Assumptions 1-4 above, the OLS
+    estimator is consistent.
+  \item \emph{Asymptotic Normality}: Under assumptions 1-5
+    \begin{align*}
+      \sqrt{N}(\bshatbeta_N- \bsbeta) \dto
+      N(0,\E[\bsx_i\bsx_i']^{-1}\;\E[\bsx_n\varepsilon^2_n\bsx_n']\;\E[\bsx_i\bsx_i']^{-1})
+    \end{align*}
+  \item Under Assumptions 1-4, the OLS error variance estimator $s^2$ is
+    consistent:
+    \begin{align*}
+      s^2_N := \frac{\bse' \bse}{N-K}
+      =\frac{1}{N-K} \sumnN (y_n-\bsx_n\bshatbeta_N)^2
+      \pto \E[\varepsilon_n^2]
+    \end{align*}
+\end{enumerate}
+\end{prop}
+\begin{proof}
+We prove each in turn
+\begin{enumerate}
+  \item
+    Write out the definition of the OLS estimator:
+    \begin{align}
+      \bshatbeta_N
+      &= (\bsX'\bsX)^{-1}\bsX'\bsy
+      = (\bsX'\bsX)^{-1}\bsX'\left(\bsX\bsbeta + \bsvarepsilon\right)
+      = \bsbeta + (\bsX'\bsX)^{-1}\bsx\bsvarepsilon \\
+      &= \bsbeta + \left[\frac{1}{N}\sumnN \bsx_n\bsx_n' \right]^{-1}
+        \left[\frac{1}{N} \sumnN \bsx_n\bsvarepsilon_n \right]
+      \label{beta-asymptotic}
+    \end{align}
+    By the LLN and the CMT, the two sums converge in probability to
+    $\E[\bsx_n\bsx_n']$ and $\E[\bsx_n\bsvarepsilon_n]$, respectively.
+    The first is finite by Assumption 4, while the second is zero by
+    Assumption 3, so they drop and we have almost sure convergence of
+    $\bshatbeta_N$ to $\bsbeta$ by LLN.
+
+  \item
+    Rearrange Equation~\ref{beta-asymptotic} and multiply by $\sqrt{N}$
+    to get
+    \begin{align}
+      \sqrt{N}(\bshatbeta_N - \bsbeta)
+      &= \left[\frac{1}{N}\sumnN \bsx_n\bsx_n' \right]^{-1}
+        \sqrt{N}\left[\frac{1}{N} \sumnN \bsx_n\bsvarepsilon_n \right]
+    \end{align}
+    Again, the first term on the RHS converges in probability to
+    $\E[\bsx_n\bsx_n']$, while the second term, which is an average of
+    expectation-zero terms, converges in distribution to
+    $N(0,\Var(\bsx_n\bsvarepsilon_n))$ by the CLT.
+    By Slutsky, the desired result follows.
+
+  \item
+    Recall that
+    \begin{align*}
+      (N-K) s^2_N
+      &= \bse' \bse
+      = \bsvarepsilon'\bsM' \bsM\bsvarepsilon
+      = \bsvarepsilon'\bsM\bsvarepsilon \\
+      &= \bsvarepsilon'(\bsI - \bsX(\bsX'\bsX)^{-1}\bsX')\bsvarepsilon
+      \\
+      &= \bsvarepsilon'\bsvarepsilon
+        - \bsvarepsilon'\bsX(\bsX'\bsX)^{-1}\bsX'\bsvarepsilon \\
+    \end{align*}
+
+\end{enumerate}
+\end{proof}
 
 
 %%%% APPPENDIX %%%%%%%%%%%
