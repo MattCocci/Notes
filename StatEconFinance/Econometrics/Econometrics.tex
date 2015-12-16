@@ -6055,8 +6055,9 @@ $\E[X_i] = \mu$ and $\Var(X_i)=\sigma^2$. Then
 \clearpage
 \subsection{Delta Method}
 
-Suppose that we have random variable $\bsy\in \mathbb{R}^m$,
-with mean and variance-covariance matrix as follows:
+We start with some motivation. Suppose that we have random variable
+$\bsy\in \mathbb{R}^m$, with mean and variance-covariance matrix as
+follows:
 \begin{align*}
   \bsmu &:= \mathbb{E}(\bsy) =
   \begin{pmatrix}
@@ -6088,7 +6089,8 @@ $\bsg(\bsmu)$.  We want a sampling distribution for that guy too (mean
 and standard errors), just like we had one for $\bsmu$.  The \emph{delta
 method} allows us to do that.
 
-One quick thing to note: The fact that $\bsg(\bsmu)$ is only a function
+\begin{rmk}
+The fact that $\bsg(\bsmu)$ is only a function
 of the first moment of $\bsy$ isn't that restrictive if we're willing to
 generalize our notion of $\bsy$. We can easily accommodate more
 complicated moments with a minor tweak.
@@ -6124,6 +6126,7 @@ From there, proceed exactly as before. In this way, we can always use
 the ``first moment representation'' above, leaving open the possibility
 that $\bsy$ is actually a transformation or function of some
 base random variable.
+\end{rmk}
 
 
 
@@ -6302,6 +6305,7 @@ Now apply Slutsky and use the distribution of $X_N$ to conclude that
 \end{proof}
 
 
+\clearpage
 \section{Estimators}
 
 \subsection{Estimators, Loss, and Risk}
@@ -7536,6 +7540,1168 @@ after setting the value of the Type I error equal to $\alpha$.
 
 
 \clearpage
+\section{Classical Linear Regression: Finite Samples Properties of OLS}
+
+\subsection{Setup and Assumptions}
+
+In this section, I follow Hayashi and assume that the $n\times k$
+regressor matrix $\bsX$ is \emph{random} rather than fixed, since that
+seems more appropriate for a non-experimental discipline like economics
+where the RHS ``independent'' variables are not under the control of the
+econometrician.
+
+
+\begin{defn}(Classical Linear Regression Model)
+For a sample of $N$ observations and $K$ regressors, the
+\emph{classical linear regression model} satisfies the following
+assumptions. Note that the sample $\{(y_n,\bsx_n)\}\nN$ is not
+necessarily assumed iid. The joint distribution of $(y_n,\bsx_n)$ could
+depend on $n$, as it likely would for time series data, though the
+assumptions we now state are not necessarily \emph{good} assumptions for
+such applications.
+\begin{enumerate}
+  \item Linearity: We assume the model can be written
+    \begin{align}
+      \underbrace{\bsy}_{(N\times 1)}
+      =
+      \underbrace{\vphantom{\bsy} \bsX}_{(N\times K)}
+      \underbrace{\vphantom{\bsy} \bsbeta}_{(K\times 1)}
+      + \underbrace{\vphantom{\bsy} \bsvarepsilon}_{(N\times 1)}
+      \label{regyx}
+    \end{align}
+  \item Strict Exogeneity: $\E[\varepsilon_n |\bsX]=0$ for
+    $n=1,\ldots,N$.
+
+    Note that error $\varepsilon_n$ for observation $n$ is
+    mean zero conditional on \emph{all} observations in $\bsX$, not just
+    $\bsx_n$.
+    And it doesn't matter here that we're restricting them to the
+    constant zero rather than some other constant, so long as we have an
+    intercept in the model.
+
+    Consequences of this assumption are that the errors are
+    unconditinally mean zero and \emph{each} error term is orthogonal to
+    the regressors of \emph{any} observation, hence uncorrelated:
+    \begin{align*}
+      \E[\varepsilon_n] &= \E[\E[\varepsilon_n|\bsX]] = 0 \\
+      \E[\bsx_m \cdot \varepsilon_n] &=
+      \E[\E[\bsx_m \cdot \varepsilon_n|\bsX]] =
+      %\E[\bsx_m\E[ \varepsilon_n|\bsX]] = \underbrace{\bso}_{K\times 1}
+      \E[\bsx_m\E[ \varepsilon_n|\bsX]] = \bso
+      \qquad \forall n,m = 1,\ldots,N \\
+      \Cov(\varepsilon_n, x_{mk})
+      &=
+      \E[\varepsilon_n x_{mk}] - \E[\varepsilon_n]\E[x_{mk}] = 0
+    \end{align*}
+    In general, strict exogeneity is a bad assumption for time series
+    models.
+
+  \item No multicolinearity: $P[\rank(\bsX)=K]=1$, full column
+    rank.\footnote{%
+      This implies that $\bsX'\bsX$ is positive definite. First, define.
+      $\bsb:=\bsX \bsa$. By the full rank assumption, there is no linear
+      combination of columns such that $\bsb=\bsX\bsa = \bso$.
+      Therefore, for all $\bsa\neq \bso$, we have
+      $\bsa'\bsX'\bsX\bsa=\bsb'\bsb = \sum_{k=1}^K b_k^2 > 0$, so we can
+      say that $\bsX'\bsX$ is positive definite.
+    }
+
+  \item Spherical Error Variance (Optional): Errors are both
+    homoskedastic and uncorrelated:
+    \begin{align*}
+      \Var(\bsvarepsilon|\bsX) =
+      \E[\bsvarepsilon\bsvarepsilon'|\bsX] = \sigma^2\bsI_N
+    \end{align*}
+    where $\bsI_N$ is the $N$-dimensional identity matrix.
+
+    Coupled with strict exogeneity, homoeskedasticy implies constant
+    conditional error variance $\Var(\varepsilon_n|\bsX)=\sigma^2$,
+    while uncorrelated errors implies no serial correlation
+    in the error terms $\Cov(\varepsilon_n,\varepsilon_m)=0$.
+\end{enumerate}
+\end{defn}
+
+\clearpage
+\begin{defn}(Conditional and Unconditional Homoskedasticity)
+Given the classical regression model, we define two concepts for
+homoskedasticity that differ subtly in the Hayashi random-$\bsX$
+approach:
+\begin{enumerate}
+  \item \emph{Unconditional homoskedasticity}:
+    $\E[\varepsilon_n^2] = \sigma^2$ for all $n$.
+  \item \emph{Conditional Homoskedasticity}:
+    $\E[\varepsilon_n^2 | \bsx_n]
+    =\E[\varepsilon_n^2 | \bsX] = \sigma^2$
+\end{enumerate}
+Most importantly, we can have unconditional homoskedasticity
+(i.e.\ $\E[\varepsilon_n^2]=\sigma^2$ a constant) \emph{without}
+conditional homoskedasticity (i.e.\ $\E[\varepsilon_n^2|\bsx_n]$
+\emph{not} a constant).  In particular, the \emph{conditional} second
+moment $\E[\varepsilon_n^2|\bsx_n]$ could be a \emph{function}---not
+just a number/constant---that depends on $\bsx_n$. For example, maybe it
+blows up for small and large values of $\bsx_n$ but it does so
+symmetrically, so that the average
+$\E[\varepsilon_n^2]=\E[\E[\varepsilon_n^2|\bsx_n]]=\sigma^2$.
+
+We need to make this distinction because Hayashi assumes $\bsX$
+is random. His formulation is not a ``fixed $\bsX$'' approach, where
+Assumptions 2 and 4 are merely $\E[\varepsilon_i]=0$ and
+$\E[\bsvarepsilon\bsvarepsilon']=\sigma^2\bsI_N$ without the
+conditioning.
+\end{defn}
+
+\begin{defn}(Classical Regression Model with Random Samples)
+The classical regression model with random sampling assumes that the
+sample $\{(y_n,\bsx_n)\}\nN$ is iid across observations.
+
+First, Assumption 1 along with the iid assumption on
+$(y_n,\bsx_n)$ implies that $(\varepsilon_n, \bsx_n)\perp \bsx_m$ for
+$n\neq m$.
+So Assumptions 1 and 4 on $\varepsilon_n$ (which we always
+conditioned on $\bsX$) will simplify to conditioning on individual
+$\bsx_n$:
+\begin{alignat*}{5}
+  \text{Assumption 2} &&\qquad
+   \E[\varepsilon_n | \bsX] &=
+   \E[\varepsilon_n | \bsx_n] &&= 0\\
+  \text{Assumption 4} &&\qquad
+   \E[\varepsilon_n^2 | \bsX] &=
+   \E[\varepsilon_n^2 | \bsx_n] &&= \sigma^2\\
+  \text{} &&\qquad
+   \E[\varepsilon_n\varepsilon_m|\bsX] &=
+   \E[\varepsilon_n|\bsx_n] \E[\varepsilon_m|\bsx_m]
+   &&=0
+\end{alignat*}
+Moreover, these objects (which are, in general, functions of $\bsx_n$)
+will be identical across observations.
+
+Now it might seem like $\E[\varepsilon_n^2|\bsx_n]=\sigma^2$ (i.e.\
+conditional homosekedasticy) is an unnecessary and worthless assumption,
+since it would seem to follow \emph{immediately} from assuming iid
+observations. In the ``fixed-$\bsX$'' approach, this is certainly true,
+but in Hayashi's ``random-$\bsX$'' approach, this is not true for the
+reasons mentioned above.
+
+Assuming an iid sample only ensures that $\E[\varepsilon_n^2|\bsx_n]$ is
+identical across observations.  But, in general, that guy is a function
+of random variable $\bsx_n$.  Though identical across observations, that
+function is not necessarily a number/constant. Of course, if we iterate
+expectations and integrate out $\bsx_n$ by computing
+$\E[\varepsilon_n^2]=\E[\E[\varepsilon_n^2|\bsx_n]]$, the result will be
+a constant. Hence, an iid sample implies \emph{unconditional}
+homoskedasticity. But as we said above, the iid sample assumption does
+not automatically imply \emph{conditional} homoskedasticity where
+$\E[\varepsilon_n^2 | \bsx_n]
+=\E[\varepsilon_n^2 | \bsX] = \sigma^2$.
+Therefore, assuming $\E[\varepsilon_n^2|\bsx_n]=\sigma^2$ a constant
+still has some bite.
+\end{defn}
+
+\clearpage
+\subsection{Estimation}
+
+\begin{defn}(Sum of Squared Residuals)
+Define the \emph{sum of squared residuals} as
+\begin{align*}
+  SSR(\bsb) = (\bsy - \bsX \bsb)'(\bsy - \bsX \bsb)
+\end{align*}
+\end{defn}
+
+
+\begin{defn}(OLS Estimates)
+The \emph{OLS Estimator} minimizes the sum of squared residuals:
+\begin{align*}
+  \bshatbeta_{OLS}
+  =
+  \argmin_{\bsb} \;
+  (\bsy - \bsX \bsb)'(\bsy - \bsX \bsb)
+\end{align*}
+The FOCs of $K$ equations and $K$ unknowns are called the
+\emph{normal equations}, where the second expression highlights the
+orthogonality of the regressors $\bsX'$ to the residual vector
+$\bsy-\bsX\bsb$.  Since the second derivative is the positive definite
+matrix $\bsX'\bsX$, we have a minimum.
+\begin{align*}
+  \bsX'\bsX\bsb &= \bsX'\bsy
+  \quad\iff\quad
+  0= \bsX'(\bsy-\bsX\bsb)
+\end{align*}
+Solving, we get the OLS estimator, which has the following mean and
+variance:
+\begin{align*}
+  \hat{\bsbeta}_{OLS}
+  &= (\bsX'\bsX)^{-1}\bsX'\bsy \\
+  &= (\bsX'\bsX)^{-1}\bsX' (\bsX \bsbeta + \bsvarepsilon)
+  = \bsbeta + (\bsX'\bsX)^{-1}\bsX' \bsvarepsilon
+  \\
+  \implies\quad
+  \hat{\bsbeta}_{OLS} - \bsbeta
+  &= (\bsX'\bsX)^{-1}\bsX' \bsvarepsilon \\
+  \E[\hat{\bsbeta}_{OLS}|\bsX]
+  %&=
+  %\bsbeta +
+  %\E[(\bsX'\bsX)^{-1}\bsX' \bsvarepsilon |\bsX]
+  %=
+  %\bsbeta +
+  %(\bsX'\bsX)^{-1}\bsX' \cdot \E[\bsvarepsilon |\bsX]
+  %\\
+  &= \bsbeta \\
+  \Var(\hat{\bsbeta}_{OLS}|\bsX)
+  &=
+  \E[(\hat{\bsbeta}_{OLS}-\bsbeta)(\hat{\bsbeta}_{OLS}-\bsbeta)'|\bsX]
+  \\
+  %&=
+  %\E\left[
+    %(\bsX'\bsX)^{-1}\bsX'\bsvarepsilon)
+    %(\bsX'\bsX)^{-1}\bsX'\bsvarepsilon)'
+  %|\bsX\right]
+  %\\
+  &=
+  \left((\bsX'\bsX)^{-1}\bsX'\right)
+  \E[\bsvarepsilon\bsvarepsilon' |\bsX]
+  \left(\bsX(\bsX'\bsX)^{-1}\right)
+\end{align*}
+With spherical errors, the variance simplifies to
+\begin{align*}
+  \Var(\hat{\bsbeta}_{OLS}|\bsX)
+  &=
+  \left((\bsX'\bsX)^{-1}\bsX'\right)
+  \sigma^2 \bsI_N
+  \left(\bsX(\bsX'\bsX)^{-1}\right)
+  =\sigma^2 (\bsX'\bsX)^{-1}
+\end{align*}
+Now define the following objects
+\begin{alignat*}{3}
+  \text{Projection Matrix}&\quad
+  \bsP &&= \bsX(\bsX'\bsX)^{-1}\bsX' \\
+  \text{Annihilator Matrix}&\quad
+  \bsM &&= \bsI_n - \bsP \\
+  \text{Residual Vector}&\quad
+  \bse &&= \bsX\bsb - \bsy \\
+  \text{Fitted Values}&\quad
+  \bshaty &&= \bsX\bsb
+\end{alignat*}
+Both $\bsP$ and $\bsM$ are easily shown to be symmetric and idempotent.
+Moreover,
+\begin{itemize}
+  \item $SSR(\bsb) = \bse'\bse$
+  \item $\bsP\bsX=\bsX$: The projection of $\bsX$ onto itself is $\bsX$
+  \item $\bsM\bsX = \bso$: This is where the annihilator matrix gets
+    it's name.
+  \item $\bse = \bsM\bsy = \bsM \bsvarepsilon$: Applied to $\bsy$, the
+    annihilator matrix returns the residuals
+\end{itemize}
+\end{defn}
+
+\begin{defn}(Distribution of Coefficients)
+If we want the mean and variance of individual coefficients or linear
+combinations of coefficients, we have
+\begin{align*}
+  \E[r'\bshatbeta_{OLS}|\bsX]
+  &= r'\bsbeta \\
+  \Var(r'\bshatbeta_{OLS}|\bsX)
+  &=
+  r'\left((\bsX'\bsX)^{-1}\bsX'\right)
+  \E[\bsvarepsilon\bsvarepsilon' |\bsX]
+  \left(\bsX(\bsX'\bsX)^{-1}\right) r \\
+  &=
+  \sigma^2r'(\bsX'\bsX)^{-1} r
+\end{align*}
+where the second formula for the variance assumed spherical errors. The
+first expression is more general.
+\end{defn}
+
+\begin{defn}(Estimator for $\sigma^2$ and $\Var[\hat{\bsbeta}_{OLS}|\bsX]$)
+Assuming spherical errors, we form the estmator for $\sigma^2$:
+\begin{align*}
+  s^2 &= \frac{SSR(\bsb)}{(n-K)} = \frac{\bse'\bse}{(N-K)}
+\end{align*}
+That let's us define an estimator for the covariance matrix of the
+coefficients:
+\begin{align*}
+  \hat{\bsV}(\hat{\bsbeta}_{OLS}|\bsX) = s^2(\bsX'\bsX)^{-1}
+\end{align*}
+\end{defn}
+
+\begin{prop}
+Assuming spherical errors, $s^2$ is an unbiased estimator:
+$\E[s^2|\bsX]=\sigma^2$.
+\end{prop}
+\begin{proof}
+Recall that $\bse=\bsM\bsvarepsilon$ where $\bsM$, the annihilator
+matrix, is idempotent. Then
+\begin{align*}
+  \E[\bse'\bse|\bsX]
+  &= \E[\bsvarepsilon'\bsM'\bsM\bsvarepsilon|\bsX]\\
+  &= \E[\bsvarepsilon'\bsM\bsvarepsilon|\bsX] \\
+  &= \sumin \sumjn m_{ij}\E[\varepsilon_i\varepsilon_j|\bsX]
+\end{align*}
+But since we assumed $\E[\varepsilon_i\varepsilon_j|\bsX]=0$, all cross
+terms drop, leaving
+\begin{align*}
+  \E[\bse'\bse|\bsX]
+  &= \sumin m_{ii}\E[\varepsilon_i\varepsilon_i|\bsX]
+  = \sumin m_{ii}\sigma^2 \\
+  &= \sigma^2 \cdot \trace(\bsM)
+\end{align*}
+Almost there. Just use the definition of $\bsM$:
+\begin{align*}
+  \E[\bse'\bse|\bsX]
+  &= \sigma^2 \cdot \trace(\bsM) \\
+  &= \sigma^2 \trace(\bsI_N - \bsX(\bsX'\bsX)^{-1}\bsX') \\
+  &= \sigma^2 \trace(\bsI_N) - \trace(\bsX(\bsX'\bsX)^{-1}\bsX') \\
+  \text{By $\trace(AB)=\trace(BA)$}\qquad
+  &= \sigma^2 \left(N - \trace(\bsX'\bsX(\bsX'\bsX)^{-1})\right) \\
+  \E[\bse'\bse|\bsX]
+  &= \sigma^2 \left(N - \trace(\bsI_K)\right)
+  = \sigma^2 \left(N - K\right)
+\end{align*}
+Therefore,
+\begin{align*}
+  \E[\bse'\bse|\bsX] = \sigma^2(N-K)
+  \quad\implies\quad
+  \E[s^2|\bsX] = \frac{\E[\bse'\bse|\bsX]}{N-K} = \sigma^2
+\end{align*}
+
+
+
+
+\end{proof}
+
+
+
+\clearpage
+\subsection{Gauss-Markov Theorem}
+
+\begin{thm}\emph{(Gauss-Markov)}
+Given the classical linear regression model assuming spherical errors
+$\Var(\bsvarepsilon|\bsX)=\sigma^2\bsI$, the OLS estimator is
+\emph{efficient} in the class of linear unbiased estimators. That is,
+\begin{align*}
+  \bstildebeta = \bsA\bsy
+  \quad \text{s.t}\quad \E[\bstildebeta]=\bsbeta
+  \quad\implies\quad
+  \Var(\bstildebeta|\bsX) \geq \Var(\bshatbeta|\bsX)
+\end{align*}
+where $\bsA$ is some constant (nonrandom) matrix that can depend upon
+$\bsX$, and $\bshatbeta$ is the OLS estimator.
+\end{thm}
+\begin{proof}
+($\bstildebeta$ Unbiased $\implies$ $\bsA\bsX=\bsI$)
+First, we want to show a mini-result. Start by writing out the
+expectation of $\bstildebeta$:
+\begin{align*}
+  \E[\bstildebeta|\bsX]
+  &= \E[\bsA\bsy|\bsX]
+  = \E[\bsA(\bsX\bsbeta +\varepsilon)|\bsX] \\
+  \implies\quad
+  \E[\bstildebeta|\bsX]
+  &= \bsA\bsX\bsbeta
+\end{align*}
+Therefore, if $\bstildebeta$ is to be an unbiased estimator of
+$\bsbeta$, we need must have $\bsA\bsX=\bsI$.
+\\
+\\
+($\Cov(\bshatbeta, \bstildebeta-\bshatbeta|\bsX)=0$)
+Next, we show another mini-result. To do so, we consider
+$\bstildebeta-\bshatbeta$ and use the result that $\bsA\bsX=\bsI$ along
+with regression equation $\bsy=\bsX\bsbeta+\bsvarepsilon$ to simplify
+the difference:
+\begin{align}
+  \bstildebeta - \bshatbeta
+  &= \bsA\bsy - ((\bsX'\bsX)^{-1}\bsX'\bsy) \notag\\
+  %&= (\bsA-(\bsX'\bsX)^{-1}\bsX)\bsy \\
+  &= (\bsA-(\bsX'\bsX)^{-1}\bsX')(\bsX\bsbeta + \bsvarepsilon) \notag\\
+  &= \bsA\bsX\bsbeta-(\bsX'\bsX)^{-1}\bsX'\bsX\bsbeta
+    + (\bsA-(\bsX'\bsX)^{-1}\bsX')\bsvarepsilon \notag \\
+  %&= \bsI\bsbeta-\bsI\bsbeta
+    %+ (\bsA-(\bsX'\bsX)^{-1}\bsX)\bsvarepsilon \\
+  \implies\quad
+  \bstildebeta - \bshatbeta
+  &= (\bsA-(\bsX'\bsX)^{-1}\bsX')\bsvarepsilon
+  \label{betatilde-betahat}
+\end{align}
+Moreover, since both $\bshatbeta$ and $\bstildebeta$ are unbiased
+estimators, we have
+\begin{align*}
+  \E[\bshatbeta|\bsX] = \E[\bstildebeta|\bsX] &= \bsbeta \\
+  \E[\bshatbeta-\bstildebeta|\bsX] &= 0
+\end{align*}
+We now compute the covariance between $\bshatbeta$ and
+$\bstildebeta-\bshatbeta$. We will use the simplified formula from above
+for $\bstildebeta-\bshatbeta$, the means just stated, and the formula
+derived in the estimation section above that
+$\bshatbeta-\bsbeta=(\bsX'\bsX)^{-1}\bsX'\bsvarepsilon$ in the covariance
+formula:
+\begin{align*}
+  \Cov(\bstildebeta - \bshatbeta,\bshatbeta|\bsX)
+  &=
+  \E\left[
+    (\bstildebeta - \bshatbeta)
+    (\bshatbeta-\bsbeta)'
+    |\bsX\right]
+  \\
+  &=
+  \E\left[
+    \left((\bsA-(\bsX'\bsX)^{-1}\bsX')\bsvarepsilon\right)
+    \left((\bsX'\bsX)^{-1}\bsX'\bsvarepsilon\right)'
+    |\bsX\right]
+  \\
+  &=
+  (\bsA-(\bsX'\bsX)^{-1}\bsX')
+    \E\left[ \bsvarepsilon \bsvarepsilon'|\bsX\right]
+    \left(\bsX(\bsX'\bsX)^{-1}\right)
+\end{align*}
+Under spherical errors
+$\E\left[\bsvarepsilon\bsvarepsilon'|\bsX\right]=\sigma^2\bsI$,
+therefore
+\begin{align*}
+  \Cov(\bstildebeta - \bshatbeta,\bshatbeta|\bsX)
+  &=
+  \sigma^2
+  (\bsA-(\bsX'\bsX)^{-1}\bsX')
+    \left(\bsX(\bsX'\bsX)^{-1}\right)
+  \\
+  &=
+  \sigma^2
+  \bsA \bsX(\bsX'\bsX)^{-1}
+  -(\bsX'\bsX)^{-1}
+  \\
+  \text{Since $\bsA\bsX=\bsI$}\qquad
+  &=
+  \sigma^2
+  \bsI(\bsX'\bsX)^{-1}
+  -(\bsX'\bsX)^{-1} \\
+  \implies\quad
+  \Cov(\bstildebeta - \bshatbeta,\bshatbeta|\bsX)
+  &= 0
+\end{align*}
+(Final Step)
+Okay, now compute the variance of $\bstildebeta$:
+using the fact that covariance equals zero
+\begin{align*}
+  \Var(\bstildebeta|\bsX)
+  &=
+  \Var(\bshatbeta + (\bstildebeta-\bshatbeta)|\bsX) \\
+  &=
+  \Var(\bshatbeta|\bsX) + \Var(\bstildebeta-\bshatbeta)|\bsX)
+  + 2\Cov(\bstildebeta-\bshatbeta,\,\bshatbeta|\bsX)\\
+  \implies\quad
+  \Var(\bstildebeta|\bsX)
+  &=
+  \Var(\bshatbeta|\bsX) + \Var(\bstildebeta-\bshatbeta)|\bsX)
+\end{align*}
+Therefore, the variance of $\bstildebeta$, an arbitrary linear unbiased
+estimator, is greater than the variance of $\bshatbeta$ by the positive
+semidefinite matrix $\Var(\bstildebeta-\bshatbeta|\bsX)$.
+\\
+\\
+If we want to answer ``How much bigger?'', we can simplify the
+expression for the variance using Expression~\ref{betatilde-betahat}:
+\begin{align*}
+  \Var(\bstildebeta-\bshatbeta)|\bsX)
+  &=
+  \Var((\bsA-(\bsX'\bsX)^{-1}\bsX')\bsvarepsilon|\bsX) \\
+  &=
+  (\bsA-(\bsX'\bsX)^{-1}\bsX')
+  \;\Var(\bsvarepsilon|\bsX)\;
+  (\bsA-(\bsX'\bsX)^{-1}\bsX')' \\
+  &=
+  \sigma^2 (\bsA-(\bsX'\bsX)^{-1}\bsX')
+  (\bsA-(\bsX'\bsX)^{-1}\bsX')'
+\end{align*}
+Where the last line used the assumption of spherical errors
+$\Var(\bsvarepsilon|\bsX)=\sigma^2\bsI$.
+\end{proof}
+
+
+\clearpage
+\subsection{$R^2$ and Relatives}
+
+\begin{defn}($R^2$)
+First, We define the \emph{uncentered $R^2$} via the decomposition
+\begin{align*}
+  \bsy' \bsy
+  &=
+  (\bshaty +\bse)'
+  (\bshaty +\bse) \\
+  &=
+  \bshaty' \bshaty
+  +2 \bshaty'\bse
+  +\bse'\bse \\
+  \text{From orthogonality condtion} \quad
+  &=
+  \bshaty' \bshaty
+  +\bse'\bse \\
+  \implies\quad
+  R^2_{uc}
+  &=
+  \frac{\bshaty' \bshaty}{\bsy' \bsy}
+  = 1- \frac{\bse'\bse}{\bsy' \bsy}
+\end{align*}
+This is guaranteed to lie in $[0,1]$.
+\\
+\\
+Next, we define the \emph{centered $R^2$} or
+\emph{coefficient of determination}.
+\begin{align*}
+  (\bsy-\bar{\bsy})'(\bsy-\bar{\bsy})
+  &=
+  (\bshaty-\bar{\bsy})'(\bsy-\bar{\bsy})
+  +
+  \bse'\bse \\
+  \implies\quad
+  R^2
+  &=
+  1-
+  \frac{\bse'\bse}{(\bsy-\bar{\bsy})'(\bsy-\bar{\bsy})}
+  =
+  \frac{(\bshaty-\bar{\bsy})'(\bsy-\bar{\bsy})}{%
+      (\bsy-\bar{\bsy})'(\bsy-\bar{\bsy})}
+\end{align*}
+Note that this guy can go negative if you don't include an intercept
+term in the regression.
+\\
+\\
+We now define \emph{adjusted $R^2$}, which penalizes the number of
+regressors:
+\begin{align*}
+  R^2_A = 1 -
+  \frac{\bse'\bse/(N-K)}{(\bsy-\bar{\bsy})'(\bsy-\bar{\bsy})/(N-1)}
+\end{align*}
+\end{defn}
+
+\clearpage
+\subsection{Omitted Variable Bias}
+
+Suppose that the true model is
+\begin{align*}
+  \bsy = \bsX\bsbeta + \bsZ \bsgamma + \bsvarepsilon
+\end{align*}
+but we run the regression
+\begin{align*}
+  \bsy = \bsX\bsbeta + \bsvarepsilon
+\end{align*}
+Then the OLS estimates are
+\begin{align*}
+  \bshatbeta
+  &= (\bsX'\bsX)^{-1}\bsX' \bsy \\
+  &= (\bsX'\bsX)^{-1}\bsX'
+    \left(\bsX\bsbeta + \bsZ \bsgamma + \bsvarepsilon\right) \\
+  \bshatbeta - \bsbeta
+  &= (\bsX'\bsX)^{-1}\bsX'
+    \left(\bsZ \bsgamma + \bsvarepsilon\right)
+\end{align*}
+This implies bias
+\begin{align*}
+  \E\left[\bshatbeta - \bsbeta\;|\;\bsX,\bsZ\right]
+  &= (\bsX'\bsX)^{-1} \bsX'\bsZ \bsgamma
+\end{align*}
+The bias is zero if and only if $\bsgamma=0$ (variables in $\bsZ$ do not
+affect $\bsy$) or $\bsX'\bsZ=0$ (the ommited variables are orthogonal to
+those included).
+
+
+
+\clearpage
+\subsection{Coefficient Restrictions}
+
+Suppose that we have linear regression model
+\begin{align*}
+  \bsy = \bsX\bsbeta + \bsvarepsilon
+\end{align*}
+and we want to estimate $\bsbeta$ while also imposing some restrictions
+$\bsR'\bsbeta = \bsr$, where $\bsR\in\R^{K\times C}$ is a matrix of $C$
+constraints on the $K$ coefficients. We assume that $\rank(\bsR)=C$
+(full column rank), otherwise there would be redundant constraints that
+could be removed without effect.
+\\
+\\
+We estimate by constrained least squares
+\begin{align*}
+  \min_{\bsb} \; &(\bsy-\bsX\bsb)'(\bsy-\bsX\bsb)
+  \\
+  \text{s.t.} \; &
+    \bsR'\bsb = \bsr
+\end{align*}
+whose solution we call $\bshatbeta_*$, while $\bshatbeta_{OLS}$
+represents the unrestricted OLS estimator.
+The basic estimates are
+\begin{align*}
+  \bshatbeta_*
+  &=
+  \bshatbeta_{OLS} - \left(\bsX'\bsX\right)^{-1}  \bsR
+  \left(\bsR'\left(\bsX'\bsX\right)^{-1}  \bsR\right)^{-1}
+  \left(\bsR'\bshatbeta_{OLS} -  \bsr\right)
+  \\
+  \Var[\bshatbeta_*\;|\;\bsX]
+  &=
+  \underbrace{\sigma^2(\bsX'\bsX)^{-1}}_{\Var(\bshatbeta_{OLS}|\bsX)}
+  -
+  \sigma^2(\bsX'\bsX)^{-1}  \bsR
+  \left(\bsR'(\bsX'\bsX)^{-1}  \bsR\right)^{-1} \bsR'(\bsX'\bsX)^{-1}
+  \\
+  \Var\left[ \bshatbeta_*-\bshatbeta_{OLS} \;|\;X\right]
+  &=
+  \sigma^2
+  \left(\bsX'\bsX\right)^{-1}  \bsR
+  \left(\bsR'\left(\bsX'\bsX\right)^{-1}  \bsR\right)^{-1} \bsR'
+  \left(\bsX'\bsX\right)^{-1}
+\end{align*}
+Since the term subtracted from $\Var[\bshatbeta_{OLS}\;|\;\bsX]$ in the
+expression for $\Var[\bshatbeta_*\;|\;\bsX]$ is a positive semidefinite
+matrix, the constrained estimates have a smaller variance than the OLS
+estimates (though they are biased).
+
+
+\begin{proof}
+Form the Lagrangian
+\begin{align*}
+  \sL
+  &=
+  (\bsy-\bsX\bsb)'(\bsy-\bsX\bsb)
+  + 2\bslambda' (\bsR'\bsb - \bsr)
+\end{align*}
+where $\bslambda$ is a vector the same size as $\bsr$ (possibly also length
+one, i.e.\ a scalar).
+The first order conditions of the Lagrangian with respect to $\bsb$:
+\begin{align*}
+  \frac{d}{d\bsb}
+  \left[
+    (\bsy-\bsX\bsb)'(\bsy-\bsX\bsb)
+    + 2\bslambda' (\bsR'\bsb - \bsr)
+  \right]
+  &= -2\bsX'\bsy +2\bsX'\bsX\bsb + 2\bsR\bslambda
+  =0
+\end{align*}
+Solve for $\bsb$
+\begin{align}
+  \bsb &=
+  \left(\bsX'\bsX\right)^{-1} \bsX'\bsy
+  - \left(\bsX'\bsX\right)^{-1} \bsR\bslambda
+  \notag\\
+  \implies\quad
+  \bsb &=
+  \bshatbeta_{OLS} - \left(\bsX'\bsX\right)^{-1}  \bsR\bslambda
+  \label{restricted-b}
+\end{align}
+To eliminate $\bslambda$, we will multiply through the above expression
+by $\bsR'$ and use the constraint $\bsR'\bsb=\bsr$ on the LHS to get
+\begin{align}
+  %\bsR'\bsb
+  %&=
+  %\bsR'\bshatbeta_{OLS}
+  %- \bsR'\left(\bsX'\bsX\right)^{-1} \bsR\bslambda \notag\\
+  %\iff\quad
+  \bsr
+  &=
+  \bsR'\bshatbeta_{OLS}
+  - \bsR'\left(\bsX'\bsX\right)^{-1} \bsR\bslambda \notag\\
+  \implies\quad
+  \bslambda
+  &=
+  \left(\bsR'\left(\bsX'\bsX\right)^{-1}  \bsR\right)^{-1}
+  \left(\bsR'\bshatbeta_{OLS} -  \bsr\right)
+  \label{restricted-lambda}
+\end{align}
+where $\bsR'(\bsX'\bsX)^{-1}\bsR$ is invertible because
+$(\bsX'\bsX)^{-1}$ is positive definite and $\bsR$ has full column rank.
+Now sub Expression~\ref{restricted-lambda} for $\bslambda$ into
+Expression~\ref{restricted-b} for $\bsb$:
+\begin{align*}
+  \bshatbeta_*
+  =
+  \bshatbeta_{OLS} - \left(\bsX'\bsX\right)^{-1}  \bsR
+  \left(\bsR'\left(\bsX'\bsX\right)^{-1}  \bsR\right)^{-1}
+  \left(\bsR'\bshatbeta_{OLS} -  \bsr\right)
+\end{align*}
+This estimator has expectation
+\begin{align*}
+  \E\left[ \bshatbeta_* \;|\; \bsX \right]
+  &=
+  \bsbeta
+  -
+  \left(\bsX'\bsX\right)^{-1}  \bsR
+  \left(\bsR'\left(\bsX'\bsX\right)^{-1}  \bsR\right)^{-1}
+  \left( \bsR' \bsbeta -  \bsr\right)
+\end{align*}
+Next, we compute the variance of the estimator:
+\begin{align*}
+  \Var[\bshatbeta_*\;|\;\bsX]
+  &=
+  \E\left[
+    \left(\bshatbeta_*- \E[\bshatbeta_*|\bsX]\right)^2
+  \;|\;\bsX \right] \\
+  &=
+  \E\bigg[
+  \bigg\{
+  \left[
+  \bshatbeta_{OLS} - (\bsX'\bsX)^{-1}  \bsR
+  \left(\bsR'(\bsX'\bsX)^{-1}  \bsR\right)^{-1}
+  \left(\bsR'\bshatbeta_{OLS} -  \bsr\right)
+  \right]\\
+  &\qquad\quad
+  -
+  \left[
+  \bsbeta -
+  (\bsX'\bsX)^{-1}  \bsR \left(\bsR'(\bsX'\bsX)^{-1}\bsR\right)^{-1} \left(\bsR' \bsbeta -\bsr\right)
+  \right]
+  \bigg\}^2
+  \;\big|\;\bsX
+  \bigg] \\
+  \Var[\bshatbeta_*\;|\;\bsX]
+  &=
+  \left(
+  \bsI - (\bsX'\bsX)^{-1}  \bsR \left(\bsR'(\bsX'\bsX)^{-1}  \bsR\right)^{-1} \bsR'
+  \right)
+  \E\left[ (\bshatbeta_{OLS}-\bsbeta)^2 \;\big|\;\bsX \right]
+  \left(
+  \text{Leading term}
+  \right)' \\
+  &= (\bsI - \bsA)\bsV(\bsI-\bsA)'
+  \\
+  \text{where}
+  \quad
+  \bsA &:=
+    (\bsX'\bsX)^{-1}  \bsR \big(\bsR'(\bsX'\bsX)^{-1}  \bsR\big)^{-1} \bsR' \\
+  \bsV
+  &:= \E\left[ (\bshatbeta_{OLS}-\bsbeta)^2 \;\big|\;\bsX \right]
+\end{align*}
+Note that
+$(\bsI-\bsA)\bsV(\bsI-\bsA)'=(\bsV-\bsA\bsV)-(\bsV\bsA'-\bsA\bsV\bsA')$.
+We can calculate each of these objects, assuming spherical errors,
+otherwise the result doesn't work out nicely
+\begin{align*}
+  \bsV
+  &=
+  \E\left[ (\bshatbeta_{OLS}-\bsbeta)^2 \;\big|\;\bsX \right]
+  =
+  \sigma^2(\bsX'\bsX)^{-1} \\
+  \bsA\bsV = (\bsV\bsA')'
+  &=
+  \sigma^2(\bsX'\bsX)^{-1}  \bsR \left(\bsR'(\bsX'\bsX)^{-1}  \bsR\right)^{-1} \bsR'
+  (\bsX'\bsX)^{-1} \\
+  \bsA\bsV\bsA'
+  &=
+  \sigma^2(\bsX'\bsX)^{-1}  \bsR \left(\bsR'(\bsX'\bsX)^{-1}  \bsR\right)^{-1} \bsR'
+  (\bsX'\bsX)^{-1}
+  \bsR \left(\bsR'(\bsX'\bsX)^{-1}  \bsR\right)^{-1} \bsR'(\bsX'\bsX)^{-1}
+  \\
+  &=
+  \sigma^2(\bsX'\bsX)^{-1}  \bsR
+  \left(\bsR'(\bsX'\bsX)^{-1}  \bsR\right)^{-1} \bsR'(\bsX'\bsX)^{-1}
+\end{align*}
+Hence the variance of the estimator is
+\begin{align*}
+  \Var[\bshatbeta_*\;|\;\bsX]
+  &=
+  \underbrace{\sigma^2(\bsX'\bsX)^{-1}}_{\Var(\bshatbeta_{OLS}|\bsX)}
+  -
+  \sigma^2(\bsX'\bsX)^{-1}  \bsR
+  \left(\bsR'(\bsX'\bsX)^{-1}  \bsR\right)^{-1} \bsR'(\bsX'\bsX)^{-1}
+\end{align*}
+The last one is just a bunch of messy algebra again. It's
+straightforward to derive.
+\end{proof}
+
+
+\subsection{Inference under Normal Errors}
+
+\begin{prop}
+If we assume
+$\bsvarepsilon|\bsX\sim N(0,\sigma^2\bsI)$, then the variance estimator
+$s^2$ of $\sigma^2$ has distribution
+\begin{align}
+  s^2
+  = \frac{\bse'\bse}{N-K}
+  \sim \frac{\sigma^2}{N-K} \Chi^2_{N-K}
+  \label{s2dist}
+\end{align}
+\end{prop}
+\begin{proof}
+Since $\bse=\bsM\bsvarepsilon$ where $\bsM$ is the annihilator matrix,
+the definition of $s^2$ gives us
+\begin{align*}
+  (N-K) s^2
+  &= \bse' \bse
+  = (\bsM\bsvarepsilon)' (\bsM\bsvarepsilon)\\
+  &= \sigma^2 \left(\frac{\bsvarepsilon'}{\sigma}\right)\bsM'
+    \bsM\left(\frac{\bsvarepsilon}{\sigma}\right)
+\end{align*}
+Since the matrix $\bsM$ is idempotent, we get
+\begin{align*}
+  (N-K) \frac{s^2}{\sigma^2}
+  &= \left(\frac{\bsvarepsilon'}{\sigma}\right)
+    \bsM\left(\frac{\bsvarepsilon}{\sigma}\right)
+\end{align*}
+Then $\bsvarepsilon/\sigma$, the standardized error vector, is a
+multivariate normal distribution.Therefore, the above quadratic form is
+$\Chi^2$ with $\rank(\bsM)$ degrees of freedom. But since
+$\rank(\bsM)=\trace(\bsM)$ for idempotent matrices like $\bsM$ and
+$\trace(\bsM)=N-K$, the desired result follows.
+\end{proof}
+
+
+\begin{defn}(Testing Individual Coefficient)
+If we assume $\bsvarepsilon|\bsX \sim N(0,\sigma^2\bsI_N)$, then
+\begin{align*}
+  \bshatbeta - \bsbeta
+  \sim
+  N(0,\sigma^2 (\bsX'\bsX)^{-1})
+\end{align*}
+So we can test whether the $k$th regression coefficient equals
+$\beta_{k}^0$ by forming a Z-statistic because, under the null,
+\begin{align}
+  z_k = \frac{\hat{\beta}_{k} - \beta_{k}^0}{%
+      \sqrt{\sigma^2\cdot r_k'(\bsX'\bsX)^{-1}r_k}}
+      \sim N(0,1)
+  \label{ztest}
+\end{align}
+where $r_k$ is the $k$th basis element for $\R^K$.
+
+Since $\sigma^2$ is generally unknown, we instead construct a
+$t$-statistic using $s^2$, which has a $T_{N-K}$ distribution (see
+proof):
+\begin{align*}
+  t_k = \frac{\hat{\beta}_{k} - \beta_{k}^0}{%
+      \sqrt{s^2 \cdot r_k'(\bsX'\bsX)^{-1}r_k}}
+    \sim T_{N-K}
+\end{align*}
+\end{defn}
+\begin{proof}
+Write out the $t$-statistic:
+\begin{align*}
+  t_k =
+  \frac{\hat{\beta}_{k} - \beta_{k}^0}{%
+      \sqrt{s^2 \cdot r_k'(\bsX'\bsX)^{-1}r_k}}
+  &=
+  \frac{\hat{\beta}_{k} - \beta_{k}^0}{%
+      \sqrt{\sigma^2 \cdot r_k'(\bsX'\bsX)^{-1}r_k}}
+  \cdot
+  \left(
+  \sqrt{%
+  \frac{s^2}{\sigma^2}
+  }
+  \right)^{-1} \\
+  \text{By Expressions~\ref{s2dist} and \ref{ztest}}\qquad
+  &\sim
+  N(0,1)
+  \cdot
+  \left(
+  \frac{\Chi^2_{N-K}}{N-K}
+  \right)^{-1}
+\end{align*}
+But the normal and the $\Chi^2$ distribution above are independent
+conditional on $\bsX$, so we're done because that's exactly the
+definition of a $T_{N-K}$-distribution.
+\end{proof}
+
+\begin{defn}($F$-Test)
+Suppose we want to test the linear hypothesis
+$H_0: \bsR'\bsbeta^0 = \bsr$,
+where $\bsR$ is of full column rank and $\bsr$ has dimension $p$,
+corresponding to $p$ restrictions.
+
+If we assume spherical errors,
+$\bsvarepsilon|\bsX\sim N(0,\sigma^2\bsI_N)$, then under the null, we
+know that
+\begin{align*}
+  \bsR'(\bshatbeta-\bsbeta^0)
+  &\sim N(0,\sigma^2 \bsR'(\bsX'\bsX)^{-1}\bsR) \\
+  \iff\qquad
+  \bsR'\bshatbeta-\bsr
+  &\sim N(0,\sigma^2 \bsR'(\bsX'\bsX)^{-1}\bsR)
+\end{align*}
+So then we could jointly test whether the following quadratic form is
+close to zero
+\begin{align*}
+  \left(\bsR'\bshatbeta-\bsr\right)'
+  \left[\sigma^2 \bsR'(\bsX'\bsX)^{-1}\bsR)\right]^{-1}
+  \left(\bsR'\bshatbeta-\bsr\right)
+  \sim \Chi_p^2
+\end{align*}
+But in general, we don't know $\sigma^2$, so we form the $F$-statistic
+\begin{align*}
+  F &=
+  \frac{%
+  \left(\bsR'\bshatbeta-\bsr\right)'
+  \left[\bsR'(\bsX'\bsX)^{-1}\bsR)\right]^{-1}
+  \left(\bsR'\bshatbeta-\bsr\right)
+  }{p\cdot s^2}
+  \sim F_{p,N-K}
+\end{align*}
+\end{defn}
+
+\begin{proof}
+Write out the definition of the $F$-statistic:
+\begin{align*}
+  F &=
+  \frac{%
+  \left(\bsR'\bshatbeta-\bsr\right)'
+  \left[\bsR'(\bsX'\bsX)^{-1}\bsR)\right]^{-1}
+  \left(\bsR'\bshatbeta-\bsr\right)
+  }{p\cdot s^2} \\
+  &=
+  \frac{%
+  \left(\bsR'\bshatbeta-\bsr\right)'
+  \left[\sigma^2\bsR'(\bsX'\bsX)^{-1}\bsR)\right]^{-1}
+  \left(\bsR'\bshatbeta-\bsr\right)/p
+  }{s^2/\sigma^2} \\
+  &=
+  \frac{%
+    \Chi^2_p/p
+  }{\left[(N-K)\Chi^2_{N-K}\right]/(N-K)}
+\end{align*}
+But the fraction is precisely the definition of a $F_{p,N-K}$ distribution.
+\end{proof}
+
+
+\clearpage
+\section{OLS Asymptotics}
+
+In the section on classical linear regression, we specified the joint
+distribution of $(\bsy,\bsX)$ for a fixed, finite sample size. In this
+seciton, we instead specify the underlying data generating process.
+From that, the joint distribution follows.
+
+\begin{defn}(Assumptions)
+Here, we state a few assumptions that will be referenced for different
+results:
+\begin{enumerate}
+  \item \emph{Linearity}: $y_n = \bsx_n' \bsbeta + \varepsilon_n$
+    where $\bsx_n$ and $\bsbeta$ are $(K\times 1)$ vectors
+  \item \emph{Ergodic Stationarity}:
+    The $(K+1)$-vector $(y_n, \bsx_n)$ is jointly stationary and
+    ergodic. Implied by iid, but weaker.
+
+  \item \emph{Predetermined Regressors}:
+    $\E[\bsx_n (y_n - \bsx'_n \bsbeta)]=\E[\bsx_n \varepsilon_n]= \bso$
+    for all $n$.
+
+    This is implied by (but weaker than) assuming
+    $\E[\varepsilon_n|\bsx_n]=0$.  It is also implied by (but weaker
+    than) assuming strict exogeneity, which requires
+    $\E[x_{nk}\varepsilon_m]=0$
+    for all $n,m$.  In fact, we rule out only contemporaneous ($n=m$)
+    correlation between regressor $\bsx_n$ and error $\varepsilon_n$.
+    This allows us to accommodate the AR(1) model and other time series
+    models.
+
+  \item \emph{Rank and Finiteness Condition}:
+    %$\bsSigma_{\bsx\bsx}:=\E[\bsx_n\bsx_n']$ exists, is finite, and has
+    $\E[\bsx_n\bsx_n']$ exists, is finite, and has full rank
+
+  \item \emph{Martingale Difference Sequence $\bsx_n\varepsilon_n$}:
+    We strengthen Assumption 3 above. In particular,
+    we suppose that $\bsx_n\varepsilon_n$ has finite second moment,
+    i.e.\ $\E[\bsx_n\varepsilon_n^2\bsx_n]<\infty$, and is a
+    martingale difference sequence, i.e.\
+    \begin{align*}
+      \E[\bsx_n\varepsilon_n\;|\;
+      \bsx_{n-1}\varepsilon_{n-1},\bsx_{n-2}\varepsilon_{n-2},\ldots]
+      = \bso
+    \end{align*}
+    A sufficient condition for $\bsx_n\varepsilon_n$ to be a MDS is
+    \begin{align*}
+      \E[\varepsilon_n\;|\;
+      \varepsilon_{n-1},
+      \varepsilon_{n-2}, \ldots,
+      \bsx_n,
+      \bsx_{n-1}, \ldots]
+      = \bso
+    \end{align*}
+    %For later, we define
+    %\begin{align*}
+      %\bsS := \E[\bsx_n\varepsilon^2_n\bsx_n']
+    %\end{align*}
+\end{enumerate}
+\end{defn}
+\begin{rmk}
+Since $(y_n,\bsx_n)$ is stationary, the error term $\varepsilon_n$ is
+also stationary so that $\E[\varepsilon^2_n]$ is constant across $n$,
+i.e.\ the model is unconditionally homoskedastic.
+However, the setup above allows $\E[\varepsilon_n^2|\bsx_n]$ to depend
+upon $\bsx_n$, so that the model permits \emph{conditional}
+heteroskedasticity.
+\end{rmk}
+
+\clearpage
+\begin{prop}\emph{(OLS Estimator)}
+The OLS estimator has the following properties
+\begin{enumerate}
+  \item \emph{Consistent}: Under Assumptions 1-4 above,
+    $\bshatbeta_{OLS}\pto \bsbeta$
+  \item \emph{Asymptotic Normality}: Under assumptions 1-5
+    \begin{align*}
+      \sqrt{N}(\bshatbeta_N- \bsbeta) \dto
+      N(0,\E[\bsx_i\bsx_i']^{-1}\;\E[\varepsilon^2_n\bsx_n\bsx_n']\;\E[\bsx_i\bsx_i']^{-1})
+    \end{align*}
+    Assuming conditional homoeskedasticy
+    $\E[\varepsilon_n^2|\bsx_n]=\sigma^2$,
+    \begin{align*}
+      \sqrt{N}(\bshatbeta_N- \bsbeta) \dto
+      N(0,\sigma^2\E[\bsx_i\bsx_i']^{-1})
+    \end{align*}
+  \item Under Assumptions 1-4, the OLS error variance estimator $s^2$ is
+    consistent:
+    \begin{align*}
+      s^2_N := \frac{\bse' \bse}{N-K}
+      =\frac{1}{N-K} \sumnN (y_n-\bsx_n\bshatbeta_N)^2
+      \quad\pto\quad \sigma^2 = \E[\varepsilon_n^2]
+    \end{align*}
+    and asymptotically normal
+    \begin{align*}
+      \sqrt{N}(s^2_N - \sigma^2)
+      \quad\dto\quad
+      N\left(0,\E[\varepsilon_n^4]-\E[\varepsilon^2_n]^2\right)
+    \end{align*}
+\end{enumerate}
+\end{prop}
+\begin{proof}
+We prove each in turn
+\begin{enumerate}
+  \item
+    Write out the definition of the OLS estimator:
+    \begin{align}
+      \bshatbeta_N
+      &= (\bsX'\bsX)^{-1}\bsX'\bsy
+      %= (\bsX'\bsX)^{-1}\bsX'\left(\bsX\bsbeta + \bsvarepsilon\right)
+      = \bsbeta + (\bsX'\bsX)^{-1}\bsX'\bsvarepsilon \\
+      &= \bsbeta + \left[\frac{1}{N}\sumnN \bsx_n\bsx_n' \right]^{-1}
+        \left[\frac{1}{N} \sumnN \bsx_n\bsvarepsilon_n \right]
+      \label{beta-asymptotic}
+    \end{align}
+    By the LLN and the CMT, the two sums converge in probability to
+    $\E[\bsx_n\bsx_n']$ and $\E[\bsx_n\bsvarepsilon_n]$, respectively.
+    The first is finite by Assumption 4, while the second is zero by
+    Assumption 3, so they drop and we have almost sure convergence of
+    $\bshatbeta_N$ to $\bsbeta$ by LLN.
+
+  \item
+    Rearrange Equation~\ref{beta-asymptotic} and multiply by $\sqrt{N}$
+    to get
+    \begin{align}
+      \sqrt{N}(\bshatbeta_N - \bsbeta)
+      &= \left[\frac{1}{N}\sumnN \bsx_n\bsx_n' \right]^{-1}
+        \sqrt{N}\left[\frac{1}{N} \sumnN \bsx_n\bsvarepsilon_n \right]
+    \end{align}
+    Again, the first term on the RHS converges in probability to
+    $\E[\bsx_n\bsx_n']$, while the second term, which is an average of
+    expectation-zero terms, converges in distribution to
+    $N(0,\Var(\bsx_n\bsvarepsilon_n))
+    =N(0,\E[\bsvarepsilon_n^2\bsx_n\bsx_n']))$
+    by the CLT.  Then by Slutsky, the desired result follows.
+
+  \item
+    Recall that
+    \begin{align*}
+      (N-K) s^2_N
+      &= \bse' \bse
+      = \bsvarepsilon'\bsM' \bsM\bsvarepsilon
+      = \bsvarepsilon'\bsM\bsvarepsilon \\
+      &= \bsvarepsilon'(\bsI - \bsX(\bsX'\bsX)^{-1}\bsX')\bsvarepsilon
+      \\
+      &= \bsvarepsilon'\bsvarepsilon
+        - \bsvarepsilon'\bsX(\bsX'\bsX)^{-1}\bsX'\bsvarepsilon \\
+    \end{align*}
+    Rearrange and write things out as sums, the above is equivalent to
+    \begin{align}
+      s^2_N
+      &= \underbrace{\frac{N}{N-K}}_{\pto 1}
+      \bigg(
+        \bigg[
+        \underbrace{\frac{1}{N} \sumnN \varepsilon_n^2}_{%
+          \pto \E[\varepsilon^2_n]}
+         \bigg]
+        - \bigg[
+        \underbrace{\frac{1}{N} \sumnN \varepsilon_n \bsx_n}_{%
+          \pto\E[\varepsilon_n\bsx_n]=0}
+        \bigg]'
+        \bigg[
+        \underbrace{\frac{1}{N} \sumnN \bsx_n\bsx_n'}_{%
+          \pto \E[\bsx_n\bsx_n']}
+        \bigg]^{-1}
+        \bigg[
+        \underbrace{\frac{1}{N} \sumnN \varepsilon_n \bsx_n}_{%
+          \pto\E[\varepsilon_n\bsx_n]=0}
+        \bigg]
+      \bigg)
+      \label{s2consistent}
+    \end{align}
+    where $\E[\varepsilon_n\bsx_n]=0$ by predetermined regressiors
+    Assumption 3. So in applying the continuous mapping theorem a few
+    times, the second term in parentheses will drop and we end up with
+    $s^2_N\pto \E[\varepsilon_n^2]$.
+
+    To show that it's asymptotically normal, start with
+    Expression~\ref{s2consistent}, subtract
+    $\sigma^2=\E[\varepsilon_n^2]$ from both sides, multiply by
+    $\sqrt{N}$, and rearrange the RHS a bit to get
+    \begin{align*}
+      \sqrt{N}(s^2_N - \sigma^2)
+      &= \frac{N}{N-K}
+      \bigg(
+        \bigg[
+        \frac{1}{\sqrt{N}} \sumnN \varepsilon_n^2
+         \bigg]
+      - \frac{N-K}{N}\sqrt{N}\sigma^2
+      \\
+      &\qquad\qquad\quad
+      - \bigg[
+        \frac{1}{\sqrt{N}} \sumnN \varepsilon_n \bsx_n
+        \bigg]'
+        \bigg[
+        \frac{1}{N} \sumnN \bsx_n\bsx_n'
+        \bigg]^{-1}
+        \bigg[
+        \frac{1}{N} \sumnN \varepsilon_n \bsx_n
+        \bigg]
+      \bigg)
+    \end{align*}
+    Break up the $\sigma^2$ term in parentheses and bring a chunk back
+    outside the parentheses
+    \begin{align*}
+      \sqrt{N}(s^2_N - \sigma^2)
+      &= \frac{N}{N-K}
+      \bigg(
+        \sqrt{N}\bigg[
+        \frac{1}{N} \sumnN \varepsilon_n^2
+        -\sigma^2
+         \bigg]
+      \\
+      &\qquad\qquad\quad
+      - \bigg[
+        \frac{1}{\sqrt{N}} \sumnN \varepsilon_n \bsx_n
+        \bigg]'
+        \bigg[
+        \frac{1}{N} \sumnN \bsx_n\bsx_n'
+        \bigg]^{-1}
+        \bigg[
+        \frac{1}{N} \sumnN \varepsilon_n \bsx_n
+        \bigg]
+      \bigg)
+      + \frac{K\sqrt{N}}{N-K}\sigma^2
+    \end{align*}
+    Accounting for all of the convergences in distribution and
+    probability, plus applying slutsky and the continuous mapping
+    theorem a bit, we get
+    \begin{align*}
+      \sqrt{N}(s^2_N - \sigma^2)
+      &=
+        \sqrt{N}
+        \left(
+        \frac{\sumnN \varepsilon_n^2}{N}
+        -\sigma^2
+        \right)
+      \quad\dto\quad
+      N\left(0,\E[\varepsilon_n^4]-\E[\varepsilon^2]^2\right)
+    \end{align*}
+
+\end{enumerate}
+\end{proof}
+
+
+\clearpage
 \section{Generalized Method of Moments (GMM)}
 
 GMM is often done in the context of time series models, and so I will
@@ -8193,920 +9359,6 @@ with a little bit of algebra:
 where the last line follows from Hansen's paper (the result is not an
 immediately clear simplification of the more general formula above, at
 least to me).
-
-\clearpage
-\section{Classical Linear Regression: The Exact Regression Model in
-Finite Samples}
-
-\subsection{Setup and Assumptions}
-
-In this section, I describe the assumptions for classical linear
-regression. I follow Hayashi and assume that the $n\times k$ regressor
-matrix $X$ is \emph{random} rather than fixed, since that seems more
-appropriate for a non-experimental discipline like economics.
-
-
-\begin{defn}(Classical Linear Regression Model)
-For a sample of $N$ observations and $K$ regressors, the
-\emph{classical linear regression model} satisfies the following
-assumptions. Note that the sample $\{(y_n,\bsx_n)\}\nN$ is not
-necessarily assumed iid. The joint distribution of $(y_n,\bsx_n)$ could
-depend on $n$, as it likely would for time series data, though the
-assumptions we now state are not necessarily \emph{good} assumptions for
-that application.
-\begin{enumerate}
-  \item Linearity: We assume the model can be written
-    \begin{align}
-      \underbrace{\bsy}_{(N\times 1)}
-      =
-      \underbrace{\vphantom{\bsy} \bsX}_{(N\times K)}
-      \underbrace{\vphantom{\bsy} \bsbeta}_{(K\times 1)}
-      + \underbrace{\vphantom{\bsy} \bsvarepsilon}_{(N\times 1)}
-      \label{regyx}
-    \end{align}
-  \item Strict Exogeneity: $\E[\varepsilon_n |\bsX]=0$.
-
-    Consequences of this assumption
-    \begin{align*}
-      \E[\varepsilon] &= \E[\E[\varepsilon|\bsX]] = 0 \\
-      \E[x_j \cdot \varepsilon_i] &=
-      \E[\E[x_j \cdot \varepsilon_i|\bsX]] =
-      \E[x_j\E[ \varepsilon_i|\bsX]] = 0
-      \qquad \forall i,j
-    \end{align*}
-    It doesn't matter here that we're restricting them to the constant
-    zero rather than some other constant so long as we have an intercept
-    term in the model.
-
-  \item No multicolinearity: $P[\rank(\bsX)=K]=1$.
-
-    This implies that $\bsX'\bsX$ is positive definite. First,
-    $\bsb:=\bsX \bsa\neq \bso$ for any $\bsa\neq \bso$ since there is no
-    linear combination of columns such that $\bsb=\bsX\bsa = \bso$ (by
-    full rank assumption). Therefore, for all $\bsa\neq \bso$, we have
-    $\bsa'\bsX'\bsX\bsa=\bsb'\bsb = \sum_{k=1}^K b_k^2 > 0$, we can say
-    that $\bsX'\bsX$ is positive definite.
-
-  \item Homoskedasticity and Uncorrelated Errors (Optional): This is
-    also know as spherical errors and is expressed as
-    \begin{align*}
-      \Var[\bsvarepsilon\bsvarepsilon'|\bsX] =
-      \E[\bsvarepsilon\bsvarepsilon'|\bsX] = \sigma^2\bsI_N
-    \end{align*}
-    where $\bsI_N$ is the $N$-dimensional identity matrix.
-\end{enumerate}
-\end{defn}
-
-\clearpage
-\begin{defn}(Conditional and Unconditional Homoskedasticity)
-Given the classical regression model, we define two concepts for
-homoskedasticity that differ subtly in the Hayashi random-$\bsX$
-approach:
-\begin{enumerate}
-  \item \emph{Unconditional homoskedasticity}:
-    $\E[\varepsilon_n^2] = \sigma^2$ for all $n$.
-  \item \emph{Conditional Homoskedasticity}:
-    $\E[\varepsilon_n^2 | \bsx_n]
-    =\E[\varepsilon_n^2 | \bsX] = \sigma^2$
-\end{enumerate}
-Most importantly, we can have unconditional homoskedasticity
-(i.e.\ $\E[\varepsilon_n^2]=\sigma^2$ a constant) \emph{without}
-conditional homoskedasticity (i.e.\ $\E[\varepsilon_n^2|\bsx_n]$
-\emph{not} a constant).  In particular, the \emph{conditional} second
-moment $\E[\varepsilon_n^2|\bsx_n]$ could be a function that depends on
-$\bsx_n$. For example, maybe it blows up for small and large values of
-$\bsx_n$ but it does so symmetrically, so that the average
-$\E[\varepsilon_n^2]=\E[\E[\varepsilon_n^2|\bsx_n]]=\sigma^2$.
-
-We need to worry about this distinction because Hayashi assumes $\bsX$
-is random. His formulation is not a ``fixed $\bsX$'' approach, where
-Assumptions 2 and 4 are merely $\E[\varepsilon_i]=0$ and
-$\E[\bsvarepsilon\bsvarepsilon']=\sigma^2\bsI_N$ without the
-conditioning.
-\end{defn}
-
-\begin{defn}(Classical Regression Model with Random Samples)
-The classical regression model with random sampling assumes that the
-sample $\{(y_n,\bsx_n)\}\nN$ is iid across observations.
-
-First, Assumption 1 along with the iid assumption on
-$(y_n,\bsx_n)$ implies that $(\varepsilon_n, \bsx_n)\perp \bsx_m$ for
-$n\neq m$.
-So Assumptions 1 and 4 on $\varepsilon_n$ (which we always
-conditioned on $\bsX$) will reduce to conditioning on individual
-$\bsx_n$:
-\begin{alignat*}{5}
-  \text{Assumption 2} &&\qquad
-   \E[\varepsilon_n | \bsX] &=
-   \E[\varepsilon_n | \bsx_n] &&= 0\\
-  \text{Assumption 4} &&\qquad
-   \E[\varepsilon_n^2 | \bsX] &=
-   \E[\varepsilon_n^2 | \bsx_n] &&= \sigma^2\\
-  \text{} &&\qquad
-   \E[\varepsilon_n\varepsilon_m|\bsX] &=
-   \E[\varepsilon_n|\bsx_n] \E[\varepsilon_m|\bsx_m]
-   &&=0
-\end{alignat*}
-Moreover, these objects (which are, in general, functions of $\bsx_n$)
-will be identical across observations.
-
-Now it might seem like $\E[\varepsilon_n^2|\bsx_n]=\sigma^2$ is an
-unnecessary and worthless assumption, since it would seem to follow
-\emph{immediately} from assuming iid observations. In the
-``fixed-$\bsX$'' approach, this is certainly true, but in Hayashi's
-``random-$\bsX$'' approach, this is not true. The restriction is
-meaningful for the following reasons.
-
-Assuming an iid sample only ensures that $\E[\varepsilon_n^2|\bsx_n]$ is
-identical across observations. But in general, that guy is a function of
-random variable $\bsx_n$. Though identical across observations, that
-function is not necessarily a constant. Of course, if
-we iterate expectations and integrate out $\bsx_n$ by computing
-$\E[\varepsilon_n^2]=\E[\E[\varepsilon_n^2|\bsx_n]]$, the result will be
-a constant. Hence, an iid sample implies \emph{unconditional}
-homoskedasticity. But as we said, the iid sample assumption
-does not automatically imply \emph{conditional} homoskedasticity where
-$\E[\varepsilon_n^2 | \bsx_n]
-=\E[\varepsilon_n^2 | \bsX] = \sigma^2$.
-Therefore, assuming $\E[\varepsilon_n^2|\bsx_n]=\sigma^2$ a constant
-still has some bite.
-\end{defn}
-
-\clearpage
-\subsection{Estimation}
-
-\begin{defn}(Sum of Squared Residuals)
-Define the \emph{sum of squared residuals} as
-\begin{align*}
-  SSR(\bsb) = (\bsy - \bsX \bsb)'(\bsy - \bsX \bsb)
-\end{align*}
-\end{defn}
-
-
-\begin{defn}(OLS Estimates)
-The \emph{OLS Estimator} minimizes the sum of squared residuals:
-\begin{align*}
-  \bshatbeta_{OLS}
-  =
-  \argmin_{\bsb} \;
-  (\bsy - \bsX \bsb)'(\bsy - \bsX \bsb)
-\end{align*}
-The FOCs of $K$ equations and $K$ unknowns are called the
-\emph{normal equations}, where the second expression highlights the
-orthogonality of the regressors $\bsX'$ to the residual vector
-$\bsy-\bsX\bsb$.  Since the second derivative is the positive definite
-matrix $\bsX'\bsX$, we have a minimum.
-\begin{align*}
-  \bsX'\bsX\bsb &= \bsX'\bsy
-  \quad\iff\quad
-  0= \bsX'(\bsy-\bsX\bsb)
-\end{align*}
-Solving, we get the OLS estimator, which has the following mean and
-variance:
-\begin{align*}
-  \hat{\bsbeta}_{OLS}
-  &= (\bsX'\bsX)^{-1}\bsX'\bsy \\
-  &= (\bsX'\bsX)^{-1}\bsX' (\bsX \bsbeta + \bsvarepsilon)
-  = \bsbeta + (\bsX'\bsX)^{-1}\bsX' \bsvarepsilon
-  \\
-  \implies\quad
-  \hat{\bsbeta}_{OLS} - \bsbeta
-  &= (\bsX'\bsX)^{-1}\bsX' \bsvarepsilon \\
-  \E[\hat{\bsbeta}_{OLS}|\bsX]
-  %&=
-  %\bsbeta +
-  %\E[(\bsX'\bsX)^{-1}\bsX' \bsvarepsilon |\bsX]
-  %=
-  %\bsbeta +
-  %(\bsX'\bsX)^{-1}\bsX' \cdot \E[\bsvarepsilon |\bsX]
-  %\\
-  &= \bsbeta \\
-  \Var(\hat{\bsbeta}_{OLS}|\bsX)
-  &=
-  \E[(\hat{\bsbeta}_{OLS}-\bsbeta)(\hat{\bsbeta}_{OLS}-\bsbeta)'|\bsX]
-  \\
-  %&=
-  %\E\left[
-    %(\bsX'\bsX)^{-1}\bsX'\bsvarepsilon)
-    %(\bsX'\bsX)^{-1}\bsX'\bsvarepsilon)'
-  %|\bsX\right]
-  %\\
-  &=
-  \left((\bsX'\bsX)^{-1}\bsX'\right)
-  \E[\bsvarepsilon\bsvarepsilon' |\bsX]
-  \left(\bsX(\bsX'\bsX)^{-1}\right)
-\end{align*}
-With spherical errors, the variance simplifies to
-\begin{align*}
-  \Var(\hat{\bsbeta}_{OLS}|\bsX)
-  &=
-  \left((\bsX'\bsX)^{-1}\bsX'\right)
-  \sigma^2 \bsI_N
-  \left(\bsX(\bsX'\bsX)^{-1}\right)
-  =\sigma^2 (\bsX'\bsX)^{-1}
-\end{align*}
-Now define the following objects
-\begin{alignat*}{3}
-  \text{Projection Matrix}&\quad
-  \bsP &&= \bsX(\bsX'\bsX)^{-1}\bsX' \\
-  \text{Annihilator Matrix}&\quad
-  \bsM &&= \bsI_n - \bsP \\
-  \text{Residual Vector}&\quad
-  \bse &&= \bsX\bsb - \bsy \\
-  \text{Fitted Values}&\quad
-  \bshaty &&= \bsX\bsb
-\end{alignat*}
-Both $\bsP$ and $\bsM$ are easily shown to be symmetric and idempotent.
-Moreover,
-\begin{itemize}
-  \item $SSR(\bsb) = \bse'\bse$
-  \item $\bsP\bsX=\bsX$: The projection of $\bsX$ onto itself is $\bsX$
-  \item $\bsM\bsX = \bso$: This is where the annihilator matrix gets
-    it's name.
-  \item $\bse = \bsM\bsy = \bsM \bsvarepsilon$: Applied to $\bsy$, the
-    annihilator matrix returns the residuals
-\end{itemize}
-\end{defn}
-
-\begin{defn}(Distribution of Coefficients)
-If we want the mean and variance of individual coefficients or linear
-combinations of coefficients, we have
-\begin{align*}
-  \E[r'\bshatbeta_{OLS}|\bsX]
-  &= r'\bsbeta \\
-  \Var(r'\bshatbeta_{OLS}|\bsX)
-  &=
-  r'\left((\bsX'\bsX)^{-1}\bsX'\right)
-  \E[\bsvarepsilon\bsvarepsilon' |\bsX]
-  \left(\bsX(\bsX'\bsX)^{-1}\right) r \\
-  &=
-  \sigma^2r'(\bsX'\bsX)^{-1} r
-\end{align*}
-where the second formula for the variance assumed spherical errors. The
-first expression is more general.
-\end{defn}
-
-\begin{defn}(Estimator for $\sigma^2$ and $\Var[\hat{\bsbeta}_{OLS}|\bsX]$)
-Assuming spherical errors, we form the estmator for $\sigma^2$:
-\begin{align*}
-  s^2 &= \frac{SSR(\bsb)}{(n-K)} = \frac{\bse'\bse}{(N-K)}
-\end{align*}
-That let's us define an estimator for the covariance matrix of the
-coefficients:
-\begin{align*}
-  \hat{\bsV}(\hat{\bsbeta}_{OLS}|\bsX) = s^2(\bsX'\bsX)^{-1}
-\end{align*}
-\end{defn}
-
-\begin{prop}
-Assuming spherical errors, $s^2$ is an unbiased estimator:
-$\E[s^2|\bsX]=\sigma^2$.
-\end{prop}
-\begin{proof}
-Recall that $\bse=\bsM\bsvarepsilon$ where $\bsM$, the annihilator
-matrix, is idempotent. Then
-\begin{align*}
-  \E[\bse'\bse|\bsX]
-  &= \E[\bsvarepsilon'\bsM'\bsM\bsvarepsilon|\bsX]\\
-  &= \E[\bsvarepsilon'\bsM\bsvarepsilon|\bsX] \\
-  &= \sumin \sumjn m_{ij}\E[\varepsilon_i\varepsilon_j|\bsX]
-\end{align*}
-But since we assumed $\E[\varepsilon_i\varepsilon_j|\bsX]=0$, all cross
-terms drop, leaving
-\begin{align*}
-  \E[\bse'\bse|\bsX]
-  &= \sumin m_{ii}\E[\varepsilon_i\varepsilon_i|\bsX]
-  = \sumin m_{ii}\sigma^2 \\
-  &= \sigma^2 \cdot \trace(\bsM)
-\end{align*}
-Almost there. Just use the definition of $\bsM$:
-\begin{align*}
-  \E[\bse'\bse|\bsX]
-  &= \sigma^2 \cdot \trace(\bsM) \\
-  &= \sigma^2 \trace(\bsI_N - \bsX(\bsX'\bsX)^{-1}\bsX') \\
-  &= \sigma^2 \trace(\bsI_N) - \trace(\bsX(\bsX'\bsX)^{-1}\bsX') \\
-  \text{By $\trace(AB)=\trace(BA)$}\qquad
-  &= \sigma^2 \left(N - \trace(\bsX'\bsX(\bsX'\bsX)^{-1})\right) \\
-  \E[\bse'\bse|\bsX]
-  &= \sigma^2 \left(N - \trace(\bsI_K)\right)
-  = \sigma^2 \left(N - K\right)
-\end{align*}
-Therefore,
-\begin{align*}
-  \E[\bse'\bse|\bsX] = \sigma^2(N-K)
-  \quad\implies\quad
-  \E[s^2|\bsX] = \frac{\E[\bse'\bse|\bsX]}{N-K} = \sigma^2
-\end{align*}
-
-
-
-
-\end{proof}
-
-
-
-\clearpage
-\subsection{Gauss-Markov Theorem}
-
-\begin{thm}\emph{(Gauss-Markov)}
-Given the classical linear regression model assuming spherical errors
-$\Var(\bsvarepsilon|\bsX)=\sigma^2\bsI$, the OLS estimator is
-\emph{efficient} in the class of linear unbiased estimators. That is,
-\begin{align*}
-  \bstildebeta = \bsA\bsy
-  \quad \text{s.t}\quad \E[\bstildebeta]=\bsbeta
-  \quad\implies\quad
-  \Var(\bstildebeta|\bsX) \geq \Var(\bshatbeta|\bsX)
-\end{align*}
-where $\bsA$ is some constant (nonrandom) matrix that can depend upon
-$\bsX$, and $\bshatbeta$ is the OLS estimator.
-\end{thm}
-\begin{proof}
-($\bstildebeta$ Unbiased $\implies$ $\bsA\bsX=\bsI$)
-First, we want to show a mini-result. Start by writing out the
-expectation of $\bstildebeta$:
-\begin{align*}
-  \E[\bstildebeta|\bsX]
-  &= \E[\bsA\bsy|\bsX]
-  = \E[\bsA(\bsX\bsbeta +\varepsilon)|\bsX] \\
-  \implies\quad
-  \E[\bstildebeta|\bsX]
-  &= \bsA\bsX\bsbeta
-\end{align*}
-Therefore, if $\bstildebeta$ is to be an unbiased estimator of
-$\bsbeta$, we need must have $\bsA\bsX=\bsI$.
-\\
-\\
-($\Cov(\bshatbeta, \bstildebeta-\bshatbeta|\bsX)=0$)
-Next, we show another mini-result. To do so, we consider
-$\bstildebeta-\bshatbeta$ and use the result that $\bsA\bsX=\bsI$ along
-with regression equation $\bsy=\bsX\bsbeta+\bsvarepsilon$ to simplify
-the difference:
-\begin{align}
-  \bstildebeta - \bshatbeta
-  &= \bsA\bsy - ((\bsX'\bsX)^{-1}\bsX'\bsy) \notag\\
-  %&= (\bsA-(\bsX'\bsX)^{-1}\bsX)\bsy \\
-  &= (\bsA-(\bsX'\bsX)^{-1}\bsX')(\bsX\bsbeta + \bsvarepsilon) \notag\\
-  &= \bsA\bsX\bsbeta-(\bsX'\bsX)^{-1}\bsX'\bsX\bsbeta
-    + (\bsA-(\bsX'\bsX)^{-1}\bsX')\bsvarepsilon \notag \\
-  %&= \bsI\bsbeta-\bsI\bsbeta
-    %+ (\bsA-(\bsX'\bsX)^{-1}\bsX)\bsvarepsilon \\
-  \implies\quad
-  \bstildebeta - \bshatbeta
-  &= (\bsA-(\bsX'\bsX)^{-1}\bsX')\bsvarepsilon
-  \label{betatilde-betahat}
-\end{align}
-Moreover, since both $\bshatbeta$ and $\bstildebeta$ are unbiased
-estimators, we have
-\begin{align*}
-  \E[\bshatbeta|\bsX] = \E[\bstildebeta|\bsX] &= \bsbeta \\
-  \E[\bshatbeta-\bstildebeta|\bsX] &= 0
-\end{align*}
-We now compute the covariance between $\bshatbeta$ and
-$\bstildebeta-\bshatbeta$. We will use the simplified formula from above
-for $\bstildebeta-\bshatbeta$, the means just stated, and the formula
-derived in the estimation section above that
-$\bshatbeta-\bsbeta=(\bsX'\bsX)^{-1}\bsX'\bsvarepsilon$ in the covariance
-formula:
-\begin{align*}
-  \Cov(\bstildebeta - \bshatbeta,\bshatbeta|\bsX)
-  &=
-  \E\left[
-    (\bstildebeta - \bshatbeta)
-    (\bshatbeta-\bsbeta)'
-    |\bsX\right]
-  \\
-  &=
-  \E\left[
-    \left((\bsA-(\bsX'\bsX)^{-1}\bsX')\bsvarepsilon\right)
-    \left((\bsX'\bsX)^{-1}\bsX'\bsvarepsilon\right)'
-    |\bsX\right]
-  \\
-  &=
-  (\bsA-(\bsX'\bsX)^{-1}\bsX')
-    \E\left[ \bsvarepsilon \bsvarepsilon'|\bsX\right]
-    \left(\bsX(\bsX'\bsX)^{-1}\right)
-\end{align*}
-Under spherical errors
-$\E\left[\bsvarepsilon\bsvarepsilon'|\bsX\right]=\sigma^2\bsI$,
-therefore
-\begin{align*}
-  \Cov(\bstildebeta - \bshatbeta,\bshatbeta|\bsX)
-  &=
-  \sigma^2
-  (\bsA-(\bsX'\bsX)^{-1}\bsX')
-    \left(\bsX(\bsX'\bsX)^{-1}\right)
-  \\
-  &=
-  \sigma^2
-  \bsA \bsX(\bsX'\bsX)^{-1}
-  -(\bsX'\bsX)^{-1}
-  \\
-  \text{Since $\bsA\bsX=\bsI$}\qquad
-  &=
-  \sigma^2
-  \bsI(\bsX'\bsX)^{-1}
-  -(\bsX'\bsX)^{-1} \\
-  \implies\quad
-  \Cov(\bstildebeta - \bshatbeta,\bshatbeta|\bsX)
-  &= 0
-\end{align*}
-(Final Step)
-Okay, now compute the variance of $\bstildebeta$:
-using the fact that covariance equals zero
-\begin{align*}
-  \Var(\bstildebeta|\bsX)
-  &=
-  \Var(\bshatbeta + (\bstildebeta-\bshatbeta)|\bsX) \\
-  &=
-  \Var(\bshatbeta|\bsX) + \Var(\bstildebeta-\bshatbeta)|\bsX)
-  + 2\Cov(\bstildebeta-\bshatbeta,\,\bshatbeta|\bsX)\\
-  \implies\quad
-  \Var(\bstildebeta|\bsX)
-  &=
-  \Var(\bshatbeta|\bsX) + \Var(\bstildebeta-\bshatbeta)|\bsX)
-\end{align*}
-Therefore, the variance of $\bstildebeta$, an arbitrary linear unbiased
-estimator, is greater than the variance of $\bshatbeta$ by the positive
-semidefinite matrix $\Var(\bstildebeta-\bshatbeta|\bsX)$.
-\\
-\\
-If we want to answer ``How much bigger?'', we can simplify the
-expression for the variance using Expression~\ref{betatilde-betahat}:
-\begin{align*}
-  \Var(\bstildebeta-\bshatbeta)|\bsX)
-  &=
-  \Var((\bsA-(\bsX'\bsX)^{-1}\bsX')\bsvarepsilon|\bsX) \\
-  &=
-  (\bsA-(\bsX'\bsX)^{-1}\bsX')
-  \;\Var(\bsvarepsilon|\bsX)\;
-  (\bsA-(\bsX'\bsX)^{-1}\bsX')' \\
-  &=
-  \sigma^2 (\bsA-(\bsX'\bsX)^{-1}\bsX')
-  (\bsA-(\bsX'\bsX)^{-1}\bsX')'
-\end{align*}
-Where the last line used the assumption of spherical errors
-$\Var(\bsvarepsilon|\bsX)=\sigma^2\bsI$.
-\end{proof}
-
-
-\clearpage
-\subsection{$R^2$ and Relatives}
-
-\begin{defn}($R^2$)
-First, We define the \emph{uncentered $R^2$} via the decomposition
-\begin{align*}
-  \bsy' \bsy
-  &=
-  (\bshaty +\bse)'
-  (\bshaty +\bse) \\
-  &=
-  \bshaty' \bshaty
-  +2 \bshaty'\bse
-  +\bse'\bse \\
-  \text{From orthogonality condtion} \quad
-  &=
-  \bshaty' \bshaty
-  +\bse'\bse \\
-  \implies\quad
-  R^2_{uc}
-  &=
-  \frac{\bshaty' \bshaty}{\bsy' \bsy}
-  = 1- \frac{\bse'\bse}{\bsy' \bsy}
-\end{align*}
-This is guaranteed to lie in $[0,1]$.
-\\
-\\
-Next, we define the \emph{centered $R^2$} or
-\emph{coefficient of determination}.
-\begin{align*}
-  (\bsy-\bar{\bsy})'(\bsy-\bar{\bsy})
-  &=
-  (\bshaty-\bar{\bsy})'(\bsy-\bar{\bsy})
-  +
-  \bse'\bse \\
-  \implies\quad
-  R^2
-  &=
-  1-
-  \frac{\bse'\bse}{(\bsy-\bar{\bsy})'(\bsy-\bar{\bsy})}
-  =
-  \frac{(\bshaty-\bar{\bsy})'(\bsy-\bar{\bsy})}{%
-      (\bsy-\bar{\bsy})'(\bsy-\bar{\bsy})}
-\end{align*}
-Note that this guy can go negative if you don't include an intercept
-term in the regression.
-\\
-\\
-We now define \emph{adjusted $R^2$}, which penalizes the number of
-regressors:
-\begin{align*}
-  R^2_A = 1 -
-  \frac{\bse'\bse/(N-K)}{(\bsy-\bar{\bsy})'(\bsy-\bar{\bsy})/(N-1)}
-\end{align*}
-\end{defn}
-
-\clearpage
-\subsection{Omitted Variable Bias}
-
-Suppose that the true model is
-\begin{align*}
-  \bsy = \bsX\bsbeta + \bsZ \bsgamma + \bsvarepsilon
-\end{align*}
-but we run the regression
-\begin{align*}
-  \bsy = \bsX\bsbeta + \bsvarepsilon
-\end{align*}
-Then the OLS estimates are
-\begin{align*}
-  \bshatbeta
-  &= (\bsX'\bsX)^{-1}\bsX' \bsy \\
-  &= (\bsX'\bsX)^{-1}\bsX'
-    \left(\bsX\bsbeta + \bsZ \bsgamma + \bsvarepsilon\right) \\
-  \bshatbeta - \bsbeta
-  &= (\bsX'\bsX)^{-1}\bsX'
-    \left(\bsZ \bsgamma + \bsvarepsilon\right)
-\end{align*}
-This implies bias
-\begin{align*}
-  \E[\bshatbeta - \bsbeta|\bsX,\bsZ]
-  &= (\bsX'\bsX)^{-1} \bsX'\bsZ \bsgamma
-\end{align*}
-The bias is zero if and only if $\bsgamma=0$ (variables in $\bsZ$ do not
-affect $\bsy$) or $\bsX'\bsZ=0$ (the ommited variables are orthogonal to
-those included).
-
-
-
-\clearpage
-\subsection{Coefficient Restrictions}
-
-Suppose that we have linear regression model
-\begin{align*}
-  \bsy = \bsX\bsbeta + \bsvarepsilon
-\end{align*}
-and we want to estimate $\bsbeta$ while also imposing some restrictions
-$\bsR'\bsbeta = \bsr$, where $\bsR\in\R^{K\times C}$ is a matrix of $C$
-constraints on the $K$ coefficients. We assume that $\rank(\bsR)=C$
-(full column rank), otherwise there would be redundant constraints that
-could be removed without effect.
-\\
-\\
-We estimate by constrained least squares
-\begin{align*}
-  \min_{\bsb} \; &(\bsy-\bsX\bsb)'(\bsy-\bsX\bsb)
-  \\
-  \text{s.t.} \; &
-    \bsR'\bsb = \bsr
-\end{align*}
-whose solution we call $\bshatbeta_*$, while $\bshatbeta_{OLS}$
-represents the unrestricted OLS estimator.
-The basic estimates are
-\begin{align*}
-  \bshatbeta_*
-  &=
-  \bshatbeta_{OLS} - \left(\bsX'\bsX\right)^{-1}  \bsR
-  \left(\bsR'\left(\bsX'\bsX\right)^{-1}  \bsR\right)^{-1}
-  \left(\bsR'\bshatbeta_{OLS} -  \bsr\right)
-  \\
-  \Var[\bshatbeta_*\;|\;\bsX]
-  &=
-  \underbrace{\sigma^2(\bsX'\bsX)^{-1}}_{\Var(\bshatbeta_{OLS}|\bsX)}
-  -
-  \sigma^2(\bsX'\bsX)^{-1}  \bsR
-  \left(\bsR'(\bsX'\bsX)^{-1}  \bsR\right)^{-1} \bsR'(\bsX'\bsX)^{-1}
-  \\
-  \Var\left[ \bshatbeta_*-\bshatbeta_{OLS} \;|\;X\right]
-  &=
-  \sigma^2
-  \left(\bsX'\bsX\right)^{-1}  \bsR
-  \left(\bsR'\left(\bsX'\bsX\right)^{-1}  \bsR\right)^{-1} \bsR'
-  \left(\bsX'\bsX\right)^{-1}
-\end{align*}
-Since the term subtracted from $\Var[\bshatbeta_{OLS}\;|\;\bsX]$ in the
-expression for $\Var[\bshatbeta_*\;|\;\bsX]$ is a positive semidefinite
-matrix, the constrained estimates have a smaller variance than the OLS
-estimates (though they are biased).
-
-
-\begin{proof}
-Form the Lagrangian
-\begin{align*}
-  \sL
-  &=
-  (\bsy-\bsX\bsb)'(\bsy-\bsX\bsb)
-  + 2\bslambda' (\bsR'\bsb - \bsr)
-\end{align*}
-where $\bslambda$ is a vector the same size as $\bsr$ (possibly also length
-one, i.e.\ a scalar).
-The first order conditions of the Lagrangian with respect to $\bsb$:
-\begin{align*}
-  \frac{d}{d\bsb}
-  \left[
-    (\bsy-\bsX\bsb)'(\bsy-\bsX\bsb)
-    + 2\bslambda' (\bsR'\bsb - \bsr)
-  \right]
-  &= -2\bsX'\bsy +2\bsX'\bsX\bsb + 2\bsR\bslambda
-  =0
-\end{align*}
-Solve for $\bsb$
-\begin{align}
-  \bsb &=
-  \left(\bsX'\bsX\right)^{-1} \bsX'\bsy
-  - \left(\bsX'\bsX\right)^{-1} \bsR\bslambda
-  \notag\\
-  \implies\quad
-  \bsb &=
-  \bshatbeta_{OLS} - \left(\bsX'\bsX\right)^{-1}  \bsR\bslambda
-  \label{restricted-b}
-\end{align}
-To eliminate $\bslambda$, we will multiply through the above expression
-by $\bsR'$ and use the constraint $\bsR'\bsb=\bsr$ on the LHS to get
-\begin{align}
-  %\bsR'\bsb
-  %&=
-  %\bsR'\bshatbeta_{OLS}
-  %- \bsR'\left(\bsX'\bsX\right)^{-1} \bsR\bslambda \notag\\
-  %\iff\quad
-  \bsr
-  &=
-  \bsR'\bshatbeta_{OLS}
-  - \bsR'\left(\bsX'\bsX\right)^{-1} \bsR\bslambda \notag\\
-  \implies\quad
-  \bslambda
-  &=
-  \left(\bsR'\left(\bsX'\bsX\right)^{-1}  \bsR\right)^{-1}
-  \left(\bsR'\bshatbeta_{OLS} -  \bsr\right)
-  \label{restricted-lambda}
-\end{align}
-where $\bsR'(\bsX'\bsX)^{-1}\bsR$ is invertible because
-$(\bsX'\bsX)^{-1}$ is positive definite and $\bsR$ has full column rank.
-Now sub Expression~\ref{restricted-lambda} for $\bslambda$ into
-Expression~\ref{restricted-b} for $\bsb$:
-\begin{align*}
-  \bshatbeta_*
-  =
-  \bshatbeta_{OLS} - \left(\bsX'\bsX\right)^{-1}  \bsR
-  \left(\bsR'\left(\bsX'\bsX\right)^{-1}  \bsR\right)^{-1}
-  \left(\bsR'\bshatbeta_{OLS} -  \bsr\right)
-\end{align*}
-This estimator has expectation
-\begin{align*}
-  \E\left[ \bshatbeta_* \;|\; \bsX \right]
-  &=
-  \bsbeta
-  -
-  \left(\bsX'\bsX\right)^{-1}  \bsR
-  \left(\bsR'\left(\bsX'\bsX\right)^{-1}  \bsR\right)^{-1}
-  \left( \bsR' \bsbeta -  \bsr\right)
-\end{align*}
-Next, we compute the variance of the estimator:
-\begin{align*}
-  \Var[\bshatbeta_*\;|\;\bsX]
-  &=
-  \E\left[
-    \left(\bshatbeta_*- \E[\bshatbeta_*|\bsX]\right)^2
-  \;|\;\bsX \right] \\
-  &=
-  \E\bigg[
-  \bigg\{
-  \left[
-  \bshatbeta_{OLS} - (\bsX'\bsX)^{-1}  \bsR
-  \left(\bsR'(\bsX'\bsX)^{-1}  \bsR\right)^{-1}
-  \left(\bsR'\bshatbeta_{OLS} -  \bsr\right)
-  \right]\\
-  &\qquad\quad
-  -
-  \left[
-  \bsbeta -
-  (\bsX'\bsX)^{-1}  \bsR \left(\bsR'(\bsX'\bsX)^{-1}\bsR\right)^{-1} \left(\bsR' \bsbeta -\bsr\right)
-  \right]
-  \bigg\}^2
-  \;\big|\;\bsX
-  \bigg] \\
-  \Var[\bshatbeta_*\;|\;\bsX]
-  &=
-  \left(
-  \bsI - (\bsX'\bsX)^{-1}  \bsR \left(\bsR'(\bsX'\bsX)^{-1}  \bsR\right)^{-1} \bsR'
-  \right)
-  \E\left[ (\bshatbeta_{OLS}-\bsbeta)^2 \;\big|\;\bsX \right]
-  \left(
-  \text{Leading term}
-  \right)' \\
-  &= (\bsI - \bsA)\bsV(\bsI-\bsA)'
-  \\
-  \text{where}
-  \quad
-  \bsA &:=
-    (\bsX'\bsX)^{-1}  \bsR \big(\bsR'(\bsX'\bsX)^{-1}  \bsR\big)^{-1} \bsR' \\
-  \bsV
-  &:= \E\left[ (\bshatbeta_{OLS}-\bsbeta)^2 \;\big|\;\bsX \right]
-\end{align*}
-Note that
-$(\bsI-\bsA)\bsV(\bsI-\bsA)'=(\bsV-\bsA\bsV)-(\bsV\bsA'-\bsA\bsV\bsA')$.
-We can calculate each of these objects, assuming spherical errors,
-otherwise the result doesn't work out nicely
-\begin{align*}
-  \bsV
-  &=
-  \E\left[ (\bshatbeta_{OLS}-\bsbeta)^2 \;\big|\;\bsX \right]
-  =
-  \sigma^2(\bsX'\bsX)^{-1} \\
-  \bsA\bsV = (\bsV\bsA')'
-  &=
-  \sigma^2(\bsX'\bsX)^{-1}  \bsR \left(\bsR'(\bsX'\bsX)^{-1}  \bsR\right)^{-1} \bsR'
-  (\bsX'\bsX)^{-1} \\
-  \bsA\bsV\bsA'
-  &=
-  \sigma^2(\bsX'\bsX)^{-1}  \bsR \left(\bsR'(\bsX'\bsX)^{-1}  \bsR\right)^{-1} \bsR'
-  (\bsX'\bsX)^{-1}
-  \bsR \left(\bsR'(\bsX'\bsX)^{-1}  \bsR\right)^{-1} \bsR'(\bsX'\bsX)^{-1}
-  \\
-  &=
-  \sigma^2(\bsX'\bsX)^{-1}  \bsR
-  \left(\bsR'(\bsX'\bsX)^{-1}  \bsR\right)^{-1} \bsR'(\bsX'\bsX)^{-1}
-\end{align*}
-Hence the variance of the estimator is
-\begin{align*}
-  \Var[\bshatbeta_*\;|\;\bsX]
-  &=
-  \underbrace{\sigma^2(\bsX'\bsX)^{-1}}_{\Var(\bshatbeta_{OLS}|\bsX)}
-  -
-  \sigma^2(\bsX'\bsX)^{-1}  \bsR
-  \left(\bsR'(\bsX'\bsX)^{-1}  \bsR\right)^{-1} \bsR'(\bsX'\bsX)^{-1}
-\end{align*}
-The last one is just a bunch of messy algebra again. It's
-straightforward to derive.
-\end{proof}
-
-
-\subsection{Inference under Normal Errors}
-
-
-\begin{prop}
-If we assume normally distributed spherical errors
-$\bsvarepsilon|\bsX\sim N(0,\sigma^2\bsI)$, then the variance estimator
-$s^2$ of $\sigma^2$ has distribution
-\begin{align*}
-  s^2 \sim \frac{\sigma^2}{N-K} \Chi^2_{N-K}
-\end{align*}
-\end{prop}
-\begin{proof}
-Since $\bse=\bsM\bsvarepsilon$ where $\bsM$ is the annihilator matrix,
-the definition of $s^2$ gives us
-\begin{align*}
-  (N-K) s^2
-  &= \bse' \bse
-  = (\bsM\bsvarepsilon)' (\bsM\bsvarepsilon)\\
-  &= \sigma^2 \left(\frac{\bsvarepsilon'}{\sigma}\right)\bsM'
-    \bsM\left(\frac{\bsvarepsilon}{\sigma}\right)
-\end{align*}
-Since the matrix $\bsM$ is idempotent, we get
-\begin{align*}
-  (N-K) \frac{s^2}{\sigma^2}
-  &= \left(\frac{\bsvarepsilon'}{\sigma}\right)
-    \bsM\left(\frac{\bsvarepsilon}{\sigma}\right)\\
-\end{align*}
-Then $\bsvarepsilon/\sigma$, the standardized error vector, is a
-multivariate normal distribution. So we have a multivariate normal
-wrapped around a quadratic form.
-\end{proof}
-
-
-\clearpage
-\section{OLS Asymptotics}
-
-In the section on classical linear regression, we specified the joint
-distribution of $(\bsy,\bsX)$ for a fixed, finite sample size. In this
-seciton, we instead specify the underlying data generating process.
-From that, the joint distribution follows.
-
-\begin{defn}(Assumptions)
-Here, we state a few assumptions that will be referenced for different
-results:
-\begin{enumerate}
-  \item \emph{Linearity}: $y_n = \bsx_n' \bsbeta + \varepsilon_n$
-    where $\bsx_n$ and $\bsbeta$ are $(K\times 1)$ vectors
-  \item \emph{Ergodic Stationarity}:
-    The $(K+1)$-vector $(y_n, \bsx_n)$ is jointly stationary and
-    ergodic. Much weaker than iid.
-  \item \emph{Predetermined Regressors}:
-    $\E[\bsx_n (y_n - \bsx'_n \bsbeta)]=\E[\bsx_n \varepsilon_n]= \bso$
-    for all $n$.
-
-    This is weaker than requiring $\E[\varepsilon_n|\bsx_n]=0$.
-    It is also weaker than strict exogeneity, which requires
-    $\E[x_{ni}\varepsilon_m]=0$ for all $n,m$.
-    Here, we rule out only contemporaneous ($n=m$) correlation between
-    regressor $\bsx_n$ and error $\varepsilon_n$.
-    This allows us to accommodate the AR(1) model and other time series
-    models.
-
-  \item \emph{Rank and Finiteness Condition}:
-    $\bsSigma_{\bsx\bsx}:=\E[\bsx_n\bsx_n']$ exists, is finite, and has
-    full rank
-
-  \item \emph{Martingale Difference Sequence $\bsx_n\varepsilon_n$}:
-    We strengthen Assumption 3 above. In particular,
-    we suppose that $\bsx_n\varepsilon_n$ has finite second moment,
-    i.e.\ $\E[\bsx_n\varepsilon_n^2\bsx_n]<\infty$, and is is a
-    martingale difference sequence, i.e.\
-    \begin{align*}
-      \E[\bsx_n\varepsilon_n\;|\;
-      \bsx_{n-1}\varepsilon_{n-1},\bsx_{n-2}\varepsilon_{n-2},\ldots]
-      = \bso
-    \end{align*}
-    A sufficient condition for $\bsx_n\varepsilon_n$ to be a MDS is
-    \begin{align*}
-      \E[\varepsilon_n\;|\;
-      \varepsilon_{n-1},
-      \varepsilon_{n-2}, \ldots,
-      \bsx_n,
-      \bsx_{n-1}, \ldots]
-      = \bso
-    \end{align*}
-    %For later, we define
-    %\begin{align*}
-      %\bsS := \E[\bsx_n\varepsilon^2_n\bsx_n']
-    %\end{align*}
-\end{enumerate}
-\end{defn}
-\begin{rmk}
-This model permits conditional heteroskedasticity. Since $(y_n,\bsx_n)$
-is stationary, the error term $\varepsilon_n$ is also stationary so that
-$\E[\varepsilon^2_n]$ is constant across $n$. But the setup above
-allows $\E[\varepsilon_n^2|\bsx_n]$ to depend upon $\bsx_n$.
-\end{rmk}
-
-
-\begin{prop}\emph{(OLS Estimator)}
-The OLS estimator has the following properties
-\begin{enumerate}
-  \item \emph{Consistent}: Under Assumptions 1-4 above, the OLS
-    estimator is consistent.
-  \item \emph{Asymptotic Normality}: Under assumptions 1-5
-    \begin{align*}
-      \sqrt{N}(\bshatbeta_N- \bsbeta) \dto
-      N(0,\E[\bsx_i\bsx_i']^{-1}\;\E[\bsx_n\varepsilon^2_n\bsx_n']\;\E[\bsx_i\bsx_i']^{-1})
-    \end{align*}
-  \item Under Assumptions 1-4, the OLS error variance estimator $s^2$ is
-    consistent:
-    \begin{align*}
-      s^2_N := \frac{\bse' \bse}{N-K}
-      =\frac{1}{N-K} \sumnN (y_n-\bsx_n\bshatbeta_N)^2
-      \pto \E[\varepsilon_n^2]
-    \end{align*}
-\end{enumerate}
-\end{prop}
-\begin{proof}
-We prove each in turn
-\begin{enumerate}
-  \item
-    Write out the definition of the OLS estimator:
-    \begin{align}
-      \bshatbeta_N
-      &= (\bsX'\bsX)^{-1}\bsX'\bsy
-      = (\bsX'\bsX)^{-1}\bsX'\left(\bsX\bsbeta + \bsvarepsilon\right)
-      = \bsbeta + (\bsX'\bsX)^{-1}\bsx\bsvarepsilon \\
-      &= \bsbeta + \left[\frac{1}{N}\sumnN \bsx_n\bsx_n' \right]^{-1}
-        \left[\frac{1}{N} \sumnN \bsx_n\bsvarepsilon_n \right]
-      \label{beta-asymptotic}
-    \end{align}
-    By the LLN and the CMT, the two sums converge in probability to
-    $\E[\bsx_n\bsx_n']$ and $\E[\bsx_n\bsvarepsilon_n]$, respectively.
-    The first is finite by Assumption 4, while the second is zero by
-    Assumption 3, so they drop and we have almost sure convergence of
-    $\bshatbeta_N$ to $\bsbeta$ by LLN.
-
-  \item
-    Rearrange Equation~\ref{beta-asymptotic} and multiply by $\sqrt{N}$
-    to get
-    \begin{align}
-      \sqrt{N}(\bshatbeta_N - \bsbeta)
-      &= \left[\frac{1}{N}\sumnN \bsx_n\bsx_n' \right]^{-1}
-        \sqrt{N}\left[\frac{1}{N} \sumnN \bsx_n\bsvarepsilon_n \right]
-    \end{align}
-    Again, the first term on the RHS converges in probability to
-    $\E[\bsx_n\bsx_n']$, while the second term, which is an average of
-    expectation-zero terms, converges in distribution to
-    $N(0,\Var(\bsx_n\bsvarepsilon_n))$ by the CLT.
-    By Slutsky, the desired result follows.
-
-  \item
-    Recall that
-    \begin{align*}
-      (N-K) s^2_N
-      &= \bse' \bse
-      = \bsvarepsilon'\bsM' \bsM\bsvarepsilon
-      = \bsvarepsilon'\bsM\bsvarepsilon \\
-      &= \bsvarepsilon'(\bsI - \bsX(\bsX'\bsX)^{-1}\bsX')\bsvarepsilon
-      \\
-      &= \bsvarepsilon'\bsvarepsilon
-        - \bsvarepsilon'\bsX(\bsX'\bsX)^{-1}\bsX'\bsvarepsilon \\
-    \end{align*}
-
-\end{enumerate}
-\end{proof}
 
 
 %%%% APPPENDIX %%%%%%%%%%%
