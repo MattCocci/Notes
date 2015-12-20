@@ -6055,82 +6055,27 @@ $\E[X_i] = \mu$ and $\Var(X_i)=\sigma^2$. Then
 \clearpage
 \subsection{Delta Method}
 
-We start with some motivation. Suppose that we have random variable
-$\bsy\in \mathbb{R}^m$, with mean and variance-covariance matrix as
-follows:
+We start with some motivation.
+Suppose we have some sequence of vector-valued random variables
+$\{\bsX_n\}\ninf$ such that
 \begin{align*}
-  \bsmu &:= \mathbb{E}(\bsy) =
-  \begin{pmatrix}
-    \mathbb{E}(y_1)\\\mathbb{E}(y_2)\\\vdots\\\mathbb{E}(y_m)
-  \end{pmatrix}
-  \in \mathbb{R}^m
-  \\
-  \bsSigma
-  &:=
-  \mathbb{E}\left[ (\bsy-\bsmu) (\bsy-\bsmu)' \right]
-  \in \mathbb{R}^{m\times m}
+  \bsX_n \dto \bsX
 \end{align*}
-Now suppose that we have an iid sample $\left\{\bsy_i\right\}_{i=1}^N$.
-We can construct an estimator of the first moment vector
-\begin{align*}
-  \bshatmu_N
-  &=
-  \frac{1}{N}
-  \sum^N_{i=1}
-  \bsy_i\\
-  \sqrt{N}(\bshatmu_N - \bsmu)
-  &\dto N(0,\bsSigma)
-\end{align*}
-where the convergence of this estimator follows from the Central Limit
-Theorem.
+In words, we know that the asymptotic distribution of sequence
+$\{\bsX_n\}\ninf$ is the random variable $\bsX$.
+Often, this limiting distribution will be derived through some version
+of the Central Limit Theorem.
 
-Now consider a transformation of the first moment vector, denoted
-$\bsg(\bsmu)$.  We want a sampling distribution for that guy too (mean
-and standard errors), just like we had one for $\bsmu$.  The \emph{delta
-method} allows us to do that.
+That's great, but now consider a transformation of the original
+sequence, denoted $\{\bsg(\bsX_n)\}\ninf$ for some function $\bsg$. What
+is the asymptotic distribution of that guy? Since we know that $\bsX$ is
+the limiting distribution of $\{\bsX_n\}$, it seems like we should be
+able to figure out the asymptotic distribution of the transformed
+sequence $\{\bsg(\bsX_n)\}$ and that the result should probably be some
+function of $\bsX$. Both of those things are true. The
+\emph{delta method} lets us show that rigorously and derive an explicit
+distribution.
 
-\begin{rmk}
-The fact that $\bsg(\bsmu)$ is only a function
-of the first moment of $\bsy$ isn't that restrictive if we're willing to
-generalize our notion of $\bsy$. We can easily accommodate more
-complicated moments with a minor tweak.
-
-To see this, suppose that we have some base random variable
-$\bsx\in\mathbb{R}^n$
-\begin{align*}
-  \bsx =
-  \begin{pmatrix}
-    x_1\\x_2\\\vdots\\x_n
-  \end{pmatrix}
-  \in \mathbb{R}^n
-\end{align*}
-along with sample $\{\bsx_i\}_{i=1}^N$. If we want second
-moments or cross-correlations of elements in $\bsx$, simply
-define a function $\bsh: \mathbb{R}^n \rightarrow
-\mathbb{R}^m$ to do the transformations you want and set
-\begin{align*}
-  \bsy
-  :=\bsh(\bsx)
-  =
-  \begin{pmatrix}
-    h_1(\bsx)\\h_2(\bsx)\\\vdots\\h_m(\bsx)
-  \end{pmatrix}
-  \in\mathbb{R}^m
-\end{align*}
-Then, to generate the sample for $\bsy$, just take
-\begin{align*}
-  \{\bsy_i\}_{i=1}^N &:=
-  \left\{\bsh\left(\bsx_i\right)\right\}_{i=1}^N
-\end{align*}
-From there, proceed exactly as before. In this way, we can always use
-the ``first moment representation'' above, leaving open the possibility
-that $\bsy$ is actually a transformation or function of some
-base random variable.
-\end{rmk}
-
-
-
-\clearpage
 \begin{thm}\emph{(Delta Method)}
 Given random variable $\bsX_N$ and continuously differentiable
 transformation $\bsg:\R^m\rightarrow \R^p$, the \emph{delta method}
@@ -6160,7 +6105,7 @@ In words, suggestively-named $\bsJ$ is the Jacobian of $\bsg$, while
 $\bsG$ is shorthand for the Jacobian evaluated at $\bsmu$.
 \\
 \\
-Finally, if $\bsX$ is normal $N(0,\bsSigma)$, then
+If $\bsX$ is normal $N(0,\bsSigma)$, then this specializes to
 \begin{align*}
   \sqrt{N}\left(
   \bsg(\bsX_N)
@@ -6172,7 +6117,7 @@ Finally, if $\bsX$ is normal $N(0,\bsSigma)$, then
 \end{align*}
 \end{thm}
 \begin{proof}
-Start by doing a Taylor series expansion of $g$ about $\bsmu$:
+Start by doing a Taylor series expansion of $\bsg$ about $\bsmu$:
 \begin{align*}
   \bsg(\bsX_N)
   &=
@@ -6239,13 +6184,12 @@ which is exactly what we wanted to prove.
 The normal case follows directly.
 \end{proof}
 
-\clearpage
 \begin{thm}\emph{(Second-Order Delta Method, Normal Case)}
 Given random variable $X_N$ and continuously differentiable
-transformation $g:\R^m\rightarrow \R^p$
-such that $g'(\mu)=0$, the \emph{second-order delta method} states
+transformation $\bsg:\R^m\rightarrow \R^p$
+such that $\bsg'(\bsmu)=0$, the \emph{second-order delta method} states
 \begin{align*}
-  \sqrt{N}\left( X_N -\mu \right)
+  \sqrt{N}\left( \bsX_N -\bsmu \right)
   \dto N(0,\sigma^2)
   \quad\implies\quad
   \sqrt{N}(
@@ -8472,7 +8416,7 @@ results:
     where $\bsx_n$ and $\bsbeta$ are $(K\times 1)$ vectors
   \item \emph{Ergodic Stationarity}:
     The $(K+1)$-vector $(y_n, \bsx_n)$ is jointly stationary and
-    ergodic. Implied by iid, but weaker.
+    ergodic. This would be implied by iid, but is a weaker assumption.
 
   \item \emph{Predetermined Regressors}:
     $\E[\bsx_n (y_n - \bsx'_n \bsbeta)]=\E[\bsx_n \varepsilon_n]= \bso$
@@ -8494,7 +8438,7 @@ results:
   \item \emph{Martingale Difference Sequence $\bsx_n\varepsilon_n$}:
     We strengthen Assumption 3 above. In particular,
     we suppose that $\bsx_n\varepsilon_n$ has finite second moment,
-    i.e.\ $\E[\bsx_n\varepsilon_n^2\bsx_n]<\infty$, and is a
+    i.e.\ $\E[\varepsilon_n^2\bsx_n\bsx_n']<\infty$, and is a
     martingale difference sequence, i.e.\
     \begin{align*}
       \E[\bsx_n\varepsilon_n\;|\;
@@ -8522,7 +8466,8 @@ also stationary so that $\E[\varepsilon^2_n]$ is constant across $n$,
 i.e.\ the model is unconditionally homoskedastic.
 However, the setup above allows $\E[\varepsilon_n^2|\bsx_n]$ to depend
 upon $\bsx_n$, so that the model permits \emph{conditional}
-heteroskedasticity.
+heteroskedasticity. For that reason, we will develop
+heteroskedasticity-robust standard errors.
 \end{rmk}
 
 \clearpage
@@ -8537,13 +8482,42 @@ The OLS estimator has the following properties
       N(0,\E[\bsx_i\bsx_i']^{-1}\;\E[\varepsilon^2_n\bsx_n\bsx_n']\;\E[\bsx_i\bsx_i']^{-1})
     \end{align*}
     Assuming conditional homoeskedasticy
-    $\E[\varepsilon_n^2|\bsx_n]=\sigma^2$,
+    $\E[\varepsilon_n^2|\bsx_n]=\E[\varepsilon_n^2]=\sigma^2$, the
+    distribution simplifies
     \begin{align*}
       \sqrt{N}(\bshatbeta_N- \bsbeta) \dto
       N(0,\sigma^2\E[\bsx_i\bsx_i']^{-1})
     \end{align*}
-  \item Under Assumptions 1-4, the OLS error variance estimator $s^2$ is
-    consistent:
+
+  \item Since $\bshatbeta_{OLS}$ is a consistent estimator for
+    $\bsbeta$, the estimated residuals
+    $\bse_n = \bsy_n - \bsx_n' \bshatbeta$ can be used to construct a
+    consistent estimator for $\E[\varepsilon_n^2\bsx_n\bsx_n']$:
+    \begin{align*}
+      \frac{1}{N} \sumnN \bse^2_n \bsx_n \bsx_n'
+      \quad\pto\quad
+      \E[\varepsilon_n^2\bsx_n\bsx_n']
+    \end{align*}
+    provided $\E[\varepsilon_n\bsx_n\bsx_n']$ exists and is finite, and
+    the regressors have finite fourth moments
+    $\E[(x_{ni}x_{nj})^2]<\infty$ for all $i,j$.
+
+    From there, we can form a consistent heteroskedasticity-robust
+    estimator of the asymptotic variance of $\bshatbeta_{OLS}$:
+    \begin{align*}
+      \bigg(
+        \frac{1}{N} \underbrace{\sumnN \bsx_n\bsx_n'}_{\bsX'\bsX}
+      \bigg)^{-1}
+      \left(\frac{1}{N} \sumnN \bse^2_n \bsx_n \bsx_n'\right)
+      \bigg(
+        \frac{1}{N} \underbrace{\sumnN \bsx_n\bsx_n'}_{\bsX'\bsX}
+      \bigg)^{-1}
+      \;\pto\;
+      \E[\bsx_i\bsx_i']^{-1}\;\E[\varepsilon^2_n\bsx_n\bsx_n']\;\E[\bsx_i\bsx_i']^{-1}
+    \end{align*}
+
+  \item Under Assumptions 1-4, the OLS error variance estimator $s^2$
+    for $\E[\varepsilon_n^2]$ is consistent:
     \begin{align*}
       s^2_N := \frac{\bse' \bse}{N-K}
       =\frac{1}{N-K} \sumnN (y_n-\bsx_n\bshatbeta_N)^2
@@ -8555,8 +8529,19 @@ The OLS estimator has the following properties
       \quad\dto\quad
       N\left(0,\E[\varepsilon_n^4]-\E[\varepsilon^2_n]^2\right)
     \end{align*}
+    Therefore, if we assume homoskedasticity, i.e.
+    $\E[\varepsilon_n^2|\bsx_n]=\E[\varepsilon_n^2]=\sigma^2$, we
+    can construct a consistent estimator of the asymptotic variance of
+    $\bshatbeta_{OLS}$:
+    \begin{align*}
+      s_N^2\left(\frac{1}{N} \bsX'\bsX\right)^{-1}
+      \quad\pto\quad
+      \sigma^2\E[\bsx_i\bsx_i']^{-1}
+    \end{align*}
 \end{enumerate}
 \end{prop}
+
+\clearpage
 \begin{proof}
 We prove each in turn
 \begin{enumerate}
@@ -8896,6 +8881,76 @@ This holds regardless of whether or not the data are iid or serially
 correlated (since you're using the correct covariance matrix,
 $\bsS$).
 \end{thm}
+
+Suppose that we have random variable
+$\bsy\in \mathbb{R}^m$, with mean and variance-covariance matrix as
+follows:
+\begin{align*}
+  \bsmu &:= \mathbb{E}(\bsy) =
+  \begin{pmatrix}
+    \mathbb{E}(y_1)\\\mathbb{E}(y_2)\\\vdots\\\mathbb{E}(y_m)
+  \end{pmatrix}
+  \in \mathbb{R}^m
+  \\
+  \bsSigma
+  &:=
+  \mathbb{E}\left[ (\bsy-\bsmu) (\bsy-\bsmu)' \right]
+  \in \mathbb{R}^{m\times m}
+\end{align*}
+Now suppose that we have an iid sample $\left\{\bsy_i\right\}_{i=1}^N$.
+We can construct an estimator of the first moment vector
+\begin{align*}
+  \bshatmu_N
+  &=
+  \frac{1}{N}
+  \sum^N_{i=1}
+  \bsy_i\\
+  \sqrt{N}(\bshatmu_N - \bsmu)
+  &\dto N(0,\bsSigma)
+\end{align*}
+where the convergence of this estimator follows from the Central Limit
+Theorem.
+
+\begin{rmk}
+The fact that $\bsg(\bsmu)$ is only a function
+of the first moment of $\bsy$ isn't that restrictive if we're willing to
+generalize our notion of $\bsy$. We can easily accommodate more
+complicated moments with a minor tweak.
+
+To see this, suppose that we have some base random variable
+$\bsx\in\mathbb{R}^n$
+\begin{align*}
+  \bsx =
+  \begin{pmatrix}
+    x_1\\x_2\\\vdots\\x_n
+  \end{pmatrix}
+  \in \mathbb{R}^n
+\end{align*}
+along with sample $\{\bsx_i\}_{i=1}^N$. If we want second
+moments or cross-correlations of elements in $\bsx$, simply
+define a function $\bsh: \mathbb{R}^n \rightarrow
+\mathbb{R}^m$ to do the transformations you want and set
+\begin{align*}
+  \bsy
+  :=\bsh(\bsx)
+  =
+  \begin{pmatrix}
+    h_1(\bsx)\\h_2(\bsx)\\\vdots\\h_m(\bsx)
+  \end{pmatrix}
+  \in\mathbb{R}^m
+\end{align*}
+Then, to generate the sample for $\bsy$, just take
+\begin{align*}
+  \{\bsy_i\}_{i=1}^N &:=
+  \left\{\bsh\left(\bsx_i\right)\right\}_{i=1}^N
+\end{align*}
+From there, proceed exactly as before. In this way, we can always use
+the ``first moment representation'' above, leaving open the possibility
+that $\bsy$ is actually a transformation or function of some
+base random variable.
+\end{rmk}
+
+
 
 \clearpage
 \subsection{Casting the Model in GMM Form}
