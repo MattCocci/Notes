@@ -256,11 +256,13 @@
 \newcommand{\bshatb}{\boldsymbol{\hat{b}}}
 \newcommand{\bshaty}{\boldsymbol{\hat{y}}}
 \newcommand{\bsd}{\boldsymbol{d}}
+\newcommand{\bsf}{\boldsymbol{f}}
 \newcommand{\bsg}{\boldsymbol{g}}
 \newcommand{\bsG}{\boldsymbol{G}}
 \newcommand{\bsJ}{\boldsymbol{J}}
 \newcommand{\bsh}{\boldsymbol{h}}
 \newcommand{\bsS}{\boldsymbol{S}}
+\newcommand{\bshatS}{\boldsymbol{\hat{S}}}
 \newcommand{\bsu}{\boldsymbol{u}}
 \newcommand{\bsa}{\boldsymbol{a}}
 \newcommand{\bsA}{\boldsymbol{A}}
@@ -269,7 +271,11 @@
 \newcommand{\bsX}{\boldsymbol{X}}
 \newcommand{\bsy}{\boldsymbol{y}}
 \newcommand{\bsY}{\boldsymbol{Y}}
+\newcommand{\bsz}{\boldsymbol{z}}
 \newcommand{\bsZ}{\boldsymbol{Z}}
+\newcommand{\bsw}{\boldsymbol{w}}
+\newcommand{\bsW}{\boldsymbol{W}}
+\newcommand{\bshatW}{\boldsymbol{\hat{W}}}
 \newcommand{\bsV}{\boldsymbol{V}}
 \newcommand{\bso}{\boldsymbol{0}}
 \newcommand{\bstheta}{\boldsymbol{\theta}}
@@ -283,6 +289,7 @@
 \newcommand{\bslambda}{\boldsymbol{\lambda}}
 \newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
 \newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
 \newcommand{\bsR}{\boldsymbol{R}}
 \newcommand{\bsr}{\boldsymbol{r}}
 
@@ -321,7 +328,11 @@
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\Rn}{\mathbb{R}^n}
 \newcommand{\RN}{\mathbb{R}^N}
-\newcommand{\Rk}{\mathbb{R}^n}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rm}{\mathbb{R}^m}
 \newcommand{\Rnn}{\mathbb{R}^{n\times n}}
 \newcommand{\Rmn}{\mathbb{R}^{m\times n}}
 \newcommand{\Rnm}{\mathbb{R}^{n\times m}}
@@ -6067,11 +6078,12 @@ Often, this limiting distribution will be derived through some version
 of the Central Limit Theorem.
 
 That's great, but now consider a transformation of the original
-sequence, denoted $\{\bsg(\bsX_n)\}\ninf$ for some function $\bsg$. What
-is the asymptotic distribution of that guy? Since we know that $\bsX$ is
-the limiting distribution of $\{\bsX_n\}$, it seems like we should be
-able to figure out the asymptotic distribution of the transformed
-sequence $\{\bsg(\bsX_n)\}$ and that the result should probably be some
+sequence, denoted $\{\bsg(\bsX_n)\}\ninf$ for some continuously
+differentiable function $\bsg$. What is the asymptotic distribution of
+that guy? Since we know that $\bsX$ is the limiting distribution of
+$\{\bsX_n\}$, it seems like we should be able to figure out the
+asymptotic distribution of the transformed sequence
+$\{\bsg(\bsX_n)\}\ninf$ and that the result should probably be some
 function of $\bsX$. Both of those things are true. The
 \emph{delta method} lets us show that rigorously and derive an explicit
 distribution.
@@ -6185,7 +6197,7 @@ The normal case follows directly.
 \end{proof}
 
 \begin{thm}\emph{(Second-Order Delta Method, Normal Case)}
-Given random variable $X_N$ and continuously differentiable
+Given random variable $\bsX_N$ and continuously differentiable
 transformation $\bsg:\R^m\rightarrow \R^p$
 such that $\bsg'(\bsmu)=0$, the \emph{second-order delta method} states
 \begin{align*}
@@ -6215,7 +6227,7 @@ intuition and details filled in during the previous theorem.
 \begin{proof}
 Start by doing a second-order Taylor series expansion of $g$ about $\mu$:
 \begin{align*}
-  g(X_N)
+  \bsg(X_N)
   &=
   g(\mu)
   + g'(\mu) \left( X_N - \mu \right)
@@ -8286,7 +8298,7 @@ $\trace(\bsM)=N-K$, the desired result follows.
 \end{proof}
 
 
-\begin{defn}(Testing Individual Coefficient)
+\begin{defn}(Testing Individual Coefficients)
 If we assume $\bsvarepsilon|\bsX \sim N(0,\sigma^2\bsI_N)$, then
 \begin{align*}
   \bshatbeta - \bsbeta
@@ -8345,16 +8357,20 @@ Suppose we want to test the linear hypothesis
 $H_0: \bsR'\bsbeta^0 = \bsr$,
 where $\bsR$ is of full column rank and $\bsr$ has dimension $p$,
 corresponding to $p$ restrictions.
-
+\\
+\\
 If we assume spherical errors,
 $\bsvarepsilon|\bsX\sim N(0,\sigma^2\bsI_N)$, then under the null, we
 know that
 \begin{align*}
   \bsR'(\bshatbeta-\bsbeta^0)
-  &\sim N(0,\sigma^2 \bsR'(\bsX'\bsX)^{-1}\bsR) \\
-  \iff\qquad
+  =
   \bsR'\bshatbeta-\bsr
   &\sim N(0,\sigma^2 \bsR'(\bsX'\bsX)^{-1}\bsR)
+  %\\
+  %\iff\qquad
+  %\bsR'\bshatbeta-\bsr
+  %&\sim N(0,\sigma^2 \bsR'(\bsX'\bsX)^{-1}\bsR)
 \end{align*}
 So then we could jointly test whether the following quadratic form is
 close to zero
@@ -8364,7 +8380,8 @@ close to zero
   \left(\bsR'\bshatbeta-\bsr\right)
   \sim \Chi_p^2
 \end{align*}
-But in general, we don't know $\sigma^2$, so we form the $F$-statistic
+But in general, we don't know $\sigma^2$, so we form the $F$-statistic,
+which has the following distribution:
 \begin{align*}
   F &=
   \frac{%
@@ -8394,19 +8411,56 @@ Write out the definition of the $F$-statistic:
   &=
   \frac{%
     \Chi^2_p/p
-  }{\left[(N-K)\Chi^2_{N-K}\right]/(N-K)}
+  }{\Chi^2_{N-K}/(N-K)}
 \end{align*}
 But the fraction is precisely the definition of a $F_{p,N-K}$ distribution.
 \end{proof}
+
+\begin{prop}
+An $F$-distributed random variable has a $\Chi^2$-distributed asymptotic
+distribution in the second degree of freedom:
+\begin{align*}
+  \limn F_{k,n} \quad\dto \quad\Chi_k^2 / k
+\end{align*}
+\end{prop}
+\begin{proof}
+Start by writing out the definition of an $F_{k,n}$ random variable:
+\begin{align}
+  F_{k,n} =
+  \frac{%
+    \Chi^2_k/k
+  }{\Chi^2_{n}/n}
+  \label{Ffrac}
+\end{align}
+Write out the denominator:
+\begin{align*}
+  \Chi^2_{n}/n
+  = \frac{1}{n} \sumin Z_i^2
+  \quad\underset{\text{By LLN}}{\pto}\quad
+  \E[Z_i^2] = 1
+\end{align*}
+We can then use Slutsky on Expression~\ref{Ffrac} since the numerator
+trivially converges in distribution to $\Chi_k^2/k$, while the
+denominator converges in probability to one, hence the whole thing
+converges in distribution to $\Chi_k^2/k$.
+
+\end{proof}
+
 
 
 \clearpage
 \section{OLS Asymptotics}
 
-In the section on classical linear regression, we specified the joint
-distribution of $(\bsy,\bsX)$ for a fixed, finite sample size. In this
-seciton, we instead specify the underlying data generating process.
-From that, the joint distribution follows.
+
+\subsection{Model Assumptions and OLS Estimator}
+
+In the previous section on classical linear regression, we specified the
+joint distribution of $(\bsy,\bsX)$ for a fixed, finite sample size. The
+distributions were exact.
+In this section, we instead specify just enough assumptions about the
+underlying data-generating process to derive joint
+\emph{asymptotic} distributions which hold only approximately in a
+fixed, finite sample.
 
 \begin{defn}(Assumptions)
 Here, we state a few assumptions that will be referenced for different
@@ -8681,9 +8735,195 @@ We prove each in turn
       \quad\dto\quad
       N\left(0,\E[\varepsilon_n^4]-\E[\varepsilon^2]^2\right)
     \end{align*}
-
 \end{enumerate}
 \end{proof}
+
+\clearpage
+\subsection{Inference}
+
+\begin{prop}
+Suppose we have OLS estimator $\bshatbeta_{OLS}$ and we construct the
+above-proposed consistent estimator for its asymptotic variance:
+\begin{align}
+  \bshatSigma :=
+  N\cdot
+  \left(\bsX'\bsX\right)
+  \left(\sumnN \bse^2_n \bsx_n \bsx_n'\right)
+  \left(\bsX'\bsX\right)
+  \quad&\pto\quad
+  \bsSigma :=
+  \E[\bsx_i\bsx_i']^{-1}\;\E[\varepsilon^2_n\bsx_n\bsx_n']\;\E[\bsx_i\bsx_i']^{-1}
+  \notag\\
+  \text{where}\quad
+  \sqrt{N}(\bshatbeta_{OLS} - \bsbeta)
+  \quad &\dto \quad
+  N(0,\bsSigma) \label{trobust}
+\end{align}
+These results and estimators can be used to conduct the following tests:
+\begin{enumerate}
+  \item \emph{Robust $t$-Ratio for Testing Coefficients}: We can
+    test the null hypothesis $H_0:\beta_k = \beta_k^0$ (where $\beta_k$
+    is the $k$th element of $\bsbeta$) by constructing the
+    \emph{robust $t$-ratio}:
+    \begin{align*}
+      t_k = \frac{\sqrt{N}(\hat{\beta}_k-\beta_k^0)}{\hat{\Sigma}_{kk}}
+      \quad\dto \quad N(0,1)
+    \end{align*}
+    where $\hat{\Sigma}_{kk}$ is the $k,k$th element of $\bshatSigma$.
+
+  \item \emph{Wald Statistic for Testing Linear Hypotheses}:
+    Suppose we want to test null hypothesis
+    \begin{align*}
+      H_0: \bsR'\bsbeta = \bsr
+      \qquad \text{where} \quad \bsR \in \R^{K \times C}
+    \end{align*}
+    and where $\bsR$ has full column rank,
+    $\rank(\bsR) = C$, i.e.\ no redundant constraints.
+    Then
+    \begin{align*}
+      W = N\cdot
+      (\bsR'\bshatbeta-\bsr)'
+      \big(
+      \bsR'\bshatSigma\bsR
+      \big)^{-1}
+      (\bsR'\bshatbeta-\bsr)
+      \quad\dto\quad
+      \Chi^2_C
+    \end{align*}
+    where $W = N\cdot F$, the $F$-ratio in the finite-sample, exact
+    section under homoskedasticity.
+
+  \item \emph{Wald Statistic for Testing Non-Linear Hypotheses}:
+    Any nonlinear hypothesis can be written (WLOG) as $H_0:
+    \bsa(\bsbeta) = \bso$ for some function $\bsa:\R^K\ra \R^C$. Then
+    \begin{align*}
+      W :=
+      N \cdot \bsa(\bshatbeta_{OLS})'
+      \big(
+      \bsA \bshatSigma \bsA'
+      \big)^{-1}
+      \bsa(\bshatbeta_{OLS})
+      \quad&\dto\quad
+      \Chi^2_C
+      \qquad
+      \text{where} \quad
+      \bsA := \; \frac{\partial}{\partial \bsbeta'}[\bsa(\bsbeta)]
+    \end{align*}
+    i.e. $\bsA$ is the derivative of $\bsa$ evaluated at true parameter
+    vector $\bsbeta$.
+
+  \item \emph{``LR'' Test for Testing Non-Linear Hypotheses}:
+    Given Null Hypothesis $H_0: \bsa(\bsbeta) = \bso$ for some function
+    $\bsa:\R^K\ra \R^C$ above,  we consider restricted and unrestricted
+    efficient GMM estimates
+    \begin{align*}
+      \bshatbeta
+      :=&\; \argmin_{\bsb}\; J(\bsb, \bshatS) \\
+      \bsbarbeta
+      :=&\; \argmin_{\bsb}\; J(\bsb, \bshatS)
+      \qquad\text{s.t.} \quad \bsa(\bsb) = \bso
+    \end{align*}
+    where
+    $J(\bsb, \bshatS) := N\cdot \bsg_N(\bsb)' \bshatS^{-1} \bsg_N(\bsb)$
+    and $\bshatS$ is a consistent estimator
+    of $\E[\varepsilon_n^2\bsx_n\bsx_n']$, the inverse of the efficient
+    weighting matrix. Then
+    \begin{align*}
+      LR := J(\bsbarbeta, \bshatS) - J(\bshatbeta, \bshatS)
+      \quad \dto \quad \Chi^2_C
+    \end{align*}
+    i.e.\ it has the same asymptotic distribution as the Wald Statistic
+    $W$ in Test 3 above.
+\end{enumerate}
+Tests 3 and 4 both test the nonlinear null hypothesis
+$H_0:\bsa(\bsbeta)=\bso$. However, Test 3 is \emph{not} invariant to
+different (but equivalent) ways of writing the same null hypothesis.
+Test 4 \emph{is} invariant to such rewriting.
+\end{prop}
+\begin{proof}
+Note/recall that $\bshatSigma$ is a consistent estimator of $\bsSigma$.
+Now we consider each in turn:
+\begin{enumerate}
+  \item Convergence in distribution of the $t$-ratio follows from
+    Expression~\ref{trobust} above, consistency of $\bshatSigma$ in
+    estimating $\bsSigma$, and Slutsky.
+
+  \item
+    By Expression~\ref{trobust} and a property of MVN RV's, we get
+    \begin{align*}
+      \sqrt{N}(\bshatbeta - \bsbeta)
+      \; &\dto \;
+      N(0,\bsSigma)
+      \quad\implies\quad
+      \bsR'\sqrt{N}(\bshatbeta - \bsbeta)
+      \; \dto \;
+      N(0,\bsR'\bsSigma\bsR)
+    \end{align*}
+    But under the null, $\bsR'\bsbeta = \bsr$, so that
+    $\bsR'\sqrt{N}(\bshatbeta - \bsbeta)
+    =
+    \sqrt{N}(\bsR'\bshatbeta - \bsr)$,
+    hence
+    \begin{align*}
+      \sqrt{N}(\bsR'\bshatbeta - \bsr)
+      \; \dto \;
+      N(0,\bsR'\bsSigma\bsR)
+    \end{align*}
+    Moreover, we can write $W$ as
+    \begin{align*}
+      W &=
+      %N\cdot
+      %(\bsR'\bshatbeta-\bsr)'
+      %\big(
+      %\bsR'\bshatSigma\bsR
+      %\big)^{-1}
+      %(\bsR'\bshatbeta-\bsr) \\
+      %&=
+      \sqrt{N}
+      (\bsR'\bshatbeta-\bsr)'
+      \big(
+      \bsR'\bshatSigma\bsR
+      \big)^{-1}
+      \sqrt{N}
+      (\bsR'\bshatbeta-\bsr)
+    \end{align*}
+    This is just a quadratic form of a MVN RV wrapped around its inverse
+    variance so that the whole thing converges to a $\Chi^2_C$ variable
+    since $C$ is the rank of the variance.
+
+  \item
+    Given Expression~\ref{trobust}, Straightforward application of the
+    the Delta Method gets us
+    \begin{align*}
+      \sqrt{N}\big(
+        \bsa(\bshatbeta_{OLS})
+        -
+        \underbrace{\bsa(\bsbeta)}_{\text{$=0$ for $H_0$}}
+      \big)
+      \dto N(\bso,\bsA \bsSigma \bsA')
+      \qquad \text{where}\quad
+      \bsA := \frac{\partial}{\partial \bsbeta'}[\bsa(\bsbeta)]
+    \end{align*}
+    Again, $\bsA$ is the first derivative of $\bsa$ evaluated at true
+    parameter vector $\bsbeta$. Therefore, we can form the Wald
+    statistic by squaring this MVN RV about its inverse variance (using
+    the fact that $\bsa(\bsbeta)=0$ under the null) to get
+    \begin{align*}
+      \sqrt{N}
+      \bsa(\bshatbeta_{OLS})'
+      \big(
+      \bsA \bshatSigma \bsA'
+      \big)^{-1}
+      \sqrt{N}
+      \bsa(\bshatbeta_{OLS})
+      \quad \dto\quad \Chi^2_C
+    \end{align*}
+    But this is precisely the statistic we defined above once you
+    combine the $\sqrt{N}$ terms.
+\end{enumerate}
+\end{proof}
+
+
 
 
 \clearpage
