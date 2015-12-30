@@ -8929,6 +8929,366 @@ Now we consider each in turn:
 \clearpage
 \section{Generalized Method of Moments (GMM)}
 
+\section{Definition}
+
+\begin{defn}(Method of Moments and Generalized Method of Moments)
+A model and its assumptions typically imply certain
+\emph{moment conditions} stating that some function
+$\bsf:\Rm\times\Rk \ra \Rl$ of random variable $\bsw_n\in\Rm$ and
+parameters $\bsbeta \in\Rk$ must equal the constant zero vector (without
+loss of generality):
+\begin{align*}
+  \bsg(\bsbeta) := \E[\bsf(\bsw_n,\bsbeta)] = \bso
+\end{align*}
+We can estimate parameters by drawing a sample $\{\bsw_n\}\nN$ of the
+random variable, constructing a sample analog $\bsg_N$ of the moment
+conditions
+\begin{align*}
+  \bsg_N(\bsb) :=
+  \frac{1}{N} \sumnN f(\bsw_n,\bsb)
+\end{align*}
+and then choosing parameter vector $\bsb$ that sets the sample analog
+equal to zero or close to zero.
+\\
+\\
+When the dimensionality of $\bsbeta$ equals the dimensionality of $\bsg$
+(when there are as many parameters as moment conditions), we can always
+set the sample analog of the moment conditions equal to zero exactly.
+Therefore, we call $\bshatbeta$, the solution to the following system of
+equations,
+\begin{align*}
+  \bsg_N(\bshatbeta) &= \bso
+  \qquad\text{where}\quad
+  \bsg_N,\bshatbeta \in\Rk
+\end{align*}
+the \emph{method of moments} estimator.
+\\
+\\
+When there are more moment conditions than parameters,  i.e.\ when the
+model is \emph{overidentified}, we call
+\begin{align*}
+  \bshatbeta(\bshatW) :=&\;
+  \argmin_{\bsb} J(\bsb,\bshatW) \\
+  \text{where}\quad
+  J(\bsb,\bshatW)
+  :=&\;
+  N\cdot \bsg_N(\bsb)' \, \bshatW \, \bsg_N(\bsb)
+\end{align*}
+the \emph{Generalized Method of Moments} (GMM) estimator given
+symmetric, positive definite weighting matrix $\bshatW$ such that
+$\bshatW\pto \bsW$ as $N\ra\infty$.\footnote{%
+  Note that $\bsW$ and $\bsw$ having nothing to do with each other
+  directly. Just notation.}
+In words, since we probably can't set the sample analog of the moment
+conditions $\bsg_N$ equal to zero \emph{exactly}, we'll try to get it
+\emph{close} to the zero vector, possibly weighting the different moment
+conditions asymmetrically, emphasizing some over others.
+We index $\bshatbeta$ by $\bshatW$ because the estimate depends
+crucially on the choice of weighting matrix.
+Most estimators that we care about can be expressed as a GMM estimator
+given an appropriate choice of moment conditions and weighting matrix.
+\end{defn}
+\begin{rmk}
+We typically use the ``generalized'' quantifier to refer to methods
+where there are more conditions than parameters and so we have to ``do
+something close'' rather than exactly.
+\end{rmk}
+
+\clearpage
+\subsection{OLS as a GMM Estimator}
+
+As a first example, take simple OLS, which can be written as a GMM
+estimator. In particular, take the model
+\begin{align*}
+  y_n &= \bsx_n' \bsbeta + \varepsilon_n \\
+  \text{where} \quad
+  \E[\varepsilon_n\bsx_n] &=
+  \E[(y_n-\bsx_n'\bsbeta)\bsx_n] = \bso
+\end{align*}
+The orthogonality condition $\bsg(\bsb)=\E[\varepsilon_n\bsx_n']=\bso$
+will be the moment condition to use. Therefore, we form $\bsg_N$, the
+sample analog of $\bsg$,
+\begin{align*}
+  \bsg_N(\bsb) &= \frac{1}{N}\sumnN (y_n-\bsx_n'\bsbeta)\bsx_n
+  = \frac{1}{N}\bsX'(\bsy - \bsX\bsbeta)
+\end{align*}
+and estimate the parameters using identity weighting matrix
+$\bsW = \bsI_K$ (ignoring constants like $N$ or $\frac{1}{N}$):
+\begin{align*}
+  \bshatbeta(\bsI_K)
+  &= \argmin_{\bsb} \; \bsg_N(\bsb)' \, \bsI_K \, \bsg_N(\bsb) \\
+  &= \argmin_{\bsb} \;
+    (\bsy - \bsX\bsb)'\bsX \bsI_K \bsX'(\bsy - \bsX\bsb)
+\end{align*}
+Ignoring terms constant terms that are not a function of $\bsb$, we can
+simplify the minimization problem to
+\begin{align*}
+  \bshatbeta(\bsI_K)
+  &= \argmin_{\bsb} \;
+    -\bsb'\bsX'\bsX \bsX'\bsy
+    - \bsy'\bsX \bsX'\bsX\bsb + \bsb'\bsX'\bsX \bsX'\bsX\bsb
+\end{align*}
+The first order conditions of the minimization problem are
+\begin{align*}
+  0 &=
+  -2\bsX'\bsX \bsX'\bsy
+  + 2\bsX'\bsX \bsX'\bsX\bsb \\
+  \implies\quad
+  \bsb
+  &= (\bsX'\bsX)^{-1} \bsX'\bsy
+\end{align*}
+which is exactly the OLS estimator formula.
+
+\clearpage
+\subsection{Regression with Endogenous Regressors and Instruments}
+
+\begin{defn}(Model Assumptions)
+We have dependent variable $y_n$ and vector of regressors
+$\bsx_n\in\RK$. We now also introduce vector $\bsz_n\in\RL$ of
+instruments. Vectors $\bsx_n$ and $\bsz_n$ might have elements in
+common.\footnote{%
+  The extreme case $\bsx_n=\bsz_n$ is just OLS, though we obviously
+  really care about the case where $\bsx_n\neq \bsz_n$.
+}
+Regressors of $\bsx_n$ that are also instruments in $\bsz_n$ are called
+\emph{predetermined}, while the other elements of $\bsx_n$
+are \emph{endogenous}.
+Assumptions:
+\begin{enumerate}
+  \item \emph{Linearity}: $y_n = \bsx_n' \bsbeta + \varepsilon_n$
+    where $\bsx_n,\bsbeta\in\RK$.
+
+  \item \emph{Ergodic Stationarity}:
+    The unique and nonconstant elelements of $(y_n, \bsx_n, \bsz_n)$ are
+    jointly stationary and ergodic. This is implied by iid, but weaker.
+
+  \item \emph{Orthogonality Conditions/Predetermined Instruments}:
+    $\E[\bsz_n (y_n - \bsx'_n \bsbeta)]=\E[\bsz_n\varepsilon_n]= \bso$
+
+    These will be the moment conditions that we exploit in
+    the GMM estimation step.
+    Note that we allow $\E[\bsx_n\varepsilon_n]\neq \bso$. In words, the
+    regressors $\bsx_n$ are potentially endogenous, i.e.\ correlated
+    with the error term $\varepsilon_n$. However, we require the
+    \emph{instruments} to be predetermined, i.e.\ orthogonal to the
+    error term $\varepsilon_n$.
+
+    In general, any predetermined regressors in $\bsx_n$ should also be
+    included in $\bsz_n$ because we exploit moment conditions
+    $\E[\bsz_n\varepsilon_n]=\bso$ to estimate $\bsbeta$, so we should
+    include as many valid moment condititons as possible. Not including
+    those regressors as instruments would remove moment conditions that
+    are informative about $\bsbeta$.
+
+  \item \emph{Rank \& Order Conditions for Identification}:
+    $\E[\bsz_n\bsx_n']$ is finite with full column rank $K$.
+
+    First, this ensures that the instruments and regressors are
+    correlated, otherwise the IV estimator would be undefined. Second,
+    linearity and Assumption 3 state
+    \begin{align*}
+      \E[\bsz_n\varepsilon_n]=
+      \E[\bsz_n (y_n - \bsx'_n \bsbeta)]&=\bso
+      \quad \iff \quad
+      \E[\bsz_n\bsx'_n] \bsbeta = \E[\bsz_n y_n]
+    \end{align*}
+    which imply that $\bsbeta$ is \emph{a particular} solution of the
+    $L$ moment conditions in $K$ unknowns. This rank requirement then
+    ensures that $\bsbeta$ is the \emph{only} solution, i.e.\ that
+    $\bsbeta$ is identified.
+
+    A necessary condition for the rank assumption is the
+    \emph{order condition for identification}:
+    \begin{align*}
+      \dim(\bsx_n) = K \leq L = \dim(\bsz_n)
+    \end{align*}
+    i.e. more instruments than regressors. Each element of $\bsx_n$ must
+    either be predetermined/non-endogenous (in both $\bsx_n$ and
+    $\bsz_n$) or have an instrument to circumvent the endogeneity
+    problem and estimate the corresponding element of $\bsbeta$
+    correctly.
+
+    If $K=L$, the model is \emph{exactly} identified. There are as many
+    instruments as regressors, and we use Method of Moments to construct
+    an IV estimator. If $K< L$, the model is \emph{overidentified},
+    and we use GMM to estimate parameters. If $K>L$, the model is
+    \emph{underidentified}; you are shit out of luck until you find more
+    instruments.
+
+  \item \emph{Martingale Difference Sequence $\bsz_n\varepsilon_n$}:
+    We strengthen Assumption 3, supposing that
+    $\bsz_n\varepsilon_n$ has finite second moment,
+    $\E[\varepsilon_n^2\bsz_n\bsz_n']<\infty$, and is a martingale
+    difference sequence,
+    \begin{align*}
+      \E[\bsz_n\varepsilon_n\;|\;
+      \bsz_{n-1}\varepsilon_{n-1},\bsz_{n-2}\varepsilon_{n-2},\ldots]
+      = \bso
+    \end{align*}
+\end{enumerate}
+\end{defn}
+
+\begin{defn}(Method of Moments IV Estimator, Exactly Identified Case)
+Take Assumptions 1-5 above and assume additionally that $K=L$ so there
+are as many regressors as instruments. Then the orthogonality conditions
+imply
+\begin{align*}
+  \E[\bsz_n\varepsilon_n]=
+  \E[\bsz_n (y_n - \bsx'_n \bsbeta)]&=\bso
+  \quad \iff \quad
+  \E[\bsz_n\bsx'_n] \bsbeta = \E[\bsz_n y_n]
+\end{align*}
+Assumption 3, the Rank Condition for Identification, the ensures that we
+can solve for $\bsbeta$:
+\begin{align*}
+  \bsbeta = \E[\bsz_n\bsx'_n]^{-1}\E[\bsz_n y_n]
+\end{align*}
+Therefore, we can construct a method of moments estimator
+$\bshatbeta_{IV}$, also called the
+\emph{instrumental variables estimator}, by using the sample analog:
+\begin{align*}
+  \bshatbeta_{IV} =
+  \left(\frac{1}{N}\sumnN\bsz_n\bsx'_n\right)^{-1}
+  \left(\frac{1}{N}\sumnN \bsz_n y_n\right)
+  =
+  (\bsZ'\bsX)^{-1}\bsZ'\bsy
+\end{align*}
+Substituting in $y_n=\bsx_n'\bsbeta + \varepsilon_n$, we can derive
+\begin{align*}
+  \bshatbeta_{IV}
+  &=
+  \left(\frac{1}{N}\sumnN\bsz_n\bsx'_n\right)^{-1}
+  \left(\frac{1}{N}\sumnN \bsz_n (\bsx_n'\bsbeta + \varepsilon_n)\right)
+  \\
+  %&=
+  %\left(\frac{1}{N}\sumnN\bsz_n\bsx'_n\right)^{-1}
+  %\left[
+  %\left(
+  %\frac{1}{N}
+  %\sumnN \bsz_n\bsx_n'\right)\bsbeta
+  %+
+  %\left(
+  %\frac{1}{N}
+  %\sumnN \bsz_n \varepsilon_n\right)
+  %\right]
+  %\\
+  \implies\quad
+  \bshatbeta_{IV} - \bsbeta
+  &=
+  \left(\frac{1}{N}\sumnN\bsz_n\bsx'_n\right)^{-1}
+  \left( \frac{1}{N} \sumnN \bsz_n \varepsilon_n\right)
+\end{align*}
+By the orthogonality condition, the estimator is unbiased. We can also
+derive an asymptotic distribution through LLN, CLT, and Slutsky:
+\begin{align*}
+  \sqrt{N}\left(\bshatbeta_{IV} - \bsbeta\right)
+  &\quad\dto\quad
+  \E[\bsz_n\bsx'_n]^{-1}
+  \cdot
+  N\left(0,\;\E[\varepsilon_n^2\bsz_n\bsz_n']\right)
+\end{align*}
+\end{defn}
+
+\clearpage
+\begin{defn}(GMM Estimator, Overidentified Case)
+Take Assumptions 1-5 above and assume additionally that $K<L$ so there
+are as more instruments than regressors. The orthogonality conditions
+state that
+\begin{align*}
+  \E[\bsz_n\varepsilon_n]=
+  \E[\bsz_n (y_n - \bsx'_n \bsbeta)]&=\bso
+  \quad \iff \quad
+  \bsg(\bsbeta) = \E[\bsz_n\bsx'_n] \bsbeta - \E[\bsz_n y_n] = \bso
+\end{align*}
+We construct the sample analog
+\begin{align*}
+  \bsg_N(\bsb) &=
+  \left(\frac{1}{N}\sumnN \bsz_n\bsx'_n \right)\bsb
+  -\left( \frac{1}{N} \sumnN \bsz_n y_n \right)
+  = \frac{1}{N}\left(\bsZ'\bsX\bsb - \bsZ'\bsy\right)
+\end{align*}
+We want to construct the GMM estimator (ignoring scalar constants like
+$N$ and $\frac{1}{N}$):
+\begin{align*}
+  \bshatbeta(\bshatW)
+  &= \argmin_{\bsb} \; \bsg_N(\bsb)' \, \bshatW \, \bsg_N(\bsb) \\
+  &= \argmin_{\bsb} \;
+    \left(\bsZ'\bsX\bsb - \bsZ'\bsy\right)'
+    \bshatW
+    \left(\bsZ'\bsX\bsb - \bsZ'\bsy\right)
+\end{align*}
+%Simplifying and removing constant terms that don't depend upon $\bsb$,
+%we get
+%\begin{align*}
+  %\bshatbeta(\bshatW)
+  %&= \argmin_{\bsb} \;
+    %\bsb'\bsX'\bsZ\bshatW \bsZ'\bsX\bsb
+    %- \bsb'\bsX'\bsZ\bshatW\bsZ'\bsy
+    %- \bsy'\bsZ\bshatW \bsZ'\bsX\bsb
+%\end{align*}
+This has first order conditions
+\begin{align*}
+  \bso &= 2\bsX'\bsZ\bshatW \bsZ'\bsX\bsb - 2\bsX'\bsZ\bshatW\bsZ'\bsy
+  \\
+  \implies\quad
+  \bshatbeta(\bshatW) &=
+  \left(\bsX'\bsZ\bshatW \bsZ'\bsX\right)^{-1}\bsX'\bsZ\bshatW\bsZ'\bsy
+\end{align*}
+Substituting in $\bsy = \bsX\bsbeta +\bsvarepsilon$, we get
+\begin{align*}
+  \bshatbeta(\bshatW) &=
+  \left(\bsX'\bsZ\bshatW \bsZ'\bsX\right)^{-1}\bsX'\bsZ\bshatW\bsZ'
+  \left(\bsX\bsbeta +\bsvarepsilon\right) \\
+  \implies\quad
+  \bshatbeta(\bshatW) - \bsbeta
+  &=
+  \left(\bsX'\bsZ\bshatW
+  \bsZ'\bsX\right)^{-1}\bsX'\bsZ\bshatW\bsZ'\bsvarepsilon \\
+  &=
+  \left[
+    \left(\frac{1}{N} \sumnN \bsx_n \bsz_n'\right)
+    \bshatW
+    \left(\frac{1}{N} \sumnN \bsz_n\bsx_n' \right)
+  \right]^{-1}
+  \left[
+    \left(\frac{1}{N} \sumnN \bsx_n \bsz_n'\right)
+    \bshatW
+    \left(\frac{1}{N} \sumnN \bsz_n \varepsilon_n \right)
+  \right]
+\end{align*}
+From there, we get
+\begin{enumerate}[label=(\roman*)]
+  \item Consistency: $\bshatbeta(\bshatW)\pto \bsbeta$
+  \item Asymptotic Normality: Recalling that $\bshatW\pto \bsW$
+    applying LLN, CLT, and Slutsky gives
+    \begin{align*}
+      \sqrt{N}\left(\bshatbeta(\bshatW) - \bsbeta\right)
+      \quad \dto \quad
+      \bigg(
+      \big(
+        \E[\bsx_n\bsz_n']
+        \bsW
+        \E[\bsz_n\bsx_n']
+      \big)^{-1}
+      \E[\bsx_n\bsz_n']
+      \bsW
+      \bigg)
+      \cdot
+      \big[
+      N\left(0,\;
+      \E[\varepsilon_n^2 \bsz_n\bsz_n']
+      \right)
+      \big]
+    \end{align*}
+  \item
+\end{enumerate}
+
+\end{defn}
+
+
+\clearpage
+\section{Time Series GMM}
+
 GMM is often done in the context of time series models, and so I will
 use $T$ to denote sample size rather than $N$.
 
