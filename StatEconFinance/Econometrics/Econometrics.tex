@@ -255,6 +255,9 @@
 \newcommand{\bse}{\boldsymbol{e}}
 \newcommand{\bshatb}{\boldsymbol{\hat{b}}}
 \newcommand{\bshaty}{\boldsymbol{\hat{y}}}
+\newcommand{\bshatx}{\boldsymbol{\hat{x}}}
+\newcommand{\bshatX}{\boldsymbol{\hat{X}}}
+\newcommand{\bshatV}{\boldsymbol{\hat{V}}}
 \newcommand{\bsd}{\boldsymbol{d}}
 \newcommand{\bsf}{\boldsymbol{f}}
 \newcommand{\bsg}{\boldsymbol{g}}
@@ -284,6 +287,7 @@
 \newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
 \newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
 \newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
 \newcommand{\bsbeta}{\boldsymbol{\beta}}
 \newcommand{\bsgamma}{\boldsymbol{\gamma}}
 \newcommand{\bslambda}{\boldsymbol{\lambda}}
@@ -7768,14 +7772,14 @@ first expression is more general.
 \end{defn}
 
 \begin{defn}(Estimator for $\sigma^2$ and $\Var[\hat{\bsbeta}_{OLS}|\bsX]$)
-Assuming spherical errors, we form the estmator for $\sigma^2$:
+Assuming spherical errors, we form the estimator for $\sigma^2$:
 \begin{align*}
   s^2 &= \frac{SSR(\bsb)}{(n-K)} = \frac{\bse'\bse}{(N-K)}
 \end{align*}
 That let's us define an estimator for the covariance matrix of the
 coefficients:
 \begin{align*}
-  \hat{\bsV}(\hat{\bsbeta}_{OLS}|\bsX) = s^2(\bsX'\bsX)^{-1}
+  \bshatV(\hat{\bsbeta}_{OLS}|\bsX) = s^2(\bsX'\bsX)^{-1}
 \end{align*}
 \end{defn}
 
@@ -8026,6 +8030,73 @@ regressors:
   \frac{\bse'\bse/(N-K)}{(\bsy-\bar{\bsy})'(\bsy-\bar{\bsy})/(N-1)}
 \end{align*}
 \end{defn}
+
+\clearpage
+\subsection{Heteroskedasticity Robust Standard Errors}
+
+Without assuming spherical errors (homoskedasticity), recall that
+the variance of the OLS estimator is
+\begin{align*}
+  \Var(\hat{\bsbeta}_{OLS}|\bsX)
+  &=
+  \left((\bsX'\bsX)^{-1}\bsX'\right)
+  \E[\bsvarepsilon\bsvarepsilon' |\bsX]
+  \left(\bsX(\bsX'\bsX)^{-1}\right) \\
+  %&=
+  %(\bsX'\bsX)^{-1}
+  %\E[\bsX'\bsvarepsilon\bsvarepsilon'\bsX\;|\;\bsX]
+  %(\bsX'\bsX)^{-1}
+  %\\
+  &=
+  (\bsX'\bsX)^{-1}
+  \E\left[
+  \left(
+  \sumnN \varepsilon_n \bsx_n
+  \right)
+  \left(
+  \sumnN \varepsilon_n \bsx_n
+  \right)'
+  \;\bigg|\;\bsX
+  \right]
+  (\bsX'\bsX)^{-1} \\
+  &=
+  (\bsX'\bsX)^{-1}
+  \E\left[
+  \sumnN
+  \sum_{m=1}^N
+  \varepsilon_n\varepsilon_m \bsx_n\bsx_m'
+  \big|\bsX
+  \right]
+  (\bsX'\bsX)^{-1} \\
+  \implies\quad
+  \Var(\hat{\bsbeta}_{OLS}|\bsX)
+  &=
+  (\bsX'\bsX)^{-1}
+  \E\left[
+  \sumnN
+  \varepsilon_n^2 \bsx_n\bsx_n'
+  \;\big|\;\bsX
+  \right]
+  (\bsX'\bsX)^{-1}
+\end{align*}
+where got to the last line by using the fact that
+$\E[\varepsilon_n\varepsilon_m|\bsX]=0$ for $n\neq m$.
+\\
+\\
+To esitmate this object, we form the natural estimator called the
+\emph{sandwich estimator}:
+\begin{align*}
+  \bshatV(\hat{\bsbeta}_{OLS}|\bsX)
+  =
+  (\bsX'\bsX)^{-1}
+  \left(
+  \sumnN
+  e_n^2 \bsx_n\bsx_n'
+  \right)
+  (\bsX'\bsX)^{-1}
+\end{align*}
+using the estimated errors $e_n$.
+
 
 \clearpage
 \subsection{Omitted Variable Bias}
