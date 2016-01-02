@@ -8517,6 +8517,101 @@ converges in distribution to $\Chi_k^2/k$.
 
 \end{proof}
 
+\clearpage
+\subsection{Weighted and Generalized Least Squares (WLS, GLS)}
+
+\subsubsection{Weighted Least Squares (WLS) Estimator}
+
+While OLS minimized the sum of squared residuals, the
+\emph{weighted least squares (WLS) estimator} $\bshatbeta_{WLS}$
+minimizes the weighted sum of squared residuals:
+\begin{align*}
+  \bshatbeta_{WLS}
+  :=&\; \argmin_{\bsb}
+  \sumnN w_n^2(y_n - \bsx_n'\bsb)^2
+  = \argmin_{\bsb}
+  (\bsy - \bsX\bsb)'\bsW(\bsy - \bsX\bsb)
+\end{align*}
+where $\{w_n\}\nN$ is a sequence of sample weights and $\bsW :=
+\diag\{w_1^2,\ldots,w_N^2\}$.  Obviously, they must be chosen or
+observed.
+From the first order conditions, we get the expression
+\begin{align*}
+  \bshatbeta_{WLS}
+  &= \left(
+  \sumnN w_n^2 \bsx_n\bsx_n'
+  \right)^{-1}
+  \left(
+  \sumnN w_n^2 \bsx_ny_n
+  \right)
+  = \left( \bsX'\bsW\bsX \right)^{-1} \bsX'\bsW \bsy
+\end{align*}
+Substiting in $y_n=\bsx_n\bsbeta+\varepsilon_n$, we get
+\begin{align*}
+  \bshatbeta_{WLS} - \bsbeta
+  &= \left(
+  \sumnN w_n^2 \bsx_n\bsx_n'
+  \right)^{-1}
+  \left(
+  \sumnN w_n^2 \bsx_n\varepsilon_n
+  \right)
+  = \left( \bsX'\bsW\bsX \right)^{-1} \bsX'\bsW \bsvarepsilon
+\end{align*}
+The estimator is consistent if $\E[w_n^2\bsx_n\varepsilon_n]=0$. That is
+implied by $\E[\varepsilon_n|\bsx_n\bsw_n]=0$.
+
+\subsubsection{Generalized Least Squares (GLS) Estimator}
+
+Gauss-Markov says that under spherical errors
+$\Var(\bsvarepsilon|\bsX)=\sigma^2\bsI$ (i.e. conditional
+homoskedasticity), the OLS estimator is \emph{efficient}. However, if
+the errors are \emph{heteroskedastic} this is not the case. But we could
+construct sample weights so that the \emph{weighted} observations are
+conditionally homosekedastic, compute the WLS estimator with these
+weights (which is equivalent to OLS on the homosekedastic weighted
+observations), and then apply Gauss-Markov to say that the resulting the
+WLS estimator is efficient. This is GLS.
+
+\begin{defn}(GLS Estimator)
+Suppose the errors are conditionally heteroskedastic with mean and
+covariance matrix
+\begin{align*}
+  \E[\bsvarepsilon|\bsX]= \bso
+  \qquad
+  \Var(\bsvarepsilon|\bsX)
+  = \diag\{\sigma_1^2,\ldots,\sigma^2_N\}
+\end{align*}
+That suggests weights $w_n=\sigma^{-1}_n$. Then the WLS estimator under
+these weights is equivalent to the OLS estimator of regression
+\begin{align*}
+  \frac{y_n}{\sigma_n} = \left(\frac{\bsx_n}{\sigma_n}\right)'\bsbeta
+  + \frac{\varepsilon_n}{\sigma_n}
+\end{align*}
+Since, for this regression, we have homoskedasticity
+$\Var(\bsvarepsilon|\bsX)=\bsI$, the OLS estimator is efficient. But
+since it's equivalent to the WLS estimator given weights
+$w_n=\sigma^{-1}_n$, the WLS estimator is efficient, and it gets the
+special name: the \emph{GLS estimator}.
+
+The weighting structure $w_n=\sigma_n^{-1}$ clearly \emph{overweights}
+those observations that have small conditional variance. Intuitively,
+GLS uses those observations that are measured most precisely to
+construct an more efficient estimator than plain OLS.
+\end{defn}
+
+\begin{defn}(FGLS Estimator)
+Of course, we don't know the $\{\sigma_n^2\}\nN$ terms in practice that
+we need to construct the optimal weights. So we instead specify
+functional form
+\begin{align*}
+  \sigma_n^2 = g(\bsx_n,\bsalpha)
+\end{align*}
+for some $\bsalpha$ that we can either observe or estimate.
+Then the WLS estimator using weights $w_n=g(\bsx_n,\alpha)^{-1}$ is
+called the \emph{Feasible Generalized Least Squares (FGLS) Estimator}.
+\end{defn}
+
+
 
 
 \clearpage
