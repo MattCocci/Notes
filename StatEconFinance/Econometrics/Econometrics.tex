@@ -8984,18 +8984,18 @@ These results and estimators can be used to conduct the following tests:
     efficient GMM estimates
     \begin{align*}
       \bshatbeta
-      :=&\; \argmin_{\bsb}\; J(\bsb, \bshatS) \\
+      :=&\; \argmin_{\bsb}\; J(\bsb, \bshatS^{-1}) \\
       \bsbarbeta
-      :=&\; \argmin_{\bsb}\; J(\bsb, \bshatS)
+      :=&\; \argmin_{\bsb}\; J(\bsb, \bshatS^{-1})
       \qquad\text{s.t.} \quad \bsa(\bsb) = \bso
     \end{align*}
     where
-    $J(\bsb, \bshatS) := N\cdot \bsg_N(\bsb)' \bshatS^{-1} \bsg_N(\bsb)$
+    $J(\bsb, \bshatW) := N\cdot \bsg_N(\bsb)' \bshatW \bsg_N(\bsb)$
     and $\bshatS$ is a consistent estimator
     of $\E[\varepsilon_n^2\bsx_n\bsx_n']$, the inverse of the efficient
     weighting matrix. Then
     \begin{align*}
-      LR := J(\bsbarbeta, \bshatS) - J(\bshatbeta, \bshatS)
+      LR := J(\bsbarbeta, \bshatS^{-1}) - J(\bshatbeta, \bshatS^{-1})
       \quad \dto \quad \Chi^2_C
     \end{align*}
     i.e.\ it has the same asymptotic distribution as the Wald Statistic
@@ -9064,7 +9064,7 @@ Now we consider each in turn:
       \sqrt{N}\big(
         \bsa(\bshatbeta_{OLS})
         -
-        \underbrace{\bsa(\bsbeta)}_{\text{$=0$ for $H_0$}}
+        \bsa(\bsbeta)
       \big)
       \dto N(\bso,\bsA \bsSigma \bsA')
       \qquad \text{where}\quad
@@ -9089,20 +9089,328 @@ Now we consider each in turn:
 \end{enumerate}
 \end{proof}
 
+\clearpage
+\subsection{Clustering}
+
+In this section, the total $N$ observations are divided into $M$
+clusters/groups, where the $m$th cluster/group has $N_m$ observations so
+that
+\begin{align*}
+  N = \sum_{m=1}^N N_m
+\end{align*}
+Therefore, any sum over the $N$ individual observations can be rewritten
+as a double-sum over clusters and individuals within a cluster. For
+example
+\begin{align}
+  \sum\nN \bsx_n
+  = \sum_{m=1}^M \sum_{n=1}^{N_m} \bsx_{mn}
+  \label{clusterSums}
+\end{align}
+where $\bsx_{mn}$ is the $n$ observation within the $m$th cluster.
+\\
+\\
+Lastly, clustering is obviously important when the observations really
+do fall into clusters or bins or groups, so that there's good reason to
+believe that the error terms are correlated within those clusters. But
+it \emph{also} matters in another important and common case.
+
+Let $x_{ni}$ denote the $i$th regressor on the RHS of some plain-vanilla
+linear regression
+\begin{align*}
+  y_n = \bsx_n'\bsbeta + \varepsilon_n
+\end{align*}
+where the errors $\varepsilon_n$ are definitely \emph{not} correlated
+within groups in the data-generating process. To fix concepts, suppose
+$y_n$ is an individual's wages, and we include as RHS regressors
+in $\bsx_n$ a slew of controls, including occupation and $i$th regressor
+$x_{ni}$---average wage for someone who has individual $n$'s occupation.
+Many occupations are in the sample, and there are many individuals per
+occupation. So we \emph{could} cluster on occuupation if we wanted, but
+again, the data-generating process for $\varepsilon_n$ has no
+correlation by occupation. Therefore, it's not immediately clear that we
+\emph{should} cluster.
+
+However, suppose that in the data-generating process, wages $y_n$
+actually depend upon upon $\log(x_{ni})$---the \emph{log} of the
+occupation's average wage---rather than just $x_{ni}$. In other words,
+we have misspecified the functional form of a regressor that is
+\emph{occupation-specific}. Well even if there weren't any
+within-occupation correlation for the true errors $\varepsilon_n$, this
+misspecification \emph{would} induce within-occupation correlation in
+the estimated errors $e_n$. Therefore, we would \emph{want} to cluster
+on occupation.  Or more practically, if we're worried about
+misspecification of the functional form of some RHS regressor that
+varies only at a cluster/group level (not at an individual level), then
+we should check whether the usual standard errors and the standard
+errors clustered on those groups are wildly different.
+
+Summarizing, we want to cluster (or at the very least, compare regular
+and clustered standard errors) if \emph{either}
+\begin{enumerate}
+  \item We have good reason to believe the true errors $\varepsilon_n$
+    are correlated within clusters/groups.
+  \item We are worried that we have misspecified the functional form of
+    some regressor that varies only at a cluster/group level---not an
+    individual level.
+\end{enumerate}
+
+\subsubsection{Model with Disjoint Clusters}
+
+The regression model we have in mind is
+\begin{align}
+  y_{mn} = \bsx_{mn}'\bsbeta + \varepsilon_{mn}
+  \qquad \E[\bsx_{mn}\varepsilon_{mn}] = 0
+  \label{clusterModel}
+\end{align}
+where $(y_{mn},\bsx_{mn})$ is the $n$th observation within cluster $m$,
+and $\varepsilon_{mn}$ is the corresponding error term.
+Now however, we want to allow for correlation of the error terms
+\emph{within} a cluster:
+\begin{align*}
+  \E[\varepsilon_{mn_i}\varepsilon_{mn_j}]\neq 0
+  \qquad n_i,n_j \in \{1,\ldots,N_m\}
+\end{align*}
+However, we will still assume that errors are uncorrelated \emph{across}
+independently sampled clusters
+\begin{align*}
+  \E[\varepsilon_{m_in_k}\varepsilon_{m_jn_\ell}]= 0
+  \qquad \forall m_i \neq m_j
+  \quad\text{and}
+  \quad
+  \begin{cases}
+    n_k \in \{1,\ldots,N_{m_i}\} \\
+    n_\ell \in \{1,\ldots,N_{m_j}\} \\
+  \end{cases}
+\end{align*}
+Therefore, we need to modify the asymptotic results for the OLS
+estimator accordingly. This is accomplished by changing the unit of
+observation. In particular, the basic unit of observation is no longer
+the $N$ total \emph{observations} that we send to infinity to derive the
+asymptotics, but instead the $M$ independently sampled \emph{clusters}
+that we will send to infinity to derive the asymptotics.
+
+Given this, we rewrite the OLS estimator as
+\begin{align}
+  \bshatbeta_{OLS}
+  = (\bsX'\bsX)^{-1}\bsX'\bsy
+  &=
+  \left[
+    \sumnN \bsx_n\bsx_n'
+  \right]^{-1}
+  \left[
+    \sumnN
+    \bsx_ny_n
+  \right] \notag\\
+  \text{Using~\ref{clusterSums}:}\qquad
+  &=
+  \left[
+    \frac{1}{M}
+    \sum_{m=1}^M \left(\sum_{n=1}^{N_m} \bsx_{mn}\bsx_{mn}'\right)
+  \right]^{-1}
+  \left[
+    \frac{1}{M}
+    \sum_{m=1}^M \left(\sum_{n=1}^{N_m} \bsx_{mn}y_{mn} \right)
+  \right] \notag\\
+  \implies\quad
+  \bshatbeta_{OLS} - \bsbeta
+  &=
+  \left[
+    \frac{1}{M}
+    \sum_{m=1}^M \left(\sum_{n=1}^{N_m} \bsx_{mn}\bsx_{mn}'\right)
+  \right]^{-1}
+  \left[
+    \frac{1}{M}
+    \sum_{m=1}^M \left(\sum_{n=1}^{N_m} \bsx_{mn}\varepsilon_{mn} \right)
+  \right]
+  \label{clusterSamplingError}
+\end{align}
+Sending the number of clusters $M\ra\infty$ gives consistency
+\begin{align*}
+  \bshatbeta_{OLS} - \bsbeta
+  \quad\pto\quad
+    \E\left[\sum_{n=1}^{N_m} \bsx_{mn}\bsx_{mn}'\right]^{-1}
+    \E\left[\sum_{n=1}^{N_m} \bsx_{mn}\varepsilon_{mn} \right]
+  = 0
+\end{align*}
+using the fact that $\E[\bsx_{mn}\varepsilon_{mn}]=0$ for all $m,n$.
+We can then derive an asymptotic distribution from the LLN, CLT,
+Slutsky, and Expression~\ref{clusterSamplingError} for the sampling
+error:
+\begin{align*}
+  \sqrt{M}\left(\bshatbeta_{OLS} - \bsbeta\right)
+  &=
+  \left[
+    \frac{1}{M}
+    \sum_{m=1}^M \left(\sum_{n=1}^{N_m} \bsx_{mn}\bsx_{mn}'\right)
+  \right]^{-1}
+  \left[
+    \frac{1}{\sqrt{M}}
+    \sum_{m=1}^M \left(\sum_{n=1}^{N_m} \bsx_{mn}\varepsilon_{mn} \right)
+  \right] \\
+  \text{as $M\ra\infty$}\qquad
+  &\dto
+  \E\left[\sum_{n=1}^{N_m} \bsx_{mn}\bsx_{mn}'\right]^{-1}
+  \cdot
+  N\left(0,\;
+    \E\left[\,
+      \left(\sum_{n=1}^{N_m} \bsx_{mn}\varepsilon_{mn}\right)
+      \left(\sum_{n=1}^{N_m} \bsx_{mn}\varepsilon_{mn}\right)'
+    \, \right]
+  \right)
+\end{align*}
+%If $\bsSigma$ is the asymptotic variance, then we form the natural
+%estimator $\bshatSigma$ given the sample using the estimated errors
+%$e_{mn}$ rather than the unobserved true errors $\varepsilon_{mn}$:
+%\begin{align*}
+  %\bshatSigma
+  %&=
+  %\left(
+  %\frac{1}{M}
+  %\sum_{m=1}^M
+  %\sum_{n=1}^{N_m} \bsx_{mn}\bsx_{mn}'
+  %\right)^{-1}
+  %\left(
+  %\frac{1}{M}
+  %\sum_{m=1}^M
+  %\left(\sum_{n=1}^{N_m} \bsx_{mn}e_{mn}\right)
+  %\left(\sum_{n=1}^{N_m} \bsx_{mn}e_{mn}\right)'
+  %\right)
+  %\left(
+  %\frac{1}{M}
+  %\sum_{m=1}^M
+  %\sum_{n=1}^{N_m} \bsx_{mn}\bsx_{mn}'
+  %\right)^{-1}
+  %\\
+  %&=
+  %M\cdot
+  %\left( \bsX'\bsX \right)^{-1}
+  %\left(
+  %\sum_{m=1}^M
+  %\left(\sum_{i=1}^{N_m} \bsx_{mi}e_{mi}\right)
+  %\left(\sum_{j=1}^{N_m} \bsx_{mj}e_{mj}\right)'
+  %\right)
+  %\left( \bsX'\bsX \right)^{-1}
+  %\\
+  %&=
+  %M\cdot
+  %\left( \bsX'\bsX \right)^{-1}
+  %\left(
+  %\sum_{m=1}^M
+  %\sum_{i=1}^{N_m}
+  %\sum_{j=1}^{N_m}
+  %e_{mi}e_{mj}\bsx_{mi}\bsx_{mj}'
+  %\right)
+  %\left( \bsX'\bsX \right)^{-1}
+%\end{align*}
+%Since
+
+
+
+\clearpage
+\subsubsection{Model with Nested Clusters}
+
+Suppose that we have nested clusters, e.g.\ counties within states. You
+should cluster on the \emph{aggregate} or \emph{coarsest} group, e.g.\
+states.
+
+First, recall that the asymptotics of the last subsection hold only if
+the clusters are \emph{independently} sampled. Almost certainly,
+counties within states are correlated, so clustering on counties
+wouldn't satisfy the independent sampling of clusters. Second, we made
+no assumption on the error structure \emph{within} a cluster. It can be
+correlated in any arbitrary way, so this really can capture whatever
+correlation structure we need at the finer level.
+
+
+\subsubsection{Model with Non-Nested Overlapping Clusters}
+
+The regression model we have in mind is
+\begin{align*}
+  y_n = \bsx_n'\bsbeta + \varepsilon_n
+  \qquad \E[\bsx_n\varepsilon_n] = 0
+\end{align*}
+However, there are $M$ possibly-overlapping clusters such that
+\begin{align*}
+  \text{Observations $n_i,n_j$ share some (any) cluster}
+  \quad\implies\quad
+  \E[\varepsilon_{n_i}\varepsilon_{n_j}] \neq 0
+\end{align*}
+We can derive an expression for the finite-sample covariance matrix,
+starting from the standard expression:
+\begin{align*}
+  \bshatbeta_{OLS} - \bsbeta
+  &= (\bsX'\bsX)^{-1}\bsX'\varepsilon
+  %=
+  %\left[
+    %\sumnN \bsx_n\bsx_n'
+  %\right]^{-1}
+  %\left[
+    %\sumnN \varepsilon_n\bsx_n
+  %\right]
+  \\
+  \implies\quad
+  \Var(\bshatbeta_{OLS} - \bsbeta|\bsX)
+  &=
+  (\bsX'\bsX)^{-1}
+  \,
+  \E[\bsX'\bsvarepsilon\bsvarepsilon'\bsX|\bsX]
+  \,
+  (\bsX'\bsX)^{-1} \\
+  &=
+  (\bsX'\bsX)^{-1}
+  \E\left[
+  \left(
+    \sumnN \varepsilon_n\bsx_n
+  \right)
+  \left(
+    \sumnN \varepsilon_n\bsx_n'
+  \right)
+  \big|\bsX
+  \right]
+  (\bsX'\bsX)^{-1}
+  \\
+  &=
+  (\bsX'\bsX)^{-1}
+  \E\left[
+  \sumiN
+  \sum_{j=1}^N
+  \varepsilon_i\varepsilon_j\bsx_i\bsx_j'
+  \cdot
+  \mathbf{1}_{\{\text{$i,j$ share some cluster}\}}
+  \big| \bsX
+  \right]
+  (\bsX'\bsX)^{-1}
+\end{align*}
+We can form an estimator of this object by using the estimated errors
+$e_n$ (since the true errors $\varepsilon_n$ are unobserved) in the
+middle term:
+\begin{align*}
+  \widehat{\Var}(\bshatbeta_{OLS} - \bsbeta|\bsX)
+  &=
+  (\bsX'\bsX)^{-1}
+  \left(
+  \sumiN
+  \sum_{j=1}^N
+  e_ie_j\bsx_i\bsx_j'
+  \cdot
+  \mathbf{1}_{\{\text{$i,j$ share some cluster}\}}
+  \right)
+  (\bsX'\bsX)^{-1}
+\end{align*}
 
 
 
 \clearpage
 \section{Generalized Method of Moments (GMM)}
 
-\section{Definition}
+\subsection{Definition}
 
 \begin{defn}(Method of Moments and Generalized Method of Moments)
 A model and its assumptions typically imply certain
 \emph{moment conditions} stating that some function
 $\bsf:\Rm\times\Rk \ra \Rl$ of random variable $\bsw_n\in\Rm$ and
-parameters $\bsbeta \in\Rk$ must equal the constant zero vector (without
-loss of generality):
+parameters $\bsbeta \in\Rk$ must equal (without loss of generality) the
+constant zero vector:
 \begin{align*}
   \bsg(\bsbeta) := \E[\bsf(\bsw_n,\bsbeta)] = \bso
 \end{align*}
