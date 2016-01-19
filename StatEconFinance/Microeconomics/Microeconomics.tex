@@ -1001,6 +1001,63 @@ function in expected utility form.
 \clearpage
 \section{Game Theory}
 
+Main groupings based on whether the game is \emph{static} vs.
+\emph{dynamic} (sometimes phrased \emph{simulataneous move} vs.
+\emph{sequential move}), and whether there is
+\emph{complete information} or \emph{incomplete information}, where
+complete information means no private information about timing, feasible
+movies, or payoffs---everything is common knowledge.
+In incomplete information games, sometimes called \emph{Bayesian Games},
+at least one player is uncertain about another's payoff function.
+\\
+\\
+We now consider those four cases, and briefly describe the equilibrium
+concepts in each:
+\begin{enumerate}
+  \item Static games, complete information: Nash Equilibrium (whether
+    pure and/or mixed strategy) is the main form of equilibrium.
+    A strategy is a NE if and only if everyone is playing a best
+    response.
+
+    Can sometimes use iterative removal of strictly dominated strategies
+    to solve for pure strategy NE. Mixed strategies are a probability
+    distributio over pure strategies that are not iteratively strictly
+    dominated.
+
+  \item Dynamic games, complete information: Most naturally
+    represented in extensive form. There are many NE, but some involves
+    incredible threats. Therefore, introduce refinement of basic NE
+    concept called a \emph{subgame perfect Nash equilibrium},
+    where a whole-game subgame perfect NE is a NE in all subgames.
+
+    If there is a finite number of rounds, backward induction will
+    always get you the subgame perfect NE, but the concept is still well
+    defined for infinite games where you cannot use backward induction.
+
+  \item Static games, incomplete information: Extend NE to allow for
+    private information, which is called
+    \emph{Bayesian Nash Equilibrium}.
+    Typically, players have \emph{types} that are known only by
+    themselves, though generally the distribution of types is common
+    knowledge.
+
+    A strategy in a static Bayesian game is an action \emph{rule}, not
+    just an action, that depends upon the player's own drawn type and
+    the distribution of other players' types.
+    A player is playing a best response if his response (conditional on
+    his own drawn type) maximizes his expected payoff, integrating over
+    the other player's decision rule and possible types.
+
+  \item Dynamic games, incomplete information: Lead to notion of
+    \emph{perfect Bayesian equilibrium}.
+    Here, beliefs are as important as strategies.
+    The introduction of a little bit of imperfect information can allow
+    cooperation and reputation where it would otherwise have broken down
+    under perfect information through backwards induction.
+\end{enumerate}
+This is all based on Gibbons, JEP.
+
+\clearpage
 \subsection{Normal Form Games}
 
 \begin{defn}(Normal Form Game)
@@ -1304,6 +1361,186 @@ Every mixed strategy Nash Equilibrium is rationalizable
 Each player $i$ can rationalize $p^*_i$ in response to the Nash
 Equilibrium strategies $p^*_{-i}$.
 \end{proof}
+
+\clearpage
+\subsection{Auctions}
+
+We have $n$ bidders each with value draws from
+$F:[\underline{x},\overline{x}]\ra[0,1]$, which is absolutely continuous
+with density function $f$.
+
+In a first price sealed bid auction, the strategy for player $i$ is
+captured by bidding function $b_i:[\underline{x},\overline{x}]\ra\R$.
+Suppose that the equilibrium is symmetric so $b_i=b$ for all $i$.
+\\
+\\
+Function $b$ is weakly increasing. To see this, we note that by virtue
+of it being an equlibrium strategy,
+\begin{align}
+  [x-b(x)]P(x) \geq [x-b(y)]P(y)
+  \label{binc1}
+\end{align}
+In words, it always does weakly better, if you draw $x$, to bid the
+equilibrium value $b(x)$, which entails winning probability $P(x)$,
+rather than pretending to have drawn some other value $y$ and bidding
+$b(y)$, which entails winning probablity $P(y)$. Similarly, if you draw
+$y$,
+\begin{align}
+  [y-b(y)]P(y) \geq [y-b(x)]P(x)
+  \label{binc2}
+\end{align}
+Next, we can also say that
+\begin{align*}
+  [\text{LHS of (\ref{binc1})}]
+  &\geq
+  [\text{RHS of (\ref{binc1})}] \\
+  [\text{LHS of (\ref{binc2})}]
+  &\geq
+  [\text{RHS of (\ref{binc2})}] \\
+  \implies\quad
+  [\text{LHS of (\ref{binc1})}]
+  -
+  [\text{RHS of (\ref{binc2})}]
+  &\geq
+  [\text{RHS of (\ref{binc1})}]
+  -
+  [\text{LHS of (\ref{binc2})}]
+\end{align*}
+Writing this out
+\begin{align*}
+  [x-b(x)]P(x)
+  -
+  [y-b(x)]P(x)
+  &\geq
+  [x-b(y)]P(y)
+  -
+  [y-b(y)]P(y) \\
+  (x-y)P(x)
+  &\geq
+  (x-y)P(y) \\
+  (x-y)[P(x)-P(y)]
+  &\geq
+  0
+\end{align*}
+For $x>y$, that means $P(x)-P(y)\geq 0$, which means that
+$b(x)\geq b(y)$.
+
+Next, we want to derive properties about the equilibrium bidding
+function $b$. We start by letting $\psi(y)=F^{n-1}(y)$ denote the
+distribution function of $Y_1=\max\{X_2,\ldots,X_n\}$. Then $\psi$ is
+the distribution function for the max type draw among everyone but
+player one.  The value $\psi(y)$ is the probability that everyone else
+bets less than $y$.  Since higher types will map directly into higher
+bids (recall that $b$ is strictly increasing), it's okay to concern
+ourselves with the distribution of types rather than the distribution of
+bids (which would still give the same answer).
+
+So upon drawing $x$, for $b$ to be an equilibrium betting function, it
+must be that
+\begin{align*}
+  x =
+  \argmax_y (x-b(y))\psi(y)
+\end{align*}
+That is, if $b$ is a function mapping from drawn types to bids that
+really does represent equilibrium bidding strategies, then $b(x)$ should
+maximize expected payoff, which is value in excess of bid $(x-b(x))$
+times probability $\psi(y)$ of drawing the highest type (and thus
+winning because bid $b$ is strictly increasing in drawn type).
+
+The first order necessary condition to the above maximization problem is
+\begin{align*}
+  (x-b(y))\psi'(y) -b'(y) \psi(y) &= 0
+\end{align*}
+Since $b$ is an equilibrium strategy that maps types to optimal
+strategies, $x$ must solve the problem so $y=x$ must satisfy the FOC:
+\begin{align*}
+  b'(x) \psi(x) + b(x)\psi'(x) &= x\psi'(x)
+\end{align*}
+This is an ODE characterizing the equilibrium bidding strategy $b$.
+We can get several different characterizations, each potentially useful
+in its own right. First, we get the equation capuring the first order
+condition necessary condition:
+\begin{align*}
+  b'(x) \psi(x) + b(x)\psi'(x) &= x\psi'(x)
+\end{align*}
+We can solve this ODE to get
+\begin{align*}
+  \left(b(x) \psi(x)\right)' &= x\psi'(x)\\
+  \int^x_{\underline{x}}
+  \left(b(z) \psi(z)\right)'\; dz
+  &=
+  \int^x_{\underline{x}}
+  z\psi'(z)\; dz\\
+  b(x) \psi(x)
+  -
+  b(\underline{x}) \underbrace{\psi(\underline{x})}_{0}
+  &=
+  \int^x_{\underline{x}}
+  z\psi'(z)\; dz\\
+  b(x)
+  &=
+  \int^x_{\underline{x}}
+  z \; \frac{\psi'(z)}{\psi(x)}\; dz
+\end{align*}
+Note that the last line is something like an expected value since $\psi$
+is a distribution function (so that $\psi'(z)$ is a density). However,
+it's not an expectation and density over the whole support. It's a
+truncated expectation conditional on being less than $x$, requiring use
+to renormalize the density $\psi'(z)$ by the probability mass of being
+below $x$, $\psi(x)$.
+\\
+\\
+We can then integrate by parts to get the final representation
+\begin{align*}
+  b(x)
+  &=
+  \frac{1}{\psi(x)}
+  \int^x_{\underline{x}}
+  z \; \psi'(z)\;dz \\
+  &=
+  \frac{1}{\psi(x)}
+  \left[
+    [z\psi(z)]^x_{\underline{x}}
+    -
+    \int^x_{\underline{x}}
+    \psi(z)\;dz
+  \right] \\
+  &=
+  \frac{1}{\psi(x)}
+  \left[
+    x\psi(x)
+    -
+    \underline{x} \underbrace{\psi(\underline{x})}_{0}
+    -
+    \int^x_{\underline{x}}
+    \psi(z)\;dz
+  \right] \\
+  &=
+    x -
+    \frac{1}{\psi(x)}
+    \int^x_{\underline{x}}
+    \psi(z)\;dz
+\end{align*}
+Finally, taking the derivative
+\begin{align*}
+  b'(x)
+  &=
+    1 -
+    \frac{1}{\psi(x)}
+    \cdot
+    \psi(x)
+    +
+    \frac{\psi'(x)}{\psi(x)^{2}}
+    \int^x_{\underline{x}}
+    \psi(z)\;dz \\
+  &=
+    \frac{\psi'(x)}{\psi(x)^{2}}
+    \int^x_{\underline{x}}
+    \psi(z)\;dz
+\end{align*}
+This is also how to see that $b$ is strictly increasing.
+
+
 
 
 %% APPPENDIX %%
