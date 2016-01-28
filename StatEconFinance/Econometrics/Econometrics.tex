@@ -7907,6 +7907,8 @@ Now apply Slutsky and use the distribution of $X_N$ to conclude that
 \end{proof}
 
 
+
+
 \clearpage
 \section{Estimators}
 
@@ -9142,6 +9144,183 @@ after setting the value of the Type I error equal to $\alpha$.
 
 
 \clearpage
+\section{Generalized Method of Moments}
+
+\subsection{Method of Moments and GMM Defined}
+
+A model and its assumptions typically imply certain
+\emph{moment conditions} stating that some function
+$\bsf:\R^M\times\R^K \ra \R^L$ of random variable $\bsw_n\in\R^M$ and
+parameters $\bsbeta \in\R^K$ must equal (without loss of generality) the
+constant zero vector:
+\begin{align}
+  \label{populationMomentConditions}
+  \bsg(\bsbeta) := \E[\bsf(\bsw_n,\bsbeta)] = \bso
+\end{align}
+where $g:\R^K\ra \R^L$. Our goal is to estimate $\bsbeta$.
+Quite sensibly, we can estimate parameters by drawing a sample
+$\{\bsw_n\}\nN$ of the random variable, constructing a sample analog
+$\bsg_N$ of the moment conditions
+\begin{align}
+  \label{sampleMomentConditions}
+  \bsg_N(\bsb) :=
+  \frac{1}{N} \sumnN \bsf(\bsw_n,\bsb)
+\end{align}
+and then choosing parameter vector $\bsb$ that sets the sample analog
+equal to zero or ``close'' to zero, with these two notions leading us to
+the following definitions.
+
+\begin{defn}(Method of Moments Estimator)
+When the dimensionality of $\bsbeta$ equals that of $\bsg(\bsbeta)$
+(when there are as many parameters as moment conditions $K=L$), we can
+always set the sample analog of the moment conditions equal to zero
+exactly. Therefore, we define the \emph{method of moments estimator} as
+the solution $\bshatbeta$ to the following system of
+equations:
+\begin{align*}
+  \bsg_N(\bshatbeta) &= \bso
+  \qquad\text{where}\quad
+  \bsg_N,\bshatbeta \in\R^K
+\end{align*}
+\end{defn}
+
+
+\begin{defn}(GMM Estimator)
+\label{defn:gmm}
+When there are more moment conditions than parameters, i.e.\ when $L>K$
+so that the model is \emph{overidentified}, we cannot generally set the
+sample analog of the moment conditions $\bsg_N(\bsb)$ to zero
+\emph{exactly} using some $K$-dimensional $\bsb$.
+Therefore, we instead look for the parameter vector that gets the
+squared weighted elements of vector $\bsg_N(\bsb)$ jointly as
+\emph{close} to the scalar zero as possible:
+\begin{align}
+  \bshatbeta(\bshatW) :=&\;
+  \argmin_{\bsb} J(\bsb,\bshatW)
+  \label{eq:bhatmin} \\
+  \text{where}\quad
+  J(\bsb,\bshatW)
+  :=&\;
+  N\cdot \bsg_N(\bsb)' \, \bshatW \, \bsg_N(\bsb)
+  \notag
+\end{align}
+where $\bshatbeta(\bshatW)$ is called
+the \emph{Generalized Method of Moments} (GMM) estimator using
+symmetric, positive definite weighting matrix $\bshatW$ such that
+$\bshatW\pto \bsW$ as $N\ra\infty$.\footnote{%
+  Note that $\bsW$ and $\bsw_n$ above having nothing to do with each
+  other directly. Just notation.}
+
+We index $\bshatbeta$ by $\bshatW$ because the estimate depends
+crucially on the choice of weighting matrix, which can possibly weight
+the different moment conditions asymmetrically, emphasizing some over
+others.
+We'll talk about choices of the weighting matrix
+$\boldsymbol{W}$ later on. For now though, you might reasonably just
+choose $\boldsymbol{W}=\boldsymbol{I}$, treating all moments
+equally.
+But later on, we'll see that most estimators that we care about can be
+expressed as a GMM estimator given an appropriate choice of moment
+conditions and weighting matrix.
+\end{defn}
+
+
+\begin{rmk}
+We typically use the ``generalized'' quantifier to refer to methods
+where there are more conditions than parameters and so we have to ``do
+something close'' rather than exactly.
+\end{rmk}
+
+
+\begin{defn}(GMM via Moment Selection)
+Another way to think about GMM is to deal with overidentification by
+employing a selection matrix $\bshata\in \R^{K\times L}$ to
+select/emphasize important moments or linear combinations of moments.
+In particular, rather than solve minimization Problem~\ref{eq:bhatmin},
+we solve this modified, but exactly-identified variation on the original
+moment conditions:
+\begin{align*}
+  \bshata \; \bsg_N(\bshatbeta) &= \bso
+  \qquad\text{where}\quad
+  \bshatbeta \in\R^K\quad \bshata \in \R^{L\times K}
+\end{align*}
+We see that $\bshata\,\bsg_N(\bshatb)$ is like a new set of moment
+conditions, but with the dimensionality reduced from $L>K$ to $K$ so
+that we \emph{can} set this to zero for some $\bshatbeta\in\R^K$.
+
+This selection matrix can depend upon the data---hence the hat in
+$\bshata$. It could also, for example, be mostly ones and zeros to pick
+out the moments in $\bsg_N(\bshatb)$ (or form linear combinations of
+moments) that we think are most important and definitely want to force
+to zero. But in general, it really can be any arbitrary matrix in
+$R^{L\times K}$.
+
+Lastly, just to tie things together, this is actually equivalent to
+Definition~\ref{defn:gmm} if you set
+\begin{align}
+  \bshata =
+  \frac{\partial \bsg'_N}{\partial \bsb}
+  \bshatW
+  \label{eq:equivrep}
+\end{align}
+This follows from the first order conditions to the minimization defined
+by Equation~\ref{eq:bhatmin}:
+\begin{align*}
+  \bso
+  =
+  \underbrace{\frac{\partial \bsg_N'}{\partial \bsb} \bshatW}_{\bshata}
+  \bsg_N(\bsb)
+\end{align*}
+\end{defn}
+
+
+\clearpage
+\subsection{Example: OLS as a GMM Estimator}
+
+As a first example, take simple OLS, which can be written as a GMM
+estimator. In particular, take the model
+\begin{align*}
+  y_n &= \bsx_n' \bsbeta + \varepsilon_n \\
+  \text{where} \quad
+  \E[\varepsilon_n\bsx_n] &=
+  \E[(y_n-\bsx_n'\bsbeta)\bsx_n] = \bso
+\end{align*}
+The orthogonality condition $\bsg(\bsb)=\E[\varepsilon_n\bsx_n']=\bso$
+will be the moment condition to use. Therefore, we form $\bsg_N$, the
+sample analog of $\bsg$,
+\begin{align*}
+  \bsg_N(\bsb) &= \frac{1}{N}\sumnN (y_n-\bsx_n'\bsbeta)\bsx_n
+  = \frac{1}{N}\bsX'(\bsy - \bsX\bsbeta)
+\end{align*}
+and estimate the parameters using identity weighting matrix
+$\bsW = \bsI_K$ (ignoring constants like $N$ or $\frac{1}{N}$):
+\begin{align*}
+  \bshatbeta(\bsI_K)
+  &= \argmin_{\bsb} \; \bsg_N(\bsb)' \, \bsI_K \, \bsg_N(\bsb) \\
+  &= \argmin_{\bsb} \;
+    (\bsy - \bsX\bsb)'\bsX \bsI_K \bsX'(\bsy - \bsX\bsb)
+\end{align*}
+Ignoring terms constant terms that are not a function of $\bsb$, we can
+simplify the minimization problem to
+\begin{align*}
+  \bshatbeta(\bsI_K)
+  &= \argmin_{\bsb} \;
+    -\bsb'\bsX'\bsX \bsX'\bsy
+    - \bsy'\bsX \bsX'\bsX\bsb + \bsb'\bsX'\bsX \bsX'\bsX\bsb
+\end{align*}
+The first order conditions of the minimization problem are
+\begin{align*}
+  0 &=
+  -2\bsX'\bsX \bsX'\bsy
+  + 2\bsX'\bsX \bsX'\bsX\bsb \\
+  \implies\quad
+  \bsb
+  &= (\bsX'\bsX)^{-1} \bsX'\bsy
+\end{align*}
+which is exactly the OLS estimator formula.
+
+
+\clearpage
 \section{Classical Linear Regression: Finite Samples Properties of OLS}
 
 \subsection{Setup and Assumptions}
@@ -9620,7 +9799,7 @@ $\Var(\bsvarepsilon|\bsX)=\sigma^2\bsI$.
 \clearpage
 \subsection{$R^2$ and Relatives}
 
-\begin{defn}($R^2$)
+\begin{defn}(Uncentered $R^2$)
 First, We define the \emph{uncentered $R^2$} via the decomposition
 \begin{align*}
   \bsy' \bsy
@@ -9642,11 +9821,13 @@ First, We define the \emph{uncentered $R^2$} via the decomposition
   = 1- \frac{\bse'\bse}{\bsy' \bsy}
 \end{align*}
 This is guaranteed to lie in $[0,1]$.
-\\
-\\
+\end{defn}
+
+\begin{defn}(Centered $R^2$)
 Next, we define the \emph{centered $R^2$} or
 \emph{coefficient of determination}.
 \begin{align*}
+  SST &= SSM + SSR \\
   (\bsy-\bar{\bsy})'(\bsy-\bar{\bsy})
   &=
   (\bshaty-\bar{\bsy})'(\bsy-\bar{\bsy})
@@ -9660,16 +9841,27 @@ Next, we define the \emph{centered $R^2$} or
   =
   \frac{(\bshaty-\bar{\bsy})'(\bsy-\bar{\bsy})}{%
       (\bsy-\bar{\bsy})'(\bsy-\bar{\bsy})}
+  \\
+  &= 1- \frac{SSR}{SST} = \frac{SSM}{SST}
 \end{align*}
 Note that this guy can go negative if you don't include an intercept
 term in the regression.
-\\
-\\
+\end{defn}
+
+\begin{defn}
 We now define \emph{adjusted $R^2$}, which penalizes the number of
 regressors:
 \begin{align*}
-  R^2_A = 1 -
+  R^2_A
+  &= 1 -
   \frac{\bse'\bse/(N-K)}{(\bsy-\bar{\bsy})'(\bsy-\bar{\bsy})/(N-1)}
+\end{align*}
+Given plain old $R^2$, it can be derived as
+\begin{align*}
+  R^2_A =
+  1 -
+  \left(\frac{N-1}{N-K}\right)
+  \left(1 - R^2\right)
 \end{align*}
 \end{defn}
 
@@ -10100,8 +10292,8 @@ which has the following distribution:
   \frac{%
   \left(\bsR'\bshatbeta-\bsr\right)'
   \left[\bsR'(\bsX'\bsX)^{-1}\bsR)\right]^{-1}
-  \left(\bsR'\bshatbeta-\bsr\right)
-  }{p\cdot s^2}
+  \left(\bsR'\bshatbeta-\bsr\right)/p
+  }{s^2}
   \sim F_{p,N-K}
 \end{align*}
 \end{defn}
@@ -10113,8 +10305,8 @@ Write out the definition of the $F$-statistic:
   \frac{%
   \left(\bsR'\bshatbeta-\bsr\right)'
   \left[\bsR'(\bsX'\bsX)^{-1}\bsR)\right]^{-1}
-  \left(\bsR'\bshatbeta-\bsr\right)
-  }{p\cdot s^2} \\
+  \left(\bsR'\bshatbeta-\bsr\right)/p
+  }{s^2} \\
   &=
   \frac{%
   \left(\bsR'\bshatbeta-\bsr\right)'
@@ -10128,6 +10320,24 @@ Write out the definition of the $F$-statistic:
 \end{align*}
 But the fraction is precisely the definition of a $F_{p,N-K}$ distribution.
 \end{proof}
+
+\begin{prop}
+Alternatively, we can motivate the $F$-stat as follows. Consider the sum
+of squared errors from an \emph{unrestricted} minimization problem
+\begin{align*}
+  SSR_U = \min_{\bsb} (\bsy-\bsX\bsb)'(\bsy-\bsX\bsb)
+\end{align*}
+and the sum of squared errors from an \emph{restricted} minimization
+problem with $p = \dim(\bsr)$ constraints:
+\begin{align*}
+  SSR_R &= \min_{\bsb} (\bsy-\bsX\bsb)'(\bsy-\bsX\bsb) \\
+  \text{s.t.} \; \bsR' \bsb &= \bsr
+\end{align*}
+Then we can compute the $F$ statistic as
+\begin{align*}
+  F = \frac{(SSR_R-SSR_U)/p}{SSR_U/(N-K)}
+\end{align*}
+\end{prop}
 
 \begin{prop}
 An $F$-distributed random variable has a $\Chi^2$-distributed asymptotic
@@ -10353,10 +10563,10 @@ The OLS estimator has the following properties
 
   \item Since $\bshatbeta_{OLS}$ is a consistent estimator for
     $\bsbeta$, the estimated residuals
-    $\bse_n = \bsy_n - \bsx_n' \bshatbeta$ can be used to construct a
+    $e_n = y_n - \bsx_n' \bshatbeta$ can be used to construct a
     consistent estimator for $\E[\varepsilon_n^2\bsx_n\bsx_n']$:
     \begin{align*}
-      \frac{1}{N} \sumnN \bse^2_n \bsx_n \bsx_n'
+      \frac{1}{N} \sumnN e^2_n \bsx_n \bsx_n'
       \quad\pto\quad
       \E[\varepsilon_n^2\bsx_n\bsx_n']
     \end{align*}
@@ -10555,9 +10765,9 @@ above-proposed consistent estimator for its asymptotic variance:
 \begin{align}
   \bshatSigma :=
   N\cdot
-  \left(\bsX'\bsX\right)
+  \left(\bsX'\bsX\right)^{-1}
   \left(\sumnN \bse^2_n \bsx_n \bsx_n'\right)
-  \left(\bsX'\bsX\right)
+  \left(\bsX'\bsX\right)^{-1}
   \quad&\pto\quad
   \bsSigma :=
   \E[\bsx_i\bsx_i']^{-1}\;\E[\varepsilon^2_n\bsx_n\bsx_n']\;\E[\bsx_i\bsx_i']^{-1}
@@ -10602,8 +10812,9 @@ These results and estimators can be used to conduct the following tests:
     section under homoskedasticity.
 
   \item \emph{Wald Statistic for Testing Non-Linear Hypotheses}:
-    Any nonlinear hypothesis can be written (WLOG) as $H_0:
-    \bsa(\bsbeta) = \bso$ for some function $\bsa:\R^K\ra \R^C$. Then
+    Any nonlinear hypothesis can be written (w.l.o.g.) as
+    $H_0: \bsa(\bsbeta) = \bso$ for some function $\bsa:\R^K\ra \R^C$.
+    Then
     \begin{align*}
       W :=
       N \cdot \bsa(\bshatbeta_{OLS})'
@@ -11041,122 +11252,10 @@ middle term:
 \end{align*}
 
 
-
 \clearpage
-\section{Generalized Method of Moments (GMM)}
+\section{Single Equation Endogenous Regressor Model}
 
-\subsection{Definition}
-
-\begin{defn}(Method of Moments and Generalized Method of Moments)
-A model and its assumptions typically imply certain
-\emph{moment conditions} stating that some function
-$\bsf:\Rm\times\Rk \ra \Rl$ of random variable $\bsw_n\in\Rm$ and
-parameters $\bsbeta \in\Rk$ must equal (without loss of generality) the
-constant zero vector:
-\begin{align*}
-  \bsg(\bsbeta) := \E[\bsf(\bsw_n,\bsbeta)] = \bso
-\end{align*}
-We can estimate parameters by drawing a sample $\{\bsw_n\}\nN$ of the
-random variable, constructing a sample analog $\bsg_N$ of the moment
-conditions
-\begin{align*}
-  \bsg_N(\bsb) :=
-  \frac{1}{N} \sumnN \bsf(\bsw_n,\bsb)
-\end{align*}
-and then choosing parameter vector $\bsb$ that sets the sample analog
-equal to zero or close to zero.
-\\
-\\
-When the dimensionality of $\bsbeta$ equals the dimensionality of $\bsg$
-(when there are as many parameters as moment conditions), we can always
-set the sample analog of the moment conditions equal to zero exactly.
-Therefore, we define an estimator $\bshatbeta$ as the solution to the
-following system of equations,
-\begin{align*}
-  \bsg_N(\bshatbeta) &= \bso
-  \qquad\text{where}\quad
-  \bsg_N,\bshatbeta \in\Rk
-\end{align*}
-where $\bshatbeta$ is called the \emph{method of moments} estimator.
-\\
-\\
-When there are more moment conditions than parameters,  i.e.\ when the
-model is \emph{overidentified}, we call
-\begin{align*}
-  \bshatbeta(\bshatW) :=&\;
-  \argmin_{\bsb} J(\bsb,\bshatW) \\
-  \text{where}\quad
-  J(\bsb,\bshatW)
-  :=&\;
-  N\cdot \bsg_N(\bsb)' \, \bshatW \, \bsg_N(\bsb)
-\end{align*}
-the \emph{Generalized Method of Moments} (GMM) estimator given
-symmetric, positive definite weighting matrix $\bshatW$ such that
-$\bshatW\pto \bsW$ as $N\ra\infty$.\footnote{%
-  Note that $\bsW$ and $\bsw_n$ above having nothing to do with each
-  other directly. Just notation.}
-In words, since we probably can't set the sample analog of the moment
-conditions $\bsg_N$ equal to zero \emph{exactly}, we'll try to get it
-\emph{close} to the zero vector, possibly weighting the different moment
-conditions asymmetrically by $\bshatW$, emphasizing some over others.
-We index $\bshatbeta$ by $\bshatW$ because the estimate depends
-crucially on the choice of weighting matrix.  Most estimators that we
-care about can be expressed as a GMM estimator given an appropriate
-choice of moment conditions and weighting matrix.
-\end{defn}
-\begin{rmk}
-We typically use the ``generalized'' quantifier to refer to methods
-where there are more conditions than parameters and so we have to ``do
-something close'' rather than exactly.
-\end{rmk}
-
-\clearpage
-\subsection{OLS as a GMM Estimator}
-
-As a first example, take simple OLS, which can be written as a GMM
-estimator. In particular, take the model
-\begin{align*}
-  y_n &= \bsx_n' \bsbeta + \varepsilon_n \\
-  \text{where} \quad
-  \E[\varepsilon_n\bsx_n] &=
-  \E[(y_n-\bsx_n'\bsbeta)\bsx_n] = \bso
-\end{align*}
-The orthogonality condition $\bsg(\bsb)=\E[\varepsilon_n\bsx_n']=\bso$
-will be the moment condition to use. Therefore, we form $\bsg_N$, the
-sample analog of $\bsg$,
-\begin{align*}
-  \bsg_N(\bsb) &= \frac{1}{N}\sumnN (y_n-\bsx_n'\bsbeta)\bsx_n
-  = \frac{1}{N}\bsX'(\bsy - \bsX\bsbeta)
-\end{align*}
-and estimate the parameters using identity weighting matrix
-$\bsW = \bsI_K$ (ignoring constants like $N$ or $\frac{1}{N}$):
-\begin{align*}
-  \bshatbeta(\bsI_K)
-  &= \argmin_{\bsb} \; \bsg_N(\bsb)' \, \bsI_K \, \bsg_N(\bsb) \\
-  &= \argmin_{\bsb} \;
-    (\bsy - \bsX\bsb)'\bsX \bsI_K \bsX'(\bsy - \bsX\bsb)
-\end{align*}
-Ignoring terms constant terms that are not a function of $\bsb$, we can
-simplify the minimization problem to
-\begin{align*}
-  \bshatbeta(\bsI_K)
-  &= \argmin_{\bsb} \;
-    -\bsb'\bsX'\bsX \bsX'\bsy
-    - \bsy'\bsX \bsX'\bsX\bsb + \bsb'\bsX'\bsX \bsX'\bsX\bsb
-\end{align*}
-The first order conditions of the minimization problem are
-\begin{align*}
-  0 &=
-  -2\bsX'\bsX \bsX'\bsy
-  + 2\bsX'\bsX \bsX'\bsX\bsb \\
-  \implies\quad
-  \bsb
-  &= (\bsX'\bsX)^{-1} \bsX'\bsy
-\end{align*}
-which is exactly the OLS estimator formula.
-
-\clearpage
-\subsection{Model with Endogenous Regressors and Instruments}
+\subsection{Model Assumptions}
 
 \begin{defn}(Model Assumptions)
 We have dependent variable $y_n$ and vector of regressors
@@ -11244,7 +11343,7 @@ Assumptions:
 \end{enumerate}
 \end{defn}
 
-\subsubsection{Method of Moments IV Estimator, Exactly Identified Case}
+\subsection{Method of Moments IV Estimator, Exactly Identified Case}
 
 \begin{defn}(Method of Moments IV Estimator, Exactly Identified Case)
 Take Assumptions 1-5 above and assume additionally that $K=L$ so there
@@ -11308,7 +11407,7 @@ derive an asymptotic distribution through LLN, CLT, and Slutsky:
 \end{defn}
 
 \clearpage
-\subsubsection{GMM Estimator, Overidentified Case}
+\subsection{GMM Estimator, Overidentified Case}
 
 \begin{defn}(GMM Estimator, Overidentified Case)
 Take Assumptions 1-5 above and assume additionally that $K<L$ so there
@@ -11416,7 +11515,7 @@ From there, we get
 
 
 \clearpage
-\subsubsection{Efficient GMM Estimator}
+\subsection{Efficient GMM Estimator}
 
 \begin{defn}(Two-Stage Efficient GMM Estimator, Overidentified Case)
 Above, we defined the GMM estimator $\bshatbeta(\bshatW)$ for $\bsbeta$
@@ -11506,7 +11605,7 @@ asymptotic variance of our estimator. In particular, we get
 
 
 \clearpage
-\subsubsection{Efficient GMM Estimator under Conditional Homoskedasticity (2SLS)}
+\subsection{Efficient GMM Estimator under Conditional Homoskedasticity (2SLS)}
 
 None of the above assumed conditional homoskedasticity of the error
 term, but if we do, the efficient GMM estimator reduces to the 2SLS
@@ -11630,7 +11729,7 @@ In words, these are
 \end{defn}
 
 \clearpage
-\subsubsection{Continuously Updated GMM Estimator (CUE)}
+\subsection{Continuously Updated GMM Estimator (CUE)}
 
 Recall the two-step procedure:
 \begin{enumerate}
@@ -11718,66 +11817,6 @@ which is also the LIML estimator.
 
 \clearpage
 \section{Time Series GMM}
-
-GMM is often done in the context of time series models, and so I will
-use $T$ to denote sample size rather than $N$.
-
-\subsection{Notation}
-
-Suppose that we have vector random variable $\bsy_t$ with
-population mean $\mathbb{E}(\bsy_t)$. Given a sample
-$\{\bsy_t\}^T_{t=1}$, we can form an estimator of the mean
-\begin{align*}
-  \mathbb{E}_T(\bsy_t)
-  := \frac{1}{T} \sum^T_{t=1} \bsy_t
-\end{align*}
-Oten, however, we have a model and want to estimate a vector of
-parameters, $\bsb$. When this is the goal, we define a function
-that suppresses some of the notation above and makes the focus on
-parameters more explicit:
-\begin{align*}
-  \bsg(\bsb)
-  &:= \mathbb{E}[\boldsymbol{f}(\bsy_t,\bsb)]\\
-  \bsg_T(\bsb)
-  &:= \mathbb{E}_T[\boldsymbol{f}(\bsy_t,\bsb)]
-  = \frac{1}{T}\sum^T_{t=1}
-      \boldsymbol{f}(\bsy_t,\bsb)
-\end{align*}
-where $\boldsymbol{f}$ is some function that mixes data and parameters
-according to model-implied structure. We'll see more clearly how this is
-used below.
-
-But in general, note the convention: For a population concept like
-$\mathbb{E}(\cdot)$ or $\bsg(\cdot)$, we form the sample
-estimators (given $T$ observations) of $\mathbb{E}_T(\cdot)$ and
-$\bsg_T(\cdot)$.
-
-This convention might seem a little odd at first since
-$\mathbb{E}_T(\cdot)$ is often used to denote the expectation
-conditional on time $T$ information. But that's not going to be a
-problem here, since GMM will deal pretty much exclusively with
-\emph{unconditional} moments (or at least unconditional with respect to
-time).\footnote{%
-To take a quick example, consider the simple de-meaned, stationary AR(1)
-model
-\begin{align*}
-  y_t = \rho y_{t-1} + \varepsilon_t
-  \qquad \varepsilon_t \sim N(0,\sigma^2)
-\end{align*}
-You might reasonably care about \emph{either} the unconditional or (on
-time $t-1$ information) mean and variance of $y_t$.
-\begin{alignat*}{3}
-  \mathbb{E}(y_t) &= 0 &\mathbb{E}_t(y_{t}) &= \rho y_{t-1}\\
-  \text{Var}(y_t) &= \frac{\sigma^2}{1-\rho^2}
-  \qquad
-  &\text{Var}_t(y_t) &= \sigma^2
-\end{alignat*}
-In GMM, we'll be talking about the unconditional estimates on the left.
-}
-Plus, the convention has the added benefit of connecting estimators to
-their sample estimates in about the most explicit way possible (i.e.\
-just add ${}_T$ to go from estimator to estimate).
-
 
 \subsection{Distribution of Sample Mean}
 \label{sec:mean}
@@ -11980,163 +12019,6 @@ that $\bsy$ is actually a transformation or function of some
 base random variable.
 \end{rmk}
 
-
-
-\clearpage
-\subsection{Casting the Model in GMM Form}
-
-The first step is to write your model in standard GMM form:
-\begin{align}
-  0 &= \bsg(\bsb)\label{eq:stdform}\\
-  \Leftrightarrow\qquad
-  0 &= \mathbb{E}[\boldsymbol{f}(\bsy_t,\bsb)]
-  \notag
-\end{align}
-where $\bsb\in\mathbb{R}^p$,
-$\bsy_t\in\mathbb{R}^n$, and $\boldsymbol{f},
-\bsg\in\mathbb{R}^m$.  Equation~\ref{eq:stdform} states the
-\emph{moment conditions} of the model, since it encapsulates
-restrictions the model imposes on the moments.
-\\
-\\
-Examples
-\begin{enumerate}
-  \item An asset pricing model of asset ruturns for $N$ assets can be
-    expressed
-    \begin{align*}
-      1 &= \mathbb{E}(m_{t+1}(b) \boldsymbol{R}_{t+1}) \\
-      \Leftrightarrow \qquad
-      0 &= \mathbb{E}(m_{t+1}(b) \boldsymbol{R}_{t+1}-1)\\
-      \boldsymbol{R}_{t+1} &=
-      \begin{pmatrix}
-        R^1_{t+1}
-        &\cdots&
-        R^N_{t+1}
-      \end{pmatrix}'
-    \end{align*}
-    where the discount factor $m_{t+1}(b)$ is a scalar that depends on
-    data and model parameters.
-  \item Let $\boldsymbol{f}(\bsy_t,\bsb)$ represent
-    forecast or regression errors at time $t$ for a vector of different
-    data series that we're trying to predict or describe with the model.
-    Then Equation~\ref{eq:stdform} expresses the natural idea ``Set
-    errors to zero.''
-  \item Take a typical regression equation:
-    \begin{align*}
-    \end{align*}
-\end{enumerate}
-So it's usually very easy to write any model (linear or nonlinear) in
-standard form. Your model's structure is going to consist of a bunch of
-equations that place restrictions on data and parameters.  Simply figure
-out what combination of data and parameters should be zero in
-expectation, and the shift terms in those equations around as necessary
-until you work your model's restrictions/implications into the standard
-representation of Equation~\ref{eq:stdform}.
-
-\clearpage
-\subsection{Estimating the Model}
-
-Suppose that your model is the correct model of the world. Then by
-assumption, if we can find the \emph{true} parameter vector
-$\bsb_0\in \mathbb{R}^p$, it must be the case that
-\begin{align}
-  \bsg(\bsb_0) = 0
-  \label{eq:gmmtrue}
-\end{align}
-This suggests how to find an estimate $\bshatb$ of true
-parameter vector $\bsb_0$: just find the vector that sets the
-the function $\bsg(\bsb)$ to zero---i.e.\ solve the
-system.  But in practice, we need to overcome two very obvious issues
-with that recommendation.
-
-First, we don't have access to the population moment conditions
-$\bsg(\bsb)$. Remember that the function
-$\bsg$ depends upon random variable $\bsy_t$ under
-the hood, and we work with samples like $\{\bsy_t\}_{t=1}^T$
-in real life.  But we have an easy fix for that: just set the sample
-equivalent $\bsg_T(\bsb)=0$ instead. Done, this
-problem is solved.  \emph{However}, that leads us right to our next
-issue.
-
-We won't be able to simply set $\bsg_T(\bsb)=0$
-since the model The model probably isn't \emph{actually} the true model
-of the world. And in general, we're not going to be able set all $m$
-elements of vector $\bsg_T(\bsb)$ to zero with a
-misspecified model when $p<m$ (when the number of free parameters $p$ is
-less than the number of moment conditions $m$).  Now of course, we want
-$p<m$ because models should be parsimonious with less degress of freedom
-than data points, but the consequence is that you can't cleanly solve
-the system to set $\bsg_T(\bsb)=0$.
-
-So how exactly do you estimate the $p$ parameters given these issues,
-sample $\{\bsy_t\}_{t=1}^T$, and corresponding vector-valued
-function $\bsg_T(\bsb)\in \mathbb{R}^m$? There are
-two approaches:
-\begin{enumerate}
-  \item Choose a matrix $\boldsymbol{a}_T\in\mathbb{R}^{p\times m}$ and
-    set only $p$ linear combinations of the
-    moments to zero, i.e.\ solve the system of $p$ equations for the
-    $\bshatb$ that satisfies
-    \begin{align}
-      \boldsymbol{a}_T
-      \;
-      \bsg_T(\bshatb) = 0
-      \label{eq:bhatdef}
-    \end{align}
-    Most of the time, $\boldsymbol{a}_T$ will be a matrix of ones and
-    zeros to pick out the moments in $\bsg_T(b)$ (or form
-    linear combination of moments) we want to force to zero. But it
-    really can be as complicated as you want or depend upon sample size
-    (hence the ${}_T$ subscript). We'll see an example just below.
-
-    The main idea: $p<m$ means we can't set \emph{all} of the $m$
-    moments to zero, so focus on $p$ important ones.\footnote{Of course,
-      this might all be pointless if $r > g$ and patrimonial capitalism
-    kills us all. ``Piketty!!! [Shakes fist at sky]''}
-
-  \item If we don't want to take a stance on the important moments, form
-    a weighting matrix $\boldsymbol{W}\in \mathbb{R}^{m\times m}$ and
-    choose the parameter vector that gets the squared (weighted)
-    elements of $\bsg_T(\bsb)$ as close to zero as
-    possible:
-    \begin{align}
-      \bshatb = \arg\min_{\bsb}\;
-      \bsg_T(\bsb)' \boldsymbol{W}
-      \bsg_T(\bsb)
-      \label{eq:bhatmin}
-    \end{align}
-    We're minimizing a weighted sum of squared ``errors'' (i.e.\
-    differences of $\bsg_T(b)$ from its target of zero), which
-    is both conceptually and computationally straightfoward.
-
-    And, just to tie things together, this is actually equivalent to
-    Approach 1, if you set
-    \begin{align}
-      \boldsymbol{a}_T =
-      \frac{\partial \bsg'_T}{\partial \bsb}
-      \boldsymbol{W}
-      =
-      \bsd'
-      \boldsymbol{W}
-      \label{eq:equivrep}
-    \end{align}
-    where $\bsd
-    :=\frac{\partial \bsg'_T}{\partial \bsb}
-    \in \mathbb{R}^{p\times m}$.
-    This follows from the first order conditions to the minimization
-    defined by Equation~\ref{eq:bhatmin}:
-    \begin{align*}
-      0
-      = \frac{\partial \bsg'_T}{\partial \bsb}
-      \boldsymbol{W} \bsg_T(\bsb)
-      = \bsd'
-      \boldsymbol{W} \bsg_T(\bsb)
-    \end{align*}
-    We'll talk about choices of the weighting matrix
-    $\boldsymbol{W}$ later on. For now though, you might reasonably just
-    choose $\boldsymbol{W}=\boldsymbol{I}$, treating all moments
-    equally.
-\end{enumerate}
 
 \subsection{Standard Errors}
 
@@ -12576,6 +12458,91 @@ We also have, in general,
   \frac{\partial\bsg}{\partial \boldsymbol{\theta'}}
   \right)'
 \end{align*}
+
+
+\clearpage
+\section{Hayashi Reference Sheet}
+
+Hayashi makes the following definitions:
+\begin{align*}
+  \bsg_n &= \bsx_n\varepsilon_n \\
+  \bsS &= \E\bsg_n\bsg_n'] = \E[\varepsilon_n^2\bsx_n\bsx_n'] \\
+  \bsS_{\bsx\bsx} &= \frac{1}{N}\sumnN \bsx_n\bsx_n'\\
+\end{align*}
+
+%We have two equations, each estimated separately. Let $\beta_i$ denote
+%the OLS estimate from the $i$th regression, with $\beta^0_i$ the true
+%value, and ${se}_i$ the corresponding standard error. Whether in Chapter
+%1 or 2, we will have normality of the coefficient estimates about the
+%true value, i.e.
+%\begin{align*}
+  %\sqrt{N}
+  %\left(
+  %\begin{pmatrix}
+    %\beta_1 \\ \beta_2
+  %\end{pmatrix}
+  %-
+  %\begin{pmatrix}
+    %\beta_1^0 \\ \beta_2^0
+  %\end{pmatrix}
+  %\right)
+  %\sim
+  %N\left(
+  %\begin{pmatrix}
+    %0 \\ 0
+  %\end{pmatrix}
+  %,\;
+  %\begin{pmatrix}
+    %{se}_1 & 0 \\
+    %0 & {se}_2 \\
+  %\end{pmatrix}
+  %\right)
+%\end{align*}
+%Realistically, the coefficients could be correlated, but we have no
+%information in the problem to pin that down. So I just assume zero
+%correlation between errors/coefficients in the two equations, hence the
+%zeros in the covariance matrix. Then we have some functions
+%$g(\beta_1,\beta_2) = \beta_1 - \beta_2$ and $h(\beta_1,\beta_2) =
+%\beta_1\beta_2$. So then just apply the delta-method with these
+%functions to get
+%\begin{align*}
+  %\sqrt{N}
+  %\left(
+  %g(\beta_1,\beta_2)
+  %-
+  %g(\beta_1^0,\beta_2^0)
+  %\right)
+  %\sim
+  %N\left(
+  %0
+  %,\;
+  %G
+  %\begin{pmatrix}
+    %{se}_1 & 0 \\
+    %0 & {se}_2 \\
+  %\end{pmatrix}
+  %G'
+  %\right)
+%\end{align*}
+%where $G=\nabla g$, the row vector of first derivatives of $g$. Then,
+%just use that distribution to get a confidence interval:
+%\begin{align*}
+  %g(\beta_1,\beta_2)
+  %\pm
+  %1.96\times
+  %\sqrt{
+  %\frac{1}{N}
+  %G
+  %\begin{pmatrix}
+    %{se}_1 & 0 \\
+    %0 & {se}_2 \\
+  %\end{pmatrix}
+  %G'
+  %}
+%\end{align*}
+
+
+
 
 \clearpage
 \section{Matrix Manipulations}
