@@ -217,86 +217,79 @@
 \def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
 \makeatother
 
-% Limits
-\newcommand{\limN}{\lim_{N\rightarrow\infty}}
-\newcommand{\limn}{\lim_{n\rightarrow\infty}}
-\newcommand{\limt}{\lim_{t\rightarrow\infty}}
-\newcommand{\limT}{\lim_{T\rightarrow\infty}}
-\newcommand{\limhz}{\lim_{h\rightarrow 0}}
-
 % Misc Math
-\newcommand{\Prb}{\mathrm{P}}
 \newcommand{\ra}{\rightarrow}
 \newcommand{\diag}{\text{diag}}
 \newcommand{\ch}{\text{ch}}
 \newcommand{\dom}{\text{dom}}
-%\newcommand{\one}{\mathbbm{1}}
-\newcommand{\one}{\Chi}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
 
-% Script
-\newcommand{\sG}{\mathscr{G}}
-\newcommand{\sE}{\mathscr{E}}
-\newcommand{\sF}{\mathscr{F}}
-\newcommand{\sB}{\mathscr{B}}
-\newcommand{\sL}{\mathscr{L}}
-\newcommand{\sC}{\mathscr{C}}
-\newcommand{\sI}{\mathscr{I}}
-\newcommand{\sD}{\mathscr{D}}
-\newcommand{\sM}{\mathscr{M}}
-\newcommand{\sT}{\mathscr{T}}
-\newcommand{\sA}{\mathscr{A}}
-\newcommand{\sP}{\mathscr{P}}
-\newcommand{\sJ}{\mathscr{J}}
 
-% Boldsymbol
-\newcommand{\bsP}{\boldsymbol{P}}
-\newcommand{\bsM}{\boldsymbol{M}}
-\newcommand{\bsb}{\boldsymbol{b}}
-\newcommand{\bse}{\boldsymbol{e}}
-\newcommand{\bshatb}{\boldsymbol{\hat{b}}}
-\newcommand{\bshaty}{\boldsymbol{\hat{y}}}
-\newcommand{\bshatx}{\boldsymbol{\hat{x}}}
-\newcommand{\bshatX}{\boldsymbol{\hat{X}}}
-\newcommand{\bshatV}{\boldsymbol{\hat{V}}}
-\newcommand{\bsd}{\boldsymbol{d}}
-\newcommand{\bsf}{\boldsymbol{f}}
-\newcommand{\bsg}{\boldsymbol{g}}
-\newcommand{\bsG}{\boldsymbol{G}}
-\newcommand{\bsJ}{\boldsymbol{J}}
-\newcommand{\bsh}{\boldsymbol{h}}
-\newcommand{\bsS}{\boldsymbol{S}}
-\newcommand{\bshatS}{\boldsymbol{\hat{S}}}
-\newcommand{\bsu}{\boldsymbol{u}}
-\newcommand{\bsa}{\boldsymbol{a}}
-\newcommand{\bsA}{\boldsymbol{A}}
-\newcommand{\bsx}{\boldsymbol{x}}
-\newcommand{\bsI}{\boldsymbol{I}}
-\newcommand{\bsX}{\boldsymbol{X}}
-\newcommand{\bsy}{\boldsymbol{y}}
-\newcommand{\bsY}{\boldsymbol{Y}}
-\newcommand{\bsz}{\boldsymbol{z}}
-\newcommand{\bsZ}{\boldsymbol{Z}}
-\newcommand{\bsw}{\boldsymbol{w}}
-\newcommand{\bsW}{\boldsymbol{W}}
-\newcommand{\bshatW}{\boldsymbol{\hat{W}}}
-\newcommand{\bsV}{\boldsymbol{V}}
-\newcommand{\bso}{\boldsymbol{0}}
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
 \newcommand{\bstheta}{\boldsymbol{\theta}}
 \newcommand{\bsmu}{\boldsymbol{\mu}}
 \newcommand{\bsSigma}{\boldsymbol{\Sigma}}
-\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
-\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
 \newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
 \newcommand{\bsalpha}{\boldsymbol{\alpha}}
 \newcommand{\bsbeta}{\boldsymbol{\beta}}
 \newcommand{\bsgamma}{\boldsymbol{\gamma}}
 \newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{a,b,y,x,X,V,S,W}
 \newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
 \newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
 \newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
-\newcommand{\bsR}{\boldsymbol{R}}
-\newcommand{\bsr}{\boldsymbol{r}}
 
+% Zero vector as \bso
+\renewcommand{\bso}{\boldsymbol{0}}
 
 % Transposes of all the boldsymbol shit
 \newcommand{\bsbp}{\boldsymbol{b'}}
@@ -315,46 +308,65 @@
 \newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
 \newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
 
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
 
-% Mathcal
-\newcommand{\calL}{\mathcal{L}}
-\newcommand{\calM}{\mathcal{M}}
-\newcommand{\calD}{\mathcal{D}}
-\newcommand{\calF}{\mathcal{F}}
-\newcommand{\calE}{\mathcal{E}}
-\newcommand{\calG}{\mathcal{G}}
-\newcommand{\calI}{\mathcal{I}}
-\newcommand{\calP}{\mathcal{P}}
-\newcommand{\calJ}{\mathcal{J}}
-
-% Blackboard
-\newcommand{\Q}{\mathbb{Q}}
-\newcommand{\R}{\mathbb{R}}
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
 \newcommand{\Rn}{\mathbb{R}^n}
 \newcommand{\RN}{\mathbb{R}^N}
 \newcommand{\Rk}{\mathbb{R}^k}
-\newcommand{\Rl}{\mathbb{R}^\ell}
 \newcommand{\RK}{\mathbb{R}^K}
 \newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
 \newcommand{\Rm}{\mathbb{R}^m}
 \newcommand{\Rnn}{\mathbb{R}^{n\times n}}
 \newcommand{\Rmn}{\mathbb{R}^{m\times n}}
 \newcommand{\Rnm}{\mathbb{R}^{n\times m}}
-\newcommand{\C}{\mathbb{C}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
 \newcommand{\Cn}{\mathbb{C}^n}
 \newcommand{\Cnn}{\mathbb{C}^{n\times n}}
-\newcommand{\E}{\mathbb{E}}
-\newcommand{\N}{\mathbb{N}}
 
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+% argmin and argmax
 \DeclareMathOperator*{\argmin}{arg\;min}
 \DeclareMathOperator*{\argmax}{arg\;max}
 \newenvironment{rcases}
   {\left.\begin{aligned}}
   {\end{aligned}\right\rbrace}
 
-% Redefine real and imaginary from fraktur to plain text
+% Various probability and statistics commands
 \newcommand{\vc}{\operatorname{vec}}
 \newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Prb}{\operatorname{P}}
 \newcommand{\rank}{\operatorname{rank}}
 \newcommand{\trace}{\operatorname{trace}}
 \newcommand{\Corr}{\operatorname{Corr}}
@@ -364,6 +376,7 @@
 \newcommand{\msto}{\xrightarrow{m.s.}}
 \newcommand{\dto}{\xrightarrow{d}}
 \newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
 \newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
 
 % Redefine real and imaginary from fraktur to plain text
@@ -400,16 +413,32 @@
 \newcommand{\prodknz}{\prod^n_{k=0}}
 \newcommand{\prodtTz}{\prod^T_{t=0}}
 
-% Bounds/Limits
+% Bounds
 \newcommand{\atob}{_a^b}
 \newcommand{\ztoinf}{_0^\infty}
 \newcommand{\kinf}{_{k=1}^\infty}
 \newcommand{\ninf}{_{n=1}^\infty}
-\newcommand{\nN}{_{n=1}^N}
 \newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
 \newcommand{\kinfz}{_{k=0}^\infty}
 \newcommand{\ninfz}{_{n=0}^\infty}
 \newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
