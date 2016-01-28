@@ -459,9 +459,7 @@ stochastic process that have particular relevance in finance and
 economics.
 
 
-\section{Measure Theoretic Probability}
-
-\subsection{Notation}
+\section{Notation}
 
 
 \begin{defn}(Extended Real Line)
@@ -518,16 +516,16 @@ so that $||f||$ is an upper bound for the range of $f$.
 \end{defn}
 
 
+\clearpage
+\section{Finite Probability Spaces}
 
-\subsection{Finite Probability Spaces}
-
-\subsubsection{The Basics}
+\subsection{Definition}
 
 \begin{defn}{(Sample Space)}
-The \emph{sample space} $\Omega=\{\omega_1,\ldots,\omega_N\}$ is the set
-of all \emph{elementary} outcomes of some statistical experiment. For a
-given experiment, only one $\omega \in \Omega$ can occur when we conduct
-and observe that experiment.
+The \emph{sample space} $\Omega$ is the set of all \emph{elementary}
+outcomes of some statistical experiment. For a given experiment, only
+one $\omega \in \Omega$ can occur when we conduct and observe that
+experiment.
 \end{defn}
 \begin{ex}
 If our experiment consists of flipping a single coin, the sample space
@@ -560,8 +558,36 @@ events together with probabilities $\{p_1,\ldots,p_N\}$ satisfying
   p_n \in [0,1] \quad \forall n=1,\ldots,N
 \end{align*}
 where $p_n$ is the probability of elementary event $\omega_n\in\Omega$
-occurring.
+occurring, and $P$ is the \emph{probability measure} implied by these
+$p_n$, where we now define probability measure.
 \end{defn}
+
+\begin{defn}{(Probability Measure)}
+\label{defn:finitemeasure}
+Given a finite probability space, define the \emph{probability measure}
+on $\Omega$ as the mapping
+\begin{align*}
+  \Prb&: 2^\Omega \rightarrow [0,1] \\
+  \Prb[A] &:= \sum_{\{n|\omega_n\in A\}} p_n
+  \qquad \forall A\subseteq\Omega
+\end{align*}
+In this way, we use the probabilities $\{p_1,\ldots,p_n\}$ over the
+elementary events to construct the probabilites of any event
+$A\subseteq \Omega$.
+
+Probability measures display the following properties
+\begin{enumerate}
+  \item $\Prb[\omega_n]=p_n$ for $\omega_n\in\Omega$
+  \item $\Prb[\emptyset] = 0$
+  \item $\Prb[\Omega] = 1$
+  \item $\Prb[A\cup B] = \Prb[A] + \Prb[B] - \Prb[A\cap B]$ for any
+    events $A,B$.
+\end{enumerate}
+\end{defn}
+
+
+\clearpage
+\subsection{Events, Algebras, Decompositions, and Atoms}
 
 \begin{defn}{(Event)}
 An \emph{event} is any subset $A\subseteq \Omega$ of the sample space.
@@ -571,7 +597,6 @@ Given sample space $\Omega=\{HH,HT,TH,TT\}$ for an experiment where we
 toss two coins, we might consider the event $A=\{HH,HT\}$ which is
 ``heads tossed first.''
 \end{ex}
-
 
 \begin{defn}{(Set Algebra)}
 A collection $\sF$ of subsets of $\Omega$ (i.e.\ a collection of
@@ -596,29 +621,57 @@ Our notion of a probability will be defined for elements in this
 collection, as we see in the next definition.
 \end{rmk}
 
-
-\begin{defn}{(Probability Measure)}
-\label{defn:finitemeasure}
-Given a finite probability space, define the \emph{probability measure}
-on $\Omega$ as the mapping
+\begin{defn}(Decomposition and its Atoms)
+Suppose we have a finite probability space $(\Omega,\sA,P)$. Then a
+\emph{decomposition} is any collection
 \begin{align*}
-  \Prb&: 2^\Omega \rightarrow [0,1] \\
-  \Prb[A] &:= \sum_{\{n|\omega_n\in A\}} p_n
+  \sD = \{D_1,\ldots,D_N\}
 \end{align*}
-In this way, we use the probabilities $\{p_1,\ldots,p_n\}$ over the
-elementary events to construct the probabilites of any event
-$A\subseteq \Omega$ or $A\in\sF$.
-
-Probability measures display the following properties
-\begin{enumerate}
-  \item $\Prb[\omega_n]=p_n$ for $\omega_n\in\Omega$
-  \item $\Prb[\emptyset] = 0$
-  \item $\Prb[\Omega] = 1$
-  \item $\Prb[A\cup B] = \Prb[A] + \Prb[B] - \Prb[A\cap B]$ for any
-    events $A,B$.
-\end{enumerate}
+such that the collection is pairwise disjoint (i.e.\
+$D_n\cap D_m=\emptyset$ for all $n\neq m$) and
+\begin{align*}
+  \Omega = \bigcup\nN D_n
+\end{align*}
+We call the $D_n\in\sD$ the \emph{atoms of decomposition $\sD$}.
 \end{defn}
 
+\begin{defn}(Atoms of Algebra $\sA$)
+Suppose we have an algebra $\sA$. An \emph{atom of $\sA$} is any set
+$A\in \sA$ such that it's only subsets are $\emptyset$ and $A$.  Atoms
+of algebras are like its prime numbers---you can't break atoms up into
+smaller pieces that are also in the algebra.
+\end{defn}
+
+\begin{prop}\emph{(Results about Atoms of $\sA$)}
+Let $\sA$ be an algebra and let $\sD$ be the set of all atoms of $\sA$.
+\begin{enumerate}
+  \item Any arbitrary $B\in\sA$ can be expressed as a union of atoms.
+  \item Any two atoms of an algebra are disjoint.
+  \item $\sD$, the set of all atoms of $\sA$, is a decomposition of the
+    finite sample space $\Omega$.
+\end{enumerate}
+\end{prop}
+\begin{proof}
+Suppose that $A,B\in\sA$ are two distinct atoms. Since $\sA$ is an
+algebra, then $A\cap B\in\sA$. If this intersection were nonempty, it
+would violate the definition of $A$ and $B$ as atoms.
+\end{proof}
+
+\begin{ex}
+Let $\{x_1,\ldots,x_N\}$ denote the range of some function
+$X:\Omega\ra\R$ (which we'll later call a \emph{random variable}). Then
+the sets
+\begin{align}
+  \{X=x_1\}\quad\cdots\quad\{X=x_N\}
+  \label{atoms}
+\end{align}
+form a decomposition of $\Omega$. Moreover, Collection~\ref{atoms}
+is also the collection of all atoms of $\alpha(X)$, the algebra
+generated by $X$ (i.e.\ the algebra generated by Collection~\ref{atoms}).
+\end{ex}
+
+\clearpage
+\subsection{Random Variable}
 
 \begin{defn}{(Random Variable)}
 A \emph{random variable} on finite probability space $\Omega$ is a
@@ -633,7 +686,7 @@ events in $\Omega$. How can assign probabiilities to random variables?
 That leads us to the next definition.
 \end{defn}
 
-\begin{defn}{($\sF$-Measurable)}
+\begin{defn}{(Measurability)}
 A random variable $X$ is $\sF$-measurable if
 \begin{align*}
   \{X=x\} :=
@@ -652,7 +705,37 @@ $\sF$-measurable because random variables might be measurable with
 respect to some algebras and not others.
 \end{defn}
 
-\subsubsection{Product Spaces}
+\begin{defn}(Distribution of a Random Variable)
+Let $X:\Omega\ra\R$ be a random variable on finite probability space
+$(\Omega,\sA,P)$. While $P$ gives probabilities of the different
+$\omega$'s in $\Omega$ ocurring, we can instead define
+the \emph{probability distribution of $X$}, denoted $P_X$,
+\begin{align*}
+  P_X(A) :=&\; P[X \in A] \\
+  \iff \quad
+  =&\; P\big[
+    \{\omega \in \Omega\;|\; X(\omega) \in A\}
+  \big] \\
+  \iff \quad
+  =&\; P\big[ X^{-1}(A) \big]
+\end{align*}
+which defines the probabilities of different \emph{values of $X$}
+occurring, rather than the $\omega$'s. In practice, this is what we care
+about.
+\end{defn}
+
+\begin{rmk}
+Instead of thinking about the finite probability space
+$(\Omega,\sA,P)$ and a random variable $X$ on that space, we could
+alternatively and equivalent work with the induced finite probability
+space $(\Omega_X,\sA_X,P_X)$, where
+$\Omega_X:=\{X(\omega_1),\ldots,X(\omega_n)\}$, algebra
+$\sA_X:=2^{\Omega_X}$, and $P_X$ is as above. This is a valid finite
+probability space induced by $X$.
+\end{rmk}
+
+\clearpage
+\subsection{Product Spaces}
 
 \begin{defn}{(Product Space)}
 Given two finite probability spaces $(\Omega,P)$ and $(\Omega',P')$,
@@ -702,6 +785,151 @@ have random variables $X:\Omega\ra\R$ and $Y:\Omega'\ra\R$. Then define
 Then $\hat{X}$ and $\hat{Y}$ are RVs $X$ and $Y$ suitably adapted to
 live on probability space $(\Omega,\Omega')$.
 \end{defn}
+
+\clearpage
+\subsection{Conditional Probability}
+
+\begin{defn}(Conditional Probability Given an Event)
+\label{defn:condprob}
+The conditional probability of event $A$ ocurring given $B$ occurring
+(assuming $P(B)>0$) is
+\begin{align*}
+  P[A|B] = \frac{P[A\cap B]}{P[B]}
+\end{align*}
+The numerator adds up the probabilities of all the $\omega \in A\cap B$,
+while the denominator adds up the probabilities of all the
+$\omega\in B$.
+\end{defn}
+
+\begin{defn}(Conditional Probability Given a Decomposition)
+Let $\sD$ be a decomposition of sample space $\Omega$. Then
+the \emph{conditional probability with respect to decomposition $\sD$}
+denoted $P[A|\sD]$ is a random variable defined
+\begin{align*}
+  P[A|\sD](\omega) = \sumnN P[A|D_n] I_{D_n}(\omega)
+  \qquad A \in \sA
+\end{align*}
+Since a decomposition consists of pairwise disjoint sets, $\omega$ is in
+\emph{some} $D_i\in\sD$. Random Variable $P[A|\sD](\omega)$ takes
+$\omega$, finds that $D_i$, and returns $P[A|D_i]$ as defined in
+Definition~\ref{defn:condprob}.
+\end{defn}
+
+We see here how a decomposition can represent our ``information.''
+Suppose we have an event $A$. We have some baseline probability of it
+occurring, $P[A]$. The conditional probability $P[A|\sD](\omega)$ is a
+function that tells us a new ``updated'' probability for $A$ occuring
+given that $\omega$ occurred. Let's consider a few examples for $\sD$.
+
+Say that $\sD_1=\{\Omega\}$. This is a very coarse decomposition.
+And by the definition, it's clear
+\begin{align*}
+  P[A|\sD_1](\omega)=P[A|\Omega]=P[A]
+  \qquad\forall\omega\in\Omega
+\end{align*}
+Here we see that $\sD_1$ represents a decomposition without much
+information.  Knowing which $\omega$ turns up does not cause us to
+revise our baseline probability $P[A]$. That's in sharp contrast to the
+next example.
+
+Suppose that we have a decomposition $\sD_2=\{A,A^c\}$. Then by the
+definition
+\begin{align*}
+  P[A|\sD_2](\omega)
+  =
+  \begin{cases}
+    1 & \omega \in A \\
+    0 & \omega \in A^c \\
+  \end{cases}
+\end{align*}
+The decomposition $\sD$ conveys a lot of information about event $A$.
+
+More generally, conditional probabilities relative to events like
+$P[A|B]$ are like ``I tell you $B$ happened. You tell me
+the probability $A$ happened too.'' On the other hand, conditional
+probabilities relative to decompositions are like ``I tell you $\omega$
+happened and give you a collection of probabilities
+$\{P[A|D_n]\}_{D_n\in\sD}$. You then look up the $D_i$ such that
+$\omega\in D_i$ and tell me $P[A|D_i]$.'' It's more general because it's
+a function mapping from the sample space to numbers, and that mapping
+depends crucially on $\sD$.
+
+\begin{defn}(Law of Total Probability)
+Given a decomposition $\sD=\{D_1,\ldots,D_N\}$ of $\Omega$,
+it's clear for $B\subseteq\Omega$ that
+\begin{align*}
+  B = \bigcup\nN (B\cap D_n)
+\end{align*}
+with each $B\cap D_n$ pairwise disjoint. In combination with
+Definition~\ref{defn:condprob}, we get the
+\emph{law of total probability}
+\begin{align*}
+  P[B] = \sumnN P[B|D_n]P[D_n]
+\end{align*}
+Using the definition of a conditional probability with respect to a
+decomposition (and recalling that its a random variable), we could also
+write this as
+\begin{align*}
+  P[B] = \E\big[P[B|\sD]\big]
+\end{align*}
+\end{defn}
+
+
+\subsection{Conditional Expectation}
+
+\begin{defn}(Conditional Expectation with Respect to a Decomposition)
+Let $\sD = \{D_1,\ldots,D_N\}$  be a decomposition. The conditional
+expectation of $X$ with respect to $\sD$ is the random variable
+\begin{align*}
+  \E[X|\sD](\omega)
+  &=
+  \sum
+\end{align*}
+\end{defn}
+
+
+\subsection{Independence}
+
+As mentioned in Shiryaev, \emph{independence} is the concept that
+``distinguishes probability theory from the general theory of measure
+spaces.''
+
+\begin{defn}(Independence of Events)
+We say that $A_1,\ldots,A_N\subseteq \Omega$ are
+\emph{independent events} if and only if
+\begin{align*}
+  P[A_{n_1}\cap \cdots \cap A_{n_K}] =
+  P[A_{n_1}]\cdots P[A_{n_K}]
+\end{align*}
+for any set of $K\leq N$ indices $n_1,n_2,\ldots,n_K\in\{1,\ldots,N\}$
+\end{defn}
+
+\begin{defn}(Independence of Algebras)
+We say that $\sA_1,\ldots,\sA_N$ are \emph{independent algebras} if and
+only if $A_1,\ldots,A_N$ are independent events for any set of events
+such that $A_n\in\sA_n$ for $n=1,\ldots,N$.
+\end{defn}
+
+\begin{rmk}
+Note that \emph{pairwise} independence among elements of collection of
+events or algebras does not imply independence of the entire collection.
+\end{rmk}
+
+\begin{defn}(Independence of Random Variables)
+We say that random variables $X_1,\ldots,X_N$ on finite probability
+$(\Omega,\sA,P)$ are \emph{independent random variables} if
+\begin{align*}
+  P\big[
+    X_1\in A_1,\ldots,X_N\in A_N
+  \big]
+  =
+  P[X_1\in A_1] \cdots P[X_N\in A_N]
+\end{align*}
+for all $A_1,\ldots,A_N\in 2^{\Omega_X}$ where
+$\Omega_X=\{X(\omega_1),\ldots,X(\omega_N)\}$.
+\end{defn}
+
+
 
 %\section{Probability with Measure Theory}
 
