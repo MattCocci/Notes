@@ -1249,6 +1249,8 @@ $\Omega_X=\{X(\omega_1),\ldots,X(\omega_N)\}$.
 
 
 \clearpage
+\section{Foundations of Measure Theoretic Probability}
+
 
 \subsection{Collections of Subsets of $\Omega$}
 
@@ -1257,8 +1259,8 @@ of subsets of $\Omega$. Those collections may have a special structure
 so that we call them an algebra, a $\sigma$-algebra, a Dynkin System,
 etc.
 
-This section will define these collections and describe relationshiops
-etween these different types of collections.
+This section will define these collections and describe relationships
+between these different types of collections.
 
 \subsubsection{Algebra}
 
@@ -1266,11 +1268,12 @@ etween these different types of collections.
 \label{algebra}
 (Algebra)
 Let $\Omega$ be any set, and let $\mathscr{A}$ be a collection of subsets of
-$\Omega$ (so $\mathscr{A}\subseteq\mathscr{P}(\Omega)$). We say that
+$\Omega$ (so $\mathscr{A}\subseteq2^\Omega$). We say that
 $\mathscr{A}$ is an \emph{algebra} if
 \begin{enumerate}
-    \item $A\in\mathscr{A}\Rightarrow A^c\in\mathscr{A}$
-    \item $A,B\in\mathscr{A} \Rightarrow A\cup B\in\mathscr{A}$
+  \item $\Omega\in\sA$
+  \item $A\in\mathscr{A}\Rightarrow A^c\in\mathscr{A}$
+  \item $A,B\in\mathscr{A} \Rightarrow A\cup B\in\mathscr{A}$
 \end{enumerate}
 Algebras are collections of subsets of $\Omega$ that are closed
 under complements and finite unions. (We will see below that
@@ -1461,13 +1464,14 @@ of their collection type containing $\sE$.
 \end{defn}
 
 \begin{prop}
-Given function $f:\Omega\ra E$ and collection $\calE$ of subsets of $E$,
+\label{prop:gensigal}
+Given function $f:\Omega\ra E$ and collection $\sE$ of subsets of $E$,
 \begin{align*}
-  \sigma\left( \left\{ f^{-1}(A) \;|\; A\in\calE \right\} \right)
+  \sigma\left( \left\{ f^{-1}(A) \;|\; A\in\sE \right\} \right)
   =
-  \left\{ f^{-1}(A) \;|\; A\in\sigma\left( \calE \right)\right\}
+  \left\{ f^{-1}(A) \;|\; A\in\sigma\left( \sE \right)\right\}
 \end{align*}
-So generating the $\sigma$-algebra containing $\calE$ and taking
+So generating the $\sigma$-algebra containing $\sE$ and taking
 preimages \emph{commutes} with taking preimages and generating the
 $\sigma$-algebra.
 \end{prop}
@@ -1493,7 +1497,7 @@ intersection of all $\sigma$-algebras containing $\sT$.
 \begin{defn}(Borel $\sigma$-algebra on $\R$, $\sB(\R)$)
 Consider the collection of all half-open intervals in $\R$:
 \begin{align}
-  \sI = \left\{(a,b] \cap \R \; | \; -\infty\leq a < b \leq \infty\right\}
+  \sI := \left\{(a,b] \cap \R \; | \; -\infty\leq a < b \leq \infty\right\}
   \label{intervals}
 \end{align}
 Then, in an abuse of notation, define the Borel $\sigma$-algebra on $\R$
@@ -1540,9 +1544,11 @@ most convenient thing to work with.
 Therefore, $\sB(\R)$ will contain all of the sets in (\ref{borelsets})
 along with singlton sets $\{a\}$ and many other weird types of unions,
 intersections, constructions etc.\ built from these sets.
+\end{defn}
 
-Lastly, we can define the Borel $\sigma$-algebra for the extended real
-line $\sB(\bar{\R})$ as
+\begin{defn}(Borel $\sigma$-algebra on $\bar{\R}$, $\sB(\bar{\R})$)
+We can define the Borel $\sigma$-algebra for the extended real line
+$\sB(\bar{\R})$ as
 \begin{align*}
   \sB(\bar{\R}) :=& \; \sigma(\bar{\sI}) \\
   \bar{\sI} =& \; \left\{(a,b] \; | \; -\infty\leq a < b \leq \infty\right\}
@@ -1557,27 +1563,30 @@ Statement~\ref{intervals}.
 The completion of the Borel sets is called the
 \emph{Lebesgue $\sigma$-algebra}, which includes uncountable measure
 zero sets. (The Borel $\sigma$-algebra has no way to generate those
-bitches.)
+bitches, so the completion is non-trivial.)
 \end{defn}
 
 \begin{defn}(Product Borel $\sigma$-Algebra,
 $\sB(\R^J)=\sB(\R)^{\otimes J}$)
 Suppose we wanted to generalize from $\R$ to the Borel $\sigma$-algebra
 on $\Rn$, denoted $\sB(\R^n)$. One way to do that is to define the set
-of rectangles in $\Rn$ and generate the $\sigma$-algebra:
+of rectangles in $\Rn$
 \begin{align*}
-  \sB(\Rn) &:= \sigma(\sI^n) \\\\
-  \text{where} \quad
   \sI^n &:=
   \left\{
     \times_{k=1}^n (a_{k},b_{k}] \cap \R
     \;|\; -\infty\leq a < b \leq \infty
-  \right\} \\
+  \right\} \\\\
+  \text{where} \quad
   \times_{k=1}^n (a_{k},b_{k}]
   &:=
   (a_{1},b_{1}]
   \times \cdots\times
   (a_{n},b_{n}]
+\end{align*}
+and generate the $\sigma$-algebra from that
+\begin{align*}
+  \sB(\Rn) &:= \sigma(\sI^n)
 \end{align*}
 This is a very natural way to generate the $\sigma$-algebra. However,
 there's a more general way. Suppose that instead of using intervals
@@ -1595,15 +1604,16 @@ these sets in $\Rn$, loosely referred to as ``rectangles with Borel
 sides''
 \begin{align*}
   \sB(\R)^{\otimes n}
-  =
+  :=&\; \underbrace{\sB(\R) \otimes \cdots \otimes \sB(\R)}_{\text{$n$ times}} \\
+  :=&\;
   \sigma
-  \left(
+  \big(
   \left\{
   A \in \Rn \;|\;
   A = B_1 \times \cdots \times B_n
   \quad B_i \in \sB(\R) \quad\forall i
   \right\}
-  \right)
+  \big)
 \end{align*}
 It happens that these two sensible definitions are equivalent:
 $\sB(\Rn)=\sB(\R)^{\otimes n}$. See the next Lemma. However, when it's
@@ -1619,7 +1629,7 @@ conceptualize (though, again, they're equivalent even in $\R^J$).
 The reason we care about $\sigma$-algebras for $\R^J$ where $J$ is
 arbitrary is that we want to be able to model infinite time stochastic
 processes, whether in discrete or continuous time. For the former, we
-choose $\R^\N$ while the latter could be $\R^[0,\infty)$. Basically,
+choose $\R^\N$ while the latter could be $\R^{[0,\infty)}$. Basically,
 it's useful when we want $\R^J$ to be an ordered set.
 
 So let's define $\sB(\R)^{\otimes J}$, where $J$ is a nonempty, possibly
@@ -1639,7 +1649,7 @@ define
   \right\}
 \end{align*}
 That is, $\R^J$ is the set of all vectors/functions with $J$ components,
-each real-valued $\R$. Here are a few examples:
+each taking a value in $\R$. Here are a few examples:
 \begin{enumerate}
   \item $J=\{1,\ldots,N\}$: $\R^J$ is the set of all vectors in $\R^N$.
   \item $J=\N$: $\R^J$ is the set of all real-valued sequences. This is
@@ -1698,8 +1708,7 @@ For any arbitrary indexing set $J$, we have
 $\sB(\R^J)=\sB(\R)^{\otimes J}$.
 \end{cor}
 
-
-
+\clearpage
 \subsubsection{Relating Types of Collections and the Monotone Class Theorems}
 
 \begin{prop}\emph{(Dynkin $\implies$ Monotone Class)}
@@ -1724,6 +1733,7 @@ restrictive than Dynkin Systems.
 
 
 \begin{lem}\emph{(Algebra is a $\sigma$-algebra $\iff$ Monotone Class)}
+\label{lem:alg-sigal-mc}
 An algebra $\sA$ is a $\sigma$-algebra if and only if it is a monotone
 class.
 \end{lem}
@@ -1740,7 +1750,7 @@ $\{A_n\}\ninf\subseteq\sA$. Define sequence
 \begin{align*}
   B_m := \bigcup_{n=1}^m A_n
 \end{align*}
-Clearly,
+Clearly, $B_m \in \sA$ since closed under finite unions and
 \begin{align}
   \bigcup\minf B_m = \bigcup\ninf A_n
   \label{mcBm}
@@ -1760,7 +1770,88 @@ If $\sA$ is an algebra, then
 In words, the monotone class generated by algebra $\sA$ matches the
 $\sigma$-algebra generated by $\sA$.
 \end{thm}
+\begin{proof}
+($\mu(\sA) \subseteq \sigma(\sA)$)
+First, since $\sigma(\sA)$ is a $\sigma$-algebra,
+Lemma~\ref{lem:alg-sigal-mc} implies that $\sigma(\sA)$ is a monotone
+class. It also contains $\sA$, therefore by the definition of
+$\mu(\sA)$ as the \emph{smallest} monotone class containing $\sA$, we
+have $\mu(\sA) \subseteq \sigma(\sA)$.
+\\
+\\
+($\mu(\sA) \supseteq \sigma(\sA)$)
+This follows if we can show that $\mu(\sA)$ is an algebra. Then
+$\mu(\sA)$ would be a monotone class \emph{and} an algebra containing
+$\sA$, so we could again apply Lemma~\ref{lem:alg-sigal-mc} to conclude
+that it is a $\sigma$-algebra. Then $\sigma(\sA)$ as the smallest
+$\sigma$-algebra containing $\sA$ would clearly imply
+$\mu(\sA) \supseteq \sigma(\sA)$.
 
+So we want to show $\mu(\sA)$ is an algebra; therefore, we must show
+it satisfies the properties
+\begin{itemize}
+  \item \emph{Closed under Complements}:
+    Start by defining
+    \begin{align*}
+      \sM :=& \;\mu(\sA) \\
+      \tilde{\sM} :=& \; \{A\;|\; A,A^c\in\sM\}
+    \end{align*}
+    In words, $\sM$ is the collection $\mu(\sA)$ that we want to show is
+    closed under complements, and $\tilde{\sM}$ is the subset of $\sM$
+    for which it \emph{actually is} closed under complements---it's all
+    the sets that satisfy the property we want.\footnote{%
+      This is called the \emph{principle of appropriate sets}.
+    }
+    It's clear that $\sA\subseteq \tilde{\sM} \subseteq\sM$, by
+    construction.
+
+    Now, suppose we change the game. We started out wanting to show that
+    $\sM$ is closed under complements. But how about we instead show
+    that $\tilde{\sM}$ (that contains $\sA$) is a monotone class. Then,
+    since $\sM$ is the smallest monotone class containing $\sA$, we have
+    $\sM\subseteq\tilde{\sM}$ which implies $\sM=\tilde{\sM}$. In words,
+    the subset of collection $\sM$ that satisfies the desired property
+    is the whole collection.
+
+    Okay, take any sequence of increasing sets
+    $\{A_n\}\in\tilde{\sM}$, i.e.\ $A_1\subseteq A_2\subseteq \cdots$.
+    We need to show that the union is $\tilde{\sM}$, which means showing
+    \begin{align*}
+      A:= \bigcup\ninf A_n &\in \tilde{\sM}
+      \qquad \qquad
+      A^c:=\left(\bigcup\ninf A_n\right)^c
+      =
+      \bigcap\ninf A_n^c
+      \in \tilde{\sM}
+    \end{align*}
+    First, since $\tilde{\sM}\subseteq \sM$, with $\sM$ being a monotone
+    class, we can say that
+    \begin{align}
+      A:=\bigcup\ninf A_n &\in \sM
+      \label{mc:increasing}
+    \end{align}
+    Second, since $A_n\in\tilde{\sM}$, we have $A_n^c\in\tilde{\sM}$ by
+    construction. Moreover, $\{A^c_n\}$ is a sequence of decreasing sets
+    in $\tilde{\sM}\subseteq\sM$. Since $\sM$ is a monotone class, we
+    can say that
+    \begin{align}
+      A^c:=\bigcap\ninf A_n^c &\in \sM
+      \label{mc:decreasing}
+    \end{align}
+    Therefore, since Expressions~\ref{mc:increasing} and
+    \ref{mc:decreasing} imply that $A,A^c\in\sM$, we have
+    $A,A^c\in\tilde{\sM}$ by the definition of $\tilde{\sM}$.
+    We can do the same for any decreasing sequence of sets $\{A_n\}$,
+    hence $\tilde{\sM}$ is a monotone class containing $\sA$, hence
+    $\sM\subseteq\tilde{\sM}$, hence $\sM=\tilde{\sM}$, hence $\sM$ is
+    a monotone class \emph{and} an algebra, hence $\sM=\mu(\sA)$ is a
+    $\sigma$-algebra.
+
+  \item \emph{Closed under Finite Intersections}:
+\end{itemize}
+\end{proof}
+
+\clearpage
 \begin{lem}
 \label{lem:dynkin-closed}
 \emph{(Dynkin System closed under Finite $\cap$ $\implies$ $\sigma$-algebra)}
@@ -1830,7 +1921,8 @@ $\Omega$. Then the couplet $(\Omega, \sF)$ is called a
 The space is ``measur\emph{able}'' in the sense that we can assign a
 \emph{measure} (some special function) to it. The elements of $\sF$ are
 ``measurable sets'' in the sense that the measure has domain $\sF$ and
-tells us their size. We see all of this in the next definition.
+``measures'' them (i.e.\ tells us their size). We see all of this in the
+next definition.
 \end{defn}
 
 \begin{defn}(Measure)
@@ -1874,8 +1966,8 @@ $P(\Omega)=1$.
 \end{defn}
 \begin{rmk}
 The key property is really finiteness $\mu(\Omega)<\infty$ of the
-measure. We can normalize \emph{any} finite measure to be a probability
-measure.
+measure. We can always normalize \emph{any} finite measure to be a
+probability measure.
 \end{rmk}
 
 \begin{defn}(Probability Space)
@@ -1897,10 +1989,12 @@ $\mu:\sF\ra [0,\infty]$ is a \emph{finitely additive measure} if
 This is weaker than a ``measure'' as introduced in
 Definition~\ref{defn:measure}. Here, we don't \emph{necessarly} have
 countable additivity; we might just have finite additivity.  (Of course,
-Definition~\ref{defn:measure}  measures are obviously finitely additive
-measures as well.) Moreover, that's nontrivially weaker, since many of
-the convergence results that we'll see for general integration turn on
-countable additivity and fail to work without it.
+Definition~\ref{defn:measure}  countably-additive measures are obviously
+finitely additive measures as well.) Moreover, that's nontrivially
+weaker, since many of the convergence results that we'll see for general
+integration are definitions involving limits, they turn on
+\emph{countable} additivity and fail to work with
+only finite additivity.
 
 The reason we also care about finitely additive measures is that they're
 often easier to write down or define or verify than $\sigma$-additive
@@ -1910,13 +2004,13 @@ measures as well.
 \end{rmk}
 
 \begin{note}
-In general, ``measure'' will refer to the countably-additive kind of
+In general, ``measure'' refers to the countably-additive kind of
 measure. We will explicitly use ``finitely additive measure'' to refer
 to those measures that are not \emph{necessarily} countably-additive.
 \end{note}
 
 \begin{defn}($\sigma$-Finite Measure)
-Given a collection $\sC$ of subsets of $\Omega$,
+Given some collection $\sC$ of subsets of $\Omega$,
 we say that a measure $\mu:\sC\ra [0,\infty]$
 is \emph{$\sigma$-finite} if there exists a sequence of sets
 $\{A_n\}\subseteq \sC$ such that
@@ -1928,10 +2022,11 @@ $\{A_n\}\subseteq \sC$ such that
 \end{align*}
 \end{defn}
 
-\begin{ex}(Important)
-Any, I repeat, \emph{any} probability measure is going to be
-$\sigma$-finite.
-\end{ex}
+\begin{rmk}(Important)
+Any, I repeat, any \emph{finite}/\emph{probability} measure is going to
+be \emph{$\sigma$-finite}, though this is not necessarily true for
+general measures.
+\end{rmk}
 
 \begin{ex}
 The Lebesgue measure $\mu([a,b])=b-a$ on the Borel $\sigma$-algebra
@@ -1958,6 +2053,7 @@ sets. Then use finite additivity to say $\mu(B) = \mu(A) +
 \mu(B\setminus A) \geq \mu(A)$.
 \end{proof}
 
+\clearpage
 \begin{cor}
 If $A\subseteq B$ for $A,B\in \sF$ and $\mu$ is finite measure, then
 \begin{align*}
@@ -2101,14 +2197,16 @@ Next let $A_n = \{n, n+1, n+2, \ldots\}$. In this case, $\mu(A_n) =
   \mu\left(\bigcap^\infty_{n=1} A_n\right) =
   \mu(\emptyset) = 0
 \end{align*}
+Though of course, this never happens for probability measures. It's only
+something to worry about for non-finite measures.
 \end{ex}
 
 \begin{thm}
 \emph{(Necessary and Sufficient Conditions for a Finitely-Additive
 Measure on an Algebra to be $\sigma$-additive)}
-Suppose that $\mu$ is a finitely additive measure over an Algebra $\sA$
-that is also finite, i.e. $\mu(\Omega)<\infty$. Then the following are
-equivalent:
+Suppose that $\mu$ is a finitely-additive measure over an algebra $\sA$
+that is also finite, i.e. $\mu(\Omega)<\infty$ (so probability measures
+qualify). Then the following are equivalent:
 \begin{enumerate}
   \item $\mu$ is $\sigma$-additive, i.e.
     \begin{align*}
@@ -2312,12 +2410,14 @@ will follow.
 
 \subsection{Extension Theorems}
 
-Classic example for why extension theorems are important: CDFs work with
-have open intervals like $(-\infty,x]$. We naturally define a CDF in
-terms of these intervals, but we would like the corresponding measure to
-hold on $\sB(\R)$ as well, which contains these half-open intervals
-along with many more sets. The Extension Theorems let us ``extend'' a
-measure defined on half-open intervals to all of the Borel sets.
+Classic example for why extension theorems are important: CDFs give you
+the probability that a random variable falls in some half-open interval
+like $(-\infty,x]$. Though we naturally define a CDF in terms of these
+intervals, we would like the corresponding measure implied by that
+CDF to hold on $\sB(\R)$ as well, which contains these half-open
+intervals along with many more sets. The Extension Theorems let us
+``extend'' a measure defined on half-open intervals to all of the Borel
+sets.
 
 \begin{thm}
 \label{thm:PQunq}
@@ -2440,8 +2540,86 @@ which is the Lebesgue measure. By Caratheodory, this has a unique
 extension to $\sigma(S)=\sB(\R)$.
 \end{ex}
 
+\begin{defn}(Consistent Family of Probability Measures)
+Let $J$ be a nonempty index set and assume that for every finite
+sequence of unique elements $\alpha_1,\ldots,\alpha_n,\in J$, there
+exists a probability measure $P^{\alpha_1,\ldots,\alpha_n}$ on
+measurable space $(\Rn, \sB(\R)^{\otimes n})$. Then this family of
+probability mesaures is called \emph{consistent} if for any
+$\alpha_1,\ldots,\alpha_n\in J$ and $A_1,\ldots,A_n\in\sB(\R)$ we have
+\begin{enumerate}[label=(\roman*)]
+  \item For every permutation $\pi: \{1,\ldots,n\}\ra \{1,\ldots,n\}$,
+    \begin{align*}
+      P^{\alpha_1,\ldots,\alpha_n}[A_1\times \cdots \times A_n]
+      =
+      P^{\alpha_{\pi(1)},\ldots,\alpha_{\pi(n)}}\big[
+          A_{\pi(1)}\times \cdots \times A_{\pi(n)}
+      \big]
+    \end{align*}
+  \item
+      $P^{\alpha_1,\ldots,\alpha_{n-1}}[A_1\times \cdots \times A_{n-1}]
+      =
+      P^{\alpha_1,\ldots,\alpha_{n-1},\alpha_n}[
+        A_1\times \cdots \times A_{n-1} \times \R]
+      $
+\end{enumerate}
+\end{defn}
+
 \clearpage
-\subsection{Measurable Functions and Simple Functions}
+\begin{thm}\emph{(Kolmogorov's Extension Theorem)}
+Let $J$ be a nonempty index set and suppose we have a consistent family
+of probability measures. Then there exists a \emph{unique} probability
+measure $P$ on $(\R^J,\sB(\R)^{\otimes J})$ such that
+\begin{align*}
+  P\big[
+    \omega\in \R^J \; |\; (\omega_{\alpha_1},\ldots,\omega_{\alpha_n})
+    \in B
+  \big]
+  = P^{\alpha_1,\ldots,\alpha_n}[B]
+\end{align*}
+for every finite sequence $(\alpha_1,\ldots,\alpha_n)$ of elements in
+$J$ and $B\in\sB(\R)^{\otimes n}$.
+\end{thm}
+
+\begin{cor}
+Taking $J=\N$, let $P_1,P_2,\ldots$ be a sequence of probability
+measures on
+$(\R,\sB(\R)$,
+$(\R^2,\sB(\R)^{\otimes 2})$,\ldots
+such that
+\begin{align*}
+  P_{n+1}[B\times \R] = P_n[B]
+\end{align*}
+for all $n$ and $B\in\sB(\R)^{\otimes n}$. Then there exists a unique
+probability measure on $(\R^{\N},\sB(\R)^{\otimes \N})$ such that
+\begin{align*}
+  P\big[
+    \omega\in \R^{\N} \; |\; (\omega_{1},\ldots,\omega_{n})
+    \in B
+  \big]
+  = P_n[B]
+\end{align*}
+for all $n$ and for all measurable sets $B\in\sB(\R)^{\otimes n}$.
+\end{cor}
+
+\begin{ex}
+There exists a unique probability measure on
+$(\R^{\N},\sB(\R)^{\otimes \N})$ such that
+\begin{align*}
+  P\big[
+    \omega\in \R^{\N} \; |\;
+    \omega_1 = j_1, \omega_2=j_2,\ldots,\omega_n=j_n
+  \big]
+  = \frac{1}{2^n}
+\end{align*}
+for all $n\geq 1$ and for every sequence $(j_1,\ldots,j_n)\in\{0,1\}^n$.
+\end{ex}
+
+
+\clearpage
+\section{Measurable Functions}
+
+\subsection{General Measurable Functions}
 
 We now define the important notion of measurable functions, the class of
 functions for which we will define the Lebesgue integral. Note that they
@@ -2450,24 +2628,40 @@ measure unless we want to do integration, so I'll often leave it out in
 the definitions below to work with measurable spaces (rather than
 measure spaces).
 
+
 \begin{defn}(Measurable Function)
 A function $f:(\Omega,\sF)\ra (E,\sE)$ between two measurable space
-is called a \emph{measurable function} iff
+is called a \emph{measurable function} if and only if
 \begin{align*}
   f^{-1}(A) \in \sF \qquad \forall A\in \sE
 \end{align*}
 In words, the preimage of a measurable set of $(E,\sE)$ is always a
 measurable set of $(\Omega,\sF)$.\footnote{%
-  Not surprising that the definition of ``nice'' functions in measure
-  theory stems from preimages, which are generally nice to work with.
-  For example, $f^{-1}\left( \cup A_n \right) = \cup f^{-1}(A_n)$
-  and $f^{-1}(A\cap B) = f^{-1}(A)\cap f^{-1}(B)$ and
-  $f^{-1}(A^c)= [f^{-1}(A)]^c$
+  It shouldn't be surprising that the definition of ``nice'' functions
+  in measure theory stems from preimages (as is the case for
+  continuity), since preimages are generally nice to work with. For
+  example, $f^{-1}\left( \cup A_n \right) = \cup f^{-1}(A_n)$ and
+  $f^{-1}(A\cap B) = f^{-1}(A)\cap f^{-1}(B)$ and $f^{-1}(A^c)=
+  [f^{-1}(A)]^c$
 }
-Measurable functions are the
-structure-preserving entities in Measury Theory, similar to isomorphisms
-in linear algebra or homeomorphisms in Topology.
+Measurable functions are the structure-preserving entities in Measury
+Theory, similar to isomorphisms in linear algebra or homeomorphisms in
+Topology.
+
+Mesurable functions are important for probability, since random
+variables are defined as (extended) real-valued measurable functions on
+a probability space $(\Omega,\sF,P)$, as we'll see below.
 \end{defn}
+
+\begin{ex}
+Measurability depends crucially on the $\sigma$-algebras involved. For
+example, suppose we take for the domain the measure space
+$(\Omega,2^\Omega)$, where the $\sigma$-algebra is the power set. Then
+\emph{any} function $f:(\Omega,2^\Omega)\ra (E,\sE)$ with any range
+$\sigma$-algebra $\sE$ will be measurable. However, if we restirct the
+domain $\sigma$-algebra from $2^\Omega$ to a proper subset
+$\sF \subset 2^\Omega$, this will clearly not be true in general.
+\end{ex}
 
 %Suppose we have a measurable space $(\Omega,\calF)$ and a function
 %$f: \Omega\rightarrow X$. The most natural way to characterize the
@@ -2486,9 +2680,8 @@ in linear algebra or homeomorphisms in Topology.
 %on where we think about partitioning based on the range, not the domain
 %(as in the Riemann approach).
 
-
-
 \begin{prop}
+\label{prop:meascomp}
 Let $f:(\Omega,\sF)\ra(E,\sE)$ and $g:(E,\sE)\ra (G,\sG)$ be two
 measurable functions. Then
 \begin{align*}
@@ -2498,19 +2691,37 @@ is a measurable function.
 \end{prop}
 
 \begin{defn}($\sigma$-algebra Generated by $f$)
-Given function $f:\Omega\ra (E,\sE)$, define
+Given $f:\Omega\ra (E,\sE)$ for $\sigma$-algebra $\sE$, define
 \begin{align*}
   \sigma(f):=\left\{ f^{-1}(A) \; |\; A \in\sE \right\}
 \end{align*}
-We call $\sigma(f)$ the \emph{$\sigma$-algebra generated by $f$}. The
-next proposition checks that this is a valid $\sigma$-algebra.
+which is called the \emph{$\sigma$-algebra generated by $f$}. The next
+proposition verifies this is a valid $\sigma$-algebra.
 \end{defn}
 
 \begin{prop}
 Given function $f:\Omega\ra (E,\sE)$, the collection $\sigma(f)$ is a
 valid $\sigma$-algebra, and it is the smallest $\sigma$-algebra such
-that $f:(\Omega,\sigma(f))\ra (E,\sE)$ is $\sE$-measurable.
+that $f:(\Omega,\sigma(f))\ra (E,\sE)$ is measurable.
 \end{prop}
+\begin{proof}
+Since $\sE$ is a $\sigma$-algebra, we have $\sE=\sigma(\sE)$ so that
+\begin{align*}
+  \left\{ f^{-1}(A) \;|\; A\in\sigma\left( \sE \right)\right\}
+  =
+  \left\{ f^{-1}(A) \;|\; A\in \sE \right\}
+\end{align*}
+Then by Proposition~\ref{prop:gensigal}, we get that
+\begin{align*}
+  \left\{ f^{-1}(A) \;|\; A\in \sE \right\}
+  =
+  \sigma\left( \left\{ f^{-1}(A) \;|\; A\in\sE \right\} \right)
+\end{align*}
+Since the RHS is clearly a $\sigma$-algebra, the LHS must be one as
+well. Moreover, by the definition of the generated $\sigma$-algebra
+$\sigma(\cdot)$, it is indeed the smallest one such that $f$ is
+measurable.
+\end{proof}
 
 \begin{prop}
 Given function $f:(\Omega,\sF)\ra E$, the set
@@ -2519,24 +2730,314 @@ Given function $f:(\Omega,\sF)\ra E$, the set
   :=
   \left\{ A\subseteq E \; |\; f^{-1}(A)\in\sF \right\}
 \end{align*}
-is the finest $\sigma$-algebra such that
+is the \emph{finest} $\sigma$-algebra such that
 $f:(\Omega,\sF)\ra (E,\hat{\sigma}(f))$ is measurable.
 \end{prop}
+
+\clearpage
+\subsection{%
+  (Extended) Real-Valued Measurable Functions and Random Variables
+}
+
+The previous subsection defined measurable functions and properties of
+measurable functions for functions $f:(\Omega,\sF)\ra(E,\sE)$ between
+two arbitrary measurable spaces $(\Omega,\sF)$ and $(E,\sE)$. In this
+section, we restrict our attention to real-valued
+$f:(\Omega,\sF)\ra(\R,\sR(\R))$ or extended real-valued functions
+$f:(\Omega,\sF)\ra(\bar{\R},\sB(\bar{\R}))$.
+
+All results of the previous subsection hold, but we can say even more if
+we restrict our attention to this class of functions. Moreover, this
+class of functions is especially important for probability theory,
+as we see in the next two definitions, which give a special name to
+(extended) real-valued measurable functions.
+
+\begin{defn}(Random Variable)
+A measurable function $X:(\Omega,\sF)\ra (\R,\sB(\R))$ is called a
+\emph{random variable}.
+\end{defn}
+
+\begin{defn}(Extended Random Variable)
+A measurable function $X:(\Omega,\sF)\ra (\bar{\R},\sB(\bar{\R}))$ is
+called an \emph{extended random variable}.
+\end{defn}
+
+We'll have more to say about random variables and their distributions
+later, after we introduce measures. But now, we just want to prove some
+general results about (extended) random variables, a.k.a. (extended)
+real-valued measurable functions. And before doing so, we just recall
+the standard shorthand notation that will be used extensively in this
+subsection and in later subsections dealing with random variables:
+\begin{align*}
+  \{f\leq x\} = \{\omega\in\Omega\;|\;f(\omega)\leq x\}
+  = f^{-1}\big((-\infty,x]\big)
+\end{align*}
+and similar constructs $\{f<x\}$, $\{f=x\}$, $\{f\geq x\}$, etc.
+
+\begin{prop}
+\label{prop:measurableiff}
+\emph{(Necessary and Sufficient Condition for Measurability)}
+The real-valued function $f:(\Omega,\sF)\ra\R$ is measurable if and only
+if
+\begin{align}
+  \{f\leq x\}
+  \in \sF
+  \qquad \forall x\in\R
+  \label{measurableiff}
+\end{align}
+The same is true is for \emph{extended} real-valued functions, except
+Statement~\ref{measurableiff} must hold for any
+$x\in\bar{\R}=\R\cup\{\pm\infty\}$.
+\end{prop}
+\begin{rmk}
+This provides a really easy and convenient way to check measurability of
+(extended) real-valued functions. Note also that we could have used
+$\{f<x\}$, $\{f\geq x\}$, or $\{f>x\}$ in the proposition instead.
+\end{rmk}
+
+\begin{cor}\emph{(Continuous Functions are Measurable)}
+Suppose that $f:(\R,\sB(\R))\ra\R$ is a continuous function. Then $f$ is
+also measurable.
+\end{cor}
+\begin{proof}
+Since $(-\infty,x)$ is an open set, by the definition of continuity, we
+know that $\{f<x\}$ will be open hence $\{f<x\}\in\sB(\R)$. Then by
+Proposition~\ref{prop:measurableiff} and the fact that we could have
+used $\{f<x\}$ instead of $\{f\leq x\}$, the function $f$ is measurable.
+\end{proof}
+
+\begin{prop}
+Given two real-valued measurable functions $f,g:(\Omega,\sF)\ra\R$,
+the following functions are also measurable:
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item $f+g$
+  \item $f-g$
+  \item $f\cdot g$
+  \item $f/g$, provided $g(\omega)\neq 0$ for all $\omega\in\Omega$
+\end{enumerate}
+\end{prop}
+\begin{rmk}
+Together, (i) and (ii) imply that the class of measurable real-valued
+functions forms a vector space.
+\end{rmk}
+\begin{proof}
+We prove each in turn
+\begin{enumerate}[label=(\roman*)]
+  \item
+    By Proposition~\ref{prop:measurableiff}, we can prove the result by
+    showing that
+    \begin{align*}
+      \{f+g> x\} \in\sF
+    \end{align*}
+    To start, suppose you give me $\omega\in \{f+g>x\}$. Then obviously
+    \begin{align*}
+      f(\omega) + g(\omega) > x
+      \quad\implies\quad
+      f(\omega) > x  - g(\omega)
+    \end{align*}
+    By the density of $\Q$ in $\R$, there then exists a $q\in \Q$ such
+    that
+    \begin{align}
+      f(\omega) > q > x  - g(\omega)
+      \quad\iff\quad
+      \begin{cases}
+        f(\omega) > q \\
+        g(\omega) > x  - q
+      \end{cases}
+      \label{qexists}
+    \end{align}
+    This suggests that we can write
+    \begin{align}
+      \{f+g> x\}
+      &=
+      \bigcup_{q\in \Q}
+      \{
+        f > q,\;
+        g > x-q
+      \}
+      \label{asunion}
+    \end{align}
+    To prove this claim rigorously, we will show each side of
+    Equation~\ref{asunion} is a subset of the other:
+    \begin{itemize}
+      \item LHS $\subseteq$ RHS:
+        Take any $\omega\in \{f+g>x\}$.  We argued above that there's
+        going to be a $q$ such that Statement~\ref{qexists} holds for
+        that $\omega$. So the RHS of Equation~\ref{asunion} (as the
+        union over \emph{all} $q\in\Q$) will definitely pick out that
+        $\omega$, implying LHS $\subseteq$ RHS.
+
+      \item LHS $\supseteq$ RHS:
+        Choose $\omega$ in the RHS of Equation~\ref{asunion}. Then
+        there's some associated $q$ such that
+        \begin{align*}
+          \begin{rcases}
+          f(\omega) &> q \\
+          g(\omega) &> x-q
+          \end{rcases}
+          \quad\implies\quad&
+          f(\omega) > q > x-g(\omega) \\
+          \quad\iff\quad&
+          f(\omega) + g(\omega) > q + g(\omega)> x
+        \end{align*}
+        Hence $f(\omega)+g(\omega) > x$ implying LHS $\supseteq$ RHS.
+    \end{itemize}
+    Okay, now we rewrite Equation~\ref{asunion}:
+    \begin{align*}
+      \{f+g> x\}
+      &=
+      \bigcup_{q\in \Q}
+      \{
+        f > q,\;
+        g > x-q
+      \} \\
+      &=
+      \bigcup_{q\in \Q}
+      \{ f > q\}
+      \cap
+      \{ g > x-q \}
+    \end{align*}
+    But since both $f$ and $g$ are $\sF$-measurable, the sets $\{f>q\}$
+    and $\{g>x-q\}$ will be in $\sF$ for any $x,q$. Therefore, each
+    intersection in the above union will be in $\sF$ for fixed $x,q$,
+    and so too will the countable union of those intersections be in
+    $\sF$ over all $q\in\Q$.
+
+  \item Trivial
+  \item Write $f\cdot g$ as
+    \begin{align*}
+      f\cdot g
+      =
+      \frac{1}{2}
+      \left[
+      (f+g)^2 - f^2 - g^2
+      \right]
+    \end{align*}
+    Proposition~\ref{prop:meascomp}, (i), and (ii) give that
+    $\varphi\circ h$ is measurable for continuous (hence measurable)
+    $\varphi(x)=x^2$ and measurable $f+g$. Invoking (i) and (ii) again,
+    we get that $f\cdot g$ is measurable.
+\end{enumerate}
+\end{proof}
+
+\begin{prop}\emph{(Pointwise Sup and Inf)}
+Given a countable sequence $\{f_n\}\ninf$ of measurable, extended
+real-valued functions $f_n:(\Omega,\sF)\ra\bar{\R}$, both the pointwise
+sup and inf
+\begin{align*}
+  g(\omega) = \sup_n f_n(\omega)
+  \qquad
+  h(\omega) = \inf_n f_n(\omega)
+\end{align*}
+are measurable extended real-valued functions.
+\end{prop}
+\begin{proof}
+Note that we can write
+\begin{align}
+  \{g \leq x \}
+  &= \bigcap\ninf \{f_n\leq x\}
+  \label{gintersection} \\
+  \{h \geq x \}
+  &= \bigcap\ninf \{f_n\geq x\}
+  \notag
+\end{align}
+To show that these statements are valid, we show that each side is a
+subset of the other for $g$. (The proof for $h$ is analogous.)
+\begin{itemize}
+  \item LHS $\subseteq$ RHS: Take any $\omega\in\{g\leq x\}$. Then by
+    the definition of $g$ as the sup, we know that
+    $f_n(\omega)\leq g(\omega)\leq x$ for all $n$.
+    Hence $\omega\in \cap\ninf \{f_n \leq x\}$.
+  \item LHS $\supseteq$ RHS:
+    Take any $\omega\in \cap\ninf \{f_n\leq x\}$. Suppose by
+    contradiction that
+    \begin{align*}
+      \omega\not\in \{g\leq x\}
+      \quad&\iff\quad
+      \omega\in \{g\leq x\}^c
+      \quad\iff\quad
+      \omega\in \{g > x\}
+    \end{align*}
+    But then by the definition of the sup, there would exist an integer
+    $m$ such that
+    \begin{align*}
+      f_m(\omega)\in(x,g(\omega)]
+      \quad\implies\quad
+      f_m(\omega)>x
+      \quad\implies\quad
+      \omega\not\in \bigcap\ninf \{f_n\leq x\}
+    \end{align*}
+    which is a contradiction.
+\end{itemize}
+That shows that Statement~\ref{gintersection} and its counterpart for
+$h$ are both true. Now we just have to show that $\{g\leq x\}$ is indeed
+measurable. But that's easy.  Since all of the $f_n$ are measurable,
+each term in the RHS intersection of Statement~\ref{gintersection} will
+be in $\sF$, so that the countable intersection will in $\sF$ as well.
+Hence $\{g\leq x\}$ is in in $\sF$, and same for $h$, implying $g$ and
+$h$ are measurable by Proposition~\ref{prop:measurableiff}.
+\end{proof}
+
+\begin{cor}\emph{(Pointwise limsup and liminf)}
+Let $\{f_n\}\ninf$ be a sequence of measurable, extended real-valued
+functions on $(\Omega,\sF)$. Then the pointwise limsup $g$ and liminf
+$h$
+\begin{alignat*}{3}
+  g(\omega) =
+  \limsup_n f_n(\omega)
+  &= \limn \bigg(\sup_{m\geq n} f_m(\omega) \bigg)
+  &&=
+    \inf_n\bigg(\sup_{m\geq n} f_m(\omega)\bigg) \\
+  h(\omega) =
+  \liminf_n f_n(\omega)
+  &= \limn \bigg(\inf_{m\geq n} f_m(\omega) \bigg)
+  &&= \sup_n\bigg(\inf_{m\geq n} f_m(\omega)\bigg)
+\end{alignat*}
+are both measurable functions.
+\end{cor}
+
+\begin{cor}\emph{(Pointwise Limit)}
+Let $\{f_n\}\ninf$ be a sequence of measurable, extended real-valued
+functions on $(\Omega,\sF)$. Then if the pointwise limit
+\begin{align*}
+  f(\omega) = \limn f_n(\omega)
+\end{align*}
+exists as an extended real-valued function (so possibly infinite at
+points), then $f$ is measurable.
+Moreover, for those $\omega\in\Omega$ such that the limit exists, we
+have
+\begin{align*}
+  \liminf_n f_n(\omega)
+  &=
+  \limsup_n f_n(\omega)
+\end{align*}
+\end{cor}
+\begin{rmk}
+This last corollary, stating that measurability is preserved under
+pointwise limits, is realy nice. Recall that continuity wasn't preserved
+under pointwise limits (only uniform convergence). This will turn out to
+be really useful in integration of measurable functions, where we work
+with pointwise limits all of the time.
+\end{rmk}
+
+
+\clearpage
+\subsection{Simple Functions}
 
 Next, we come to the topic of simple functions. Simple functions are
 (get ready for it) the simplest class of measurable functions. They are
 extremely easy to characterize, and they will be the building block of
 the Lebesgue Integral in a later section. We first define simple
 functions, and then show you can approximate \emph{any}
-extended-real-valued function with a sequence of simple functions that
-converges pointwise.
+extended-real-valued function $f$ with a sequence of simple functions
+that converges pointwise to $f$.
 
 \begin{defn}(Simple Function)
 A function $f$ on measurable space $(\Omega,\sF)$ is called a
 \emph{simple function} if it can be written
 \begin{equation}
   \label{simplefn}
-  f = \sum^N_{n=1} c_n \cdot \Chi_{A_n}
+  f(\omega) = \sum^N_{n=1} c_n \cdot \one{A_n}(\omega)
   %\quad
   %\text{ where } A_i = f^{-1}(c_i)
 \end{equation}
@@ -2546,14 +3047,14 @@ assumed that the $A_n$ are pairwise disjoint.\footnote{%
   Otherwise, since $\sF$ is a $\sigma$-algebra, you can always redefine
   the simple function on pairwise disjoint sets.
 }
-Thus, $A_1,\ldots,A_n$ forms a \emph{measurable partition} of $\Omega$
+Thus, $A_1,\ldots,A_N$ forms a \emph{measurable partition} of $\Omega$
 based on the range of $f$, which takes on only a finite set of values,
-$\{c_1, \ldots, c_N\}$. The case where the $A_i$ are disjoint is called
+$\{c_1, \ldots, c_N\}$. The case where the $A_n$ are disjoint is called
 the \emph{standard representation}, and can also be expressed as:
 \begin{align*}
   f
   %= \sum^N_{n=1} c_n \cdot \Chi_{A_n}
-  = \sum^N_{n=1} c_n \cdot \Chi_{\left\{f=c_n \right\}}
+  = \sum^N_{n=1} c_n \cdot \one{\left\{f=c_n \right\}}
 \end{align*}
 \end{defn}
 \begin{rmk} Simple functions form a vector space.
@@ -2585,16 +3086,14 @@ We prove by successive approximation, partitioning the range.
 We partition the range $[0,\infty]$ and then construct our approximating
 functions as follows:
 \begin{align*}
-    [0,1) \cup [1,\infty] \quad&\quad
-        s_1 := 0\cdot \Chi_{f^{-1}([0,1) )}
-        + 1 \cdot \Chi_{f^{-1}([1,\infty] )} \\
-    [0,1/2) \cup [1/2,1) \cup [1,3/2)\cup [3/2, 2)
-        \cup [2, \infty] \quad&\quad
-        s_2 := 0\cdot \Chi_{f^{-1}([0,1/2) )}
-        + \frac{1}{2} \Chi_{f^{-1}([1/2,1] )} \\
-    &\qquad
-        + \cdots
-        + 2 \cdot \Chi_{f^{-1}([2,\infty] )}
+      s_1 := &\; 0\cdot \one{\{f\in [0,1)\}}
+        + 1 \cdot \one{\{f\in [1,\infty]\}} \\
+      s_2 :=&\; 0\cdot \one{\{f\in [0,1/2)\}}
+        + \frac{1}{2} \cdot \one{\{f\in [1/2,1)\}}
+        + 1 \cdot \one{\{f\in [1,3/2)\}}
+          + \frac{3}{2} \cdot \one{\{f\in [3/2,2)\}}
+        + 2 \cdot \one{\{f\in [2,\infty]\}} \\
+      \vdots \quad & \qquad \vdots
 \end{align*}
 So what are we doing here? Well, in the case of $s_1$, we approximate
 $f$ at each $\omega\in\Omega$ such that $f(\omega)\in [0,1)$ by
@@ -2604,26 +3103,39 @@ $f(\omega)\in [1,\infty]$ by the value one---again, the minimum value
 $f$ takes on for those $\omega$.
 
 And so we see the basic logic here. Each $s_n$ splits the range of $f$,
-which is $[0,\infty]$ into two parts. The first is a finely divided
-part, running from $[0,n]$ where we have $2^n-1$ subdivisions of
-$[0,n]$. Second, there's a coarsely divided part, where we just take
-$[n,\infty]$.  We then use $f$ to pull these subdivisions of
-$[0,\infty]$ back into $\Omega$, allowing us to partition the space
-$\Omega$ into measurable sets. Then, for each point in the pre-image
-$f^{-1}([a,b))$, we assume that it maps to the \emph{smallest possible}
-  value it could, $a$.
+$[0,\infty]$, into two parts.
+\begin{itemize}
+  \item $[0,n]$: This part is very finely divided, where each interval
+    $[k,k+1)$ for $k=0,\ldots,n-1$ is broken up into $2^{n-1}$ parts.
+    This implies a total of $n\cdot 2^{n-1}$ subintervals for
+    $[0,n]$.
+  \item $[n,\infty]$: This part is obviously coarsly divided. We just
+    take $[n,\infty]$ as the single subinterval.
+\end{itemize}
+Therefore, $s_n$ divides $[0,\infty]$ into $n\cdot 2^{n-1}+1$ total
+subintervals. Since $f$ is measurable, all of the preimages of these
+subintervals are measurable, implying $s_n$ is a well defined simple
+function for whatever values we assign to it. What are those values?
+Again, the value of $s_n$ over any one of those subintervals is set to
+be the value of $f$ at the left endpoint of that interval.
 
 And so we work out the process we saw above, first extending the finely
 approximated part of $f$'s range by one integer span with each $n$, but
 then halving the size of those fine subdivisions. We also continue to
 approximate $f$ with the minimum value, giving us
-\begin{align*}
-  s_n = \left(\sum^{n\cdot 2^{n}-1}_{k=1}\frac{k}{2^{n}}
-  \Chi_{f^{-1}\left( \left[\frac{k}{2^{n}}, \;
-      \frac{k+1}{2^{n}} \right)\right)}\right)
-      + n \Chi_{f^{-1}\left([n,\infty]\right)}
+\begin{align}
+  s_n = \left(
+  \sum^{n\cdot 2^{n-1}}_{k=0}\frac{k}{2^{n}}
+  \one{%
+    \left\{
+      f\in \left[\frac{k}{2^{n}}, \; \frac{k+1}{2^{n}}\right)
+    \right\}
+  }
+  \right)
+  + n \cdot \one{\{f\geq n\}}
   \qquad n=1,2,\ldots
-\end{align*}
+  \label{simpleapprox}
+\end{align}
 Now it's clear that $s_n$ approaches $f$ from below, since with each
 $s_n$, we're taking the \emph{smallest possible} approximation of $f$.
 So we can never have $s_n>f$ for any $f$. It's also clear that $s_n\leq
@@ -2633,23 +3145,25 @@ increase the value of of the approximation at an $\omega\in\Omega$.
 Finally, we just wish to show that we, in fact, do have
 $s_n(\omega)\rightarrow f(\omega)$ for all $\omega\in \Omega$. Let's
 take it case by case.
-\begin{enumerate}
-  \item Suppose that $f(\omega)=\infty$. Since $\omega\in f^{-1}([n,\infty])$ for
-    all $n$, we know that
+\begin{enumerate}[label=(\roman*)]
+  \item Suppose that $f(\omega)=\infty$. Since $\omega\in \{f\geq n\}$
+    for all $n$, we know that
     \begin{align*}
-      \lim_{n\rightarrow\infty} s_n(\omega) = \lim_{n\rightarrow\infty}
-      n\Chi_{f^{-1}([n,\infty])} = \lim_{n\rightarrow\infty}
-      n = \infty = f(\omega)
+      \lim_{n\rightarrow\infty} s_n(\omega)
+      = \lim_{n\rightarrow\infty}
+      n\cdot\one{\{f\geq n\}}
+      = \lim_{n\rightarrow\infty} n = \infty = f(\omega)
     \end{align*}
-  \item Next, suppose that $f(\omega) = 0$. Then $\omega\in f^{-1}([0,1/2^{n-1}))$
-      for all $n$, so
-      \begin{align*}
-        \lim_{n\rightarrow\infty} s_n(\omega) = \lim_{n\rightarrow\infty}
-        \frac{0}{2^{n-1}}\Chi_{f^{-1}([0,1/2^{n-1}])} =
-        \lim_{n\rightarrow\infty} 0 = 0 = f(\omega)
-      \end{align*}
-  \item Finally, suppose $f(\omega)\in(0,\infty)$. Then, $N>f(\omega)$ for some $N$.
-    That implies
+  \item Next, suppose that $f(\omega) = 0$. Then
+    $\omega\in \big\{f \in [0,1/2^{n-1})\big\}$ for all $n$, so
+    \begin{align*}
+      \lim_{n\rightarrow\infty} s_n(\omega)
+      = \lim_{n\rightarrow\infty}
+      \frac{0}{2^{n-1}}\cdot\one{\{f\in[0,1/2^{n-1}]\}} =
+      \lim_{n\rightarrow\infty} 0 = 0 = f(\omega)
+    \end{align*}
+  \item Finally, suppose $f(\omega)\in(0,\infty)$. Then, $N>f(\omega)$
+    for some $N$. That implies
     \begin{align*}
       f(\omega) \in \left[\frac{k}{2^{N-1}}, \frac{k+1}{2^{N-1}}\right)
           \qquad
@@ -2657,19 +3171,22 @@ take it case by case.
     \end{align*}
     This, in turn, implies that
     \begin{align*}
-      f(\omega) - S_N \leq \frac{1}{2^{N-1}}
+      f(\omega) - s_N \leq \frac{1}{2^{N-1}}
       \quad \Rightarrow\quad
-      \lim_{n\rightarrow\infty}  S_N  =
+      \lim_{n\rightarrow\infty}  s_n  =
       f(\omega)
     \end{align*}
 \end{enumerate}
+Hence, for sequence $\{s_n\}\ninf$ defined by
+Equation~\ref{simpleapprox}, we have $s_n\ra f$ pointwise.
 \end{proof}
 
-
 \clearpage
-\subsection{General Theory of Integration}
+\section{General Theory of Integration}
 
-What we did in the proof of Theorem \ref{lebapprox} is \emph{the key} to
+\subsection{Intuition}
+
+What we did in the proof of Theorem \ref{lebapprox} is the \emph{key} to
 our general theory of integration.  And it all has to do with how we
 partitioned the domain $\Omega$.
 
@@ -2722,7 +3239,7 @@ sometimes be used to highlight the argument of the function being
 integrated.
 
 \clearpage
-\subsubsection{Definition of the Integral}
+\subsection{Definition of the Integral}
 
 \begin{defn}(Integral of Simple Function)
 \label{simpleint}
@@ -2938,7 +3455,7 @@ $\sum^\infty_{n=1}|f(n)|<\infty$, as $|f| = f_+ + f_-$.
 \end{ex}
 
 \clearpage
-\subsubsection{Properties of the Integral}
+\subsection{Properties of the Integral}
 
 \begin{thm}\emph{(Homogoneity)}
 Given measurable function $f$,
@@ -3112,7 +3629,7 @@ we've developed. We need to do the hard work in the next subsections to
 establish this property.
 \end{rmk}
 
-\subsubsection{Convergence Theorems}
+\subsection{Pillar Convergence Theorems}
 
 We defined the integral of nonnegative measurable function $f$ as the
 supremum over integrals of simple functions bounded above by $f$. But
@@ -3305,7 +3822,7 @@ we'll be able to use the result all of the time.
 \end{rmk}
 
 \clearpage
-\subsubsection{Radon-Nikodym}
+\subsection{Radon-Nikodym}
 
 \begin{defn}(Absolutely Continuous and Equivalent Measures)
 Given two measures $\mu_1$ and $\mu_2$ on measure space $(\Omega,\sF)$,
@@ -3393,70 +3910,7 @@ denote this function by $\frac{d\mu_2}{d\mu_1}$.
 \end{thm}
 
 
-\clearpage
-\subsubsection{Fubini-Tonelli}
-
-\begin{thm}\emph{(Fubini-Tonelli)}
-Let
-$(\Omega_1,\sF_1,\mu_1)$ and
-$(\Omega_2,\sF_2,\mu_2)$
-be measure spaces and let
-\begin{align*}
-  f:
-  (\Omega_1\times \Omega_2, \sF_1\otimes\sF_2)
-  \ra
-  (\R,\sB(\R))
-\end{align*}
-be a measurable function. Then
-\begin{enumerate}
-  \item \emph{Fubini}:
-    If $f$ is integrable on the product space
-    \begin{align*}
-      \int_{\Omega_1\times \Omega_2}
-      |f(\omega_1,\omega_2)| \; d(\mu_1\otimes\mu_2)
-      <\infty
-    \end{align*}
-    then you can swap the order of integration:
-    \begin{align*}
-      \int_{\Omega_1\times \Omega_2}
-      f(\omega_1,\omega_2) \; d(\mu_1\otimes\mu_2)
-      &=
-      \int_{\Omega_1} \left[\int_{\Omega_2}
-      f(\omega_1,\omega_2)
-      \;\mu_2(d\omega_2) \right]\;\mu_1(d\omega_1) \\
-      &=
-      \int_{\Omega_2}\left[
-        \int_{\Omega_1}
-      f(\omega_1,\omega_2)
-      \;\mu_1(d\omega_1) \right]\;\mu_2(d\omega_2)
-    \end{align*}
-
-  \item \emph{Tonelli}:
-    Suppose that $f$ is nonnegative and $\mu_1,\mu_2$ are
-    $\sigma$-finite. Then you can swap the order of integration:
-    \begin{align*}
-      \begin{rcases}
-      f\geq 0 \\
-      \text{$\mu_1,\mu_2$ are $\sigma$-finite}
-      \end{rcases}
-      \quad\implies \quad
-      \int_{\Omega_1\times \Omega_2}
-      f \; d(\mu_1\otimes\mu_2)
-      =
-      \int_{\Omega_1}\int_{\Omega_2}
-      f(\omega_1,\omega_2)
-      \;d\mu_2(\omega_2) \;d\mu_1(\omega_1)
-    \end{align*}
-\end{enumerate}
-\end{thm}
-\begin{rmk}
-Fubini is often easy to check, since a bounded function with a finite
-measure will be integrable, so then Fubini tells you that you can swap
-the order of integration.
-\end{rmk}
-
-
-\subsubsection{Inequalities}
+\subsection{Inequalities}
 
 \begin{prop}{\emph{(Jensen's Inequality)}}
 Let $g$ be a function and let $X$ be some random variable. Then
@@ -3573,9 +4027,224 @@ To prove Statement~\ref{chebyshev2}, define $Z=X-\E[X]$ and use that in
 Markov's inequality with $p=2$ on $Z$.
 \end{proof}
 
+\clearpage
+\subsection{Uniform Integrability}
+
+\begin{defn}(Uniform Integrability)
+A family of random variables $\{X_\alpha\}_{\alpha \in J}$ is
+\emph{uniformly integrable} if
+\begin{align*}
+  \lim_{c\ra\infty} \sup_{\alpha\in J}\quad
+  \int_{\{|X_\alpha|>c\}}
+  |X_i|\; dP = 0
+\end{align*}
+That is, you're integrating the absolute value of $X_\alpha$ over the
+tails where it has large values. Moreover, you require that the value
+of the integral goes to zero uniformly for \emph{all} $X_\alpha$ (since
+you're taking the sup over $\alpha \in J$).
+\end{defn}
+
+\begin{rmk}
+Given a family of random variables $\{X_\alpha\}_{\alpha \in J}$, we
+might consider two notions of boundedness for the family:
+\begin{enumerate}[label=(\roman*)]
+  \item Random Variable in $L^1$ Bounded: For some random variable
+    $X\in L^1(\Omega,\sF,P)$:
+    \begin{align*}
+      |X_\alpha|\leq |X|
+      \qquad \forall \alpha \in J
+    \end{align*}
+
+  \item $L^p$ Bounded for $p\in[1,\infty)$:
+    \begin{align*}
+      \sup_{\alpha\in J} \lVert X_\alpha\rVert_p<\infty
+      \qquad\text{or equivalently}\qquad
+      \sup_{\alpha\in J} \E[|X_\alpha|^p]<\infty
+    \end{align*}
+\end{enumerate}
+In the following lemmas and propositions, we will have the following
+results:
+\begin{itemize}
+  \item RV in $L^1$ bounded $\implies$ UI
+  \item $L^1$ bounded + tail condition $\implies$ UI
+  \item UI $\implies$ $L^1$ bounded
+  \item UI $\implies$ $L^p$ bounded for \emph{some} (but not all)
+    $p \in (1,\infty]$
+  \item $L^p$ bounded for any $p\in(1,\infty]$ $\implies$ UI
+\end{itemize}
+In this sense, uniformly integrable families are somewhere in between
+``bounded in $L^1$ families'' (since UI implies this) and ``bounded in
+$L^{p>1}$ families'' (since this implies UI).
+\end{rmk}
+
+
+\begin{lem}
+If $\{X_\alpha\}_{\alpha\in J}$ is a family of random variables such
+that $|X_\alpha|\leq |X|$ a.s. for some $X\in L^1(\Omega,\sF,P)$, then
+$\{X_\alpha\}_{\alpha\in J}$ is a uniformly integrable family.
+\end{lem}
+%\begin{proof}
+%First, note that for any $c\in\R$ and $\alpha\in J$, we can write
+%\begin{align*}
+  %\int_{\{|X_\alpha|>c\}}
+  %|X_\alpha|\;dP
+  %&=
+  %\int_\Omega
+  %|X_\alpha|\one{\{|X_\alpha|>c\}}\;dP \\
+  %&=
+  %\E\left[|X_\alpha|\one{\{|X_\alpha|>c\}}\right] \\
+  %&\leq
+  %\E\left[|X|\one{\{|X|>c\}}\right]
+%\end{align*}
+%since $|X_\alpha|\leq |X|$ for all $\alpha\in J$ by assumption.
+%This inequality holds for all $\alpha$, so it will also hold if we take
+%the sup over $\alpha$ on the LHS:
+%\begin{align*}
+  %\sup_\alpha \int_{\{|X_\alpha|>c\}}
+  %|X_\alpha|\;dP
+  %&\leq
+  %\E\left[|X|\one{\{|X|>c\}}\right]
+%\end{align*}
+%Now take the limit as $c\ra\infty$ on both sides:
+%\begin{align*}
+  %\lim_{c\ra\infty}
+  %\sup_\alpha \int_{\{|X_\alpha|>c\}}
+  %|X_\alpha|\;dP
+  %&\leq
+  %\lim_{c\ra\infty}
+  %\E\left[|X|\one{\{|X|>c\}}\right]
+%\end{align*}
+%Finally, by the Lebesgue dominated convergence theorem since
+%$|X|\one{|X_\alpha|>c}<|X|$ a.s. for all $\alpha$, we can take the limit
+%inside on the RHS to get
+%\begin{align*}
+  %\lim_{c\ra\infty}
+  %\sup_\alpha \int_{\{|X_\alpha|>c\}}
+  %|X_\alpha|\;dP
+  %&\leq
+  %\E\left[
+  %\lim_{c\ra\infty}
+  %|X|\one{\{|X|>c\}}
+  %\right]
+  %= 0
+%\end{align*}
+%which is exactly what we needed to show.
+%\end{proof}
+
+\begin{prop}
+A family of random variables $\{X_\alpha\}_{\alpha\in J}$
+on probability space $(\Omega,\sF,P)$ is uniformly integrable if and
+only if
+\begin{align*}
+  \text{both}\quad
+  \begin{cases}
+    \sup_{\alpha \in J} \E[|X_\alpha|]<\infty \\
+    \forall\varepsilon>0
+    \quad\exists \delta >0
+    \quad\text{s.t.}\;
+    \E[|X_\alpha|\one{A}]\leq\varepsilon
+  \end{cases}
+\end{align*}
+In words, uniform integrability implies that the family is $L^1$-bounded
+(as mentioned above in the definition of uniform integrability),
+\emph{and} we can control the tails.
+\end{prop}
+
+\begin{thm}\emph{(Lebesgue DCT Generalization)}
+Let $\{X_n\}\ninf$ and $X$ be random variables on $(\Omega,\sF,P)$ such
+that
+\begin{enumerate}[label=(\roman*)]
+  \item $X_n\pto X$
+  \item $\{X_n\}\ninf$ is a UI family
+\end{enumerate}
+Then
+\begin{enumerate}[label=(\roman*)]
+  \item $X\in L^1(\Omega,\sF,P)$
+  \item $\limn \E[X_n] = \E\left[\limn X_n\right] = \E[X]$
+  \item $X_n \Lqto{1} X$, i.e. $\lim \E[|X_n-X|] = 0$.
+\end{enumerate}
+\end{thm}
+\begin{rmk}
+This is strictly weaker than Lebesgue's DCT for a few reasons. First, we
+don't need $|X_n|\leq |X|$ for all $n$ as in Lebesgue---we just need the
+family to be UI, which we saw is weaker. Moreover, we don't need
+$X_n\asto X$---we just need $X_n\pto X$, which (again) is weaker.
+This only works for a probability space where $P[\Omega]<1$, so this is
+really a probability theory result, not a measure theory result.
+\end{rmk}
+
+
+\begin{cor}
+A family of random variables $\{X_\alpha\}_{\alpha\in J}$ is UI if and
+only if the family is $L^p$-bounded for some $p\in(1,\infty]$.
+\end{cor}
 
 \clearpage
-\subsection{$L^p$ Spaces}
+\subsection{Fubini-Tonelli}
+
+\begin{thm}\emph{(Fubini-Tonelli)}
+Let
+$(\Omega_1,\sF_1,\mu_1)$ and
+$(\Omega_2,\sF_2,\mu_2)$
+be measure spaces and let
+\begin{align*}
+  f:
+  (\Omega_1\times \Omega_2, \sF_1\otimes\sF_2)
+  \ra
+  (\R,\sB(\R))
+\end{align*}
+be a measurable function. Then
+\begin{enumerate}
+  \item \emph{Fubini}:
+    If $f$ is integrable on the product space
+    \begin{align*}
+      \int_{\Omega_1\times \Omega_2}
+      |f(\omega_1,\omega_2)| \; d(\mu_1\otimes\mu_2)
+      <\infty
+    \end{align*}
+    then you can swap the order of integration:
+    \begin{align*}
+      \int_{\Omega_1\times \Omega_2}
+      f(\omega_1,\omega_2) \; d(\mu_1\otimes\mu_2)
+      &=
+      \int_{\Omega_1} \left[\int_{\Omega_2}
+      f(\omega_1,\omega_2)
+      \;\mu_2(d\omega_2) \right]\;\mu_1(d\omega_1) \\
+      &=
+      \int_{\Omega_2}\left[
+        \int_{\Omega_1}
+      f(\omega_1,\omega_2)
+      \;\mu_1(d\omega_1) \right]\;\mu_2(d\omega_2)
+    \end{align*}
+
+  \item \emph{Tonelli}:
+    Suppose that $f$ is nonnegative and $\mu_1,\mu_2$ are
+    $\sigma$-finite. Then you can swap the order of integration:
+    \begin{align*}
+      \begin{rcases}
+      f\geq 0 \\
+      \text{$\mu_1,\mu_2$ are $\sigma$-finite}
+      \end{rcases}
+      \quad\implies \quad
+      \int_{\Omega_1\times \Omega_2}
+      f \; d(\mu_1\otimes\mu_2)
+      =
+      \int_{\Omega_1}\int_{\Omega_2}
+      f(\omega_1,\omega_2)
+      \;d\mu_2(\omega_2) \;d\mu_1(\omega_1)
+    \end{align*}
+\end{enumerate}
+\end{thm}
+\begin{rmk}
+Fubini is often easy to check, since a bounded function with a finite
+measure will be integrable, so then Fubini tells you that you can swap
+the order of integration.
+\end{rmk}
+
+
+
+\clearpage
+\section{$L^p$ Spaces}
 
 We start with a discussion of \emph{normed vector spaces}, which take a
 vector space and add the notion of a \emph{norm}, a function that can be
@@ -3588,7 +4257,7 @@ concepts together.
 
 Finally, we move onto $L^p$ spaces.
 
-\subsubsection{Normed Vector Spaces and Banach Spaces}
+\subsection{Normed Vector Spaces and Banach Spaces}
 
 
 \begin{defn}(Norm)
@@ -3669,7 +4338,7 @@ $n$ elements, $x=(x_1,\ldots,x_n)$. Then define the a semi-norm for
 $m<n$ as $\lvert x\rvert = \sum_{i=1}^m |x_i|$.
 \end{ex}
 
-\subsubsection{Inner Product and Hilbert Spaces}
+\subsection{Inner Product and Hilbert Spaces}
 
 \begin{defn}(Inner Products and Inner Product Space)
 An \emph{inner product space} is a vector space $X$ with an
@@ -3853,7 +4522,7 @@ $N=1$ and $u_1=\frac{y}{\lVert y\rVert}$. Then
 
 
 \clearpage
-\subsubsection{$L^p$ Spaces}
+\subsection{$L^p$ Spaces}
 
 \begin{defn}(Set of Measurable Functions $\sL^0$, $L^0$)
 Given measure space $(\Omega,\sF,\mu)$, define
@@ -4280,297 +4949,23 @@ $L^2$ is a Hilbert space under inner product
 \end{thm}
 
 \clearpage
-\subsection{Random Variables}
+\section{Probability Theory with Random Variables}
 
-\begin{defn}(Random Variable)
-A measurable function $X:(\Omega,\sF)\ra (\R,\sB(\R))$ is called a
-\emph{random variable}.
-\end{defn}
+\subsection{Cumulative Distribution Functions}
 
-\begin{prop}
-A random variable $X:(\Omega,\sF)\ra (\R,\sB(\R))$ is measurable iff
-\begin{align*}
-  \{X\leq x\} \in \sF
-  \qquad \forall x\in\R
-\end{align*}
-\end{prop}
+Next we take up the following problem: You have the measurable space
+$(\R,\sB(\R))$, how do you come up with a sensible probability measure
+for it? We'll first define a cumulative distribution function (CDF) and
+show that given a probability measure on $(\R,\sB(\R))$, you can
+construct a CDF. Then, we'll show that the \emph{converse} is also true:
+Any function satisfying the necessary properties to be called a CDF
+\emph{implies} a probability measure $P_F$ on $(\R,\sB(\R))$. Moreover,
+that implied probability measure will be \emph{uniquely} specified.
 
+Therefore, cumulative distributions are a really handy way to introduce
+measures on $(\R,\sB(\R))$. In later sections, we'll also see the close
+relationship between CDFs and random variables.
 
-\begin{prop}
-Given two random variables $X,Y:(\Omega,\sF)\ra (\R,\sB(\R))$, the
-functions $X+Y$ and $X-Y$ and $X\cdot Y$ are also random variables.  And
-if $Y(\omega)\neq 0$ for all $\omega\in\Omega$, then the function $X/Y$
-is also a random variable.
-%\begin{align*}
-  %(X+Y)(\omega) &:= X(\omega) + Y(\omega) \\
-  %(X-Y)(\omega) &:= X(\omega) - Y(\omega) \\
-  %(X\cdot Y)(\omega) &:= X(\omega) \cdot Y(\omega) \\
-  %(X/ Y)(\omega) &:= X(\omega) / Y(\omega)
-%\end{align*}
-%are all random variables .
-\end{prop}
-\begin{proof}
-Since the range $\R$ uses the Borel $\sigma$-algebra, we can prove the
-result by showing that
-\begin{align*}
-  \{X+Y> x\} \in\sF
-\end{align*}
-To start, suppose you give me $\omega\in \{X+Y>x\}$. Then obviously
-\begin{align*}
-  X(\omega) + Y(\omega) > x
-  \quad\implies\quad
-  X(\omega) > x  - Y(\omega)
-\end{align*}
-By the density of $\Q$ in $\R$, there then exists a $q\in \Q$ such that
-\begin{align}
-  X(\omega) > q > x  - Y(\omega)
-  \quad\iff\quad
-  \begin{cases}
-    X(\omega) > q \\
-     Y(\omega) > x  - q
-  \end{cases}
-  \label{qexists}
-\end{align}
-This suggests that we can write
-\begin{align}
-  \{X+Y> x\}
-  &=
-  \bigcup_{q\in \Q}
-  \{
-    X > q,\;
-    Y > x-q
-  \}
-  \label{asunion}
-\end{align}
-To prove this statement, we will show each side of
-Equation~\ref{asunion} is a subset of the other.
-
-First, we show LHS $\subseteq$ RHS. So take any $\omega\in \{X+Y>x\}$.
-We argued above that there's going to be a $q$ such that
-Statement~\ref{qexists} holds for that $\omega$. So the RHS of
-Equation~\ref{asunion} (as the union over \emph{all} $q\in\Q$) will
-definitely pick out that $\omega$, implying LHS $\subseteq$ RHS.
-
-To show the other direction, choose $\omega$ in the RHS of
-Equation~\ref{asunion}. Then there's some associated $q$ such that
-\begin{align*}
-  \begin{rcases}
-  X(\omega) &> q \\
-  Y(\omega) &> x-q
-  \end{rcases}
-  \quad\implies\quad&
-  X(\omega) > q > x-Y(\omega) \\
-  \quad\iff\quad&
-  X(\omega) + Y(\omega) > q + Y(\omega)> x
-\end{align*}
-Hence $X(\omega)+Y(\omega) > x$ implying LHS $\supseteq$ RHS.
-
-Okay, now we rewrite Equation~\ref{asunion}:
-\begin{align*}
-  \{X+Y> x\}
-  &=
-  \bigcup_{q\in \Q}
-  \{
-    X > q,\;
-    Y > x-q
-  \} \\
-  &=
-  \bigcup_{q\in \Q}
-  \{ X > q\}
-  \cap
-  \{ Y > x-q \}
-\end{align*}
-But since both $X$ and $Y$ are $\sF$-measurable, the sets $\{X>q\}$ and
-$\{Y>x-q\}$ will be in $\sF$ for any $x,q$. Therefore, each intersection
-in the above union will be in $\sF$ for fixed $x,q$, and so too will the
-countable union of those intersections be in $\sF$ over all $q\in\Q$.
-\end{proof}
-
-\begin{defn}(Extended Random Variable)
-We call a function $X:(\Omega,\sF)\ra \bar{\R}$ where $\bar{\R}=\R \cup
-\{\pm \infty\}$ an \emph{extended random variable} if
-$\{X\leq x\}\in\sF$ for all $x\in\R$.
-\end{defn}
-
-\begin{prop}\emph{(Pointwise Sup and Inf of Extended RVs)}
-Given a countable sequence $\{X_n\}\ninf$ of extended random variables
-on $(\Omega,\sF)$, both the pointwise sup and inf
-\begin{align*}
-  Y(\omega) = \sup_n X_n(\omega)
-  \qquad
-  Z(\omega) = \inf_n X_n(\omega)
-\end{align*}
-are extended random variables.
-\end{prop}
-\begin{proof}
-Note that we can write
-\begin{align*}
-  \{Y \leq x \}
-  &= \bigcap\ninf \{X_n\leq x\} \\
-  \{Z \geq x \}
-  &= \bigcap\ninf \{X_n\geq x\}
-\end{align*}
-Since all of the $X_n$ are measurable, each term in each union will be
-in $\sF$, so that the countable intersection will be as well.
-Hence $\{Y\leq x\}$ and $\{Z\geq x\}$ are in $\sF$, implying $Y$ and $Z$
-are measurable.
-\end{proof}
-
-\begin{cor}
-Let $\{X_n\}\ninf$ be a sequence of extended RVs on $(\Omega,\sF)$ and
-let the mapping $X:(\Omega,\sF)\ra \bar{\R}$ represent the pointwise
-limit of the sequence (possibly infinite at some points):
-\begin{align*}
-  \limn X_n(\omega) = X(\omega)
-  \qquad \forall \omega\in\Omega
-\end{align*}
-Then $X$ is an extended random variable. Moreover, for those
-$\omega\in\Omega$ such that the limit exists, we have
-\begin{align*}
-  \liminf_n X_n(\omega)
-  &=
-  \limsup_n X_n(\omega) \\
-  \iff\quad
-  \sup_n \inf_{m \geq n} X_m(\omega)
-  &=
-  \inf_n \sup_{m \geq n}
-  X_m(\omega)
-\end{align*}
-\end{cor}
-
-\clearpage
-\subsection{Push Forward Measure, Distribution Functions, Moments}
-
-\begin{prop}\emph{(Push Forward Measure and Change of Variables)}
-Suppose we have $f:\Omega\ra E$, a measurable function between measure
-space $(\Omega,\sF,\mu)$ and measurable space $(E,\sE)$. Then the push
-forward measure denoted $\mu \circ f^{-1}$ or $\mu_f$ is defined
-\begin{align*}
-  \mu_f[A] := \mu[f^{-1}(A)]
-  \qquad\forall A \in\sE
-\end{align*}
-It is a measure such that for any $\sE$-measurable function
-$g:(E,\sE)\ra(\R,\sB(\R))$, we have
-\begin{align*}
-  \int_{f^{-1}(A)} g\circ f \; d\mu
-  =
-  \int_A g\;d\mu_f
-  \qquad A \in \sE
-\end{align*}
-Expressing these integrals in more verbose, explicit notation
-\begin{align*}
-  \int_{f^{-1}(A)} g(f(\omega)) \; \mu(d\omega)
-  =
-  \int_A g(x)\;\mu_f(dx)
-  \qquad A \in \sE
-\end{align*}
-\end{prop}
-\begin{rmk}
-The push-forward measure is so named because we don't have a measure
-defined for $(E,\sE)$, but we \emph{induce} one by pushing forward the
-measure defined for measurable $(\Omega,\sF)$ to measurable space
-$(E,\sE)$.
-\end{rmk}
-
-\begin{defn}(Distribution of Random Variable $X$)
-Consider measurable function $X:(\Omega,\sF,P)\ra (\R,\sB(\R))$.
-If $P$ is a probability measure, then the push forward
-measure $P \circ X^{-1}$ or $P_X$ is \emph{also} a probability measure
-called the \emph{distribution of $X$} such that
-\begin{align*}
-  \int_\Omega g\circ X\; dP
-  = \int_\R g \; dP_X
-  \qquad \forall g:(\R,\sB(\R))\ra (\R,\sB(\R))
-\end{align*}
-\end{defn}
-\begin{rmk}
-I actually could have left this more general and defined $\mu_f$, the
-distribution of $f$ where $f:(\Omega,\sF,\mu)\ra (E,\sE)$ rather than a
-function to $(\R,\sB(\R))$, but oh well.
-\end{rmk}
-
-The above proposition and definition are motivated as follows. I could
-write down $\Omega$, the set of elementary events that could happen. I
-could then specify the measurable sets $\sF$, which are events or
-subsets of $\Omega$ whose probabilities I want to compute. I could then
-also specify a measure $P$ that assigns probabilities to the measurable
-sets in $\sF$. Finally, if I define a random variable $X$ mapping
-$\Omega$ into real numbers, I could (in theory) compute integrals
-corresponding to functions of my random variable like
-\begin{align*}
-  \int_\Omega g\circ X \; dP
-\end{align*}
-But the problem is that I don't really know how to integrate over
-$\Omega$. On the other hand, I might know how to integrate over $\R$,
-the range of $X$. This, in fact, is part of the reason I defined $X$ in
-the first place---so that I wouldn't have to work exclusively with the
-more abstract measure space $(\Omega,\sF,P)$. So rather than integrate
-over subsets of $\Omega$ (the domain of $X$ and $g\circ X$), I change
-variables to integrate over subsets of $\R$ (the range of $X$), using
-the preimage of $X$ to use implicitly the probability measure $P$:
-\begin{align}
-  \int_{X^{-1}(A)} g\circ X \; dP
-  =
-  \int_A g \; dP_X
-  \qquad A \in \sB(\R)
-  \label{omega-Px}
-\end{align}
-or in more verbose notation
-\begin{align}
-  \int_{X^{-1}(A)} (g(X(\omega)) \; P(d\omega)
-  =
-  \int_A g(x) \; P_X(dx)
-  \qquad A \in \sB(\R)
-\end{align}
-Yeah, right okay. But the RHS is still a general (non-Riemman or
-Riemann-Stieltjes) integral. How do I compute it? And what does $P_X$
-actually look like? There's no reason that it should be nice.
-Plus, it was dependent upon writing down $(\Omega,\sF)$, some measure
-$P$ on that measurable space, and a random variable
-$X:(\Omega,\sF)\ra\R$---all to get to $P_X$ and a general integral over
-$\R$.  That's all super abstract and not often how we work with
-probability spaces.
-
-As a result, we actually work in a different way, starting with $P_X$
-and showing that it implies all of that other formal structure that
-makes probability work---the measurable space, the probablity measure,
-the random variable, etc. That's what the rest of this section will
-concern itself with.
-
-Specifically, we usually start by defining a cumulative distribution
-function $F:\R\ra\R$, which is just a special type of function
-satisfying certain properties. By satisfying those properties, the CDF
-then implicitly represents some distribution $P_X$ that implies an
-underlying measure space $(\Omega,\sF)$ and probability measure $P$.
-This then allows us to construction the chain
-\begin{align*}
-  \int_\R g(x) \; F(dx)
-  =
-  \int_\R g(x) \; P_X(dx)
-  =
-  \int_\Omega g(X(\omega)) \; P(d\omega)
-\end{align*}
-While the second two integrals operate with measure $P_X$ and $P$---set
-functions---the first integral is a Lebesgue integral (that might
-specialize to a Riemann-Stieltjes integral) using function
-$F$ from $\R$ to $\R$.  That's huge. Moreover, that will be
-equivalent to computing the integral $\int_\Omega g \circ X \; dP$ on
-some underlying probability space by Equation~\ref{omega-Px}.
-
-Finally, if we write down a density function for a random variable, then
-we can also get
-\begin{align*}
-  \int_\R g(x)f(x) \; dx
-  =
-  \int_\R g(x) \; F(dx)
-  \qquad \text{where}\quad
-  F(x) &= \int_{(-\infty,x]} f(x)\; dx \\
-  P_X(B) &= \int_{B} f(x)\; dx \quad B\in\sB(\R)
-\end{align*}
-where the first and last integral use the Lebesgue measure (which might
-specialize to a Riemann integral).
-
-\clearpage
 \begin{defn}(Cumulative Distribution Function)
 \label{defn:cdf}
 A function $F:\R\ra\R$ is called a
@@ -4579,27 +4974,25 @@ following properties:
 \begin{enumerate}
   \item Non-decreasing
   \item Right continuous
-  \item $\lim_{x\ra-\infty} F(x)=0$ and $\lim_{x\ra \infty}=1$.
+  \item $\lim_{x\ra-\infty} F(x)=0$ and $\lim_{x\ra+\infty}=1$.
 \end{enumerate}
 Right rather than left continuity because only the former makes sense
 for distributions with mass points---we can interpret the jump size as
 the probability of point $x$ occuring.
 \end{defn}
 
-
-\begin{prop}\emph{(Prob. Measure to CDF)}
+\begin{prop}\emph{(Prob. Measure on $(\R,\sB(\R))$ to CDF)}
 Given prob. measure $P$ on $(\R,\sB(\R))$, define
 \begin{align*}
   F(x) := P\big[(-\infty,x]\big]
   \qquad x\in\R
 \end{align*}
-This is a cumulative distribution function.
+which is well defined since $(-\infty,x]\in\sB(\R)$.
+This is a cumulative distribution function.\footnote{%
+  $(-\infty,x)$, $(x,\infty)$, $[x,\infty)$ also work, but $(-\infty,x]$
+  is standard, see remark above.
+}
 \end{prop}
-\begin{rmk}
-It also works to take $(-\infty,x)$, $(x,\infty)$, $[x,\infty)$ but the
-choice above is standard.
-%and matches right continuity of $F$.
-\end{rmk}
 \begin{proof}
 We check that it satisfies the properties in Definition~\ref{defn:cdf}
 (except 3, which is obvious):
@@ -4619,24 +5012,24 @@ We check that it satisfies the properties in Definition~\ref{defn:cdf}
   \item We can write $(-\infty,x]$ as the intersection of a decreasing
     sequence of sets
     \begin{align}
-      (-\infty,x] = \bigcap\ninf \bigg(-\infty, \; x+\frac{1}{n}\bigg]
+      (-\infty,x] = \bigcap\ninf \left(-\infty, \; x+1/n\right]
       \label{ascap}
     \end{align}
     Since $P$ is a probability measure, it is continuous from above,
     so for that decreasing sequence of sets, we have
     \begin{align*}
-      P\left[ \bigcap\ninf \bigg(-\infty, \; x+\frac{1}{n}\bigg]
+      P\left[ \bigcap\ninf \left(-\infty, \; x+1/n\right]
       \right]
-      &=\limn P\left[ \bigg(-\infty, \; x+\frac{1}{n}\bigg]
+      &=\limn P\big[ \left(-\infty, \; x+1/n\big]
       \right]
     \end{align*}
     So by Statement~\ref{ascap}, we have
     \begin{align*}
       P\big[(-\infty,x]\big]
-      &=\limn P\left[ \bigg(-\infty, \; x+\frac{1}{n}\bigg]\right] \\
+      &=\limn P\big[ \left(-\infty, \; x+1/n\right]\big] \\
       \iff \quad
       F(x)
-      &=\limn F\left(x+\frac{1}{n}\right)
+      &=\limn F(x+1/n)
     \end{align*}
     Hence, $F$ is right continuous.
 \end{enumerate}
@@ -4653,16 +5046,15 @@ We check that it satisfies the properties in Definition~\ref{defn:cdf}
 
 The next statement is very important. In terms of the discussion above,
 this next statement says that writing down $F$ will uniquely determine a
-probability measure $P_X$.
+probability measure on measurable space $(\R,\sB(\R))$.
 
-
-\begin{prop}\emph{(CDF to Probability Measure)}
-Let $F$ be a cumulative distribution function. Define
-measure $P_F$ on $S$ by setting
+\begin{prop}\emph{(CDF to Prob. Measure on $(\R,\sB(\R))$)}
+Let $F:\R\ra\R$ be a cumulative distribution function. There exists a
+\emph{unique} probability measure $P_F$ on measurable space
+$(\R,\sB(\R))$ such that
 \begin{align*}
-  P_F\big[(a,b]\big] := F(b)-F(a)
+  P_F\big[(a,b]\big] = F(b)-F(a)
 \end{align*}
-This is a probability measure with a unique extension to $\sB(\R)$.
 \end{prop}
 \begin{proof}
 Let $S$ denote the set of all intervals
@@ -4755,7 +5147,7 @@ northeast hatched areas, then adding back in the double-hatched area
 (since we subtracted it twice).
 \begin{figure}[htpb!]
 \centering
-\begin{tikzpicture}[xscale=1.5]
+\begin{tikzpicture}[yscale=1.0, xscale=1.5]
   \coordinate (zzzz) at (-1,-1);
   \coordinate (a1zz) at ( 2,-1);
   \coordinate (zza2) at (-1, 2);
@@ -4783,22 +5175,23 @@ northeast hatched areas, then adding back in the double-hatched area
 \end{figure}
 \end{rmk}
 
-\begin{prop}\emph{(From CDF to Probability Measure)}
+\begin{prop}
+\emph{(From CDF to Probability Measure on $(\R^n,\sB(\R)^{\otimes n})$)}
 Let $S$ denote the set of all hypercubes
 \begin{align*}
   S = \left\{ (a_1,b_1]\times\cdots\times(a_n,b_n]
   \;|\; a_i\in\bar{\R}, \; b_i\in\R\right\}
 \end{align*}
-Given a function $F$ satisfying Definition~\ref{defn:F}, define
+Given a function $F$ satisfying Definition~\ref{defn:F}, there is a
+unique probability measure on $(\R^n,\sB(\R)^{\otimes n})$ such
+that
 \begin{align*}
-  P\big[\, (a_1,b_1]\times\cdots\times(a_n,b_n] \,\big] :=
+  P\big[\, (a_1,b_1]\times\cdots\times(a_n,b_n] \,\big] =
   \Delta_{a_1,b_2}
   \cdots
   \Delta_{a_n,b_n}
   F(x_1,\ldots,x_n)
 \end{align*}
-Then $P$ defines a probability measure on $S$ with a unique extension to
-$\sB(\R)^{\otimes n}$.
 \end{prop}
 \begin{proof}
 $S$ forms a semiring, and it is precisely the set that generates the
@@ -4807,6 +5200,146 @@ $\sigma$-finite. So by Caratheodory's Extension Theorem, $P$ defined
 above on $S$ has a unique extension to $\sB(\R)^{\otimes n}$.
 \end{proof}
 
+
+\clearpage
+\subsection{Push Forward Measure and Moments}
+
+\begin{prop}\emph{(Push Forward Measure and Change of Variables)}
+Suppose we have $f:\Omega\ra E$, a measurable function between measure
+space $(\Omega,\sF,\mu)$ and measurable space $(E,\sE)$. Then the push
+forward measure denoted $\mu \circ f^{-1}$ or $\mu_f$ is defined
+\begin{align*}
+  \mu_f[A] := \mu[f^{-1}(A)]
+  \qquad\forall A \in\sE
+\end{align*}
+It is a measure such that for any $\sE$-measurable function
+$g:(E,\sE)\ra(\R,\sB(\R))$, we have
+\begin{align*}
+  \int_{f^{-1}(A)} g\circ f \; d\mu
+  =
+  \int_A g\;d\mu_f
+  \qquad A \in \sE
+\end{align*}
+Expressing these integrals in more verbose, explicit notation
+\begin{align*}
+  \int_{f^{-1}(A)} g(f(\omega)) \; \mu(d\omega)
+  =
+  \int_A g(x)\;\mu_f(dx)
+  \qquad A \in \sE
+\end{align*}
+\end{prop}
+\begin{rmk}
+The push-forward measure is so named because we don't have a measure
+defined for $(E,\sE)$, but we \emph{induce} one by pushing forward the
+measure defined for measurable $(\Omega,\sF)$ to measurable space
+$(E,\sE)$.
+\end{rmk}
+
+\begin{defn}(Prob. Distribution and Distribution Function of Random Variable $X$)
+Consider measurable function $X:(\Omega,\sF,P)\ra (\R,\sB(\R))$.
+If $P$ is a probability measure, then the push forward
+measure $P \circ X^{-1}$ or $P_X$ is \emph{also} a probability measure
+called the \emph{probability distribution of $X$}, where
+\begin{align*}
+  \int_\Omega g\circ X\; dP
+  = \int_\R g \; dP_X
+  \qquad \forall g:(\R,\sB(\R))\ra (\R,\sB(\R))
+\end{align*}
+Moreover, we call
+\begin{align*}
+  F_X(x)
+  = P_X\big[(-\infty,x]\big]
+  = P\big[X^{-1}\big((-\infty,x]\big)\big]
+\end{align*}
+the \emph{distribution function of $X$}.
+\end{defn}
+\begin{rmk}
+I actually could have left this more general and defined $\mu_f$, the
+distribution of $f$ where $f:(\Omega,\sF,\mu)\ra (E,\sE)$ rather than a
+function to $(\R,\sB(\R))$, but oh well.
+\end{rmk}
+
+
+The above proposition and definition are motivated as follows. I could
+write down $\Omega$, the set of elementary events that could happen. I
+could then specify the measurable sets $\sF$, which are events or
+subsets of $\Omega$ whose probabilities I want to compute. I could then
+also specify a measure $P$ that assigns probabilities to the measurable
+sets in $\sF$. Finally, if I define a random variable $X$ mapping
+$\Omega$ into real numbers, I could (in theory) compute integrals
+corresponding to functions of my random variable like
+\begin{align*}
+  \int_\Omega g\circ X \; dP
+\end{align*}
+But the problem is that I don't really know how to integrate over
+$\Omega$. On the other hand, I might know how to integrate over $\R$,
+the range of $X$. This, in fact, is part of the reason I defined $X$ in
+the first place---so that I wouldn't have to work exclusively with the
+more abstract measure space $(\Omega,\sF,P)$. So rather than integrate
+over subsets of $\Omega$ (the domain of $X$ and $g\circ X$), I change
+variables to integrate over subsets of $\R$ (the range of $X$), using
+the preimage of $X$ to use implicitly the probability measure $P$:
+\begin{align}
+  \int_{X^{-1}(A)} g\circ X \; dP
+  =
+  \int_A g \; dP_X
+  \qquad A \in \sB(\R)
+  \label{omega-Px}
+\end{align}
+or in more verbose notation
+\begin{align}
+  \int_{X^{-1}(A)} (g(X(\omega)) \; P(d\omega)
+  =
+  \int_A g(x) \; P_X(dx)
+  \qquad A \in \sB(\R)
+\end{align}
+Yeah, right okay. But the RHS is still a general (non-Riemman or
+Riemann-Stieltjes) integral. How do I compute it? And what does $P_X$
+actually look like? There's no reason that it should be nice.
+Plus, it was dependent upon writing down $(\Omega,\sF)$, some measure
+$P$ on that measurable space, and a random variable
+$X:(\Omega,\sF)\ra\R$---all to get to $P_X$ and a general integral over
+$\R$.  That's all super abstract and not often how we work with
+probability spaces.
+
+As a result, we actually work in a different way, starting with $P_X$
+and showing that it implies all of that other formal structure that
+makes probability work---the measurable space, the probablity measure,
+the random variable, etc. That's what the rest of this section will
+concern itself with.
+
+Specifically, we usually start by defining a cumulative distribution
+function $F:\R\ra\R$, which is just a special type of function
+satisfying certain properties. By satisfying those properties, the CDF
+then implicitly represents some distribution $P_X$ that implies an
+underlying measure space $(\Omega,\sF)$ and probability measure $P$.
+This then allows us to construct the chain
+\begin{align*}
+  \int_\R g(x) \; F(dx)
+  =
+  \int_\R g(x) \; P_X(dx)
+  =
+  \int_\Omega g(X(\omega)) \; P(d\omega)
+\end{align*}
+While the second two integrals operate with measure $P_X$ and $P$---set
+functions---the first integral is a Lebesgue integral (that might
+specialize to a Riemann-Stieltjes integral) using function
+$F$ from $\R$ to $\R$.  That's huge. Moreover, that will be
+equivalent to computing the integral $\int_\Omega g \circ X \; dP$ on
+some underlying probability space by Equation~\ref{omega-Px}.
+
+Finally, if we write down a density function for a random variable, then
+we can also get
+\begin{align*}
+  \int_\R g(x)f(x) \; dx
+  =
+  \int_\R g(x) \; F(dx)
+  \qquad \text{where}\quad
+  F(x) &= \int_{(-\infty,x]} f(x)\; dx \\
+  P_X(B) &= \int_{B} f(x)\; dx \quad B\in\sB(\R)
+\end{align*}
+where the first and last integral use the Lebesgue measure (which might
+specialize to a Riemann integral).
 
 \begin{defn}
 Let $X:(\Omega,\sF,P)\ra (\R,\sB(\R))$ and $P$ a probability measure,
@@ -4823,6 +5356,139 @@ Given measurable $X\in L^1(\Omega,\sF,P)$ and $P$ a probability measure,
 \end{prop}
 
 
+\clearpage
+\subsection{Conditional Expectation and Probability}
+
+\begin{defn}(Conditional Expectation)
+Let $(\Omega,\sF,P)$ be a probability space and $X\in L^1(\Omega,\sF,P)$
+with $\sG\subseteq\sF$ a sub-$\sigma$-algebra. Define the
+\emph{conditional expectation} $Y=\E[X|\sG]$ as a random variable such
+that
+\begin{align*}
+  \E[1_AY] = \E[\one{A}X]
+  \qquad \forall A\in \sG
+\end{align*}
+If $Z$ is another random variable on $(\Omega,\sF,P)$, then we use the
+shorthand
+\begin{align*}
+  \E[X|Z]
+  \quad\iff\quad
+  \E[X|\sigma(Z)]
+\end{align*}
+with the former being the shorthand notation and the latter expression
+representing the most precise meaning (since the conditional
+expectation is only defined for a $\sigma$-algebra).
+\end{defn}
+
+\begin{prop}
+The conditional expectation \emph{exists} and is \emph{unique} up to
+$P$-a.e.\ equality for any $X\in L^1(\Omega,\sF,P)$.
+\end{prop}
+
+\begin{defn}(Conditional Probability)
+Given probability space $(\Omega,\sF,P)$, event $A\in\sF$, and
+sub-$\sigma$-algebra $\sG\subseteq\sF$, define
+\begin{align*}
+  P[A|\sG] := \E[\one{A}|\sG]
+\end{align*}
+\end{defn}
+
+\begin{prop}\emph{(Properties of the Conditional Expectation)}
+Let $(\Omega,\sF,P)$ be a probability space and
+$X,Y\in L^1(\Omega,\sF,P)$ with $\sG\subseteq\sF$ a
+sub-$\sigma$-algebra. Then
+\begin{enumerate}[label=(\roman*)]
+  \item If $X$ is $\sG$ measurable, then $\E[X|\sG]=X$.
+  \item Tower Property: For any sub-$\sigma$-algebra $\sH\subseteq\sG$,
+    we have
+    \begin{align*}
+      \E\big[
+        \,\E[X|\sG]\,
+        \big|
+        \sH
+      \big]
+      = \E[X|\sH]
+    \end{align*}
+
+  \item For $X$ independent of $\sG$, we have $\E[X|\sG]=\E[X]$.
+
+  \item $X \geq Y$ $P$-a.s. implies that $\E[X|\sG]\geq\E[Y|\sG]$
+    $P$-a.s.
+  \item Conditional Jensen: For a convex function $\varphi:\R\ra \R$ suh
+    such that $\varphi(X)\in L^1$, we have
+    \begin{align*}
+      \E[ \varphi(X) |\sG]
+      \geq \varphi\left(\E[X|\sG]\right)
+      \quad \text{a.s.}
+    \end{align*}
+    For a concave function, the inequality flips.
+
+  \item $\lVert X\rVert_p\geq \lVert\,\E[X|\sG]\,\rVert_p$ (conditional
+    expectation can only decrease in $p$-norm relative to the original
+    $X$).
+\end{enumerate}
+\end{prop}
+\begin{proof}
+We prove each in turn
+\begin{enumerate}[label=(\roman*)]
+  \item
+  \item
+  \item Here, we can apply conditional Jensen since $|\,\cdot\,|^p$ is
+    a convex function so that
+    \begin{align*}
+      \E[\lvert X\rvert^p\,|\,\sG]
+      &\geq
+      \big\lvert\,\E[X|\sG]\,\big\rvert^p
+    \end{align*}
+    Now take the uconditional expectation of each side:
+    \begin{align*}
+      \E\big[
+      \E[\lvert X\rvert^p\,|\,\sG]
+      \big]
+      &\geq
+      \E\big[
+      \lvert\,\E[X|\sG]\,\rvert^p
+      \big] \\
+      \iff\quad
+      \E\left[ \lvert X\rvert^p\right]
+      &\geq
+      \E\big[
+      \lvert\,\E[X|\sG]\,\rvert^p
+      \big]
+    \end{align*}
+    But then raise each side to the power $1/p$ and recongnize that
+    \begin{align*}
+      \E\left[ \lvert X\rvert^p\right]^{\frac{1}{p}}
+      &\geq
+      \E\big[
+      \lvert\,\E[X|\sG]\,\rvert^p
+      \big]^{\frac{1}{p}} \\
+      \iff\quad
+      \lVert X \rVert_p
+      &\geq
+      \lVert \, \E[X|\sG] \,\rVert_p
+    \end{align*}
+\end{enumerate}
+\end{proof}
+
+\begin{defn}
+Let $X$ be a $\bar{\R}$-valued random variable on $(\Omega,\sF,P)$ and
+let $\sG\subseteq \sF$ be a sub-$\sigma$-algebra. Then
+\begin{enumerate}[label=(\roman*)]
+  \item $\E[X^-]<\infty$, define
+    \begin{align*}
+      \E[X|\sG] = \limn \E[X\wedge n|\sG]
+    \end{align*}
+  \item $\E[X^+]<\infty$, define
+    \begin{align*}
+      \E[X|\sG] = \lim_{n\ra-\infty} \E[X\vee n|\sG]
+    \end{align*}
+\end{enumerate}
+\end{defn}
+
+
+
+\clearpage
 \subsection{Independence and Borel-Cantelli}
 
 \begin{defn}(Independence)
@@ -4932,156 +5598,6 @@ and
 \end{lem}
 
 \clearpage
-\subsection{Conditional Probabilities and Expectations}
-
-\subsubsection{Finite Probability Spaces}
-
-\begin{defn}(Decomposition)
-Suppose we have a probability space $(\Omega,\sA,P)$. Then a
-\emph{decomposition} is any collection
-\begin{align*}
-  \sD = \{D_1,\ldots,D_N\}
-\end{align*}
-such that the collection is pairwise disjoint (i.e.\
-$D_n\cap D_m=\emptyset$ for all $n\neq m$) and
-\begin{align*}
-  \Omega = \bigcup\nN D_n
-\end{align*}
-\end{defn}
-
-\begin{defn}(Atoms of Algebra $\sA$)
-Suppose we have an algebra $\sA$. An \emph{atom} is any set $A\in \sA$
-such that it's only subsets are $\emptyset$ and $A$.
-Atoms are like the prime numbers of an algebra---you can't divide them
-up into smaller pieces that are also in the algebra.
-
-Any arbitrary $B\in\sA$ can be expressed as a union of atoms. Moreover,
-you can always create a decomposition of the sample space $\Omega$ into
-the set of all atoms, since atoms are pairwise disjoint (see next
-proposition).
-\end{defn}
-
-\begin{rmk}
-Shiryaev refers to elements of any arbitrary decomposition as ``atoms.''
-I do not. I reserve that term for sets strictly satisfying the
-definition above.
-
-Though the set of all atoms \emph{always} forms a decomposition, by my
-terminology, you can have a decomposition of $\Omega$ consisting of sets
-that are not atoms.
-\end{rmk}
-
-\begin{prop}
-Any two atoms of an algebra are disjoint.
-\end{prop}
-\begin{proof}
-Suppose that $A,B\in\sA$ are two distinct atoms. Since $\sA$ is an
-algebra, then $A\cap B\in\sA$. If this intersection were nonempty, it
-would violate the definition of $A$ and $B$ as atoms.
-\end{proof}
-
-
-\begin{ex}
-Let $\{x_1,\ldots,x_N\}$ denote the range of random variable $X$ defined
-on probability space $(\Omega,\sA,P)$. Then the sets
-\begin{align}
-  \{X=x_1\}\quad\cdots\quad\{X=x_N\}
-  \label{atoms}
-\end{align}
-form a decomposition of $\Omega$. Moreover, Collection~\ref{atoms}
-is also the collection of all atoms of $\alpha(X)$, the algebra
-generated by $X$ (i.e.\ the algebra generated by Collection~\ref{atoms}).
-\end{ex}
-
-
-\begin{defn}(Bayes Rule: Conditional Probability Given an Event)
-\label{defn:bayesrule}
-The conditional probability of event $A$ ocurring given $B$ occurring
-(assuming $P(B)>0$) is
-\begin{align*}
-  P[A|B] = \frac{P[A\cap B]}{P[B]}
-\end{align*}
-\end{defn}
-
-\begin{defn}(Conditional Probability Given a Decomposition)
-Let $\sD$ be a decomposition of sample space $\Omega$. Then
-the \emph{conditional probability with respect to decomposition $\sD$}
-denoted $P[A|\sD]$ is a random variable defined
-\begin{align*}
-  P[A|\sD](\omega) = \sumnN P[A|D_n] I_{D_n}(\omega)
-\end{align*}
-Since a decomposition consists of pairwise disjoint sets, $\omega$ is in
-\emph{some} $D_i\in\sD$. The random variable $P[A|\sD](\omega)$ takes
-$\omega$, finds that $D_i$, and returns $P[A|D_i]$ as defined in Bayes
-Rule, Definition~\ref{defn:bayesrule}.
-\end{defn}
-
-We see here how a decomposition can represent our ``information.''
-Suppose we have an event $A$. We have some baseline probability of it
-occurring, $P[A]$. The conditional probability $P[A|\sD](\omega)$ is a
-function that tells us a new ``updated'' probability for $A$ occuring
-given that $\omega$ occurred. Let's consider a few examples for $\sD$.
-
-Say that $\sD_1=\{\Omega\}$. This is a very coarse decomposition.
-Moreover, by the definition, it's clear that
-\begin{align*}
-  P[A|\sD_1](\omega)=P[A|\Omega]=P[A]
-  \qquad\forall\omega\in\Omega
-\end{align*}
-Here we see that $\sD_1$ represents a decomposition without much
-information.  Knowing which $\omega$ turns up does not cause us to
-revise our baseline probability $P[A]$. That's in sharp contrast to the
-next example.
-
-Suppose that we have a decomposition $\sD_2=\{A,A^c\}$. Then by the
-definition
-\begin{align*}
-  P[A|\sD_2](\omega)
-  =
-  \begin{cases}
-    1 & \omega \in A \\
-    0 & \omega \in A^c \\
-  \end{cases}
-\end{align*}
-The decomposition $\sD$ conveys a lot of information about event $A$.
-
-More generally, conditional probabilities relative to events like
-$P[A|B]$ are like ``I tell you $B$ happened. You tell me
-the probability $A$ happened too.'' On the other hand, conditional
-probabilities relative to decompositions are like ``I tell you $\omega$
-happened and give you a collection of probabilities
-$\{P[A|D_n]\}_{D_n\in\sD}$. You then look up the $D_i$ such that
-$\omega\in D_i$ and tell me $P[A|D_i]$.'' It's more general because it's
-a function mapping from the sample space to numbers, and that mapping
-depends crucially on $\sD$.
-
-\begin{defn}(Conditional Expectation with Respect to an Algebra)
-Let $\sA$ be an algebra with atoms $A_1,\ldots,A_m$. The conditional
-expectation of $X$ with respect to $\sA$ is the random variable
-\begin{align*}
-  \E[X|\sA](\omega)
-  &=
-\end{align*}
-\end{defn}
-
-\begin{defn}(Law of Total Probability)
-Given a decomposition $\sD=\{D_1,\ldots,D_N\}$ of $\Omega$,
-it's clear for $B\subseteq\Omega$ that
-\begin{align*}
-  B = \bigcup\nN (B\cap D_n)
-\end{align*}
-Therefore, we get the law of total probability
-\begin{align*}
-  P[B] = \sumnN P[B|D_n]P[D_n]
-\end{align*}
-\end{defn}
-
-\subsubsection{General Probability Spaces}
-
-\begin{prop}
-\end{prop}
-
-
 \subsection{Gaussian Processes}
 
 \begin{defn}
@@ -5115,9 +5631,878 @@ Hilbert space.
 \end{rmk}
 
 
-\subsection{Martingale Theory}
+\clearpage
+\section{Martingale Theory}
+
+\subsection{Basics}
+\begin{defn}(Stochastic Process)
+A \emph{stochastic process} on probability space $(\Omega,\sF,P)$ is a
+family of random variables $\{X_\alpha\}_{\alpha\in J}$, where $J$ is an
+arbitrary nonempty index set.
+If $J=\N$, then we call $\{X_t\}\tinfz$ a \emph{discrete time}
+stochastic process.
+\end{defn}
+
+\begin{defn}(Filtration)
+A \emph{filtration} is a sequence $\{\sF_t\}\tinfz$ of $\sigma$-algebras
+on probability space $(\Omega,\sF,P)$ such that
+\begin{align*}
+  \sF_0 \subseteq \sF_1 \subseteq \cdots \subseteq\sF
+\end{align*}
+where
+\begin{align*}
+  \sF = \vee\tinfz \sF_t := \sigma\left(\cup\tinfz \sF_t\right)
+\end{align*}
+We will think about the filtration as a sequence of information sets,
+while a single $\sF_t$ represents the collection of events that are
+observable up until time $t$. As time progresses, the information sets
+get finer and finer, captured by
+$\sF_t\subseteq \sF_{t+1}\subseteq\cdots$, with more events being
+observable (an in the successive $\sigma$-algebras) as time goes on.
+\end{defn}
+
+\begin{defn}(Adapted)
+A stochastic process $\{X_t\}\tinfz$ is \emph{adapted} to the filtration
+$\{\sF_t\}\tinfz$ if $X_t$ is $\sF_t$-measurable for all $t$.
+In words, this just means that the value of $X_t$ is observable at time
+$t$.
+\end{defn}
+%\begin{rmk}
+%Recall the definition of measurability: real-valued RV $X_t$ is $\sF_t$
+%measurable if and only if $\{X_t\leq x\}\in\sF_t$ for all $x\in\R$.  In
+%words, this means that you can probabilistically answer questions about
+%the values that $X_t$ takes on. So if someone asks you ``Is
+%$X_t\leq x$'', the set of all $\omega$'s where this is true,
+%$\{X_t\leq x\}$, is a set in the $\sigma$-algebra $\sF_t$, so you can
+%give a valid probabilistic answer to that. Same for other values of $x$,
+%other equalities or inequalities, or (more generally) whether
+%$X_t$ is in some Borel set of $\R$. You can make valid probabilistic
+%statements about all of those things. And what \emph{adapted} means is
+%that \emph{at any time} $t$, you give probabilistic answers about the
+%values $X_t$ might take on using the associated time $t$
+%$\sigma$-algebra, $\sF_t$.
+%\end{rmk}
+
+\begin{defn}(Predictable Process)
+We say that stochastic process $\{X_t\}\tinfz$ is \emph{predictable} if
+$X_t$ is $\sF_{t-1}$-measurable for all $t\geq 1$.
+\end{defn}
+%\begin{rmk}
+%$X_t$ is adapted to $\sF_t$ means that you can make statements about the
+%value of $X_t$ in terms of the time $t$ information set $\sF_t$.
+%For predictable processes, you can make statements about the value of
+%$X_t$ given the time $t-1$ information set, $\sF_{t-1}$.
+%\end{rmk}
+
+\begin{defn}(Martingale)
+Suppose we have a stochastic process $\{X_t\}\tinfz$ adapted to
+filtration $\{\sF_t\}\tinfz$ on probability space $(\Omega,\sF,P)$ such
+that $X_t\in L^1(\Omega,\sF_t,P)$ for all $t$. Then we define
+\begin{enumerate}[label=(\roman*)]
+  \item Martingale: $\E[X_{t+1}|\sF_t] = X_t$
+  \item Sub-Martingale: $\E[X_{t+1}|\sF_t] \geq X_t$
+  \item Super-Martingale: $\E[X_{t+1}|\sF_t] \leq X_t$
+\end{enumerate}
+Each must hold for all $t$. And to be especially pedantic, we make sure
+to say that $\{X_t\}\tinfz$ is a (sub/super-)martingale \emph{with
+respect to filtration} $\{\sF_t\}\tinfz$, since a process might be one
+of those things with respect to \emph{some} filtration, but not another.
+\end{defn}
+
+\begin{prop}
+Let $X\in L^1(\Omega,\sF,P)$ and $\{\sF_t\}$ be any filtration. Then
+\begin{align*}
+  X_t := \E[X|\sF_t] \qquad t=0,1,2,\ldots
+\end{align*}
+defines a uniformly integrable martingale.
+\end{prop}
 
 
+\begin{defn}(Martingale Sum/Integral)
+Consider two stochastic processes $\{X_t\}\tinfz$ and $\{V_t\}\tinfz$ on
+probability space $(\Omega,\sF,P)$. The define the discrete time
+\emph{martingale sum} or \emph{martingale integral} as
+\begin{align*}
+  (V\circ X)_T
+  :=
+  \begin{cases}
+    0 & T = 0 \\
+    \sumtT V_t \Delta X_t & t \geq 1
+  \end{cases}
+\end{align*}
+where $\Delta X_t:= X_t - X_{t-1}$.
+\end{defn}
+
+\begin{prop}\emph{(Doob Decomposition)}
+Let $\{X_t\}\tinfz$ be a submartingale with respect to filtration
+$\{\sF_t\}\tinfz$ Then there exists a martingale $\{M_t\}\tinfz$ and a
+non-decreasing predictable process $\{A_t\}\tinfz$ such that $A_0=0$ and
+\begin{align*}
+  X_n = M_n + A_n
+\end{align*}
+Moreover this decomposition is unique.
+\end{prop}
+\begin{proof}
+Let $A_0=0$ and $M_0=X_0$, then choose
+\begin{align*}
+  \Delta X_t
+  = \underbrace{\Delta X_t - \E[\Delta X_t |\sF_{t-1}]}_{\Delta M_t}
+  +
+  \underbrace{\E[\Delta X_t |\sF_{t-1}]}_{\Delta A_t}
+\end{align*}
+\end{proof}
+
+
+\begin{cor}
+Let $\{X_t\}\tinfz$ be a submartingale and $\{V_t\}\tinf$ be a
+non-negative predictable process with respetct $\{\sF_t\}\tinfz$
+such that $\E[|V_t\Delta X_t|]<+\infty$ for all $t\geq 1$. Then
+$(V\circ X)\tinfz$ is a submartingale with decomposition
+\begin{align*}
+  (V\circ X)_t =
+  (V\circ M)_t +
+  (V\circ A)_t
+\end{align*}
+\end{cor}
+
+
+\clearpage
+\subsection{Stopping Times}
+
+\begin{defn}(Stopping Time)
+A \emph{stopping time} $\tau$ with respect to filtration
+$\{\sF_t\}\tinfz$ is a random variable
+\begin{align*}
+  \tau: (\Omega,\sF,P)\ra \N \cup \{+\infty\}
+\end{align*}
+such that $\{\tau=t\}\in \sF_t$ (or equivalently $\{\tau\leq
+t\}\in\sF_t$) for all $t\in\N$.
+\\
+\\
+In words, a stopping time maps every $\omega\in\Omega$ to number
+$\tau(\omega)\in\N$ representing a time. The measurability condition
+simply ensures that at time $t$, you can tell whether $\tau$ occurred or
+not.
+Qualifiers we might use to describe a particular stopping time:
+\begin{itemize}
+  \item \emph{Bounded}: if $P[\tau < T]=1$ for some $T<\infty$.
+  \item \emph{Finite}: if $P[\tau=+\infty]=0$, which is weaker than
+    bounded. It's like ``We know it will stop at some point, but we
+    can't put a hard bound on when.''
+\end{itemize}
+\end{defn}
+
+\begin{defn}(Stopping $\sigma$-Algebra)
+Given a stopping time $\tau$, we define a
+\emph{stopping $\sigma$-algebra}:
+\begin{align*}
+  \sF_\tau :=
+  \{A\in\sF \;|\; A\cap \{\tau=t\} \in \sF_t \quad \forall t\in\N\}
+\end{align*}
+This is the information at random time $\tau$, just like $\sF_t$ is the
+information at fixed, nonrandom time $t$. An event $A$ is in $\sF_\tau$
+if we can say whether $A$ \emph{and} $\tau\leq t$ happened given
+information up to time $t$.
+\end{defn}
+
+\begin{thm}\emph{(Debut Theorem/First Hitting Time)}
+Given stochastic process $\{X_t\}\tinfz$ adapted to filtration
+$\{\sF_t\}\tinfz$ and some $B\in\sB(\R)$, the random variable
+\begin{align*}
+  \tau(\omega) := \inf_t\{t\in\N \;|\; X_t(\omega) \in B\}
+\end{align*}
+is a stopping time with respect to $\{\sF_t\}\tinfz$ called the
+\emph{first hitting time}.
+\end{thm}
+
+\begin{defn}\emph{(Stopped Process)}
+Let $\{X_t\}\tinfz$ be a stochastic process adapted to
+$\{\sF_t\}\tinfz$ and $\tau$ a stopping time with respect to
+$\{\sF_t\}\tinfz$. Then
+\begin{itemize}
+  \item $X_\tau \cdot \one{\{\tau<+\infty\}}$ is $\sF_\tau$-measurable.
+    It is the value of the stochastic process when it is stopped.
+    We can think about $\{X_{\tau(\omega}(\omega)\}_{\omega\in\Omega}$
+    as the set of values the process takes on at the stopping time for
+    each different sample path realizations. It can be written as
+    \begin{align*}
+      X_\tau\cdot \one{\{\tau<+\infty\}}
+      = \sumtinfz X_t \cdot \one{\tau=t}
+    \end{align*}
+
+  \item $X^\tau_t := X_{\tau \wedge t}$ for
+    $t\in\N$ is adapted to $\{\sF_t\}\tinfz$.
+    To be super explicit about the dependence on $\omega\in\Omega$, this
+    would be written in its most verbose form as
+    $X^\tau_t(\omega) := X_{\tau(\omega) \wedge t}(\omega)$. Note that
+    we can write
+    \begin{align*}
+      X_t^\tau = X_0 + (V\circ X)_t
+      \qquad V_t = \one{\{t\leq \tau\}}\quad\text{for $t\geq 1$}
+    \end{align*}
+\end{itemize}
+\end{defn}
+
+
+\begin{prop}\emph{(Poor Man's Optional Stopping)}
+Suppose that the process $\{X_t\}\tinfz$ is a martingale with respect to
+filtration $\{\sF_t\}\tinfz$. Then
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item $\{X^\tau_t\}\tinfz$ is also a martingale with respect to
+    $\{\sF_t\}\tinfz$.
+  \item If $\tau$ is bounded, then $\E[X_\tau] = \E[X_0]$
+\end{enumerate}
+\end{prop}
+
+
+\begin{prop}
+From Poor Man's optional stopping, recall that $X^\tau_t$ is a
+submartingale given submartingale $\{X_t\}\tinfz$. Then, using the
+corollary to Doob's Decomposition,
+\begin{align*}
+  X_t^\tau = X_0 + (V\circ X)_t
+  \qquad V_t = \one{\{t\leq \tau\}}\quad\text{for $t\geq 1$}
+\end{align*}
+is a submartingale with the above deocmposition for every stopping time
+$\tau$.
+\end{prop}
+
+\begin{prop}\emph{(Optional Stopping/Sampling)}
+Let $\{X_t\}\tinfz$ be a martingale and $\sigma \leq \tau$ stopping
+times with respect to $\{\sF_t\}\tinfz$, where $\tau$ is also a bounded
+stopping time. Then
+\begin{align*}
+  \E[X_\tau |\sF_\sigma] = X_\sigma
+\end{align*}
+If you set $\sigma=0$, the constant function, and take expectations, you
+get $\E[X_\tau]=\E[X_0]$ as we had in the previous proposition.
+\end{prop}
+
+\clearpage
+\subsection{Martingale Convergence Theorems}
+
+\begin{defn}(Upcrossings)
+Let $\{X_t\}\tinfz$ be a stochastic process. Fix numbers $a<b$. Then
+define stopping times
+\begin{align*}
+  \tau_1 :=& \; \inf\{t\geq 0\;|\; X_t \leq a\} \\
+  \tau_2 :=& \; \inf\{t> \tau_1\;|\; X_t \geq b\} \\
+  \tau_3 :=& \; \inf\{t> \tau_2\;|\; X_t \leq a\} \\
+  \vdots \quad & \quad \vdots
+\end{align*}
+or more generally, for $k=1,2,3,\ldots$
+\begin{align*}
+  \tau_{2k-1} &= \inf\{t\geq \tau_{2k-2)} \;|\; X_t \leq a\} \\
+  \tau_{2k} &= \inf\{t\geq \tau_{2k-1} \;|\; X_t \geq b\}
+\end{align*}
+so that $\tau_{2k-1}$ is $k$th time you dip below $a$ (conditional on
+having gone above $b$ since the last time you dipped below $a$), while
+$\tau_{2k}$ is the $k$th time you punched above $b$ (conditional on
+having dipped below $a$ since the last time you punched above $b$).
+
+From these stopping times, we define the number of \emph{upcrossings} up
+to and including $t$:
+\begin{align*}
+  \beta_t(a,b)
+  :=
+  \begin{cases}
+    0 & t < \tau_2  \\
+    \max\{k | \tau_{2k} \leq t\} & t \geq \tau_2
+  \end{cases}
+\end{align*}
+This is the total number of times the process has dipped below $a$ then
+punched above $b$ by the time $t$.
+\end{defn}
+
+\begin{thm}\emph{(Upcrossing Theorem)}
+If $\{X_t\}\tinfz$ is a submartingale, then
+\begin{align*}
+  \E[\beta_t(a,b)]
+  \leq
+  \frac{\E[(X_t-a)^+]}{b-a}
+  \qquad \forall t
+\end{align*}
+\end{thm}
+
+\begin{thm}\emph{(Martingale Convergence Theorem)}
+Let $\{X_t\}\tinfz$ be a $L^1$-bounded submartingale (i.e.
+$\sup_t\lVert X_t\rVert_1<\infty$), then there exists a random variable
+$X_\infty$ such that
+\begin{align*}
+  X_t \asto X_\infty
+  \qquad\text{and}\qquad
+  \lVert X_\infty\rVert_1 \leq \sup_t \lVert X_t\rVert_1 < \infty
+\end{align*}
+\end{thm}
+
+\begin{cor}
+Let $\{X_t\}\tinfz$ be a uniformly integrable submartingale. Then there
+exists a limit $X_\infty\in L^1$ such that
+\begin{align*}
+  X_t\asto X_\infty
+  \qquad
+  X_t \Lqto{1} X_\infty
+\end{align*}
+Moreover
+$\E[X_\infty|\sF_t] \geq X_t$.
+\end{cor}
+\begin{rmk}
+In the case of a martingale, the last statement specializes to
+$\E[X_\infty|\sF_t] = X_t$, which means that $X_\infty$ characterizes
+the entire submartingale sequence in the case of a martingale.
+\end{rmk}
+
+\begin{cor}
+Let $\{X_t\}\tinfz$ be a submartingale that is bounded above.
+Then there exists a random variable $X_\infty\in L^1$ such that
+$X_t\asto X_\infty$.
+\end{cor}
+
+\begin{cor}
+Consider $X\in L^1(\Omega,\sF,P)$ and filtration $\{\sF_t\}\tinfz$.
+Denote
+\begin{align*}
+  X_t &= \E[X|\sF_t] \\
+  X_\infty &= \E[X|\sF_\infty]
+  \qquad
+  \text{where} \;
+  \sF_\infty=\vee\tinfz \sF_n := \sigma(\cup\tinfz \sF_t)
+\end{align*}
+Then $X_n\asto X_\infty$ and $X_n\Lqto{1} X\infty$.
+\end{cor}
+
+
+\clearpage
+\section{Markov Chains}
+
+Some of assumptions to make things more tractable:
+\begin{enumerate}
+  \item[i.] Discrete time.
+  \item[ii.] Discrete (countable) space
+  \item[iii.] Time Homogeneous: Transition probabilities don't depend
+    upon time, just the state.
+\end{enumerate}
+
+\subsection{Basics}
+
+\begin{defn}(Distribution)
+Given a countable state space $I$, a vector $(\lambda_i)_{i\in I}$ is a
+\emph{distribution} if
+\begin{itemize}
+  \item $\lambda_i\geq 0$ for all $i\in I$.
+  \item $\sum_{i\in I} \lambda_i= 1$
+\end{itemize}
+\end{defn}
+
+\begin{defn}(Stochastic Matrix)
+A matrix $(Q_{ij})_{i,j\in I}$ is a a \emph{stochastic matrix} if all of
+its rows are distributions.\footnote{%
+  If the elements of each column added up to 1 as well, we would call
+  the matrix {\sl doubly-stochastic}.
+}
+\\
+\\
+You should Think about the row $Q_{(i\cdot)}$ as the conditional
+distribution for moving from the state $i$ to any of the other states
+with probability $Q_{ij}$.
+\end{defn}
+
+\begin{defn}(Markov Chain)
+A stochastic process $\{X_t\}\tinfz$ on a probability space
+$(\Omega,\sF,P)$ is a \emph{Markov Chain} with initial distribution
+$\lambda$ and transition matrix $Q$ if
+\begin{enumerate}[label=(\roman*)]
+  \item $P[X_0=i]=\lambda_i$ for all $i\in I$
+  \item $P[X_{t+1} = i_{t+1} \; | \; X_0=i_0, \ldots, X_t=i_t]
+    = p_{i_t,i_{t+1}}$ for all $t$
+\end{enumerate}
+In that case, we say that $\{X_t\}\tinfz$ is Markov$(\lambda,P)$.
+\end{defn}
+
+\begin{thm}\emph{(Markov Property)}
+Let $\{X_t\}\tinfz$ be Markov($\lambda,P$). If $P[X_t=i]>0$, then
+conditional on $X_t=i$, the stochastic process
+$\{X_{t+s}\}_{s=0}^\infty$ is Markov($\delta_i,P$) and independent of
+$(X_0,\ldots,X_t)$.
+\end{thm}
+
+\begin{defn}
+Define $P_i = P[\;\cdot \;| X_0=i]$.
+We say that
+\begin{enumerate}[label=(\roman*)]
+  \item $i\ra j$ or ``$i$ leads to $j$'' if, for some $t\geq 0$, we have
+    $P_i[X_t = j]>0$. Note that $i\ra i$ always.
+  \item $i\leftrightarrow j$ or ``$i$ communicates with $j$ if both
+    $i\ra j$ and $j\ra i$.
+\end{enumerate}
+\end{defn}
+
+\begin{thm}
+For $i$ and $j$, the following are equivalent:
+\begin{enumerate}
+  \item $i\ra j$
+  \item $p_{i,i_1}\cdots p_{i_{n-1},j}$ for some
+    $i_1,\ldots,i_{n-1}\in I$
+  \item $p^n_{ij}> 0$ for some $n\geq 1$.
+\end{enumerate}
+\end{thm}
+
+\begin{defn}(Communicating Classes)
+$I$ decomposes into a set of $N$ communicating classes
+$I=\bigcup\nN C_n$ such that $C_n\cap C_m=\emptyset$ for all $m\neq n$.
+Terminology:
+\begin{enumerate}[label=(\roman*)]
+  \item A class $C_n$ is closed if $i\in C_n$ and $i\ra j$ implies that
+    $j\in C_n$.
+  \item A state $i \in I$ is absorbing if $\{i\}$ is a closed class.
+  \item A Markov chain or transition matrix is called \emph{irreducible}
+    if the whole Markov chain is a single communicating class---it's
+    possible to go from anywhere to anywhere.
+\end{enumerate}
+\end{defn}
+
+\begin{defn}
+Let $A\subseteq I$ be a collection of states and define
+\begin{itemize}
+  \item $H^A:=\inf\{t\geq 0 \;|\; X_t \in A\}$: A first-hitting time for
+    process hitting $A$
+  \item $h^A_i:= P_i[H^A<\infty]$: The probability of a finite first
+    hitting time for $A$
+  \item $k_i^A=\E_i[H^A]$: The expected time until the first hit of $A$
+\end{itemize}
+\end{defn}
+
+\begin{thm}
+The vector of hitting probabilities $(h_i^A)_{i\in I}$ is the minimal
+nonnegative solution to the system of linear equations:
+\begin{align*}
+  h_i^A =
+  \begin{cases}
+    1 & i \in A \\
+    \sum_{j\in I} p_{ij} h_j^A & \forall i \not \in A
+  \end{cases}
+\end{align*}
+\end{thm}
+
+\begin{thm}
+The vector $(k_i^A)_{i\in I}$ is the minimal nonnegative solution to the
+system of linear equations:
+\begin{align*}
+  k_i^A =
+  \begin{cases}
+    0 & i \in A \\
+    1 + \sum_{j\in I} p_{ij}k_j^A & \forall i \not \in A
+  \end{cases}
+\end{align*}
+\end{thm}
+
+\begin{thm}\emph{(Strong Markov Property)}
+Let $\{X_t\}\tinfz$ be a Markov$(\lambda,P)$ and $\tau$ a stopping time
+with respect to $\{\sF_t^X\}\tinfz$ and $i\in I$ such that
+$P[\tau<\infty, \; X_\tau=i]>0$. Then conditioned on $\tau<\infty$ and
+$X_\tau=i$, $\{X_{\tau+s}\}_{s=0}^\infty$ is Markov$(\delta_i,P)$
+independent of $\sF_\tau^X$.
+\end{thm}
+
+\begin{defn}
+We call a state $i\in I$ \emph{recurrent} if
+\begin{align*}
+  P_i[X_n=i \;\; \text{for $\infty$ many $t$}]=1
+\end{align*}
+and we call a state \emph{transient} if
+\begin{align*}
+  P_i[X_n=i \;\; \text{for $\infty$ many $t$}]=0
+\end{align*}
+\end{defn}
+
+\begin{defn}
+Denote
+\begin{align*}
+  T_i^0 &= 0 \\
+  T_i^1 &= T_i = \inf\{t \geq 1 \;|\; X_t=i\} \\
+  T_i^2 &= \inf\{t \geq T_i^1 + 1 \;|\; X_t=i\} \\
+  \vdots \quad &\qquad \vdots \\
+  S_i^k &=
+  \begin{cases}
+    T_i^k- T_i^{k-1} & T_i^{k-1} < \infty \\
+    0 & \text{o.w.}
+  \end{cases}
+\end{align*}
+So $T^k_i$ is the time until the $k$th transition to state $i$.
+\end{defn}
+
+
+%\paragraph{Definition} $\{X_t\}$ is a {\sl non-homogeneous Markov Chain}
+%when $\{X_t\}$ is an infinite sequence of random variables $X_0, X_1,\ldots$
+%which satisfy the following properties
+%\begin{enumerate}
+   %\item[i.]{$X_n$ denotes the \emph{state number} of a subject at time
+      %$t$.}
+   %\item[ii.]{Each $X_t$ is a discrete-type random variable over $n$
+      %possible discrete values.}
+   %\item[iii.]{The {\sl transition probabilities} are history
+      %independent when it comes to pre-$t$ states, 
+      %but the transition probabilities may vary with time, $t$:
+      %\[ Q_{ij}^{(t)} = P( X_{t+1}=j \; | \; X_t = i, \; X_{t-1}=k_{t-1},
+	 %\ldots,\; X_0 = k_0 ) \]
+      %\[ =P(X_{t+1} = j \; | \; X_t = i ) \]
+      %So $Q_{ij}^{(t)}$ is the probability of moving from
+      %state $i$ to state $j$ at time $t$.
+      %}
+%\end{enumerate}
+
+%If the transition probabilities, $Q^{(t)}_{ij}$, do
+%not depend on $t$, then they are denoted by $Q_{ij}$ and we have
+%a {\sl homogeneous Markov Chain}. 
+%\\
+%\\
+%For this type of Markov Chain, 
+%only state or position, \emph{not} time, factors into the distribution for the
+%next period. This differs from the definition above, in that we explicity allow $Q_{ij}^{(t_1)} \neq Q_{ij}^{(t_2)}$ for 
+%$t_1\neq t_2$.
+
+
+%\subsection{Order of a Markov Chain}
+%We can generalize a bit and allow the Markov Chain to depend upon more
+%than one previously observed state.  In particular, we define an 
+%{\sl order}-${n}$ {\sl Markov Chain} to be a Markov Chain that 
+%depends upon the previous $n$ values.  
+%\\
+%\\
+%Above, we defined an order-1 Markov chain. If we want to consider 
+%higher-order Markov Chains, we'll have to do a bit of work when it
+%comes time to put the probabilities in the transition matrices that
+%we next define. Namely, we will have to convert them to order-1.
+
+
+%\newpage
+%\subsection{Transition Matrices}
+
+%Hopefully, the notation above clearly suggested that it will be
+%convenient to place the many transition probabilities into a
+%{\sl transition matrix}, whose $i,j$ entry is the transition
+%probability for moving from state $i$ to state $j$. So if 
+%there are $n$ states, define
+%\[\mathbf{Q}^{(t)}=\begin{pmatrix} Q_{ij}^{(t)} \end{pmatrix}_{ij}
+    %\quad \text{where $\mathbf{Q}^{(t)}$ is $n\times n$} \]
+%And just a word about the funky notation you see above: it says
+%``the matrix $\mathbf{Q}^{(t)}$ is a matrix populated
+%with the values/probabilities $Q_{ij}^{(t)}$ at the $ij$ 
+%entry.'' 
+%\\
+%\\
+
+
+%\subsection{Longer Term Transition Probabilities and Matrices}
+
+%Often, we'll want to look further ahead than just the next period, which
+%is all that our current formulation allows. To do so, we'll define
+%the {\sl longer term transition probabilities} as 
+%\[ Q^{(t,k)}_{ij} = P(X_{t+k} = j \;|\; X_t = i ) \]
+%where $Q^{(t,k)}_{ij}$ is the probability of 
+%being in state $j$ in $k$ periods given that you are currently
+%at time $t$ and in state $i$.\footnote{It's important to note that the transition
+    %probability $Q^{(t,k)}_{ij}$ does \textbf{not} care what happens in between
+    %time $t$ and time $t+k$.  It's just the probability that you were in
+    %state $i$ at time $t$ and may be in state $j$ at time 
+    %$t+k$. In fact, it's even entirely possible 
+    %that you were \emph{already} in state $j$ sometime between
+    %time $t$ and $t+k$! So if we're considering $Q^{(t,k)}_{ii}$, 
+    %this is not the probability of staying of in state $i$
+    %from time $t$ to $t+k$.  You can drift away and then come back.}
+%The above sections dealt with the special case where $k=1$.
+%\\
+%\\
+%Quite naturally, the {\sl longer term transition matrix} is defined
+%\[\mathbf{Q^{(t,k)}} =
+      %\begin{pmatrix} Q^{(t,k)}_{ij} \end{pmatrix}_{ij}
+      %\]
+%\paragraph{Theorem} In non-homogeneous Markov Chains, the longer-term
+%probability $Q^{(t,k)}_{ij}$ can be computed as the $(i,j)$-entry of
+%the matrix 
+   %\[\mathbf{Q^{(t,k)}}= \mathbf{Q^{(t)}} \times \mathbf{Q^{(t+1)}} \times
+      %\cdots \times \mathbf{Q^{(t+k-1)}} 
+            %\]
+%And for a homogeneous Markov Chain, this matrix is just 
+%$\mathbf{Q^{(\cdot, k)}} = \left(\mathbf{Q}\right)^k$, dropping the
+%$t$ in the superscript since the transition probabilities do not 
+%change over time.
+
+%\subsection{Chapman-Kolmogorov Equations (Homogeneous Case)}
+
+%\paragraph{Theorem} If we restrict ourselves to the 
+%homogeneous case, 
+%the {\sl Chapman-Kolmogorov Equations} tell us that 
+%\[Q^{(\cdot, \; k+\ell)}_{ij} = \sum^n_{s=1} 
+    %Q^{(\cdot, \; k)}_{is} Q^{(\cdot,\; \ell)}_{sj} \]
+%This equation captures the idea of ``interposing'' some
+%intermediate time and state between now (time $t$, state
+%$i$) and the future (time $t+k+\ell$, and state $j$).
+%The logic goes as follows:
+%\begin{enumerate}
+    %\item Before you get to time $t+k+\ell$ and state $j$, you
+	%have to stop at time $t+k$.   
+    %\item At that time $t+k$, you'll be in any one of the states,
+	%call it $s$, where $s$ could equal $1, \cdots, n$ (where
+	%$n$ is the number of states.
+    %\item So if you sum over the probability
+	%of moving as follows: 
+	%\[  \text{state $i$ at $t$} \quad \Rightarrow \quad
+			%\text{state $s$ at $t+k$} \quad \Rightarrow \quad 
+			%\text{state $j$ at $t+k+\ell$} \]
+	%(where $s$ ranges over all possible intermediary states), 
+	%you'll get the desired probability.
+%\end{enumerate}
+%{\sl Matrix Representation:}
+%In matrix form, this result can be written more compactly as
+    %\[ \mathbf{Q}^{(\cdot,\; k+\ell)} = \mathbf{Q}^{(\cdot,\; k)} \times 
+      %\mathbf{Q}^{(\cdot,\; \ell)}\]
+%restricting ourselves to the homogeneous case.
+%Things are a little tougher if we want to consider the 
+%non-homogeneous case, as we'll have to multiply more matrices 
+%together and keep track of subscripts.
+
+
+%\newpage
+%\subsection{Marginal Distributions}
+
+%Suppose we have:
+%\begin{enumerate}
+    %\item A homogeneous Markov Chain, $\{X_t\}$ with a transition matrix,
+	%$\mathbf{Q}^{(\cdot)}$
+    %\item A marginal distribution for $X_t$, denoted by row-matrix $\psi^{(t)}$ 
+	%The $i$th entry of $\psi^{(t)}$ is
+	%\[ \psi^{(t)}_i = P\left\{ X_t = i \right\} \]
+%\end{enumerate}
+%First, suppose we want to get the marginal distribution of $X_{t+1}$.
+%This we can do by using the law of total probability:
+%\begin{align*}
+     %P\{X_{t+1} = j\} &= \sum_{i=1}^n 
+	%P\{X_{t+1} = j \; | \; X_t = i \} \cdot 
+	%P\{X_{t} = i\} \\
+    %&= \sum_{i=1}^n 
+	%Q^{(\cdot)}_{ij} \cdot 
+	%\psi_i^{(t)} \\
+    %\Rightarrow \qquad 
+    %\psi^{(t+1)} &= \psi^{(t)} \mathbf{Q}^{(\cdot)}
+%\end{align*}
+%More generally, and still restricting to the homogeneous case, 
+%this implies that for any arbitrary $m$, 
+    %\[ \psi^{(t+m)} = \psi^{(t)} \mathbf{Q}^{(\cdot,\; m)} \]
+
+%\paragraph{Note}: All of this math works whether we are 
+%\emph{certain} of the initial distribution, $X_t$, or
+%whether we aren't quite sure.  
+%\begin{itemize}
+    %\item[-] If we are \emph{certain} of the initial state $i$, 
+	%$X_t$, or if we want to assume an initial state $i$,
+	%$\psi^{(t)}$ will be a vector that is all zeros
+	%\emph{except} for $i$th position, which will have a 1.
+    %\item[-] If we want to think about things more probabilistically
+	%or if we are uncertain of the state $X_t$, then
+	%$\psi^{(t)}$ will be a vector that sums to one and
+	%has, in each position $i=1,\ldots, n$, a probability
+	%of being in state $i$ at time $t$.
+%\end{itemize}
+
+
+%\newpage
+%\subsection{Stationary Distributions}
+
+%In this section, we dispense with the non-homegeneous
+%case, assuming $\mathbf{Q}^{(t)}$ is homegeneous
+%over time. Therefore, we drop the superscript altogether
+%and simply write $\mathbf{Q}$.
+
+%\subsection{Definition}
+
+%A distribution $\psi^*$ is called {\sl stationary} or 
+%{\sl invariant} if $\psi^* = \psi^* \mathbf{Q}$,
+%which implies that $\psi^* = \psi^* \left(\mathbf{Q}\right)^m$
+%for all $m$ too.\footnote{Take note that a stationary 
+    %\emph{distribution} differs from a stationary \emph{process}.
+    %The former is the limiting distribution of a Markov Chain,
+    %or the marginal distribution of a stationary process. The
+    %latter is a stochastic process whose joint probability 
+    %distribution does not change when shifted through time or
+    %space.  Finally, a ``stationary process'' is \emph{not} the
+    %same as a ``process with a stationary distribution.''}
+%Mathematically, a stationary distribution
+%is a fixed point if we think of $\mathbf{Q}$ as a map:
+%\begin{align*}
+    %P: \; &\mathbb{R}^n \rightarrow \mathbb{R}^n \\
+    %&\psi \rightarrow \psi P
+%\end{align*}
+%At least one such distribution exists for each stochastic
+%matrix, $\mathbf{Q}$.\footnote{Use Brouwer's fixed point theorem.}
+%\\
+%\\
+%Importantly, if the distribution of $X_0$ is a stationary distribution,
+%then $X_t$ will have this same distribution for all $t$.
+%As a result stationary distributions have a natural
+%interpretation of \emph{stochastic steady states}.
+
+
+%\subsection{Solving for Stationary Distributions}
+
+%We saw above that a stationary distribution, $\psi^*$, must solve 
+%\begin{equation}
+    %\label{psicond1}
+    %\psi = \psi \mathbf{Q} \quad \Leftrightarrow \quad
+    %\psi \left(I_n - \mathbf{Q}\right) = 0
+%\end{equation}
+%But note that this does not require $\psi^*$ to be a probability
+%distribution since the zero vector happens to solve Equation
+%\ref{psicond1}. So we want to impose the additional constraint
+%\begin{align}
+    %\sum_{i=1}^n \psi_i = 1 \quad &\Leftrightarrow \quad
+    %\psi b = 1 \qquad \text{where $b_i \in \mathbb{R}^n$ and
+				%$b_i=1$ for $i=1,\ldots,n$.} \nonumber \\ 
+    %&\Leftrightarrow \quad \psi B = b 
+    %\qquad \text{where $B$ is an $n\times n$ matrix of 1s}
+    %\label{psicond2}
+%\end{align}
+%By adding together the two conditions, Equations \ref{psicond1}
+%and \ref{psicond2}, we see that $\psi$ must satisfy 
+%\begin{align*}
+    %\psi \left(I_n - \mathbf{Q} + B\right) &= b \\
+    %\Leftrightarrow \qquad
+	%\left(I_n - \mathbf{Q} + B\right)^T \psi^T &= b^T 
+%\end{align*}
+%In this way, we can solve for the stationary distribution
+%by inverting the matrix to get:
+%\begin{equation}
+    %\psi^* = \left[\left(I_n - \mathbf{Q} + B\right)^T\right]^{-1}
+	%b^T
+%\end{equation}
+
+
+%\subsection{Uniform Ergodicity} 
+
+%\paragraph{Definition}
+%A stochastic matrix, $\mathbf{Q}$,
+%is called uniformly ergodic if there is a positive
+%integer $m$ such that all elements of $\left(\mathbf{Q}\right)^m$
+%are \emph{strictly} positive.
+
+%\paragraph{Uniqueness of the Stationary Distribution}
+%Note that there may in fact be
+%many stationary distributions for the stochastic matrix,
+%$\mathbf{Q}$ (as in the case of the identity matrix).
+%But one sufficient condition for uniqueness is 
+%\emph{uniform ergodicity}.  
+
+%\paragraph{Convergence to Steady-State}
+%If uniform ergodicity holds, we also get the result that
+%for any non-negative row vector, $\psi$, summing to one (so a
+%proper distribution)
+%\[ \psi \mathbf{Q}^t \rightarrow \psi^* \quad \text{ as }
+	%t\rightarrow \infty \]
+%where $\psi^*$ is the unique stationary distribution. So
+%regardless of the distribution of $X_0$, the distribution 
+%of $X_t$ converges to $\psi^*$.
+
+%\paragraph{Time in States} To get another import interpretation
+%and result, assume $\{X_t\}$ is a Markov Chain with stochastic 
+%matrix $\mathbf{Q}$. Also assume that $\mathbf{Q}$ is 
+%uniformly ergodic with stationary distribution $\psi^*$. Then
+%\begin{equation}
+    %\lim_{s\rightarrow\infty}
+    %\frac{1}{s} \sum^s_{t=1} 1\{X_t = j\} \rightarrow
+	%\psi^*_j  \qquad
+	%\forall j \in \{1, \ldots, n\}
+%\end{equation}
+%This tells use that the fraction of time the Markov Chain
+%$\{X_t\}$ spends in state $j$ converges to $\psi^*_j$ as
+%time goes to infinity.  Therefore, if we consider many
+%Markov chains with the same stochastic matrix, $\mathbf{Q}$,
+%the long-run cross-sectional averages for a population will
+%equal time-series averages for individual chains.
+
+
+
+%\newpage
+%\subsection{Application: Page Rank}
+
+%Suppose we have a set of web-pages, $j \in \{1, 2, \dots,n \}$.
+%We want to find the fanking $r_j$ for each page, $j$. To do 
+%so, we'll set the ranking as
+    %\[ r_j = \sum_{i \in L_j} \frac{r_i}{\ell_i} \]
+%where $L_j$ is the set of pages linking to page $j$, and
+%where $\ell_i$ is the total number of outbound links from 
+%page $i$. 
+%\\
+%\\
+%But we can think of this another way.  Specifically, imagine
+%a jabroni on some webpage $i$ who is clicking links randomly
+%and with equal probability.  So what's his probability of 
+%landing on page $j$?  Well clearly, we can define this whole
+%``ranking'' business in terms of Markov Chains and transition
+%probabilities:
+    %\[ r_j = \sum_{\text{all $i$}} Q_{ij} r_i, \qquad
+	%\text{ where  } Q_{ij} = \frac{1\{i \rightarrow j\}}{\ell_i}
+    %\]
+%where $1\{i \rightarrow j\}$ is an indicator function that 
+%equals 1 if page $i$ links to page $j$, zero otherwise.
+%So $Q_{ij}$ is, as above, the transition probability for
+%moving from state--or in this case ``page''--$i$ to 
+%$j$.\footnote{We drop the superscript, since we'll assume 
+%we're in the homeogeneous case.}
+%\\
+%\\
+%Awesome, now let's write the ranking in vector and matrix 
+%notation so we can describe the problem for all pages,
+%$j \in \{1, \ldots, n\}$:
+    %\[ \mathbf{r} = \mathbf{r} \mathbf{Q} \]
+%where $\mathbf{r}$ is the vector of rankings and $\mathbf{Q}$
+%is the transition matrix.  Well that looks familiar.  
+%Specifically, $r$ is the stationary distribution of the
+%stochastic matrix $\mathbf{Q}$---and we know how to solve for
+%that!
+
+
+%\newpage
+%\subsection{Tauchen's Approximation Method}
+
+%\subsection{AR(1) Approximiation}
+%Often, we will approximate some continuous model with a 
+%discrete model that utilizes Markov Chains. Specifically, the
+%discrete model takes the form:
+%\begin{equation}
+    %y_{t+1} = \rho y_t + \varepsilon_{t+1} \qquad 
+	%\varepsilon_{t+1} \sim \text{N}(0, \sigma_\varepsilon^2)
+%\end{equation}
+%Now the variance of the stationary probability distribution 
+%of the stochastic process $\{y_t\}$ (which we hope to specify
+%as a Markov Chain) can be easily shown to be
+    %\[ \sigma_y^2 = \frac{\sigma^2_\varepsilon}{1-\rho^2} \]
+
+%\subsection{Constructing the State Space}
+%To discretize an otherwise continuous process, we choose
+%\begin{itemize}
+    %\item $n$, the number of states for the discrete 
+	%approximation that $y_t$ can be in.
+    %\item $m$, an integer that parameterizes the width of
+	%the space of values $y_t$ can take on.
+%\end{itemize}
+%From there, we create a space $\{x_1, \ldots, x_n\}$ and
+%transition matrix $\mathbf{Q}$ defined
+%by the parameters $n$ and $m$ such that
+%\begin{enumerate}
+    %\item $\{ x_1, x_n \} = \{ -m \sigma_y, \; m \sigma_y \}$.
+	%So we see how $m$ controls the width of the space.
+    %\item $x_{i+1} = x_i + s$ where
+	%\[ s = \frac{x_n - x_1}{n-1} \]
+    %\item $Q_{ij}$ represents the probability of transition
+	%from state $x_i$ to state $x_j$. 
+%\end{enumerate}
+
+%\subsection{Defining the Transition Probabilities}
+
+%We've essentially divided the values $y_t$ can take into buckets
+%that run from $[x_i, x_{i+1}]$.  So if we say that $y_t$
+%is in state $i$, we really mean that $y_t$ is in that bucket.
+%There are, of course, $n-1$ equal width buckets.
 
 
 
@@ -5975,8 +7360,8 @@ in distribution as either
 To see why we need to restrict convergence to points of continuity on
 $F_X(x)$, consider the following example:
 \begin{align*}
-  F_{X_n}(x) &= \one_{\left\{x\geq \frac{1}{n}\right\}}\\
-  F_{X}(x) &= \one_{\left\{x\geq 0\right\}}
+  F_{X_n}(x) &= \one{\left\{x\geq \frac{1}{n}\right\}}\\
+  F_{X}(x) &= \one{\left\{x\geq 0\right\}}
 \end{align*} In other words, random variable $X_n$ takes on value
 $\frac{1}{n}$ with probability one, while $X$ takes on value zero with
 probability one.  So if we check convergence of the CDFs at $x=0$, we
