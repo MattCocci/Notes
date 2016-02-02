@@ -9157,18 +9157,17 @@ constant zero vector:
   \label{populationMomentConditions}
   \bsg(\bsbeta) := \E[\bsf(\bsw_n,\bsbeta)] = \bso
 \end{align}
-where $g:\R^K\ra \R^L$. Our goal is to estimate $\bsbeta$.
-Quite sensibly, we can estimate parameters by drawing a sample
-$\{\bsw_n\}\nN$ of the random variable, constructing a sample analog
-$\bsg_N$ of the moment conditions
+where $\bsg:\R^K\ra \R^L$. Our goal is to estimate $\bsbeta$.  Quite
+sensibly, we can estimate parameters by drawing a sample $\{\bsw_n\}\nN$
+and constructing a sample analog $\bsg_N$ of the moment conditions
 \begin{align}
   \label{sampleMomentConditions}
   \bsg_N(\bsb) :=
   \frac{1}{N} \sumnN \bsf(\bsw_n,\bsb)
 \end{align}
-and then choosing parameter vector $\bsb$ that sets the sample analog
-equal to zero or ``close'' to zero, with these two notions leading us to
-the following definitions.
+This is a function of parameter vector $\bsb$. We will naturally choose
+our estimator to be the parameter vector that sets this sample analog
+equal to zero or ``close'' to zero.
 
 \begin{defn}(Method of Moments Estimator)
 When the dimensionality of $\bsbeta$ equals that of $\bsg(\bsbeta)$
@@ -9192,11 +9191,11 @@ so that the model is \emph{overidentified}, we cannot generally set the
 sample analog of the moment conditions $\bsg_N(\bsb)$ to zero
 \emph{exactly} using some $K$-dimensional $\bsb$.
 Therefore, we instead look for the parameter vector that gets the
-squared weighted elements of vector $\bsg_N(\bsb)$ jointly as
+squared-weighted elements of vector $\bsg_N(\bsb)$ jointly as
 \emph{close} to the scalar zero as possible:
 \begin{align}
   \bshatbeta(\bshatW) :=&\;
-  \argmin_{\bsb} J(\bsb,\bshatW)
+  \argmin_{\bsb} \; J(\bsb,\bshatW)
   \label{eq:bhatmin} \\
   \text{where}\quad
   J(\bsb,\bshatW)
@@ -9239,11 +9238,12 @@ select/emphasize important moments or linear combinations of moments.
 In particular, rather than solve minimization Problem~\ref{eq:bhatmin},
 we solve this modified, but exactly-identified variation on the original
 moment conditions:
-\begin{align*}
+\begin{align}
   \bshata \; \bsg_N(\bshatbeta) &= \bso
   \qquad\text{where}\quad
   \bshatbeta \in\R^K\quad \bshata \in \R^{L\times K}
-\end{align*}
+  \label{eq:bhatmina}
+\end{align}
 We see that $\bshata\,\bsg_N(\bshatb)$ is like a new set of moment
 conditions, but with the dimensionality reduced from $L>K$ to $K$ so
 that we \emph{can} set this to zero for some $\bshatbeta\in\R^K$.
@@ -9256,22 +9256,56 @@ to zero. But in general, it really can be any arbitrary matrix in
 $R^{L\times K}$.
 
 Lastly, just to tie things together, this is actually equivalent to
-Definition~\ref{defn:gmm} if you set
+Definition~\ref{defn:gmm} if you choose $\bshata$ based on the first
+order conditions to the minimization problem defined by
+Equation~\ref{eq:bhatmin}:
 \begin{align}
-  \bshata =
-  \frac{\partial \bsg'_N}{\partial \bsb}
-  \bshatW
-  \label{eq:equivrep}
-\end{align}
-This follows from the first order conditions to the minimization defined
-by Equation~\ref{eq:bhatmin}:
-\begin{align*}
   \bso
   =
   \underbrace{\frac{\partial \bsg_N'}{\partial \bsb} \bshatW}_{\bshata}
-  \bsg_N(\bsb)
-\end{align*}
+  \;\bsg_N(\bsb)
+  \label{eq:equivrep}
+\end{align}
 \end{defn}
+
+\begin{defn}(Two-Step Efficient GMM Estimators)
+In some cases, our goal is to obtain not just consistent estimators, but
+also \emph{efficient} GMM estimators, i.e.\ an estimator $\bshatbeta$
+with the lowest possible asymptotic variance.
+That typically presents the following chicken and egg problem:
+\begin{enumerate}[label=(\roman*)]
+  \item Obtaining the efficient GMM estimator, call it $\bshatbeta_2$,
+    often requires using a specific/specially-chosen weighting matrix,
+    call it $\bshatW_2$
+  \item However, the weighting matrix $\bshatW_2$ that
+    delivers the the efficient estimator is often a function of the true
+    parameter vector $\bsbeta$. Since we don't know the true parameter
+    vector, we approximate it by a consistent estimate called
+    $\bshatbeta_1$.
+\end{enumerate}
+That's the problem: (i) requires $\bshatW_2$ to get efficient
+$\bshatbeta_2$, while (ii) requires some consistent estimate
+$\bshatbeta_1$ to get the appropriate $\bshatW_2$.
+For this reason, efficient estimation is typically carried out in two
+steps:
+\begin{enumerate}
+  \item Choose some arbitrary $\bshatW_1$ ($\bsI$ often works) and solve
+    Expression~\ref{eq:bhatmin} for a preliminary ``inefficient'', but
+    consistent estimator $\bshatbeta_1$.
+  \item Use $\bshatbeta_1$ to compute the second-stage efficient
+    weighting matrix $\bshatW_2$, and then use this to solve
+    Expression~\ref{eq:bhatmin} again for the now efficient GMM
+    estimator $\bshatbeta_2$.
+\end{enumerate}
+This is all very general, but there will be specific examples of this
+procedure below.
+\end{defn}
+\begin{rmk}
+The above approach was described for the $\bshatW$ weighting-matrix
+approach of Expression~\ref{eq:bhatmin}. But it also applies analogously
+to the moment selection approach with $\bshata$.
+\end{rmk}
+
 
 
 \clearpage
