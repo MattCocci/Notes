@@ -280,7 +280,7 @@
 \newcommand{\bslambda}{\boldsymbol{\lambda}}
 
 % Special cases like \bshatb for \boldsymbol{\hat{b}}
-\generate[\hat]{bshat}{\boldsymbol}{a,b,y,x,X,V,S,W}
+\generate[\hat]{bshat}{\boldsymbol}{a,b,y,x,X,V,S,W,A,B,P}
 \newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
 \newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
 \newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
@@ -10818,7 +10818,8 @@ These results and estimators can be used to conduct the following tests:
     is the $k$th element of $\bsbeta$) by constructing the
     \emph{robust $t$-ratio}:
     \begin{align*}
-      t_k = \frac{\sqrt{N}(\hat{\beta}_k-\beta_k^0)}{\hat{\Sigma}_{kk}}
+      t_k =
+      \frac{\sqrt{N}(\hat{\beta}_k-\beta_k^0)}{\sqrt{\hat{\Sigma}_{kk}}}
       \quad\dto \quad N(0,1)
     \end{align*}
     where $\hat{\Sigma}_{kk}$ is the $k,k$th element of $\bshatSigma$.
@@ -11293,15 +11294,15 @@ middle term:
 
 \begin{defn}(Model Assumptions)
 We have dependent variable $y_n$ and vector of regressors
-$\bsx_n\in\RK$. We now also introduce vector $\bsz_n\in\RL$ of
+$\bsx_n\in\RK$. We also introduce vector $\bsz_n\in\RL$ of
 instruments. Vectors $\bsx_n$ and $\bsz_n$ might have elements in
 common.\footnote{%
   The extreme case $\bsx_n=\bsz_n$ is just OLS, though we obviously
   really care about the case where $\bsx_n\neq \bsz_n$.
 }
-Regressors of $\bsx_n$ that are also instruments in $\bsz_n$ are called
+Regressors in $\bsx_n$ that are also instruments in $\bsz_n$ are called
 \emph{predetermined}, while the other elements of $\bsx_n$
-are \emph{endogenous}.
+are called \emph{endogenous}.
 Assumptions:
 \begin{enumerate}
   \item \emph{Linearity}: $y_n = \bsx_n' \bsbeta + \varepsilon_n$
@@ -11332,19 +11333,19 @@ Assumptions:
   \item \emph{Rank \& Order Conditions for Identification}:
     $\E[\bsz_n\bsx_n']$ is finite with full column rank $K$.
 
-    First, this ensures that the instruments and regressors are
-    correlated, otherwise the IV estimator would be undefined. Second,
-    linearity and Assumption 3 state
+    First, this \emph{rank condition} ensures that the instruments and
+    regressors are correlated, otherwise the IV estimator is undefined.
+    Second, linearity and Assumption 3 state
     \begin{align*}
       \E[\bsz_n\varepsilon_n]=
       \E[\bsz_n (y_n - \bsx'_n \bsbeta)]&=\bso
-      \quad \iff \quad
+      \quad \text{or} \quad
       \E[\bsz_n\bsx'_n] \bsbeta = \E[\bsz_n y_n]
     \end{align*}
-    which imply that $\bsbeta$ is \emph{a particular} solution of the
-    $L$ moment conditions in $K$ unknowns. This rank requirement then
-    ensures that $\bsbeta$ is the \emph{only} solution, i.e.\ that
-    $\bsbeta$ is identified.
+    i.e.\ true $\bsbeta$ is \emph{a particular} solution of the above
+    $L$ equations in $K$ unknowns. The \emph{rank condition}
+    $\rank(\E[\bsz_n\bsx_n'])=K$ then also ensures that true $\bsbeta$
+    is the \emph{only} solution, i.e.\ that $\bsbeta$ is identified.
 
     A necessary condition for the rank assumption is the
     \emph{order condition for identification}:
@@ -11438,10 +11439,15 @@ derive an asymptotic distribution through LLN, CLT, and Slutsky:
   \cdot
   N\left(0,\;\E[\varepsilon_n^2\bsz_n\bsz_n']\right)
 \end{align*}
+Note that if $\bsz_n=\bsx_n$ so that all of the regressors are
+predetermined (no endogeneity problems), this reduces to the OLS
+estimator.
 \end{defn}
+
 
 \clearpage
 \subsection{GMM Estimator, Overidentified Case}
+\label{subsec:EndogenousRegressorGMM}
 
 \begin{defn}(GMM Estimator, Overidentified Case)
 Take Assumptions 1-5 above and assume additionally that $K<L$ so there
@@ -11464,8 +11470,8 @@ We want to construct the GMM estimator (ignoring scalar constants like
 $N$ and $\frac{1}{N}$):
 \begin{align*}
   \bshatbeta(\bshatW)
-  &= \argmin_{\bsb} \; \bsg_N(\bsb)' \, \bshatW \, \bsg_N(\bsb) \\
-  &= \argmin_{\bsb} \;
+  &= \argmin_{\bsb} \; \bsg_N(\bsb)' \, \bshatW \, \bsg_N(\bsb)
+  = \argmin_{\bsb} \;
     \left(\bsZ'\bsX\bsb - \bsZ'\bsy\right)'
     \bshatW
     \left(\bsZ'\bsX\bsb - \bsZ'\bsy\right)
@@ -11487,7 +11493,11 @@ From the first order conditions, we get
   \bshatbeta(\bshatW) &=
   \left(\bsX'\bsZ\bshatW \bsZ'\bsX\right)^{-1}\bsX'\bsZ\bshatW\bsZ'\bsy
 \end{align*}
-Substituting in $\bsy = \bsX\bsbeta +\bsvarepsilon$, we get
+\end{defn}
+
+\begin{prop}\emph{(Sampling Error)}
+Sub $\bsy = \bsX\bsbeta +\bsvarepsilon$ into the expression for
+$\bshatbeta(\bshatW)$ to get
 \begin{align*}
   %\bshatbeta(\bshatW) &=
   %\left(\bsX'\bsZ\bshatW \bsZ'\bsX\right)^{-1}\bsX'\bsZ\bshatW\bsZ'
@@ -11509,15 +11519,23 @@ Substituting in $\bsy = \bsX\bsbeta +\bsvarepsilon$, we get
     \left(\frac{1}{N} \sumnN \bsz_n \varepsilon_n \right)
   \right]
 \end{align*}
-From there, we get
+\end{prop}
+
+
+\begin{prop}\emph{(Asymptotic Properties)}
+\label{prop:gmmasymptotics}
+From the sampling error expression, we get
 \begin{enumerate}[label=(\roman*)]
   \item Consistency: $\bshatbeta(\bshatW)\pto \bsbeta$
   \item Asymptotic Normality: Recalling that $\bshatW\pto \bsW$
     applying LLN, CLT, and Slutsky gives
     \begin{align*}
       \sqrt{N}\left(\bshatbeta(\bshatW) - \bsbeta\right)
-      \quad \dto \quad
-      \bigg(
+      \quad &\dto \quad
+      N(0,\bsP\bsS\bsP') \\
+      \text{where}\quad
+      \bsP &=
+      %\bigg(
       \big(
         \E[\bsx_n\bsz_n']
         \bsW
@@ -11525,27 +11543,61 @@ From there, we get
       \big)^{-1}
       \E[\bsx_n\bsz_n']
       \bsW
-      \bigg)
-      \cdot
-      \big[
-      N\left(0,\;
-      \E[\varepsilon_n^2 \bsz_n\bsz_n']
-      \right)
-      \big]
+      %\bigg)
+      \\
+      \bsS &=
+        \E[\varepsilon_n^2 \bsz_n\bsz_n']
+      %\cdot
+      %\big[
+      %N\big(0,\;
+      %\underbrace{%
+        %\E[\varepsilon_n^2 \bsz_n\bsz_n']
+      %}_{\bsS}
+      %\big)
+      %\big]
     \end{align*}
-  \item Consistent Estimation of Error Variance:
-    Using $\bshatbeta(\bshatW)$, the consistent estimator of $\bsbeta$,
-    we can obtain a consistent estimator of the error variance
+    We can construct a consistent estimator of the asymptotic variance:
     \begin{align*}
-      \frac{1}{N} \sumnN e_n^2
-      =
-      \frac{1}{N} \sumnN \big(y_n - \bsx_n'\bshatbeta(\bshatW)\big)^2
-      \quad\pto\quad
-      \E[\varepsilon_n^2]
+      \bshatP\bshatS\bshatP' \pto \bsP\bsS\bsP'
+      \quad\text{where}\quad
+      \bshatP &=
+      \left[
+      \left(
+      \frac{1}{N}
+        \sumnN \bsx_n\bsz_n'
+      \right)
+      \bshatW
+      \left(
+      \frac{1}{N}
+        \sumnN \bsz_n\bsx_n'
+      \right)
+      \right]^{-1}
+      \left(
+      \frac{1}{N}
+        \sumnN \bsx_n\bsz_n'
+      \right)
+      \bshatW \\
+      &= N \cdot [(\bsX'\bsZ)\bshatW(\bsZ'\bsX)]^{-1}(\bsX'\bsZ)\bshatW
+      \\
+      \bshatS &=
+      \frac{1}{N}\sumnN e_n \bsz_n\bsz_n' \\
+      \text{where}\quad
+      e_n &= y_n - \bsx_n'\bshatbeta(\bshatW)
     \end{align*}
-
 \end{enumerate}
-\end{defn}
+\end{prop}
+
+\begin{prop}\emph{(Consistent Estimation of Error Variance)}
+Using $\bshatbeta(\bshatW)$, a consistent estimator of $\bsbeta$, we can
+obtain a consistent estimator of the error variance
+\begin{align*}
+  \frac{1}{N} \sumnN e_n^2
+  =
+  \frac{1}{N} \sumnN \big(y_n - \bsx_n'\bshatbeta(\bshatW)\big)^2
+  \quad\pto\quad
+  \E[\varepsilon_n^2]
+\end{align*}
+\end{prop}
 
 
 \clearpage
@@ -11615,14 +11667,12 @@ procedure:
       &e_n &:= y_n - \bsx_n'\bshatbeta(\bsW_1)
     \end{alignat*}
 \end{enumerate}
-As in the one-stage procedure, $\bshatbeta(\bshatW_1)$ and
-$\bshatbeta(\bshatW_2)$ are \emph{both} consistent estimators of
-$\bsbeta$, though $\bshatbeta(\bshatW_2)$ will have a lower variance.
-Using the fact that
-$\bshatW_2\pto \E[\varepsilon_n^2\bsz_n\bsz_n']^{-1}$,
-if we sub this into the formulas
-in the previous subsection, we obtain a dramatic simplification of the
-asymptotic variance of our estimator. In particular, we get
+As in the one-stage procedure, \emph{both} $\bshatbeta(\bshatW_1)$ and
+$\bshatbeta(\bshatW_2)$ consistently estimate $\bsbeta$, though
+$\bshatbeta(\bshatW_2)$ has lower variance.
+Using $\bshatW_2\pto \E[\varepsilon_n^2\bsz_n\bsz_n']^{-1}$,
+if we sub this into the formulas in the previous subsection, the
+asymptotic distribution of our estimator dramatically simplifies to
 \begin{align*}
   \sqrt{N}\left(\bshatbeta(\bshatW_2) - \bsbeta\right)
   \quad \dto \quad
@@ -11635,58 +11685,209 @@ asymptotic variance of our estimator. In particular, we get
     \big)^{-1}
   \right)
 \end{align*}
+To form a consistent estimator for the asymptotice variance, we simply
+take
+\begin{align*}
+  &
+  \left[
+    \left(
+    \frac{1}{N}\sumnN \bsx_n\bsz_n'
+    \right)
+    \left(
+    \frac{1}{N}
+    \sumnN e_n \bsz_n\bsz_n'
+    \right)^{-1}
+    \left(
+    \frac{1}{N}\sumnN \bsx_n\bsz_n'
+    \right)
+  \right]^{-1} \\
+  &\qquad\qquad =
+  N \cdot \left[
+      (\bsX'\bsZ)\left(\sumnN e_n\bsz_n\bsz_n'\right)(\bsX'\bsZ)
+    \right]^{-1}
+  \pto
+    \big(
+    \E[\bsx_n\bsz_n']
+    \,\E[\varepsilon_n^2\bsz_n\bsz_n']^{-1}
+    \,\E[\bsz_n\bsx_n']
+    \big)^{-1}
+\end{align*}
+where the residuals are defined as
+\begin{align*}
+  e_n &= y_n - \bsx_n'\bshatbeta(\bshatW)
+\end{align*}
+where $\bshatbeta(\bshatW)$ is the GMM estimator given some weighting
+matrix $\bshatW$ with probability limit equal to a symmetric positive
+definite matrix (since that always delivers a consistent estimate of
+$\bsbeta$, and we need a consistent estimator to get appropriate
+estimates of the residuals).
+Of course, either $\bshatW_1$ or $\bshatW_2$ would work.
 \end{defn}
 
 
 \clearpage
-\subsection{Efficient GMM Estimator under Conditional Homoskedasticity (2SLS)}
+\subsection{Inference}
 
-None of the above assumed conditional homoskedasticity of the error
-term, but if we do, the efficient GMM estimator reduces to the 2SLS
-estimator, which we can even construct in one GMM stage, rather than
-two.
-So our additional operating assumption for this section is
-\begin{align}
-  \text{Conditional homoskedasticity:}\quad
-  \E[\varepsilon_n^2|\bsz_n] = \sigma^2
-  \quad\implies\quad
-  \E[\varepsilon_n^2\bsz_n\bsz_n']
-  = \sigma^2 \E[\bsz_n\bsz_n']
-  \label{2SLSerror}
-\end{align}
+\begin{prop}
+Suppose we have GMM estimator $\bshatbeta(\bshatW)$, where $\bshatW$ is
+any weighting matrix---not necessarily the efficient one.
+For simplicitly, we will denote the estimator  more simply as
+$\bshatbeta$, though it is understood that everything below depends upon
+(but still holds for) any choice of $\bshatW$.
 
-\begin{defn}
-(Efficient GMM Estimator under Conditional Homoeskedasticy, 2SLS)
-Under homoskedasticity, the efficient weighting matrix
-$\E[\varepsilon_n^2\bsz_n\bsz_n']^{-1}$ simplifies to
-$\left(\sigma^2 \E[\bsz_n\bsz_n']\right)^{-1}$ as stated in
-Expression~\ref{2SLSerror}.
-Now suppose just for a second that we knew $\sigma^2$. Then we could
-form the following consistent estimator for the efficient weighting
-matrix
-\begin{align*}
-  \frac{\sigma^2\bsZ'\bsZ}{N}
-  =
-  \frac{\sigma^2}{N} \sumnN \bsz_n\bsz_n'
-  \quad\pto\quad
-  \sigma^2 \E[\bsz_n\bsz_n']
-\end{align*}
-Then, by the formula for the efficient GMM estimator, we would get
-\begin{align*}
-  \bshatbeta\left(
-    N\cdot \left(\sigma^2 \bsZ'\bsZ\right)^{-1}
-  \right)
-  &=
-  \left(
-  \bsX'\bsZ
-    \left(N\cdot \left(\sigma^2 \bsZ'\bsZ\right)^{-1}\right)
-  \bsZ'\bsX
-  \right)^{-1}
-  \bsX'\bsZ\left(N\cdot \left(\sigma^2 \bsZ'\bsZ\right)^{-1}\right)\bsZ'\bsy
-\end{align*}
-But notice that the scalars $\sigma^2$ and $N$ cancel out. Neither
-matters for the estimator, so we could have just used $(\bsZ'\bsZ)^{-1}$
-as the weighting matrix. Doing so gets us the \emph{2SLS estimator}
+Let $\bsSigma$ denote the asymptotic variance $\bsP\bsS\bsP'$ derived
+above in Proposition~\ref{prop:gmmasymptotics}, and let $\bshatSigma$
+represent the corresponding consistent estimator of that asymptotic
+variance. Then these estimators can be used to conduct the following
+tests:
+\begin{enumerate}
+  \item \emph{Robust $t$-Ratio for Testing Coefficients}: We can
+    test the null hypothesis $H_0:\beta_k = \beta_k^0$ (where $\beta_k$
+    is the $k$th element of $\bsbeta$) by constructing the
+    \emph{robust $t$-ratio}:
+    \begin{align*}
+      t_k =
+      \frac{\sqrt{N}(\hat{\beta}_k-\beta_k^0)}{\sqrt{\hat{\Sigma}_{kk}}}
+      \quad\dto \quad N(0,1)
+    \end{align*}
+    where $\hat{\Sigma}_{kk}$ is the $k,k$ element of $\bshatSigma$.
+
+  \item \emph{Wald Statistic for Testing Linear Hypotheses}:
+    Suppose we want to test null hypothesis
+    \begin{align*}
+      H_0: \bsR'\bsbeta = \bsr
+      \qquad \text{where} \quad \bsR \in \R^{K \times C}
+    \end{align*}
+    and where $\bsR$ has full column rank,
+    $\rank(\bsR) = C$, i.e.\ no redundant constraints.
+    Then
+    \begin{align*}
+      W = N\cdot
+      (\bsR'\bshatbeta-\bsr)'
+      \big(
+      \bsR'\bshatSigma\bsR
+      \big)^{-1}
+      (\bsR'\bshatbeta-\bsr)
+      \quad\dto\quad
+      \Chi^2_C
+    \end{align*}
+
+  \item \emph{Wald Statistic for Testing Non-Linear Hypotheses}:
+    Any nonlinear hypothesis can be written (w.l.o.g.) as
+    $H_0: \bsa(\bsbeta) = \bso$ for some function $\bsa:\R^K\ra \R^C$.
+    Then
+    \begin{align*}
+      W :=
+      N \cdot \bsa(\bshatbeta)'
+      \big(
+      \bsA \bshatSigma \bsA'
+      \big)^{-1}
+      \bsa(\bshatbeta)
+      \quad&\dto\quad
+      \Chi^2_C
+      \qquad
+      \text{where} \quad
+      \bsA := \; \frac{\partial}{\partial \bsbeta'}[\bsa(\bsbeta)]
+    \end{align*}
+    i.e. $\bsA$ is the derivative of $\bsa$ evaluated at true parameter
+    vector $\bsbeta$.
+
+  \item \emph{``LR'' Test for Testing Non-Linear Hypotheses}:
+    Given Null Hypothesis $H_0: \bsa(\bsbeta) = \bso$ for some function
+    $\bsa:\R^K\ra \R^C$ above,  we consider restricted and unrestricted
+    efficient GMM estimates
+    \begin{align}
+      \bshatbeta
+      :=&\; \argmin_{\bsb}\; J(\bsb, \bshatS^{-1})
+      \label{gmm:lrunrestricted}\\
+      \bsbarbeta
+      :=&\; \argmin_{\bsb}\; J(\bsb, \bshatS^{-1})
+      \qquad\text{s.t.} \quad \bsa(\bsb) = \bso
+      \label{gmm:lrrestricted}
+    \end{align}
+    where
+    $J(\bsb, \bshatW) := N\cdot \bsg_N(\bsb)' \bshatW \bsg_N(\bsb)$
+    and $\bshatS$ is a consistent estimator
+    of $\E[\varepsilon_n^2\bsz_n\bsz_n']$, the inverse of the efficient
+    weighting matrix. Then
+    \begin{align*}
+      LR := J(\bsbarbeta, \bshatS^{-1}) - J(\bshatbeta, \bshatS^{-1})
+      \quad \dto \quad \Chi^2_C
+    \end{align*}
+    i.e.\ it has the same asymptotic distribution as the Wald Statistic
+    $W$ in Test 3 above.
+\end{enumerate}
+\end{prop}
+
+\begin{rmk}
+The above should look very familiar. All of the formulas are essentially
+the same as those from large-sample OLS. Only the estimator $\bshatbeta$
+has changed from $\bshatbeta_{OLS}$ to $\bshatbeta(\bshatW)$ (the GMM
+estimator) and of course, the underlying $\bshatSigma$ has a more
+complicated structure.
+\end{rmk}
+
+\begin{rmk}
+Comparing (3) and (4), both test the nonlinear null hypothesis
+$H_0:\bsa(\bsbeta)=\bso$. However, Test 3 is \emph{not} invariant to
+different (but equivalent) ways of writing the same null hypothesis.
+Test 4 \emph{is} invariant to such rewriting.
+\\
+\\
+\emph{However}, a few caveats for Test (4):
+\begin{itemize}
+  \item This test \emph{only} works with an efficient GMM weighting
+    matrix such that
+    $\bshatS^{-1}\pto \E[\varepsilon_n^2\bsz_n\bsz_n']^{-1}$, otherwise,
+    the LR is not asymptotically $\Chi^2$. In contrast, Wald test (3)
+    works for any weighting matrix $\bshatW$, including inefficient
+    ones.
+
+  \item The same consistent estimate $\bshatS^{-1}$ for
+    $\E[\varepsilon_n\bsz_n\bsz_n']$ should be used for both
+    estimation Problems~\ref{gmm:lrrestricted} and
+    \ref{gmm:lrunrestricted}. The typical procedure is
+    \begin{enumerate}[label=(\roman*)]
+      \item
+        Choose initial weighting matrix $\bshatW$ and compute
+        \begin{align*}
+          \bshatbeta(\bshatW) = \argmin_{\bsb} J(\bsb,\bshatW)
+        \end{align*}
+
+      \item Use consistent $\bshatbeta(\bshatW)$ to compute the
+        residuals and obtain a consistent estimate of
+        $\E[\varepsilon_n\bsz_n\bsz_n']^{-1}$, which we denote by
+        $\bshatS^{-1}$.
+
+      \item Use $\bshatS^{-1}$ to solve Problem~\ref{gmm:lrunrestricted}
+        for the efficient unrestricted GMM estimator $\bshatbeta$.
+
+      \item Use that same $\bshatS^{-1}$ to solve
+        Problem~\ref{gmm:lrrestricted} for efficient restricted
+        GMM estimator $\bsbarbeta$.
+    \end{enumerate}
+    Notice that we didn't resolve for a new $\bshatS^{-1}$ before Step
+    (iv), running a restricted version of Step (i) to get a consistent
+    $\bsbarbeta(\bshatW)$, then estimating the residuals again. We used
+    the same consistent $\bshatS^{-1}$ for both minimization problems.
+
+    While not a problem asymptotically, using different consistent
+    estimates of $\bshatS^{-1}$ in solving
+    Problems~\ref{gmm:lrunrestricted} and \ref{gmm:lrrestricted} is bad
+    in finite samples because the LR statistic can be negative. Using
+    the same $\bshatS^{-1}$ in both avoids this problem.
+\end{itemize}
+\end{rmk}
+
+
+\clearpage
+\subsection{2SLS and Efficient GMM Estimation under Conditional Homoskedasticity}
+
+
+\begin{defn}(2SLS Estimator)
+If we take weighting matrix $\bshatW=(\bsZ'\bsZ)^{-1}$, the resulting
+GMM estimator is called the
+\emph{two-stage least squares (2SLS) estimator}:
 \begin{align*}
   \bshatbeta_{2SLS}
   := \bshatbeta\left((\bsZ'\bsZ)^{-1}\right)
@@ -11742,15 +11943,15 @@ Then we can write
 \end{align*}
 In words, these are
 \begin{enumerate}[label=(\alph*)]
-  \item The most basic expression that writes $\bshatbeta_{2SLS}$ simply
-    as the GMM efficient estimate
+  \item Here, $\bshatbeta_{2SLS}$ is simply the GMM estimate with
+    $\bshatW = (\bsZ'\bsZ)^{-1}$
   \item The final expression in this line writes $\bshatbeta_{2SLS}$ as
     the exactly-identified IV estimator taking $\bsx_n$ as regressors
     and the fitted values $\bshatx_n$ (from regressing $\bsx_n$ on
     $\bsz_n$) as instruments.
   \item The final expression in this line writes $\bshatbeta_{2SLS}$ as
-    a regression of $\bsy$ on the fitted values of $\bshatx_n$ from a
-    regression of $\bsx_n$ on $\bsz_n$---hence the
+    a regression of $\bsy$ on the fitted values of $\bshatx_n$ (from a
+    regression of $\bsx_n$ on $\bsz_n$)---hence the
     ``two-stage'' name.\footnote{%
       The two stages are the two regressions: (1) regressors on instruments,
       then (2) $y_n$ on fitted values from (1). This does not correspond to
@@ -11758,9 +11959,71 @@ In words, these are
       straightaway, using the matrices $\bsX$ and $\bsZ$ in our dataset.
     }
 \end{enumerate}
-
-
 \end{defn}
+
+\begin{rmk}
+We can \emph{always} form the 2SLS estimator because we can always just
+take $\bshatW=(\bsZ'\bsZ)^{-1}$ as our GMM weighting matrix, and appeal
+to all the results in Subsection~\ref{subsec:EndogenousRegressorGMM}.
+But that then raises the question ``When is it a \emph{good} idea to use
+that weighting matrix and thus use the 2SLS estimator?'' That gives us
+our next proposition.
+\end{rmk}
+
+
+\begin{prop}
+\emph{%
+  (Efficient GMM Estimator under Conditional Homoeskedasticy is 2SLS)}
+No part of the efficient GMM estimation section assumed conditional
+homoskedasticity of the error term. However, if we are willing to assume
+that, i.e.\
+\begin{align}
+  \text{\emph{Conditional homoskedasticity:}}\quad
+  \E[\varepsilon_n^2|\bsz_n] = \sigma^2
+  \quad\implies\quad
+  \E[\varepsilon_n^2\bsz_n\bsz_n']
+  = \sigma^2 \E[\bsz_n\bsz_n']
+  \label{2SLSerror}
+\end{align}
+the efficient GMM estimator reduces to the 2SLS estimator.
+Moreover, this is an efficient GMM estimator that we can construct in
+one stage, rather than two.
+\end{prop}
+
+\begin{proof}
+Under homoskedasticity, the efficient weighting matrix
+$\E[\varepsilon_n^2\bsz_n\bsz_n']^{-1}$ simplifies to
+$\left(\sigma^2 \E[\bsz_n\bsz_n']\right)^{-1}$ as stated in
+Expression~\ref{2SLSerror}.
+Now suppose just for a second that we knew $\sigma^2$. Then we could
+form the following consistent estimator for the efficient weighting
+matrix
+\begin{align*}
+  \frac{\sigma^2\bsZ'\bsZ}{N}
+  =
+  \frac{\sigma^2}{N} \sumnN \bsz_n\bsz_n'
+  \quad\pto\quad
+  \sigma^2 \E[\bsz_n\bsz_n']
+\end{align*}
+Then, by the formula for the efficient GMM estimator, we would get
+\begin{align*}
+  \bshatbeta\left(
+    N\cdot \left(\sigma^2 \bsZ'\bsZ\right)^{-1}
+  \right)
+  &=
+  \left(
+  \bsX'\bsZ
+    \left(N\cdot \left(\sigma^2 \bsZ'\bsZ\right)^{-1}\right)
+  \bsZ'\bsX
+  \right)^{-1}
+  \bsX'\bsZ\left(N\cdot \left(\sigma^2 \bsZ'\bsZ\right)^{-1}\right)\bsZ'\bsy
+\end{align*}
+But notice that the scalars $\sigma^2$ and $N$ cancel out. Neither
+matters for the estimator, so we could have just used $(\bsZ'\bsZ)^{-1}$
+as the weighting matrix. But then that exactly matches the definition of
+the \emph{2SLS estimator}.
+\end{proof}
+
 
 \clearpage
 \subsection{Continuously Updated GMM Estimator (CUE)}
