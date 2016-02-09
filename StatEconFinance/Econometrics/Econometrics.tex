@@ -7226,22 +7226,26 @@ $k$. Then $Z'MZ\sim \Chi^2_k$.
 \section{Large Sample Theory}
 
 
-\subsection{Types of Convergence}
+\subsection{Modes of Convergence}
 
 Recall the usual Analysis definition of convergence of a sequence: A
 sequence $\{x_n\}$ converges to limit $x$ if for all $\varepsilon> 0$,
 there exists a finite $N$ such that
 \begin{align*}
-  n > N \implies ||x_n - x|| < \varepsilon
+  n > N \implies |x_n - x| < \varepsilon
 \end{align*}
 But this, of course, is for a sequence of numbers $\{x_n\}$ in some
 metric space. There's no randomness there. So what about a sequence of
 random variables---something non-deterministic?
 
 There are a few options when talking about convergence of random
-variables, but all involve resolving the randomness somehow and checking
-convergence of functions, probabilities, or expectations---all of which
-are possible given the usual analysis machinery.
+variables, but all involve getting rid of the randomness somehow and
+checking convergence of a sequence of \emph{functions} (random
+variables) or a sequence of \emph{numbers} (where that number represents
+a probability or expectation). And checking convergence of functions or
+numerical sequences are both well within the domain of the usual
+analysis machinery. More specifically, these alternatives give rise to
+the following three different types of convergence:
 \begin{enumerate}
   \item \emph{Almost Sure Convergence}: Check that the set of points
     $\omega\in\Omega$ where the sequence $X_n(\omega)\not\ra
@@ -7279,9 +7283,9 @@ vectors, we need almost surely convergence element-by-element.
 This notion is called ``strong convergence'' because it it computes the
 probability of the limit of a sequence of random variables, rather than
 the limit of a sequence of probabilities. We're effectively asking that
-the random variable \emph{itself}, which is a function on sample space
-$\Omega$, converges pointwise to another function on $\Omega$---the
-random variable $X$---almost everywhere on $\Omega$.
+the functions $X_n:\Omega\ra\R$ (the random variables in the sequence)
+\emph{converge pointwise} to $X:\Omega\ra\R$ (the limiting random
+variable) almost everywhere on the sample space $\Omega$.
 \end{defn}
 
 
@@ -7428,6 +7432,10 @@ the various convergence concepts are related in the following way:
   \item $X_n\pto X \implies$ There's a deterministic subsequence such
     that $X_{n_k}\asto X$ (but does not imply almost sure convergence
     for the original sequence).
+
+  \item $X_n\dto c$, a constant, then $X_n\pto c$. However, in general,
+    convergence in distribution does not imply convergence in
+    probability.
 \end{enumerate}
 \end{prop}
 \begin{proof}
@@ -7588,44 +7596,18 @@ We also have the following implications and rules of operations:
 
 
 \clearpage
-\subsection{Slutsky's Theorem and the Continuous Mapping Theorem}
+\subsection{The Continuous Mapping Theorem and Slutsky's Theorem}
 
-\begin{thm}{\emph{(Slutsky's Theorem)}}
-Suppose that we have sequences of random variables $\{X_n\}$ and
-$\{Y_n\}$ such that
-\begin{align*}
-  X_n &\dto X
-  \qquad
-  Y_n \pto c
-\end{align*}
-Then we have
-\begin{enumerate}
-  \item $X_n+Y_n\dto X+c$
-  \item $X_n\cdot Y_n\dto Xc$
-  \item $Y_n^{-1}X_n\dto c^{-1}X$ provided $c\neq 0$
-\end{enumerate}
-We can also let $X$ be a random vector and $c$ be a vector or matrix of
-constants. In that case, the $c\neq 0$ requirement becomes ``$c$ full
-rank.''
-\end{thm}
-
-\begin{cor}
-Suppose that $X_n - Y_n\pto 0$ and $Y_n\dto Y$. Then $X_n \dto Y$ as
-well.
-\end{cor}
-\begin{proof}
-Define $Z_n := X_n - Y_n$. We're told that $Z_n\pto 0$. We also know
-that $Y_n\dto Y$. Then by Slutsky's Theorem, we know
-\begin{align*}
-  Z_n + Y_n &\dto 0 + Y \\
-  \Leftrightarrow\quad (X_n-Y_n) + Y_n &\dto 0 + Y \\
-  \Leftrightarrow\quad X_n &\dto Y
-\end{align*}
-\end{proof}
+\begin{lem}
+\label{lem:joint}
+Suppose $X_n\dto X$ and $Y_n\pto c$, for constant vector $c$.
+Then $(X_n,Y_n)\dto (X,c)$ jointly.
+\end{lem}
 
 \begin{thm}\emph{(Continuous Mapping Theorem)}
-Let $g$ be a function that is continuous at all points $X$ can take on
-with nonzero probability. Then
+\label{thm:cmt}
+Let $g(\,\cdot\,)$ be a function that is continuous on the support of
+$X$.  Then
 \begin{enumerate}
   \item $X_n\asto X \implies g(X_n) \asto g(X)$
   \item $X_n\pto X \implies g(X_n) \pto g(X)$
@@ -7643,6 +7625,46 @@ requirement that $Y_n$ is bounded in probability and doesn't race off to
 infinity, which would prevent us from having $g(X_n)-g(Y_n) \pto 0$ as
 we want to conclude.
 \end{rmk}
+
+\begin{cor}{\emph{(Slutsky's Theorem)}}
+Suppose that we have sequences of random variables $\{X_n\}$ and
+$\{Y_n\}$ such that
+\begin{align*}
+  X_n &\dto X
+  \qquad
+  Y_n \pto c
+\end{align*}
+Then we have
+\begin{enumerate}
+  \item $X_n+Y_n\dto X+c$
+  \item $X_n\cdot Y_n\dto Xc$
+  \item $Y_n^{-1}X_n\dto c^{-1}X$ provided $c\neq 0$
+\end{enumerate}
+We can also let $X$ be a random vector and $c$ be a vector or matrix of
+constants. In that case, the $c\neq 0$ requirement becomes ``$c$ full
+rank.''
+\end{cor}
+\begin{proof}
+We know from Lemma~\ref{lem:joint} that $(X_n,Y_n)\dto (X,c)$ jointly.
+Since $g_1(x,y) = x+y$, $g_2(x,y)=x\cdot y$, and $g_3(x,y)=y^{-1}x$
+(for $y\neq 0$) are all continuous functions of $(X_n,Y_n)$, Result 3 of
+Continuous Mapping Theorem~\ref{thm:cmt} implies 1, 2, and 3.
+\end{proof}
+
+\begin{cor}
+Suppose that $X_n - Y_n\pto 0$ and $Y_n\dto Y$. Then $X_n \dto Y$ as
+well.
+\end{cor}
+\begin{proof}
+Define $Z_n := X_n - Y_n$. We're told that $Z_n\pto 0$. We also know
+that $Y_n\dto Y$. Then by Slutsky's Theorem, we know
+\begin{align*}
+  Z_n + Y_n &\dto 0 + Y \\
+  \Leftrightarrow\quad (X_n-Y_n) + Y_n &\dto 0 + Y \\
+  \Leftrightarrow\quad X_n &\dto Y
+\end{align*}
+\end{proof}
+
 
 %Now for some final notes. Convergence in probability
 %is \textbf{not} convergence in expectation. The former
