@@ -4205,7 +4205,7 @@ swap ``semidefinite'' for ``definite'' in the conditions above.
 \clearpage
 \section{Fixed Points}
 
-\subsection{Operators}
+\subsection{Preliminaries: Operators}
 
 \begin{defn}{(Operator)}
 If $X$ is some function space
@@ -4240,6 +4240,141 @@ It takes a function $f$, integrates it, and returns a number.
 Therefore, $T$ is an operator.
 \end{ex}
 
+\subsection{Preliminaries: Correspondences}
+
+\begin{defn}{(Correspondence)}
+A \emph{Correspondence} $\Gamma:X\rightrightarrows Y$ is a function that
+maps any element of $X$ into a subset of $Y$. Moreover, if
+$\Gamma(x)\subseteq Y$ is \emph{compact} for all $x\in Y$, then we say
+that $\Gamma$ is a \emph{compact correspondence}.
+\end{defn}
+
+\begin{ex}
+Here's an example of a correspondence $\Gamma: \R\rightrightarrows\R$.
+\begin{figure}[htpb!]
+\centering
+\begin{tikzpicture}[xscale=1.5]
+  % Upper bound of region
+  \draw[d4blue, ultra thin, domain=0.1:4, fill=d4blue, opacity=0.4] %
+    (0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+3}) -- (4,0);
+
+  % Lower bound of region
+  \draw[white, ultra thick, domain=0.1:4, fill=white] %
+    (0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+1}) -- (4,0);
+
+  % Axis
+  \draw[d4black, <->] (0,5) -- (0,0) -- (4,0);
+
+  % Dashed Line at x
+  \draw[d4black, ultra thick, dashed, -] %
+    (2,0) node[below, yshift=-5pt] {$x$} -- (2,1.8);
+
+  % Vertical \Gamma(x) line
+  \draw[d4black, ultra thick, -] (2,1.8) -- (2,3) -- (2,3.8);
+
+  % Brace marking Gamma(x)
+  \draw[%
+      d4black, decorate, %
+      decoration={brace, amplitude=10pt, mirror}, xshift=2pt
+    ] %
+    (2,1.8) -- (2,3.8) node[midway, right, xshift=12pt] {$\Gamma(x)$};
+\end{tikzpicture}
+\end{figure}
+
+As shown, numbers in $\R$ on the $x$-axis map into intervals along the
+$y$-axis (rather than just a single point as they would for a curve).
+An example is shown for one particular $x$.
+\end{ex}
+
+\begin{defn}{(Lower Hemi-Continuous)}
+Correspondence $\Gamma:X\rightrightarrows Y$ is \emph{lower
+hemi-continuous} (LHC) if and only if points don't ``pop up out of
+nowhere'' in the limit.
+
+Formally, choose $x\in X$. Note that we require
+$\Gamma(x)\neq\emptyset$. Now let $\{x_n\}\subseteq X$ be any arbitrary
+sequence converging to $x\in X$. Now choose any $y\in\Gamma(x)$.  For
+$\Gamma$ to be LHC at $x$, you need to be able to construct a sequence
+\begin{align*}
+  \{y_n\}\rightarrow y
+  \quad\text{s.t.}\quad
+  y_n \in \Gamma(x_n) \quad\forall n
+\end{align*}
+Now the informal definition makes sense. If $y$ popped up out of
+nowhere in the limit, then you could not construct a sequence $\{y_n\}$
+converging to it whose elements stayed inside the sets
+$\{\Gamma({x_n})\}$ the whole time.
+\end{defn}
+%\begin{figure}[htpb!]
+%\centering
+%\begin{tikzpicture}[xscale=1.5]
+  %% Upper bound of region
+  %\draw[d4blue, ultra thin, domain=0.1:4, fill=d4blue, opacity=0.4] %
+    %(0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+3}) -- (4,0);
+
+  %% Left segment
+  %\draw[white, ultra thick, domain=0.1:1, fill=white] %
+    %(0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+1}) -- (1,0);
+
+  %% Middle segment
+  %\draw[white, ultra thick, domain=0.1:4, fill=white] %
+    %(0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x}) -- (4,0);
+
+  %%% Lower bound of region
+  %%\draw[white, ultra thick, domain=0.1:4, fill=white] %
+    %%(0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+1}) -- (4,0);
+
+  %% Axis
+  %\draw[d4black, <->] (0,5) -- (0,0) -- (4,0);
+
+  %%% Dashed Line at x
+  %%\draw[d4black, ultra thick, dashed, -] %
+    %%(2,0) node[below, yshift=-5pt] {$x$} -- (2,1.8);
+
+  %%% Vertical \Gamma(x) line
+  %%\draw[d4black, ultra thick, -] (2,1.8) -- (2,3) -- (2,3.8);
+
+  %%% Brace marking Gamma(x)
+  %%\draw[%
+      %%d4black, decorate, %
+      %%decoration={brace, amplitude=10pt, mirror}, xshift=2pt
+    %%] %
+    %%(2,1.8) -- (2,3.8) node[midway, right, xshift=12pt] {$\Gamma(x)$};
+%\end{tikzpicture}
+%\end{figure}
+
+\begin{defn}{(Upper Hemi-Continuous)}
+The \emph{compact}-valued correspondence $\Gamma:X\rightrightarrows Y$
+is \emph{upper hemi-continuous} (UHC) if and only if points don't
+``disappear'' in the limit. Alternatively, we might informally say that
+the graph of $\Gamma$ is closed.
+
+Formally, choose $x\in X$. Note that we require
+$\Gamma(x)\neq\emptyset$. Now let $\{x_n\}\subseteq X$ be any arbitrary
+sequence such that $x_n\ra x\in X$. Also let $\{y_n\}$ be any sequence
+where
+\begin{align*}
+  y_n \in \Gamma(x_n) \quad\forall n
+\end{align*}
+For $\Gamma$ to be UHC at $x$, it must the case that $\{y_n\}$ has a
+convergent subsequence that converges to some $y\in \Gamma(x)$.
+
+Now the informal definition makes sense. If there were some $y'\in Y$
+such that $y_n = y' \in \Gamma(x_n)$ for all $n$ (implying
+$y_n\rightarrow y'$), then we also want $y'\in \Gamma(x)$. It shouldn't
+disappear in the limit.
+\end{defn}
+\begin{rmk}
+A single-valued correspondence that is upper hemicontinuous is a
+continuous function.
+\end{rmk}
+
+\begin{defn}{(Continuous Correspondence)}
+Compact-valued correspondence $\Gamma:X\rightrightarrows Y$ is
+\emph{continuous} at $x\in X$ if it is both UHC and LHC at $x$.
+\end{defn}
+
+\clearpage
 \subsection{Contraction Maps}
 
 \begin{defn}{(Contraction Map)}
@@ -4383,7 +4518,7 @@ satisfying the condition for a nonexpansive mapping.
 \end{ex}
 
 \clearpage
-\subsection{Contraction Mapping Theorem}
+\subsection{Banach Fixed Point or Contraction Mapping Theorem}
 
 \begin{thm}{\emph{(Banach Fixed Point, Contraction Mapping Theorem)}}
 \label{thm:banach}
@@ -4661,25 +4796,43 @@ functions, then the fixed point will be \emph{strictly} increasing by
 Statement 2 of Corollary~\ref{cor:cmt}
 \end{ex}
 
-\subsection{Brouwer's Fixed Point Theorem}
+\clearpage
+\subsection{Brouwer and Kakutani Fixed Point Theorems}
 
-\begin{thm}
-Suppose that $T:K\rightarrow K$ is a continuous function and $K\subseteq
-\Rn$ is compact and convex.  Then there exists a fixed point
-such that $x^*=T(x^*)$.
+\begin{thm}\emph{(Brouwer's Fixed Point Theorem)}
+Suppose that $K\subseteq \Rn$ is nonempty, compact, and convex and that
+$f:K\rightarrow K$ is a continuous function. Then there exists a fixed
+point such that $x^*=f(x^*)$.
 \end{thm}
 \begin{rmk}
 There are three key differences from Theorem~\ref{thm:banach}---the
 Contraction Mapping or Banach Fixed Point Theorem.
 \begin{enumerate}
-  \item $T$ need not be a contraction map. It only needs to be a
-    continuous function (which is weaker).
+  \item $f$ here need not be a contraction map like $T$ was in the CMT.
+    It only needs to be a continuous function (which is weaker).
   \item We provide no way to construct a sequence that converges to the
     fixed point.
   \item The fixed point need not be unique. The theorem just furnishes
     existence.
 \end{enumerate}
 \end{rmk}
+
+\begin{thm}\emph{(Kakutani's Fixed Point Theorem)}
+Suppose that $K\subseteq \Rn$ is nonempty, compact, and convex and that
+$f:K\rightrightarrows K$ is an upper hemicontinuous correspondence
+such that $f(x)\subseteq K$ is nonempty and convex $\forall x\in K$.
+Then there exists a fixed point such that $x^*\in f(x^*)$.
+\end{thm}
+\begin{rmk}
+Kakutani is a direct generalization of Brouwer, which can be viewed as a
+corollary of Kakutani. Specifically, assume $f$ and $K$ satisfy all of
+the Kakutani condition and, additionally, that $f$ is a
+\emph{single-valued} correspondence.  Well, a single-valued uppper
+hemicontinuous function is just plain continuous (like $f$ in Brouwer),
+and the fixed point that exists by Kakutani satisfies $x^*\in
+\{f(x^*)\}$ by the single-valuedness of $f$, i.e. we have $x^*=f(x^*)$.
+\end{rmk}
+
 
 
 \clearpage
@@ -5502,140 +5655,6 @@ problems with a finite number of constraints. In this section, we tackle
 optimization problems that require choosing allocations over
 time---especially into the infinite future---subject to certain
 constraints.
-
-\subsection{Preliminaries: Correspondences}
-
-\begin{defn}{(Correspondence)}
-A \emph{Correspondence} $\Gamma:X\rightrightarrows Y$ is a function that
-maps any element of $X$ into a subset of $Y$. Moreover, if
-$\Gamma(x)\subseteq Y$ is \emph{compact} for all $x\in Y$, then we say
-that $\Gamma$ is a \emph{compact correspondence}.
-\end{defn}
-
-\begin{ex}
-Here's an example of a correspondence $\Gamma: \R\rightrightarrows\R$.
-\begin{figure}[htpb!]
-\centering
-\begin{tikzpicture}[xscale=1.5]
-  % Upper bound of region
-  \draw[d4blue, ultra thin, domain=0.1:4, fill=d4blue, opacity=0.4] %
-    (0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+3}) -- (4,0);
-
-  % Lower bound of region
-  \draw[white, ultra thick, domain=0.1:4, fill=white] %
-    (0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+1}) -- (4,0);
-
-  % Axis
-  \draw[d4black, <->] (0,5) -- (0,0) -- (4,0);
-
-  % Dashed Line at x
-  \draw[d4black, ultra thick, dashed, -] %
-    (2,0) node[below, yshift=-5pt] {$x$} -- (2,1.8);
-
-  % Vertical \Gamma(x) line
-  \draw[d4black, ultra thick, -] (2,1.8) -- (2,3) -- (2,3.8);
-
-  % Brace marking Gamma(x)
-  \draw[%
-      d4black, decorate, %
-      decoration={brace, amplitude=10pt, mirror}, xshift=2pt
-    ] %
-    (2,1.8) -- (2,3.8) node[midway, right, xshift=12pt] {$\Gamma(x)$};
-\end{tikzpicture}
-\end{figure}
-
-As shown, numbers in $\R$ on the $x$-axis map into intervals along the
-$y$-axis (rather than just a single point as they would for a curve).
-An example is shown for one particular $x$.
-\end{ex}
-
-\begin{defn}{(Lower Hemi-Continuous)}
-Correspondence $\Gamma:X\rightrightarrows Y$ is \emph{lower
-hemi-continuous} (LHC) if and only if points don't ``pop up out of
-nowhere'' in the limit.
-
-Formally, choose $x\in X$. Note that we require
-$\Gamma(x)\neq\emptyset$. Now let $\{x_n\}\subseteq X$ be any arbitrary
-sequence converging to $x\in X$. Now choose any $y\in\Gamma(x)$.  For
-$\Gamma$ to be LHC at $x$, you need to be able to construct a sequence
-\begin{align*}
-  \{y_n\}\rightarrow y
-  \quad\text{s.t.}\quad
-  y_n \in \Gamma(x_n) \quad\forall n
-\end{align*}
-Now the informal definition makes sense. If $y$ popped up out of
-nowhere in the limit, then you could not construct a sequence $\{y_n\}$
-converging to it whose elements stayed inside the sets
-$\{\Gamma({x_n})\}$ the whole time.
-\end{defn}
-%\begin{figure}[htpb!]
-%\centering
-%\begin{tikzpicture}[xscale=1.5]
-  %% Upper bound of region
-  %\draw[d4blue, ultra thin, domain=0.1:4, fill=d4blue, opacity=0.4] %
-    %(0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+3}) -- (4,0);
-
-  %% Left segment
-  %\draw[white, ultra thick, domain=0.1:1, fill=white] %
-    %(0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+1}) -- (1,0);
-
-  %% Middle segment
-  %\draw[white, ultra thick, domain=0.1:4, fill=white] %
-    %(0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x}) -- (4,0);
-
-  %%% Lower bound of region
-  %%\draw[white, ultra thick, domain=0.1:4, fill=white] %
-    %%(0.1,0) -- plot (\x, {0.1*pow(\x,3)-0.6*pow(\x,2)+1.2*\x+1}) -- (4,0);
-
-  %% Axis
-  %\draw[d4black, <->] (0,5) -- (0,0) -- (4,0);
-
-  %%% Dashed Line at x
-  %%\draw[d4black, ultra thick, dashed, -] %
-    %%(2,0) node[below, yshift=-5pt] {$x$} -- (2,1.8);
-
-  %%% Vertical \Gamma(x) line
-  %%\draw[d4black, ultra thick, -] (2,1.8) -- (2,3) -- (2,3.8);
-
-  %%% Brace marking Gamma(x)
-  %%\draw[%
-      %%d4black, decorate, %
-      %%decoration={brace, amplitude=10pt, mirror}, xshift=2pt
-    %%] %
-    %%(2,1.8) -- (2,3.8) node[midway, right, xshift=12pt] {$\Gamma(x)$};
-%\end{tikzpicture}
-%\end{figure}
-
-\begin{defn}{(Upper Hemi-Continuous)}
-The \emph{compact}-valued correspondence $\Gamma:X\rightrightarrows Y$
-is \emph{upper hemi-continuous} (UHC) if and only if points don't
-``disappear'' in the limit. Alternatively, we might informally say that
-the graph of $\Gamma$ is closed.
-
-Formally, choose $x\in X$. Note that we require
-$\Gamma(x)\neq\emptyset$. Now let $\{x_n\}\subseteq X$ be any arbitrary
-sequence such that $x_n\ra x\in X$. Also let $\{y_n\}$ be any sequence
-where
-\begin{align*}
-  y_n \in \Gamma(x_n) \quad\forall n
-\end{align*}
-For $\Gamma$ to be UHC at $x$, it must the case that $\{y_n\}$ has a
-convergent subsequence that converges to some $y\in \Gamma(x)$.
-
-Now the informal definition makes sense. If there were some $y'\in Y$
-such that $y_n = y' \in \Gamma(x_n)$ for all $n$ (implying
-$y_n\rightarrow y'$), then we also want $y'\in \Gamma(x)$. It shouldn't
-disappear in the limit.
-\end{defn}
-\begin{rmk}
-A single-valued correspondence that is upper hemicontinuous is a
-continuous function.
-\end{rmk}
-
-\begin{defn}{(Continuous Correspondence)}
-Compact-valued correspondence $\Gamma:X\rightrightarrows Y$ is
-\emph{continuous} at $x\in X$ if it is both UHC and LHC at $x$.
-\end{defn}
 
 \clearpage
 \subsection{Preliminaries: Theorem of the Maximum}
