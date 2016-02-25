@@ -13474,13 +13474,14 @@ least to me).
 \clearpage
 \appendix
 
-\section{Matrix Calculus}
+\section{Matrix Results and Conventions}
+
+\subsection{Matrix Calculus}
 
 Here, I lay down a few conventions and (light) results for derivatives
 with respect to vectors and of vector-valued functions.
 
-\subsection{Scalar-Valued}
-
+\paragraph{Scalar-Valued}
 For scalar-valued function $f: \mathbb{R}^n \rightarrow \mathbb{R}$
 which takes column vector $\bsx$ as an argument, we have
 \begin{align*}
@@ -13568,7 +13569,7 @@ From there, we can get
 \end{align*}
 
 
-\subsection{Vector-Valued}
+\paragraph{Vector-Valued}
 
 For vector-valued function $\bsg:
 \mathbb{R}^n\rightarrow\mathbb{R}^m$,
@@ -13599,6 +13600,265 @@ We also have, in general,
   \frac{\partial\bsg}{\partial \boldsymbol{\theta'}}
   \right)'
 \end{align*}
+
+
+\clearpage
+\subsection{Matrix Manipulations}
+
+\begin{defn}(Trace)
+If $A$ is an $n\times n$ matrix, then
+\begin{equation}
+    \text{tr}[A] = \sum^n_{i=1} a_{ii}
+\end{equation}
+which is the sum of diagonal elements.
+\end{defn}
+
+\begin{defn}(Vec Operator)
+Next, the \emph{vec operator} takes any matrix $A\in\Rmn$
+and stacks to columns on top of each other (left to right) to form a
+column vector of length $mn$.  Supposing that $a_i$ are column vectors
+to simplify notation:
+\begin{align*}
+  A &= \begin{pmatrix} a_1 & \cdots & a_n \end{pmatrix}
+	\qquad a_i \in \mathbb{R}^{n\times 1}
+  \quad\implies\quad
+  \vc\; A =
+	\begin{pmatrix} a_1 \\ \vdots \\ a_n \end{pmatrix}
+\end{align*}
+\end{defn}
+
+\begin{defn}(Kronecker Product)
+Suppose we have two matrices, $A$ which is $m \times n$ and $B$
+which is $p\times q$. Then the {\sl Kronecker Product} of $A$ and $B$ is
+\begin{align*}
+  A \otimes B = \begin{pmatrix} a_{11} B & \cdots & a_{1n} B \\
+      \vdots & \ddots & \vdots \\
+      a_{m1} B & \cdots & a_{mn}B \end{pmatrix}
+  \in \R^{(mp)\times(nq)}
+\end{align*}
+\end{defn}
+
+
+\begin{prop}\emph{(Matrix Identities)}
+First, consider $P\in\Rmn$ and $Q\in\R^{n\times m}$. Then
+\begin{enumerate}
+  \item[\emph{(i)}]
+    $\text{tr}[PQ]=\text{tr}[QP]$
+\end{enumerate}
+Next, consider $a\in\Rn$ and $M\in\R^{n\times n}$ where $M$ is a
+symmetric positive definite matrix. Then
+\begin{enumerate}
+  \item[\emph{(ii)}]
+    $a'Ma = \text{tr}[Maa']$
+\end{enumerate}
+Next, consider $A\in\Rmn$, $B\in\R^{p\times q}$, $C\in\R^{n\times r}$,
+and $D\in\R^{q\times s}$. Then
+\begin{enumerate}
+  \item[\emph{(iii)}] $(A \otimes B)(C \otimes D) = AC \otimes BD$
+  \item[\emph{(iv)}] $(A\otimes B)' = (A' \otimes B')$.
+  \item[\emph{(v)}] $(A\otimes B)^{-1} = (A^{-1} \otimes B^{-1})$.
+  \item[\emph{(vi)}]
+    tr$\left[A'BCD'\right] = \text{vec}(A)' (D \otimes B) \text{vec}(C)$.
+\end{enumerate}
+\end{prop}
+\clearpage
+\begin{proof}
+We prove the non-obvious or non-tedious proofs here:
+\begin{enumerate}[label=(\roman*)]
+  \item This isn't dificult to prove, just tedious.
+  \item First, note that $a'Ma$ is just a scalar,  and the trace of a
+    scalar is just the scalar itself, i.e.\ $a'Ma=\text{tr}[a'Ma]$. Now
+    use Part (i) of the proposition to write
+    \begin{align*}
+        a' M a &= tr\left[a' (M a) \right]
+      = tr\left[(M a) a' \right]  \\
+      &= tr\left[M a a' \right]
+    \end{align*}
+
+  \item[(vi)] This one is easily the most ``What the hell?'' with no
+    intuition, so let's prove it.
+
+    We know that the matrix that results from $A'BCD'$ must be square to
+    apply the trace operator to it.  So let's call that the beast inside
+    the trace operator $E$ and suppose that it is $q \times q$. Now what
+    does that imply about the size of our other matrices?
+
+    Well to allow the matrix multiplication to be carried out (i.e.\ we
+    can only multiply matrix $X$ and matrix $Y$ if the columns of $X$
+    equal the rows of $Y$), and to have $E$ be $q\times q$, this forces
+    \begin{align*}
+        A\;\;  \text{is}\;\;  m \times q \qquad
+      \qquad B \text{is} \;\; m \times n \qquad
+        C\;\;  \text{is}\;\; n \times p \qquad
+      & \qquad
+        D\;\;  \text{is}\;\;  q \times p
+    \end{align*}
+    where $m$, $n$, $p$, and $q$ are all left unspecified.
+
+    Okay then, let's get a move on
+    \begin{align*}
+        \text{tr}[A'BCD'] = \text{tr}[E] &=
+      \sum^q_{i=1} e_{ii} \\
+    \end{align*}
+    Now suppose define $X = A'B$ and $Y = CD'$, implying
+    that $X$ is $q\times n$ and $Y$ is $n\times q$.
+    We can rewrite the diagonal components of $E$ in
+    terms of the rows of $X$, the $x_{i\cdot}$, and
+    the colums of $Y$, $y_{\cdot i}$.
+    \begin{align*}
+        \text{tr}[E] &=
+      \sum^q_{i=1} e_{ii}
+      = \sum^q_{i=1} x_{i\cdot} y_{\cdot i}
+    \end{align*}
+    Now let's not forget where the rows and columns of
+    $X$ and $Y$ come from. The $i$th row of $X$ is
+    the product of the $i$th row of $A'$ (or the $i$th
+    column of $A$) with
+    each subsequent column of $B$. Similarly, each
+    column of $Y$ is the dot product of each
+    successive row of $C$ with the $i$th column of $D'$
+    (or the $i$th row of $D$).
+    Mathematically,
+    \begin{align}
+        \text{tr}[E] &=
+      \sum^q_{i=1} e_{ii}
+      = \sum^q_{i=1} x_{i\cdot} y_{\cdot i} \notag \\
+        &= \sum^q_{i=1} a'_{\cdot i}
+      \begin{pmatrix} b_{\cdot 1} & \cdots & b_{\cdot n}
+      \end{pmatrix}
+      \begin{pmatrix} c_{1\cdot} \\ \vdots \\ c_{n \cdot}
+      \end{pmatrix}
+      d'_{i \cdot} \label{fullrep} \\
+        &= \sum^q_{i=1} a'_{\cdot i}
+      BC
+      d'_{i \cdot} \label{simprep}
+    \end{align}
+    where $a'_{\cdot i}$ is the $i$th column of $A$,
+    transposed, and $d'_{i \cdot}$ is the $i$th row of $D$,
+    transposed.
+
+    Alright, where did that get us? Well, let's look at
+    that last expression. Let's suppress the three
+    components to the write of $a'_{\cdot i}$---those nasty
+    vectors and matrices with $b$'s, $c$'s, and $d$'s in
+    them. We'll do so by just grouping those three
+    terms into a ``back-box'' term called ``$z_i$,'' which
+    we'll postpone computing for now.  This let's us
+    write
+    \begin{align}
+        \text{tr}[E]
+        &= \sum^q_{i=1} a'_{\cdot i}  z_i \label{goback}
+    \end{align}
+    where $z_i$ is of size $m\times 1$.
+    \\
+    \\
+    But hey, that's a regular old dot product, so let's
+    rewrite it as such with simple matrix notation:
+    \begin{align}
+        \text{tr}[E]
+      &= \sum^q_{i=1} a'_{\cdot i}  z_i
+      = \begin{pmatrix} a'_{\cdot 1}
+          & \cdots & a'_{\cdot q} \end{pmatrix}
+          \begin{pmatrix} z_{1}
+          \\ \vdots \\ z_{q} \end{pmatrix}
+      = \text{vec}(A)' \; Z
+        \label{zrep}
+    \end{align}
+    Now hopefully you were able to make the jump to
+    Equation \ref{zrep} yourself once you saw what
+    we were doing.
+    And now we at least have \emph{something}
+    %from Equation \ref{vecder}.
+    Now let's try to pin down those $z_i$ terms that
+    helped us get here.
+    \\
+    \\
+    Now, let's pin down that $Z$ matrix and show
+    that, in fact,
+    \begin{equation}
+        Z = (D\otimes B) \text{vec}(C)
+    \end{equation}
+    We do so by first using Equations
+    \ref{simprep}, \ref{goback}, and \ref{zrep} to infer the
+    following:
+    \begin{align}
+        Z &= \begin{pmatrix} z_1 \\ \vdots \\ z_q
+      \end{pmatrix} =
+      \begin{pmatrix} BCd'_{1\cdot} \\ \vdots \\ BCd'_{q\cdot}
+      \end{pmatrix} \label{bigz}
+    \end{align}
+    Next, let's consider the $j$th row of the last vector, then
+    rewrite $C$, expanding it into a different but equivalent
+    representation---a row of column vectors all lined up:
+    \begin{align*}
+        BCd'_{j\cdot} &= B
+      \begin{pmatrix} c_{\cdot 1} & \cdots & c_{\cdot p}
+      \end{pmatrix} d'_{j \cdot} \notag \\
+        \text{expanding $d'_{j \cdot}$} \quad
+      &= B
+      \begin{pmatrix} c_{\cdot 1} & \cdots & c_{\cdot p}
+      \end{pmatrix}
+      \begin{pmatrix} d_{j 1} \\ \vdots \\ d_{j p}
+      \end{pmatrix}
+    \end{align*}
+    Now distribute $B$ and dot product with the $d'_{j\cdot}$:
+    \begin{align}
+        BCd'_{j\cdot} &=
+      \begin{pmatrix} Bc_{\cdot 1} d_{j 1} + \cdots
+          + Bc_{\cdot p} d_{j p}
+      \end{pmatrix}   \notag \\
+        \text{Since the $d_{jm}$ are scalars} \quad &=
+      \begin{pmatrix}  d_{j 1} Bc_{\cdot 1} + \cdots
+          +  d_{j p}Bc_{\cdot p}
+      \end{pmatrix}   \notag
+    \end{align}
+    Amost there, I promise.
+
+    Now stack these $BCd'_{j\cdot}$ terms
+    to get $Z$ as in Equation \ref{bigz}:
+    \begin{align}
+        Z &= \begin{pmatrix} z_1 \\ \vdots \\ z_q
+      \end{pmatrix} =
+      \begin{pmatrix} BCd'_{1\cdot} \\ \vdots \\ BCd'_{q\cdot}
+      \end{pmatrix}
+        = \begin{pmatrix}
+          d_{1 1} Bc_{\cdot 1} + \cdots
+          +  d_{1 p}Bc_{\cdot p} \\
+          \vdots \\
+          d_{q 1} Bc_{\cdot 1} + \cdots
+          +  d_{q p}Bc_{\cdot p}
+      \end{pmatrix}
+    \end{align}
+    Finally, take out the expanded $C$ term from
+    each row and rewrite the sums in each row
+    as a result of matrix multiplication
+    \begin{align}
+        Z &=\begin{pmatrix}
+          d_{1 1} Bc_{\cdot 1} + \cdots
+          +  d_{1 p}Bc_{\cdot p} \\
+          \vdots \\
+          d_{q 1} Bc_{\cdot 1} + \cdots
+          +  d_{q p}Bc_{\cdot p}
+      \end{pmatrix}
+        = \begin{pmatrix}
+          d_{1 1} B & \cdots
+          &  d_{1 p}B \\
+          \vdots & \ddots & \vdots \\
+          d_{q 1} B & \cdots
+          &  d_{q p}B
+      \end{pmatrix}
+        \begin{pmatrix}
+      c_{\cdot 1} \\ \vdots \\ c_{\cdot p}
+        \end{pmatrix}
+    \end{align}
+    Or in other words, if you look at the
+    last line closely
+    \begin{align*}
+        Z = (D\otimes B) \text{vec}(C)
+    \end{align*}
+    QED (drops mic).
+    \end{enumerate}
+\end{proof}
 
 
 \clearpage
@@ -13684,297 +13944,6 @@ Hayashi makes the following definitions:
 
 
 
-
-\clearpage
-\section{Matrix Manipulations}
-
-\begin{defn}(Trace)
-If $A$ is an $n\times n$ matrix, then
-\begin{equation}
-    \text{tr}[A] = \sum^n_{i=1} a_{ii}
-\end{equation}
-which is the sum of diagonal elements.
-\end{defn}
-
-\begin{defn}(Vec Operator)
-Next, the \emph{vec operator} takes any matrix $A\in\Rmn$
-and stacks to columns on top of each other (left to right) to form a
-column vector of length $mn$.  Supposing that $a_i$ are column vectors
-to simplify notation:
-\begin{align*}
-  A &= \begin{pmatrix} a_1 & \cdots & a_n \end{pmatrix}
-	\qquad a_i \in \mathbb{R}^{n\times 1}
-  \quad\implies\quad
-  \vc\; A =
-	\begin{pmatrix} a_1 \\ \vdots \\ a_n \end{pmatrix}
-\end{align*}
-\end{defn}
-
-\begin{defn}(Kronecker Product)
-Suppose we have two matrices, $A$ which is $m \times n$ and $B$
-which is $p\times q$. Then the {\sl Kronecker Product} of $A$ and $B$ is
-\begin{align*}
-  A \otimes B = \begin{pmatrix} a_{11} B & \cdots & a_{1n} B \\
-      \vdots & \ddots & \vdots \\
-      a_{m1} B & \cdots & a_{mn}B \end{pmatrix}
-  \in \R^{(mp)\times(nq)}
-\end{align*}
-\end{defn}
-
-Now onto some properties of all of these operators.
-
-\begin{prop}
-If $X\in\Rmn$ and $Y\in\Rnm$, then
-\begin{equation}
-    \label{tr}
-    \text{tr}[XY] = \text{tr}[YX]
-\end{equation}
-This isn't dificult to prove, just tedious.
-\end{prop}
-
-\begin{prop}
-Suppose that $a\in\Rn$ and $B$ is a symmetric positive definite
-$n\times n$ matrix. Then
-\begin{align*}
-    a' B a &= tr\left[a' B a \right]
-    %&= tr\left[a' (B a) \right]
-\end{align*}
-because $a'Ba$ is just a scalar (so the trace of a scalar is just the
-scalar itself).
-Now if we use Equation~\ref{tr}, taking $X = a'$ and $Y = Ba$, we can
-carry on from the simplification above to write
-\begin{align*}
-    a' B a &= tr\left[a' (B a) \right]
-	= tr\left[(B a) a' \right]  \\
-	&= tr\left[B a a' \right]
-\end{align*}
-\end{prop}
-
-
-
-
-\begin{prop}
-Let $A\in\Rmn$, $B\in\R^{p\times q}$, $C\in\R^{n\times r}$, and
-$D\in\R^{q\times s}$. Then
-\begin{enumerate}
-  \item $(A \otimes B)(C \otimes D) = AC \otimes BD$
-  \item $(A\otimes B)' = (A' \otimes B')$.
-  \item $(A\otimes B)^{-1} = (A^{-1} \otimes B^{-1})$.
-  \item tr$\left[A'BCD'\right] = \text{vec}(A)' (D \otimes B) \text{vec}(C)$.
-\end{enumerate}
-\end{prop}
-
-%\begin{proof} We start by writing:
-%
-%\begin{align*}
-%    (A \otimes B)(C \otimes D) =
-%    \begin{pmatrix} a_{11} B & \cdots & a_{1n} B \\
-%	\vdots & \ddots & \vdots \\
-%	a_{m1} B & \cdots & a_{mn}B \end{pmatrix}
-%    \begin{pmatrix} c_{11} D & \cdots & c_{1r} D \\
-%	\vdots & \ddots & \vdots \\
-%	c_{n1} D & \cdots & c_{nr}D \end{pmatrix}
-%\end{align*}
-%Since the matrix $D$ has the same number of rows as $B$ has columns,
-%we can carry out the multiplication to get
-%
-%\end{proof}
-
-Of all the properties, this one strikes me the most of
-``Now what the hell?''  There is zero intuition for this that
-I can see, so let's try to derive it.
-\begin{equation}
-    \label{vecder}
-    \text{tr}\left[A'BCD'\right]
-	= \text{vec}(A)' (D \otimes B) \text{vec}(C)
-\end{equation}
-
-\begin{proof} We know that the matrix that results from
-$A'BCD'$ must be square to
-apply the trace operator to it.  So let's call that the beast
-inside the trace operator $E$ and suppose that it is
-$q \times q$. Now what does that imply about the size of our
-other matrices?
-\\
-\\
-Well to allow the matrix multiplication to
-be carried out (i.e. we can only multiply matrix $X$ and
-matrix $Y$ if the columns of $X$ equal the rows of $Y$),
-and to have $E$ be $q\times q$, this forces
-\begin{align*}
-    A \text{ is } m \times q \qquad
-	 \qquad B \text{ is } m \times n \qquad
-    C \text{ is } n \times p \qquad
-	& \qquad
-    D \text{ is } q \times p
-\end{align*}
-where $m$, $n$, $p$, and $q$ are all left unspecified.
-\\
-\\
-Okay then, let's get a move on
-\begin{align*}
-    \text{tr}[A'BCD'] = \text{tr}[E] &=
-	\sum^q_{i=1} e_{ii} \\
-\end{align*}
-Now suppose define $X = A'B$ and $Y = CD'$, implying
-that $X$ is $q\times n$ and $Y$ is $n\times q$.
-We can rewrite the diagonal components of $E$ in
-terms of the rows of $X$, the $x_{i\cdot}$, and
-the colums of $Y$, $y_{\cdot i}$.
-\begin{align*}
-    \text{tr}[E] &=
-	\sum^q_{i=1} e_{ii}
-	= \sum^q_{i=1} x_{i\cdot} y_{\cdot i}
-\end{align*}
-Now let's not forget where the rows and columns of
-$X$ and $Y$ come from. The $i$th row of $X$ is
-the product of the $i$th row of $A'$ (or the $i$th
-column of $A$) with
-each subsequent column of $B$. Similarly, each
-column of $Y$ is the dot product of each
-successive row of $C$ with the $i$th column of $D'$
-(or the $i$th row of $D$).
-Mathematically,
-\begin{align}
-    \text{tr}[E] &=
-	\sum^q_{i=1} e_{ii}
-	= \sum^q_{i=1} x_{i\cdot} y_{\cdot i} \notag \\
-    &= \sum^q_{i=1} a'_{\cdot i}
-	\begin{pmatrix} b_{\cdot 1} & \cdots & b_{\cdot n}
-	\end{pmatrix}
-	\begin{pmatrix} c_{1\cdot} \\ \vdots \\ c_{n \cdot}
-	\end{pmatrix}
-	d'_{i \cdot} \label{fullrep} \\
-    &= \sum^q_{i=1} a'_{\cdot i}
-	BC
-	d'_{i \cdot} \label{simprep}
-\end{align}
-where $a'_{\cdot i}$ is the $i$th column of $A$,
-transposed, and $d'_{i \cdot}$ is the $i$th row of $D$,
-transposed.
-
-Alright, where did that get us? Well, let's look at
-that last expression. Let's suppress the three
-components to the write of $a'_{\cdot i}$---those nasty
-vectors and matrices with $b$'s, $c$'s, and $d$'s in
-them. We'll do so by just grouping those three
-terms into a ``back-box'' term called ``$z_i$,'' which
-we'll postpone computing for now.  This let's us
-write
-\begin{align}
-    \text{tr}[E]
-    &= \sum^q_{i=1} a'_{\cdot i}  z_i \label{goback}
-\end{align}
-where $z_i$ is of size $m\times 1$.
-\\
-\\
-But hey, that's a regular old dot product, so let's
-rewrite it as such with simple matrix notation:
-\begin{align}
-    \text{tr}[E]
-	&= \sum^q_{i=1} a'_{\cdot i}  z_i
-	= \begin{pmatrix} a'_{\cdot 1}
-	    & \cdots & a'_{\cdot q} \end{pmatrix}
-	    \begin{pmatrix} z_{1}
-	    \\ \vdots \\ z_{q} \end{pmatrix}
-	= \text{vec}(A)' \; Z
-    \label{zrep}
-\end{align}
-Now hopefully you were able to make the jump to
-Equation \ref{zrep} yourself once you saw what
-we were doing.
-And now we at least have \emph{something}
-from Equation \ref{vecder}.
-Now let's try to pin down those $z_i$ terms that
-helped us get here.
-\\
-\\
-Now, let's pin down that $Z$ matrix and show
-that, in fact,
-\begin{equation}
-    Z = (D\otimes B) \text{vec}(C)
-\end{equation}
-We do so by first using Equations
-\ref{simprep}, \ref{goback}, and \ref{zrep} to infer the
-following:
-\begin{align}
-    Z &= \begin{pmatrix} z_1 \\ \vdots \\ z_q
-	\end{pmatrix} =
-	\begin{pmatrix} BCd'_{1\cdot} \\ \vdots \\ BCd'_{q\cdot}
-	\end{pmatrix} \label{bigz}
-\end{align}
-Next, let's consider the $j$th row of the last vector, then
-rewrite $C$, expanding it into a different but equivalent
-representation---a row of column vectors all lined up:
-\begin{align*}
-    BCd'_{j\cdot} &= B
-	\begin{pmatrix} c_{\cdot 1} & \cdots & c_{\cdot p}
-	\end{pmatrix} d'_{j \cdot} \notag \\
-    \text{expanding $d'_{j \cdot}$} \quad
-	&= B
-	\begin{pmatrix} c_{\cdot 1} & \cdots & c_{\cdot p}
-	\end{pmatrix}
-	\begin{pmatrix} d_{j 1} \\ \vdots \\ d_{j p}
-	\end{pmatrix}
-\end{align*}
-Now distribute $B$ and dot product with the $d'_{j\cdot}$:
-\begin{align}
-    BCd'_{j\cdot} &=
-	\begin{pmatrix} Bc_{\cdot 1} d_{j 1} + \cdots
-	    + Bc_{\cdot p} d_{j p}
-	\end{pmatrix}   \notag \\
-    \text{Since the $d_{jm}$ are scalars} \quad &=
-	\begin{pmatrix}  d_{j 1} Bc_{\cdot 1} + \cdots
-	    +  d_{j p}Bc_{\cdot p}
-	\end{pmatrix}   \notag
-\end{align}
-Amost there, I promise.
-
-\newpage
-Now stack these $BCd'_{j\cdot}$ terms
-to get $Z$ as in Equation \ref{bigz}:
-\begin{align}
-    Z &= \begin{pmatrix} z_1 \\ \vdots \\ z_q
-	\end{pmatrix} =
-	\begin{pmatrix} BCd'_{1\cdot} \\ \vdots \\ BCd'_{q\cdot}
-	\end{pmatrix}
-    = \begin{pmatrix}
-	    d_{1 1} Bc_{\cdot 1} + \cdots
-	    +  d_{1 p}Bc_{\cdot p} \\
-	    \vdots \\
-	    d_{q 1} Bc_{\cdot 1} + \cdots
-	    +  d_{q p}Bc_{\cdot p}
-	\end{pmatrix}
-\end{align}
-Finally, take out the expanded $C$ term from
-each row and rewrite the sums in each row
-as a result of matrix multiplication
-\begin{align}
-    Z &=\begin{pmatrix}
-	    d_{1 1} Bc_{\cdot 1} + \cdots
-	    +  d_{1 p}Bc_{\cdot p} \\
-	    \vdots \\
-	    d_{q 1} Bc_{\cdot 1} + \cdots
-	    +  d_{q p}Bc_{\cdot p}
-	\end{pmatrix}
-    = \begin{pmatrix}
-	    d_{1 1} B & \cdots
-	    &  d_{1 p}B \\
-	    \vdots & \ddots & \vdots \\
-	    d_{q 1} B & \cdots
-	    &  d_{q p}B
-	\end{pmatrix}
-    \begin{pmatrix}
-	c_{\cdot 1} \\ \vdots \\ c_{\cdot p}
-    \end{pmatrix}
-\end{align}
-Or in other words, if you look at the
-last line closely
-\begin{align*}
-    Z = (D\otimes B) \text{vec}(C)
-\end{align*}
-QED (drops mic).
-\end{proof}
 
 
 \section{Linear Gaussian Recurrences}
