@@ -215,6 +215,7 @@
 
 % Script
 \newcommand{\sF}{\mathscr{F}}
+\newcommand{\sH}{\mathscr{H}}
 \newcommand{\sB}{\mathscr{B}}
 \newcommand{\sC}{\mathscr{C}}
 \newcommand{\sL}{\mathscr{L}}
@@ -1428,6 +1429,8 @@ where the constants $c_i$ are determined by the initial condition and
 the $\lambda_i$ represent the eigenvalues in $D$.
 
 
+
+
 \clearpage
 \section{Metric Spaces and Sequences}
 
@@ -1486,6 +1489,8 @@ Notice also that this is a vector space, as
 \end{defn}
 
 
+
+\clearpage
 \subsection{Metrics, Norms, and Metric Spaces}
 
 \begin{defn}{(Metric Space)}
@@ -1550,42 +1555,44 @@ by looking at all these attributes and seeing where the differ most
 sharply.
 \end{rmk}
 
-Distance functions are commonly built up from another special type of
-function called a \emph{norm}. Often, we first encounter \emph{norms} as
-functions that measure the length of vectors in $\R^n$, although
-the definition permits much more general functions over much more
-general spaces (as we'll see). But we really care about them here
-because given a norm, you can always construct a distance function from
-that norm. So let's define them.
 
-\begin{defn}
+In practice, distance functions are commonly built up from \emph{norms},
+which are special functions satisfying certain properties.  Those
+properties ensure that norms can be interpreted as measuring the
+\emph{length} of vectors in some vector space.\footnote{%
+  See Section~\ref{sec:banachhilbert} for much more on vector spaces,
+  norms, inner products, and Banach and Hilbert Spaces.
+}
+But Aside from this use, we also care care about them because, given a
+norm, we can \emph{always} construct a metric by setting the distance
+between two points equal to the length of the vector connecting them, as
+we see below.
+
+\begin{defn}(Norm)
 \label{defn:norm}
-Given a space $X$, a function $N:X\rightarrow \R$ is called a
-\emph{norm} if it satisfies the following properties:
+Given a space $X$, a function $\lVert\,\cdot\,\rVert:X\rightarrow \R$ is
+called a \emph{norm} if it satisfies the following properties:
 \begin{enumerate}
-  \item $N(x)\geq 0$
-  \item $N(x)=0 \quad \Leftrightarrow \quad x=0$
-  \item $N(\alpha x)= |\alpha| N(x)$
-  \item $N(x+y) \leq N(x) + N(y)$
+  \item $\lVert x\rVert\geq 0$
+  \item $\lVert x\rVert=0 \quad \iff \quad x=0$
+  \item $\lVert \alpha x\rVert= |\alpha| \cdot \lVert x\rVert$
+  \item $\lVert x+y\rVert \leq \lVert x\rVert + \lVert y\rVert$
 \end{enumerate}
-Often, you see the notation $||x||$ instead of $N(x)$ to denote the norm
-of $x$.
 \end{defn}
 
 \begin{ex}
 One common norm for $x\in \R^n$ is
 \begin{align*}
-  N_1(x) = \sum^n_{i=1} |x_i|
+  \lVert x\rVert_1 = \sum^n_{i=1} |x_i|
 \end{align*}
 To show this is a norm, one must show that it satisfies the four
 properties in Definition~\ref{defn:norm}. Since that's pretty easy, the
 proof is omitted.
 \end{ex}
 
-
 \begin{prop}
-If $N$ is a norm, then $d:X \times X\rightarrow \R$ defined as
-$d(x,y):=N(x-y)$ is a metric for space $X$.
+If $\lVert \,\cdot\,\rVert$ is a norm, then $d:X \times X\rightarrow \R$
+defined as $d(x,y):=\lVert x-y\rVert$ is a metric for space $X$.
 \end{prop}
 \begin{proof}
 To show that $d$ is a valid metric, we need to show that it satisfies
@@ -1594,24 +1601,27 @@ the four properties of Definition~\ref{defn:metric}:
   \item Non-negativity: Trivial by Property 1 of
     Definition~\ref{defn:norm}.
   \item Identification: ($\Leftarrow$) If $x=y$, then
-    $d(x,y)=N(x-y)=N(0)=0$ by Property 2 of Definition~\ref{defn:norm}.
+    $d(x,y)=\lVert x-y\rVert=\lVert 0\rVert=0$ by Property 2 of
+    Definition~\ref{defn:norm}.
 
-    ($\Rightarrow$) Suppose $0 = d(x,y) =: N(x-y)$. Property 2 of
-    Definition~\ref{defn:norm} tells us that $x-y=0$, hence $x=y$.
+    ($\Rightarrow$) Suppose $0 = d(x,y) =: \lVert x-y\rVert$. Property 2
+    of Definition~\ref{defn:norm} tells us that $x-y=0$, hence $x=y$.
   \item Symmetry: Take
     \begin{align*}
-      d(x,y)=N(x-y) = N(-(y-x))
+      d(x,y)= \lVert x-y\rVert= \lVert -(y-x)\rVert
     \end{align*}
     By Property 3 of
     Definition~\ref{defn:norm}, we can pull out the negative sign to get
     \begin{align*}
-      d(x,y)=N(-(y-x))=|-1|N(y-x) = d(y,x)
+      d(x,y)= \lVert -(y-x)\rVert =|-1| \cdot \lVert y-x\rVert = d(y,x)
     \end{align*}
   \item Triangle Inequality: Take some $z$, then by Property 4 of
     Definition~\ref{defn:norm}
     \begin{align*}
-      d(x,y) = N(x-y) = N((x-z)+(z-y))
-      &\leq N(x-z) + N(z-y)  \\
+      d(x,y) = \lVert x-y\rVert
+      = \lVert (x-z)+ (z-y) \rVert
+      &\leq \lVert x-z\rVert +\lVert z-y\rVert
+      \\
       \Leftrightarrow\qquad
       &\leq d(x,z) + d(z,y)
     \end{align*}
@@ -1619,15 +1629,16 @@ the four properties of Definition~\ref{defn:metric}:
 \end{proof}
 
 \begin{ex}{(Norms and Metrics for $\mathscr{B}(A,\R^n)$)}
-Start by defining a norm $N$ for any bounded function $f:A
-\rightarrow \R^n$
+Start by defining a norm $\lVert \,\cdot\,\rVert$ for any bounded
+function $f:A \rightarrow \R^n$
 \begin{align*}
-  N(f) = \sup_{x\in A} |f(x)|
+  \lVert f\rVert_\infty
+  = \sup_{x\in A} |f(x)|
 \end{align*}
-By ``bounded function'', I mean that $N(f)<\infty$.  Since
-Axiom~\ref{ax:completeness} states that the sup always exists for any
-function bounded in $\R^n$, this norm is well
-defined, and it is called the \emph{sup norm}.
+By ``bounded function'', I mean that $\lVert f\rVert_\infty<\infty$.
+Since Axiom~\ref{ax:completeness} states that the sup always exists for
+any function bounded in $\R^n$, this norm is well defined, and it is
+called the \emph{sup norm}.
 
 %With this norm, we can define our space $X$ as the set of all bounded
 %functions
@@ -1641,18 +1652,18 @@ Given the space $X=\mathscr{B}(A,\R^n)$, we just need a distance
 function to construct the metric space $(X,d)$. As is always the case
 with norms, we use the norm and define a metric:
 \begin{align*}
-  d_\infty(f,g) = N(f-g)
+  d_\infty(f,g) = \lVert f-g\rVert
 \end{align*}
 for any $f,g\in X$. Intuitively, this distance functions looks at how
 far apart $f$ and $g$ are at each $x\in A$, and then sets the distance
 equal to the gap between the functions at the point of ``maximal gap.''
 
-Of course, we need to show that $N$ is actually a norm for all of the
-above to hold.
+Of course, we need to show that $\lVert \,\cdot\,\rVert$ is actually a
+norm for all of the above to hold.
 \end{ex}
 
 \begin{ex}{($L_p$ Space)}
-Consider the space of $L_p$ integrable functions:
+Consider the space $X$ of $L_p$ integrable functions:
 \begin{align*}
   X = \left\{
     f:A\rightarrow \R \; \big|\;
@@ -1665,6 +1676,7 @@ On this space, we can define the metric
 \end{align*}
 \end{ex}
 
+\clearpage
 \subsection{Sequences, Subsequences, Limits, and Convergence}
 
 Now that we have defined the notions of metrics and metric spaces, which
@@ -2340,6 +2352,8 @@ satisfies the property, then the space is complete.
 \end{rmk}
 
 
+
+\clearpage
 \section{Metric Topology}
 
 Topology is the study of open sets and continuous functions in arbitrary
@@ -3136,6 +3150,619 @@ can find $\bar{x}$ such that
   f(\bar{x}) = \sup f(K) = \sup_{x\in K} f(x)
 \end{align*}
 \end{proof}
+
+\clearpage
+\section{Banach and Hilbert Spaces}
+\label{sec:banachhilbert}
+
+Often, we first encounter \emph{norms} and \emph{inner products} as
+special functions on vector space $\Rn$ or $\Cn$ that measure the
+\emph{length} of a vector or the \emph{angle} between vectors,
+respectively.  However, the definition permits much more general
+functions over much more general spaces (as we'll see).
+
+\subsection{Vector Space}
+
+\begin{defn}(Field)
+We say that $K\subseteq \C$ is a \emph{field} if it satisfies the following
+conditions:
+\begin{enumerate}[label=(\roman*)]
+  \item \emph{Identity Elements} $0,1\in K$
+  \item \emph{Closed under Addition}:
+      $x,y\in K \implies x+y\in K$
+  \item \emph{Closed under Multiplication}:
+      $x,y\in K \implies xy\in K$
+  \item \emph{Additive Inverse}: $x\in K \implies -x\in K$
+  \item \emph{Multiplicative Inverse}: $x\in K$ and $x\neq 0$, then
+    $x^{-1}\in K$.
+\end{enumerate}
+Note that we could have $K \subseteq \R$ since $\R\subset\C$.
+\end{defn}
+
+\begin{defn}(Vector Space)
+A vector space $V$ over field $K$ is a set of objects closed under the
+following operations (which are well-defined):
+\begin{itemize}
+  \item \emph{Vector Addition}: $v+u\in V$ for $v,u\in V$.
+  \item \emph{Scalar Multiplication}: $kv\in V$ where $k\in K$ and $v\in
+    V$
+\end{itemize}
+satisfying the following properties for all $u,v,w\in V$ and $a,b\in K$:
+\begin{enumerate}[label=(\roman*)]
+  \item \emph{Associativity of Vector Addition}: $(u+v)+w = u + (v+w)$
+  \item \emph{Commutatitivity of Vector Addition}: $u+v=v+u$.
+  \item \emph{Additive Inverse}: For any $v$, there exists an element
+    $-v$ such that $v+(-v)=0$.
+  \item \emph{Distributive Property over Vector Addition}:
+    $a(u+v) = au + av$
+  \item \emph{Distributive Property over Scalar Addition}:
+    $(a+b)v = av + bv$
+  \item \emph{Multiplicative Associativity}: $(ab)v = a(bv)$
+  \item \emph{Additive Identity Element}: There exists a zero element
+    $0\in V$ such that $v+0 = 0+v=0$.
+  \item \emph{Multiplicative Identity Element}: $1\cdot u = u$.
+\end{enumerate}
+\end{defn}
+
+\begin{defn}(Complex Vector Space)
+We will refer to ``vector space $V$ over $K\subseteq\C$'' (where
+$K\not\subseteq\R$) more succinctly as \emph{complex vector space} $V$.
+\end{defn}
+
+\begin{rmk}
+Since $V$ over $K\subseteq\C$ must be closed under scalar
+multiplication, using a complex field $K\subseteq\C$ ensures that
+vectors in $V$ can take on complex values as well. So ``complex vector
+space'' always refers to cases where \emph{both} elements of $K$ and $V$
+can take on complex values.
+\end{rmk}
+
+\begin{defn}(Real Vector Space)
+We will refer to ``vector space $V$ over $K\subseteq\R$'' (where elments
+of $V$ take on strictly real values) more succinctly as
+\emph{real vector space} $V$.
+\end{defn}
+
+\begin{ex}
+Three classic examples: field $\C$ over $\Cn$, field $\C$ over $\Rn$, or
+field $\R$ over $\Rn$.
+\end{ex}
+
+\clearpage
+\subsection{Normed Vector Spaces and Banach Spaces}
+
+
+\begin{defn}(Norm)
+Given complex vector space $V$, a function
+$\lVert\,\cdot\,\rVert:V\rightarrow \R$ is called a \emph{norm} if it
+satisfies the following properties for all $v,u\in V$ and $\alpha\in
+\C$:
+\begin{enumerate}[label=(\roman*)]
+  \item $\lVert v\rVert\geq 0$
+  \item $\lVert v\rVert=0 \quad \iff \quad v=0$
+  \item $\lVert \alpha v\rVert= |\alpha| \cdot \lVert v\rVert$
+  \item $\lVert v+u\rVert \leq \lVert v\rVert + \lVert u\rVert$
+\end{enumerate}
+\end{defn}
+
+\begin{defn}(Semi-Norm)
+A \emph{semi-norm} is a norm \emph{except} for Condition (ii). That is,
+there can exist nonzero vectors that the semi-norm maps to zero.
+\end{defn}
+
+\begin{ex}(Semi-Norm)
+Suppose we take real vector space $V=\Rn$. Then define
+\begin{align*}
+  \lVert x\rVert = \sum_{i=1}^m |x_i|
+  \qquad m < n
+\end{align*}
+So it just adds up the absolute value of the first $m<n$ entries only.
+\end{ex}
+
+\begin{ex}
+Here are a few classic norms where vectors $x\in \Rn$:
+\begin{enumerate}
+\item $\lVert x\rVert_\infty = \max_{1\leq i\leq n} |x_i|$
+\item $\lVert x\rVert_2 = \left(\sum_{i=1}^n |x_i|^2\right)^{\frac{1}{2}}$
+\item $\lVert x\rVert_p = \left(\sum_{i=1}^n
+  |x_i|^p\right)^{\frac{1}{p}}$ for $p\in[1,\infty]$, not necessarily an
+  integer.
+\end{enumerate}
+\end{ex}
+
+\begin{prop}\emph{(Norms are Continuous)}
+Let $\lVert \,\cdot\,\rVert$ be a norm on some complex vector space.
+That norm is a (Lipschitz) continuous function.
+\end{prop}
+\begin{proof}
+Notice that
+\begin{align*}
+    \big\lvert \lVert x \rVert - \lVert y\rVert \big\rvert
+    \leq
+    \big\lvert \lVert x - y + y\rVert - \lVert y\rVert \big\rvert
+    \leq
+    \big\lvert \lVert x - y \rVert + \lVert y\rVert - \lVert y\rVert \big\rvert
+    \leq
+    \lVert x - y \rVert
+\end{align*}
+So given $\varepsilon>0$, choosing $x$ and $y$ sufficiently close such
+that $\lVert x-y\rVert<\varepsilon$ implies that the distance between
+the function evaluated at $x$ and $y$ (i.e.
+$\lVert x\rVert- \lVert y\rVert$) is sufficiently small.
+\end{proof}
+
+\begin{defn}(Normed Vector Space)
+We call a complex (or real) vector space $V$ equipped with a norm a
+\emph{normed vector space}.
+\end{defn}
+
+
+\begin{defn}(Banach Space)
+We use the term \emph{Banach Space} for a a \emph{complete} normed
+vector space, i.e. all Cauchy series are convergent using the metric
+defined by the norm:
+\begin{align*}
+  d(x,y) = \lVert x-y\rVert
+\end{align*}
+\end{defn}
+
+
+\clearpage
+\subsection{Inner Product Spaces and Hilbert Spaces}
+
+\begin{defn}(Inner Product)
+Given complex vector space $V$, an \emph{inner product} is a function
+$\langle \cdot, \cdot \rangle: V\times V \ra \C$ such that, for all
+$u,v,z\in V$ and $a,b\in\C$, it satisfies
+\begin{enumerate}[label=(\roman*)]
+  \item $\langle v,v \rangle \geq 0$
+  \item $\langle v,v\rangle =0 \iff v=0$.
+  \item $\langle u,v\rangle = \overline{\langle v,u\rangle}$
+  \item $\langle au + bv, z\rangle
+    = a\langle u, z\rangle + b\langle v, z\rangle$
+\end{enumerate}
+In the special case that $V$ is a \emph{real} vector space, everything
+is the same except that we can drop the complex conjugation on the RHS
+of condition (iii).
+\end{defn}
+
+\begin{ex}
+We can define the usual inner product on complex vector space $\Cn$:
+\begin{align*}
+  \langle x,y\rangle = \sum_{i=1}^n x_i \bar{y}_i
+\end{align*}
+\end{ex}
+
+\begin{prop}\emph{(Induced Norm)}
+Given inner product $\langle \cdot, \cdot \rangle: V\times V \ra \C$ on
+complex vector space $V$, there is an \emph{induced norm} that can be
+defined as
+\begin{align*}
+  \lVert x\rVert = \sqrt{\langle x, x\rangle}
+\end{align*}
+From now on, when you see the norm $\lVert \cdot \rVert$ in this
+subsection, it will refer to the induced norm.
+\end{prop}
+\begin{proof}
+To show $\lVert x \rVert =\sqrt{\langle x,x\rangle}$ is indeed a norm,
+we must show it satisfies all of the properties.
+\begin{enumerate}[label=(\roman*)]
+  \item By Condition (i) of inner products, $\langle x,x \rangle\geq 0$;
+    therefore $\lVert x\rVert = \sqrt{\langle x,x \rangle} \geq 0$.
+  \item By Condition (ii) of inner products, $\langle x,x \rangle= 0$ if
+    and only if $x=0$. Therefore, $\lVert x\rVert = \sqrt{\langle x,x
+    \rangle} = 0$ if and only if $x=0$.
+  \item Using Linearity Condition (iv),
+      $\lVert \alpha x\rVert
+      = \sqrt{\langle \alpha x, \alpha x\rangle}
+      = \sqrt{\alpha^2\langle x, x \rangle}
+      = |\alpha|\sqrt{\langle x, x \rangle}
+      = |\alpha|\, \lVert x\rVert$
+  \item We will again use Condition (iv) linearity along with Condition
+    (iii) symmetry:
+    \begin{align*}
+      \lVert x+y\rVert^2
+      =
+      \langle x+y, x+y\rangle
+      &=
+      \langle x, x\rangle
+      +
+      \langle x, y\rangle
+      +
+      \langle y, x\rangle
+      +
+      \langle y, y\rangle
+      \\
+      &=
+      \lVert x\rVert^2
+      +
+      \langle x, y\rangle
+      +
+      \overline{\langle x, y\rangle}
+      +
+      \lVert y\rVert^2
+      \\
+      &=
+      \lVert x\rVert^2
+      +
+      2\Re\big( \langle x, y\rangle\big)
+      +
+      \lVert y\rVert^2
+      \\
+      &\leq
+      \lVert x\rVert^2
+      +
+      2\left\lvert\Re\big( \langle x, y\rangle\big)\right\rvert
+      +
+      \lVert y\rVert^2
+      \\
+      \text{Since $|\Re(a+bi)|=|a| \leq \left\lvert\sqrt{a^2+b^2}\right\rvert$}\qquad\quad
+      &\leq
+      \lVert x\rVert^2
+      +
+      2\left\lvert\langle x, y\rangle\right\rvert
+      +
+      \lVert y\rVert^2
+    \end{align*}
+    Next, apply Cauchy-Schwartz (derived in the next subsection) to the
+    middle term:
+    \begin{align*}
+      \lVert x+y\rVert^2
+      &\leq
+      \lVert x\rVert^2
+      +
+      2\lVert x\rVert\cdot\lVert y\rVert
+      +
+      \lVert y\rVert^2
+      =
+      \left(
+      \lVert x\rVert
+      +
+      \lVert y\rVert
+      \right)^2
+      \\
+      \implies\quad
+      \lVert x+y\rVert
+      &\leq
+      \lVert x\rVert
+      +
+      \lVert y\rVert
+    \end{align*}
+
+\end{enumerate}
+\end{proof}
+
+
+\begin{defn}(Inner Product Space)
+We use the term \emph{inner product space} for a complex (or real)
+vector space $V$ that is equipped with an inner product.
+\end{defn}
+
+\begin{defn}(Hilbert Space)
+We use the term \emph{Hilbert Space} for an inner product space where
+the \emph{induced norm} $\lVert x\rVert=\sqrt{\langle x,x\rangle}$ gives
+us a metric
+\begin{align*}
+  d(x,y) = \lVert x-y\rVert
+  = \sqrt{\langle x-y,\; x-y\rangle}
+\end{align*}
+under which the underlying vector space is \emph{complete}.  Therefore,
+all Hilbert are Banach spaces---complete under metric $d$ above.
+\end{defn}
+
+\begin{lem}
+Let $\{x_n\}$ be a sequence on an inner product space which has induced
+norm $\lVert\,\cdot\,\rVert$. Then
+\begin{align*}
+  \lVert x_n - x \rVert \ra 0
+  \quad\implies\quad
+  \lVert x_n \rVert \ra
+  \lVert x \rVert
+\end{align*}
+\end{lem}
+\begin{proof}
+This follows from the triangle inequality because
+\begin{align*}
+  \lVert x_n - x + x\rVert
+  \leq
+  \lVert x_n - x\rVert + \lVert x\rVert
+  \quad\implies\quad
+  0 \leq
+  \big\lvert
+  \lVert x_n\rVert - \lVert x\rVert
+  \big\rvert
+  \leq
+  \lVert x_n - x\rVert
+  \ra 0
+\end{align*}
+\end{proof}
+
+\begin{prop}\emph{(Continuity of the Inner Product)}
+Let $\{x_n\}$ and $\{y_n\}$ be sequence on an inner product space which
+has induced norm $\lVert\,\cdot\,\rVert$. Then
+\begin{align*}
+  \begin{rcases}
+    \lVert x_n -x \rVert \ra 0 \\
+    \lVert y_n -y \rVert \ra 0 \\
+  \end{rcases}
+  \quad\implies\quad
+  \langle x_n, y_n\rangle
+  \ra
+  \langle x, y\rangle
+\end{align*}
+\end{prop}
+\begin{proof}
+We want to prove the following goes to zero:
+\begin{align*}
+  \big\lvert
+  \langle x_n, y_n\rangle
+  -
+  \langle x, y\rangle
+  \big\rvert
+  &=
+  \big\lvert
+  \langle x_n, y_n-y\rangle
+  + \langle x_n, y\rangle
+  - \langle x, y\rangle
+  \big\rvert
+  \\
+  &=
+  \big\lvert
+  \langle x_n, y_n-y\rangle
+  + \langle x_n-x, y\rangle
+  \big\rvert
+\end{align*}
+Next, we apply Cauchy-Schwarz, which will be proved in the next
+subsection, to get
+\begin{align*}
+  \big\lvert
+  \langle x_n, y_n\rangle
+  -
+  \langle x, y\rangle
+  \big\rvert
+  &=
+  \big\lvert
+  \langle x_n, y_n-y\rangle
+  + \langle x_n-x, y\rangle
+  \big\rvert
+  \\
+  &\leq
+  \lVert x_n \rVert
+  \cdot
+  \lVert y_n - y\rVert
+  +
+  \lVert x_n -x\rVert
+  \cdot
+  \lVert y\rVert
+\end{align*}
+By the last lemma, $\lVert x_n\rVert\ra \lVert x\rVert$ and, by
+assumption both $\lVert y_n - y\rVert$ and $\lVert x_n - y\rVert$
+converge to zero, the whole object converges to zero.
+\end{proof}
+
+
+\begin{prop}\emph{(Parallelogram Law and Polarization Identity)}
+Let $\lVert\,\cdot\,\rVert$ be the induced norm from some inner product
+over a complex vector space.
+Then we have the \emph{parallelogram law}
+\begin{align*}
+  \lVert x+y\rVert^2 +
+  \lVert x-y\rVert^2 =
+  2\lVert x \rVert^2
+  + 2\lVert y \rVert^2
+\end{align*}
+If the vector space is \emph{real}, then we also have the
+\emph{polarization identity}
+\begin{align*}
+  \lVert x+y\rVert^2 +
+  \lVert x-y\rVert^2 = 4\langle x,y \rangle
+\end{align*}
+\end{prop}
+\begin{rmk}
+Though this might appear at first glance to be a proposition about norms
+in general, it is not. It holds \emph{only} for norms induced by an
+inner product.
+\end{rmk}
+\begin{proof}
+First the parallelogram law:
+\begin{align*}
+  \lVert x+y\rVert^2 +
+  \lVert x-y\rVert^2
+  &=
+  \langle x+y, x+y\rangle
+  + \langle x-y, x-y\rangle \\
+  &=
+  \langle x, x\rangle
+  + \langle x, y\rangle
+  + \langle y, x\rangle
+  + \langle y, y\rangle \\
+  &\qquad
+  + \langle x, x\rangle
+  - \langle x, y\rangle
+  - \langle y, x\rangle
+  + \langle y, y\rangle \\
+  &=
+  2\langle x, x\rangle
+  + 2\langle y, y\rangle \\
+  &=
+  2\lVert x\rVert
+  + 2\lVert y\rVert
+\end{align*}
+And now for the polarization identity, recalling that this assumes we
+have a \emph{real} vector space so that
+$\langle x,y\rangle = \langle y,x\rangle$.
+\begin{align*}
+  \lVert x+y\rVert^2 -
+  \lVert x-y\rVert^2
+  &=
+  \langle x+y, x+y\rangle
+  - \langle x-y, x-y\rangle \\
+  &=
+  \langle x, x\rangle
+  + \langle x, y\rangle
+  + \langle y, x\rangle
+  + \langle y, y\rangle \\
+  &\qquad
+  - \langle x, x\rangle
+  + \langle x, y\rangle
+  + \langle y, x\rangle
+  - \langle y, y\rangle \\
+  &=
+  4\langle x, y\rangle
+\end{align*}
+
+\end{proof}
+
+
+\clearpage
+\subsection{Cauchy-Schwarz}
+
+\begin{thm}
+\label{thm.cauchyscwarz}
+\emph{(Cauchy-Schwartz Inequality)}
+Given any inner product space, let
+$\lVert x\rVert := \sqrt{\langle x,x\rangle}$ represent the induced
+norm.  Then
+\begin{align*}
+  \lvert \langle x,y\rangle\rvert \leq \lVert x\rVert\cdot\lVert y\rVert
+\end{align*}
+The inequality becomes an equality if and only if
+\begin{align*}
+  x = \frac{\langle x,y\rangle}{\lVert y\rVert}y
+\end{align*}
+\end{thm}
+\begin{proof}
+Start by assuming that $|\alpha|=1$ and that $\alpha\in\mathbb{C}$. Then
+define
+\begin{align*}
+  Q_\alpha(t) = \lVert x - t\alpha y\rVert^2
+\end{align*}
+By the definition of $\lVert \cdot\rVert$, it's clear that
+$Q_\alpha(t)\geq 0$ for all $t\in\mathbb{R}$. Then let's use the
+properties of the inner product to write
+\begin{align}
+    Q_\alpha(t) &= \langle x -t\alpha y,\; x -t\alpha y\rangle \notag \\
+    &= \lVert x\rVert^2 + t^2 \lVert y\rVert^2
+    - t\alpha \overline{\langle x,y\rangle}
+    - t\bar{\alpha} {\langle x,y\rangle} \label{cauchyhold}
+\end{align}
+Without loss of generality, assume $\langle x,y\rangle\neq 0$, otherwise
+trivial. Now since $\alpha$ was only restricted to be such that
+$|\alpha|=1$, we can choose it to be whatever we want, and use the fact
+that the Equality \ref{cauchyhold} \emph{must} be true for all
+$|\alpha|=1$ and $t\in\mathbb{R}$, given the definition fo the inner
+product. So let
+\begin{align*}
+    \alpha = \frac{\langle x,y\rangle}{|\langle x,y\rangle|}
+    \quad\implies\quad
+    Q_\alpha(t) &= \lVert x\rVert^2 + t^2 \lVert y\rVert^2
+    - t\frac{\langle x,y\rangle\overline{\langle x,y\rangle}}{\langle x,y\rangle}
+    - t\frac{\overline{\langle x,y\rangle}{\langle x,y\rangle}}{\langle x,y\rangle}  \\
+    &= \lVert x\rVert^2 + t^2 \lVert y\rVert^2
+    -2t |\langle x,y\rangle|
+\end{align*}
+Next, we minimize the function over $t$. The first order conditions to
+that minimization are
+\begin{align*}
+  0 &= \frac{d}{dt}[Q_\alpha(t)]
+    = 2t \lVert y\rVert^2 -2 |\langle x,y\rangle|
+  \qquad\implies\qquad
+  t = \frac{|\langle x,y\rangle|}{\lVert y\rVert^2}
+\end{align*}
+We will use this as our $t$ in $Q_\alpha(t)$ and simplify:
+\begin{align*}
+  Q_\alpha\left(
+  \frac{|\langle x,y\rangle|}{\lVert y\rVert^2}
+  \right)
+  &= \lVert x\rVert^2 +
+  \left(\frac{|\langle x,y\rangle|}{\lVert y\rVert^2}\right)^2
+  \lVert y\rVert^2
+  -2
+  \left(\frac{|\langle x,y\rangle|}{\lVert y\rVert^2}\right)
+  |\langle x,y\rangle| \\
+  &= \lVert x\rVert^2
+  - \frac{|\langle x,y\rangle|^2}{\lVert y\rVert^2}
+\end{align*}
+Recalling that $Q_\alpha(t)\geq 0$ for all $t\in\R$, we can use this
+inequality for the RHS of the above expression to conclude
+\begin{align*}
+  0 &\leq
+   \lVert x\rVert^2
+  - \frac{|\langle x,y\rangle|^2}{\lVert y\rVert^2} \\
+  \implies\quad
+  |\langle x,y\rangle| &\leq
+   \lVert x\rVert \cdot \lVert y\rVert
+\end{align*}
+\end{proof}
+
+
+\clearpage
+\subsection{Orthogonality and Projections}
+
+\begin{defn}(Angle)
+Given \emph{any} real inner product space, define the \emph{angle}
+between any two non-zero elements as
+\begin{align*}
+  \theta = \cos^{-1}\left(
+  \frac{\langle x,y \rangle}{\lVert x\rVert \cdot \lVert y \rVert}
+  \right)
+\end{align*}
+
+\end{defn}
+
+\begin{defn}(Orthogonal)
+We say that two vectors, $v,u\in V$ \emph{orthogonal} if $\langle
+u,v\rangle=0$ or, equivalently, their angle is $\theta=\pi/2$. We denote
+orthogonality by $u\perp v$.
+\end{defn}
+
+\begin{defn}(Orthogonal and Orthonormal Family)
+We call a collection of vectors $\{v_i\}$ an \emph{orthogonal family} if
+$v_i\perp v_j$ for all $i\neq j$. We call the family \emph{orthonormal}
+if, in addition to being an orthogonal family, $\lVert v_i\rVert=1$ for
+all $i$.
+\end{defn}
+
+\begin{thm}
+\label{pythag}
+\emph{(Pythagorean Relation)} Given $x\perp y$,
+\begin{align*}
+    \lVert x + y\rVert^2 = \lVert x\rVert^2 + \lVert y \rVert^2
+\end{align*}
+More generally, given an orthonormal family $\{u_1,\ldots,u_N\}$:
+\begin{align*}
+  \left\lVert \sum_{i=1}^N c_i u_i \right\rVert^2
+  = \sum_{i=1}^N |c_i|^2
+\end{align*}
+\end{thm}
+\begin{proof}
+Simply write out
+\begin{align*}
+  \lVert x + y\rVert^2 =
+  \langle x + y, x + y\rangle
+  =
+  \langle x , x \rangle
+  +
+  \langle x , y \rangle
+  +
+  \langle y , x \rangle
+  +
+  \langle y , y \rangle
+\end{align*}
+Since $x\perp y$, we know that $\langle x,y \rangle = \langle y,x
+\rangle =0$, hence
+\begin{align*}
+  \lVert x + y\rVert^2 =
+  \langle x , x \rangle
+  +
+  \langle y , y \rangle
+  =
+  \lVert x\rVert^2 + \lVert y\rVert^2
+\end{align*}
+\end{proof}
+
+
+
 
 \clearpage
 \section{Differentiability}
