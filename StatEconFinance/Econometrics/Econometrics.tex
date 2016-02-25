@@ -12656,6 +12656,303 @@ which is also the LIML estimator.
 
 
 
+\clearpage
+\section{Multiple Equation Endogenous Regressor Model}
+
+\subsection{Model Assumptions}
+
+\begin{defn}(Model Assumptions)
+Each of the $N$ observations shows up in $M$ equations.
+For each equation, we have a dependent variable $y_{mn}$, a vector of
+potentially endogenous regressors $\bsx_{mn}\in K_m$, and a vector of
+predetermined instruments $\bsz_{mn}\in L_m$.
+For a given equation $m$, $\bsx_{mn}$
+and $\bsz_{mn}$ might have elements in common. Also
+\emph{across} equations, elements might be shared by the different
+regressor and instrument vectors. We use $K$ and $L$ to denote
+$\sum_{m=1}^M K_m$ and $\sum_{m=1}^M L_m$, respectively.
+\\
+\\
+Model assumptions:
+\begin{enumerate}
+  \item \emph{Linearity}:
+    For equation equation,
+    $y_{mn} = \bsx_{mn}' \bsbeta_m + \varepsilon_{mn}$
+    where $\bsx_{mn},\bsbeta_m\in\R^{K_m}$.
+
+    For a given $n$, we allow \emph{interequation} correlation
+    $\E[\varepsilon_{m_1,n}\varepsilon_{m_2,n}]>0$ (also called
+    \emph{contemporaneous}, when $n$ is a time index).
+    We assume no \emph{cross-equation restrictions} on coefficients,
+    i.e. we do not assume $\beta_{m_1,k_1} = \beta_{m_2,k_2}$ for
+    two equations $m_1\neq m_2$ and entries $k_1$ and $k_2$ in the
+    ceofficient vectors, respectively.
+
+  \item \emph{Ergodic Stationarity}:
+    Joint stationarity and ergodicity for the unique, nonconstant
+    elelements of
+    $(y_{1n},\ldots,y_{Mn},\bsz_{1n},\ldots,\bsz_{Mn},\bsx_{1n}\ldots,\bsx_{Mn})$.
+    %\begin{align*}
+    %\end{align*}
+    Implied by iid, but weaker.
+
+  \item \emph{Orthogonality Conditions/Predetermined Instruments}:
+    For each equation, $L_m\times 1$ vector of instruments $\bsz_{mn}$
+    is predetermined (uncorrelated with $\varepsilon_{mn}$):
+    \begin{align*}
+      \E[\bsz_{mn} (y_{mn} - \bsx'_{mn} \bsbeta_m)]
+        =\E[\bsz_{mn}\varepsilon_{mn}]= \bso
+      \qquad m = 1,\ldots,M
+    \end{align*}
+    This can also be expressed compactly by stacking the moment
+    conditions and parameters:
+    \begin{align}
+      \bso &=
+      \begin{bmatrix}
+        \E[\bsz_{1n}\varepsilon_{1n}] \\
+        \vdots\\
+        \E[\bsz_{Mn}\varepsilon_{Mn}] \\
+      \end{bmatrix}
+      =
+      \begin{bmatrix}
+        \E\big[\bsz_{1n}(y_{1n}-\bsx_{1n}'\bsbeta_1)\big] \\
+        \vdots\\
+        \E\big[\bsz_{Mn}(y_{Mn}-\bsx_{Mn}'\bsbeta_M)\big] \\
+      \end{bmatrix}
+      \in \R^{L}
+      \label{multipleortho}
+    \end{align}
+    Note that we only assume \emph{within}-equation orthogonality, not
+    \emph{cross}-equation orthogonality, so it is indeed possible that
+    $\E[\bsz_{m_1,n}\varepsilon_{m_2,n}]\neq\bso$ for
+    $m_1\neq m_2$.\footnote{%
+      Of course, if a variable is \emph{common} to both $m_1$ and $m_2$,
+      we will trivially have cross-equation orthogonality.
+    }
+
+  \item \emph{Rank Condition for Identification}:
+    For each equation $m$,
+    $\E[\bsz_{mn}\bsx_{mn}']\in\R^{L_m \times K_m}$ is finite with full
+    column rank $K_m$
+
+  \item \emph{Martingale Difference Sequence}:
+    The stacked vector
+    \begin{align*}
+      \begin{bmatrix}
+        z_{1n}\varepsilon_{1n} & \cdots &
+        z_{Mn}\varepsilon_{Mn}
+      \end{bmatrix}'
+        \in \R^L
+    \end{align*}
+    is a joint martingale difference sequence with finite, nonsigular
+    second moment matrix.
+\end{enumerate}
+\end{defn}
+
+\clearpage
+\subsection{Multiple Equation GMM Estimator}
+\label{subsec:EndogenousRegressorMultipleGMM}
+
+\begin{defn}(GMM Estimator, Overidentified Case)
+Take Assumptions 1-5 above. The orthogonality conditions state that
+\begin{align*}
+  \begin{bmatrix}
+    \E[\bsz_{1n}\varepsilon_{1n}] \\
+    \vdots\\
+    \E[\bsz_{Mn}\varepsilon_{Mn}]
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    \E[\bsz_{1n}(y_{1n}-\bsx_{1n}'\bsbeta_1)] \\
+    \vdots\\
+    \E[\bsz_{Mn}(y_{Mn}-\bsx_{Mn}'\bsbeta_M)] \\
+  \end{bmatrix}
+  &=
+  \bso
+\end{align*}
+This can also be equivalently written as
+\begin{align*}
+  \bsg(\bsbeta) &= \bso \\
+  \text{where}\quad
+  \bsg(\bsbeta) &=
+  \begin{bmatrix}
+    \E[\bsz_{1n}y_{1n}] \\
+    \vdots\\
+    \E[\bsz_{Mn}y_{Mn}] \\
+  \end{bmatrix}
+  -
+  \begin{bmatrix}
+    \E[\bsz_{1n}\bsx_{1n}'] &  &\\
+    & \ddots & \\
+    && \E[\bsz_{Mn}\bsx_{Mn}'] \\
+  \end{bmatrix}
+  \begin{bmatrix}
+    \bsbeta_1 \\
+    \vdots \\
+    \bsbeta_M \\
+  \end{bmatrix} \in \R^L
+\end{align*}
+So then construct the sample analog of $\bsg$, which we will try to get
+close to zero:
+\begin{align*}
+  \bsg_N(\bsb) &=
+  \begin{bmatrix}
+    \frac{1}{N}\sumnN \bsz_{1n}y_{1n} \\
+    \vdots\\
+    \frac{1}{N}\sumnN\bsz_{Mn}y_{Mn} \\
+  \end{bmatrix}
+  -
+  \begin{bmatrix}
+    \frac{1}{N}\sumnN\bsz_{1n}\bsx_{1n}' &  &\\
+    & \ddots & \\
+    && \frac{1}{N}\sumnN\bsz_{Mn}\bsx_{Mn}' \\
+  \end{bmatrix}
+  \begin{bmatrix}
+    \bsb_1 \\
+    \vdots \\
+    \bsb_M \\
+  \end{bmatrix} \\
+  &= \bss_{\bsz\bsy} - \bsS_{\bsz\bsx}\bsb
+\end{align*}
+We want to construct the GMM estimator (ignoring scalar constants like
+$N$ and $\frac{1}{N}$) for some weighting matrix
+$\bshatW\in \R^{L\times L}$:
+\begin{align*}
+  \bshatbeta(\bshatW)
+  &= \argmin_{\bsb} \; \bsg_N(\bsb)' \, \bshatW \, \bsg_N(\bsb) \\
+  &= \argmin_{\bsb} \;
+    \big(\bss_{\bsz\bsy} - \bsS_{\bsz\bsx}\bsb\big)'
+    \bshatW
+    \big(\bss_{\bsz\bsy} - \bsS_{\bsz\bsx}\bsb\big)
+\end{align*}
+%Simplifying and removing constant terms that don't depend upon $\bsb$,
+%we get
+%\begin{align*}
+  %\bshatbeta(\bshatW)
+  %&= \argmin_{\bsb} \;
+    %-
+    %\bss_{\bsz\bsy}'
+    %\bshatW
+    %\bsS_{\bsz\bsx}\bsb
+    %- \bsb'\bsS_{\bsz\bsx}'
+    %\bshatW
+    %\bss_{\bsz\bsy}
+    %+ \bsb'\bsS_{\bsz\bsx}'
+    %\bshatW
+    %\bsS_{\bsz\bsx}\bsb
+%\end{align*}
+From the first order conditions, we get
+\begin{align*}
+  \bshatbeta(\bshatW) &=
+  \big(\bsS_{\bsz\bsx}' \bshatW \bsS_{\bsz\bsx}\big)^{-1}
+    \bsS_{\bsz\bsx}' \bshatW \bss_{\bsz\bsy}
+\end{align*}
+\end{defn}
+
+\begin{prop}\emph{(Sampling Error)}
+Sub $\bsy = \bsX\bsbeta +\bsvarepsilon$ into the expression for
+$\bshatbeta(\bshatW)$ to get
+\begin{align*}
+  %\bshatbeta(\bshatW) &=
+  %\left(\bsX'\bsZ\bshatW \bsZ'\bsX\right)^{-1}\bsX'\bsZ\bshatW\bsZ'
+  %\left(\bsX\bsbeta +\bsvarepsilon\right) \\
+  %\implies\quad
+  \bshatbeta(\bshatW) - \bsbeta
+  &=
+  \left(\bsX'\bsZ\bshatW
+  \bsZ'\bsX\right)^{-1}\bsX'\bsZ\bshatW\bsZ'\bsvarepsilon \\
+  &=
+  \left[
+    \left(\frac{1}{N} \sumnN \bsx_n \bsz_n'\right)
+    \bshatW
+    \left(\frac{1}{N} \sumnN \bsz_n\bsx_n' \right)
+  \right]^{-1}
+  \left[
+    \left(\frac{1}{N} \sumnN \bsx_n \bsz_n'\right)
+    \bshatW
+    \left(\frac{1}{N} \sumnN \bsz_n \varepsilon_n \right)
+  \right]
+\end{align*}
+\end{prop}
+
+
+\begin{prop}\emph{(Asymptotic Properties)}
+\label{prop:gmmasymptoticsmultiple}
+From the sampling error expression, we get
+\begin{enumerate}[label=(\roman*)]
+  \item Consistency: $\bshatbeta(\bshatW)\pto \bsbeta$
+  \item Asymptotic Normality: Recalling that $\bshatW\pto \bsW$
+    applying LLN, CLT, and Slutsky gives
+    \begin{align*}
+      \sqrt{N}\left(\bshatbeta(\bshatW) - \bsbeta\right)
+      \quad &\dto \quad
+      N(0,\bsP\bsS\bsP') \\
+      \text{where}\quad
+      \bsP &=
+      %\bigg(
+      \big(
+        \E[\bsx_n\bsz_n']
+        \bsW
+        \E[\bsz_n\bsx_n']
+      \big)^{-1}
+      \E[\bsx_n\bsz_n']
+      \bsW
+      %\bigg)
+      \\
+      \bsS &=
+        \E[\varepsilon_n^2 \bsz_n\bsz_n']
+      %\cdot
+      %\big[
+      %N\big(0,\;
+      %\underbrace{%
+        %\E[\varepsilon_n^2 \bsz_n\bsz_n']
+      %}_{\bsS}
+      %\big)
+      %\big]
+    \end{align*}
+    We can construct a consistent estimator of the asymptotic variance:
+    \begin{align*}
+      \bshatP\bshatS\bshatP' \pto \bsP\bsS\bsP'
+      \quad\text{where}\quad
+      \bshatP &=
+      \left[
+      \left(
+      \frac{1}{N}
+        \sumnN \bsx_n\bsz_n'
+      \right)
+      \bshatW
+      \left(
+      \frac{1}{N}
+        \sumnN \bsz_n\bsx_n'
+      \right)
+      \right]^{-1}
+      \left(
+      \frac{1}{N}
+        \sumnN \bsx_n\bsz_n'
+      \right)
+      \bshatW \\
+      &= N \cdot [(\bsX'\bsZ)\bshatW(\bsZ'\bsX)]^{-1}(\bsX'\bsZ)\bshatW
+      \\
+      \bshatS &=
+      \frac{1}{N}\sumnN e_n \bsz_n\bsz_n' \\
+      \text{where}\quad
+      e_n &= y_n - \bsx_n'\bshatbeta(\bshatW)
+    \end{align*}
+\end{enumerate}
+\end{prop}
+
+\begin{prop}\emph{(Consistent Estimation of Error Variance)}
+Using $\bshatbeta(\bshatW)$, a consistent estimator of $\bsbeta$, we can
+obtain a consistent estimator of the error variance
+\begin{align*}
+  \frac{1}{N} \sumnN e_n^2
+  =
+  \frac{1}{N} \sumnN \big(y_n - \bsx_n'\bshatbeta(\bshatW)\big)^2
+  \quad\pto\quad
+  \E[\varepsilon_n^2]
+\end{align*}
+\end{prop}
+
 
 
 
