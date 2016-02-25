@@ -2408,6 +2408,77 @@ Expression~\ref{relsigal-chain}. Thus, countable additivity for $\mu_E$
 will follow.
 \end{proof}
 
+\clearpage
+\subsection{Dirac, Discrete, and (Absolutely) Continuous Measure}
+
+\begin{defn}(Dirac Measure)
+Given set $\Omega$, pick some element $\omega\in\Omega$. Then the
+\emph{Dirac measure} $\delta_\omega$ for that element is defined as
+\begin{align*}
+  \delta_\omega: 2^\Omega &\ra \{0,1\} \\
+  \delta_\omega[A]
+  &\mapsto
+  \begin{cases}
+    1 & \omega\in A\\
+    0 & \omega\not\in A\\
+  \end{cases}
+\end{align*}
+In words, the Dirac measure $\delta_\omega$ will assign a value of one
+to any $A\in2^\Omega$ that contains $\omega$, zero otherwise.
+\end{defn}
+
+\begin{defn}(Discrete, Continuous, Absolutely Continuous Meausures)
+Let $\mu$ be a measure on $\Omega=\R^d$. Then we call the measure $\mu$
+\begin{itemize}
+  \item \emph{Discrete}: If we can express $\mu$ as a sum of Dirac
+    measures
+    \begin{align*}
+      \mu[A] = \sum\ninf p_n \delta_{c_n}[A]
+    \end{align*}
+    for $c_1,c_2,\ldots\in\Omega=\R^d$ and $p_1,p_2,\ldots\geq 0$
+
+  \item \emph{Continuous}: If the following
+    \begin{align*}
+      \mu\big[
+        (a_1,b_1] \times\cdots\times (a_d,b_d]
+      \big]
+    \end{align*}
+    is a continuous function of $b\in \R^d$
+
+  \item \emph{Absolutely Continuous}: If there exists a Borel-function
+    $f:\R^d\ra\R$ called a \emph{density} such that
+    \begin{align*}
+      \mu\big[
+        (a_1,b_1] \times\cdots\times (a_d,b_d]
+      \big]
+      =
+      \int_{a_1}^{b_1}
+      \cdots
+      \int_{a_d}^{b_d}
+      f(x_1,\ldots,x_d)\;
+      dx_1\;\cdots \;dx_d
+    \end{align*}
+    Recall that $f$ is a Borel function if
+    $f^{-1}(A) \in \sB(\R)^{\otimes d}$ for any open $A\subseteq\R$.
+    This is stronger than a continuous measure; it rules out weird,
+    intractable cases.
+\end{itemize}
+\end{defn}
+
+\begin{prop}
+If $f_1,\ldots,f_d$ are densities on $\R$ then
+\begin{align*}
+  f(x) = f_1(x_1) \cdots f_d(x_d)
+\end{align*}
+is a density in $\R^d$ that implies a corresponding measure
+\begin{align*}
+  \mu = \mu_1\otimes \cdots \otimes \mu_d
+\end{align*}
+\end{prop}
+
+
+
+\clearpage
 \subsection{Extension Theorems}
 
 Classic example for why extension theorems are important: CDFs give you
@@ -2762,12 +2833,19 @@ A measurable function $X:(\Omega,\sF)\ra (\bar{\R},\sB(\bar{\R}))$ is
 called an \emph{extended random variable}.
 \end{defn}
 
+\begin{defn}(Random Vector)
+A \emph{random vector} on a probability space $(\Omega,\sF,P)$ is a
+vector $(X_1 \; \cdots \; X_d)$ where $X_1,\ldots,X_d$ are all random
+variables. In other words, it is a measurable mapping
+$X:(\Omega,\sF)\ra(\R^d,\sB(\R)^{\otimes d})$.
+\end{defn}
+
 We'll have more to say about random variables and their distributions
-later, after we introduce measures. But now, we just want to prove some
-general results about (extended) random variables, a.k.a. (extended)
-real-valued measurable functions. And before doing so, we just recall
-the standard shorthand notation that will be used extensively in this
-subsection and in later subsections dealing with random variables:
+later. But now, we just want to prove some general results about
+(extended) random variables, a.k.a. (extended) real-valued measurable
+functions. And before doing so, we just recall the standard shorthand
+notation that will be used extensively in this subsection and in later
+subsections dealing with random variables:
 \begin{align*}
   \{f\leq x\} = \{\omega\in\Omega\;|\;f(\omega)\leq x\}
   = f^{-1}\big((-\infty,x]\big)
@@ -3822,6 +3900,45 @@ we'll be able to use the result all of the time.
 \end{rmk}
 
 \clearpage
+\subsection{Push Forward Measure and Change of Variables}
+
+\begin{defn}(Push Forward Measure)
+Suppose we have $f:\Omega\ra E$, a measurable function between measure
+space $(\Omega,\sF,\mu)$ and measurable space $(E,\sE)$. Then the push
+forward measure denoted $\mu \circ f^{-1}$ or $\mu_f$ is defined
+\begin{align*}
+  \mu_f[A] := \mu[f^{-1}(A)]
+  \qquad\forall A \in\sE
+\end{align*}
+\end{defn}
+\begin{rmk}
+The push-forward measure is so named because we don't have a measure
+defined for $(E,\sE)$, but we \emph{induce} one by pushing forward the
+measure defined for measurable $(\Omega,\sF)$ to measurable space
+$(E,\sE)$.
+\end{rmk}
+
+\begin{prop}\emph{(Change of Variables)}
+Suppose we have $f:\Omega\ra E$, a measurable function between measure
+space $(\Omega,\sF,\mu)$ and measurable space $(E,\sE)$, which together
+imply push forward measure $\mu \circ f^{-1}$ or $\mu_f$. Then for any
+$\sE$-measurable function $g:(E,\sE)\ra(G,\sG)$, we have
+\begin{align*}
+  \int_{f^{-1}(A)} g\circ f \; d\mu
+  =
+  \int_A g\;d\mu_f
+  \qquad A \in \sE
+\end{align*}
+Expressing these integrals in more verbose, explicit notation
+\begin{align*}
+  \int_{f^{-1}(A)} g(f(\omega)) \; \mu(d\omega)
+  =
+  \int_A g(x)\;\mu_f(dx)
+  \qquad A \in \sE
+\end{align*}
+\end{prop}
+
+\clearpage
 \subsection{Radon-Nikodym}
 
 \begin{defn}(Absolutely Continuous and Equivalent Measures)
@@ -3910,7 +4027,7 @@ denote this function by $\frac{d\mu_2}{d\mu_1}$.
 \end{thm}
 
 
-\subsection{Inequalities}
+\subsection{Integral Inequalities}
 
 \begin{prop}{\emph{(Jensen's Inequality)}}
 Let $g$ be a function and let $X$ be some random variable. Then
@@ -4959,7 +5076,7 @@ for it? We'll first define a cumulative distribution function (CDF) and
 show that given a probability measure on $(\R,\sB(\R))$, you can
 construct a CDF. Then, we'll show that the \emph{converse} is also true:
 Any function satisfying the necessary properties to be called a CDF
-\emph{implies} a probability measure $P_F$ on $(\R,\sB(\R))$. Moreover,
+\emph{implies} a probability measure on $(\R,\sB(\R))$. Moreover,
 that implied probability measure will be \emph{uniquely} specified.
 
 Therefore, cumulative distributions are a really handy way to introduce
@@ -5202,38 +5319,8 @@ above on $S$ has a unique extension to $\sB(\R)^{\otimes n}$.
 
 
 \clearpage
-\subsection{Push Forward Measure and Moments}
+\subsection{Distributions of Random Variables}
 
-\begin{prop}\emph{(Push Forward Measure and Change of Variables)}
-Suppose we have $f:\Omega\ra E$, a measurable function between measure
-space $(\Omega,\sF,\mu)$ and measurable space $(E,\sE)$. Then the push
-forward measure denoted $\mu \circ f^{-1}$ or $\mu_f$ is defined
-\begin{align*}
-  \mu_f[A] := \mu[f^{-1}(A)]
-  \qquad\forall A \in\sE
-\end{align*}
-It is a measure such that for any $\sE$-measurable function
-$g:(E,\sE)\ra(\R,\sB(\R))$, we have
-\begin{align*}
-  \int_{f^{-1}(A)} g\circ f \; d\mu
-  =
-  \int_A g\;d\mu_f
-  \qquad A \in \sE
-\end{align*}
-Expressing these integrals in more verbose, explicit notation
-\begin{align*}
-  \int_{f^{-1}(A)} g(f(\omega)) \; \mu(d\omega)
-  =
-  \int_A g(x)\;\mu_f(dx)
-  \qquad A \in \sE
-\end{align*}
-\end{prop}
-\begin{rmk}
-The push-forward measure is so named because we don't have a measure
-defined for $(E,\sE)$, but we \emph{induce} one by pushing forward the
-measure defined for measurable $(\Omega,\sF)$ to measurable space
-$(E,\sE)$.
-\end{rmk}
 
 \begin{defn}(Prob. Distribution and Distribution Function of Random Variable $X$)
 Consider measurable function $X:(\Omega,\sF,P)\ra (\R,\sB(\R))$.
@@ -5241,8 +5328,8 @@ If $P$ is a probability measure, then the push forward
 measure $P \circ X^{-1}$ or $P_X$ is \emph{also} a probability measure
 called the \emph{probability distribution of $X$}, where
 \begin{align*}
-  \int_\Omega g\circ X\; dP
-  = \int_\R g \; dP_X
+  \int_\Omega (g\circ X)(\omega)\; dP(d\omega)
+  = \int_\R g(x) \; dP_X(dx)
   \qquad \forall g:(\R,\sB(\R))\ra (\R,\sB(\R))
 \end{align*}
 Moreover, we call
@@ -5253,21 +5340,26 @@ Moreover, we call
 \end{align*}
 the \emph{distribution function of $X$}.
 \end{defn}
-\begin{rmk}
-I actually could have left this more general and defined $\mu_f$, the
-distribution of $f$ where $f:(\Omega,\sF,\mu)\ra (E,\sE)$ rather than a
-function to $(\R,\sB(\R))$, but oh well.
-\end{rmk}
 
+\begin{defn}
+We call the random vector $X:(\Omega,\sF)\ra(\R^d,\sB(\R)^{\otimes d})$
+on probability space $(\Omega,\sF,P)$
+\begin{itemize}
+  \item \emph{Discrete}: If $P\circ X^{-1}$ is a discrete measure
+  \item \emph{Continuous}: If $P\circ X^{-1}$ is a continuous measure
+  \item \emph{Absolutely Continuous}: If $P\circ X^{-1}$ is an
+    absolutely continuous measure
+\end{itemize}
+\end{defn}
 
-The above proposition and definition are motivated as follows. I could
-write down $\Omega$, the set of elementary events that could happen. I
-could then specify the measurable sets $\sF$, which are events or
-subsets of $\Omega$ whose probabilities I want to compute. I could then
-also specify a measure $P$ that assigns probabilities to the measurable
-sets in $\sF$. Finally, if I define a random variable $X$ mapping
-$\Omega$ into real numbers, I could (in theory) compute integrals
-corresponding to functions of my random variable like
+The above definitions are motivated as follows. I could write down
+$\Omega$, the set of elementary events that could happen. I could then
+specify the measurable sets $\sF$, which are events or subsets of
+$\Omega$ whose probabilities I want to compute. I could then also
+specify a measure $P$ that assigns probabilities to the measurable sets
+in $\sF$. Finally, if I define a random variable $X$ mapping $\Omega$
+into real numbers, I could (in theory) compute integrals corresponding
+to functions of my random variable like
 \begin{align*}
   \int_\Omega g\circ X \; dP
 \end{align*}
@@ -5278,20 +5370,14 @@ the first place---so that I wouldn't have to work exclusively with the
 more abstract measure space $(\Omega,\sF,P)$. So rather than integrate
 over subsets of $\Omega$ (the domain of $X$ and $g\circ X$), I change
 variables to integrate over subsets of $\R$ (the range of $X$), using
-the preimage of $X$ to use implicitly the probability measure $P$:
+the preimage of $X$ to invoke implicitly the underlying probability
+measure $P$:
 \begin{align}
   \int_{X^{-1}(A)} g\circ X \; dP
   =
   \int_A g \; dP_X
   \qquad A \in \sB(\R)
   \label{omega-Px}
-\end{align}
-or in more verbose notation
-\begin{align}
-  \int_{X^{-1}(A)} (g(X(\omega)) \; P(d\omega)
-  =
-  \int_A g(x) \; P_X(dx)
-  \qquad A \in \sB(\R)
 \end{align}
 Yeah, right okay. But the RHS is still a general (non-Riemman or
 Riemann-Stieltjes) integral. How do I compute it? And what does $P_X$
@@ -5354,6 +5440,291 @@ Then define
 \begin{prop}
 Given measurable $X\in L^1(\Omega,\sF,P)$ and $P$ a probability measure,
 \end{prop}
+
+\clearpage
+\subsection{Complex Random Variables}
+
+\begin{prop}
+Let $X\in\C^d$ be a $d$-dimensional complex random variable. Then
+\begin{align*}
+  \E[X] = \E[\Re(X)] + i\;\E[\Im(X)]
+\end{align*}
+\end{prop}
+
+\begin{defn}
+Let $Z = V+iW$, where $V$ and $W$ are real-valued integrable random
+variables. Then we say that $Z$ is \emph{square integrable} if
+$\E[|Z|^2]=\E[V^2 + W^2]<\infty$.
+\end{defn}
+
+\begin{prop}
+Let $Z = V+iW$ and $Z' = V'+iW'$, where $V$, $W$, $V'$, and $W'$ are
+real-valued integrable random variables. Then
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item $\E[Z] = \E[V] + i\E[W]$
+  \item $\E[\,|Z|\,] = \E\left[\sqrt{V^2 + W^2}\right] \leq
+    \E\big[|V|+|W|\big]<\infty$
+  \item $\big|\E[Z]\big|\leq \E[\,|Z|\,]$
+  \item $Z$ and $Z'$ are independent if $\sigma(V,W)$ is independent of
+    $\sigma(V',W')$
+  \item If $Z$ and $Z'$ are independent and square integrable, then
+    \begin{align*}
+      \E[Z\cdot Z'] = \E[Z]\cdot\E[Z']
+    \end{align*}
+\end{enumerate}
+\end{prop}
+\begin{proof}
+We prove each in turn:
+\begin{enumerate}
+  \item[(iii)]
+    First, we'll want a clever way to write $\big|\E[Z]\big|$. To do so,
+    we make use of the following result:
+    \begin{align}
+      |z| = \sup_{q\in\Q} \Re(e^{iq}z)
+      \qquad\forall z = v+iw\in\C
+      \label{absvalz}
+    \end{align}
+    To prove this claim, we expand out the object on the RHS:
+    \begin{align*}
+      \Re(e^{iq}z)
+      &= \Re\big(
+      \left(\cos(q) + i\sin(q)\right)
+      \cdot
+      \left(v + iw\right)
+      \big) \\
+      &=\cos(q)v - \sin(q)w
+    \end{align*}
+    Now we want the $q$ that maximizes this object. Since everything is
+    differentiable, the first order necessary condition for an optimum
+    is
+    \begin{align*}
+      0 &=-\sin(q)v - \cos(q)w \\
+      -\frac{w}{v} &=
+      \frac{\sin(q)}{\cos(q)} = \tan(q) \\
+      \implies\quad
+      q &= \arctan\left(-\frac{w}{v}\right)
+    \end{align*}
+    Using this in the expression for $\Re(e^{iq}z)$, we get
+    \begin{align*}
+      \sup_q
+      \Re(e^{iq}z)
+      &=
+      \cos\left(\arctan\left(-\frac{w}{v}\right)\right)v -
+      \sin\left(\arctan\left(-\frac{w}{v}\right)\right)w \\
+      &=
+      \frac{v}{\sqrt{1+\left(-\frac{w}{v}\right)^2}}
+      -
+      \frac{\left(-\frac{w}{v}\right)w}{\sqrt{1+\left(-\frac{w}{v}\right)^2}}
+      \\
+      &= \sqrt{v^2+w^2} \\
+      \implies\quad
+      \sup_q
+      \Re(e^{iq}z)
+      &= |z|
+    \end{align*}
+    We will be able to apply this to $\big|\E[Z]\big|$, since that's
+    just a complex number in $\C$ like $z$ above. But first start by
+    fixing $q\in\Q$ and use linearity of the expectation operator along
+    with (i) to get
+    \begin{align*}
+      \Re\left(e^{iq}\E[Z]\right)
+      &= \Re\left(\E[e^{iq}Z]\right)
+      = \E\left[\Re(e^{iq}Z)\right]
+    \end{align*}
+    Now take the supremum over $q\in\Q$ on both sides to get
+    \begin{align*}
+      \sup_{q\in\Q}\Re\left(e^{iq}\E[Z]\right)
+      &= \sup_{q\in\Q}\E\left[\Re(e^{iq}Z)\right] \\
+      \text{By (\ref{absvalz})}\quad\implies\quad
+      \big|\E[Z]\big|
+      &= \sup_{q\in\Q}\E\left[\Re(e^{iq}Z)\right]
+    \end{align*}
+    Next, by Jensen since the supremum is a convex function, we get
+    \begin{align*}
+      \big|\E[Z]\big|
+      &\leq \E\left[\sup_{q\in\Q}\Re(e^{iq}Z)\right] \\
+      \text{By (\ref{absvalz}) again}\quad\implies\quad
+      \big|\E[Z]\big|
+      &\leq \E\left[\,|Z|\,\right]
+    \end{align*}
+
+\end{enumerate}
+\end{proof}
+
+
+\clearpage
+\subsection{Characteristic Functions}
+
+
+
+\begin{defn}(Characteristic Function)
+Let $X$ be a $d$-dimensional random vector on probability space
+$(\Omega,\sF,P)$ with CDF
+\begin{align*}
+  F_{X}(x_1,\ldots,x_d)
+  =
+  P[X_1\leq x_1,\ldots, X_d\leq x_d]
+\end{align*}
+Then the \emph{characteristic function} is the function
+$\varphi_X:\R^d\ra \C$ defined
+\begin{align*}
+  \varphi_X(u)
+  &= \E\left[e^{iu^TX}\right]
+  = \E\left[\cos(u^TX)\right]+i\,\E\left[\sin(u^TX)\right]\\
+  &= \int_{\R^d} e^{iu^TX} \; dF_{X}
+  \qquad\text{where}\quad u^T X = \sum_{i=1}^d u_iX_i
+\end{align*}
+If $X$ is absolutely continuouse with density $f_{X}(x)$, we
+can write
+\begin{align*}
+  \varphi_X(u)
+  &=
+  \int_{\R^d} e^{iu^TX} f_{X}(x)\; dx
+\end{align*}
+A few facts about characteristic functions:
+\begin{enumerate}[label=(\roman*)]
+  \item The characteristic function is the Fourier transform of a
+    measure.
+  \item They always exist, even for fat-tailed distributions. That's why
+    we prefer them to moment generating functions
+  \item Characteristic functions \emph{uniquely} determine distributions
+  \item Convergence in distribution is equivalent to pointwise
+    convergence of characteristic functions
+\end{enumerate}
+\end{defn}
+
+\begin{thm}
+\label{thm:charfcnunq}
+\emph{(Characteristic Functions Uniquely Characterize the Distribution)}
+\end{thm}
+
+\begin{prop}\emph{(Properties of Characteristic Functions)}
+Let $X$ be a random vector and $\varphi_X(u)$ the associated
+characteristic function. Then
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item $|\varphi_X(u)| \leq \varphi_X(0) = 1$
+  \item $\varphi_X(u) = \overline{\varphi_X(-u)}$
+  \item $\varphi_X(u)$ is real-valued if and only if $X$ is symmetric,
+    i.e. $X \overset{d}{=} -X$
+  \item $\varphi_X(u)$ is uniformly continuous in $u$
+\end{enumerate}
+\end{prop}
+\begin{proof}
+We prove each in turn
+\begin{enumerate}[label=(\roman*)]
+  \item Recall that for complex $Z$, we have
+    $\big|\E[Z]\big|\leq \E[\,|Z|\,]$. Well
+    \begin{align*}
+      |\varphi_X(u)|
+      =
+      \left\lvert\E\left[e^{iu^TX}\right]\right\rvert
+      &\leq
+      \E\left[\left\lvert e^{iu^TX}\right\rvert\right]
+      = 1
+    \end{align*}
+    And also, rather trivially, $\varphi_X(0)=\E[e^{0}] = 1$
+
+  \item Write out the complex conjugate:
+    \begin{align*}
+      \overline{\varphi_X(-u)}
+      &=
+      \overline{\E\left[e^{-iu^TX}\right]}
+      =
+      \E\left[\,\overline{e^{-iu^TX}}\,\right]
+      =
+      \E\left[e^{iu^TX}\right]
+      =
+      \varphi_X(u)
+    \end{align*}
+
+  \item
+    ($\Rightarrow$)
+    Suppose that $\varphi_X(u)$ is real-valued. To show $X$ is
+    symmetric, we need to show $-X$ has the same distribution, i.e. the
+    same characteristic function by Theorem~\ref{thm:charfcnunq}. So
+    let's examine the characteristic function of $-X$:
+    \begin{align*}
+      \varphi_{-X}(u)
+      =
+      \E\left[e^{-iu^TX}\right]
+      &=
+      \overline{\E\left[e^{iu^TX}\right]} \\
+      &=
+      \overline{\varphi_X(u)} \\
+      \text{Since $\varphi_X(u)$ real-valued}
+      \quad\implies\quad
+      \varphi_{-X}(u)
+      &= \varphi_X(u)
+    \end{align*}
+    And by Theorem~\ref{thm:charfcnunq}, identical characteristic
+    functions means identical distributions.
+
+    ($\Leftarrow$)
+    Suppose that $X$ is symmetric so that $X\overset{d}{=}-X$. Then
+    again, by Theorem~\ref{thm:charfcnunq}, we have
+    have
+    \begin{align}
+      \varphi_X(u)&=\varphi_{-X}(u) \notag \\
+      \iff\quad
+      \E\left[e^{iu^TX}\right]
+      &= \E\left[e^{-iu^TX}\right]
+      \label{charfcnsymmetric}
+    \end{align}
+    Well then since $\Im(z) = (z - \bar{z})/2i$, we get
+    \begin{align*}
+      \Im(\varphi_X(u))
+      &=
+      \frac{\varphi_X(u)-\overline{\varphi_X(u)}}{2i} \\
+      &=
+      \frac{\E\left[e^{iu^TX}\right]-\E\left[e^{-iu^TX}\right]}{2i} \\
+      \text{By (\ref{charfcnsymmetric})}
+      \quad\implies\quad
+      \Im(\varphi_X(u))
+      &=
+      0
+    \end{align*}
+    Hence $\varphi_X(u)$ is real-valued.
+
+  \item To prove uniform continuity of $u$, we need to be able to pick a
+    $\delta$ given $\varepsilon$ regardless of $u$. So consider
+    \begin{align*}
+      \left\lvert
+      \varphi_X(u+\delta) - \varphi_X(u)
+      \right\rvert
+      &=
+      \left\lvert
+      \E\left[e^{i(u^T+\delta)X}\right] - \E\left[e^{iu^TX}\right]
+      \right\rvert \\
+      &=
+      \left\lvert
+      \E\left[(e^{i\delta X}-1)e^{iu^TX}\right]
+      \right\rvert \\
+      &\leq
+      \E\bigg[
+      \left\lvert
+      e^{i\delta X}-1
+      \right\rvert
+      \cdot
+      \underbrace{\left\lvert e^{iu^TX} \right\rvert}_{\leq 1}
+      \bigg]
+      \\
+      &\leq
+      \E\big[
+      \left\lvert
+      e^{i\delta X}-1
+      \right\rvert
+      \big]
+    \end{align*}
+    Then by Lebesgue's DCT, that goes to zero as $\delta\ra 0$.
+\end{enumerate}
+\end{proof}
+
+\begin{thm}
+Let $X$ be a random vector. Then
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item If $\E[|X|^n]<\infty$ for some $n\in\N$, then
+\end{enumerate}
+\end{thm}
 
 
 \clearpage
@@ -5629,6 +6000,725 @@ $\{i_1,\ldots,i_d\}\subseteq J$, and check the resulting matrix for
 positive (semi)definiteness, just see if it's an inner product in a
 Hilbert space.
 \end{rmk}
+
+
+\clearpage
+\section{Random Variables in Practice}
+\subsection{Transformation Theory}
+
+Throughout this subsection, we'll only consider continuous random
+variables. So let's start with $n$ random variables, $X_1, \ldots, X_n$,
+(not necessarily iid) which have jdf
+   \[ f_{X_1, \ldots, X_n}(x_1, \ldots, x_n) \]
+Now let's suppose that we define a new random variable $Y$, which is
+some function
+   \[ Y = g(X_1, \ldots, X_n) \]
+Let's review some reasons why we might want to construct such a $Y$:
+\begin{enumerate}
+  \item We might want to build up a more complex random variable $Y$
+    by transforming relatively simple ones.
+  \item Often, a maximum likelihood estimator for some parameter will be
+    a function of random variables $X_i$.
+  \item Many test statistics are, in fact, \emph{derived} statistics
+    dependent on the variables $X_i$.
+\end{enumerate}
+So we'll need to be able to say something about the distribution of $Y$.
+We'll start with the univariate case where $n=1$, so that $Y=g(X)$. From
+there, we'll move onto the multivariate case.
+
+\subsubsection{Univariate Case}
+
+Throughout this section, we'll assume that $X$ has a known density
+function, $f_X(x)$. For some differentiable function $g$, we then define
+$Y = g(X)$. The goal is to find $f_Y(y)$.
+
+\begin{thm}\emph{(Monotonic Transformations)}
+Suppose that $g$ is a monotonic function. Then
+\begin{align*}
+   f_Y(y) &= \left[f_X(x) \left\lvert \frac{dx}{dy}\right\rvert
+      \right]_{x = g^{-1}(y)} \\
+    &= \left[ f_X(x) \left\lvert \frac{dy}{dx}\right\rvert^{-1}
+      \right]_{x = g^{-1}(y)}
+\end{align*}
+\end{thm}
+
+\begin{thm}\emph{(Non-Monotonic Transformations)}
+Suppose $g$ is some non-monotonic function. Then split up the function
+into monotonic segments. Suppose that there are $n$ such monotonic
+segments of $g$, denoted $g_1,\ldots,g_n$. Then
+\begin{align}
+   \label{nonmontrans}
+   f_Y(y)
+   &= \sumin \left[ f_X(x_i) \left\lvert \frac{dx_i}{dy}
+      \right\rvert \right]_{x_i=g_i^{-1}(y)}\\
+   &= \sumin \left[ f_X(x_i) \left\lvert \frac{dy}{dx_i}
+    \right\rvert^{-1} \right]_{x_i=g_i^{-1}(y)}
+    \notag
+\end{align}
+\end{thm}
+
+
+\subsubsection{Multivariate Case}
+
+Suppose that we have
+$X:=\begin{pmatrix}X_1 & \cdots & X_n\end{pmatrix}'$ with jdf
+$f_{X}(x)$.
+Now suppose that we have an invertible function $g:\Rn\ra\Rn$. The
+invertibility assumption is similar to the monotonicity assumption in
+the univariate case.  Let
+\begin{align*}
+  Y:= \begin{pmatrix} Y_1 \\ \vdots \\ Y_n \end{pmatrix}
+  = g(X)
+\end{align*}
+We can compute the jdf for vector $Y$ as
+\begin{align*}
+  f_{Y}(y)
+  %&= \left[ f_{X}(x) \lvert J \rvert \right]_{x=g^{-1}(y)} \\
+   &= \left[
+      f_{X}(x)\frac{1}{\lvert J\rvert}
+      \right]_{x=g^{-1}(y)}
+\end{align*}
+where $|J|$ is the determinants of the Jacobian matrix
+\begin{equation}
+   %J = \begin{bmatrix} \frac{\partial x_1}{\partial y_1} &
+      %\frac{\partial x_1}{\partial y_2} & \cdots &
+      %\frac{\partial x_1}{\partial y_n} \\
+      %\vdots & & \ddots & \vdots \\
+      %\frac{\partial x_n}{\partial y_1} &
+      %\frac{\partial x_n}{\partial y_2} & \cdots &
+      %\frac{\partial x_n}{\partial y_n}
+   %\end{bmatrix} \qquad \qquad
+   J = \begin{bmatrix} \frac{\partial g_1}{\partial x_1} &
+      \frac{\partial g_1}{\partial x_2} & \cdots &
+      \frac{\partial g_1}{\partial x_n} \\
+      \vdots & & \ddots & \vdots \\
+      \frac{\partial g_n}{\partial x_1} &
+      \frac{\partial g_n}{\partial x_2} & \cdots &
+      \frac{\partial g_n}{\partial x_n}
+   \end{bmatrix}
+\end{equation}
+where $\frac{\partial g_i}{\partial x_j}$ is the partial derivative of
+the $i$th element of $g(X)$ with respect to the $j$th element of vector
+$X$.
+
+Often, we will even use this to do transformations that are not
+1-to-1. That will involve doing a transformation that \emph{is}
+1-to-1 using this method with dummy variables, then integrating
+out those dummy variables.
+
+
+\clearpage
+\subsection{Select Probability Distributions}
+
+
+\subsubsection{Multivariate Normal}
+
+The univariate normal distribution is an extremely familiar concept
+where some random variable $X$ can take values along the real with
+probabilities that match the famouse bell-curve. Recall the probability
+density function of
+   \[ f_Y(y) = \frac{1}{\sigma \sqrt{2\pi}} \; e^{-\frac{1}{2\sigma^2}
+      (y - \mu)^2} \]
+However, that's limited to only one dimension, and we would like to
+generalize to higher dimensions. In the next-simplest 2-dimensional
+case, we'd like a distribution that actually looks like a bell---where
+potentional values can range over the real plane, $\mathbb{R}^2$, with
+the density clustered around some mean before tapering off in all
+directions, as below.
+\begin{figure}[h!]
+   \centering
+   \includegraphics[scale=0.40]{multivariate.pdf}
+\end{figure}
+\\
+This figure has mean zero for both $X_1$ and and $X_2$, and
+which are independent, implying $\sigma = I_2$, the identity matrix.
+It's easy to see that any vertical cuts parallel to $xz$ or $yz$ planes
+will yield a traditional normal random variable. This of course
+generalizes to higher dimensions, although we can't display it so nicely.
+\\
+\\
+This generalization will give us the
+\emph{Multivariate Normal (MVN) Distribution}.
+This turns out to be an extremely useful distribution. Let's highlight
+a few applications here:
+\begin{enumerate}
+  \item The MVN distribution has applications in Bayesian multivariate
+    regressions (i.e. Bayesian regressions with more than one
+    ``independent,'' ``predictor,'' or ``$X$'' variable).  In such
+    applications, we hope to find the posterior distribution of the
+    $\beta$ regression vector, and it's common to assume a MVN prior on
+    $\beta$ that results in an MVN posterior for $p(\beta|y)$.
+
+  \item Next, we often use the MVN distribution to describe
+    \emph{recurrence relations}, where we try to forecast an MVN RV one
+    period into the future, given current information about the RV, like
+    it's current value and distribution. One example would include
+    jointly forecasting height \emph{and} weight in the future given
+    current height and weight.
+
+  \item Finally, the MVN distribution forms the basis for VARs, which
+    are used to forecast different economic variables one period into
+    the future, expressing each future variable as a function of lags of
+    itself and other economic variables.  However, VARs are too broad
+    and interesting a subject to elicit only a cursory summary in this
+    note.  I'll write a more extensive summary of them elsewhere.
+\end{enumerate}
+
+In this note, the multivariate distribution will apply to a
+$d$-dimensional random vector
+\[ X = \begin{pmatrix} X^{(1)} & X^{(2)} & \ldots & X^{(d)} \end{pmatrix}^T,
+    \qquad X  \sim N_d(\mu, \Sigma) \]
+where $\mu$ is the $n$-dimensional \emph{mean vector},
+\[ \mu = \begin{pmatrix} EX^{(1)} & EX^{(2)} & \ldots & EX^{(d)} \end{pmatrix}^T,
+      \]
+and where $\Sigma$ is the $d\times d$ \emph{covariance matrix}, which
+is defined and has in its $i,j$ entry
+\[ \sigma^2 = E\left[ (X - \mu) (X-\mu)^T\right] \in
+   \mathbb{R}^{N\times N} \]
+\[ \Sigma_{ij} = Cov(X^{(i)}, X^{(j)}), \qquad i,j = 1, \ldots, d\]
+Superscripts with parentheses, like ``$X^{(i)}$,'' will denote
+$i$th element of the MVN RV ``$X$,'' while ``$X_t$'' will denote
+an MVN RV at time $t$.
+
+
+\begin{defn}(Multivariate Normal)
+A random vector $X$ has a \emph{multivariate normal}
+distribution if every linear combination of its components,
+\[ Y = a_1 X^{(1)} + \ldots + a_d X^{(d)} \]
+\[ \Leftrightarrow Y = {a} X, \qquad
+    {a} \in \mathbb{R}^{d} \]
+is \emph{univariate normally
+distributed}, with a corresponding mean and variance. This gives a
+joint density function of
+\begin{equation}
+    \label{pdf2}
+    f_{X}({x}) = \frac{1}{(2\pi)^{d/2}\lvert \Sigma \rvert^{1/2}}
+	\; e^{ -\frac{1}{2} ({x} - \mu)^T \;
+	\Sigma^{-1} ({x} - \mu) }, \qquad \lvert\Sigma\rvert =
+      \det\Sigma \qquad x \in \mathbb{R}^d
+\end{equation}
+Note, we impose the requirement that $\Sigma$ is symmetric and positive
+definite.  Symmetric because the correlation of $X$ and $Y$ equals the
+correlation of $Y$ and $X$.
+\end{defn}
+{\sl Terminology}: I'll often us MVN to refer to the case where $X$ is
+a vector with $d\geq2$; however, it should be clear that the univariate
+normal distribution is just a special case where $d=1$. Therefore,
+when speaking about an RV that could be either MVN or univariate normal
+\emph{or} properties that apply equally well to either
+type of RV, I'll often use the term \emph{Gaussian}
+both for convenience and out of reverence to long-dead German-speaking
+mathematicians. Stimmt?
+
+
+It's fairly common to consider linear transformations and functions
+of a multivariate normally distributed random variable.  For instance,
+we might have an economic or statistical model with a recurrence
+relation to describe the dynamics of some process:
+\[ X_{t+1} = A X_{t} + {V}_{t} \]
+where ${V}_t$ is some innovation or random noise vector.
+Therefore, it would be useful to be able to derive the distributions
+of \emph{functions} or \emph{linear transformation} of multivariate
+normal random variables.
+
+So let's find the probability distribution of a linear transforamtion
+of an MVN RV. Begin by assuming
+\begin{align*}
+    X &= A{Y}, \qquad {Y} \sim
+	\text{MVN}(\mu, \Sigma) \\
+    \Rightarrow \quad f(y) &= k \; \exp\left\{-\frac{1}{2} (y - \mu)^T
+	\; \Sigma^{-1} (y-\mu)\right\}
+\end{align*}
+where $k$ is a constant.\footnote{The constant will come from the
+definition of the distribution given above in Equation \ref{pdf}, but
+it's boring algebra not that interesting, so I'll suppress the details.}
+Assuming that $A$ is invertible, we substitute in, using Equation
+, to get the distribution of $X$:
+\begin{align}
+    \label{midway}
+    \Rightarrow \quad f_X(A^{-1}x) &= k' \exp\left\{-\frac{1}{2} (A^{-1}x - \mu)^T
+	\Sigma^{-1} (A^{-1}x-\mu)\right\}
+\end{align}
+Next, since the expectation is a linear operator, we can use the fact
+that
+\begin{align*}
+    EX &= E[A{Y}] = A E{Y} = A \mu \\
+    \Rightarrow \quad \mu_* &= A \mu \\
+    \Leftrightarrow \quad \mu &= A^{-1} \mu_*
+\end{align*}
+where $\mu'$ is the mean vector of $X$.  With that, we
+can substitute back into Equation \ref{midway} and simplify even
+further, using convenient matrix manipulations like the distributivity
+property, associativity, etc.:
+\begin{align*}
+    f_X(A^{-1}x) &= k' \exp\left\{-\frac{1}{2} (A^{-1}x - \mu)^T \;
+	\Sigma^{-1} (A^{-1}x-\mu)\right\} \\
+    &= k' \exp\left\{-\frac{1}{2} (A^{-1}x - A^{-1}\mu_*)^T \;
+	\Sigma^{-1} (A^{-1}x-A^{-1}\mu_*)\right\} \\
+    &= k' \exp\left\{-\frac{1}{2} [A^{-1}(x - \mu_*)]^T \;
+	\Sigma^{-1} [A^{-1}(x-\mu_*)]\right\} \\
+    &= k' \exp\left\{-\frac{1}{2} (x - \mu_*)^T \; [(A^{-1})^T \;
+	\Sigma^{-1} A^{-1}] (x-\mu_*)\right\} \\
+    &= k' \exp\left\{-\frac{1}{2} (x - \mu_*)^T \;
+	\Sigma_*^{-1} \; (x-\mu_*)\right\} \\
+    \Rightarrow X &\sim  \text{MVN}(\mu_*, \Sigma_*),
+    \qquad \text{where $\mu_* = A\mu$ and $\Sigma_* = A\Sigma A^T $}
+\end{align*}
+This is huge! It means \emph{linear transformations of MVN
+RV's are themselves MVN.}
+
+
+If you're familiar with the standard univariate normal RV,
+then you can probably guess what the standard MVN RV is:
+\begin{equation}
+    {Z} \sim \text{MVN}(0, \; I_d)
+\end{equation}
+where $I_d$ is the $d\times d$ identity matrix.  This form for
+the covariance matrix also suggests that the different components
+of ${Z}$ (denoted $Z_1, Z_2, \ldots, Z_d$) are independent and
+Gaussian.
+\\
+\\
+Moreover, just like we can build from a standard univariate to
+a general univariate.  To do so, we'll use the results from the
+last section, since building from a standard MVN
+to general MVN simply involves linear transformations of the components.
+Specifically, we can express the MVN RV ${X}$ as follows
+\begin{equation}
+    {X} = \mu + A{Z}, \qquad {X}\sim
+	\text{MVN}(\mu, AA^T)
+\end{equation}
+{\sl Computation}: Suppose we know that we want ${X}$ to
+be MVN($\mu, \; \Sigma)$, and we can only generate ${Z}$.
+How do we choose $A$ such that $AA^T = \Sigma$.  Typically, we'll
+have to use something like a \emph{Cholesky Factorization}
+algorithm to find the correct $A$ in the form of a lower triangular
+matrix. And if $\Sigma$ is symmetric, positive definite, then
+$A$ is guaranteed to exist and this approach will work.
+The algorithm itself can be found in the appendix.
+
+
+So to summarize, MVN (or Gaussian) RV's are particularly nice to work with because
+of some convenient properties:
+\begin{enumerate}
+    \item Suppose that ${X}$ and ${Y}$ are \emph{univariate}
+	normally distributed and independent. This then implies that they are
+	\emph{jointly normally distributed}. In other words,
+	$\begin{pmatrix} {X} & {Y} \end{pmatrix}$ must have a multivariate
+	normal distribution.
+    \item Linear functions of Gaussians are Gaussian. So if $A$
+	is a constant matrix and ${X}$ is MVN, then $A{X}$
+	is also MVN.
+    \item Uncorrelated Gaussian random variables are independent.
+    \item Conditions Gaussian's are normal. So if $X_1$ and $X_2$
+	are two components of a MVN RV, ${X}$, then
+	$X_1 | X_2$ is normal, and vice versa.
+\end{enumerate}
+
+\clearpage
+\subsubsection{$\Chi^2$ Distribution}
+
+
+\begin{defn}
+The $\Chi^2_\nu$ distribution with $\nu$ degrees of freedom is the sum of
+$\nu$ squared standard normal random variables:
+\begin{align*}
+  Y \sim \Chi^2_\nu
+  \quad\implies\quad
+	 Y = \sum^\nu_{i=1} Z^2_i
+   \qquad Z_i \sim N(0,1)
+\end{align*}
+\end{defn}
+
+\begin{prop}
+\label{prop:chisum}
+Given $Y_i \sim \Chi_{\nu_i}^2$, then
+\begin{align*}
+  \sum^n_{i=1} Y_i \sim \Chi^2_{\nu}
+  \qquad
+  \text{where}\;
+  \nu=\sum^n_{i=1} \nu_i
+\end{align*}
+In words, sums of $\Chi^2$ RVs are also $\Chi^2$ distributed.
+\end{prop}
+
+\begin{cor}
+\label{cor:chimu}
+Suppose that $Y_i \sim N(\mu,\sigma^2)$. Then
+\begin{align*}
+  \sum^n_{i=1} \frac{(Y_i-\mu)^2}{\sigma^2}  \sim \chi^2_n
+\end{align*}
+\end{cor}
+
+\begin{cor}
+Suppose that $Y_i \sim N(\mu,\sigma^2)$. Then
+\begin{align*}
+  \sum^n_{i=1} \frac{(Y_i-\bar{Y})^2}{\sigma^2}  \sim \Chi^2_{n-1}
+\end{align*}
+In other words, if we estimate the mean by the sample average $\bar{Y}$,
+we loose one degree of freedom.
+\end{cor}
+\begin{proof}
+Start first with the sum assuming we have the true mean $\mu$. We'll
+break it up
+\begin{align*}
+	 \sum^n_{i=1} \frac{(Y_i-\mu)^2}{\sigma^2} &= \frac{1}{
+	    \sigma^2} \sum^n_{i=1} (Y_i - \bar{Y}+ \bar{Y}-\mu)^2 \\
+	    &= \frac{1}{\sigma^2} \sum^n_{i=1}  (Y_i - \bar{Y})^2
+	    + \frac{2}{\sigma^2} \sum^n_{i=1} (Y_i-\bar{Y})(\bar{Y}-\mu)
+	    + \frac{1}{\sigma^2} \sum^n_{i=1} (\bar{Y}-\mu)^2
+      %\\
+			%&= \frac{1}{\sigma^2} \sum^n_{i=1}  (Y_i - \bar{Y})^2
+			%+ \frac{2(\bar{Y}-\mu)}{\sigma^2} \sum^n_{i=1} (Y_i-\bar{Y})
+			%+ \frac{n(\bar{Y}-\mu)^2 }{\sigma^2}  \\
+\end{align*}
+If you do out the algebra, the middle term is zero and drops out, so we
+are left with
+\begin{align*}
+	 \sum^n_{i=1} \frac{(Y_i-\mu)^2}{\sigma^2}
+	 &= \sum^n_{i=1}\frac{(Y_i - \bar{Y})^2 }{\sigma^2} +
+	    \left(\frac{\bar{Y}-\mu }{\sigma /\sqrt{n}}\right)^2
+\end{align*}
+The LHS is $\Chi^2_n$ by Corollary~\ref{cor:chimu}.
+On the RHS, the second term is the mean estimator divided by the
+standard error of the mean; therefore, that term in parentheses is a
+$N(0,1)$ random variable. When squared, the result is a $\Chi_1^2$
+random variable. Taking that over to the LHS and applying
+Proposition~\ref{prop:chisum}, we conclude that
+\begin{align*}
+  \sum^n_{i=1}\frac{(Y_i - \bar{Y})^2}{\sigma^2}
+  \sim \Chi^2_{n-1}
+\end{align*}
+\end{proof}
+\begin{rmk}
+This result is extremely important for deriving the distribution of
+different estimators, variance estimators in particular.
+\end{rmk}
+
+\begin{prop}
+Suppose that $Y$ has a $\Chi^2$ distribution with $\nu$ degrees of
+freedom. Then the distribution is a special case of the gamma
+distribution, where $\alpha = \nu/2$ and $\beta = 1/2$ with the pdf and
+descriptive statistics
+\begin{equation}
+   f_Y(y) = \frac{1}{2^{\frac{\nu}{2}} \Gamma\left(\frac{\nu}{2}\right)}
+      x^{\frac{\nu}{2} - 1} e^{-\frac{x}{2}} \qquad
+\text{Mean} = \nu, \qquad \text{Variance} = 2 \nu
+\end{equation}
+\end{prop}
+\begin{proof}
+Since we can generate a $\Chi^2(\nu)$ random variable by summing the
+square of $\nu$ independent N(0,1) random variables, this suggests that
+we can use an induction argument to get the distribution.
+\end{proof}
+
+\subsubsection{Student's t-Distribution}
+
+\begin{defn}
+Let $Z\sim N(0,1)$ and $Y\sim \Chi^2_n$ be independent random variables.
+Then
+\begin{align*}
+  X = \frac{Z}{(Y/n)^{1/2}}
+  \sim t_n
+\end{align*}
+where $n$ is the degrees of freedom.
+\end{defn}
+%In order to generate a variable that has $t$ distribution with
+%$n-1$ degrees of freedom,
+%we start by supposing that $Y_i\sim \text{NID}(\mu,\sigma^2)$. From
+%there, we define
+%\begin{align*}
+   %\bar{Y} = \frac{1}{n} \sum^n_{i=1} Y_i \qquad
+   %S^2 &= \frac{1}{n-1} \sum^n_{i=1} (Y_i - \bar{Y})^2 \\
+   %&=\frac{1}{n-1} \left( Y_1^2 + \cdots + Y_n^2 - n \bar{Y}^2\right)
+%\end{align*}
+%The statistics $\bar{Y}$ and $S^2$ are useful because they are both
+%unbiased estimators of $\mu$ and $\sigma^2$, respectively.
+%And before we get to the derivation, we make one final note:
+%\emph{Cochran's Theorem}
+%says that $\bar{Y}$ and $S^2$ are independent for the normal
+%distribution.\footnote{This holds for \emph{no} other distributions;
+%it is unique to the normal.}
+%\\
+%\\
+%Now let's define the statistic, $T$,
+%whose distribution we hope to find:
+   %\[ T = \frac{\bar{Y}-\mu}{S/\sqrt{n}} \qquad Y_i \sim \text{NID}(\mu,
+      %\sigma^2) \]
+%But after a bit of rearranging and variable definitions, we get
+%\begin{align*}
+   %T &= \frac{(\bar{Y}-\mu)\sqrt{n} }{S} = \frac{
+      %\frac{\bar{Y}-\mu}{\sigma/\sqrt{n}}}{\sqrt{\frac{S^2}{\sigma^2}
+      %\cdot \frac{n-1}{n-1}}} \\
+      %&= \frac{W_1}{\sqrt{W_2 / (n-1)}}
+%\end{align*}
+%Now it's clear by how we defined $W_1$ and $W_2$ that $W_1$ has a
+%N(0,1) distribution, while $W_2$ has a $\chi^2$ distribution with
+%$n-1$ degrees of freedom. Since $W_1$ and $W_2$ are \emph{independent}
+%by Cochran's theorem, the jdf of $W_1, W_2$ is
+   %\[ f_{W_1, W_2}(w_1, w_2) = \left(
+      %\frac{1}{\sqrt{2\pi}} \; e^{-\frac{1}{2} w_1^2}\right)\left(
+      %\frac{1}{ 2^{\frac{n-1}{2}} \Gamma\left(\frac{n-1}{2}\right)}
+      %\; w_2^{\frac{n-1}{2} -1} e^{-\frac{1}{2}
+      %w_2}\right)
+      %\]
+%Now we just hope to find the jdf of $T$. Since transformations must be
+%1-to-1 in the number of variables, we'll choose
+%a dummy variable, $V$, and define to simplify the mess of fractions
+%in the jdf:
+%\[ V =W_2, \qquad k = \frac{1}{\sqrt{2\pi}} \cdot \frac{1}{
+   %2^{\frac{n-1}{2}} \Gamma\left(\frac{n-1}{2}\right)} \]
+%This leads us to from the Jacobian matrix to go from $W_1$ and
+%$W_2$ to $T$ and $V$:
+%\[ J^* = \det \begin{bmatrix} \frac{\partial T}{\partial W_1} &
+   %\frac{\partial T}{\partial W_2} \\
+   %\frac{\partial V}{\partial W_1} &
+   %\frac{\partial V}{\partial W_2} \end{bmatrix} =
+   %\begin{vmatrix} \frac{1}{\sqrt{W_2/(n-1)}} && \frac{\partial T}{
+      %\partial W_2} \\ 0 && 1
+   %\end{vmatrix} = \frac{1}{\sqrt{W_2/(n-1)}}
+   %\]
+%Now we can get the jdf of $T$ and $V$:
+%\begin{align*}
+   %f_{T,V}(t,v) &= \left[ f_{W_1,W_2}(w_1, w_2) \cdot
+      %\lvert J^* \rvert^{-1}
+      %\right]^{w_1 = g_1^{-1}(t,v)}_{w_2 = g_2^{-1}(t,v)}\\
+   %&= \left[ k \cdot e^{-\frac{1}{2} w_1^2}
+      %w_2^{\frac{n-1}{2} - 1} e^{-\frac{1}{2} w_2}  \left(
+      %\frac{1}{\sqrt{w_2/(n-1)}}\right)^{-1}
+      %\right]^{w_1 = t \sqrt{\frac{v}{
+      %n-1}}}_{w_2=v}\\
+      %&= \frac{k}{\sqrt{n-1}} v^{\frac{n-1}{2} - \frac{1}{2}}
+      %e^{-\frac{1}{2} v\left( 1 + \frac{t^2}{n-1}\right)}
+%\end{align*}
+%Now we just need to integrate out the dummy variable, $V$, to
+%get the distribution of $T$, which will require some substitution:
+%\[ y = \frac{1}{2} v \left( 1 + \frac{t^2}{n-1} \right), \qquad
+   %dv = \frac{2}{\left( 1 + \frac{t^2}{n-1} \right)} \; dy \]
+%\begin{align*}
+   %\Rightarrow f_{T}(t) &=\frac{k}{\sqrt{n-1}} \int^\infty_0
+      %v^{\frac{n-1}{2} - \frac{1}{2}}
+      %e^{-\frac{1}{2} v\left( 1 + \frac{t^2}{n-1}\right)} \; dv \\
+      %&= \frac{k}{\sqrt{n-1}} \left( \frac{2}{ 1 + \frac{t^2}{n-1} }
+      %\right)^{\frac{n-1}{2} + \frac{1}{2}} \int^\infty_0
+      %y^{\frac{n-1}{2} - \frac{1}{2}} e^{-y} \; dy
+%\end{align*}
+%Now we recognize the integral as the $\Gamma(n/2)$ function, so
+%we can substitute that in and substitute in for $k$ to get
+%\begin{align*}
+   %\Rightarrow f_{T}(t) &=\frac{\Gamma(n/2)}{
+      %\Gamma\left(\frac{n-1}{2}\right)\sqrt{\pi(n-1)}}
+      %\left( 1 + \frac{t^2}{n-1}\right)^{-\frac{n}{2}}
+%\end{align*}
+%So for a given $n$, this is the $t$-distribution with $n-1$ degrees
+%of freedom.
+%\\
+%\\
+%Equivalently, we can also express the distribution in an equally
+%common formulation, where the statistic has $\nu$ degrees of freedom:
+%\begin{align*}
+   %\Rightarrow f_{T}(t) &=\frac{\Gamma\left(\frac{\nu+1}{2}\right)}{
+      %\Gamma\left(\frac{\nu}{2}\right)\sqrt{\nu\pi}}
+      %\left( 1 + \frac{t^2}{\nu}\right)^{-\frac{\nu+1}{2}}
+%\end{align*}
+
+\newpage
+\subsubsection{F-Statistic and Distribution}
+
+
+\begin{defn}
+Closely related to the $t$-distribution (and just as important), we now
+want to find the distribution of the $F$-statistic, defined as
+\begin{align*}
+  Y = \frac{ X_a / a}{X_b / b},\qquad\qquad
+  X_a \sim \Chi^2_a
+  \quad X_b \sim \Chi^2_b
+\end{align*}
+Then $Y\sim F_{a,b}$.
+\end{defn}
+%Since $X_a$ and $X_b$ are assumed independent,
+%we can form the jdf as the product of the two density functions
+%\begin{align*}
+   %f_{X_a, X_b}(x_a, x_b) &= \left(\frac{1}{2^{a/2} \Gamma(a/2)}
+      %\; x_a^{a/2 -1} e^{-x_a/2 }\right) \left(
+      %\frac{1}{2^{b/2}  \Gamma(b/2)} \;
+      %x_b^{b/2 -1} e^{- x_b /2} \right)\\
+   %&= k \; x_a^{a/2 -1} \; x_b^{b/2 -1} e^{-\frac{1}{2}(x_a + x_b)} \\
+   %\text{where } \quad k &= \frac{1}{ 2^{\frac{a+b}{2}} \Gamma(a/2)
+      %\Gamma(b/2)}
+%\end{align*}
+%Now we want to find the jdf of $F$ and our chosen dummy variable,
+%$G=X_b$. To do so, we start with the inverse functions and
+%then form the Jacobian matrix:
+   %\[ X_a = \frac{a FG}{b}, \qquad X_b = G, \quad\Rightarrow \quad
+     %|J| = \begin{vmatrix} \frac{\partial X_a}{\partial F} &
+      %\frac{\partial X_a}{\partial G} \\
+      %\frac{\partial X_b}{\partial F} &
+      %\frac{\partial X_b}{\partial G} \end{vmatrix} =
+      %\begin{vmatrix}
+	 %\frac{a G}{b} & \frac{a F}{b} \\ 0 & 1
+      %\end{vmatrix}
+      %= \frac{a}{b} G
+      %\]
+%This allows us to write the trnasformed jdf
+%\begin{align*}
+   %p_{F,G}(f,g) &= \left[
+      %k x_a^{a/2 -1} x_b^{b/2 -1} e^{-\frac{1}{2}(x_a + x_b)}
+      %\left( \frac{a}{b} g\right) \right]^{x_a = a f g/b}_{x_b = g}\\
+   %&= k' f^{a/2 -1} g^{\frac{a+b}{2}-1} e^{-\frac{g}{2}\left(
+      %\frac{a}{b}f +1 \right)} \\
+   %\text{ Where} \qquad k' &= \frac{1}{ 2^{\frac{a+b}{2}} \Gamma(a/2)
+      %\Gamma(b/2)} \left( \frac{a}{b}\right)^{\frac{a}{2}}
+%\end{align*}
+%To get the density function of $F$, we integrate out the dummy
+%variable, $G=X_b$, which is a simple $\chi^2$ variable whose support
+%is the positive real line:
+%\begin{align*}
+   %p_F(f) &= k' f^{a/2 -1} \int^\infty_0
+      %g^{\frac{a+b}{2}-1} e^{-\frac{g}{2}\left(
+      %\frac{a}{b}f +1 \right)} \; dg
+%\end{align*}
+%We'll make the substitution
+   %\[ u = \frac{g}{2}\left(\frac{a}{b} f +1\right) , \qquad
+      %g = 2u \left( \frac{a}{b} f +1\right)^{-1} \]
+   %\[ dg = 2 \left( \frac{a}{b} f +1\right)^{-1} \; du
+      %\]
+%\begin{align*}
+   %\Rightarrow \qquad p_F(f) &= k' f^{a/2 -1}  \left[
+      %2 \left( \frac{a}{b} f +1\right)^{-1}\right]^{\frac{a+b}{2}}
+     %\int^\infty_0 u^{\frac{a+b}{2} - 1}
+     %e^{-u} \; du
+%\end{align*}
+%Finally,
+%we recognize that the integral is simply the $\Gamma( (a+b)/2)$
+%function. This allows us to simplify $p_F$ and substitute back for
+%$k'$ to get
+%\begin{align*}
+   %p_F(f) &= k' f^{a/2 -1}  \left[
+      %2 \left( \frac{a}{b} f +1\right)^{-1}\right]^{\frac{a+b}{2}}
+      %\Gamma\left(\frac{a+b}{2}\right) \\
+   %\Rightarrow \qquad
+   %p_F(f) &= \frac{\Gamma\left(\frac{a+b}{2}\right)}{ \Gamma(a/2)
+      %\Gamma(b/2)} \left( \frac{a}{b}\right)^{\frac{a}{2}}
+      %f^{\frac{a}{2} -1} \left[
+	 %1 + \frac{a}{b} f \right]^{-\frac{a+b}{2}}
+%\end{align*}
+%which is the density function for $F$.
+
+
+
+\clearpage
+\subsubsection{Beta Distribution}
+
+One particularly useful random variable is the Beta Distribution, which
+model proportions relatively well, as it only takes values between
+$0$ and $1$, and which also retains the uniform distribution as a special
+case.
+
+A random variable $Y$ has a \emph{beta probability distribution} if
+and only if it has density function
+\begin{equation}
+   \label{pdf}
+   f_Y(y) = \begin{cases} \frac{y^{\alpha -1} (1-y)^{\beta-1}}{B(\alpha,
+      \beta)}, & 0\leq y \leq 1 \\
+	 0, & \text{otherwise}
+   \end{cases} \qquad \alpha, \beta > 0
+\end{equation}
+where the function $B$ is defined
+   \[ B(\alpha, \beta) = \int^1_0 y^{\alpha-1}(1-y)^{\beta-1} \; dy =
+      \frac{\Gamma(\alpha)\Gamma(\beta)}{\Gamma(\alpha + \beta)} \]
+Varying $\alpha$ and $\beta$ can lead to a vast array of different
+shapes.
+
+By a few easy manipulations, it can be shown that the beta distribution
+has mean and variance
+\begin{equation}
+   \label{beta}
+    \mu = \frac{\alpha}{\alpha+\beta}, \qquad \sigma^2 =
+      \frac{\alpha\beta}{(\alpha+\beta)^2 (\alpha+\beta+1)}
+\end{equation}
+
+The Beta Function can be defined as
+\[ B(\alpha, \beta) = \frac{\Gamma(\alpha) \Gamma(\beta)}{\Gamma(\alpha
+   + \beta)} \]
+This happens to have several integral representations, two of which
+we list:
+\begin{align}
+   B(\alpha, \beta) &= \int^{\infty}_0 t^{\alpha-1} (1+t)^{-(\alpha+
+   \beta)} \; dt \label{int1} \\
+   B(\alpha, \beta) = \int^1_0 t^{x-1} (1-t)^{y-1} dt \label{int2}
+\end{align}
+The proof\footnote{All proofs and further information can be found
+   on the Statlect.com website:
+   \url{http://www.statlect.com/subon2/betfun1.htm}. }
+that Equation \ref{int1} does indeed equal that of \ref{int1}
+requires a bit of clever manipulation, while the Equation \ref{int2} uses
+Equation \ref{int1} and makes the substitution
+   \[ s = \frac{t}{1+t} = 1-\frac{1}{1+t}, \qquad \Rightarrow
+      t = \frac{s}{1-s} \]
+
+
+\subsubsection{General Gamma Function}
+
+The gamma function has many special cases, but let's consider it
+in its most general form, along with the mean and variance:
+\begin{equation}
+   f_X(x) = \frac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha-1}
+      e^{-\beta x}, \qquad x > 0
+\end{equation}
+\[ \text{Mean} = \frac{\alpha}{\beta} \qquad \text{Variance} =
+   \frac{\alpha}{\beta^2} \]
+Gamma random variables also have the nice property that
+\[ X_i \sim \text{Gamma}(\alpha_i, \;\beta) \quad \Rightarrow \quad
+   \sum^n_{i=1} X_i \sim \text{Gamma}\left(\sum^n_{i=1} \alpha_i,\;\beta
+   \right) \]
+
+\subsubsection{Exponential Random Variable}
+
+This family has $\alpha=1$ with $\beta$ unrestricted. Changing the way
+we denote the variables (set $\beta =\theta$), this simplifies to
+   \[ f_X(x) = \theta\; e^{-\theta} \]
+This is particularly useful for waiting times, as it is a memoryless
+distribution. In addition, as it is technically a Gamma random
+variable, sums of exponential variables will have a Gamma distribution:
+\[ X_i \sim \text{Exp}(\theta) \quad \Rightarrow \quad
+   \sum^n_{i=1} X_i \sim \text{Gamma}(n, \theta) \]
+Another attraction is the intimate connection this distribution has
+with the Poisson process.  Namely, suppose $N(t)$ is a Poisson process
+with parameter $\theta$, in which case $N(t)$ is Poisson distributed
+with parameter $\theta t$, then the interarrival times are
+exponentially distributed with parameter $\theta$.
+
+\clearpage
+\subsubsection{Quadratic Form Results}
+
+\begin{prop}
+Suppose that $X\sim N_p(\mu,\Sigma)$ where $\rank(\Sigma)=p$. Then
+\begin{align*}
+  (X-\mu)'\Sigma^{-1}(X-\mu) \sim \Chi_p^2
+\end{align*}
+\end{prop}
+\begin{proof}
+Since $\Sigma$ is symmetric positive definite, we can factor
+$\Sigma=\Sigma^{-1}\Sigma^{-1}$ via an eigenvalue decomposition. Then
+define
+\begin{align*}
+  Z = \Sigma^{-1/2}(X-\mu)
+  \quad\implies\quad
+  (X-\mu)'\Sigma^{-1}(X-\mu)
+  = Z'Z
+\end{align*}
+where the $Z\sim N(0,I_p)$. Hence, the result follows.
+\end{proof}
+
+\begin{prop}
+Suppose that $M$ is an idempotent matrix $p\times p$ matrix with rank
+$k$. Then $Z'MZ\sim \Chi^2_k$.
+\end{prop}
+\begin{proof}
+\end{proof}
+
+
 
 
 \clearpage
@@ -5971,9 +7061,83 @@ Denote
 Then $X_n\asto X_\infty$ and $X_n\Lqto{1} X\infty$.
 \end{cor}
 
-
 \clearpage
-\section{Markov Chains}
+\section{Markov Transition Dynamics}
+
+\subsection{Transition Kernels and Conditional Probability}
+
+\begin{defn}(Transition Kernel)
+Let $(\Omega,\sF)$ and $(E,\sE)$ be measurable spaces. A mapping
+\begin{align*}
+  Q:\Omega\times \sE \ra \R_+ \cup\{\infty\}
+\end{align*}
+is a \emph{transition kernel} (or \emph{stochastic kernel}) from
+$(\Omega,\sF)$ into $(E,\sE)$ if
+\begin{enumerate}
+  \item For any fixed $\omega \in \Omega$, the set function
+    $Q(\omega, \cdot):(E,\sE)\ra\R_+\cup\{\infty\}$ defines a valid
+    measure on $(E,\sE)$
+
+    In words, ``I know where I am today---$\omega\in\Omega$. Where might
+    I go tomorrow? What is the distribution?'' Well, that distribution
+    is $Q(\omega,\cdot)$.
+
+  \item For any fixed measurable set $A\in\sE$, the function
+    $Q(\cdot,A)$ is $\sF$-measurable.
+
+    This is like ``I don't know where I am today---I could be anywhere
+    in $\Omega$. But suppose I think that I'll be in $A\in\sE$ tomorrow.
+    What measurable sets in $\sF$ for my position \emph{today} are
+    consistent with being in $A\in\sE$ \emph{tomorrow}?''
+\end{enumerate}
+\end{defn}
+
+\begin{ex}
+Let $Q:\Omega\times E\ra\R_+\cup\{\infty\}$ be a measurable function,
+and let $\mu$ be a measure on $(E,\sE)$. Then
+\begin{align*}
+  Q(\omega,A) = \int_A Q(\omega,x) \; d\mu(x)
+\end{align*}
+defines a transition kernel.
+\end{ex}
+
+\begin{defn}(Finite and Probability Transitional Kernels)
+Much like we had for probability measures, a kernel
+$Q:\Omega\times E\ra\R_+\cup\{\infty\}$ is said to be a
+\emph{finite transition kernel} if $Q(\omega,E)<\infty$ for all
+$\omega\in\Omega$. It is said to be a
+\emph{probability transition kernel} if  $Q(\omega,E)=1$ for all
+$\omega\in\Omega$.
+\end{defn}
+
+\begin{thm}
+Let $Q$ be a transition Kernel from $(\Omega,\sF)$ into $(E,\sE)$.
+Then
+\begin{enumerate}
+  \item For $\sE$-measurable function $f:(E,\sE)\ra\bar{\R}_+$,
+    then the following defines a $\sF$-measurable function
+    $Qf:(\Omega,\sF)\ra\bar{\R}_+$:
+    \begin{align*}
+      Qf(\omega) = \int_E f(e) \; Q(\omega,de)
+    \end{align*}
+
+  \item If $\mu$ is a measure on $(\Omega,\sF)$ than the following is a
+    measure on $(E,\sE)$.
+    \begin{align*}
+      \mu Q(A) = \int_\Omega Q(\omega,A) \;\mu(d\omega)
+      \qquad A\in\sE
+    \end{align*}
+
+  \item Let $\mu$ be a measure on $(\Omega,\sF)$ and $Q$ a transition
+    kernel from $(\Omega,\sF)$ into $(E,\sE)$. Then
+    the following defines a measure on $(\Omega,\sF\otimes \sE)$.
+    \begin{align*}
+      \nu(A\times B) = \int_A Q(\omega,B)\;\mu(d\omega)
+    \end{align*}
+\end{enumerate}
+\end{thm}
+
+\subsection{Markov Chains}
 
 Some of assumptions to make things more tractable:
 \begin{enumerate}
@@ -5983,7 +7147,7 @@ Some of assumptions to make things more tractable:
     upon time, just the state.
 \end{enumerate}
 
-\subsection{Basics}
+\subsubsection{Basics}
 
 \begin{defn}(Distribution)
 Given a countable state space $I$, a vector $(\lambda_i)_{i\in I}$ is a
@@ -6507,722 +7671,6 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 
 
 \clearpage
-\section{Transformation Theory}
-
-Throughout this subsection, we'll only consider continuous random
-variables. So let's start with $n$ random variables, $X_1, \ldots, X_n$,
-(not necessarily iid) which have jdf
-   \[ f_{X_1, \ldots, X_n}(x_1, \ldots, x_n) \]
-Now let's suppose that we define a new random variable $Y$, which is
-some function
-   \[ Y = g(X_1, \ldots, X_n) \]
-Let's review some reasons why we might want to construct such a $Y$:
-\begin{enumerate}
-  \item We might want to build up a more complex random variable $Y$
-    by transforming relatively simple ones.
-  \item Often, a maximum likelihood estimator for some parameter will be
-    a function of random variables $X_i$.
-  \item Many test statistics are, in fact, \emph{derived} statistics
-    dependent on the variables $X_i$.
-\end{enumerate}
-So we'll need to be able to say something about the distribution of $Y$.
-We'll start with the univariate case where $n=1$, so that $Y=g(X)$. From
-there, we'll move onto the multivariate case.
-
-\subsection{Univariate Case}
-
-Throughout this section, we'll assume that $X$ has a known density
-function, $f_X(x)$. For some differentiable function $g$, we then define
-$Y = g(X)$. The goal is to find $f_Y(y)$.
-
-\begin{thm}\emph{(Monotonic Transformations)}
-Suppose that $g$ is a monotonic function. Then
-\begin{align*}
-   f_Y(y) &= \left[f_X(x) \left\lvert \frac{dx}{dy}\right\rvert
-      \right]_{x = g^{-1}(y)} \\
-    &= \left[ f_X(x) \left\lvert \frac{dy}{dx}\right\rvert^{-1}
-      \right]_{x = g^{-1}(y)}
-\end{align*}
-\end{thm}
-
-\begin{thm}\emph{(Non-Monotonic Transformations)}
-Suppose $g$ is some non-monotonic function. Then split up the function
-into monotonic segments. Suppose that there are $n$ such monotonic
-segments of $g$, denoted $g_1,\ldots,g_n$. Then
-\begin{align}
-   \label{nonmontrans}
-   f_Y(y)
-   &= \sumin \left[ f_X(x_i) \left\lvert \frac{dx_i}{dy}
-      \right\rvert \right]_{x_i=g_i^{-1}(y)}\\
-   &= \sumin \left[ f_X(x_i) \left\lvert \frac{dy}{dx_i}
-    \right\rvert^{-1} \right]_{x_i=g_i^{-1}(y)}
-    \notag
-\end{align}
-\end{thm}
-
-
-\subsection{Multivariate Case}
-
-Suppose that we have
-$X:=\begin{pmatrix}X_1 & \cdots & X_n\end{pmatrix}'$ with jdf
-$f_{X}(x)$.
-Now suppose that we have an invertible function $g:\Rn\ra\Rn$. The
-invertibility assumption is similar to the monotonicity assumption in
-the univariate case.  Let
-\begin{align*}
-  Y:= \begin{pmatrix} Y_1 \\ \vdots \\ Y_n \end{pmatrix}
-  = g(X)
-\end{align*}
-We can compute the jdf for vector $Y$ as
-\begin{align*}
-  f_{Y}(y)
-  %&= \left[ f_{X}(x) \lvert J \rvert \right]_{x=g^{-1}(y)} \\
-   &= \left[
-      f_{X}(x)\frac{1}{\lvert J\rvert}
-      \right]_{x=g^{-1}(y)}
-\end{align*}
-where $|J|$ is the determinants of the Jacobian matrix
-\begin{equation}
-   %J = \begin{bmatrix} \frac{\partial x_1}{\partial y_1} &
-      %\frac{\partial x_1}{\partial y_2} & \cdots &
-      %\frac{\partial x_1}{\partial y_n} \\
-      %\vdots & & \ddots & \vdots \\
-      %\frac{\partial x_n}{\partial y_1} &
-      %\frac{\partial x_n}{\partial y_2} & \cdots &
-      %\frac{\partial x_n}{\partial y_n}
-   %\end{bmatrix} \qquad \qquad
-   J = \begin{bmatrix} \frac{\partial g_1}{\partial x_1} &
-      \frac{\partial g_1}{\partial x_2} & \cdots &
-      \frac{\partial g_1}{\partial x_n} \\
-      \vdots & & \ddots & \vdots \\
-      \frac{\partial g_n}{\partial x_1} &
-      \frac{\partial g_n}{\partial x_2} & \cdots &
-      \frac{\partial g_n}{\partial x_n}
-   \end{bmatrix}
-\end{equation}
-where $\frac{\partial g_i}{\partial x_j}$ is the partial derivative of
-the $i$th element of $g(X)$ with respect to the $j$th element of vector
-$X$.
-
-Often, we will even use this to do transformations that are not
-1-to-1. That will involve doing a transformation that \emph{is}
-1-to-1 using this method with dummy variables, then integrating
-out those dummy variables.
-
-
-\clearpage
-\section{Select Probability Distributions}
-
-
-\subsection{Multivariate Normal}
-
-The univariate normal distribution is an extremely familiar concept
-where some random variable $X$ can take values along the real with
-probabilities that match the famouse bell-curve. Recall the probability
-density function of
-   \[ f_Y(y) = \frac{1}{\sigma \sqrt{2\pi}} \; e^{-\frac{1}{2\sigma^2}
-      (y - \mu)^2} \]
-However, that's limited to only one dimension, and we would like to
-generalize to higher dimensions. In the next-simplest 2-dimensional
-case, we'd like a distribution that actually looks like a bell---where
-potentional values can range over the real plane, $\mathbb{R}^2$, with
-the density clustered around some mean before tapering off in all
-directions, as below.
-\begin{figure}[h!]
-   \centering
-   \includegraphics[scale=0.40]{multivariate.pdf}
-\end{figure}
-\\
-This figure has mean zero for both $X_1$ and and $X_2$, and
-which are independent, implying $\sigma = I_2$, the identity matrix.
-It's easy to see that any vertical cuts parallel to $xz$ or $yz$ planes
-will yield a traditional normal random variable. This of course
-generalizes to higher dimensions, although we can't display it so nicely.
-\\
-\\
-This generalization will give us the
-\emph{Multivariate Normal (MVN) Distribution}.
-This turns out to be an extremely useful distribution. Let's highlight
-a few applications here:
-\begin{enumerate}
-  \item The MVN distribution has applications in Bayesian multivariate
-    regressions (i.e. Bayesian regressions with more than one
-    ``independent,'' ``predictor,'' or ``$X$'' variable).  In such
-    applications, we hope to find the posterior distribution of the
-    $\beta$ regression vector, and it's common to assume a MVN prior on
-    $\beta$ that results in an MVN posterior for $p(\beta|y)$.
-
-  \item Next, we often use the MVN distribution to describe
-    \emph{recurrence relations}, where we try to forecast an MVN RV one
-    period into the future, given current information about the RV, like
-    it's current value and distribution. One example would include
-    jointly forecasting height \emph{and} weight in the future given
-    current height and weight.
-
-  \item Finally, the MVN distribution forms the basis for VARs, which
-    are used to forecast different economic variables one period into
-    the future, expressing each future variable as a function of lags of
-    itself and other economic variables.  However, VARs are too broad
-    and interesting a subject to elicit only a cursory summary in this
-    note.  I'll write a more extensive summary of them elsewhere.
-\end{enumerate}
-
-In this note, the multivariate distribution will apply to a
-$d$-dimensional random vector
-\[ X = \begin{pmatrix} X^{(1)} & X^{(2)} & \ldots & X^{(d)} \end{pmatrix}^T,
-    \qquad X  \sim N_d(\mu, \Sigma) \]
-where $\mu$ is the $n$-dimensional \emph{mean vector},
-\[ \mu = \begin{pmatrix} EX^{(1)} & EX^{(2)} & \ldots & EX^{(d)} \end{pmatrix}^T,
-      \]
-and where $\Sigma$ is the $d\times d$ \emph{covariance matrix}, which
-is defined and has in its $i,j$ entry
-\[ \sigma^2 = E\left[ (X - \mu) (X-\mu)^T\right] \in
-   \mathbb{R}^{N\times N} \]
-\[ \Sigma_{ij} = Cov(X^{(i)}, X^{(j)}), \qquad i,j = 1, \ldots, d\]
-Superscripts with parentheses, like ``$X^{(i)}$,'' will denote
-$i$th element of the MVN RV ``$X$,'' while ``$X_t$'' will denote
-an MVN RV at time $t$.
-
-
-\begin{defn}(Multivariate Normal)
-A random vector $X$ has a \emph{multivariate normal}
-distribution if every linear combination of its components,
-\[ Y = a_1 X^{(1)} + \ldots + a_d X^{(d)} \]
-\[ \Leftrightarrow Y = {a} X, \qquad
-    {a} \in \mathbb{R}^{d} \]
-is \emph{univariate normally
-distributed}, with a corresponding mean and variance. This gives a
-joint density function of
-\begin{equation}
-    \label{pdf2}
-    f_{X}({x}) = \frac{1}{(2\pi)^{d/2}\lvert \Sigma \rvert^{1/2}}
-	\; e^{ -\frac{1}{2} ({x} - \mu)^T \;
-	\Sigma^{-1} ({x} - \mu) }, \qquad \lvert\Sigma\rvert =
-      \det\Sigma \qquad x \in \mathbb{R}^d
-\end{equation}
-Note, we impose the requirement that $\Sigma$ is symmetric and positive
-definite.  Symmetric because the correlation of $X$ and $Y$ equals the
-correlation of $Y$ and $X$.
-\end{defn}
-{\sl Terminology}: I'll often us MVN to refer to the case where $X$ is
-a vector with $d\geq2$; however, it should be clear that the univariate
-normal distribution is just a special case where $d=1$. Therefore,
-when speaking about an RV that could be either MVN or univariate normal
-\emph{or} properties that apply equally well to either
-type of RV, I'll often use the term \emph{Gaussian}
-both for convenience and out of reverence to long-dead German-speaking
-mathematicians. Stimmt?
-
-
-It's fairly common to consider linear transformations and functions
-of a multivariate normally distributed random variable.  For instance,
-we might have an economic or statistical model with a recurrence
-relation to describe the dynamics of some process:
-\[ X_{t+1} = A X_{t} + {V}_{t} \]
-where ${V}_t$ is some innovation or random noise vector.
-Therefore, it would be useful to be able to derive the distributions
-of \emph{functions} or \emph{linear transformation} of multivariate
-normal random variables.
-
-So let's find the probability distribution of a linear transforamtion
-of an MVN RV. Begin by assuming
-\begin{align*}
-    X &= A{Y}, \qquad {Y} \sim
-	\text{MVN}(\mu, \Sigma) \\
-    \Rightarrow \quad f(y) &= k \; \exp\left\{-\frac{1}{2} (y - \mu)^T
-	\; \Sigma^{-1} (y-\mu)\right\}
-\end{align*}
-where $k$ is a constant.\footnote{The constant will come from the
-definition of the distribution given above in Equation \ref{pdf}, but
-it's boring algebra not that interesting, so I'll suppress the details.}
-Assuming that $A$ is invertible, we substitute in, using Equation
-, to get the distribution of $X$:
-\begin{align}
-    \label{midway}
-    \Rightarrow \quad f_X(A^{-1}x) &= k' \exp\left\{-\frac{1}{2} (A^{-1}x - \mu)^T
-	\Sigma^{-1} (A^{-1}x-\mu)\right\}
-\end{align}
-Next, since the expectation is a linear operator, we can use the fact
-that
-\begin{align*}
-    EX &= E[A{Y}] = A E{Y} = A \mu \\
-    \Rightarrow \quad \mu_* &= A \mu \\
-    \Leftrightarrow \quad \mu &= A^{-1} \mu_*
-\end{align*}
-where $\mu'$ is the mean vector of $X$.  With that, we
-can substitute back into Equation \ref{midway} and simplify even
-further, using convenient matrix manipulations like the distributivity
-property, associativity, etc.:
-\begin{align*}
-    f_X(A^{-1}x) &= k' \exp\left\{-\frac{1}{2} (A^{-1}x - \mu)^T \;
-	\Sigma^{-1} (A^{-1}x-\mu)\right\} \\
-    &= k' \exp\left\{-\frac{1}{2} (A^{-1}x - A^{-1}\mu_*)^T \;
-	\Sigma^{-1} (A^{-1}x-A^{-1}\mu_*)\right\} \\
-    &= k' \exp\left\{-\frac{1}{2} [A^{-1}(x - \mu_*)]^T \;
-	\Sigma^{-1} [A^{-1}(x-\mu_*)]\right\} \\
-    &= k' \exp\left\{-\frac{1}{2} (x - \mu_*)^T \; [(A^{-1})^T \;
-	\Sigma^{-1} A^{-1}] (x-\mu_*)\right\} \\
-    &= k' \exp\left\{-\frac{1}{2} (x - \mu_*)^T \;
-	\Sigma_*^{-1} \; (x-\mu_*)\right\} \\
-    \Rightarrow X &\sim  \text{MVN}(\mu_*, \Sigma_*),
-    \qquad \text{where $\mu_* = A\mu$ and $\Sigma_* = A\Sigma A^T $}
-\end{align*}
-This is huge! It means \emph{linear transformations of MVN
-RV's are themselves MVN.}
-
-
-If you're familiar with the standard univariate normal RV,
-then you can probably guess what the standard MVN RV is:
-\begin{equation}
-    {Z} \sim \text{MVN}(0, \; I_d)
-\end{equation}
-where $I_d$ is the $d\times d$ identity matrix.  This form for
-the covariance matrix also suggests that the different components
-of ${Z}$ (denoted $Z_1, Z_2, \ldots, Z_d$) are independent and
-Gaussian.
-\\
-\\
-Moreover, just like we can build from a standard univariate to
-a general univariate.  To do so, we'll use the results from the
-last section, since building from a standard MVN
-to general MVN simply involves linear transformations of the components.
-Specifically, we can express the MVN RV ${X}$ as follows
-\begin{equation}
-    {X} = \mu + A{Z}, \qquad {X}\sim
-	\text{MVN}(\mu, AA^T)
-\end{equation}
-{\sl Computation}: Suppose we know that we want ${X}$ to
-be MVN($\mu, \; \Sigma)$, and we can only generate ${Z}$.
-How do we choose $A$ such that $AA^T = \Sigma$.  Typically, we'll
-have to use something like a \emph{Cholesky Factorization}
-algorithm to find the correct $A$ in the form of a lower triangular
-matrix. And if $\Sigma$ is symmetric, positive definite, then
-$A$ is guaranteed to exist and this approach will work.
-The algorithm itself can be found in the appendix.
-
-
-So to summarize, MVN (or Gaussian) RV's are particularly nice to work with because
-of some convenient properties:
-\begin{enumerate}
-    \item Suppose that ${X}$ and ${Y}$ are \emph{univariate}
-	normally distributed and independent. This then implies that they are
-	\emph{jointly normally distributed}. In other words,
-	$\begin{pmatrix} {X} & {Y} \end{pmatrix}$ must have a multivariate
-	normal distribution.
-    \item Linear functions of Gaussians are Gaussian. So if $A$
-	is a constant matrix and ${X}$ is MVN, then $A{X}$
-	is also MVN.
-    \item Uncorrelated Gaussian random variables are independent.
-    \item Conditions Gaussian's are normal. So if $X_1$ and $X_2$
-	are two components of a MVN RV, ${X}$, then
-	$X_1 | X_2$ is normal, and vice versa.
-\end{enumerate}
-
-\clearpage
-\subsection{$\Chi^2$ Distribution}
-
-
-\begin{defn}
-The $\Chi^2_\nu$ distribution with $\nu$ degrees of freedom is the sum of
-$\nu$ squared standard normal random variables:
-\begin{align*}
-  Y \sim \Chi^2_\nu
-  \quad\implies\quad
-	 Y = \sum^\nu_{i=1} Z^2_i
-   \qquad Z_i \sim N(0,1)
-\end{align*}
-\end{defn}
-
-\begin{prop}
-\label{prop:chisum}
-Given $Y_i \sim \Chi_{\nu_i}^2$, then
-\begin{align*}
-  \sum^n_{i=1} Y_i \sim \Chi^2_{\nu}
-  \qquad
-  \text{where}\;
-  \nu=\sum^n_{i=1} \nu_i
-\end{align*}
-In words, sums of $\Chi^2$ RVs are also $\Chi^2$ distributed.
-\end{prop}
-
-\begin{cor}
-\label{cor:chimu}
-Suppose that $Y_i \sim N(\mu,\sigma^2)$. Then
-\begin{align*}
-  \sum^n_{i=1} \frac{(Y_i-\mu)^2}{\sigma^2}  \sim \chi^2_n
-\end{align*}
-\end{cor}
-
-\begin{cor}
-Suppose that $Y_i \sim N(\mu,\sigma^2)$. Then
-\begin{align*}
-  \sum^n_{i=1} \frac{(Y_i-\bar{Y})^2}{\sigma^2}  \sim \Chi^2_{n-1}
-\end{align*}
-In other words, if we estimate the mean by the sample average $\bar{Y}$,
-we loose one degree of freedom.
-\end{cor}
-\begin{proof}
-Start first with the sum assuming we have the true mean $\mu$. We'll
-break it up
-\begin{align*}
-	 \sum^n_{i=1} \frac{(Y_i-\mu)^2}{\sigma^2} &= \frac{1}{
-	    \sigma^2} \sum^n_{i=1} (Y_i - \bar{Y}+ \bar{Y}-\mu)^2 \\
-	    &= \frac{1}{\sigma^2} \sum^n_{i=1}  (Y_i - \bar{Y})^2
-	    + \frac{2}{\sigma^2} \sum^n_{i=1} (Y_i-\bar{Y})(\bar{Y}-\mu)
-	    + \frac{1}{\sigma^2} \sum^n_{i=1} (\bar{Y}-\mu)^2
-      %\\
-			%&= \frac{1}{\sigma^2} \sum^n_{i=1}  (Y_i - \bar{Y})^2
-			%+ \frac{2(\bar{Y}-\mu)}{\sigma^2} \sum^n_{i=1} (Y_i-\bar{Y})
-			%+ \frac{n(\bar{Y}-\mu)^2 }{\sigma^2}  \\
-\end{align*}
-If you do out the algebra, the middle term is zero and drops out, so we
-are left with
-\begin{align*}
-	 \sum^n_{i=1} \frac{(Y_i-\mu)^2}{\sigma^2}
-	 &= \sum^n_{i=1}\frac{(Y_i - \bar{Y})^2 }{\sigma^2} +
-	    \left(\frac{\bar{Y}-\mu }{\sigma /\sqrt{n}}\right)^2
-\end{align*}
-The LHS is $\Chi^2_n$ by Corollary~\ref{cor:chimu}.
-On the RHS, the second term is the mean estimator divided by the
-standard error of the mean; therefore, that term in parentheses is a
-$N(0,1)$ random variable. When squared, the result is a $\Chi_1^2$
-random variable. Taking that over to the LHS and applying
-Proposition~\ref{prop:chisum}, we conclude that
-\begin{align*}
-  \sum^n_{i=1}\frac{(Y_i - \bar{Y})^2}{\sigma^2}
-  \sim \Chi^2_{n-1}
-\end{align*}
-\end{proof}
-\begin{rmk}
-This result is extremely important for deriving the distribution of
-different estimators, variance estimators in particular.
-\end{rmk}
-
-\begin{prop}
-Suppose that $Y$ has a $\Chi^2$ distribution with $\nu$ degrees of
-freedom. Then the distribution is a special case of the gamma
-distribution, where $\alpha = \nu/2$ and $\beta = 1/2$ with the pdf and
-descriptive statistics
-\begin{equation}
-   f_Y(y) = \frac{1}{2^{\frac{\nu}{2}} \Gamma\left(\frac{\nu}{2}\right)}
-      x^{\frac{\nu}{2} - 1} e^{-\frac{x}{2}} \qquad
-\text{Mean} = \nu, \qquad \text{Variance} = 2 \nu
-\end{equation}
-\end{prop}
-\begin{proof}
-Since we can generate a $\Chi^2(\nu)$ random variable by summing the
-square of $\nu$ independent N(0,1) random variables, this suggests that
-we can use an induction argument to get the distribution.
-\end{proof}
-
-\subsection{Student's t-Distribution}
-
-\begin{defn}
-Let $Z\sim N(0,1)$ and $Y\sim \Chi^2_n$ be independent random variables.
-Then
-\begin{align*}
-  X = \frac{Z}{(Y/n)^{1/2}}
-  \sim t_n
-\end{align*}
-where $n$ is the degrees of freedom.
-\end{defn}
-%In order to generate a variable that has $t$ distribution with
-%$n-1$ degrees of freedom,
-%we start by supposing that $Y_i\sim \text{NID}(\mu,\sigma^2)$. From
-%there, we define
-%\begin{align*}
-   %\bar{Y} = \frac{1}{n} \sum^n_{i=1} Y_i \qquad
-   %S^2 &= \frac{1}{n-1} \sum^n_{i=1} (Y_i - \bar{Y})^2 \\
-   %&=\frac{1}{n-1} \left( Y_1^2 + \cdots + Y_n^2 - n \bar{Y}^2\right)
-%\end{align*}
-%The statistics $\bar{Y}$ and $S^2$ are useful because they are both
-%unbiased estimators of $\mu$ and $\sigma^2$, respectively.
-%And before we get to the derivation, we make one final note:
-%\emph{Cochran's Theorem}
-%says that $\bar{Y}$ and $S^2$ are independent for the normal
-%distribution.\footnote{This holds for \emph{no} other distributions;
-%it is unique to the normal.}
-%\\
-%\\
-%Now let's define the statistic, $T$,
-%whose distribution we hope to find:
-   %\[ T = \frac{\bar{Y}-\mu}{S/\sqrt{n}} \qquad Y_i \sim \text{NID}(\mu,
-      %\sigma^2) \]
-%But after a bit of rearranging and variable definitions, we get
-%\begin{align*}
-   %T &= \frac{(\bar{Y}-\mu)\sqrt{n} }{S} = \frac{
-      %\frac{\bar{Y}-\mu}{\sigma/\sqrt{n}}}{\sqrt{\frac{S^2}{\sigma^2}
-      %\cdot \frac{n-1}{n-1}}} \\
-      %&= \frac{W_1}{\sqrt{W_2 / (n-1)}}
-%\end{align*}
-%Now it's clear by how we defined $W_1$ and $W_2$ that $W_1$ has a
-%N(0,1) distribution, while $W_2$ has a $\chi^2$ distribution with
-%$n-1$ degrees of freedom. Since $W_1$ and $W_2$ are \emph{independent}
-%by Cochran's theorem, the jdf of $W_1, W_2$ is
-   %\[ f_{W_1, W_2}(w_1, w_2) = \left(
-      %\frac{1}{\sqrt{2\pi}} \; e^{-\frac{1}{2} w_1^2}\right)\left(
-      %\frac{1}{ 2^{\frac{n-1}{2}} \Gamma\left(\frac{n-1}{2}\right)}
-      %\; w_2^{\frac{n-1}{2} -1} e^{-\frac{1}{2}
-      %w_2}\right)
-      %\]
-%Now we just hope to find the jdf of $T$. Since transformations must be
-%1-to-1 in the number of variables, we'll choose
-%a dummy variable, $V$, and define to simplify the mess of fractions
-%in the jdf:
-%\[ V =W_2, \qquad k = \frac{1}{\sqrt{2\pi}} \cdot \frac{1}{
-   %2^{\frac{n-1}{2}} \Gamma\left(\frac{n-1}{2}\right)} \]
-%This leads us to from the Jacobian matrix to go from $W_1$ and
-%$W_2$ to $T$ and $V$:
-%\[ J^* = \det \begin{bmatrix} \frac{\partial T}{\partial W_1} &
-   %\frac{\partial T}{\partial W_2} \\
-   %\frac{\partial V}{\partial W_1} &
-   %\frac{\partial V}{\partial W_2} \end{bmatrix} =
-   %\begin{vmatrix} \frac{1}{\sqrt{W_2/(n-1)}} && \frac{\partial T}{
-      %\partial W_2} \\ 0 && 1
-   %\end{vmatrix} = \frac{1}{\sqrt{W_2/(n-1)}}
-   %\]
-%Now we can get the jdf of $T$ and $V$:
-%\begin{align*}
-   %f_{T,V}(t,v) &= \left[ f_{W_1,W_2}(w_1, w_2) \cdot
-      %\lvert J^* \rvert^{-1}
-      %\right]^{w_1 = g_1^{-1}(t,v)}_{w_2 = g_2^{-1}(t,v)}\\
-   %&= \left[ k \cdot e^{-\frac{1}{2} w_1^2}
-      %w_2^{\frac{n-1}{2} - 1} e^{-\frac{1}{2} w_2}  \left(
-      %\frac{1}{\sqrt{w_2/(n-1)}}\right)^{-1}
-      %\right]^{w_1 = t \sqrt{\frac{v}{
-      %n-1}}}_{w_2=v}\\
-      %&= \frac{k}{\sqrt{n-1}} v^{\frac{n-1}{2} - \frac{1}{2}}
-      %e^{-\frac{1}{2} v\left( 1 + \frac{t^2}{n-1}\right)}
-%\end{align*}
-%Now we just need to integrate out the dummy variable, $V$, to
-%get the distribution of $T$, which will require some substitution:
-%\[ y = \frac{1}{2} v \left( 1 + \frac{t^2}{n-1} \right), \qquad
-   %dv = \frac{2}{\left( 1 + \frac{t^2}{n-1} \right)} \; dy \]
-%\begin{align*}
-   %\Rightarrow f_{T}(t) &=\frac{k}{\sqrt{n-1}} \int^\infty_0
-      %v^{\frac{n-1}{2} - \frac{1}{2}}
-      %e^{-\frac{1}{2} v\left( 1 + \frac{t^2}{n-1}\right)} \; dv \\
-      %&= \frac{k}{\sqrt{n-1}} \left( \frac{2}{ 1 + \frac{t^2}{n-1} }
-      %\right)^{\frac{n-1}{2} + \frac{1}{2}} \int^\infty_0
-      %y^{\frac{n-1}{2} - \frac{1}{2}} e^{-y} \; dy
-%\end{align*}
-%Now we recognize the integral as the $\Gamma(n/2)$ function, so
-%we can substitute that in and substitute in for $k$ to get
-%\begin{align*}
-   %\Rightarrow f_{T}(t) &=\frac{\Gamma(n/2)}{
-      %\Gamma\left(\frac{n-1}{2}\right)\sqrt{\pi(n-1)}}
-      %\left( 1 + \frac{t^2}{n-1}\right)^{-\frac{n}{2}}
-%\end{align*}
-%So for a given $n$, this is the $t$-distribution with $n-1$ degrees
-%of freedom.
-%\\
-%\\
-%Equivalently, we can also express the distribution in an equally
-%common formulation, where the statistic has $\nu$ degrees of freedom:
-%\begin{align*}
-   %\Rightarrow f_{T}(t) &=\frac{\Gamma\left(\frac{\nu+1}{2}\right)}{
-      %\Gamma\left(\frac{\nu}{2}\right)\sqrt{\nu\pi}}
-      %\left( 1 + \frac{t^2}{\nu}\right)^{-\frac{\nu+1}{2}}
-%\end{align*}
-
-\newpage
-\subsection{F-Statistic and Distribution}
-
-
-\begin{defn}
-Closely related to the $t$-distribution (and just as important), we now
-want to find the distribution of the $F$-statistic, defined as
-\begin{align*}
-  Y = \frac{ X_a / a}{X_b / b},\qquad\qquad
-  X_a \sim \Chi^2_a
-  \quad X_b \sim \Chi^2_b
-\end{align*}
-Then $Y\sim F_{a,b}$.
-\end{defn}
-%Since $X_a$ and $X_b$ are assumed independent,
-%we can form the jdf as the product of the two density functions
-%\begin{align*}
-   %f_{X_a, X_b}(x_a, x_b) &= \left(\frac{1}{2^{a/2} \Gamma(a/2)}
-      %\; x_a^{a/2 -1} e^{-x_a/2 }\right) \left(
-      %\frac{1}{2^{b/2}  \Gamma(b/2)} \;
-      %x_b^{b/2 -1} e^{- x_b /2} \right)\\
-   %&= k \; x_a^{a/2 -1} \; x_b^{b/2 -1} e^{-\frac{1}{2}(x_a + x_b)} \\
-   %\text{where } \quad k &= \frac{1}{ 2^{\frac{a+b}{2}} \Gamma(a/2)
-      %\Gamma(b/2)}
-%\end{align*}
-%Now we want to find the jdf of $F$ and our chosen dummy variable,
-%$G=X_b$. To do so, we start with the inverse functions and
-%then form the Jacobian matrix:
-   %\[ X_a = \frac{a FG}{b}, \qquad X_b = G, \quad\Rightarrow \quad
-     %|J| = \begin{vmatrix} \frac{\partial X_a}{\partial F} &
-      %\frac{\partial X_a}{\partial G} \\
-      %\frac{\partial X_b}{\partial F} &
-      %\frac{\partial X_b}{\partial G} \end{vmatrix} =
-      %\begin{vmatrix}
-	 %\frac{a G}{b} & \frac{a F}{b} \\ 0 & 1
-      %\end{vmatrix}
-      %= \frac{a}{b} G
-      %\]
-%This allows us to write the trnasformed jdf
-%\begin{align*}
-   %p_{F,G}(f,g) &= \left[
-      %k x_a^{a/2 -1} x_b^{b/2 -1} e^{-\frac{1}{2}(x_a + x_b)}
-      %\left( \frac{a}{b} g\right) \right]^{x_a = a f g/b}_{x_b = g}\\
-   %&= k' f^{a/2 -1} g^{\frac{a+b}{2}-1} e^{-\frac{g}{2}\left(
-      %\frac{a}{b}f +1 \right)} \\
-   %\text{ Where} \qquad k' &= \frac{1}{ 2^{\frac{a+b}{2}} \Gamma(a/2)
-      %\Gamma(b/2)} \left( \frac{a}{b}\right)^{\frac{a}{2}}
-%\end{align*}
-%To get the density function of $F$, we integrate out the dummy
-%variable, $G=X_b$, which is a simple $\chi^2$ variable whose support
-%is the positive real line:
-%\begin{align*}
-   %p_F(f) &= k' f^{a/2 -1} \int^\infty_0
-      %g^{\frac{a+b}{2}-1} e^{-\frac{g}{2}\left(
-      %\frac{a}{b}f +1 \right)} \; dg
-%\end{align*}
-%We'll make the substitution
-   %\[ u = \frac{g}{2}\left(\frac{a}{b} f +1\right) , \qquad
-      %g = 2u \left( \frac{a}{b} f +1\right)^{-1} \]
-   %\[ dg = 2 \left( \frac{a}{b} f +1\right)^{-1} \; du
-      %\]
-%\begin{align*}
-   %\Rightarrow \qquad p_F(f) &= k' f^{a/2 -1}  \left[
-      %2 \left( \frac{a}{b} f +1\right)^{-1}\right]^{\frac{a+b}{2}}
-     %\int^\infty_0 u^{\frac{a+b}{2} - 1}
-     %e^{-u} \; du
-%\end{align*}
-%Finally,
-%we recognize that the integral is simply the $\Gamma( (a+b)/2)$
-%function. This allows us to simplify $p_F$ and substitute back for
-%$k'$ to get
-%\begin{align*}
-   %p_F(f) &= k' f^{a/2 -1}  \left[
-      %2 \left( \frac{a}{b} f +1\right)^{-1}\right]^{\frac{a+b}{2}}
-      %\Gamma\left(\frac{a+b}{2}\right) \\
-   %\Rightarrow \qquad
-   %p_F(f) &= \frac{\Gamma\left(\frac{a+b}{2}\right)}{ \Gamma(a/2)
-      %\Gamma(b/2)} \left( \frac{a}{b}\right)^{\frac{a}{2}}
-      %f^{\frac{a}{2} -1} \left[
-	 %1 + \frac{a}{b} f \right]^{-\frac{a+b}{2}}
-%\end{align*}
-%which is the density function for $F$.
-
-
-
-\clearpage
-\subsection{Beta Distribution}
-
-One particularly useful random variable is the Beta Distribution, which
-model proportions relatively well, as it only takes values between
-$0$ and $1$, and which also retains the uniform distribution as a special
-case.
-
-A random variable $Y$ has a \emph{beta probability distribution} if
-and only if it has density function
-\begin{equation}
-   \label{pdf}
-   f_Y(y) = \begin{cases} \frac{y^{\alpha -1} (1-y)^{\beta-1}}{B(\alpha,
-      \beta)}, & 0\leq y \leq 1 \\
-	 0, & \text{otherwise}
-   \end{cases} \qquad \alpha, \beta > 0
-\end{equation}
-where the function $B$ is defined
-   \[ B(\alpha, \beta) = \int^1_0 y^{\alpha-1}(1-y)^{\beta-1} \; dy =
-      \frac{\Gamma(\alpha)\Gamma(\beta)}{\Gamma(\alpha + \beta)} \]
-Varying $\alpha$ and $\beta$ can lead to a vast array of different
-shapes.
-
-By a few easy manipulations, it can be shown that the beta distribution
-has mean and variance
-\begin{equation}
-   \label{beta}
-    \mu = \frac{\alpha}{\alpha+\beta}, \qquad \sigma^2 =
-      \frac{\alpha\beta}{(\alpha+\beta)^2 (\alpha+\beta+1)}
-\end{equation}
-
-The Beta Function can be defined as
-\[ B(\alpha, \beta) = \frac{\Gamma(\alpha) \Gamma(\beta)}{\Gamma(\alpha
-   + \beta)} \]
-This happens to have several integral representations, two of which
-we list:
-\begin{align}
-   B(\alpha, \beta) &= \int^{\infty}_0 t^{\alpha-1} (1+t)^{-(\alpha+
-   \beta)} \; dt \label{int1} \\
-   B(\alpha, \beta) = \int^1_0 t^{x-1} (1-t)^{y-1} dt \label{int2}
-\end{align}
-The proof\footnote{All proofs and further information can be found
-   on the Statlect.com website:
-   \url{http://www.statlect.com/subon2/betfun1.htm}. }
-that Equation \ref{int1} does indeed equal that of \ref{int1}
-requires a bit of clever manipulation, while the Equation \ref{int2} uses
-Equation \ref{int1} and makes the substitution
-   \[ s = \frac{t}{1+t} = 1-\frac{1}{1+t}, \qquad \Rightarrow
-      t = \frac{s}{1-s} \]
-
-
-\subsection{General Gamma Function}
-
-The gamma function has many special cases, but let's consider it
-in its most general form, along with the mean and variance:
-\begin{equation}
-   f_X(x) = \frac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha-1}
-      e^{-\beta x}, \qquad x > 0
-\end{equation}
-\[ \text{Mean} = \frac{\alpha}{\beta} \qquad \text{Variance} =
-   \frac{\alpha}{\beta^2} \]
-Gamma random variables also have the nice property that
-\[ X_i \sim \text{Gamma}(\alpha_i, \;\beta) \quad \Rightarrow \quad
-   \sum^n_{i=1} X_i \sim \text{Gamma}\left(\sum^n_{i=1} \alpha_i,\;\beta
-   \right) \]
-
-\subsection{Exponential Random Variable}
-
-This family has $\alpha=1$ with $\beta$ unrestricted. Changing the way
-we denote the variables (set $\beta =\theta$), this simplifies to
-   \[ f_X(x) = \theta\; e^{-\theta} \]
-This is particularly useful for waiting times, as it is a memoryless
-distribution. In addition, as it is technically a Gamma random
-variable, sums of exponential variables will have a Gamma distribution:
-\[ X_i \sim \text{Exp}(\theta) \quad \Rightarrow \quad
-   \sum^n_{i=1} X_i \sim \text{Gamma}(n, \theta) \]
-Another attraction is the intimate connection this distribution has
-with the Poisson process.  Namely, suppose $N(t)$ is a Poisson process
-with parameter $\theta$, in which case $N(t)$ is Poisson distributed
-with parameter $\theta t$, then the interarrival times are
-exponentially distributed with parameter $\theta$.
-
-\clearpage
-\subsection{Quadratic Form Results}
-
-\begin{prop}
-Suppose that $X\sim N_p(\mu,\Sigma)$ where $\rank(\Sigma)=p$. Then
-\begin{align*}
-  (X-\mu)'\Sigma^{-1}(X-\mu) \sim \Chi_p^2
-\end{align*}
-\end{prop}
-\begin{proof}
-Since $\Sigma$ is symmetric positive definite, we can factor
-$\Sigma=\Sigma^{-1}\Sigma^{-1}$ via an eigenvalue decomposition. Then
-define
-\begin{align*}
-  Z = \Sigma^{-1/2}(X-\mu)
-  \quad\implies\quad
-  (X-\mu)'\Sigma^{-1}(X-\mu)
-  = Z'Z
-\end{align*}
-where the $Z\sim N(0,I_p)$. Hence, the result follows.
-\end{proof}
-
-\begin{prop}
-Suppose that $M$ is an idempotent matrix $p\times p$ matrix with rank
-$k$. Then $Z'MZ\sim \Chi^2_k$.
-\end{prop}
-\begin{proof}
-\end{proof}
-
-
-\clearpage
 \section{Large Sample Theory}
 
 
@@ -7686,7 +8134,9 @@ $\E[X_n]=\mu$, $\Var(X_n)=\sigma^2$, and $\Cov(X_i,X_j)=0$,
 \end{thm}
 \begin{rmk}
 We assume existence of the second moment here. In the Strong Law of
-Large Numbers, we dispense with that assumption.
+Large Numbers, we dispense with that assumption, and we also happen to
+get \emph{almost sure} convergence, rather than the weaker notion of
+convergence in probability as we had here.
 \end{rmk}
 \begin{proof}
 Since $\hat{\mu}_N$ is a random variable, we can use Chebyshev's
@@ -7715,6 +8165,16 @@ $\E[X_n]=\mu<\infty$.
 \end{align*}
 \end{thm}
 
+\begin{thm}\emph{(Ergodic Theorem)}
+Suppose that $y_t$ is a stationary and ergodic (vector) process with
+$\E[y_t]=\mu$. Then
+\begin{align*}
+  \frac{1}{T}\sumtT y_t \pto \mu
+\end{align*}
+In words, the $y_t$ can be correlated rather than iid---so long as they
+are stationary and ergodic---and the resulting time average will
+converge to the cross-sectional average.
+\end{thm}
 
 \clearpage
 \subsection{Central Limit Theorem}
@@ -7730,6 +8190,14 @@ $\E[X_i] = \mu$ and $\Var(X_i)=\sigma^2$. Then
 \end{align*}
 \end{thm}
 
+\begin{thm}\emph{(Martingale Difference CLT)}
+Suppose that $\{X_n\}\ninf$ is a stationary and ergodic martingale
+difference sequence with respect to the filtration $\{\sF_n\}\ninfz$,
+i.e. $\E[X_n|\sF_{n-1}]=0$. Also suppose that $\E[X_nX_n']=\Sigma$. Then
+\begin{align*}
+  \frac{1}{N}\sumnN X_n \dto N(0,\Sigma)
+\end{align*}
+\end{thm}
 
 \clearpage
 \subsection{Delta Method}
@@ -9164,27 +9632,36 @@ where $K$ is ``sufficiently small'' given the chosen value of $\alpha$.
 This maximizes the power after controlling for the Type I error---i.e.
 after setting the value of the Type I error equal to $\alpha$.
 
+\clearpage
+\section{Time Series}
+
 
 \clearpage
 \section{Generalized Method of Moments}
 
 \subsection{Method of Moments and GMM Defined}
 
-A model and its assumptions typically imply certain
-\emph{moment conditions} stating that some function
-$\bsf:\R^M\times\R^K \ra \R^L$ of random variable $\bsw_n\in\R^M$ and
-parameters $\bsbeta \in\R^K$ must equal (without loss of generality) the
-constant zero vector:
+A model and its assumptions typically imply certain \emph{moment
+conditions} which state that some function $\bsf:\R^M\times\R^K \ra
+\R^L$ of random variable $\bsw_n\in\R^M$ and true parameter vector
+$\bsbeta \in\R^K$ must equal (without loss of generality) the constant
+zero vector:
 \begin{align}
   \label{populationMomentConditions}
-  \bsg(\bsbeta) := \E[\bsf(\bsw_n,\bsbeta)] = \bso
+  \bsg(\bsbeta) := \E[\bsg_n(\bsbeta) ]
+  = \E[\bsf(\bsw_n,\bsbeta)] = \bso
 \end{align}
-where $\bsg:\R^K\ra \R^L$. Our goal is to estimate $\bsbeta$.  Quite
-sensibly, we can estimate parameters by drawing a sample $\{\bsw_n\}\nN$
-and constructing a sample analog $\bsg_N$ of the moment conditions
+where $\bsg:\R^K\ra \R^L$. Notice that we introduced the shorthand
+notation $\bsg_n(\bsb)=\bsf(\bsw_n,\bsb)$.
+Our goal is to estimate $\bsbeta$. Quite sensibly, we can estimate
+parameters by drawing a sample $\{\bsw_n\}\nN$, using them to construct
+sample observations $\bsg_n(\bsb)$, and then forming the sample analog
+$\bsg_N$ of the moment conditions
 \begin{align}
   \label{sampleMomentConditions}
   \bsg_N(\bsb) :=
+  \frac{1}{N} \sumnN \bsg_n(\bsb)
+  =
   \frac{1}{N} \sumnN \bsf(\bsw_n,\bsb)
 \end{align}
 This is a function of parameter vector $\bsb$. We will naturally choose
@@ -9341,12 +9818,12 @@ estimator. In particular, take the model
   \E[\varepsilon_n\bsx_n] &=
   \E[(y_n-\bsx_n'\bsbeta)\bsx_n] = \bso
 \end{align*}
-The orthogonality condition $\bsg(\bsb)=\E[\varepsilon_n\bsx_n']=\bso$
+The orthogonality condition $\bsg(\bsbeta)=\E[\varepsilon_n\bsx_n']=\bso$
 will be the moment condition to use. Therefore, we form $\bsg_N$, the
 sample analog of $\bsg$,
 \begin{align*}
-  \bsg_N(\bsb) &= \frac{1}{N}\sumnN (y_n-\bsx_n'\bsbeta)\bsx_n
-  = \frac{1}{N}\bsX'(\bsy - \bsX\bsbeta)
+  \bsg_N(\bsb) &= \frac{1}{N}\sumnN (y_n-\bsx_n'\bsb)\bsx_n
+  = \frac{1}{N}\bsX'(\bsy - \bsX\bsb)
 \end{align*}
 and estimate the parameters using identity weighting matrix
 $\bsW = \bsI_K$ (ignoring constants like $N$ or $\frac{1}{N}$):
@@ -10567,7 +11044,8 @@ results:
     We strengthen Assumption 3 above. In particular,
     we suppose that $\bsx_n\varepsilon_n$ has finite second moment,
     i.e.\ $\E[\varepsilon_n^2\bsx_n\bsx_n']<\infty$, and is a
-    martingale difference sequence, i.e.\
+    martingale difference sequence relative to some filtration (the
+    natural filtration will do just fine), i.e.\
     \begin{align*}
       \E[\bsx_n\varepsilon_n\;|\;
       \bsx_{n-1}\varepsilon_{n-1},\bsx_{n-2}\varepsilon_{n-2},\ldots]
@@ -10998,6 +11476,53 @@ Now we consider each in turn:
     combine the $\sqrt{N}$ terms.
 \end{enumerate}
 \end{proof}
+
+\clearpage
+\subsection{Estimation of AR($p$) Model}
+
+Suppose that we have AR($p$) model
+\begin{align*}
+  y_t &= \phi_1y_{t-1} + \cdots + \phi_py_{t-p}
+  + \varepsilon_t
+  \qquad \varepsilon_t \sim iid(0,\sigma^2)
+\end{align*}
+If all roots of the AR polynomial
+$\phi(z) = 1-\phi_1z - \cdots - \phi_pz^p$ are outside the unit circle,
+then $y_t$ is stationary and ergodic.
+Therefore, letting $\bsx_t=(y_{t-1} \; \cdots \; y_{t-p})'$ and
+$\bsbeta=(\phi_1\; \cdots \phi_p)'$, we can construct the following
+regression,
+\begin{align*}
+  y_t = \bsx_t'\bsbeta + \varepsilon_t
+\end{align*}
+Even though $y_t$ is correlated over time and $\bsx_t$ is also
+correlated over time, this regression satisfies all of the assumptions
+of this section---stationary and ergodic $(y_t,\bsx_t)$, mds
+$\bsx_t\varepsilon_t$), etc. So all of the results above apply equally
+well to this regression. But we also happen to get a nice simplification
+in the asymptotic distribution of our OLS estimator. In particular,
+$\varepsilon_t$ is independent of all past $y_t$, so $\varepsilon_t$ is
+independent of $\bsx_t$. Therefore, we can break up the middle term in
+the asymptotic variance formula:
+\begin{align*}
+  \E[\bsx_t\bsx_t']^{-1}\;\E[\varepsilon^2_t\bsx_t\bsx_t']\;\E[\bsx_t\bsx_t']^{-1}
+  &=
+  \E[\bsx_t\bsx_t']^{-1}\;
+  \E[\varepsilon^2_t]
+  \E[\bsx_t\bsx_t']
+  \;\E[\bsx_t\bsx_t']^{-1} \\
+  &=
+  \sigma^2\E[\bsx_t\bsx_t']^{-1}\;
+\end{align*}
+which implies that
+\begin{align*}
+  \sqrt{T}(\bshatbeta_{OLS}-\bsbeta)
+  \dto N\big(0,\sigma^2\E[\bsx_t\bsx_t']^{-1}\big)
+\end{align*}
+
+
+
+
 
 \clearpage
 \subsection{Clustering}
