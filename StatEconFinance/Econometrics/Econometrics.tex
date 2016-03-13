@@ -364,6 +364,7 @@
   {\end{aligned}\right\rbrace}
 
 % Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
 \newcommand{\vc}{\operatorname{vec}}
 \newcommand{\Cov}{\operatorname{Cov}}
 \newcommand{\Prb}{\operatorname{P}}
@@ -421,11 +422,12 @@
 \newcommand{\minf}{_{m=1}^\infty}
 \newcommand{\tinf}{_{t=1}^\infty}
 \newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
 \newcommand{\kinfz}{_{k=0}^\infty}
 \newcommand{\ninfz}{_{n=0}^\infty}
 \newcommand{\minfz}{_{m=0}^\infty}
 \newcommand{\tinfz}{_{t=0}^\infty}
-\newcommand{\nNz}{_{n=0}^N}
+\newcommand{\tTz}{_{t=0}^T}
 
 % Limits
 \newcommand{\limN}{\lim_{N\rightarrow\infty}}
@@ -7669,6 +7671,1171 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 %There are, of course, $n-1$ equal width buckets.
 
 
+\clearpage
+\section{Time Series}
+
+%\subsection{Linear Difference Equations}
+
+%\begin{defn}(Linear Difference Sequence)
+%A linear difference sequence specifies a law of motion for some series.
+%It generally involves taking some input sequence $\{\varepsilon_t\}$ and
+%producing some output sequence $\{y_t\}$.
+%\end{defn}
+
+%\clearpage
+\subsection{Stationarity}
+
+\begin{defn}(Strict Stationarity)
+A discrete stochastic process $\{y_t\}$ is \emph{strictly stationary} if
+the distribution of $(y_t,\ldots,y_{t+k})$ is the same as the
+distribution for $(y_s,\ldots,y_{s+k})$ for all $t$, $s$, and $k$. That
+is, shifting time indices does not change the joint distribution of the
+stochastic process.
+\end{defn}
+
+\begin{defn}(Covariance or Weak Stationarity)
+A stochastic process $\{y_t\}$ is \emph{covariance stationary},
+\emph{weakly stationary}, or just \emph{stationary} if the mean and the
+autocovariance function does not depend upon time, i.e. for all $t$:
+\begin{align*}
+  \E[y_t] &= \mu \\
+  \Cov(y_t,y_{t+k}) &= \gamma(k)
+\end{align*}
+where $\mu$ is a constant and $\gamma(k)$ is an autocovariance function
+that does not depend upon time, just the lag length $k$.
+\end{defn}
+\begin{rmk}
+``Stationary'' will generally refer to covariance or weak stationarity
+since that's mostly what we care about. If I want to invoke strict
+stationarity, I will explicitly use the qualification ``\emph{strictly}
+stationary.''
+\end{rmk}
+
+\begin{defn}(Trend Stationary)
+A stochastic process $\{y_t\}$ is \emph{trend stationary} if
+$\{y_t-f(t)\}$ is stationary for some nonstochastic function $f(t)$ that
+traces out a trend.
+\end{defn}
+
+
+\begin{defn}(White Noise)
+A stochasic process $\{y_t\}$ is called \emph{white noise} if it
+satisfies for all $t$
+\begin{align*}
+  \E[y_t] &= 0 \\
+  \E[y_t^2] &= \sigma^2 \\
+  \E[y_ty_{t-k}] &= 0 \qquad \forall k\neq 0
+\end{align*}
+This process is clearly covariance stationary, and it's one of the
+simplest examples of a covariance stationary process.
+\end{defn}
+
+\begin{defn}(Random Walk)
+A stochastic process $\{y_t\}$ is a \emph{random walk} if the process
+$\{\Delta y_t\}$ is white noise, where $\Delta y_t = y_t-y_{t-1}$.
+\end{defn}
+
+
+\clearpage
+\subsection{Lag Operator and Lag Polynomials}
+
+\begin{defn}(Lag Operator)
+The \emph{lag operator} $L$ is an operator that maps sequences
+into sequences such that $\{y_{t-1}\}=L\left(\{y_t\}\right)$. We often
+simply write $y_{t-1}=Ly_t$. We use powers of the lag operator to
+express lags of more than one time unit:
+\begin{align*}
+  y_{t-k} = L^k y_t
+\end{align*}
+Important, $L$ is a \emph{linear} operator.
+\end{defn}
+
+\begin{defn}(Lag Polynomial)
+The lag operator allows us to write linear difference equations in a
+very terse way. In particular, suppose we have an ARMA($p$, $q$)
+\begin{align*}
+  y_t
+  = \phi_1 y_{t-1}
+  +\cdots
+  + \phi_p y_{t-p}
+  + \varepsilon_t
+  + \theta_1\varepsilon_{t-1}
+  + \cdots
+  + \theta_q\varepsilon_{t-q}
+\end{align*}
+This can be written using the lag operator as
+\begin{align*}
+  (1 - \phi_1 L - \cdots - \phi_pL^p)y_t
+  &=
+  (1+ \theta_1 L + \cdots +\theta_qL^q )\varepsilon_t
+\end{align*}
+From there, we can define \emph{lag polynomials} $\phi(\,\cdot\,)$ and
+$\theta(\,\cdot\,)$ to arrive at the compact expression
+\begin{align*}
+  \phi(L)y_t
+  &=
+  \theta(L)\varepsilon_t \\
+  \text{where}\quad
+  \phi(z) &:=
+  1 - \phi_1 z - \cdots - \phi_pz^p
+  \\
+  \theta(z)
+  &:=
+  1+ \theta_1 z + \cdots +\theta_qz^q
+\end{align*}
+where we think of $\phi(\,\cdot\,)$ and $\theta(\,\cdot\,)$ as
+polynomials that we can evaluate at $L$ (the lag operator) or any
+$z\in\C$.
+\end{defn}
+
+\begin{defn}(Lag Polynomial Inverses)
+Consider the following function: $\Psi(z)=(1-z)$. If we want to compute
+its inverse for $|z|<1$, we could appeal to the geometric sum to write
+\begin{align*}
+  \Psi(z)^{-1} = \frac{1}{1-z}
+  = \sumninfz z^n
+  = 1+z+z^2 + z^3 + \cdots
+\end{align*}
+Now if instead, $\Psi$ defined a \emph{lag polynomial} $\Psi(L) =
+(1-\psi L)$ where $|\psi|<1$, this logic still works, and we should
+define the inverse of the simple lag polynomial as
+\begin{align}
+  \Psi(z)^{-1}
+  = 1+\psi L+\psi L^2 + \psi L^3 + \cdots
+  \label{laginv}
+\end{align}
+where, again, we need $|\psi|<1$ for this to make sense.\footnote{%
+  The lag operator $L$ can usefully be thought of as having modulus of
+  one so that $|\psi|<1$ is sufficient to ensure that $|\psi L|<1$,
+  whatever that means.
+}
+We can invert more general lag polynomials by first factoring them as we
+would any other polynomial:
+\begin{align*}
+  \Psi(L)
+  &= 1 - \psi_1 L - \cdots \psi_pL^p \\
+  &= (1-\lambda_1L)(1-\lambda_2L)\cdots(1-\lambda_pL)
+\end{align*}
+Then to invert $\Psi(L)$, we can just invert the individual
+$(1-\lambda_iL)$ one at a time
+\begin{align*}
+  \Psi(L)^{-1}
+  &= (1-\lambda_1L)^{-1}(1-\lambda_2L)^{-1}\cdots(1-\lambda_pL)^{-1}
+\end{align*}
+using the geometric sum Expression~\ref{laginv} above for each.
+Of course, this makes clear that we need all roots $|\lambda_i|<1$ to do
+this.
+\end{defn}
+
+\clearpage
+\subsection{MA(q), AR(p), and ARMA(p,q) Models}
+
+\begin{defn}(MA(q) Models)
+We define an MA(q) process $\{y_t\}$ given white noise innovations
+$\{\varepsilon_t\}$ as
+\begin{align*}
+  y_t &= \mu + \theta_0\varepsilon_t + \theta_1y_{t-1} + \cdots \theta_qy_{t-q}
+  \qquad\qquad \varepsilon_t\sim(0,\sigma^2)
+  \\
+  \iff\quad
+  y_t - \mu
+  &= \theta(L) \varepsilon_t
+  \\
+  \text{where}\quad
+  \theta(z) &= \theta_0 + \theta_1z + \cdots + \theta_qz^q
+\end{align*}
+It is easy to work out the mean and covariance function of the process
+\begin{align*}
+  \E[y_t] = \mu
+  \qquad
+  \gamma(k) = \E[y_ty_{t-k}] &=
+    \sum_{j=0}^{q-k} \theta_j \theta_{j+k}
+\end{align*}
+Since neither depends upon $t$, we conclude that \emph{any} MA(q)
+process is covariance stationary. And since the autocovariance function
+includes on finitely many terms, it will be absolutely summable
+$\sum_{j=0}^\infty |\gamma(j)|<\infty$, which ensures that $y_t$ will be
+ergodic for the mean.
+\end{defn}
+\begin{rmk}
+Note that in practice we often take the innovations in an MA(q) process
+to be mean-zero and \emph{iid}, which of course implies that the
+innovations are white noise and satisfy this definition. \emph{However},
+that's also slightly stronger than the definition we've given here since
+we want to be able to define the MA(q) process given only white noise
+(potentially non-iid) innovations.  Though white noise implies that the
+$\{\varepsilon_t\}$ are uncorrelated, that will not necessarily imply
+they are \emph{independent} (unless we assume they are Gaussian). This
+whole remark will turn out to be important when we encounter the Wold
+Representation.
+\end{rmk}
+
+\begin{defn}(MA($\infty$) Process)
+Suppose we let $q\ra\infty$, we get the MA($\infty$) process
+\begin{align*}
+  y_t &= \mu + \sum_{i=0}^\infty \psi_i \varepsilon_{t-i}
+  = \mu + \psi(L)\varepsilon_t
+  \qquad \varepsilon_t\sim (0,\sigma^2)
+  \\
+  \text{where}\quad
+  \psi(z) &= \psi_0 + \psi_1z + \psi_2z^2 + \cdots
+\end{align*}
+Given square summability of the coefficients, the mean and covariance
+are given by
+\begin{align*}
+  \E[y_t] &= \mu\\
+  \gamma(k) = \E[y_ty_{t-k}] &=
+  \begin{cases}
+    \sigma^2\sum_{i=0}^\infty \psi_i^2 & k=0\\
+    \sigma^2
+      \sum_{j=0}^{\infty}
+      \psi_j \psi_{j+k}
+    & k\neq 0
+  \end{cases}
+\end{align*}
+Note that this object is only well-defined if the coefficients are
+\emph{square-summable}: $\sum_{i=0}^\infty \psi_i^2<\infty$. Square
+summability is implied by another stronger assumption we might
+reasonably impose on the coefficients, \emph{absolute summability}:
+$\sum_{i=0}^\infty |\psi_i|<\infty$.
+Given either of these conditions, we can be assured that sum defining
+$y_t$ will converge in mean-square to a random variable (making
+$y_t$ a well-defined object) and that the variance of $y_t$ is finite,
+which is necessary for the process to be covariance stationary.
+Moreover, if we do impose absolute summability of the coefficients, we
+also get that the covariance function is absolutely summable
+$\sum_j |\gamma(j)|<\infty$ so that $y_t$ is ergodic for the mean.
+\end{defn}
+
+\begin{defn}(AR(p) Process)
+Given white noise innovations $\{\varepsilon_t\}$, define the AR(p)
+model
+\begin{align*}
+  y_t
+  &= \phi_1 y_{t-1} + \cdots + \phi_p y_{t-p} + \varepsilon_t
+  \qquad \varepsilon_t\sim(0,\sigma^2) \\
+  \phi(L)y_t &= \varepsilon_t \\
+  \text{where}\quad
+  \phi(z)
+  &= 1-\phi_1z - \cdots \phi_pz^p
+\end{align*}
+This can also be written in \emph{companion form}, expressing the scalar
+valued AR(p) as a vector-valued AR(1):
+\begin{align*}
+  \begin{pmatrix}
+    y_t \\ y_{t-1}\\\vdots \\ y_{t-p+2}\\y_{t-p+1}
+  \end{pmatrix}
+  &=
+  \begin{pmatrix}
+    \phi_1 & \phi_2 & \cdots& \phi_{p-1} & \phi_p \\
+    1 & 0 & \cdots & 0 & 0\\
+    0 & 1 & \cdots & 0 & 0\\
+    \vdots & \vdots & \ddots & \vdots & \vdots \\
+    0 & 0 & \cdots & 1 & 0\\
+  \end{pmatrix}
+  \begin{pmatrix}
+    y_{t-1} \\ y_{t-2}\\\vdots \\ y_{t-p+1} \\y_{t-p}
+  \end{pmatrix}
+  +
+  \begin{pmatrix}
+     \varepsilon_t\\ 0\\\vdots \\ 0 \\0
+  \end{pmatrix}
+   \\
+  \iff \qquad
+  Y_t &= \Phi Y_{t-1} + e_t
+\end{align*}
+Though MA(q) processes are \emph{always} covariance-stationary, this is
+decidedly \emph{not} the case for AR(p) processes. This motivates the
+following proposition.
+\end{defn}
+
+\begin{prop}\emph{(Stationarity of AR(p) Processes)}
+\label{prop:stationaryar}
+Suppose that $\{y_t\}$ follows AR(p) with lag polynomial $\phi(z)$.  The
+process is stationary if and only if any of the following equivalent
+statements hold:
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item All roots of the lag polynomial $\phi(z)$ have modulus $>1$
+  \item The lag polynomial has a well-defined inverse $\phi(z)^{-1}$
+  \item All of the eigenvalues of $\Phi$ have modulus $<1$
+\end{enumerate}
+\end{prop}
+
+\begin{prop}
+\emph{(Yule-Walker and the Autocovariance Function of Stationary AR(p))}
+If we multiply through the $p$th order difference equation by $y_{t-k}$
+for $k=0,1,\ldots,p$ and take expectation, it follows that the
+autocovariances satisfy the same difference equation as $y_t$:
+\begin{align*}
+  \gamma(k)
+  &=
+  \begin{cases}
+    \sigma^2 + \sum_{j=1}^p \phi_j\gamma(j)
+    & k = 0 \\
+    \sum_{j=1}^p \phi_j\gamma(k-j)
+    & k = 1,2,\ldots \\
+  \end{cases}
+\end{align*}
+This is a system of $p+1$ equations in $p+1$ unknowns,
+$\gamma(0),\ldots,\gamma(p)$.
+
+We could have also derived this from the vector representation. So
+define the unconditional variance $\Sigma=\Var(Y_t)$, which holds for
+all $t$ (since $Y_t$ is stationary) and solve
+\begin{align*}
+  \Sigma = \Var(Y_t)
+  &= \Var(\Phi Y_{t-1} + e_t)
+  = \Phi \Sigma\Phi' + D_e \\
+  \Sigma
+  &= \Phi \Sigma\Phi' + D_e
+\end{align*}
+where $D_e=\diag(\sigma^2,0,\ldots,0)$. We can solve this system by
+computing
+\begin{align*}
+  \vc(\Sigma) &= (\Phi\otimes\Phi)\vc(\Sigma) + \vc(D_e) \\
+  \implies\quad
+  \vc(\Sigma) &= \big(I_{p^2}-(\Phi\otimes\Phi)\big)^{-1}\vc(D_e)
+\end{align*}
+
+\end{prop}
+
+\begin{ex}(Stationary AR(1) Model)
+Consider the simple AR(1) model where
+\begin{align*}
+  y_t = \rho y_{t-1} + \varepsilon_t
+  \qquad \varepsilon_t\sim(0,\sigma^2)
+\end{align*}
+Suppose that $|\rho|<1$. Then we we can solve for $y_t$ in terms of past
+$\varepsilon_t$'s by backward recursive substitution:
+\begin{align*}
+  y_t
+  &= \rho y_{t-1} + \varepsilon_t
+  = \rho\big(\rho y_{t-2} + \varepsilon_{t-1}\big) + \varepsilon_t
+  = \cdots \\
+  \implies\quad
+  y_t
+  &=
+  \sum_{j=0}^\infty \rho^j\varepsilon_{t-j}
+\end{align*}
+We have thus expressed the AR(1) as an MA($\infty$) model (more on that
+in Proposition~\ref{prop:artoma}), and we see here why exactly we need
+$|\rho|<1$ or, equivalently, the roots of $\phi(z) = 1-\rho z$ to be
+$>1$ in modulus. Only this will ensure that the variance of $y_t$ is
+finite and that the process is stationary.  From there, we can then
+solve the Yule-Walker equations to compute the autocovariance function
+\begin{align*}
+  \gamma(k) = \E[y_ty_{t-k}] = \sigma^2 \frac{\rho^{|k|}}{1-\rho^2}
+\end{align*}
+\end{ex}
+
+\begin{ex}(Explosive AR(1) Model)
+Now consider the AR(1) model where $|\rho|>1$. We solve by forward
+subsitution to get $y_t$ in terms of \emph{future} $\varepsilon_t$'s:
+\begin{align*}
+  y_t
+  &= \rho^{-1}(y_{t+1} - \varepsilon_{t+1})
+  = \rho^{-1}\big(
+      \rho^{-1}(y_{t+2} - \varepsilon_{t+2}) - \varepsilon_{t+1}\big)
+  = \cdots \\
+  \implies\quad
+  y_t
+  &=
+  -\sum_{j=1}^\infty \rho^{-j}\varepsilon_{t+j}
+\end{align*}
+\end{ex}
+
+\begin{prop}\emph{(Stationary AR(p) to MA($\infty$))}
+\label{prop:artoma}
+Extending the simple AR(1) example above, if $y_t$ is a stationary AR(p)
+model, then we know by Proposition~\ref{prop:stationaryar} that the
+associated lag polynomial $\phi(z)$ is invertible. Therefore, we can
+express $y_t$ as an MA($\infty$):
+\begin{align*}
+  \phi(L)y_t = \varepsilon_t
+  \quad\iff\quad
+  y_t = \phi(L)^{-1}\varepsilon_t
+\end{align*}
+\end{prop}
+
+\begin{prop}\emph{(Invertible MA(q) to AR($\infty$))}
+\label{prop:matoar}
+Suppose that $y_t$ follows an MA(q) representation.  If the roots of the
+associated MA lag polynomial $\theta(z)$ are all $>1$ in modulus, then
+we call the MA(q) model \emph{invertible} and can express $y_t$ as an
+AR($\infty$):
+\begin{align*}
+  y_t = \theta(L)\varepsilon_t
+  \quad\iff\quad
+  \theta(L)^{-1}y_t = \varepsilon_t
+\end{align*}
+The fact that all roots are $>1$ in modulus ensures that the
+coefficients $\phi_i$ of the AR($\infty$) are absolutely summable
+$\sum_{i=0}^\infty |\phi_i|<\infty$ so that the AR($\infty$)
+representation converges in mean square to a random variable and is,
+therefore, well-defined.
+\end{prop}
+
+\begin{rmk}
+Note that while we could \emph{always} invert a \emph{stationary} AR(p),
+we cannot always invert MA(q) models. There are such things as
+non-invertible MA(q) models. So we really do need all roots of
+$\theta(z)$ to lie outside the unit circle because only then will
+$\theta(L)^{-1}$ be a well-defined object.
+\end{rmk}
+
+\begin{prop}\emph{(Observationally Equivalent MA Representations)}
+Suppose that $y_t$ follows an invertible MA(q) process. Then there is an
+associated non-invertible MA(q) process that is
+\emph{observationally equivalent}, i.e.\ with the same first- and
+second-order properities (mean and autocovariance function). The
+opposite also holds true: For every non-invertible MA(q), there is an
+associated invertible representation.
+\end{prop}
+
+\begin{defn}(ARMA(p,q) Model)
+We define an ARMA(p,q) process $\{y_t\}$ given white noise innovations
+$\{\varepsilon_t\}$ as
+\begin{align*}
+  \phi(L)y_t = \theta(L)\varepsilon_t
+\end{align*}
+If the roots of $\phi(z)$ are all $>1$ in modulus, then $\phi(L)$ has a
+well defined inverse, the process $y_t$ is stationary, and $y_t$ has an
+MA($\infty$) representation
+\begin{align*}
+  y_t = \frac{\theta(L)}{\phi(L)}\varepsilon_t
+\end{align*}
+If the roots of the $\theta(z)$ are all $>1$ in modulus, then
+$\theta(L)$ has a well-defined inverse and $y_t$ has an AR($\infty$)
+representation
+\begin{align*}
+  \frac{\phi(L)}{\theta(L)}y_t = \varepsilon_t
+\end{align*}
+\end{defn}
+
+\clearpage
+\subsection{Wold's Theorem}
+
+\begin{thm}
+Suppose $\{y_t\}_{t=-\infty}^\infty$ is a covariance stationary process.
+Then it can be representated as
+\begin{align*}
+  y_t = \kappa_t + \sum_{s=0}^\infty c_s \varepsilon_{t-s}
+  \qquad \varepsilon_t\sim(0,\sigma^2)
+\end{align*}
+where
+\begin{enumerate}[label=(\roman*)]
+  \item $\{\varepsilon_t\}$ are uncorrelated white noise (not
+    necessarily independent)
+  \item $\sum_{s=0}^\infty c_s^2<\infty$
+  \item $\kappa_t$ is uncorrelated with $\varepsilon_{s}$ for any $s$
+    and is perfectly linearly predictable from past $y_t$.
+\end{enumerate}
+\end{thm}
+Therefore, treating any arbitrary covariance stationary processes as an
+MA($\infty$) (with white noise errors) is without loss of generality.
+Though it might be more convenient to work with and manipulate
+\emph{other} representations (MA(q), AR(p), AR($\infty$), ARMA(p,q),
+etc.) in practice, we lose nothing by working with the MA($\infty$)
+representation when stating and proving results. And indeed, we will
+make use of this result extensively in later subsections by mostly
+working with the MA($\infty$) representation of processes.
+
+To be especially pedantic, note how strong this theorem is. This theorem
+doesn't just say ``we can find sequences $\{c_s\}$ and $\{\kappa_t\}$
+along with white noise process $\{\varepsilon_t\}$ so that the resulting
+MA($\infty$)
+\begin{align}
+  \kappa_t + \sum_{s=0}^\infty c_s \varepsilon_{t-s}
+  \label{wold}
+\end{align}
+has the same mean and covariance function''---which
+is a weaker statement about moments. No, the theorem is stronger and
+says says that we can find $\{c_s\}$ and $\{\kappa_t\}$
+along with white noise process $\{\varepsilon_t\}$ so that the resulting
+MA($\infty$) as in Expression~\ref{wold} has the exact same
+\emph{joint distribution} as $y_t$:
+\begin{align*}
+  \begin{pmatrix}
+    y_t \\ \vdots \\ y_{t+k}
+  \end{pmatrix}
+  \overset{d}{=}
+  \begin{pmatrix}
+    \kappa_t + \sum_{s=0}^\infty c_s \varepsilon_{t-s}
+    \\ \vdots \\
+    \kappa_{t+k} + \sum_{s=0}^\infty c_s \varepsilon_{t+k-s}
+  \end{pmatrix}
+  \qquad \forall t,k
+\end{align*}
+
+
+
+\clearpage
+\subsection{Optimal Forecasting}
+
+\begin{prop}\emph{(Forecasting Given Past $\{\varepsilon_t\}$)}
+Suppose that covariance-stationary $\{y_t\}$ can be written as
+\begin{align*}
+  y_t = \mu + \psi(L)\varepsilon_t
+  \qquad \varepsilon_t \sim (0,\sigma^2)
+\end{align*}
+Then the lowest MSE forecast of $y_{t+s}$ given information up to time
+$t$---i.e.\ given both $\{y_s\}_{s=-\infty}^t$ and
+$\{\varepsilon_s\}_{s=-\infty}^t$---is just the conditional mean:
+\begin{align*}
+  \hat{y}_{t+s|t}
+  = \E_t[y_{t+s}]
+  &= \E_t[\mu + \psi(L)\varepsilon_{t+s}] \\
+  &= \mu + \psi_s\varepsilon_t + \psi_{s+1}\varepsilon_{t-1} + \cdots
+\end{align*}
+which can be written as
+\begin{align}
+  \hat{y}_{t+s|t}
+  &= \mu + \left[\frac{\psi(L)}{L^s}\right]_+\varepsilon_t
+  \label{optforeeps}
+\end{align}
+where $[\,\cdot\,]_+$ is called the \emph{annihilation operator} and
+says ``Ignore negative powers of $L$ in the expression $\psi(L)/L^s$.''
+\end{prop}
+\begin{rmk}
+In practice, we obviously don't observe the infinite sequence
+$\{\varepsilon_s\}_{s=-\infty}^t$ that this formula requires. There are
+two options. First, we can recast the forecast in terms of past
+$\{y_t\}$, but that still might require infinitely many past $\{y_t\}$.
+Alternatively, one can also assume that $\varepsilon_s=0$ for all
+$s\leq 0$, then solve for $\{\varepsilon_s\}_{s=1}^t$ sequentially by using
+observations $\{y_s\}_{s=1}^t$ and the formula
+$y_t = \mu + \psi(L)\varepsilon_t$ to back out first $\varepsilon_1$,
+then $\varepsilon_2$, then $\varepsilon_3$, \ldots.
+\end{rmk}
+
+
+\begin{prop}\emph{(Wiener-Kolmogorov, Forecasting Given Past $\{y_t\}$)}
+We don't usually have past $\{\varepsilon_t\}$ when forecasting (which
+are typically model-based objects to be estimated), though we always
+have access to past $\{y_t\}$. Therefore, suppose $y_t$ has an
+AR($\infty$) representation, we rewrite the process for $y_t$ as
+\begin{align*}
+  y_t = \mu + \psi(L)\varepsilon_t
+  \quad\iff\quad
+  \psi(L)^{-1}(y_t - \mu) = \varepsilon_t
+\end{align*}
+This is an expression for $\varepsilon_t$, so ubstitute this expression
+for $\varepsilon_t$ into Expression~\ref{optforeeps} to get
+\begin{align}
+  \hat{y}_{t+s|t}
+  &= \mu + \left[\frac{\psi(L)}{L^s}\right]_+
+  \psi(L)^{-1}(y_t - \mu)
+  \label{wienerkolmogorov}
+\end{align}
+which is called the \emph{Wiener-Kolmogorov prediction formula}. We can
+thus forecast any MA($\infty$) process using this formula and past
+$\{y_t\}$ only, rather than past $\{\varepsilon_t\}$.
+\end{prop}
+
+\clearpage
+\subsection{Autocovariance Generating Function}
+
+\begin{defn}(Autocovariance Generating Function)
+Let $\gamma(k)$ be the autocovariance function of some process $y_t$
+Then the \emph{autocovariance function} for $y_t$ is defined
+\begin{align*}
+  g_y(z) = \sum_{k=-\infty}^\infty \gamma(k)z^k
+  \qquad z\in\C
+\end{align*}
+For this to be well-defined, we require the $\gamma(k)$ to be absolutely
+summable.
+\end{defn}
+
+\begin{prop}\emph{(AGF of MA($\infty$))}
+Suppose that the process $y_t$ follows an MA($\infty$) representation
+with associated lag polynomial $\psi(z)$.
+Then its autocovariance function equals
+\begin{align*}
+  g_y(z) = \sigma^2 \psi(z)\psi(z^{-1})
+\end{align*}
+But for this to be a well defined object, we need the coefficients of
+the lag polynomial to be absolutely summable
+$\sum_{j=0}^\infty|\psi_j|<\infty$.
+\end{prop}
+
+
+\subsection{Filters}
+
+\begin{defn}(Filter)
+Let $\{x_t\}$ be a covariance-stationary process and let $\{h_j\}$ be an
+absolutely summable sequence.  Then we can ``treat'' the data before
+analysis by applying a function $h(\,\cdot\,)$ called a \emph{filter}
+that produces a new, filtered series $\{y_t\}$ defined
+\begin{align*}
+  y_t &= h(L)x_t \\
+  \text{where}\quad
+  h(z) &= \sum_{j=-\infty}^\infty h_j z^j
+\end{align*}
+Moreover, if the autocovariances of $\{x_t\}$ are absolutely summable,
+then so are the autocovariances of $\{y_t\}$; therefore, filters map the
+space of covariance-stationary processes into itself.
+\end{defn}
+
+\begin{rmk}
+Really almost every ARMA process we've dealt with has been a
+``filtered series'' in the sense that the sequence of white noise shocks
+$\{\varepsilon_t\}$ are covariance stationary and, if we can write the
+ARMA as $y_t=\phi(L)^{-1}\theta(L)\varepsilon_t$, then $y_t$ is
+given by applying the filter $\phi(L)^{-1}\theta(L)$ to the covariance
+stationary process $\{\varepsilon_t\}$.
+\end{rmk}
+
+\begin{prop}
+Suppose we filter the MA($\infty$) data series $\{x_t\}$ to produce the
+new series $\{y_t\} = \{h(L)x_t\}$. Then
+\begin{align*}
+  g_y(z) = h(z)h(z^{-1})g_x(z)
+\end{align*}
+where $g_y(z)$ and $g_x(z)$ are the autocovariance generating functions
+of $y$ and $x$, respectively.
+\end{prop}
+\begin{proof}
+Since $x_t$ has an MA($\infty$) representation, we can write it as
+\begin{align*}
+  x_t = \theta(L)\varepsilon_t
+  \quad\implies\quad
+  g_x(z) = \sigma^2 \theta(z)\theta(z^{-1})
+\end{align*}
+Now consider
+\begin{align*}
+  y_t = h(L)x_t = h(L)\theta(L)\varepsilon_t
+  \quad\implies\quad
+  g_y(z) &= \sigma^2 h(z)\theta(z)h(z^{-1})\theta(z^{-1})
+  \\
+  &= h(z)h(z^{-1})\big(\sigma^2 \theta(z)\theta(z^{-1})\big)
+  \\
+  &= h(z)h(z^{-1})g_x(z)
+\end{align*}
+where everything exists and is well-defined since we assume that
+$\theta(z)$ and $h(z)$ have absolutely summable coefficients.
+\end{proof}
+
+
+\clearpage
+\subsection{Spectral Analysis: Time Series in the Frequency Domain}
+
+
+\subsubsection{Motivation}
+
+
+\begin{defn}(Simple Cyclical Process)
+Suppose we construct the cyclical process
+\begin{align*}
+  y_t = \alpha \cos(\lambda t) + \beta \sin(\lambda t)
+  \qquad
+  \text{where}\quad
+  \begin{cases}
+    \E[\alpha] = \E[\beta] = \E[\alpha \beta] = 0
+    \\
+    \E[\alpha^2] = \E[\beta^2] = \sigma^2
+    \\
+    \lambda \in [0,\pi)
+  \end{cases}
+\end{align*}
+Features of this very particular type of process
+\begin{enumerate}[label=(\roman*)]
+  \item Only $\alpha$ and $\beta$ are random. If you know them, you know
+    \emph{exactly} how the process will evolve over time.
+  \item The process is cyclic. For any integer $k$
+    \begin{align*}
+      y_{t+2\pi k/\lambda}
+      %&= \alpha \cos\big(\lambda(t+2\pi k/\lambda)\big)
+      %+\beta \sin\big(\lambda(t+2\pi k/\lambda)\big) \\
+      &= \alpha \cos\big(\lambda t+2\pi k\big)
+      +\beta \sin\big(\lambda t +2\pi k\big)
+      \\
+      &= \alpha \cos(\lambda t)
+      +\beta \sin(\lambda t)
+      = y_t
+    \end{align*}
+
+  \item
+    The process has frequency $\lambda/(2\pi)$, i.e.\ completes
+    $\lambda/(2\pi)$ cycles between any $t$ and $t+1$.
+    Equivalently, the process has period $2\pi/\lambda$, i.e.\ it takes
+    $2\pi/\lambda$ units of $t$ to complete one cycle. So if $t$ indexes
+    days, months, or years, the process takes $2\pi/\lambda$ days,
+    months, or years (respectively) to complete a single cycle.
+
+  \item The restriction $\lambda \in[0,\pi)$ is without loss of
+      generality since
+    \begin{align*}
+      \forall t,k
+      \quad
+      \sin\big((\lambda + k\pi)t\big)
+      =
+      (-1)^{tk}\sin(\lambda t)
+    \end{align*}
+    and likewise for cosine, and I could always use $-\alpha$ and
+    $-\beta$ in place of $\alpha$ and $\beta$, which have the same first
+    and second moments.
+
+  \item The process has mean zero $\E[y_t]=0$ (clear by inspection) and
+    second moments:
+    \begin{align*}
+      \gamma(k) = \E[y_ty_{t+k}]
+        &=
+        \E\left[
+          \big(
+          \alpha \cos(\lambda t)+\beta \sin(\lambda t)
+          \big)
+          \big(
+          \alpha \cos(\lambda (t+k))+\beta \sin(\lambda (t+k))
+          \big)
+        \right] \\
+        \text{Since $\E[\alpha\beta]=0$}\quad
+        &=
+        \E[\alpha^2]
+        \cos(\lambda t)\cos(\lambda (t+k))
+        +
+        \E[\beta^2]
+        \sin(\lambda t)\sin(\lambda (t+k))
+        \\
+        &=
+        \sigma^2
+        \big(
+        \cos(\lambda t)\cos(\lambda (t+k))
+        + \sin(\lambda t)\sin(\lambda (t+k))
+        \big)
+        \\
+        &=
+        \sigma^2
+        \cos(\lambda k)
+    \end{align*}
+    where the last inequality followed from
+    $\cos(v)\cos(u) + \sin(v)\sin(u) =\cos(u-v)$
+
+  \item
+    The process is perfectly linearly predictable from past values.
+    To show this, guess that $y_t$ can be predicted by just two lags,
+    $y_{t-1}$ and $y_{t-2}$, since there are only two unknown parameters
+    of $y_t$ to pin down. Then compute the population regression
+    coefficients of $y_t$ on $(y_{t-1}\;y_{t-2})$ to derive the optimal
+    linear predictor of $y_t$ given $(y_{t-1}\;y_{t-2})$. They turn out
+    to be $(2\cos(\lambda)\; -1)$, suggesting that we can write
+    \begin{align*}
+      y_t = 2\cos(\lambda) y_{t-1} - y_{t-2} + \varepsilon_t
+      \qquad \E[\varepsilon_t] = 0
+    \end{align*}
+    To show that $y_t$ is indeed \emph{perfectly} linearly predictable,
+    we need to show that $\varepsilon_t=0$, i.e.\ that the RHS is
+    \emph{exactly} the LHS. So consider
+    \begin{align*}
+      RHS &= 2\cos(\lambda) y_{t-1} - y_{t-2} \\
+      &= 2\cos(\lambda)\big(
+          \alpha \cos(\lambda(t-1)) + \beta\sin(\lambda(t-1))
+          \big) \\
+        &\qquad
+        -\big(
+          \alpha \cos(\lambda(t-2)) + \beta\sin(\lambda(t-2))
+        \big)
+    \end{align*}
+    That's a bit of a mess, but by using the identities
+    \begin{align*}
+      \sin(a\pm b) &= \sin(a)\cos(b) \pm \cos(a)\sin(b)
+      \\
+      \cos(a\pm b) &= \cos(a)\cos(b) \mp \sin(a)\sin(b)
+    \end{align*}
+    the expression above can be simplified to exactly
+    \begin{align*}
+      2\cos(\lambda) y_{t-1} - y_{t-2}
+      = \alpha \cos(\lambda t) + \beta \sin(\lambda t)
+      = y_t
+    \end{align*}
+    That implies that $y_t$ is, indeed, perfectly linearly predictable.
+\end{enumerate}
+\end{defn}
+
+\begin{defn}(More General Cyclical Process)
+Construct the following cyclical process
+\begin{align*}
+  y_t = \sum_{j=1}^J \big[
+    \alpha_j \cos(\lambda_j t)
+    + \beta_j \sin(\lambda_j t)
+  \big]
+  \qquad
+  \text{where}\quad
+  \begin{cases}
+    \E[\alpha_j] = \E[\beta_j] = \E[\alpha_j \beta_k] = 0
+    \quad \forall j,k
+    \\
+    \E[\alpha_j^2] = \E[\beta_j^2] = \sigma^2_j
+    \\
+    \E[\alpha_j\alpha_k] = \E[\beta_j\beta_k] = 0
+    \\
+    \lambda_j \in [0,\pi)
+  \end{cases}
+\end{align*}
+This process is again mean zero, but has second moments
+\begin{align*}
+  \gamma(k) = \E[y_ty_{t-k}]
+  &= \sum_{j=1}^J \sigma_j^2\cos(\lambda_j k) \\
+  \gamma(0) = \E[y_t^2] &= \sum_{j=1}^J \sigma_j^2
+\end{align*}
+This process is therefore the sum of $J$ distinct versions of the
+simpler cyclical process defined above, each with a differenct frequency
+$\lambda_j/(2\pi)$.
+Accordingly, the variance formula above says that we can
+\emph{decompose} the total variance of $y_t$ into contributions from
+cycles/oscillations at the different frequencies. In particular, the
+cycle at frequency $\lambda_j/(2\pi)$ contributes $\sigma^2_j$ to the
+total variance of $y_t$.
+\end{defn}
+
+
+\clearpage
+\subsubsection{Spectral Representation Theorem}
+
+This subsection generalizes the previous one. It was really
+nice to think about the ``contributions to the variance from
+oscillations at different frequencies''. We would now like to do that
+for \emph{any} arbitrary covariance stationary process $\{y_t\}$, not
+just processes that we rig to be cyclic from the get go. Surely,
+even for general processes, we want to be able to quantify how much of
+the variability of $y_t$ is due to long, slow moving cycles versus
+high-frequency cycles.
+
+This next theorem lets us do that by effectively taking the more general
+cyclical process above, adding together uncountably many cycles (so that
+sums become integrals), and generalizing the frequency-specific
+variances from a sequence $\{\sigma_j^2\}_{j=1}^J$ to a function
+$f(\lambda)$.
+
+All of this this provides a stochastic analog to Fourier analysis of
+determistic functions, which expresses any function as a combination of
+sine and cosine oscillations. The main goal there is typically to find
+the scalar coefficients on those sines and cosines. Here, we do the
+same, except the coefficients will be random variables.
+
+\begin{thm}\emph{(Spectral Representation Theorem)}
+Any mean-zero stationary process $\{y_t\}$ with absolutely summable
+autocovariances can be represented as
+\begin{align}
+  y_t &=
+  \int_0^\pi \alpha(\lambda) \cos(\lambda t)\;d\lambda
+  + \int_0^\pi \beta(\lambda) \sin(\lambda t)\;d\lambda
+  \label{spectralrep}
+\end{align}
+where $0 = \E[\alpha(\lambda)] = \E[\beta(\lambda)] = \E[\alpha(\lambda)
+\beta(\lambda')] \notag = \E[\alpha(\lambda)\alpha(\lambda')] =
+\E[\beta(\lambda)\beta(\lambda')]$
+for all $\lambda,\lambda' \in [0,\pi)$ and also
+\begin{align*}
+    \E[\alpha(\lambda)^2] = \E[\beta(\lambda)^2] = 2f(\lambda)
+    \qquad \forall \lambda,\lambda' \in [0,\pi)
+\end{align*}
+where $f(\lambda):[0,\pi]\ra \R$ is called the
+\emph{spectral density function} and captures the contribution to the
+total variance of $y_t$ from cycles/oscillations at each frequency
+$\lambda\in[0,\pi)$.
+
+Note that $\alpha(\lambda)$ and $\beta(\lambda)$ are
+\emph{random functions}.
+Just as $y_t$ is implictly a function on the sample space $\Omega$ and
+on the time domain $\Z$, so too are $\alpha$ and $\beta$ implicitly
+functions on sample $\Omega$ and frequency domain $[0,\pi)$.
+Therefore, each particular $\omega\in\Omega$ gives rise to not only an
+entire time series realization $\{y_t(\omega)\}_{t=-\infty}^\infty$, but
+also to corresponding $\alpha(\lambda)$ and $\beta(\lambda)$ function
+realizations that Representation~\ref{spectralrep} true.
+\end{thm}
+%\begin{rmk}
+%The integrals above are a little handwavey. They really should be
+%interpreted as
+%\begin{align*}
+  %\int_0^\pi \alpha(\lambda)\cos(\lambda t)\;d\lambda
+  %=
+  %\int_0^\pi \cos(\lambda t)\;dA(\lambda)
+%\end{align*}
+%\end{rmk}
+
+
+\begin{cor}(\emph{Alternative Spectral Representation})
+We can alternatively expression $y_t$ with spectral representation as in
+Equation~\ref{spectralrep} by enlarging the domain of $\alpha$ and
+$\beta$ from $[0,\pi)$ to $[-\pi,\pi)$ by defining, for all
+$\lambda \in[0,\pi)$
+\begin{align*}
+  \alpha(-\lambda) :=& \;\alpha(\lambda)
+  \qquad
+  \beta(-\lambda) :=& \;-\beta(\lambda)
+\end{align*}
+which allows us to rewrite the spectral decomposition of $y_t$ as
+\begin{align*}
+  y_t =&\; \int_{-\pi}^\pi \delta(\lambda)e^{i\lambda t}\;d\lambda
+  =\int_{-\pi}^\pi
+  \delta(\lambda)\big(\cos(\lambda t)+i\sin(\lambda t)\big)\;d\lambda
+  \\
+  \text{where}\quad
+  \delta(\lambda) :=& \;
+    \frac{1}{2}\big(\alpha(\lambda)-i\beta(\lambda)\big)
+\end{align*}
+which implies $\delta(-\lambda)=\overline{\delta(\lambda)}$ and
+\begin{align*}
+  \E\left[\delta(\lambda)\overline{\delta(\lambda)}\right] = f(\lambda)
+\end{align*}
+\end{cor}
+
+
+\clearpage
+\subsubsection{Spectral Density Function}
+
+\begin{prop}\emph{(Spectral Density and the Autocovariance Function)}
+The autocovariance function is the inverse Fourier transform of the
+spectral density:
+\begin{align}
+  \gamma(k)
+  &= \int_{-\pi}^\pi f(\lambda)e^{i\lambda k}\;d\lambda
+  \label{inversefourier}
+  \\
+  \iff\qquad
+  &= \int_{-\pi}^\pi f(\lambda)\cos(\lambda k)\;d\lambda
+  \notag
+\end{align}
+where the $\sin$ part of $e^{i\lambda k}$ drops out of the integral
+because it is even. Alternatively, the spectral density is the
+discrete-time Fourier transform of the autocovariance function:
+\begin{align}
+  f(\lambda)
+  &= \frac{1}{2\pi} \sum_{k=-\infty}^\infty
+  \gamma(k) e^{-i\lambda k}
+  \label{fourier}
+  \\
+  \iff\qquad
+  &= \frac{1}{2\pi}
+  \left[
+    \gamma(0) + 2\sum_{k=1}^\infty \gamma(k)\cos(k\lambda)
+  \right]
+  \notag
+\end{align}
+Therefore, there is a one-to-one mapping between the spectral density
+$f(\lambda)$ and the autocovariance function $\gamma(k)$.
+All of this assumes absolute summability of $\gamma(k)$.
+\end{prop}
+\begin{proof}
+First, the inverse Fourier transform:
+\begin{align*}
+  \gamma(k)=
+  \E[y_ty_{t-k}] =
+  \E[y_t\overline{y_{t-k}}]
+  &=
+  \E\left[
+    \left(
+    \int_{-\pi}^\pi \delta(\lambda)e^{\lambda t} \; d\lambda
+    \right)
+    \left(
+    \int_{-\pi}^\pi \overline{\delta(\lambda')}e^{-\lambda' (t-k)} \;
+    d\lambda'
+    \right)
+  \right]
+  \\
+  &=
+  \int_{-\pi}^\pi \int_{-\pi}^\pi
+  \E\left[
+    \delta(\lambda) \overline{\delta(\lambda')}
+  \right]
+  e^{\lambda t}e^{-\lambda' (t-k)} \;
+  \; d\lambda \; d\lambda'
+\end{align*}
+But recall from the definition of $\delta(\lambda)$ that
+$\E[\delta(\lambda)\overline{\delta(\lambda')}]=0$ for all
+$\lambda\neq\lambda'$ and that
+$\E[\delta(\lambda)\overline{\delta(\lambda)}]=f(\lambda)$.
+Therefore, the above integral simplifies precisely to
+Expression~\ref{inversefourier}.
+Conversely, to show Expression~\ref{fourier}, we will show that
+we can plug Expression~\ref{fourier} into
+Expression~\ref{inversefourier} for $f(\lambda)$ and get the correct
+result, i.e.\ we want to show that
+\begin{align*}
+  \gamma(k)
+  &= \int_{-\pi}^\pi
+  \underbrace{%
+  \left[
+  \frac{1}{2\pi} \sum_{j=-\infty}^\infty
+  \gamma(j) e^{-i\lambda j}
+  \right]
+  }_{\text{Candidate $f(\lambda)$}}
+  e^{i\lambda k}\;d\lambda \\
+  &= \frac{1}{2\pi}
+  \sum_{j=-\infty}^\infty
+  \gamma(j)
+  \int_{-\pi}^\pi
+  e^{i\lambda (j-k)}
+  \;d\lambda
+  = \frac{1}{2\pi}
+  \sum_{j=-\infty}^\infty
+  \gamma(j)
+  \cdot2\pi \mathbf{1}_{\{j=k\}}
+  =\gamma(k)
+\end{align*}
+where we could switch the order of integration because
+$|e^{i\lambda (k-j)}|<1$ and $\sum_k|\gamma(k)|<\infty$.
+\end{proof}
+
+
+\clearpage
+\begin{cor}\emph{(Decomposing the the Variance with $f(\lambda)$)}
+Setting $k=0$, we see that the total variance $\gamma(0)$ equals the
+area under the population spectrum:
+\begin{align*}
+  \gamma(0) = \int_{-\pi}^\pi f(\lambda) \; d\lambda
+\end{align*}
+Therefore, if we integrate over frequency range
+$[\lambda_1,\lambda_2]\subseteq[0,\pi]$
+\begin{align*}
+  2\int_{\lambda_1}^{\lambda_2} f(\lambda) \; d\lambda
+\end{align*}
+this integral tells us how much oscillations/cycles with frequencies
+$\lambda \in[\lambda_1,\lambda_2]$ contribute to the overall variance
+$\gamma(0)$ of the process.
+\end{cor}
+
+
+\begin{cor}
+\emph{(Spectral Density and the Autocovariance Generating Function)}
+Given the autocovariance function  of a process
+\begin{align*}
+  g(z)=\sum_{k=-\infty}^\infty \gamma(k)z^k
+\end{align*}
+we can immediately recover the spectral density function $f(\lambda)$:
+\begin{align*}
+  f(\lambda) = \frac{1}{2\pi} g(e^{-i\lambda})
+\end{align*}
+\end{cor}
+
+\begin{cor}\emph{(Spectral Density of MA($\infty$))}
+Suppose we have a covariance-stationary process $y_t$ that has an
+MA($\infty$) representation:
+\begin{align*}
+  y_t = \psi(L)\varepsilon_t
+\end{align*}
+Then it has spectral density function
+\begin{align*}
+  f(\lambda) = \frac{\sigma^2}{2\pi}\cdot
+  \psi(e^{i\lambda})\psi(e^{-i\lambda})
+  = \frac{\sigma^2}{2\pi}\cdot
+  \left\lvert
+  \psi(e^{i\lambda})
+  \right\rvert^2
+  %\frac{\theta(e^{i\lambda})\theta(e^{-i\lambda})}{%
+    %\phi(e^{i\lambda})\phi(e^{-i\lambda})}
+  %= \frac{\sigma^2}{2\pi}\cdot
+  %\left\lvert
+  %\frac{\theta(e^{i\lambda})}{%
+    %\phi(e^{i\lambda})}
+  %\right\rvert^2
+\end{align*}
+where $|z|$ denotes the modulus of the complex number number $z$.
+\end{cor}
+\begin{proof}
+This follows immediately from the previous corralary and the fact that
+the autocovariance generating function $g_y$ of an MA($\infty$) process
+is
+\begin{align*}
+  g_y(z) = \sigma^2 \psi(z^{-1})\psi(z)
+  %g_y(z) = \sigma^2 \frac{\theta(z^{-1})\theta(z)}{\phi(z^{-1})\phi(z)}
+\end{align*}
+\end{proof}
+
+\begin{cor}\emph{(Spectral Density of an ARMA(p,q) Process)}
+Suppose that $y_t$ is a covariance stationary ARMA process
+\begin{align*}
+  \phi(L) y_t = \theta(L)\varepsilon_t
+  \qquad
+  y_t = \phi(L)^{-1}\theta(L)\varepsilon_t
+\end{align*}
+Then it has an MA($\infty$) representation and spectral density
+function as in the previous corallary, taking
+$\psi(z) = \phi(z)^{-1}\theta(z)$.
+\end{cor}
+
+
+
+\begin{cor}\emph{(White Noise)}
+It is clear from the inverse Fourier transform in
+Equation~\ref{inversefourier} that $f(\lambda)=c$ (i.e.\ the spectral
+density is flat/constant) implies the process is white noise,
+$\gamma(k)=0$ for $k\neq 0$.
+It is also clear from that formula and the constant spectral density
+that \emph{all frequencies} contribute equally to the variance
+$\gamma(0)$.
+\end{cor}
+
+
+\clearpage
+\subsection{Long-Run Variance}
+
+\begin{prop}\emph{(Long-Run Variance)}
+Suppose that $\{y_t\}$ is a stationary and ergodic process with
+absolutely summable autocovariances and $\E[y_t]=\mu$. Then we define
+the \emph{long-run variance} as
+\begin{align}
+  S := \limT \Var\left(\frac{1}{\sqrt{T}}\sumtT (y_t-\mu)\right)
+  = \sum_{j=-\infty}^\infty \gamma(j)
+  \label{clt:lrvar}
+\end{align}
+That last equality is not a definition; it's a result, which we now
+(kinda) prove.
+\end{prop}
+\begin{proof}
+First, start with expression for the finite-sample (of size $T$)
+statistic:
+\begin{align*}
+ S_T
+ := \frac{1}{T}\Var\left(\sumtT (y_t-\mu)\right)
+\end{align*}
+Since the observations are autocorrelated, the variance of the sum does
+\emph{not} equal the sum of the variances. There are covariance terms,
+and we have to account for them:
+\begin{align*}
+ T \cdot S_T
+ &= \sumtT \sum_{s=1}^T\Cov((y_t-\mu), (y_s-\mu)) \\
+ &= T\cdot \gamma(0) + \sum_{j=1}^T (T-|j|)\cdot \gamma(j)
+\end{align*}
+Dividing through on both sides by $T$ and taking the limit as
+$T\ra\infty$ will give the desired expression, since $(T-|j|)/T \ra 1$
+for all $j$ and absolutely summable autocovariances ensures
+convergence.
+\end{proof}
+
+
+\begin{prop}
+\emph{(Equivalent Expressions for the Long-Run Variance)}
+Given stationary and ergodic time series $\{y_t\}$ with $\E[y_t]=\mu$,
+the long-run variance $S$ as defined in Expression~\ref{clt:lrvar}
+satisfies
+\begin{align*}
+  S = \sum_{j=-\infty}^\infty \gamma(j) = g(1) = 2\pi f(0)
+\end{align*}
+where
+\begin{enumerate}[label=(\roman*)]
+  \item $\gamma(j)$ is the $j$th autocovariance
+    $\E[(y_t-\mu)(y_{t+j}-\mu)]$
+  \item $g(z)$ is the autocovariance generating function
+    $g(z)=\sum_{j=-\infty}^\infty \gamma(j)z^j$
+  \item $f(\lambda)$ is the spectral density of the process
+\end{enumerate}
+\end{prop}
+
+\begin{cor}
+For an ARMA process with MA($\infty$) representation has a very simple
+long-run variance formula:
+\begin{align*}
+  \begin{rcases}
+  y_t &= \psi(L)\varepsilon_t
+  \qquad \varepsilon_t \sim (0,\sigma^2) \\
+  \psi(z) &= \psi_0 + \psi_1z + \psi_2z^2 + \cdots
+  \end{rcases}
+  \quad\implies\quad
+  S = \sigma^2 \psi(1)^2
+\end{align*}
+\end{cor}
 
 \clearpage
 \section{Large Sample Theory}
@@ -8113,12 +9280,21 @@ that $Y_n\dto Y$. Then by Slutsky's Theorem, we know
 \end{align*}
 \end{proof}
 
+\begin{prop}(CMT for General Metric Spaces)
+Let $h:S\ra U$ be a mapping between general metric spaces (not just $\R$
+to $\R$) and let $D_h$ denote the set of discontinuity points of $h$.
+Then
+\begin{align*}
+  \begin{rcases}
+  X_n \dto X \\
+  P[X\in D_h] = 0
+  \end{rcases}
+  \quad\implies\quad
+  h(X_n) \dto h(X)
+\end{align*}
 
-%Now for some final notes. Convergence in probability
-%is \textbf{not} convergence in expectation. The former
-%concerns a sequence of probabilities, while the latter a
-%sequence of expectations. Finally, the probability limit
-%$X$ must be free of all dependence upon the sample size $n$.
+\end{prop}
+
 
 \clearpage
 \subsection{Law of Large Numbers}
@@ -8176,28 +9352,63 @@ are stationary and ergodic---and the resulting time average will
 converge to the cross-sectional average.
 \end{thm}
 
+
 \clearpage
-\subsection{Central Limit Theorem}
+\subsection{Central Limit Theorems}
 
 \begin{thm}\emph{(Lindberg-Levy)}
-Let $\{X_i\}_{i=1}1^n$ be a sequence of iid random variables with
-$\E[X_i] = \mu$ and $\Var(X_i)=\sigma^2$. Then
+Let $\{X_n\}_{n=1}1^N$ be a sequence of iid random variables with
+$\E[X_n] = \mu$ and $\Var(X_n)=\sigma^2$. Then
 \begin{align*}
-  \frac{\sqrt{n}}{\sigma}
-  \left(\bar{X}_n - \mu\right) \dto N(0,1)
-  \quad
-  \bar{X}_n := \frac{1}{n}\sumin X_i
+  \frac{\sqrt{N}}{\sigma}
+  \left(\bar{X}_N - \mu\right) \dto N(0,1)
+  \qquad
+  \bar{X}_N := \frac{1}{N}\sumin X_n
 \end{align*}
 \end{thm}
 
-\begin{thm}\emph{(Martingale Difference CLT)}
-Suppose that $\{X_n\}\ninf$ is a stationary and ergodic martingale
-difference sequence with respect to the filtration $\{\sF_n\}\ninfz$,
-i.e. $\E[X_n|\sF_{n-1}]=0$. Also suppose that $\E[X_nX_n']=\Sigma$. Then
+\begin{thm}\emph{(CLT for Martingale Difference Sequence)}
+Suppose that $\{u_t\}\ninf$ is a stationary and ergodic martingale
+difference sequence with respect to the filtration $\{\sF_t\}\tinfz$,
+i.e. $\E[u_t|\sF_{t-1}]=0$. Also suppose that $\E[u_tu_t']=\Sigma$. Then
 \begin{align*}
-  \frac{1}{N}\sumnN X_n \dto N(0,\Sigma)
+  \frac{1}{\sqrt{T}}\sumtT u_t \dto N(0,\Sigma)
 \end{align*}
 \end{thm}
+
+\begin{thm}\emph{(CLT for Linear Processes)}
+Suppose that we have linear process $y_t=\mu+\sum_{j=0}^\infty \psi_j
+\varepsilon_{t-j}$ where $\varepsilon_t\iid (0,\sigma^2)$ and
+$\sum_{j=0}^\infty j^2\psi_j^2<\infty$. Then
+\begin{align*}
+  \sqrt{T}\left(
+  \bar{y}_T
+  - \mu
+  \right)
+  \dto N\left(0,S\right)
+  \qquad
+  \text{where}\quad
+  \bar{y}_T =
+  \frac{1}{T}
+  \sumtT y_t
+\end{align*}
+where $S$ is the long-run variance of $\{y_t\}$.
+\end{thm}
+
+\begin{thm}\emph{(Functional CLT)}
+Suppose that $y_t$ is stationary and ergodic with mean $\mu$. Then
+\begin{align*}
+  W_T(s) :=
+  \frac{1}{\sqrt{T}}
+  \sum_{t=1}^{\lfloor s T\rfloor}
+  (y_t-\mu) \dto \sqrt{S}\cdot W(s)
+  \qquad
+  s\in [0,1]
+\end{align*}
+where $S$ is the long-run variance of $\{y_t\}$ and $W(s)$ is Brownian
+motion.
+\end{thm}
+
 
 \clearpage
 \subsection{Delta Method}
@@ -9632,8 +10843,318 @@ where $K$ is ``sufficiently small'' given the chosen value of $\alpha$.
 This maximizes the power after controlling for the Type I error---i.e.
 after setting the value of the Type I error equal to $\alpha$.
 
+
 \clearpage
-\section{Time Series}
+\section{Estimating Spectral Densities and Long-Run Variance}
+
+\subsection{Sample Periodogram}
+
+\begin{defn}(Discrete Fourier Transform)
+Consider $\{y_t\}_{t=1}^T$ and assume $T$ is odd. The discrete fourier
+transform maps the series into the mean and $T-1$ trigonometrically
+weighted averages:
+\begin{align*}
+  \hat{\mu} &= \frac{1}{T}\sumtT y_t \\
+  Z^{\cos}_\ell &= \frac{\sqrt{2}}{\sqrt{T}}
+    \sumtT \cos(\lambda_\ell (t-1))y_t
+  \qquad \ell=1,\ldots,T-1
+  \\
+  Z^{\sin}_\ell &= \frac{\sqrt{2}}{\sqrt{T}}
+    \sumtT \sin(\lambda_\ell (t-1))y_t
+  \qquad \ell=1,\ldots,T-1
+\end{align*}
+for $\lambda_\ell = (2\pi \ell)/T$ where, again, $\ell=1,\ldots,T-1$.
+\end{defn}
+
+\begin{prop}
+For any mean-zero stationary series with absolutely summable
+autocovariances, the pairwise \emph{correlations} between the $T$ random
+variables that are constructed in the DFT converge to zero
+asymptotically:
+\begin{align*}
+  \sup_{\ell\neq\ell'} \E[Z^{\cos}_\ell Z^{\cos}_{\ell'}]
+  \pto 0
+  \qquad
+  \sup_{\ell\neq\ell'} \E[Z^{\sin}_\ell Z^{\cos}_{\ell'}]
+  \pto 0
+  \qquad
+  \sup_{\ell,\ell'} \E[Z^{\cos}_\ell Z^{\cos}_{\ell'}]
+  \pto 0
+\end{align*}
+i.e.\ the random variables are asymptotically uncorrelated.
+Moreover, their variance converges to the spectral density:
+\begin{align*}
+    \sup_{\ell\leq (T-1)/2}
+    \bigg\lvert\;
+      \E[(Z^{\cos}_\ell)^2]
+      - 2\pi f(\lambda_\ell)
+    \;\bigg\rvert
+    &\pto 0 \\
+    \sup_{\ell\leq (T-1)/2}
+    \bigg\lvert\;
+      \E[(Z^{\sin}_\ell)^2]
+      - 2\pi f(\lambda_\ell)
+    \;\bigg\rvert
+    &\pto 0
+\end{align*}
+\end{prop}
+
+\begin{defn}
+We define the \emph{periodogram} at the Fourier frequencies
+$\lambda_\ell = (2\pi\ell)/T$:
+\begin{align*}
+  I_T(\lambda_\ell) =
+  \frac{(Z^{\cos}_\ell)^2 +(Z^{\sin}_\ell)^2}{2}
+  \qquad \ell = 1,\ldots,T-1
+\end{align*}
+where from the previous proposition
+\begin{align*}
+  \E[I_T(\lambda_\ell)] = 2\pi f(\lambda_\ell)
+  \qquad \ell = 1,\ldots,T-1
+\end{align*}
+\end{defn}
+
+\begin{prop}\emph{(Whittle Likelihood)}
+If $\{y_t\}$ is a Gaussian process, then $Z^{\cos}_\ell$ and
+$Z^{\sin}_\ell$ will be Gaussian such that
+\begin{align*}
+  Z_\ell^{\cos} &\sim N(0,2\pi f(\lambda_\ell)) \\
+  Z_\ell^{\sin} &\sim N(0,2\pi f(\lambda_\ell))
+\end{align*}
+for $\ell=1,\ldots,T-1$. Now let $f(\lambda;\theta)$ denote the the
+spectral density function at frequency $\lambda$ as a function of
+parameters $\theta$. Then we can write the log-likelihood of the model
+as
+\begin{align*}
+  \frac{T}{2}\log(2\pi)
+  - \sum_{\ell=1}^{(T-1)/2} \log\big(2\pi f(\lambda_\ell;\theta)\big)
+  - \sum_{\ell=1}^{(T-1)/2}
+  \frac{I_T(\lambda_\ell)}{2\pi f(\lambda_\ell;\theta)}
+\end{align*}
+
+\end{prop}
+
+\begin{ex}
+If we suppose $y_t$ follows an AR(1)
+\begin{align*}
+  y_t=\rho y_{t-1}+\varepsilon_t
+  \quad\iff\quad
+  y_t = (1-\rho L)^{-1}\varepsilon_t
+\end{align*}
+where the $\varepsilon_t$ innovations are Gaussian, then we know that
+\begin{align*}
+  f(\lambda; \rho,\sigma^2)
+  =
+  \frac{\sigma^2}{2\pi}
+  (1-\rho e^{i\lambda})^{-1}
+  (1-\rho e^{-i\lambda})^{-1}
+\end{align*}
+\end{ex}
+
+
+\clearpage
+\subsection{HAC Estimators for the Long-Run Variance}
+
+In this subsection, we suppose that we have a sample $\{y_t\}\tT$ for
+some covariance stationary process.
+We want to estimate the long-run variance, which can be written in any
+of the following three equivalent ways in terms of the autocovariances,
+the autocovariance generating function $g(z)$, or the spectral density
+$f(\lambda)$, respectively:
+\begin{align*}
+  S &= \sum_{j=-\infty}^\infty \gamma(j)
+  = g(1)
+  = 2\pi f(0)
+\end{align*}
+
+\begin{defn}(Non-Parametric Estimator)
+The non-parametric approach estimates sample covariances
+$\{\hat{\gamma}(j)\}$ and then construct
+\begin{align*}
+  \hat{S} = \sum_{j=-m}^m \hat{\gamma}(j)
+\end{align*}
+where $m<T-1$ is some truncation parameter.
+\end{defn}
+
+\begin{defn}(Kernel Based Estimators and the Newey-West Estimator)
+Here we define a class of nonparametric estimators that still uses estimates
+of the sample covariances $\{\hat{\gamma}(j)\}$, but applies a weighting
+kernel to prevent sample error from imprecisely estimated (far-apart,
+$j$ close to $T$) covariances influencing $\hat{S}$ too much or inducing
+a negative long-run variance:
+\begin{align*}
+  \hat{S} = \sum_{j=-(T-1)}^{T-1} k(j/b_T)\hat{\gamma}(j)
+\end{align*}
+where $\{b_T\}$ is a sequence of bandwith parameters such that
+$b_T\ra \infty$ and where $k$ is a weighting kernel that satisfies
+\begin{enumerate}[label=(\roman*)]
+  \item Even, $k(-x)=k(x)$
+  \item $k(0)=1$
+  \item $\lim_{x\ra\infty}k(x)=0$
+\end{enumerate}
+Therefore, $\hat{S}$ is a class of estimators indexed by different
+choices of $k$ and $b_T$.
+In practice, $k$ is often chosen to be the \emph{Bartlett Kernel}
+\begin{align*}
+  k(x) &=
+  \begin{cases}
+    (1-|x|) & |x|<1 \\
+    0 &\text{otherwise}
+  \end{cases}
+\end{align*}
+and the resulting estimator is called the \emph{Newey-West Estimator}.
+Rule of thumb from Stock and Watson for a series with moderate
+persistence: $b_T=0.75 T^{1/3}$.
+\end{defn}
+
+
+\begin{defn}(Parametric Estimator)
+If we're willing to assume that $\{y_t\}$ is an ARMA process
+\begin{align*}
+  \phi(L)(y_t-\mu) = \theta(L)\varepsilon_t
+  \qquad \varepsilon_t\sim(0,\sigma^2)
+\end{align*}
+we can estimate the parameters $\hat{\sigma}^2$, $\hat{\phi}(z)$, and
+$\hat{\theta}(z)$ and then compute the implied spectral density at zero
+$2\pi f(0)$ or (equivalently) the autocovariance generating function at
+unity $g(1)$:
+\begin{align*}
+  \hat{S} = \hat{\sigma}^2 \frac{\hat{\theta}(1)^2}{\hat{\phi}(1)^2}
+  = \hat{\sigma}^2
+  \frac{(1+\hat{\theta}_1 + \cdots + \hat{\theta}_q)^2}{%
+    (1+\hat{\phi}_1 - \cdots - \hat{\phi}_p)^2}
+\end{align*}
+\end{defn}
+
+\begin{defn}(Pre-Whitened Estimator)
+This next approach combines both the parametric and non-parameteric
+approaches. Suppose that $y_t$ follows an MA($\infty$) process
+\begin{align*}
+  y_t = \mu + \psi(L)\varepsilon_t
+  \qquad \varepsilon_t\sim (0,\sigma^2_\varepsilon)
+\end{align*}
+An MA($\infty$) process can be reasonably well approximated by an AR(1),
+so factor out an AR(1) polynomial from $\psi(L)$ to write $y_t$ as
+\begin{align}
+  y_t  - \mu &=
+  \underbrace{(1-\rho L)^{-1} \theta(L)}_{\psi(L)}
+  \varepsilon_t
+  \qquad
+  \varepsilon_t\sim (0,\sigma^2_\varepsilon)
+  \notag
+  \\
+  &=
+  (1-\rho L)^{-1} u_t
+  \qquad\qquad
+  u_t := \theta(L)\varepsilon_t
+  \label{prewhiten}
+  \\
+  \iff\quad
+  y_t -\mu &= \rho (y_{t-1}-\mu) + u_t
+  %\quad\quad\;\,
+  %u_t := \theta(L)\varepsilon_t
+  %\label{prewhiten}
+  \notag
+\end{align}
+Then we can construct an estimate of the long-run variance for $\{y_t\}$
+by computing
+\begin{align*}
+  \hat{S}_y = \frac{\hat{S}_u}{(1-\hat{\rho})^2}
+\end{align*}
+where $\hat{\rho}$ is the coefficient from an OLS regression of $y_t-\mu$ on
+$y_{t-1}-\mu$ and $\hat{S}_u$ is a nonparametric estimate (probably a
+Newey-West estimator) of the long-run variance of the residuals.
+
+The idea is that the first stage OLS regression of $y_t-\mu$ on
+$y_{t-1}-\mu$ will remove a lot of the dependence  while estimating only
+one parameter $\hat{\rho}$. As a result, the nonparametric
+estimate of the residual long-run variance
+$\sum_{j=-\infty}^\infty\gamma_u(j)$ (an infinite sum we approximate
+with a finite sum) will be much higher quality since the autocovariances
+for long langs won't contribute as much---the first state removed lots of
+the autocorrelation already.
+\end{defn}
+\begin{proof}
+To see why the formula for $\hat{S}_y$ takes that form, we work with the
+autocovariance generating functions. First recall that the long-run
+variance of $\{x_t\}$ is $S_x=g_x(1)$ where $g_x(z)$ is the
+autocovariance generating function of $\{x_t\}$.
+
+Next, if we write $y_t$ as in expression \ref{prewhiten} where $\{u_t\}$
+is a covariance stationary process with autocovariance generating
+function $g_u(z)$, then we can view $\{y_t\}$ as simply $\{u_t\}$
+filtered by $h(z)=(1-\rho z)^{-1}$. But we know to compute the
+autocovariance generating functions of filtered processes:
+\begin{align*}
+  g_y(z) = h(z)h(z^{-1}) g_u(z)
+  = (1-\rho z)^{-1}(1-\rho z^{-1})^{-1}g_u(z)
+\end{align*}
+Given this expression, we can compute the long-run variance of $y$:
+\begin{align*}
+  S_y = g_y(1) = \frac{g_u(1)}{(1-\rho)^{2}}
+\end{align*}
+But notice that $g_u(1)$ is simply the long-run variance of $u$, denoted
+$S_u$.  Therefore,
+\begin{align*}
+  S_y = g_y(1) = \frac{S_u}{(1-\rho)^{2}}
+\end{align*}
+Notice that we don't actually care about the parametric form that $S_u$
+takes. It's just a number we want to estimate nonparametrically.
+\end{proof}
+
+\begin{defn}(GLS Approach)
+We suppose that the process follows
+\begin{align*}
+  y_t &= x_t'\beta + u_t \\
+  u_t &= \psi(L)\varepsilon_t
+  \qquad \varepsilon_t\sim (0,\sigma^2)
+\end{align*}
+where $x_t$ is a vector of predetermined values (maybe just a constant)
+and $u_t$ is some covariance stationary process with MA($\infty$)
+representation as above with lag polynomial $\psi(L)$.  As stated, the
+errors $u_t$ are correlated across observations. We can turn this into a
+regression with uncorrelated errors by inverting $c(L)$ to get
+\begin{align*}
+  \psi(L)^{-1}y_t &= \psi(L)^{-1}x_t'\beta + \varepsilon_t \\
+  \iff\qquad
+  \tilde{y}_t &= \tilde{x}_t\beta + \varepsilon_t
+\end{align*}
+Then the OLS estimator from the regression of $\tilde{y}$ on $\tilde{x}$
+will be the best linear unbiased estimator by Gauss-Markov since the
+errors are now iid.
+
+Of course, this suppose that we know $\psi(L)$. In general we don't, so
+we have to estimate it and do feasible GLS. Therefore, we can do the
+following:
+\begin{enumerate}[label=(\roman*)]
+  \item Run the regression $y_t=x_t'\beta +u_t$ to get the vector of
+    residuals $\hat{u}_t$.
+  \item Using $\hat{u}_t$, estimate the parameters $\hat{\psi}(z)$
+  \item Use the estimated $\hat{\psi}(z)$ to construct $\tilde{y}_t$ and
+    $\tilde{x}_t$
+  \item Run OLS regression $\tilde{y}=\tilde{x}\beta + \varepsilon_t$.
+\end{enumerate}
+The result is a better estimate of $\beta$ and resulting asymptotic
+variance
+\begin{align*}
+  \hat{\beta}_{GLS}
+  &=
+  \left[ \sumtT \tilde{x}_t\tilde{x}_t'\right]^{-1}
+  \left[ \sumtT \tilde{x}_t\tilde{y}_t\right]
+\end{align*}
+However, we need $\E[\tilde{x}_t\varepsilon_t]$ for consistency of the
+FGLS estimator. In general that means we need not only
+\emph{predetermined} (aka \emph{weakly endogenous}) regressors
+$\E[u_t|x_t,x_{t-1},\ldots]=0$, but also \emph{strictly endogenous}
+regressors $\E[u_t|x_{t+1},x_t,x_{t-1},\ldots]=0$, which is generally a
+bad assumption.
+
+
+\end{defn}
+
+
+
+
 
 
 \clearpage
@@ -10332,6 +11853,11 @@ $\Var(\bsvarepsilon|\bsX)=\sigma^2\bsI$.
 \clearpage
 \subsection{$R^2$ and Relatives}
 
+Let $\bsy$ denote the vector of observations for the dependent value,
+$\bshaty$ the vector of fitted values, $\bar{\bsy}$ a vector with each
+entry equal to the sample mean $\frac{1}{N}\sumnN y_n$, and $\bse$ equal
+to the estimated residuals.
+
 \begin{defn}(Uncentered $R^2$)
 First, We define the \emph{uncentered $R^2$} via the decomposition
 \begin{align*}
@@ -10367,13 +11893,16 @@ Next, we define the \emph{centered $R^2$} or
   +
   \bse'\bse \\
   \implies\quad
-  R^2
+  R^2_c
   &=
   1-
   \frac{\bse'\bse}{(\bsy-\bar{\bsy})'(\bsy-\bar{\bsy})}
   =
   \frac{(\bshaty-\bar{\bsy})'(\bsy-\bar{\bsy})}{%
       (\bsy-\bar{\bsy})'(\bsy-\bar{\bsy})}
+  =
+  \frac{\bshaty'\bshaty - \bar{\bsy}'\bar{\bsy}}{%
+      \bsy'\bsy - \bar{\bsy}'\bar{\bsy}}
   \\
   &= 1- \frac{SSR}{SST} = \frac{SSM}{SST}
 \end{align*}
@@ -10389,12 +11918,12 @@ regressors:
   &= 1 -
   \frac{\bse'\bse/(N-K)}{(\bsy-\bar{\bsy})'(\bsy-\bar{\bsy})/(N-1)}
 \end{align*}
-Given plain old $R^2$, it can be derived as
+Given plain old centered $R^2_c$, it can be derived as
 \begin{align*}
   R^2_A =
   1 -
   \left(\frac{N-1}{N-K}\right)
-  \left(1 - R^2\right)
+  \left(1 - R^2_c\right)
 \end{align*}
 \end{defn}
 
@@ -10995,7 +12524,6 @@ for some $\bsalpha$ that we can either observe or estimate.
 Then the WLS estimator using weights $w_n=g(\bsx_n,\alpha)^{-1}$ is
 called the \emph{Feasible Generalized Least Squares (FGLS) Estimator}.
 \end{defn}
-
 
 
 
@@ -12953,6 +14481,88 @@ obtain a consistent estimator of the error variance
 \end{align*}
 \end{prop}
 
+
+\clearpage
+\section{Miscellaneous}
+
+\subsection{Testing for Structural Breaks}
+
+Suppose that
+\begin{align*}
+  y_t = \mu + \delta \cdot \mathbf{1}\{t>\tau\} + \varepsilon_t
+  \qquad \varepsilon_t \iid(0,1)
+\end{align*}
+Alternatively, this can be written
+\begin{align*}
+  y_t = \mu_1\cdot \mathbf{1}\{t\leq\tau\}
+  + \mu_2 \cdot \mathbf{1}\{t>\tau\} + \varepsilon_t
+  \qquad \varepsilon_t \iid(0,1)
+\end{align*}
+The regressor matrix $X$ looks like
+\begin{align*}
+  X' =
+  \begin{pmatrix}
+    1 & \cdots & 1 & 0 & \cdots & 0 \\
+    0 & \cdots & 0 & 1 & \cdots & 1 \\
+  \end{pmatrix}
+  \quad\implies\quad
+  X'X =
+  \begin{pmatrix}
+    \tau & 0 \\
+    0 & T-\tau\\
+  \end{pmatrix}
+\end{align*}
+Clearly, the regression estimates will be $\hat{\mu}_i$ for $\mu_i$.
+We want to test the hypothesis that $\mu_1=\mu_2$, i.e.
+\begin{align*}
+  H_0: r &= R'\beta \\
+  H_0: 0 &=
+  \begin{pmatrix}
+    1 & -1
+  \end{pmatrix}
+  \begin{pmatrix}
+    \mu_1 \\ \mu_2
+  \end{pmatrix}
+\end{align*}
+With $R$ and $X$ as defined above
+\begin{align*}
+  R'(X'X)^{-1}R
+  &=
+  \begin{pmatrix}
+    1 & -1
+  \end{pmatrix}
+  \begin{pmatrix}
+    \tau^{-1} & 0 \\
+    0 & (T-\tau)^{-1}\\
+  \end{pmatrix}
+  \begin{pmatrix}
+    1 \\ -1
+  \end{pmatrix}
+  = \tau^{-1} + (T-\tau)^{-1}
+\end{align*}
+So form the $F$-statistic (though this is really a $\Chi^2$ since I'm
+using the true error variance $\sigma^2=1$, rather than $s^2$)
+\begin{align*}
+  F_T(\tau)
+  &=
+  (R'\hat{\beta}-r)'
+  [\sigma^2 R'(X'X)^{-1}R]^{-1}
+  (R'\hat{\beta}-r)
+  \\
+  &=
+  (\hat{\mu}_1-\hat{\mu}_2-0)'
+  [\sigma^2 R'(X'X)^{-1}R]^{-1}
+  (\hat{\mu}_1-\hat{\mu}_2-0)
+  \\
+  &=
+  \frac{%
+  \left(
+  \frac{1}{\tau}\sum_{t=1}^\tau y_t
+  -
+  \frac{1}{T-\tau}\sum_{t=\tau+1}^T y_t
+  \right)^2
+  }{\tau^{-1} + (T-\tau)^{-1}}
+\end{align*}
 
 
 
