@@ -271,6 +271,7 @@
 \generate{bs}{\boldsymbol}{a,...,z}
 \generate{bs}{\boldsymbol}{A,...,Z}
 \newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsTheta}{\boldsymbol{\Theta}}
 \newcommand{\bsmu}{\boldsymbol{\mu}}
 \newcommand{\bsSigma}{\boldsymbol{\Sigma}}
 \newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
@@ -286,6 +287,7 @@
 \newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
 \newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
 \newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
 \newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
 
 % Zero vector as \bso
@@ -9611,172 +9613,235 @@ Now apply Slutsky and use the distribution of $X_N$ to conclude that
 
 
 \clearpage
-\section{Estimators}
+\section{Estimation}
 
-\subsection{Estimators, Loss, and Risk}
+Throughout this section, we consider the task of estimating some
+parameter vector of interest, $\bstheta$. This parameter vector should
+be interepreted very generally. It can represent moments of the data,
+regression coefficients, parameters of a conditional expectation
+function, etc.
 
-Most of statistics is about optimally estimating parameters using
-observed data. In this section, we develop language to talk about that.
-The key concepts are \emph{estimators} of parameters, \emph{loss} which
-defines a quantitative penalty for poor estimates, and \emph{risk} which
-characterizes expected loss---an average of the loss using some suitable
-weighting function. You can write down many loss functions. We will also
-see a few definitions of risk which reflect different weighting
-functions.
+This section organizes divides into two themes: \emph{assessing} and
+\emph{constructing} estimators, which are functions that map the
+sample/data $\{\bsy_n\}\nN$ into a guess $\bshattheta$ for the true
+parameter vector of interest, $\bstheta$.  We won't discuss how one can
+obtain that mapping at first.  Rather, we first start by introducing
+terminology and methods to assess the quality of estimators.  Then with
+those tools in hand, we move on to the second goal: coming up with good
+estimators (the mappings) in the first place. In doing so, this section
+will introduce nonlinear least squares (NLS), maximum likelihood
+estimation (MLE), and generalized method of moments (GMM)---all of which
+are general frameworks designed to produce estimators.
 
-Quick word about notation. In this section, capital letter $Y$ denotes
-an $N\times 1$ vector of iid random variables for an $N$-draw
-(unrealized) sample. Lower case $y$ denotes a realization. We use $Y_n$
-or $y_n$ to refer to the $n$th draw (unrealized or realized,
-respectively).
+\subsection{Estimators, Estimates, and Notation}
 
+Throughout this section, our goal is to estimate the true parameter
+value $\bstheta\in\R^p$. To do so, we will form an estimator/estimate
+$\bshattheta$ (see formal definition below). We will let $\bstildetheta$
+denote an arbitrary vector in $\R^p$, which we'll often use to
+distinguish any arbitrary vector in $\R^p$ of \emph{potential} parameter
+values from the real, true, written-in-God's-notebook parameter vector
+$\bstheta$.  To form our estimator $\bshattheta$, we typically use
+sample data $\{\bsy_n\}\nN$, where $\bsy_n\in\R^k$ refers to the $n$th
+observation. We will often use the shorthand $\bsy_{1:N}$ to refer
+to the whole sample $\{\bsy_n\}\nN$.
 
-\begin{defn}(Estimator)
-An \emph{estimator} $\hat{\theta}$ of parameter $\theta$ is a function
-$\hat{\theta} = g(Y)$ that maps an $N\times 1$ vector of
-observations $Y$ into a guess for $\theta$.  Since the sample is
-random, $\hat{\theta}=g(Y)$ is itself a random variable.
+Finally, when we talk about maximum likelihood, we suppose that the
+sample $\bsy_{1:N}$ is drawn from the \emph{true} joint likelihood
+function $f(\bsy_{1:N}|\bstheta)$ which uses the true parameter value
+$\bstheta$. In the special case of an iid sample, the individual
+$\bsy_n$ are drawn from true likelihood $f(\bsy_n|\bstheta)$ which
+implies joint likelihood
+$f(\bsy_{1:N}|\bstheta)=\prod\nN f(\bsy_n|\bstheta)$.
+
+Of course, we often don't know the true parameter value $\bstheta$ (or,
+by implication, the true likelihood), though we will assume that we
+know the functional form $f(\bsy_n|\bstildetheta)$, called simply the
+\emph{likelihood} function (ditching the ``true'' modifier).
+We sometimes restrict $\bstildetheta$ to lie in some subspace
+$\bsTheta\subseteq\R^p$ to implement nonnegativity constraints or
+other parameter resrictions (but in principle, $\bsTheta$ could be
+all of $\R^p$). Therefore, we will think of
+$\{f(\bsy_n|\bstildetheta)\}_{\bstildetheta\in\bsTheta}$ as a family of
+possible true likelihoods. The goal of maximum likelihood estimation
+(MLE) will be to use the sample $\bsy_{1:N}$ to find the correct
+likelihood in that family, $f(\bsy_n|\bstheta)$.
+
+\begin{defn}(Estimator and Estimate)
+An \emph{estimator} $\bshattheta$ of parameter $\bstheta$ is a function
+$\bshattheta = \bsg(\bsy_{1:N})$ that maps $N$ observations into a guess
+for $\bstheta$.
+Given a sample realization $\bsy_{1:N}$, we can plug in the values and
+compute a number called an \emph{estimate}. In an abuse of notation, we
+will also use $\bshattheta$ to denote an estimate, but it should always
+be understood that any estimate depends on the sample used to compute
+that estimate.
+
+Alternatively, we can instead treat the sample $\bsy_{1:N}$ as a
+collection of random variables (with some joint distribution) and study
+the statistical properties of the estimator \emph{ex ante}, before the
+sample is realized. In this way, we treat the estimator $\bshattheta$ as
+\emph{itself} a random variable with some sampling distribution,
+expectation, variance, etc.
+
+This section is concerned more with estimat\emph{ors} than
+estimat\emph{es}. We don't particularly care about plugging a realized
+sample into a function to generate some number/estimate. We care more
+about finding good functions/mappings (estimators) from sample
+$\bsy_{1:N}$ to estimates in the first place. But to understand what
+makes a ``good'' estimator, we need to study its distribution and large
+sample properties. That is the concern of the rest of this section. We
+begin by examining the topics of bias, consistency, loss, and risk which
+help identify good estimators. We then put these concepts to work by
+looking at general frameworks for estimation.
 \end{defn}
 
-\begin{defn}(Estimate)
-Given a realizations $y_1,\ldots,y_N$, we can form an
-\emph{estimate}---a computed value that is actually a number---by
-plugging in the sample $\{y_n\}^N_{n=1}$ into $\hat{\theta}$.
-\end{defn}
+\subsection{Assessment of Estimators}
+
+\subsubsection{Loss and Risk}
+
+In this section, we again consider the quality of estimators.  The key
+concepts are \emph{loss} which defines a quantitative penalty for poor
+estimates, and \emph{risk} which characterizes expected loss---an
+average of the loss using some suitable weighting function. Computing
+risk (expected loss) can be carried out in a few different ways, but all
+of them involve averaging the loss with some weighting function (that
+will differ depending upon the particular definition of risk) to arrive
+at expected loss. Of course, computing risk requires choice of a loss
+function, and there are many possible loss functions that an
+econometrician could reasonably use. We will see a few examples.
 
 \begin{defn}(Loss Function)
-The \emph{loss function} $L(\hat{\theta},\theta)$ is a function that
-maps the true parameter value $\theta$ and an estimate $\hat{\theta}$
+The \emph{loss function} $L(\bshattheta,\bstheta)$ is a function that
+maps the true parameter value $\bstheta$ and an estimate $\bshattheta$
 into negative utility. It returns the ``loss''---a number---quantifying
-how bad it was to use $\hat{\theta}$ when the true value was $\theta$.
+how bad it was to use $\bshattheta$ when the true value was $\bstheta$.
 We can think of it as a penalty function.
 \end{defn}
 
 \begin{defn}{(Classical or Frequentist Risk Function)}
-Given loss function $L(\hat{\theta},\theta)$, the \emph{classical} or
+Given loss function $L(\bshattheta,\bstheta)$, the \emph{classical} or
 \emph{frequentist risk function} is the expected value of the loss:
 \begin{align*}
-  R(\hat{\theta},\theta) = \E_{Y|\theta}[L(\hat{\theta},\theta)]
+  R(\bshattheta,\bstheta) = \E_{\bsy|\bstheta}[L(\bshattheta,\bstheta)]
 \end{align*}
+where $\E_{\bsy|\bstheta}$ indicates that the expectation is taken over
+realizations of $\bsy_{1:N}$ generated from true likelihood
+$f(\bsy_{1:N}|\bstheta)$.
 The loss tells us the penalty or negative utility \emph{given} an
-estimate $\hat{\theta}$ and the true value $\theta$. But an estimate
-$\hat{\theta}$ is a random variable that depends on the sample, so the
-risk averages out over sample draws $Y$ (conditional on $\theta$),
-hence averaging over the values $\hat{\theta}$ takes on.
+estimate $\bshattheta$ and the true value $\bstheta$. But an estimate
+$\bshattheta$ is a random variable that depends on the sample.
+So by averaging over sample draws of $\bsy_{1:N}$ (generated from true
+$\bstheta$), we are indirectly averaging over the values $\bshattheta$
+takes on to compute the risk.
 
 The ``Classical'' and ``Frequentist'' qualifiers follow from the fact
-that $R(\hat{\theta},\theta)$ does not integrate over different values
-that $\theta$ can take on, since frequentists want to treat $\theta$ as
-a fixed constant, not a random variable.
+that $R(\bshattheta,\bstheta)$ does not integrate over different values
+that $\bstheta$ can take on, since frequentists want to treat $\bstheta$
+as a fixed constant, not a random variable.
 \end{defn}
-%\begin{rmk}
-%In general, $\theta$ will be unknown. So the whole game for frequentists
-%is about finding estimators $\hat{\theta}$ such that the risk is small
-%for for many different values of $\theta$. That's why we tend to like
-%estimators with small bias and small variance. Bayesians take a
-%different approach, trying to reduce risk more sharply in regions of
-%parameter space where $\theta$ is most likely to lie
-%(more on \emph{Bayes risk} below).
-%\end{rmk}
 
 \begin{ex}(Quadratic Loss and Mean Squared Error)
 Often, a good loss function is the \emph{quadratic loss} function
 \begin{align*}
-  L(\hat{\theta},\theta) = (\hat{\theta}-\theta)^2
+  L(\bshattheta,\bstheta) = (\bshattheta-\bstheta)^2
 \end{align*}
 which penalizes more steeply the further away you are from the true
 value. It has associated \emph{mean squared error} risk:
 \begin{align*}
-  R(\hat{\theta},\theta) = \E_{Y|\theta}[(\hat{\theta}-\theta)^2]
-\end{align*}
-\end{ex}
-
-\begin{ex}(Mini-Max Estimator)
-If we know the true value $\theta$ lies in $\Theta$, then we might
-choose an estimator to solve
-\begin{align*}
-  \hat{\theta}_{\text{mini-max}}
-  =
-  \argmin_{\hat{\theta}} \max_{\theta \in \Theta} R(\hat{\theta},\theta)
+  R(\bshattheta,\bstheta) = \E_{\bsy|\bstheta}[(\bshattheta-\bstheta)^2]
 \end{align*}
 \end{ex}
 
 \begin{defn}(Average or Bayes Risk)
 \label{defn:bayesrisk}
-Given a prior distribution $w(\theta)$ for parameter $\theta$, the
-\emph{Average} or \emph{Bayes risk} denoted $r(\hat{\theta})$ averages
-the classical or frequentist risk over the values of $\theta$, weighted
-by $w(\theta)$:
+Given a prior distribution $w(\bstheta)$ for parameter $\bstheta$, the
+\emph{Average} or \emph{Bayes risk} denoted $r(\bshattheta)$ averages
+the classical or frequentist risk over the values of $\bstheta$, weighted
+by $w(\bstheta)$:
 \begin{align*}
-  r(\hat{\theta})
-  = \int R(\hat{\theta},\theta) w(\theta) \; d\theta
+  r(\bshattheta)
+  = \int R(\bshattheta,\bstheta) w(\bstheta) \; d\bstheta
+  = \E_{\bstheta}[ R(\bshattheta,\bstheta)]
 \end{align*}
 Note that we can express that a few different ways in terms of
 expectation operators, all of which offer different type of intuition:
 \begin{align*}
-  r(\hat{\theta})
-  = \int R(\hat{\theta},\theta) w(\theta) \; d\theta
-  &= \E_\theta[ R(\hat{\theta},\theta)] \\
-  &= \E_\theta\left[
-      \E_{Y|\theta}\left[
-      L(\hat{\theta},\theta)
+  r(\bshattheta)
+  = \E_{\bstheta}[ R(\bshattheta,\bstheta)]
+  = \E_{\bstheta}\left[
+      \E_{\bsy|\bstheta}\left[
+      L(\bshattheta,\bstheta)
       \right]
-    \right] \\
-  &= \E_{\theta,Y}\left[ L(\hat{\theta},\theta) \right]
+    \right]
+  = \E_{\bstheta,\bsy}\left[ L(\bshattheta,\bstheta) \right]
 \end{align*}
-In words, frequentist risk $R(\hat{\theta},\theta)$ gives expected loss
-conditional on a value of $\theta$, denoted
-$\E_{Y|\theta}[L(\hat{\theta},\theta)]$. If you take the expectation of
-that, by the law of iterated expectations, you get
-$\E_{\theta,Y}[L(\hat{\theta},\theta)]$, which is the expected loss
-\emph{jointly} averaging out over both data $Y$ uncertainty \emph{and}
-parameter $\theta$ uncertainty.
+In words, frequentist risk $R(\bshattheta,\bstheta)$ gives expected loss
+conditional on a value of $\bstheta$, denoted
+$\E_{\bsy|\bstheta}[L(\bshattheta,\bstheta)]$. If you take the
+expectation of that, by the law of iterated expectations, you get
+$\E_{\bstheta,\bsy}[L(\bshattheta,\bstheta)]$, which is the expected
+loss \emph{jointly} averaging out over both data $\bsy_{1:N}$
+uncertainty \emph{and} parameter $\bstheta$ uncertainty.
 \end{defn}
 \begin{rmk}
-In general, different priors or $w(\theta)$ functions will give
-different estimates of Bayes risk. Choose wisely.
+In general, different priors or $w(\bstheta)$ functions give
+different Bayes risk estimates.
+%Choose wisely.
 \end{rmk}
 
 \begin{defn}{(Posterior Risk or Posterior Expected Loss)}
-This is the expected loss conditional on the sample you drew, $Y=y$:
+This is the expected loss conditional on a sample realization:
 \begin{align*}
-  \E_{\theta|Y}[L(\hat{\theta},\theta)|Y=y]
+  \E_{\bstheta|\bsy}\big[
+    L(\bshattheta,\bstheta)\;|\;\bsy_{1:N}
+  \big]
   =
-  \int L(\hat{\theta},\theta) f_{\theta|Y}(\theta|y) \; d\theta
+  \int L(\bshattheta,\bstheta)
+  f_{\bstheta|\bsy}(\bstheta|\bsy_{1:N}) \; d\bstheta
 \end{align*}
-Intuitively, you have a posterior $f_{\theta|y}(\theta|y)$ that
-characterizes the distribution of $\theta$ after observing data
-$y$. The posterior risk is an average of the loss, but fixing that
-sample/data and using the posterior as the appropriate weighting
-function. As a result, you weight the loss more heavily in areas where
-the $f_{\theta|y}(\theta|y)$ is largest.
+Intuitively, you have a posterior
+$f_{\bstheta|\bsy}(\bstheta|\bsy_{1:N})$ that characterizes the
+distribution of $\bstheta$ after observing data $\bsy_{1:N}$. The
+posterior risk is an average of the loss, but fixing that sample/data
+and using the posterior as the appropriate weighting function. As a
+result, you weight the loss more heavily in areas where the
+$f_{\bstheta|\bsy}(\bstheta|\bsy_{1:N})$ is largest.
 \end{defn}
 
-\begin{ex}
-To be more concrete, suppose the sample $y$ suggests that $\theta$ is
-most likely positive.  Then if your estimate has huge loss in negative
-territory (i.e. $\hat{\theta}$ is far from $\theta$ when $\theta$ is
-negative), whatever. You don't care. Discount that loss because $\theta$
-probably isn't over there. We shouldn't penalize $\hat{\theta}$ if it's
-does a shitty job estimating $\theta$ in regions where $\theta$ is
-really unlikely to be.
-\end{ex}
+\begin{rmk}
+To be more concrete, suppose the sample $\bsy_{1:N}$ suggests that
+$\bstheta$ is most likely positive.  Then if your estimate has huge loss
+in negative territory (i.e. $\bshattheta$ is far from $\bstheta$ when
+$\bstheta$ is negative), whatever. You don't care. Discount that loss
+because $\bstheta$ probably isn't over there. We shouldn't penalize
+$\bshattheta$ if it's does a shitty job estimating $\bstheta$ in regions
+where $\bstheta$ is really unlikely to be.
+\end{rmk}
 
 \begin{prop}\emph{(Average or Bayes Risk, Revisited)}
 \label{prop:bayesrisk}
 Definition~\ref{defn:bayesrisk} defines the Bayes risk as the average of
-classical or frequentist risk over all values of $\theta$ weighted by
+classical or frequentist risk over all values of $\bstheta$ weighted by
 the prior. We can equivalently characterize Bayes risk as the posterior
-risk averaged over all samples $Y$. In other words
+risk averaged over all samples $\bsy_{1:N}$. In other words
 \begin{align*}
-  r(\hat{\theta})
-  &= \E_{\theta,Y}[L(\hat{\theta},\theta)]
+  r(\bshattheta)
+  &= \E_{\bstheta,\bsy}[L(\bshattheta,\bstheta)]
   =
   \begin{cases}
-    \E_\theta\left[\E_{Y|\theta}[L(\hat{\theta},\theta)]\right]
-    &\text{Ave.\ of classical/frequentist risk over $\theta$} \\
-    \E_Y\left[\E_{\theta|Y}[L(\hat{\theta},\theta)]\right]
-    &\text{Ave.\ of posterior risk over samples $Y$} \\
+    \E_{\bstheta}\left[
+      \E_{\bsy|\bstheta}\big[
+        L(\bshattheta,\bstheta)
+      \big]
+    \right]
+    &\text{Ave.\ of classical/frequentist risk over $\bstheta$}
+    \\
+    \\
+    \E_{\bsy}\left[
+      \E_{\bstheta|\bsy}\big[L(\bshattheta,\bstheta)\big]
+    \right]
+    &\text{Ave.\ of posterior risk over samples $\bsy_{1:N}$} \\
   \end{cases}
 \end{align*}
 \end{prop}
@@ -9791,13 +9856,15 @@ risk averaged over all samples $Y$. In other words
 
 \begin{defn}(Bayes Estimator)
 \label{defn:bayesest}
-Given a loss function $L(\hat{\theta},\theta)$, the
+Given a loss function $L(\bshattheta,\bstheta)$, the
 \emph{Bayes estimator} is the estimator that minimizes posterior risk
-conditional on $y$:
+conditional on the sample $\bsy_{1:N}$:
 \begin{align*}
-  \hat{\theta}_{\text{Bayes}}
-  = \argmin_{\hat{\theta}} \;
-  \E_{\theta|Y}[L(\hat{\theta},\theta)|Y=y]
+  \bshattheta_{\text{Bayes}}
+  = \argmin_{\bshattheta} \;
+  \E_{\bstheta|\bsy}\big[
+    L(\bshattheta,\bstheta)\;|\;\bsy_{1:N}
+  \big]
 \end{align*}
 In words, the Bayes Estimator looks at the sample and minimizes the risk
 of being far what the posterior suggests is the true value.
@@ -9808,64 +9875,67 @@ The Bayes Estimator minimizes Bayes risk.
 \end{prop}
 \begin{proof}
 Definition~\ref{defn:bayesest} defines the Bayes estimator as the
-estimator that minimizes posterior risk given $y$ fixed.
+estimator that minimizes posterior risk given $\bsy_{1:N}$ fixed.
 Proposition~\ref{prop:bayesrisk} defines Bayes risk as the average of
-the posterior risk over all samples $y$. Clearly, the Bayes estimator must
-minimize Bayes risk.
+the posterior risk over all samples $\bsy_{1:N}$. Clearly, the Bayes
+estimator must minimize Bayes risk.
 \end{proof}
 
 
 \begin{ex}
-Given quadratic loss $L(\hat{\theta},\theta) = (\hat{\theta}-\theta)^2$,
-the Bayes estimator is the posterior mean:
+Given quadratic loss $L(\bshattheta,\bstheta) =
+(\bshattheta-\bstheta)^2$, the Bayes estimator is the posterior mean:
 \begin{align*}
-  \hat{\theta}_{\text{Bayes}}
-  &= \E_{\theta|Y}[\theta|Y=y]
+  \bshattheta_{\text{Bayes}}
+  &= \E_{\bstheta|\bsy}[\bstheta|\bsy_{1:N}]
 \end{align*}
 \end{ex}
 
-A word about interpretation and intuition. Classical risk fixes $\theta$
-and averages the loss over different samples. Writing out the definition
-in especially verbose notation:
+A word about interpretation and intuition. Classical risk fixes
+$\bstheta$ and averages the loss over different samples. Writing out the
+definition in especially verbose notation:
 \begin{align*}
-  R(\hat{\theta},\theta)=
-  \E_{Y|\theta}[L(\hat{\theta},\theta)] =
-  \int L(\hat{\theta}(y_1,\ldots,y_N),\theta)
-    \cdot f_{Y_1,\ldots,Y_N|\theta}(y_1,\ldots,y_N|\theta)\; dy
+  R(\bshattheta,\bstheta)=
+  \E_{\bsy|\bstheta}\big[
+    L(\bshattheta,\bstheta)
+  \big] =
+  \int L\big(\bshattheta(\bsy_{1:N}),\bstheta\big)
+    \cdot f_{\bsy|\bstheta}(\bsy_{1:N}|\bstheta)\; d\bsy_{1:N}
 \end{align*}
 You want an estimator that does well for samples with the largest
 likelihood. As you integrate over different samples, the value of your
 estimator is changing to reflect the different sample. You want to make
-sure that the value of that estimator $\hat{\theta}(y_1,\ldots,y_N)$ is
-spot on in regions where $Y_1=y_1,\ldots,Y_N=y_N|\theta$ is super
-likely.
+sure that the value of that estimator $\bshattheta(\bsy_{1:N})$ is
+spot on in regions where $\bsy_{1:N}|\theta$ is super likely.
 
-On the other hand, posterior risk fixes the data at $y_1,\ldots,y_N$
-(hence the estimate $\hat{\theta}(y_1,\ldots,y_N)$ as well) and averages
-the loss over different values of $\theta$.
+On the other hand, posterior risk fixes the data at $\bsy_{1:N}$ (hence
+the estimate $\bshattheta(\bsy_{1:N})$ as well) and averages the loss
+over different values of $\bstheta$.
 Again, writing out the definition in especially verbose notation:
 \begin{align*}
-  \E_{\theta|Y}[L(\hat{\theta},\theta)] =
-  \int L(\hat{\theta}(y_1,\ldots,y_n),\theta)
-    \cdot f_{\theta|Y_1,\ldots,Y_n}(\theta|y_1,\ldots,y_n)\; d\theta
+  \E_{\bstheta|\bsy}\big[
+    L(\bshattheta,\bstheta)
+  \big] =
+  \int L\big(\bshattheta(\bsy_{1:N}),\bstheta\big)
+    \cdot f_{\bstheta|\bsy}(\bstheta|\bsy_{1:N})\; d\bstheta
 \end{align*}
 You want an estimator that, given the data, is pretty close to values of
-$\theta$ that are especially likely according to the posterior.  For
+$\bstheta$ that are especially likely according to the posterior.  For
 this reason, it makes sense that the Bayes Estimator with Mean Square
 Error loss is the posterior mean, since that's the balancing point of
 the posterior distribution. Hence, it does the best job of balancing
 ``pleasing everybody'' in the sense of trying to be as close as possible
-(in an $L^2$ sense) to all of the values of $\theta$ we expect to see.
+(in an $L^2$ sense) to all of the values of $\bstheta$ we expect to see.
 
 \begin{defn}(Admissability)
-An estimator $\hat{\theta}$ is said to be \emph{inadmissable} if there
-exists another estimator $\tilde{\theta}$ such that
+An estimator $\bshattheta$ is said to be \emph{inadmissable} if there
+exists another estimator $\bstildetheta$ such that
 \begin{align*}
-  R(\tilde{\theta},\theta)
+  R(\bstildetheta,\bstheta)
   \leq
-  R(\hat{\theta},\theta)
+  R(\bshattheta,\bstheta)
 \end{align*}
-and with the inequality strict for some $\theta$.
+and with the inequality strict for some $\bstheta$.
 \end{defn}
 
 \begin{prop}
@@ -9874,34 +9944,39 @@ Bayes Estimators are admissable.
 \begin{proof}
 Bayes estimators minimize Bayes risk, i.e.
 \begin{align*}
-  \hat{\theta}_\text{Bayes}
-  = \argmin_{\hat{\theta}} r(\hat{\theta})
-  = \argmin_{\hat{\theta}}\E_\theta[R(\hat{\theta},\theta)]
+  \bshattheta_\text{Bayes}
+  = \argmin_{\bshattheta} r(\bshattheta)
+  = \argmin_{\hat{\theta}}\E_\theta[R(\bshattheta,\bstheta)]
 \end{align*}
-If there were another estimator $\tilde{\theta}$ such that
-$R(\tilde{\theta},\theta)\leq R(\hat{\theta}_\text{Bayes},\theta)$ with
-the inequality strict for some $\theta$, that would contradict the
-definition of $\hat{\theta}_\text{Bayes}$ as the minimizer.
+If there were another estimator $\bstildetheta$ such that
+$R(\bstildetheta,\bstheta)\leq R(\bshattheta_\text{Bayes},\bstheta)$
+with the inequality strict for some $\bstheta$, that would contradict
+the definition of $\bshattheta_\text{Bayes}$ as the minimizer.
 \end{proof}
 
 \begin{thm}\emph{(Complete Class Theorem)}
 Any admissable estimator can be interpretated as a Bayes esitmator.
 \end{thm}
 
-\subsection{Bias and Consistency}
 
+\clearpage
+\subsubsection{Bias and Consistency}
+
+Bias and consistency are two of the most important concepts when
+assessing the quality of estimators.
 
 \begin{defn}(Bias)
 An estimator is \emph{unbiased} if
 \begin{align*}
-  \E\left[\,\hat{\theta}\,\right] =
-  \underbrace{\int \cdots \int}_{n\; times}
-      \hat{\theta}(y_1,\ldots,y_n) \;
-      f_{Y_1,\ldots,Y_n}(y_1,\ldots,y_n) \; dy_1 \ldots dy_n = \theta
+  \E[\,\bshattheta\,] =
+  %\underbrace{\int \cdots \int}_{n\; times}
+  \int
+    \bshattheta(\bsy_{1:N}) \;
+    f(\bsy_{1:N}|\bstheta) \; d\bsy_{1:N} = \bstheta
 \end{align*}
 The \emph{bias} is defined as
 \begin{align*}
-  \text{Bias} = \E[\hat{\theta}-\theta]
+  \text{Bias} = \E[\bshattheta-\bstheta]
 \end{align*}
 \end{defn}
 
@@ -9909,215 +9984,198 @@ The \emph{bias} is defined as
 Mean square error loss of an estimator can be decomposed into its bias
 and its variance:
 \begin{align*}
-  \E[(\hat{\theta}-\theta)^2]
-  =\Var(\hat{\theta}) + \left(\E[\hat{\theta}-\theta]\right)^2
+  \E[(\bshattheta-\bstheta)^2]
+  =\Var(\bshattheta) + \left(\E[\bshattheta-\bstheta]\right)^2
 \end{align*}
 \end{prop}
 
 
 \begin{defn}(Consistency)
-An estimator $\hat{\theta}_N$ using $N$ sample points is
-\emph{consistent} if $\hat{\theta}_N\pto \theta$.
+An estimator $\bshattheta_N$ using $N$ sample points is
+\emph{consistent} if $\bshattheta_N\pto \bstheta$ as $N\ra\infty$.
 \end{defn}
 
 \begin{defn}(Strongly Consistent)
-An estimator $\hat{\theta}_N$ using $N$ sample points is
-\emph{strongly consistent} if $\hat{\theta}_N\asto \theta$.
+An estimator $\bshattheta_N$ using $N$ sample points is
+\emph{strongly consistent} if $\bshattheta_N\asto \bstheta$.
 \end{defn}
 
 
-\subsection{Score and Information}
+\subsubsection{Bias and Consistency}
 
-First, notation. To avoid clutter, rather than write
-$f(Y_{1:N}|\tilde{\theta})$ wherever I want to allow for a joint density
-function, I will simply write $f(Y|\theta)$. However, it should be
-understood that $Y$ is potentially a vector of $N$ observations (with
-each observation also possibly a vector) so that $f(Y|\theta)$ can be a
-joint density function if we desire it.  But this section is about
-likelihood functions, not about samples. So the results hold whether
-$f(Y|\theta)$ is the likelihood for a single draw or the joint
-likelihood for a sample draw.
+\begin{ex}(Mini-Max Estimator)
+If we know the true value $\theta$ lies in $\Theta$, then we might
+choose an estimator to solve
+\begin{align*}
+  \bshattheta_{\text{mini-max}}
+  =
+  \argmin_{\hat{\theta}} \max_{\theta \in \Theta} R(\hat{\theta},\theta)
+\end{align*}
+\end{ex}
 
-In this section, data is generated according to a \emph{true likelihood}
-function $f(Y|\theta)$. Hence expectations involving functions of $Y$
-should be computed using the true likelihood function $f(Y|\theta)$,
-which is why we will explicitly write $\E_{Y|\theta}[\;\cdot\;]$
-whenever we have to compute expectations below.
+\clearpage
+\subsubsection{Score and Information}
 
-Though we don't know the true parameter value $\theta$ (or, by
-implication, the true likelihood), we will assume that we know the
-functional form $f(Y|\tilde{\theta})$, called simply the
-\emph{likelihood} (ditching the ``true'' modifier).  The variable
-$\tilde{\theta}$ can take on any value in some set $\Theta$ of potential
-parameter values, so $\{f(Y|\tilde{\theta})\}_{\tilde{\theta}\in\Theta}$
-forms a family of distributions including the true distribution
-$f(Y|\theta)$.  In a later section on maximimum likelihood estimation
-(which will draw heavily on the results in this section), we will try to
-estimate that true $\theta$---and hence the true likelihood
-$f(Y|\theta)$---by considering a sample $Y_{1:N}=\{Y_1,\ldots,Y_N\}$.
-But in this section, we will simply try to define a few concepts and
-derive a few simple facts about derivatives of the likelihood function
-$f(Y|\tilde{\theta})$ and what happens when we evaluate those
-derivatives at the true $\theta$.
+More on notation. In this section, $f(\bsy|\bstildetheta)$ for
+$\bstildetheta\in\bsTheta$ is the likelihood function as a function of
+$\bstildetheta$, while $f(\bsy|\bstheta)$ is the true likelihood
+function.  To avoid clutter, this notation will be used as shorthand to
+refer to either the \emph{joint} likelihood
+$f(\bsy_{1:N}|\bstildetheta)$ or the likelihood of a single observation
+$f(\bsy_n|\bstildetheta)$.  So it should be understood that $\bsy$ is
+either a single observation or a sample of $N$ observations.  But this
+section is about likelihood functions, not about samples. So the results
+hold whether $f(\bsy|\bstildetheta)$ is the likelihood function for a
+single draw or the joint likelihood for a sample draw.
 
-Most derivations will assume that $\tilde{\theta}$ is a scalar, though I
-will also restate results for cases where $\tilde{\theta}$ is a vector
-of parameters.  However, I won't derive those cases.
+Again, data is generated according to a \emph{true likelihood} function
+$f(\bsy|\bstheta)$. Hence expectations involving functions of $\bsy$
+should be computed using the true likelihood function
+$f(\bsy|\bstheta)$, which is why we will explicitly write
+$\E_{\bsy|\bstheta}[\;\cdot\;]$ whenever we have to compute expectations
+below.
+
+%Most derivations will assume that $\bstildetheta$ is a scalar, though I
+%will also restate results for cases where $\bstildetheta$ is a vector of
+%parameters. However, I won't derive those cases.
 
 \begin{defn}(Score Function)
-The score function $S(\tilde{\theta},Y)$ is the derivative of the
-log-likelihood function with respect to $\tilde{\theta}$:
+The score function $\bsS(\bstildetheta,\bsy)$ is the derivative of the
+log-likelihood function with respect to $\bstildetheta$:
 \begin{align}
-  S(\tilde{\theta},Y) &:=
-  \frac{\partial \ln f(Y|\tilde{\theta})}{\partial \tilde{\theta}}
+  \bsS(\bstildetheta,\bsy) &:=
+  \frac{\partial \ln f(\bsy|\bstildetheta)}{\partial \bstildetheta}
   \label{score1}
 \end{align}
 By the above definition, it can also be written as
 \begin{align}
-  S(\tilde{\theta},Y)
-  &= \frac{\partial \ln f(Y|\tilde{\theta})}{\partial \tilde{\theta}}
-  = \frac{1}{f(Y|\tilde{\theta})} \frac{\partial f(Y|\tilde{\theta})}{\partial \tilde{\theta}}
+  \bsS(\bstildetheta,\bsy)
+  &= \frac{\partial \ln f(\bsy|\bstildetheta)}{\partial \bstildetheta}
+  = \frac{1}{f(\bsy|\bstildetheta)}
+  \frac{\partial f(\bsy|\bstildetheta)}{\partial \bstildetheta}
   \label{score2} \\
   \implies\quad
-  f(Y|\tilde{\theta}) \cdot S(\tilde{\theta},Y)
+  f(\bsy|\bstildetheta) \cdot \bsS(\bstildetheta,\bsy)
   &=
-  \frac{\partial f(Y|\tilde{\theta})}{\partial \tilde{\theta}}
+  \frac{\partial f(\bsy|\bstildetheta)}{\partial \bstildetheta}
   \label{score3}
 \end{align}
-If $\tilde{\theta}$ is a vector, the score is defined
-\begin{align*}
-  S(\tilde{\theta},Y)
-  &:= \nabla_{\tilde{\theta}} \left[\ln f(Y|\tilde{\theta})\right]
-\end{align*}
-Since the score depends upon random variable $Y$, the score function is
-itself a random variable. Again, it is also the case that
-$\tilde{\theta}$ can vary. Don't assume $\tilde{\theta}=\theta$, the
+Since the score depends upon random variable $\bsy$, the score function
+is itself a random variable. Again, it is also the case that
+$\bstildetheta$ can vary. Don't assume $\bstildetheta=\bstheta$, the
 true value, unless I make that explicit.
 \end{defn}
 
 \begin{defn}(Score)
-The \emph{score} is the score function evaluated at the true value:
-$S(\theta,Y)$.
+The \emph{score} is the score function evaluated at true value:
+$\bsS(\bstheta,\bsy)$.
 \end{defn}
 \begin{rmk}
 In the results to follow, always note whether I am referring to the
-\emph{score function} $S(\tilde{\theta},Y)$ (which depends on both
-$\tilde{\theta}$ and $Y$) or the \emph{score}, $S(\theta,Y)$ which
-depends only on $Y$ since $\tilde{\theta}=\theta$, the true value.
+\emph{score function} $\bsS(\bstildetheta,\bsy)$ (which depends on both
+$\bstildetheta$ and $\bsy$) or the \emph{score}, $\bsS(\bstheta,\bsy)$
+which depends only on $\bsy$ since $\bstildetheta=\bstheta$, the true
+value.
 \end{rmk}
 
 \begin{prop}
-The score has expectation zero: $\E_{Y|\theta}[S(\theta,Y)]=0$.
+The score has expectation zero:
+$\E_{\bsy|\bstheta}[\bsS(\bstheta,\bsy)]=\bso$.
 \end{prop}
 \begin{proof}
-Start with an identity that holds for any $\tilde{\theta}$ (whether it
-equals $\theta$ or not):
+Start with an identity that holds for any $\bstildetheta$ (whether it
+equals $\bstheta$ or not):
 \begin{align*}
-  1 &= \int f(y|\tilde{\theta}) \; dy
+  1 &= \int f(\bsy|\bstildetheta) \; d\bsy
 \end{align*}
-Provided the support doesn't depend upon $\tilde{\theta}$, differentiate
-with respect to $\tilde{\theta}$ and take the derivative operator
-inside:
+Provided the support doesn't depend upon $\bstildetheta$, differentiate
+with respect to $\bstildetheta$ and take the derivative operator inside:
 \begin{align*}
-  \frac{d}{d\tilde{\theta}}
+  \frac{d}{d\bstildetheta}
   [ 1 ]
   &=
-  \frac{d}{d\tilde{\theta}}
+  \frac{d}{d\bstildetheta}
   \left[
-    \int f(y|\tilde{\theta}) \; dy
+    \int f(\bsy|\bstildetheta) \; d\bsy
   \right] \\
-  0
+  \bso
   &=
-  \int \frac{df(y|\tilde{\theta})}{d\tilde{\theta}}  \; dy
+  \int \frac{df(\bsy|\bstildetheta)}{d\bstildetheta}  \; d\bsy
 \end{align*}
 Now use Equation~\ref{score3} from above to substitute in for the
 partial derivative term:
 \begin{align}
-  0 &= \int S(\tilde{\theta},y)\cdot f(y|\tilde{\theta}) \; dy
+  \bso &= \int \bsS(\bstildetheta,\bsy)\cdot f(\bsy|\bstildetheta)
+  \; d\bsy
   \label{trueonly}
 \end{align}
 If we evaluate this at the true $\tilde{\theta}=\theta$, then
 \begin{align*}
-  0 &= \int S(\theta,y)\cdot f(y|\theta) \; dy
+  \bso &= \int \bsS(\bstheta,\bsy)\cdot f(\bsy|\bstheta) \; d\bsy
 \end{align*}
 But then just identify the integral as
 \begin{align*}
-  0 &= \int S(\theta,y)\cdot f(y|\theta) \; dy
-  = \E_{Y|\theta}[S(\theta,Y)]
+  \bso &= \int \bsS(\bstheta,\bsy)\cdot f(\bsy|\bstheta) \; d\bsy
+  = \E_{\bsy|\bstheta}\big[\bsS(\bstheta,\bsy)\big]
 \end{align*}
 \end{proof}
 \begin{rmk}
 It's important that this works \emph{only} if we evaluate the score at
-the true value $\tilde{\theta}=\theta$ because the data $Y$ are
-generated by \emph{true} likelihood function $f(Y|\theta)$. Therefore,
-the expectation of the score function is
+the true value $\bstildetheta=\bstheta$ because the data $\bsy$ are
+generated by \emph{true} likelihood function $f(\bsy|\bstheta)$.
+Therefore, the expectation of the score function is
 \begin{align*}
-  \E_{Y|\theta}[S(\tilde{\theta},Y)]
-  = \int S(\tilde{\theta},Y) \cdot f(y|\theta) \; dy
+  \E_{\bsy|\bstheta}\big[\bsS(\bstildetheta,\bsy)\big]
+  = \int \bsS(\bstildetheta,\bsy) \cdot f(\bsy|\bstheta) \; d\bsy
 \end{align*}
 In the key step in the proof, Equation~\ref{trueonly}, to get the
 integral to be the corresponding integral for
-$\E_{Y|\theta}[\;\cdot\;]$, we had to choose $\tilde{\theta}=\theta$ so
-that the likelihood was $f(Y|\theta)$. But that choice of
-$\tilde{\theta}$ also had to apply to the score function
-$S(\theta,Y)$. So we only get the ``expectation equals zero'' result
-if $\tilde{\theta}=\theta$.
+$\E_{\bsy|\bstheta}[\;\cdot\;]$, we had to choose
+$\bstildetheta=\bstheta$ so that the likelihood was $f(\bsy|\bstheta)$.
+But that choice of $\bstildetheta$ also had to apply to the score
+function $\bsS(\bstheta,\bsy)$. So we only get the ``expectation equals
+zero'' result if $\bstildetheta=\bstheta$.
 \end{rmk}
 
 \begin{defn}(Information)
 The \emph{information} is defined
 \begin{align*}
-  \calI(\theta)
+  \calI(\bstheta)
   =
-  -\E_{Y|\theta}\left[
-    \frac{\partial S(\theta,Y)}{\partial \tilde{\theta}}
+  -\E_{\bsy|\bstheta}\left[
+    \frac{\partial \bsS(\bstheta,\bsy)}{\partial \bstildetheta'}
   \right]
   =
-  -\E_{Y|\theta}\left[
-    \frac{\partial^2 \ln f(Y|\theta)}{\partial^2 \tilde{\theta}}
-  \right]
-\end{align*}
-where the derivatives are first taken with respect to $\tilde{\theta}$
-and then evaluated at $\theta$.
-
-If $\theta$ is a $k\times 1$ vector so that the score is a $k\times 1$
-vector, we get a $k\times k$ \emph{information matrix}
-\begin{align*}
-  \calI(\theta)
-  =
-  -\E_{Y|\theta}\left[
-    \frac{\partial S(\theta,Y)}{\partial \tilde{\theta}'}
+  -\E_{\bsy|\bstheta}\left[
+    \frac{\partial^2 \ln f(\bsy|\bstheta)}{%
+      \partial\bstildetheta\;\partial\bstildetheta'}
   \right]
 \end{align*}
+where the derivatives are first taken with respect to $\bstildetheta$
+and then evaluated at $\bstheta$.
 \end{defn}
 \begin{rmk}
-In general, information $\calI(\theta)$ is \emph{not} a function. It is
-always evaluated at the true $\theta$. It only made sense to define a
-score \emph{function} which depends upon $\tilde{\theta}$ because we
+In general, information $\calI(\bstheta)$ is \emph{not} a function. It
+is always evaluated at the true $\bstheta$. It only made sense to define
+a score \emph{function} which depends upon $\bstildetheta$ because we
 want to set that to zero in MLE estimation---doing so sets sets the
 first derivative of the log-likelihood to zero so that we maximize the
 log-likelihood. It's perfectly natural to think of this first-derivative
-function. However, there's no similar motivation or justification
-for defining an information function.  The concept only really makes
-sense when the above is evaluated at the true $\theta$.
+function. However, there's no similar motivation or justification for
+defining an information function.  The concept only really makes sense
+when the above is evaluated at the true $\bstheta$.
 \end{rmk}
 
 \begin{prop}
 The information is both the variance and the second moment of the score.
-If $\theta$ is a scalar, that is written
 \begin{align*}
-  \calI(\theta)
-  = \E_{Y|\theta}[S(\theta,Y)^2]
-  = \Var_{Y|\theta}[S(\theta,Y)]
-\end{align*}
-If $\theta$ is a vector, we have instead
-\begin{align*}
-  \calI(\theta)
-  = \E_{Y|\theta}\left[S(\theta,Y)S(\theta,Y)'\right]
-  = \Var_{Y|\theta}[S(\theta,Y)]
+  \calI(\bstheta)
+  = \E_{\bsy|\bstheta}\left[\bsS(\bstheta,\bsy)\bsS(\bstheta,\bsy)'\right]
+  = \Var_{\bsy|\bstheta}[\bsS(\bstheta,\bsy)]
 \end{align*}
 \end{prop}
 \begin{proof}
+We prove the result for the scalar case.
 Start with the fact that the score has zero expectation:
 \begin{align*}
   0
@@ -10183,40 +10241,33 @@ where the equality of the second moment and the variance followed
 because the score has mean zero.
 \end{proof}
 
-\subsection{Cramer-Rao Lower Bound}
+
+\clearpage
+\subsubsection{Cramer-Rao Lower Bound}
 
 In general, we hope to find minimum-variance unbiased (MVU) estimators
 of parameters. One approach is the Cramer-Rao inequality approach.
 Given one regularity assumption, it establishes a lower bound on the
 variance of \emph{any} unbiased estimator.
 Note also that the result is \emph{very} general, as it does not assume
-independence or identical distribution of the different $Y_i$ that we
+independence or identical distribution of the different $\bsy_n$ that we
 use to estimate the parameter.
 
 \begin{thm}\emph{(Cramer-Rao)}
 Provided the support of the likelihood does \emph{not} depend upon the
-value of $\theta$, then for \emph{any} unbiased estimator
-$\hat{\theta}$, we have
+value of $\bstheta$, then for \emph{any} unbiased estimator
+$\bshattheta$, we have
 \begin{align*}
-  \Var(\hat{\theta})
+  \Var(\bshattheta)
+  =
+  \E\big[ (\bshattheta-\bstheta) (\bshattheta-\bstheta)' \big]
   &\geq
-  \frac{1}{\Var(S(\theta,Y))} \\
-  \iff\qquad
-  \Var(\hat{\theta})
-  &\geq
-  \calI(\theta)^{-1}
+  \big[\Var(\bsS(\bstheta,\bsy))\big]^{-1}
+  =
+  \calI(\bstheta)^{-1}
 \end{align*}
-If $\theta$ is a vector, we have
-\begin{align*}
-  \E\left[
-    (\hat{\theta}-\theta)
-    (\hat{\theta}-\theta)'
-  \right]
-  \geq I(\theta)^{-1}
-\end{align*}
-i.e.\ the difference
-$\E\left[ (\hat{\theta}-\theta) (\hat{\theta}-\theta)' \right]
--I(\theta)^{-1}$ is postive semidefinite.
+i.e.\ the difference $\Var(\bshattheta)-I(\bstheta)^{-1}$ is a postive
+semidefinite matrix.
 \end{thm}
 \begin{proof}
 Let $\hat{\theta}=g(Y)$ be any unbiased estimator of $\theta$. Then
@@ -10247,7 +10298,9 @@ Therefore, we can rearrange to get
 \end{align*}
 \end{proof}
 
-\subsection{Maximum Likelihood}
+\subsection{Estimation Frameworks}
+
+\subsubsection{Maximum Likelihood}
 
 Our main goal will be to find maximum likelihood estimators: functions
 of random variables that can be use to estimate certain parameters.  The
@@ -10843,6 +10896,222 @@ where $K$ is ``sufficiently small'' given the chosen value of $\alpha$.
 This maximizes the power after controlling for the Type I error---i.e.
 after setting the value of the Type I error equal to $\alpha$.
 
+\clearpage
+\section{Generalized Method of Moments}
+
+\subsection{Method of Moments and GMM Defined}
+
+A model and its assumptions typically imply certain \emph{moment
+conditions} which state that some function $\bsf:\R^M\times\R^K \ra
+\R^L$ of random variable $\bsw_n\in\R^M$ and true parameter vector
+$\bsbeta \in\R^K$ must equal (without loss of generality) the constant
+zero vector:
+\begin{align}
+  \label{populationMomentConditions}
+  \bsg(\bsbeta) := \E[\bsg_n(\bsbeta) ]
+  = \E[\bsf(\bsw_n,\bsbeta)] = \bso
+\end{align}
+where $\bsg:\R^K\ra \R^L$. Notice that we introduced the shorthand
+notation $\bsg_n(\bsb)=\bsf(\bsw_n,\bsb)$.
+Our goal is to estimate $\bsbeta$. Quite sensibly, we can estimate
+parameters by drawing a sample $\{\bsw_n\}\nN$, using them to construct
+sample observations $\bsg_n(\bsb)$, and then forming the sample analog
+$\bsg_N$ of the moment conditions
+\begin{align}
+  \label{sampleMomentConditions}
+  \bsg_N(\bsb) :=
+  \frac{1}{N} \sumnN \bsg_n(\bsb)
+  =
+  \frac{1}{N} \sumnN \bsf(\bsw_n,\bsb)
+\end{align}
+This is a function of parameter vector $\bsb$. We will naturally choose
+our estimator to be the parameter vector that sets this sample analog
+equal to zero or ``close'' to zero.
+
+\begin{defn}(Method of Moments Estimator)
+When the dimensionality of $\bsbeta$ equals that of $\bsg(\bsbeta)$
+(when there are as many parameters as moment conditions $K=L$), we can
+always set the sample analog of the moment conditions equal to zero
+exactly. Therefore, we define the \emph{method of moments estimator} as
+the solution $\bshatbeta$ to the following system of
+equations:
+\begin{align*}
+  \bsg_N(\bshatbeta) &= \bso
+  \qquad\text{where}\quad
+  \bsg_N,\bshatbeta \in\R^K
+\end{align*}
+\end{defn}
+
+
+\begin{defn}(GMM Estimator)
+\label{defn:gmm}
+When there are more moment conditions than parameters, i.e.\ when $L>K$
+so that the model is \emph{overidentified}, we cannot generally set the
+sample analog of the moment conditions $\bsg_N(\bsb)$ to zero
+\emph{exactly} using some $K$-dimensional $\bsb$.
+Therefore, we instead look for the parameter vector that gets the
+squared-weighted elements of vector $\bsg_N(\bsb)$ jointly as
+\emph{close} to the scalar zero as possible:
+\begin{align}
+  \bshatbeta(\bshatW) :=&\;
+  \argmin_{\bsb} \; J(\bsb,\bshatW)
+  \label{eq:bhatmin} \\
+  \text{where}\quad
+  J(\bsb,\bshatW)
+  :=&\;
+  N\cdot \bsg_N(\bsb)' \, \bshatW \, \bsg_N(\bsb)
+  \notag
+\end{align}
+where $\bshatbeta(\bshatW)$ is called
+the \emph{Generalized Method of Moments} (GMM) estimator using
+symmetric, positive definite weighting matrix $\bshatW$ such that
+$\bshatW\pto \bsW$ as $N\ra\infty$.\footnote{%
+  Note that $\bsW$ and $\bsw_n$ above having nothing to do with each
+  other directly. Just notation.}
+
+We index $\bshatbeta$ by $\bshatW$ because the estimate depends
+crucially on the choice of weighting matrix, which can possibly weight
+the different moment conditions asymmetrically, emphasizing some over
+others.
+We'll talk about choices of the weighting matrix
+$\boldsymbol{W}$ later on. For now though, you might reasonably just
+choose $\boldsymbol{W}=\boldsymbol{I}$, treating all moments
+equally.
+But later on, we'll see that most estimators that we care about can be
+expressed as a GMM estimator given an appropriate choice of moment
+conditions and weighting matrix.
+\end{defn}
+
+
+\begin{rmk}
+We typically use the ``generalized'' quantifier to refer to methods
+where there are more conditions than parameters and so we have to ``do
+something close'' rather than exactly.
+\end{rmk}
+
+
+\begin{defn}(GMM via Moment Selection)
+Another way to think about GMM is to deal with overidentification by
+employing a selection matrix $\bshata\in \R^{K\times L}$ to
+select/emphasize important moments or linear combinations of moments.
+In particular, rather than solve minimization Problem~\ref{eq:bhatmin},
+we solve this modified, but exactly-identified variation on the original
+moment conditions:
+\begin{align}
+  \bshata \; \bsg_N(\bshatbeta) &= \bso
+  \qquad\text{where}\quad
+  \bshatbeta \in\R^K\quad \bshata \in \R^{L\times K}
+  \label{eq:bhatmina}
+\end{align}
+We see that $\bshata\,\bsg_N(\bshatb)$ is like a new set of moment
+conditions, but with the dimensionality reduced from $L>K$ to $K$ so
+that we \emph{can} set this to zero for some $\bshatbeta\in\R^K$.
+
+This selection matrix can depend upon the data---hence the hat in
+$\bshata$. It could also, for example, be mostly ones and zeros to pick
+out the moments in $\bsg_N(\bshatb)$ (or form linear combinations of
+moments) that we think are most important and definitely want to force
+to zero. But in general, it really can be any arbitrary matrix in
+$R^{L\times K}$.
+
+Lastly, just to tie things together, this is actually equivalent to
+Definition~\ref{defn:gmm} if you choose $\bshata$ based on the first
+order conditions to the minimization problem defined by
+Equation~\ref{eq:bhatmin}:
+\begin{align}
+  \bso
+  =
+  \underbrace{\frac{\partial \bsg_N'}{\partial \bsb} \bshatW}_{\bshata}
+  \;\bsg_N(\bsb)
+  \label{eq:equivrep}
+\end{align}
+\end{defn}
+
+\begin{defn}(Two-Step Efficient GMM Estimators)
+In some cases, our goal is to obtain not just consistent estimators, but
+also \emph{efficient} GMM estimators, i.e.\ an estimator $\bshatbeta$
+with the lowest possible asymptotic variance.
+That typically presents the following chicken and egg problem:
+\begin{enumerate}[label=(\roman*)]
+  \item Obtaining the efficient GMM estimator, call it $\bshatbeta_2$,
+    often requires using a specific/specially-chosen weighting matrix,
+    call it $\bshatW_2$
+  \item However, the weighting matrix $\bshatW_2$ that
+    delivers the the efficient estimator is often a function of the true
+    parameter vector $\bsbeta$. Since we don't know the true parameter
+    vector, we approximate it by a consistent estimate called
+    $\bshatbeta_1$.
+\end{enumerate}
+That's the problem: (i) requires $\bshatW_2$ to get efficient
+$\bshatbeta_2$, while (ii) requires some consistent estimate
+$\bshatbeta_1$ to get the appropriate $\bshatW_2$.
+For this reason, efficient estimation is typically carried out in two
+steps:
+\begin{enumerate}
+  \item Choose some arbitrary $\bshatW_1$ ($\bsI$ often works) and solve
+    Expression~\ref{eq:bhatmin} for a preliminary ``inefficient'', but
+    consistent estimator $\bshatbeta_1$.
+  \item Use $\bshatbeta_1$ to compute the second-stage efficient
+    weighting matrix $\bshatW_2$, and then use this to solve
+    Expression~\ref{eq:bhatmin} again for the now efficient GMM
+    estimator $\bshatbeta_2$.
+\end{enumerate}
+This is all very general, but there will be specific examples of this
+procedure below.
+\end{defn}
+\begin{rmk}
+The above approach was described for the $\bshatW$ weighting-matrix
+approach of Expression~\ref{eq:bhatmin}. But it also applies analogously
+to the moment selection approach with $\bshata$.
+\end{rmk}
+
+
+
+\clearpage
+\subsection{Example: OLS as a GMM Estimator}
+
+As a first example, take simple OLS, which can be written as a GMM
+estimator. In particular, take the model
+\begin{align*}
+  y_n &= \bsx_n' \bsbeta + \varepsilon_n \\
+  \text{where} \quad
+  \E[\varepsilon_n\bsx_n] &=
+  \E[(y_n-\bsx_n'\bsbeta)\bsx_n] = \bso
+\end{align*}
+The orthogonality condition $\bsg(\bsbeta)=\E[\varepsilon_n\bsx_n']=\bso$
+will be the moment condition to use. Therefore, we form $\bsg_N$, the
+sample analog of $\bsg$,
+\begin{align*}
+  \bsg_N(\bsb) &= \frac{1}{N}\sumnN (y_n-\bsx_n'\bsb)\bsx_n
+  = \frac{1}{N}\bsX'(\bsy - \bsX\bsb)
+\end{align*}
+and estimate the parameters using identity weighting matrix
+$\bsW = \bsI_K$ (ignoring constants like $N$ or $\frac{1}{N}$):
+\begin{align*}
+  \bshatbeta(\bsI_K)
+  &= \argmin_{\bsb} \; \bsg_N(\bsb)' \, \bsI_K \, \bsg_N(\bsb) \\
+  &= \argmin_{\bsb} \;
+    (\bsy - \bsX\bsb)'\bsX \bsI_K \bsX'(\bsy - \bsX\bsb)
+\end{align*}
+Ignoring terms constant terms that are not a function of $\bsb$, we can
+simplify the minimization problem to
+\begin{align*}
+  \bshatbeta(\bsI_K)
+  &= \argmin_{\bsb} \;
+    -\bsb'\bsX'\bsX \bsX'\bsy
+    - \bsy'\bsX \bsX'\bsX\bsb + \bsb'\bsX'\bsX \bsX'\bsX\bsb
+\end{align*}
+The first order conditions of the minimization problem are
+\begin{align*}
+  0 &=
+  -2\bsX'\bsX \bsX'\bsy
+  + 2\bsX'\bsX \bsX'\bsX\bsb \\
+  \implies\quad
+  \bsb
+  &= (\bsX'\bsX)^{-1} \bsX'\bsy
+\end{align*}
+which is exactly the OLS estimator formula.
+
 
 \clearpage
 \section{Estimating Spectral Densities and Long-Run Variance}
@@ -11157,221 +11426,6 @@ bad assumption.
 
 
 
-\clearpage
-\section{Generalized Method of Moments}
-
-\subsection{Method of Moments and GMM Defined}
-
-A model and its assumptions typically imply certain \emph{moment
-conditions} which state that some function $\bsf:\R^M\times\R^K \ra
-\R^L$ of random variable $\bsw_n\in\R^M$ and true parameter vector
-$\bsbeta \in\R^K$ must equal (without loss of generality) the constant
-zero vector:
-\begin{align}
-  \label{populationMomentConditions}
-  \bsg(\bsbeta) := \E[\bsg_n(\bsbeta) ]
-  = \E[\bsf(\bsw_n,\bsbeta)] = \bso
-\end{align}
-where $\bsg:\R^K\ra \R^L$. Notice that we introduced the shorthand
-notation $\bsg_n(\bsb)=\bsf(\bsw_n,\bsb)$.
-Our goal is to estimate $\bsbeta$. Quite sensibly, we can estimate
-parameters by drawing a sample $\{\bsw_n\}\nN$, using them to construct
-sample observations $\bsg_n(\bsb)$, and then forming the sample analog
-$\bsg_N$ of the moment conditions
-\begin{align}
-  \label{sampleMomentConditions}
-  \bsg_N(\bsb) :=
-  \frac{1}{N} \sumnN \bsg_n(\bsb)
-  =
-  \frac{1}{N} \sumnN \bsf(\bsw_n,\bsb)
-\end{align}
-This is a function of parameter vector $\bsb$. We will naturally choose
-our estimator to be the parameter vector that sets this sample analog
-equal to zero or ``close'' to zero.
-
-\begin{defn}(Method of Moments Estimator)
-When the dimensionality of $\bsbeta$ equals that of $\bsg(\bsbeta)$
-(when there are as many parameters as moment conditions $K=L$), we can
-always set the sample analog of the moment conditions equal to zero
-exactly. Therefore, we define the \emph{method of moments estimator} as
-the solution $\bshatbeta$ to the following system of
-equations:
-\begin{align*}
-  \bsg_N(\bshatbeta) &= \bso
-  \qquad\text{where}\quad
-  \bsg_N,\bshatbeta \in\R^K
-\end{align*}
-\end{defn}
-
-
-\begin{defn}(GMM Estimator)
-\label{defn:gmm}
-When there are more moment conditions than parameters, i.e.\ when $L>K$
-so that the model is \emph{overidentified}, we cannot generally set the
-sample analog of the moment conditions $\bsg_N(\bsb)$ to zero
-\emph{exactly} using some $K$-dimensional $\bsb$.
-Therefore, we instead look for the parameter vector that gets the
-squared-weighted elements of vector $\bsg_N(\bsb)$ jointly as
-\emph{close} to the scalar zero as possible:
-\begin{align}
-  \bshatbeta(\bshatW) :=&\;
-  \argmin_{\bsb} \; J(\bsb,\bshatW)
-  \label{eq:bhatmin} \\
-  \text{where}\quad
-  J(\bsb,\bshatW)
-  :=&\;
-  N\cdot \bsg_N(\bsb)' \, \bshatW \, \bsg_N(\bsb)
-  \notag
-\end{align}
-where $\bshatbeta(\bshatW)$ is called
-the \emph{Generalized Method of Moments} (GMM) estimator using
-symmetric, positive definite weighting matrix $\bshatW$ such that
-$\bshatW\pto \bsW$ as $N\ra\infty$.\footnote{%
-  Note that $\bsW$ and $\bsw_n$ above having nothing to do with each
-  other directly. Just notation.}
-
-We index $\bshatbeta$ by $\bshatW$ because the estimate depends
-crucially on the choice of weighting matrix, which can possibly weight
-the different moment conditions asymmetrically, emphasizing some over
-others.
-We'll talk about choices of the weighting matrix
-$\boldsymbol{W}$ later on. For now though, you might reasonably just
-choose $\boldsymbol{W}=\boldsymbol{I}$, treating all moments
-equally.
-But later on, we'll see that most estimators that we care about can be
-expressed as a GMM estimator given an appropriate choice of moment
-conditions and weighting matrix.
-\end{defn}
-
-
-\begin{rmk}
-We typically use the ``generalized'' quantifier to refer to methods
-where there are more conditions than parameters and so we have to ``do
-something close'' rather than exactly.
-\end{rmk}
-
-
-\begin{defn}(GMM via Moment Selection)
-Another way to think about GMM is to deal with overidentification by
-employing a selection matrix $\bshata\in \R^{K\times L}$ to
-select/emphasize important moments or linear combinations of moments.
-In particular, rather than solve minimization Problem~\ref{eq:bhatmin},
-we solve this modified, but exactly-identified variation on the original
-moment conditions:
-\begin{align}
-  \bshata \; \bsg_N(\bshatbeta) &= \bso
-  \qquad\text{where}\quad
-  \bshatbeta \in\R^K\quad \bshata \in \R^{L\times K}
-  \label{eq:bhatmina}
-\end{align}
-We see that $\bshata\,\bsg_N(\bshatb)$ is like a new set of moment
-conditions, but with the dimensionality reduced from $L>K$ to $K$ so
-that we \emph{can} set this to zero for some $\bshatbeta\in\R^K$.
-
-This selection matrix can depend upon the data---hence the hat in
-$\bshata$. It could also, for example, be mostly ones and zeros to pick
-out the moments in $\bsg_N(\bshatb)$ (or form linear combinations of
-moments) that we think are most important and definitely want to force
-to zero. But in general, it really can be any arbitrary matrix in
-$R^{L\times K}$.
-
-Lastly, just to tie things together, this is actually equivalent to
-Definition~\ref{defn:gmm} if you choose $\bshata$ based on the first
-order conditions to the minimization problem defined by
-Equation~\ref{eq:bhatmin}:
-\begin{align}
-  \bso
-  =
-  \underbrace{\frac{\partial \bsg_N'}{\partial \bsb} \bshatW}_{\bshata}
-  \;\bsg_N(\bsb)
-  \label{eq:equivrep}
-\end{align}
-\end{defn}
-
-\begin{defn}(Two-Step Efficient GMM Estimators)
-In some cases, our goal is to obtain not just consistent estimators, but
-also \emph{efficient} GMM estimators, i.e.\ an estimator $\bshatbeta$
-with the lowest possible asymptotic variance.
-That typically presents the following chicken and egg problem:
-\begin{enumerate}[label=(\roman*)]
-  \item Obtaining the efficient GMM estimator, call it $\bshatbeta_2$,
-    often requires using a specific/specially-chosen weighting matrix,
-    call it $\bshatW_2$
-  \item However, the weighting matrix $\bshatW_2$ that
-    delivers the the efficient estimator is often a function of the true
-    parameter vector $\bsbeta$. Since we don't know the true parameter
-    vector, we approximate it by a consistent estimate called
-    $\bshatbeta_1$.
-\end{enumerate}
-That's the problem: (i) requires $\bshatW_2$ to get efficient
-$\bshatbeta_2$, while (ii) requires some consistent estimate
-$\bshatbeta_1$ to get the appropriate $\bshatW_2$.
-For this reason, efficient estimation is typically carried out in two
-steps:
-\begin{enumerate}
-  \item Choose some arbitrary $\bshatW_1$ ($\bsI$ often works) and solve
-    Expression~\ref{eq:bhatmin} for a preliminary ``inefficient'', but
-    consistent estimator $\bshatbeta_1$.
-  \item Use $\bshatbeta_1$ to compute the second-stage efficient
-    weighting matrix $\bshatW_2$, and then use this to solve
-    Expression~\ref{eq:bhatmin} again for the now efficient GMM
-    estimator $\bshatbeta_2$.
-\end{enumerate}
-This is all very general, but there will be specific examples of this
-procedure below.
-\end{defn}
-\begin{rmk}
-The above approach was described for the $\bshatW$ weighting-matrix
-approach of Expression~\ref{eq:bhatmin}. But it also applies analogously
-to the moment selection approach with $\bshata$.
-\end{rmk}
-
-
-
-\clearpage
-\subsection{Example: OLS as a GMM Estimator}
-
-As a first example, take simple OLS, which can be written as a GMM
-estimator. In particular, take the model
-\begin{align*}
-  y_n &= \bsx_n' \bsbeta + \varepsilon_n \\
-  \text{where} \quad
-  \E[\varepsilon_n\bsx_n] &=
-  \E[(y_n-\bsx_n'\bsbeta)\bsx_n] = \bso
-\end{align*}
-The orthogonality condition $\bsg(\bsbeta)=\E[\varepsilon_n\bsx_n']=\bso$
-will be the moment condition to use. Therefore, we form $\bsg_N$, the
-sample analog of $\bsg$,
-\begin{align*}
-  \bsg_N(\bsb) &= \frac{1}{N}\sumnN (y_n-\bsx_n'\bsb)\bsx_n
-  = \frac{1}{N}\bsX'(\bsy - \bsX\bsb)
-\end{align*}
-and estimate the parameters using identity weighting matrix
-$\bsW = \bsI_K$ (ignoring constants like $N$ or $\frac{1}{N}$):
-\begin{align*}
-  \bshatbeta(\bsI_K)
-  &= \argmin_{\bsb} \; \bsg_N(\bsb)' \, \bsI_K \, \bsg_N(\bsb) \\
-  &= \argmin_{\bsb} \;
-    (\bsy - \bsX\bsb)'\bsX \bsI_K \bsX'(\bsy - \bsX\bsb)
-\end{align*}
-Ignoring terms constant terms that are not a function of $\bsb$, we can
-simplify the minimization problem to
-\begin{align*}
-  \bshatbeta(\bsI_K)
-  &= \argmin_{\bsb} \;
-    -\bsb'\bsX'\bsX \bsX'\bsy
-    - \bsy'\bsX \bsX'\bsX\bsb + \bsb'\bsX'\bsX \bsX'\bsX\bsb
-\end{align*}
-The first order conditions of the minimization problem are
-\begin{align*}
-  0 &=
-  -2\bsX'\bsX \bsX'\bsy
-  + 2\bsX'\bsX \bsX'\bsX\bsb \\
-  \implies\quad
-  \bsb
-  &= (\bsX'\bsX)^{-1} \bsX'\bsy
-\end{align*}
-which is exactly the OLS estimator formula.
 
 
 \clearpage
