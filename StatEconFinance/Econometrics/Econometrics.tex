@@ -279,12 +279,14 @@
 \newcommand{\bsbeta}{\boldsymbol{\beta}}
 \newcommand{\bsgamma}{\boldsymbol{\gamma}}
 \newcommand{\bslambda}{\boldsymbol{\lambda}}
+\newcommand{\bsdelta}{\boldsymbol{\delta}}
 
 % Special cases like \bshatb for \boldsymbol{\hat{b}}
 \generate[\hat]{bshat}{\boldsymbol}{a,b,y,x,X,V,S,W,A,B,P}
 \newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
 \newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
 \newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bsbartheta}{\boldsymbol{\bar{\theta}}}
 \newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
 \newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
 \newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
@@ -10321,23 +10323,24 @@ Therefore, we can rearrange to get
 
 
 \clearpage
-\subsection{Extremum Estimators and M-Estimators}
+\subsection{Extremum Estimators, M-Estimators, Sandwich Estimators}
 
 Extremum estimators are quite important. Virtually all estimators of
-interest---MLE, NLS, GMM---are (or can be written as) extremum
-estimators. We also introduce a special type of extremum estimator
-called the M-estimator, which also nests as special cases MLE and NLS.
+interest---MLE, NLS, GMM---are (or can be cast as) extremum
+estimators. We also introduce a particular type of extremum estimator
+called the \emph{M-estimator}, which also nests as special cases MLE and
+NLS.
 
 
 \begin{defn}(Extremum Estimator)
-We call $\bshattheta$ an \emph{extremum estimator} if it solves
+We call $\bshattheta$ an \emph{extremum estimator} if it satisfies
 \begin{align*}
   \bshattheta = \argmax_{\bstildetheta\in\bsTheta}\;
   Q_N(\bstildetheta)
 \end{align*}
-for some sample objective function $Q_N(\bstildetheta)$ that depends on
-sample $\{\bsy_n\}\nN$ and converges to corresponding population
-objective function $Q(\bstildetheta)$ as $N\ra\infty$ where
+for some sample objective function $Q_N(\bstildetheta)$, which is
+constructed from sample $\{\bsy_n\}\nN$ and converges to corresponding
+population objective function $Q(\bstildetheta)$ as $N\ra\infty$ where
 \begin{align*}
   \bstheta = \argmax_{\bstildetheta\in\bsTheta}\;
   Q(\bstildetheta)
@@ -10360,11 +10363,14 @@ written as
   \frac{1}{N}
   \sumnN q(\bsy_n,\bstildetheta)
   }_{Q_N(\bstildetheta)}
+  \qquad\implies\qquad
+  0 = Q'_N(\bshattheta)
+  = \frac{1}{N}\sumnN q'(\bsy_n, \bshattheta)
 \end{align*}
-for some function $q(\bsy_n,\bstildetheta)$. Implicit in this setup is
-that the true $\bstheta$ we hope to estimate satisfies
-$\E\big[q'(\bsy_n,\bstheta)\big]$ where $q'$ is the gradient of $q$
-evaluated at true $\bstheta$.
+for some function $q(\bsy_n,\bstildetheta)$. For differentiable $q$,
+that means the true $\bstheta$ we hope to estimate satisfies
+$\E\big[q'(\bsy_n,\bstheta)\big]=\bso$ where $q'(\,\cdot\,,\bstheta)$ is
+the gradient of $q$ evaluated at true $\bstheta$.
 \end{defn}
 
 \begin{prop}\emph{(Asymptotic Distribution of M-Estimator)}
@@ -10373,17 +10379,19 @@ $N$. Then
 \begin{align*}
   \sqrt{N}(\bshattheta_N-\bstheta)
   \quad\dto\quad
-  \E\big[q''(\bsy_n,\bstheta)\big]^{-1}
-  \cdot
   \calN\big(0,\;
+  \E\big[q''(\bsy_n,\bstheta)\big]^{-1}
+  \;
   \Var\big[q'(\bsy_n,\bstheta)\big]
+  \;
+  \E\big[q''(\bsy_n,\bstheta)\big]^{-1}
   \big)
 \end{align*}
 where
 \begin{align*}
   q'(\bsy_n,\bstildetheta)
   =
-  \frac{\partial^2 q(\bsy_n,\bstildetheta)}{%
+  \frac{\partial q(\bsy_n,\bstildetheta)}{%
     \partial\bstildetheta}
   \qquad
   q''(\bsy_n,\bstildetheta)
@@ -10398,6 +10406,8 @@ approximating the expectation and variance terms with
 \begin{align}
   \frac{1}{N}\sumnN q'(\bsy_n,\bshattheta_N)q'(\bsy_n,\bshattheta_N)'
   \quad&\pto\quad
+  \E\big[q'(\bsy_n,\bstheta)q'(\bsy_n,\bstheta)'\big]
+  =
   \Var\big[q'(\bsy_n,\bstheta)\big]
   \label{mestvar}
   \\
@@ -10406,43 +10416,46 @@ approximating the expectation and variance terms with
   \E\big[q''(\bsy_n,\bstheta)\big]
   \notag
 \end{align}
-Since $\E[q'(\bsy_n,\bstheta)]=0$, we can compute limiting variance in
-Expression~\ref{mestvar} by computing just the second moments.
+In Expression~\ref{mestvar}, second moment and the variance are equal
+because $\E[q'(\bsy_n,\bstheta)]=0$.
 \end{prop}
+\begin{rmk}
+This is sometimes called a \emph{Sandwich Estimator} because the
+asymptotic variance looks like a sandwich.
+\end{rmk}
 
 \begin{proof}
-Recall the maximization problem that defines our M-estimator:
-\begin{align*}
-  \bshattheta =
-  \argmax_{\bstildetheta\in\bsTheta}\;
-  \frac{1}{N}
-  \sumnN q(\bsy_n,\bstildetheta)
-\end{align*}
 If $\bstheta\in\R^P$, then $\bshattheta$ must satisfy the following
-$P$-first order conditions (ommitting unnecessary $1/N$):
+$P$-first order conditions for a maximum (ommitting unnecessary $1/N$):
 \begin{align*}
   \bso &=
   \sumnN q'(\bsy_n,\bshattheta)
 \end{align*}
-Since $q'$ is the derivative with respect to vector $\bstildetheta$
-(i.e.\ the gradient) evaluated at $\bshattheta$, this is $P$-equations
-in $P$-unknowns. We can do a Taylor Expansion of the $p$th equation
-about the (unknown) true value $\bstheta$:
+where the elements of the sum are the derivative of $q$ with respect to
+vector $\bstildetheta$, evaluated at $\bsy_n$ and $\bshattheta$. This is
+a system of $P$-equations in $P$-unknowns.  We can do a Taylor Expansion
+of \emph{each} equation (separately) about the unknown, true value
+$\bstheta$:
 \begin{align*}
   0 &=
-  \sumnN q'_p(\bsy_n,\bshattheta)
+  \sumnN q'(\bsy_n,\bshattheta)
   =
   \sumnN
   \big[
-  q'_p(\bsy_n,\bstheta)
+  q'(\bsy_n,\bstheta)
   +
-  q''_p(\bsy_n,\bstildetheta_p)
+  q''(\bsy_n,\bsbartheta)
   (\bshattheta-\bstheta)
   \big]
 \end{align*}
-where $\bstildetheta_p$ lies in between true $\bstheta$ and estimated
-$\bshattheta$.
-There is one for each of the $P$ equations. Rearranging,
+where $\bsbartheta$ lies in between true $\bstheta$ and estimated
+$\bshattheta$. Note that this is a slight abuse of notation. Since the
+Taylor expansion was done separately for each equation, there is a
+separate $\bsbartheta$ for each expansion/equation. But it won't matter
+because as we send $N\ra\infty$, each $\bsbartheta$ (sandwiched
+in between consistent $\bshattheta$ and true $\bstheta$) will converge
+to $\bstheta$ anyway.
+So to finish up, we rearrange,
 \begin{align*}
   \sqrt{N}(\bshattheta-\bstheta)
   =
@@ -10450,15 +10463,30 @@ There is one for each of the $P$ equations. Rearranging,
   \bigg[
   \frac{1}{N}
   \sumnN
-  q''_p(\bsy_n,\bstildetheta_p)
+  q''(\bsy_n,\bsbartheta)
   \bigg]^{-1}
   \bigg[
   \frac{1}{\sqrt{N}}
   \sumnN
-  q'_p(\bsy_n,\bstheta)
+  q'(\bsy_n,\bstheta)
   \bigg]
 \end{align*}
-By the LLN and the CMT, the first converges in probability to
+By the LLN and the CMT, the first term converges in probability to
+$\E[q''(\bsy_n,\bstheta)]^{-1}$. By the CLT, the second converges to in
+distribution to $\calN\big(0,\Var[q'(\bsy_n,\bstheta)]\big)$. Then, by
+Slutsky, we have
+\begin{align*}
+  \sqrt{N}(\bshattheta-\bstheta)
+  \quad\dto\quad
+  \calN\big(0,
+  \E[q''(\bsy_n,\bstheta)]^{-1}
+  \cdot
+  \Var[q'(\bsy_n,\bstheta)]
+  \cdot
+  \E[q''(\bsy_n,\bstheta)]^{-1}
+  \big)
+\end{align*}
+
 \end{proof}
 
 
@@ -10477,173 +10505,496 @@ to minimize the maximum risk
 \end{align*}
 \end{ex}
 
+\clearpage
+\subsection{Least Squares Estimation}
+
+Suppose we have random variables $y_n$ and $\bsx_n$ and we want to use
+$\bsx_n$ to forecast $y_n$, i.e.\ to find some function $g(\bsx_n)$ that
+does a ``good'' job predicting $y_n$. We say that $g(\bsx_n)$ is
+``good'' if it minimizes the Mean-Square Error of the forecast:
+\begin{align}
+  \min_{g(\bsx_n)} \E\big[(y_n - h(\bsx_n))^2\big]
+  =
+  \min_{g(\bsx_n)} \E\left[\E\big[(y_n - h(\bsx_n))^2\big] \;|\;\bsx_n\right]
+  \label{nlsmotivation}
+\end{align}
+Using the second expression where we iterated expectations, it can be
+shown that the choice of $g(\bsx_n)$ that minimizes the MSE is the
+conditional expectation function (CEF): $g(\bsx_n)=\E[y_n|\bsx_n]$.
+This motivates the following definition.
+
+\begin{defn}(Nonlinear Least Squares Estimator)
+Given sample $\{y_n,\bsx_n\}\nN$ and any arbitrary parametric function
+$g(\bsx_n,\bstildetheta)$, the
+\emph{nonlinear least squares (NLS) estimator} solves
+\begin{align}
+  \bshattheta_{NLS}
+  = \argmin_{\bstildetheta\in\bsTheta}
+  \frac{1}{N}\sumnN \big(y_n-g(\bsx_n,\bstildetheta)\big)^2
+  \label{nls}
+\end{align}
+We should think of $g(\bsx_n,\bstildetheta)$ as a parametric form that
+\emph{actually is} or \emph{approximates} the true population CEF.
+Since the true population CEF necessarily minimizes the population
+analog of the above objective function in
+Expression~\ref{nlsmotivation}, we will fit a sample CEF or CEF
+approximation to minimize the sample version in Expression~\ref{nls}.
+\end{defn}
+
+\begin{defn}(Ordinary Least Squares)
+If $g(\bsx_n,\bstildetheta)$ is \emph{linear} in $\bsx_n$ (as in
+regression), we instead call the NLS estimator the \emph{ordinary least
+squares (OLS) estimator}.
+\end{defn}
+
+
+\begin{defn}(Weighted NLS)
+Given sample $\{y_n,\bsx_n\}\nN$, let $\{w_n\}\nN$ denote a set of
+weights for the observations. Then the \emph{weighted NLS estimator}
+solves
+\begin{align}
+  \bshattheta_{NLS}
+  = \argmin_{\bstildetheta\in\bsTheta}
+  \frac{1}{N}\sumnN w_n^2\big(y_n-g(\bsx_n,\bstildetheta)\big)^2
+  \label{wnls}
+\end{align}
+\end{defn}
+
+
+\begin{prop}\emph{(Asymptotic Distribution of NLS Estimator)}
+The NLS estimator has asymptotic distribution
+\begin{align*}
+  \sqrt{N}(\bshattheta_{NLS}-\bstheta)
+  \quad\dto\quad
+  \E\big[
+  g'(\bsx_n,\bstheta)g'(\bsx_n,\bstheta)'
+  \big]^{-1}
+  \cdot
+  \calN\big(0,\;
+  \E\big[\varepsilon_n^2g'(\bsx_n,\bstheta)g'(\bsx_n,\bstheta)'\big]
+  \big)
+\end{align*}
+where $\varepsilon_n:=y_n-g(\bsx_n,\bstheta)$.
+Given $\bshattheta_{NLS}$, we can estimate quantities in asymptotic
+variance by
+\begin{align*}
+  \frac{1}{N}\sumnN
+  g'(\bsx_n,\bshattheta_{NLS})g'(\bsx_n,\bshattheta_{NLS})'
+  \quad&\pto\quad
+  \E\big[
+  g'(\bsx_n,\bstheta)g'(\bsx_n,\bstheta)'
+  \big]
+  \\
+  \frac{1}{N}\sumnN
+  %\underbrace{%
+  \big(y_n-g(\bsx_n,\bshattheta_{NLS})\big)^2
+  %}_{\hat{\varepsilon}_n}
+  g'(\bsx_n,\bshattheta_{NLS})g'(\bsx_n,\bshattheta_{NLS})'
+  \quad&\pto\quad
+  \E\big[\varepsilon_n^2
+  g'(\bsx_n,\bstheta)g'(\bsx_n,\bstheta)'
+  \big]
+  \notag
+\end{align*}
+\end{prop}
+\begin{cor}(Asymptotic Distribution of the OLS Esimtator)
+In the special case where $g$ is linear,
+$g(\bsx_n,\bstildebeta)=\bsx_n'\bstildebeta$ so that
+$g(\bsx_n,\bstildebeta)=\bsx_n$, the associated OLS estimator has
+asymptotic distribution
+\begin{align*}
+  \sqrt{N}(\bshatbeta_{OLS}-\bsbeta)
+  \quad\dto\quad
+  \calN\big(0,\;
+  \E[ \bsx_n\bsx_n' ]^{-1}
+  \E[\varepsilon_n^2 \bsx_n\bsx_n' ]
+  \E[ \bsx_n\bsx_n' ]^{-1}
+  \big)
+\end{align*}
+Note that these are the heteroskedasticity-robust standard errors. If we
+were willing to assume homoeskedasticy, the standard errors would
+simplify further.
+\end{cor}
+\begin{proof}
+Notice that the general NLS estimator is an $M$-estimator:
+\begin{align*}
+  \bshattheta_{NLS}
+  = \argmin_{\bstildetheta\in\bsTheta}
+  \frac{1}{N}\sumnN q(y_n,\bsx_n,\bstildetheta)
+  \qquad\text{where}
+  \quad
+  q(y_n,\bsx_n,\bstildetheta):=
+  \big(y_n-g(\bsx_n,\bstildetheta)\big)^2
+\end{align*}
+Recall the asymptotic distribution for a general M-estimator in terms of
+the derivatives of $q$:
+\begin{align*}
+  \sqrt{N}(\bshattheta_N-\bstheta)
+  \quad\dto\quad
+  \calN\big(0,\;
+  \E\big[q''(y_n,\bsx_n,\bstheta)\big]^{-1}
+  \;
+  \Var\big[q'(y_n,\bsx_n,\bstheta)\big]
+  \;
+  \E\big[q''(y_n,\bsx_n,\bstheta)\big]^{-1}
+  \big)
+\end{align*}
+We now just need to compute the derivatives of our particular $q$:
+\begin{align*}
+  q'(y_n,\bsx_n,\bstheta)
+  &= \frac{\partial}{\partial \bstildetheta}
+  \left[
+  \big(y_n-g(\bsx_n,\bstildetheta)\big)^2
+  \right]_{\bstildetheta=\bstheta}
+  \\
+  &=
+  -2
+  \big(y_n-g(\bsx_n,\bstheta)\big)
+  g'(\bsx_n,\bstheta)
+  \\
+  q''(y_n,\bsx_n,\bstheta)
+  &= \frac{\partial}{\partial \bstildetheta'}
+  \left[
+  -2
+  \big(y_n-g(\bsx_n,\bstildetheta)\big)
+  g'(\bsx_n,\bstildetheta)
+  \right]_{\bstildetheta=\bstheta}
+  \\
+  &=
+  -2
+  \big(y_n-g(\bsx_n,\bstheta)\big)
+  g''(\bsx_n,\bstheta)
+  +2 g'(\bsx_n,\bstheta)g'(\bsx_n,\bstheta)'
+\end{align*}
+Define $\varepsilon_n:=y_n-g(\bsx_n,\bstheta)$, substite that in, and
+compute moments:
+\begin{align}
+  \Var[q'(y_n,\bsx_n,\bstheta)]
+  &=
+  \E\big[q'(y_n,\bsx_n,\bstheta)q'(y_n,\bsx_n,\bstheta)'\big]
+  \notag\\
+  &=
+  4\E\big[\varepsilon_n^2g'(\bsx_n,\bstheta)g'(\bsx_n,\bstheta)'\big]
+  \notag\\
+  \E\big[q''(y_n,\bsx_n,\bstheta)\big]
+  &=
+  \E\left[
+  -2
+  \varepsilon_n
+  g''(\bsx_n,\bstheta)
+  +2 g'(\bsx_n,\bstheta)g'(\bsx_n,\bstheta)'
+  \right]
+  \notag\\
+  &=
+  2 \E\big[
+  g'(\bsx_n,\bstheta)g'(\bsx_n,\bstheta)'
+  \big]
+  \label{nlsproof}
+\end{align}
+And that is enough to plug into the formulas for the desired result.
+
+Final note: the simplification to Line~\ref{nlsproof} required
+elimination of the $-2\varepsilon_ng''(\bsx_n,\bstheta)$ term. This
+followed because $\bstheta$ must satisfy the population first order
+necessary conditions, of the minimization problem, which say that
+\begin{align*}
+  0 =
+  \E\big[q'(y_n,\bsx_n,\bstheta)\big]
+  &=
+  -2\E\big[\varepsilon_ng'(\bsx_n,\bstheta)\big]
+\end{align*}
+Iterating expectations, this says
+\begin{align*}
+  0 &=
+  -2\E\left[
+    \E\big[\varepsilon_ng'(\bsx_n,\bstheta)\;|\bsx_n\big]
+  \right]
+  =
+  -2\E\big[
+    g'(\bsx_n,\bstheta)\cdot \E[\varepsilon_n|\bsx_n]
+  \big]
+\end{align*}
+In general, $g'(\bsx_n,\bstheta)\neq 0$, so this implies that
+$\E[\varepsilon_n|\bsx_n]=0$. That is enough, since then
+\begin{align*}
+  \E\big[
+  \varepsilon_n
+  g''(\bsx_n,\bstheta)
+  \big]
+  =
+  \E\left[
+  \E\big[
+  \varepsilon_n
+  g''(\bsx_n,\bstheta)
+  \;|\bsx_n
+  \big]
+  \right]
+  =
+  \E\left[
+  g''(\bsx_n,\bstheta)
+  \cdot
+  \E[ \varepsilon_n |\bsx_n ]
+  \right]
+  =0
+\end{align*}
+\end{proof}
+
 
 \clearpage
-\subsection{Maximum Likelihood}
+\subsection{Maximum Likelihood Estimation (MLE)}
 
-Our main goal will be to find maximum likelihood estimators: functions
-of random variables that can be use to estimate certain parameters.  The
-big insight in MLE is that you change your thinking about the likelihood
-function $f(Y|\theta)$. Rather than think of it as a function of fixed
-$\theta$ that gives you the probability of different realizations of
-$Y$, think of the sample $y$ as fixed, and find the $\tilde{\theta}$
-that maximizes $f(y|\tilde{\theta})$. In a sense, you're assuming you
-know the functional form (just not the parameter), and you think of
-$\{f(y|\tilde{\theta})\}_{\tilde{\theta}\in\Theta}$
-as a \emph{family} of distributions that could have generated data $y$.
-Maximimum likelihood finds the $\tilde{\theta}\in \Theta$, hence
-$f(y|\tilde{\theta})$, that makes the data you observed the most likely.
+Maximum likelihood is another framework for estimating parameters from
+the data. The big insight of MLE is to invert our thinking about the
+data generating process and think in terms of likelihoods. In
+particular, suppose we consider a random sample $\bsy_{1:N}$ which has
+true joint likelihood function $f(\bsy_{1:N}|\bstheta)$. There are two
+ways to think about the object $f(\bsy_{1:N}|\bstheta)$:
+\begin{enumerate}[label=(\roman*)]
+  \item Probability theory says that if you know $\bstheta$, you know
+    the data generating process of $\bsy_{1:N}$. You can use
+    $f(\bsy_{1:N}|\bstheta)$ to make probability statements about the
+    distribution and expected realizations of $\bsy_{1:N}$ \emph{ex ante},
+    before observing any data. In that case, $f(\bsy_{1:N}|\bstheta)$ is
+    a map from some hypothetical sample realization $\bsy_{1:N}$ to the
+    probablity of observing that realization if you actually draw a
+    sample.
 
-\subsubsection{Definition of Maximum Likelihood Estimators}
+  \item The MLE approach to estimation inverts that. MLE
+    says instead that \emph{you have an already-realized sample}
+    $\bsy_{1:N}$, but you don't know $\bstheta$.  You therefore think
+    about $f(\bsy_{1:N}|\bstildetheta)$ as a map from hypothetical
+    $\bstildetheta$ (not hypothetical $\bsy_n$) to the the probability
+    of \emph{having observed your realized sample $\bsy_{1:N}$}, given
+    that $\bstildetheta$ was the true parameter vector. Maximum
+    likelihood estimation then says to choose as $\bshattheta$ the
+    vector that would have delivered the highest \emph{ex ante}
+    probability of observing the actual realized sample $\bsy_{1:N}$.
+\end{enumerate}
+Now this is all well and good, but we wouldn't care about this logic if
+maximum likelihood estimation produced garbage estimators. But it
+doesn't. In fact, it produces estimators with really desireable
+properties, as we'll see below. But first, we have to define MLEs.
 
-\begin{defn}(Likelihood Function)
-Given $N$ random variables
-$Y=\begin{pmatrix}Y_1&\cdots &Y_N\end{pmatrix}'$
-with joint density $f(Y|\theta)$, define the \emph{likelihood}
-\begin{align*}
-  L(\theta; Y) = f_Y(Y|\theta)
-\end{align*}
-If the elements of $Y$ are independent, then
-\begin{align*}
-  L(\theta; Y) = f_Y(Y|\theta)
-  = \prodiN f_{Y_n}(Y_{n}|\theta)
-\end{align*}
-\end{defn}
+\subsection{MLE Definition and Properties}
 
 \begin{defn}(Maximum Likelihood Estimator)
-We deifne the \emph{maximum likelihood estimator} as
+Suppose we think that the joint likelihood of our sample $\bsy_{1:N}$
+has parameteric form $f(\bsy_{1:N}|\bstildetheta)$. Then the
+\emph{maximum likelihood estimator} solves
 \begin{align}
-   \label{mlelik}
-    \hat{\theta}_{\text{MLE}} &=
-   \argmax_\theta \; L(\theta; y_1, \ldots, y_n) \\
-   \Leftrightarrow\quad
-    \hat{\theta}_{\text{MLE}} &=
-   \argmax_\theta \; \ln L(\theta; y_1, \ldots, y_n) \notag
+  \bshattheta_{MLE}
+  &=
+  \argmax_{\bstildetheta} f(\bsy_{1:N}|\bstildetheta)
+  =
+  \argmax_{\bstildetheta} \ln f(\bsy_{1:N}|\bstildetheta)
+  \label{mlelik}
 \end{align}
-where using the log-likelihood is often more tractable, since
-it will turn the jdf of iid random variables (a product over individual
-density functions) into a sum.
+In practice, we almost always work with the log-likelihood. First, in
+the special case where $\bsy_{1:N}$ is an iid sample so that
+$f(\bsy_{1:N}|\bstildetheta)=\prod\nN f(\bsy_n|\bstildetheta)$, the
+product simplifies to a sum in the log-likelihood. Second, when we
+actually program up this maximization problem on a computer, the
+numerical value of the likelihood will often be very, very tiny given
+many observations, so working with the log-likelihood is more stable
+numerically.
+
+Finally, for simple cases, we can often solve the maximization problem
+analytically. We do so by looking at the first order conditions to the
+maximization problem and solving to get the parameter(s) in terms of the
+sample observations. That will generate a map from the sample to the MLE
+parameter estimates. This approach can also incorporate constraints,
+since we can just use constrained optimization techniques.
 \end{defn}
-
-Often, we'll find the maximum likelihood estimator by taking the
-derivatives(s), setting the result equal to zero, and solving for the
-parameter(s).  And if we want to incorporate constraints, we can just
-use constrainted optimization techniques.  However, sometimes we'll have
-a \emph{boundary maximum}, most often when the support depends upon the
-parameter.\footnote{%
-Note that MLEs aren't guaranteed to unbiased at all. But often they will
-be, and when they aren't they're usually pretty close and do well
-enough.}
+\begin{rmk}
+In finite samples, MLEs aren't guaranteed to unbiased at all, but often
+they will be, and since they're consistent in large samples (as we'll
+show), that's fine enough.
+\end{rmk}
 
 
-%\newpage
-\subsubsection{Properties of Maximum Likelihood Estimators}
-
-Maximum likelihood estimators have some very nice properties, which
-is why we like to use them in the first place.\footnote{%
-When I use the shorthand ``MLE,'' I'm explicitly talking about maximum
-likelihood estimat\textbf{ors}, which are functions of random variables,
-and more general that estimat\textbf{es}, which are simply numbers
-computed from the data.}
-Let's review some of those properties, assuming certain regularity
-conditions hold that max all of these things work out.
-Let $\theta$ denote the true value of the parameter vector we wish to
-estimate, while $\tilde{\theta}$ stands in as a placeholder for a
-parameter value that need not be the true $\theta$.
-
-\begin{prop}
-Given an iid sample, maximum likelihood estimators are consistent, i.e.\
-$\hat{\theta}_{N} \pto \theta$.
+\begin{prop}\emph{(Properties of Maximum Likelihood Estimators)}
+Given MLE estimator $\bshattheta_{MLE}$ and iid sample $\{\bsy_n\}\nN$
+with likelihood $f(\bsy_{1:N}|\bstheta) =\prodnN f(\bsy_n|\bstheta)$,
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item $\bshattheta_{MLE}$ is consistent, i.e.\
+    $\bshattheta_{MLE}\pto\bstheta$.
+  \item $\bshattheta_{MLE}$ is asymptotically normal with distribution
+    \begin{align*}
+      \sqrt{N}(\bshattheta_{MLE}-\bstheta)
+      \quad\dto\quad
+      \calN\big(0,\;
+      \calI^{-1}
+      \big)
+    \end{align*}
+    where $\calI$ is the information matrix
+    \begin{align*}
+      \calI
+      = -\E\left[
+        \frac{\partial^2 \ln f(\bsy_n|\bstheta)}{%
+          \partial \bstildetheta \,\partial \bstildetheta'}
+        \right]
+      = \Var\left[
+        \frac{\partial \ln f(\bsy_n|\bstheta)}{%
+          \partial \bstildetheta}
+        \right]
+    \end{align*}
+    where the derivatives are derivatives of log-likelihood function
+    $\ln f(\bsy_n|\bstildetheta)$ with respect to $\bstildetheta$ and
+    evaluated at true $\bstheta$.
+\end{enumerate}
 \end{prop}
-\begin{proof}
-We know that the $N$-draw sample MLE is the maximizer of the sample log
-likelihood.
-\begin{align*}
-  \hat{\theta}_N
-  = \argmax_{\tilde{\theta}}
-  \frac{1}{N} \sumnN \ln f(Y_n|\tilde{\theta})
-\end{align*}
-But we can think of the object being maximized above as a sample
-estimate of corresponding population moment
-$\E_{Y|\theta}[\ln f(Y|\tilde{\theta})]$.
-So then by the law of large numbers,
-\begin{align*}
-  \frac{1}{N} \sumnN \ln f(Y_n|\tilde{\theta})
-  \quad\pto\quad
-  \E_{Y|\theta}[\ln f(Y|\tilde{\theta})]
-  = \int \ln[f(y|\tilde{\theta})] \cdot f(y|\theta) \; dy
-\end{align*}
-Since the sample average converges in probability to the population
-moment, the \emph{maximizer} of the sample average, $\hat{\theta}_N$, will
-converge in probability to the maximizer of the population moment.  Our
-job is to show that the maximizer of the population moment is, in fact,
-the true $\theta$.
+\begin{rmk}
+Property (ii) says that, asymptotically, MLE achieves the Cramer-Rao
+lower bound---the lowest possible variance for any estimator. For that
+reason, MLE is an \emph{asymptotically efficient} or
+\emph{asymptotically lowest-variance} estimator. You simply can't do
+better than MLE as your sample grows large.
 
-So let's show that the true value $\theta$ maximizes the population
-moment, which is true iff
+But there's a catch: misspecification.
+MLE relies heavily on the assumption that the true likelihood
+\emph{really is} $f(\bsy_{1:N}|\bstildetheta)$, and that all you need to
+do is find the true $\bstheta$ to plug in for $\bstildetheta$. It
+doesn't allow for the fact that you've misspecified your model, i.e.\
+that $f(\bsy_{1:N}|\bstildetheta)$ was, flat out, the wrong likelihood
+function. So in the case of misspecification, it might \emph{not} be the
+lowest-variance efficient estimator, and we might prefer other
+alternatives. Below, we will see a test for misspecification and a word
+about interpreting the MLE under misspecification.
+\end{rmk}
+\begin{proof}
+Before proving each point, we first note that the maximum likelihood
+estimator can be written as an M-estimator if we work with the
+log-likelihood:
 \begin{align*}
-  \E_{Y|\theta}[\ln f(Y|\theta)]
-  &\geq
-  \E_{Y|\theta}[\ln f(Y|\tilde{\theta})]
-  \quad\qquad\forall \tilde{\theta} \\
-  \Leftrightarrow\qquad
-  \E_{Y|\theta}[\ln f(Y|\theta)]
-  &\geq
-  \E_{Y|\theta}[\ln f(Y|\theta + \delta)]
-  \qquad\forall \delta
+  \bshattheta_{MLE}
+  &=
+  \argmax_{\bstildetheta} \; \ln f(\bsy_{1:N}|\bstildetheta)
+  =
+  \argmax_{\bstildetheta} \;
+  \ln\left(\prodnN f(\bsy_n|\bstildetheta)\right)
+  \\
+  \iff\qquad
+  \bshattheta_{MLE}
+  &=
+  \argmax_{\bstildetheta}
+  \sumnN
+  \underbrace{%
+  \ln f(\bsy_{n}|\bstildetheta)
+  }_{q(\bsy_n,\bstildetheta)}
 \end{align*}
-We can rearrange that and alternatively say that $\theta$ is the
-maximizer iff
+where
 \begin{align*}
-  \E_{Y|\theta}\left[
-    \ln\left(\frac{f(Y|\theta + \delta)}{f(Y|\theta)}\right)
-  \right]
-  &\leq 0
-  \qquad\forall \delta
+  q'(\bsy_n,\bstildetheta)
+  =
+  \frac{\partial \ln f(\bsy_n|\bstildetheta)}{\partial \bstildetheta}
+  = S(\bstildetheta,\bsy_n)
+  \qquad
+  q''(\bsy_n,\bstildetheta)
+  =
+  \frac{\partial^2 \ln f(\bsy_n|\bstildetheta)}{%
+    \partial\bstildetheta\,\partial\bstildetheta'}
 \end{align*}
-But this follows directly from applying Jensen's Inequality to the LHS
-of the above inequality:
+where $S(\bstildetheta,\bsy_n)$ is the score function for a single
+observation.
+
+The maximization problem has FOCs for the sample and the population,
+respectively, of
 \begin{align*}
-  \E_{Y|\theta}\left[
-    \ln \left(\frac{f(Y|\theta + \delta)}{f(Y|\theta)}\right)
-  \right]
-  &\leq
-  \ln \left(
-  \E_{Y|\theta}\left[
-   \frac{f(Y|\theta + \delta)}{f(Y|\theta)}
-  \right]
-  \right) \qquad \forall\delta\\
-  &\leq
-  \ln \left(
-  \int
-   \frac{f(Y|\theta + \delta)}{f(Y|\theta)}
-   \cdot f(Y|\theta)
-   \; dy
-  \right) \\
-  &\leq
-  \ln \left(
-  \int
-   f(Y|\theta + \delta)
-   \cdot f(Y|\theta)
-  \right)
-  = \ln(1) = 0\\
-  \implies\quad
-  \E_{Y|\theta}\left[
-    \ln \left(\frac{f(Y|\theta + \delta)}{f(Y|\theta)}\right)
-  \right]
-  &\leq
-  0 \\
-  \iff\quad\qquad
-  \E_{Y|\theta}\left[
-    \ln f(Y|\theta + \delta)
-  \right]
-  &\leq
-  \E_{Y|\theta}\left[
-    \ln f(Y|\theta)
-  \right]
-  \qquad \forall\delta
+  \bso = \sumnN q'(\bsy_n,\bshattheta)
+  =
+  \sumnN S(\bstildetheta,\bsy_n)
+  \qquad
+  \bso
+  = \E\big[q'(\bsy_n,\bstheta)\big]
+  = \E\big[S(\bstheta,\bsy_n)\big]
 \end{align*}
-This is precisely the condition for $\theta$ to be the maximizer.
+As we saw before, the latter condition says the score function
+evaluated at true $\bstheta$ has mean 0.
+\clearpage
+We have now set up enough to move onto the proofs.
+\begin{enumerate}[label=(\roman*)]
+  \item
+    In a finite sample, we construct the MLE estimator by solving the
+    maximization problem
+    \begin{align*}
+      \bshattheta_{MLE}
+      &=
+      \argmax_{\bstildetheta} \sumnN \ln f(\bsy_{n}|\bstildetheta)
+    \end{align*}
+    Note that as the sample size grows, the LLN gives us
+    \begin{align*}
+      \frac{1}{N}\sumnN q(\bsy_n,\bstildetheta)
+      =
+      \frac{1}{N} \sumnN \ln f(\bsy_n|\bstildetheta)
+      \quad\pto\quad
+      \E_{\bsy|\bstheta}\big[\ln f(\bsy_n|\bstildetheta)\big]
+    \end{align*}
+    where $\E_{\bsy|\bstheta}[\;\cdot\;]$ denotes the expectation,
+    averaging over $\bsy_n$, using true likelihood function
+    $f(\bsy_n|\bstheta)$.
+    For $\bshattheta_{MLE}$ to be consistent, we need to check that
+    true $\bstheta$ is a maximizer of this limiting expectation.
+    Otherwise, the MLE estimator would be converging to another
+    parameter vector entirely.
+
+    The true $\bstheta$ is a maximizer of
+    $\E_{\bsy|\bstheta}\big[\ln f(\bsy_n|\bstildetheta)\big]$ if and
+    only if
+    \begin{align*}
+      \E_{\bsy|\bstheta}\big[\ln f(\bsy_n|\bstheta+\bsdelta)\big]
+      &\leq
+      \E_{\bsy|\bstheta}\big[\ln f(\bsy_n|\bstheta)\big]
+      \qquad\forall \bsdelta
+    \end{align*}
+    We can rearrange and alternatively say that $\bstheta$ is a
+    maximizer if and only if
+    \begin{align*}
+      \E_{\bsy|\bstheta}\left[
+        \ln\left(\frac{f(\bsy_n|\bstheta + \bsdelta)}{f(\bsy_n|\bstheta)}\right)
+      \right]
+      &\leq 0
+      \qquad\forall \bsdelta
+    \end{align*}
+    But that is immediate if we apply Jensen's inequality to the LHS of
+    the above inequaly to get:
+    \begin{align*}
+      \forall\bsdelta\qquad
+      \E_{\bsy|\bstheta}\left[
+        \ln\left(\frac{f(\bsy_n|\bstheta + \bsdelta)}{f(\bsy_n|\bstheta)}\right)
+      \right]
+      &\leq
+      \ln \left(
+      \E_{\bsy|\bstheta}\left[
+        \frac{f(\bsy_n|\bstheta + \bsdelta)}{f(\bsy_n|\bstheta)}
+      \right]
+      \right)
+      \\
+      &=
+      \ln \left(
+      \int
+      \frac{f(\bsy_n|\bstheta + \bsdelta)}{f(\bsy_n|\bstheta)}
+      \cdot f(\bsy_n|\bstheta)
+      \; d\bsy_n
+      \right) \\
+      &=
+      \ln \left(
+      \int
+      f(\bsy_n|\bstheta + \bsdelta)
+      \; d\bsy_n
+      \right)
+      = \ln(1) = 0
+      \\
+      \implies\quad
+      \E_{\bsy|\bstheta}\left[
+        \ln\left(\frac{f(\bsy_n|\bstheta + \bsdelta)}{f(\bsy_n|\bstheta)}\right)
+      \right]
+      &\leq 0
+    \end{align*}
+    But this is precisely the condition we described for $\bstheta$ to
+    be the maximizer.
+
+  \item
+\end{enumerate}
 \end{proof}
 
 \begin{prop}
