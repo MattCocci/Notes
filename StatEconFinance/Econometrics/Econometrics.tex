@@ -10198,70 +10198,90 @@ The information is both the variance and the second moment of the score.
 \end{align*}
 \end{prop}
 \begin{proof}
-We prove the result for the scalar case.
-Start with the fact that the score has zero expectation:
+Start with the expectation of the score function for any
+$\bstildetheta$, which will equal some vector of constants (we don't
+care about the values):
 \begin{align*}
-  0
-  &= \int S(\theta,y)\cdot f(y|\theta) \; dy
+  \bsC
+  &= \E_{\bsy|\bstheta}\big[\bsS(\bstildetheta,\bsy)\big]
 \end{align*}
-Differentiate with respect to $\tilde{\theta}$ again:
+Differentiate with respect to $\bstildetheta$ again:
 \begin{align*}
-  \frac{\partial}{\partial\tilde{\theta}}
-  \left[ 0 \right]
+  \frac{\partial}{\partial\bstildetheta'}
+  \left[ \bsC \right]
   &=
-  \frac{\partial}{\partial\tilde{\theta}}
-  \left[
-    \int S(\theta,y)\cdot f(y|\theta) \; dy
-  \right] \\
-  0
-  &=
+  \frac{\partial}{\partial\bstildetheta'}
+  \bigg[
+  \E_{\bsy|\bstheta}\big[S(\bstildetheta,\bsy)\big]
+  \bigg] \\
+  \bso &=
   \int
-  \frac{\partial}{\partial\tilde{\theta}}
   \left[
-    S(\theta,y)\cdot f(y|\theta)
-  \right]\; dy
-   \\
-  0 &=
-  \int
-  \frac{\partial S(\theta,y)}{\partial\tilde{\theta}}
-  \cdot f(y|\theta)
-  \; dy
+  \frac{\partial \bsS(\bstildetheta,\bsy)}{\partial\bstildetheta'}
+  f(\bsy|\bstildetheta)
   +
-  \int
-  S(\theta,y)
-  \frac{\partial f(y|\theta)}{\partial\tilde{\theta}} \; dy \\
+  \bsS(\bstildetheta,\bsy)
+  \frac{\partial f(\bsy|\bstildetheta)}{\partial\bstildetheta'}
+  \;
+  d\bsy
+  \right]
+  \\
   \text{By Equation~\ref{score3}}
   \qquad
-  0 &=
+  \bso &=
   \int
-  \frac{\partial S(\theta,y)}{\partial\tilde{\theta}}
-  \cdot f(y|\theta)
-  \; dy
+  \frac{\partial \bsS(\bstildetheta,\bsy)}{\partial\bstildetheta'}
+  f(\bsy|\bstildetheta)
+  \; d\bsy
   +
   \int
-  S(\theta,y)^2 f(y|\theta) \; dy
+  \bsS(\bstildetheta,\bsy)\bsS(\bstildetheta,\bsy)' f(\bsy|\bstildetheta) \;
+  d\bsy
 \end{align*}
-Now rearrange, and substitute in definitions to get
+Now evaluate these expressions at the true value,
+$\bstildetheta=\bstheta$:
 \begin{align*}
-  -\int
-  \frac{\partial S(\theta,y)}{\partial\tilde{\theta}}
-  \cdot f(y|\theta)
-  \; dy
-  &=
+  \bso &=
   \int
-  S(\theta,y)^2 f(y|\theta) \; dy \\
-  \implies\qquad
-  \calI
-  =
-  -\E_{Y|\theta}\left[
-    \frac{\partial S(\theta,Y)}{\partial \tilde{\theta}}
+  \frac{\partial \bsS(\bstheta,\bsy)}{\partial\bstildetheta'}
+  f(\bsy|\bstheta)
+  \; d\bsy
+  +
+  \int
+  \bsS(\bstheta,\bsy)\bsS(\bstheta,\bsy)' f(\bsy|\bstheta) \;
+  d\bsy
+  \\
+  \iff\quad
+  \bso
+  &=
+  \E_{\bsy|\bstheta}\left[
+  \frac{\partial \bsS(\bstheta,\bsy)}{\partial\bstildetheta'}
+  \right]
+  +
+  \E_{\bsy|\bstheta}\big[
+  \bsS(\bstheta,\bsy)\bsS(\bstheta,\bsy)'
+  \big]
+\end{align*}
+Rearrange:
+\begin{align*}
+  -\E_{\bsy|\bstheta}\left[
+  \frac{\partial \bsS(\bstheta,\bsy)}{\partial\bstildetheta'}
   \right]
   &=
-  \E_{Y|\theta}[S(\theta,Y)^2]
-  = \Var_{Y|\theta}(S(\theta,Y))
+  \E_{\bsy|\bstheta}\big[
+  \bsS(\bstheta,\bsy)\bsS(\bstheta,\bsy)'
+  \big] \\
+  \iff \qquad
+  \calI
+  &=
+  \Var_{\bsy|\bstheta}\big[
+  \bsS(\bstheta,\bsy)
+  \big]
 \end{align*}
-where the equality of the second moment and the variance followed
-because the score has mean zero.
+The LHS expecation simplified to $\calI$ by definition of $\calI$. The
+RHS simplified to the variance of the score because the mean of the
+score function evaluated at true $\bstheta$ is zero, as shown above, so
+the variance equals the second moment.
 \end{proof}
 
 
@@ -10293,30 +10313,52 @@ i.e.\ the difference $\Var(\bshattheta)-\calI^{-1}$ is a postive
 semidefinite matrix.
 \end{thm}
 \begin{proof}
-Let $\hat{\theta}=g(Y)$ be any unbiased estimator of $\theta$. Then
+Let $\bshattheta$ be any unbiased estimator of $\bstheta$, i.e.\ it
+satisfies
 \begin{align*}
-  \theta = \int \hat{\theta} f(y|\theta) \; dy
+  \bstheta = \int \bshattheta f(\bsy|\bstheta) \; d\bsy
 \end{align*}
-Differentiating both sides with respect to $\theta$ and using
-Equation~\ref{score3}:
+Next, note that $\bshattheta$ is a function/mapping from sample
+observations to a vector in $\R^P$. Though the data generating process
+depends upon $\bstheta$, the estimator $\bshattheta$ is, mechanically,
+just a function from data/numbers to a vector. Thus, it is a constant
+with respect to $\bstheta$. So when we differentiate both sides of the
+above equation with respect to $\bstheta$ and use Equation~\ref{score3},
+we get
 \begin{align*}
-  1
-  &= \int \hat{\theta} \cdot S(\theta,y) f(y|\theta)\; dy \\
-  &= \E[\hat{\theta} \cdot S(\theta,Y)]
+  \frac{\partial}{\partial\bstheta'}
+  [\,
+  \bstheta
+  \,]
+  &=
+  \frac{\partial}{\partial\bstheta'}
+  \left[
+  \int \bshattheta f(\bsy|\bstheta) \; d\bsy
+  \right]
+  \\
+  \bsI_P
+  &= \int \bshattheta \bsS(\bstheta,\bsy)' f(\bsy|\bstheta)\; d\bsy \\
+  \iff\quad
+  \bsI_P
+  &= \E\big[\bshattheta \bsS(\bstheta,\bsy)'\big]
 \end{align*}
-keeping in mind that both $\hat{\theta}$ and $S(\theta,Y)$ are random
-variables. But since $\E[S(\theta,Y)]=0$, we can say
-$\E[\hat{\theta} \cdot S(\theta,Y)] = \Cov(\hat{\theta},Y)$, therefore
+keeping in mind that both $\bshattheta$ and $\bsS(\bstheta,\bsy)$ are
+random variables. But since $\E[\bsS(\bstheta,\bsy)]=\bso$, we can say
+$\E[\bshattheta \bsS(\bstheta,\bsy)'] =
+\Cov[\bshattheta,\bsS(\bstheta,\bsy)]$, therefore
 \begin{align*}
-  1 &= \Cov(\hat{\theta}, S(\theta,Y)) \\
+  \bsI_P &=
+  \Cov[\bshattheta,\bsS(\bstheta,\bsy)]
+  \\
   \text{Standard Result} \qquad
-  &\leq \Var(\hat{\theta}) \Var(S(\theta,Y))
+  &\leq
+  \Var[\bshattheta]\Var[\bsS(\bstheta,\bsy)]
 \end{align*}
 Therefore, we can rearrange to get
 \begin{align*}
-  \Var(\hat{\theta})
+  \Var[\bshattheta]
   &\geq
-  \frac{1}{\Var(S(\theta,Y))}
+  \Var[\bsS(\bstheta,\bsy)]^{-1}
   =\calI^{-1}
 \end{align*}
 \end{proof}
@@ -10775,7 +10817,7 @@ maximum likelihood estimation produced garbage estimators. But it
 doesn't. In fact, it produces estimators with really desireable
 properties, as we'll see below. But first, we have to define MLEs.
 
-\subsection{MLE Definition and Properties}
+\subsubsection{MLE Definition and Properties}
 
 \begin{defn}(Maximum Likelihood Estimator)
 Suppose we think that the joint likelihood of our sample $\bsy_{1:N}$
@@ -10902,7 +10944,7 @@ respectively, of
 \begin{align*}
   \bso = \sumnN q'(\bsy_n,\bshattheta)
   =
-  \sumnN S(\bstildetheta,\bsy_n)
+  \sumnN S(\bshattheta,\bsy_n)
   \qquad
   \bso
   = \E\big[q'(\bsy_n,\bstheta)\big]
@@ -10956,7 +10998,7 @@ We have now set up enough to move onto the proofs.
       \qquad\forall \bsdelta
     \end{align*}
     But that is immediate if we apply Jensen's inequality to the LHS of
-    the above inequaly to get:
+    the inequality to get:
     \begin{align*}
       \forall\bsdelta\qquad
       \E_{\bsy|\bstheta}\left[
@@ -10983,271 +11025,178 @@ We have now set up enough to move onto the proofs.
       \; d\bsy_n
       \right)
       = \ln(1) = 0
-      \\
-      \implies\quad
-      \E_{\bsy|\bstheta}\left[
-        \ln\left(\frac{f(\bsy_n|\bstheta + \bsdelta)}{f(\bsy_n|\bstheta)}\right)
-      \right]
-      &\leq 0
+      %\\
+      %\implies\quad
+      %\E_{\bsy|\bstheta}\left[
+        %\ln\left(\frac{f(\bsy_n|\bstheta + \bsdelta)}{f(\bsy_n|\bstheta)}\right)
+      %\right]
+      %&\leq 0
     \end{align*}
-    But this is precisely the condition we described for $\bstheta$ to
-    be the maximizer.
+    So we have $\leq 0$, which is precisely the condition we described
+    for $\bstheta$ to be the maximizer.
 
   \item
+    We already wrote the MLE as an M-estimator, so we can just plug in
+    the derivatives of $q$ from above into the expression for the
+    asymptotic distribution of M-estimators:
+    \begin{align*}
+      \sqrt{N}(\bshattheta_{MLE}-\bstheta)
+      \;\dto\;
+      \calN\left(0,\;
+      \E\left[
+      \frac{\partial^2 \ln f(\bsy_n|\bstheta)}{%
+        \partial\bstildetheta\,\partial\bstildetheta'}
+      \right]^{-1}
+      \;
+      \Var\left[
+        \frac{\partial \ln f(\bsy_n|\bstheta)}{\partial \bstildetheta}
+      \right]
+      \;
+      \E\left[
+      \frac{\partial^2 \ln f(\bsy_n|\bstheta)}{%
+        \partial\bstildetheta\,\partial\bstildetheta'}
+      \right]^{-1}
+      \right)
+    \end{align*}
+    The only further step is recalling a result we proved
+    above---namely, that information also equals the variance of the
+    score
+    \begin{align*}
+      \calI
+      := -\E\left[
+        \frac{\partial^2 \ln f(\bsy_n|\bstheta)}{%
+          \partial \bstildetheta \,\partial \bstildetheta'}
+        \right]
+      = \Var\left[
+        \frac{\partial \ln f(\bsy_n|\bstheta)}{%
+          \partial \bstildetheta}
+        \right]
+    \end{align*}
+    So the above expression for asymptotic variance was
+    $\calI^{-1}\calI\calI^{-1}$, which simplifies to $\calI^{-1}$.
 \end{enumerate}
 \end{proof}
-
-\begin{prop}
-Given iid observations, maximumum likelihood estimators are
-asymptotically normal such that
-\begin{align*}
-  \sqrt{N}(\hat{\theta}_{MLE}-\theta)
-\end{align*}
-\end{prop}
-\begin{proof}
-Given iid random variables $Y_{1:N}=\{Y_1,\ldots,Y_N\}$ each drawn from
-density function $f(Y_n|\theta)$ and together drawn from joint density
-function $f(Y_{1:N}|\theta)=\prodnN f(Y_n|\theta)$, we want to consider
-the MLE of true parameter vector $\theta$. Define random variables to
-represent the score function for the $n$th observation:
-\begin{align*}
-  s_n(\tilde{\theta}) &:=
-  \frac{\partial \ln f(Y_n|\tilde{\theta})}{\partial \tilde{\theta}}
-  \qquad n = 1,\ldots,N
-  %\\
-  %i_n(\theta) &:=
-  %-\E_{Y|\theta}\left[
-    %\frac{\partial s_n(\theta)}{\partial \tilde{\theta}'}
-  %\right]
-  %= \E_{Y|\theta}[s_n(\theta) s_n(\theta)'] = \Var(s_n(\theta))
-\end{align*}
-These are score \emph{functions}---we're not yet imposing that
-$s_n(\tilde{\theta})$ be evaluated at the true $\theta$.
-\\
-\\
-Since everything is iid, these guys will be iid and we'll be able to
-break up the sample total score function and sample information of
-$Y_{1:N}$ into sums of these. Specifically, define the total score
-function for sample size $N$ as
-\begin{align*}
-  S_N(\theta):= S(\theta,Y_{1:N})
-  = \frac{\partial \ln f(Y_{1:N}|\theta)}{\partial \tilde{\theta}}
-  &= \sumnN \frac{\partial \ln f(Y_n|\theta)}{\partial \tilde{\theta}}
-  = \sumnN s_n(\theta)
-\end{align*}
-Next, define total and average information, respectively, as
-\begin{align*}
-  \calI_N &:= \E[S_N(\theta) S_N(\theta)'] = \Var(S_N(\theta))
-  \\
-  \bar{\calI}_N &:= \frac{1}{N}\calI_N(\theta)
-\end{align*}
-First result: We want to show that the total score converges in
-distribution to something useful. Looking at the definition, it's like
-an average of iid $s_n(\theta)$ guys, so let's make that exact:
-\begin{align*}
-  \frac{1}{N}S_N &= \frac{1}{N} \sumnN s_n
-\end{align*}
-where $\E[s_n(\theta)] = 0$ since we know the score has expectation zero
-when evaluated at true $\theta$.
-To get the variance, we note that
-\begin{align*}
-  \calI_N(\theta)
-  = \Var(S_N(\theta))
-  &= \Var\left(\sumnN s_n(\theta)\right) \\
-  \text{Since iid}
-  \implies\quad\qquad
-  \calI_N(\theta)
-  &= N \cdot \Var\left(s_n(\theta)\right) \\
-  \iff\quad
-  \Var\left(s_n(\theta)\right)
-  &= \bar{\calI}_N(\theta)
-\end{align*}
-%Since the $i_n(\theta)$ are all iid, we can express each $i_n(\theta)$
-%as a function of the total variance:
-%Therefore, we can conclude that
-%\begin{align*}
-  %\Var(s_n(\theta))
-  %%= i_n(\theta)
-  %&=
-  %\frac{1}{N}\calI_N(\theta)
-  %= \bar{\calI}(\theta)
-%\end{align*}
-So we have everything we need to apply the Central Limit Theorem:
-\begin{align}
-  \begin{rcases}
-    S_N(\theta) &= \frac{1}{N} \sumnN s_n(\theta) \\
-    \E[s_n(\theta)] &= 0 \\
-    \Var(s_n(\theta)) &= \bar{\calI}_N(\theta)
-  \end{rcases}
-  \quad&\implies \quad
-    \bar{\calI}_N(\theta)^{-\frac{1}{2}}\sqrt{N}
-    \left(\frac{1}{N} S_N(\theta) - 0 \right)
-    \dto N\left(0,I_k\right)
-  \notag\\
-  \quad&\iff \quad
-    \bar{\calI}_N(\theta)^{-\frac{1}{2}}\sqrt{N}
-    S_N(\theta)
-    \dto N\left(0,I_k\right)
-  \label{scoreconverge}
-\end{align}
-where $I_k$ is the $k\times k$ identity matrix and $k$ is the number of
-parameters.
-\\
-\\
-That doesn't seem to help. After all, we're after the distribution of
-$\hat{\theta}_{MLE}$. But here's where it will help: Do a mean-value
-expansion of the score function about the true value and evaluate the
-expression at the MLE estimator to get
-\begin{align*}
-  S_N(\hat{\theta}_{MLE})
-  &= S_n(\theta)
-  + \frac{\partial S_N(\theta^*)}{\partial \tilde{\theta}}
-    (\hat{\theta}_{MLE} - \theta)
-\end{align*}
-where $\theta^*$ is in between $\hat{\theta}_{MLE}$ and $\theta$.
-Since $\hat{\theta}_{MLE}$ is chosen explicitly to minimize the log
-likelihood, it will set the first order conditions (hence the sample
-score) function to zero, i.e.
-\begin{align*}
-  \tilde{\theta} = \hat{\theta}_{MLE} \;\; \text{solves} \quad
-  0 = \nabla_{\tilde{\theta}} \ln f(Y_{1:N}|\tilde{\theta})
-  = S_N(\tilde{\theta})
-  \quad\implies\quad
-  S_N(\hat{\theta}_{MLE})=0
-\end{align*}
-Therefore, we can simplify the mean value expansion to
-\begin{align}
-  0
-  &= S_N(\theta)
-  + \frac{\partial S_N(\theta^*)}{\partial \tilde{\theta}'}
-    (\hat{\theta}_{MLE} - \theta) \notag\\
-  \text{Rearranging}
-  \implies\quad
-  (\hat{\theta}_{MLE} - \theta)
-  &=
-  \left[-\frac{\partial S_N(\theta^*)}{\partial \tilde{\theta}'}\right]^{-1}
-  S_N(\theta) \notag\\
-  \iff\quad
-  \sqrt{N}(\hat{\theta}_{MLE} - \theta)
-  &=
-    \left[
-    -
-    \frac{1}{N}
-    \frac{\partial S_N(\theta^*)}{\partial \tilde{\theta}'}
-    \right]^{-1}
-  \frac{1}{\sqrt{N}}S_N(\theta)
-  \label{mleconverge}
-\end{align}
-But we're now in a position to apply the continuous mapping theorem,
-since $\theta^*$---sandwiched in between $\theta$ and
-$\hat{\theta}_{MLE}\pto \theta$---will also converge in probability to
-$\theta$, so
-\begin{align*}
-  \hat{\theta}_{MLE}\pto \theta
-  \quad\implies\quad
-  \left[
-    -
-    \frac{1}{N}
-    \frac{\partial S_N(\theta^*)}{\partial \tilde{\theta}'}
-  \right]^{-1}
-  \pto
-  \left[
-    -
-    \frac{1}{N}
-    \frac{\partial S_N(\theta)}{\partial \tilde{\theta}'}
-  \right]^{-1}
-  =
-  \left[
-    \frac{1}{N}
-    \calI_N(\theta)
-  \right]^{-1}
-  = \bar{\calI}_N(\theta)^{-1}
-\end{align*}
-So we have the product of two things, one converging in probability, and
-one converging in distribution. Therefore, we can apply Slutsky:
-\begin{align*}
-  \begin{rcases}
-    \left[
-      \frac{1}{N}
-      \frac{\partial S_N(\theta^*)}{\partial \tilde{\theta}'}
-    \right]^{-1}
-    &\pto
-    \bar{\calI}_N(\theta)^{-1}
-    \\
-    \frac{1}{\sqrt{N}}S_N(\theta)
-    &\dto
-    N\left(0,\bar{\calI}_N(\theta)\right)
-  \end{rcases}
-  \implies
-  \left[
-    \frac{1}{N}
-    \frac{\partial S_N(\theta^*)}{\partial \tilde{\theta}'}
-  \right]^{-1}
-  \frac{1}{\sqrt{N}}S_N(\theta)
-  \quad\dto\quad
-  \bar{\calI}_N(\theta)^{-1} X
-\end{align*}
-where $X \sim N(0,\bar{\calI}_N(\theta))$, the distribution we derived
-above in Line~\ref{scoreconverge}. But we saw in
-Equation~\ref{mleconverge} that this object converging in distribution
-is equal to $\sqrt{N}(\hat{\theta}_{MLE}-\theta)$, so we can conclude
-that
-\begin{align*}
-  \sqrt{N}(\hat{\theta}_{MLE}-\theta)
-  &\dto \bar{\calI}_N(\theta)^{-1}X \\
-  &\sim N(0,\bar{\calI}_N(\theta)^{-1} \bar{\calI}_N(\theta)
-  \bar{\calI}_N(\theta)^{-1})\\
-  &\sim N(0, \bar{\calI}_N(\theta)^{-1})\\
-  \iff\qquad
-  \sqrt{N}(\hat{\theta}_{MLE}-\theta)
-  &\dto N(0, \bar{\calI}_N(\theta)^{-1})\\
-\end{align*}
-
-
-
-\end{proof}
-
-
 %\begin{enumerate}
    %\item {\sl Invariance Property}: Suppose that $\tau = \tau(\theta)$
       %is a monotonically increasing or decreasing function of
       %$\theta$. Then
       %\[ \hat{\tau}_{\text{MLE}} = \tau\left(\theta_{\text{MLE}}\right)
-	 %\]
+   %\]
       %where $\hat{\tau}_{\text{MLE}}$ is the MLE for $\tau(\theta)$
       %and $\theta_{\text{MLE}}$ is the MLE for $\theta$.
    %\item {\sl Relation to MNTSS's}: If a scalar MNTSS exists,
       %then it is a function of the maximum likelihood estimator.
 
       %\begin{proof} Here's an informal sketch. We know by the
-	 %factorization criterion that the jdf, and hence the likelihood,
-	 %will look like
-			%\[ f = L = g(y_1, \ldots, y_n) h(\hat{\theta}_\text{MNTSS},
-				 %\theta) \]
-	 %where $g$ is independent of $\theta$.
-	 %Well, to max L with respect to $\theta$, we will be maxing
-	 %$h$ with respect to $\theta$, which implies that $\theta$
-	 %is some function of the MNTSS.
+   %factorization criterion that the jdf, and hence the likelihood,
+   %will look like
+      %\[ f = L = g(y_1, \ldots, y_n) h(\hat{\theta}_\text{MNTSS},
+         %\theta) \]
+   %where $g$ is independent of $\theta$.
+   %Well, to max L with respect to $\theta$, we will be maxing
+   %$h$ with respect to $\theta$, which implies that $\theta$
+   %is some function of the MNTSS.
       %\end{proof}
-   %\item {\sl Optimality Properties of MLEs}: If we let $\tau(\theta)$
-      %be any function of $\theta$ and let $\hat{\tau}_{\text{MLE}}$
-      %be the maximum likelihood estimator of $\tau(\theta)$, then
-      %under the regularity conditions assumed in the Cramer-Rao
-      %bound section,
-	 %\[ \lim_{n\rightarrow \infty} E[\hat{\tau}_{\text{MLE}}]
-	 %= \tau(\theta) \]
-	 %\[ \lim_{n\rightarrow \infty}
-			%\frac{ Var(\hat{\tau}_{\text{MLE}})}{\text{Cramer-Rao
-			%bound for $\tau(\theta)$}} \rightarrow 1 \]
-      %while the distribution of $\hat{\tau}_{\text{MLE}}$ approaches
-      %the normal distribution as $n\rightarrow \infty$. This is really
-      %powerful stuff. So in words, what this means is
-      %\begin{enumerate}
-	 %\item Asymptotically unbiased.
-	 %\item Asymptotically normal.
-	 %\item Asymptotically has variance approaching the CR bound.
-      %\end{enumerate}
 %\end{enumerate}
+
+\subsubsection{Misspecification}
+
+Throughout this section, we consider what happens when we have a random
+variable $\bsy$, but we misspecify $\bsy$'s likelihood function.
+In particular, we assume the \emph{wrong} parameteric form
+$g(\bsy|\bstildetheta)$ for the likelihood function, instead of the true
+parameteric functional form $f(\bsy|\bstildetheta)\neq
+g(\bsy|\bstildetheta)$. While there is a true $\bstheta$ for the correct
+likelihood function $f(\bsy|\bstildetheta)$, there is no such ``true''
+parameter for the misspecified likelihood. Nonetheless, it will be
+useful to define a vector $\bstheta_{KL}$ (that we will justify and
+explain below) to put in all the places where we would normally use true
+$\bstheta$.
+
+\begin{prop}\emph{(Possible Misspecification)}
+The pseudo-``information matrix'' will, in general, not equal the
+variance of the pseudo-score
+\begin{align*}
+  \calI_p
+  =
+  -\E_{\bsy|f}\left[
+    \frac{\partial^2 \ln g(\bsy|\bstheta_{KL})}{%
+      \partial\bstildetheta\;\partial\bstildetheta'}
+  \right]
+  \neq
+  \Var_{\bsy|f}\left[
+    \frac{\partial \ln g(\bsy|\bstheta_{KL})}{%
+      \partial\bstildetheta}
+  \right]
+  =
+  \Var_{\bsy|f}[\bsS_p(\bstheta_{KL},\bsy)]
+\end{align*}
+where $\E_{\bsy|f}[\;\cdot\;]$ is the expectation over $\bsy$ computed
+with the true likelihood $f(\bsy|\bstheta)$.
+\end{prop}
+\begin{proof}
+No real proof except to say that we have no reason to expect the
+variance of the log of $g$ to equal the mean of the second derivative of
+$g$. The equality of these two objects for the true likelihood relied
+heavily upon the fact that we were, in fact, working with the true
+likelihood. No such luck now.
+\end{proof}
+
+\begin{prop}(Asymptotic Distribution of the Misspecified Estimator)
+Suppose that we have an iid sample $\{\bsy_n\}\nN$, but we run ``maximum
+likelihood'' on the \emph{wrong} parameteric functional form
+$g(\bsy_n|\bstildetheta)$. Then the resulting estimator has asymptotic
+distribution
+\begin{align*}
+  \sqrt{N}(\bshattheta-\bstheta_{KL})
+  \quad\dto\quad
+  \calN\left(0,\;
+  \E\left[
+  \frac{\partial^2 \ln g(\bsy_n|\bstheta_{KL})}{%
+    \partial\bstildetheta\,\partial\bstildetheta'}
+  \right]^{-1}
+  \;
+  \Var\left[
+    \frac{\partial \ln g(\bsy_n|\bstheta_{KL})}{\partial \bstildetheta}
+  \right]
+  \;
+  \E\left[
+  \frac{\partial^2 \ln g(\bsy_n|\bstheta_{KL})}{%
+    \partial\bstildetheta\,\partial\bstildetheta'}
+  \right]^{-1}
+  \right)
+\end{align*}
+And since $g$ is the wrong likelihood function, we can't use the
+``information matrix equals variance of the score'' trick on the middle
+term to simplify the asymptotic variance expression (as we did for
+correctly specified MLE).
+\end{prop}
+\begin{proof}
+Even though we have the wrong likelihood function, the maximization
+problem still characterizes a well-defined M-estimator
+\begin{align*}
+  \bshattheta
+  &=
+  \argmax_{\bstildetheta}
+  \sumnN
+  \underbrace{%
+  \ln g(\bsy_{n}|\bstildetheta)
+  }_{q(\bsy_n,\bstildetheta)}
+\end{align*}
+where
+\begin{align*}
+  q'(\bsy_n,\bstildetheta)
+  =
+  \frac{\partial \ln g(\bsy_n|\bstildetheta)}{\partial \bstildetheta}
+  \qquad
+  q''(\bsy_n,\bstildetheta)
+  =
+  \frac{\partial^2 \ln f(\bsy_n|\bstildetheta)}{%
+    \partial\bstildetheta\,\partial\bstildetheta'}
+\end{align*}
+From there, we just apply the usual formulas.
+\end{proof}
+
 
 
 \clearpage
