@@ -280,6 +280,7 @@
 \newcommand{\bsgamma}{\boldsymbol{\gamma}}
 \newcommand{\bslambda}{\boldsymbol{\lambda}}
 \newcommand{\bsdelta}{\boldsymbol{\delta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
 
 % Special cases like \bshatb for \boldsymbol{\hat{b}}
 \generate[\hat]{bshat}{\boldsymbol}{a,b,y,x,X,V,S,W,A,B,P}
@@ -11216,11 +11217,11 @@ zero vector:
   = \E[\bsf(\bsy_n,\bstheta)] = \bso
 \end{align}
 where $\bsg:\R^P\ra \R^M$. Notice that we introduced the shorthand
-notation $\bsg_n(\bstildetheta)=\bsf(\bsy_n,\bstildetheta)$.
-Our goal is to estimate $\bstheta$. Quite sensibly, we can estimate
-parameters by drawing a sample $\{\bsy_n\}\nN$, using them to construct
-sample observations $\bsg_n(\bstildetheta)$, and then forming the sample
-analog $\bsg_N$ of the moment conditions
+notation $\bsg_n(\bstildetheta):=\bsf(\bsy_n,\bstildetheta)$.
+Our goal is to estimate true $\bstheta$. Quite sensibly, we can estimate
+parameters by drawing a sample $\{\bsy_n\}\nN$, constructing
+$\bsg_n(\bstildetheta)$, and then forming the sample analog $\bsg_N$ of
+the moment conditions
 \begin{align}
   \label{sampleMomentConditions}
   \bsg_N(\bstildetheta) :=
@@ -11228,9 +11229,9 @@ analog $\bsg_N$ of the moment conditions
   =
   \frac{1}{N} \sumnN \bsf(\bsy_n,\bstildetheta)
 \end{align}
-This is a function of parameter vector $\bstheta$. We will naturally
-choose our estimator to be the parameter vector that sets this sample
-analog equal to zero or ``close'' to zero.
+This is a function of parameter vector $\bstildetheta\in\R^P$. We will
+naturally choose our estimator to be the parameter vector that sets this
+sample analog equal to zero or ``close'' to zero.
 
 \begin{defn}(Method of Moments Estimator)
 When the dimensionality of $\bstheta$ equals that of $\bsg(\bstheta)$
@@ -11297,17 +11298,20 @@ Another way to think about GMM is to deal with overidentification by
 employing a selection matrix $\bshata\in \R^{P\times M}$ to
 select/emphasize important moments or linear combinations of moments.
 In particular, rather than solve minimization Problem~\ref{eq:bhatmin},
-we solve this modified, but exactly-identified variation on the original
-moment conditions:
+the GMM estimator $\bshattheta(\bshata)$ solves this modified, but
+exactly-identified variation on the original moment conditions:
 \begin{align}
-  \bshata \; \bsg_N(\bshattheta) &= \bso
+  \bshata \; \bsg_N\big(\bshattheta(\bshata)\big) &= \bso
   \qquad\text{where}\quad
-  \bshattheta \in\R^P\quad \bshata \in \R^{P\times M}
+  \bshattheta(\bshata) \in\R^P\quad \bshata \in \R^{P\times M}
   \label{eq:bhatmina}
 \end{align}
 We see that $\bshata\,\bsg_N(\bstildetheta)$ is like a new set of moment
 conditions, but with the dimensionality reduced from $M>P$ to $P$ so
-that we \emph{can} set this to zero for some $\bshattheta\in\R^P$.
+that we \emph{can} set this to zero for some
+$\bshattheta(\bshata)\in\R^P$. And we again use notation
+$\bshattheta(\bshata)$ since the estimate will depend crucially upon our
+choice of $\bshata$.
 
 This selection matrix can depend upon the data---hence the hat in
 $\bshata$. It could also, for example, be mostly ones and zeros to pick
@@ -11328,15 +11332,214 @@ the minimization problem defined by Equation~\ref{eq:bhatmin}:
 \end{align}
 \end{defn}
 
+
+\clearpage
+\subsubsection{Asymptotic Distribution of GMM Estimator}
+
+\begin{prop}
+The GMM estimator $\bshattheta(\bshatW)$ that solves
+\begin{align*}
+  \bshattheta(\bshatW)
+  &=
+  \argmin_{\bstildetheta}\;
+  N \cdot \bsg_N(\bstildetheta)' \,\bshatW \,\bsg_N(\bstildetheta)
+  \qquad
+  \text{where}\quad
+  \bsg_N(\bstildetheta)
+  := \frac{1}{N}\sumnN
+  \underbrace{\bsg_n(\bstildetheta)}_{\bsf_n(\bsy_n,\bstildetheta)}
+\end{align*}
+where $\bshatW\pto\bsW$ (a positive definite matrix)
+has asymptotic distribution
+\begin{align*}
+  \sqrt{N}(\bshattheta(\bshatW)-\bstheta)
+  \quad&\dto\quad
+  \big( \bsG' \bsW \bsG \big)^{-1}
+  \bsG \bsW
+  \cdot
+  \calN\big(\bso,\bsOmega\big)
+  \\
+  \text{where}\quad
+  \bsOmega &:= \Var[\bsg_n(\bstheta)] \\
+  \bsG &:= \E\left[
+    \frac{\partial \bsg(\bstheta)}{\partial \bstildetheta'}
+  \right]
+\end{align*}
+To be clear, $\bsG$ is the Jacobian matrix of the function
+$\bsg_n(\bstildetheta)$ evaluated at true $\bstheta$.
+\end{prop}
+\begin{proof}
+For notational convenience, we will simply write $\bshattheta$, rather
+that $\bshattheta(\bshatW)$ throughout this proof. Though it should be
+understood that the estimator depends upon the choice of weighting
+matrix $\bshatW$.
+We also define the Jacobian matrix of $\bsg_N$, evaluated at arbitrary
+$\bsbartheta$:
+\begin{align*}
+  \bsG_N(\bsbartheta)
+  =
+  \frac{\partial \bsg_N(\bsbartheta)}{\partial \bstildetheta'}
+  =
+  \frac{1}{N}
+  \sumnN
+  \frac{\partial \bsg_n(\bsbartheta)}{\partial \bstildetheta'}
+  \in \R^{M\times P}
+\end{align*}
+Now begin by noting that the GMM estimator $\bshattheta$ must satisfy
+the first order necessary conditions of its defining maximization
+problem, i.e.\ we must have:
+\begin{align*}
+  \bso &=
+  \frac{\partial \bsg_N(\bshattheta)'}{\partial \bstildetheta}
+  \, \bshatW \, \bsg_N(\bshattheta)
+  =
+  \bsG_N(\bshattheta)'
+  \, \bshatW \, \bsg_N(\bshattheta)
+\end{align*}
+This is $P$ equations in $P$ unknowns (the elements of $\bshattheta$).
+To derive the asymptotic distribution, do a first order Taylor expansion
+of each equation about the true value $\bstheta$:
+\begin{align}
+  \bso &=
+  \bsG_N(\bshattheta)'
+  \, \bshatW \,
+  \big(
+  \bsg_N(\bstheta)
+  +
+  \bsG_N(\bsbartheta)
+  (\bshattheta-\bstheta)
+  \big)
+  \notag
+  \\
+  \iff\quad
+  \sqrt{N}(\bshattheta-\bstheta)
+  &=
+  -
+  \big(
+  \bsG_N(\bshattheta)'
+  \, \bshatW \,
+  \bsG_N(\bsbartheta)
+  \big)^{-1}
+  \bsG_N(\bshattheta)'
+  \, \bshatW \,
+  \sqrt{N}
+  \bsg_N(\bstheta)
+  \label{gmm:proof}
+\end{align}
+for some $\bsbartheta$ in between true $\bstheta$ and estimate
+$\bshattheta$. Note that this is an abuse of notation since there's
+actually a separate $\bsbartheta$ for each of the $P$ equations.
+However, it won't matter asymptotically---they'll all get arbitrarily
+close together to each other and to $\bstheta$ as we'll see---so we'll
+ignore that caveat.
+
+We now consider the asymptotic properties of the elements on the RHS of
+Equation~\ref{gmm:proof}. First, by the CLT
+\begin{align*}
+  \sqrt{N}
+  \bsg_N(\bstheta)
+  =
+  \frac{1}{\sqrt{N}}
+  \sumnN
+  \bsg_n(\bstheta)
+  \quad\dto\quad
+  \calN\big(\bso,\Var[\bsg_n(\bstheta)]\big)
+\end{align*}
+Next, consistent $\bshattheta$ means that $\bshattheta\pto\bstheta$. And
+with $\bsbartheta$ sandwiched in between $\bshattheta$ and $\bstheta$,
+we also get $\bsbartheta\pto\bstheta$. Therefore,
+\begin{align*}
+  \bsG_N(\bshattheta)
+  \pto \bsG
+  \qquad
+  \bsG_N(\bsbartheta)
+  \pto \bsG
+\end{align*}
+Finally, we've already assumed that $\bshatW$ was chosen such that
+$\bshatW\pto \bsW$. Putting all of this together, we can apply these
+results to the terms in Expression~\ref{gmm:proof} individually,
+\begin{align*}
+  \sqrt{N}(\bshattheta-\bstheta)
+  &=
+  -
+  \big(
+  \underbrace{%
+    \bsG_N(\bshattheta)'
+  }_{%
+    \pto \bsG
+  }
+  \quad
+  \underbrace{%
+    \bshatW
+    \vphantom{\bsG(\bshattheta)'}
+  }_{%
+    \pto\bsW
+  }
+  \quad
+  \underbrace{%
+    \bsG_N(\bshattheta)
+  }_{%
+    \pto \bsG
+    \vphantom{\bsG(\bshattheta)'}
+  }
+  \quad
+  \big)^{-1}
+  \underbrace{%
+    \bsG_N(\bshattheta)'
+  }_{%
+    \pto \bsG
+    \vphantom{\bsG(\bshattheta)'}
+  }
+  \quad
+  \underbrace{%
+    \bshatW
+    \vphantom{\bsG(\bshattheta)'}
+  }_{%
+    \pto\bsW
+  }
+  \quad
+  \underbrace{%
+  \sqrt{N}
+  \bsg_N(\bstheta)
+  }_{\dto\calN\big(\bso,\bsOmega\big)}
+\end{align*}
+From there, we can invoke the continuous mapping theorem to string
+everything together and arrive at the asymptotic distribution:
+\begin{align*}
+  \sqrt{N}(\bshattheta-\bstheta)
+  \quad\dto\quad
+  \big( \bsG' \bsW \bsG\big)^{-1}
+  \bsG \bsW
+  \cdot
+  \calN\big(\bso,\bsOmega\big)
+\end{align*}
+\end{proof}
+
+
+\clearpage
+\subsubsection{Efficient GMM}
+
+\begin{prop}\emph{(Efficient GMM under Optimal Weighting Matrix)}
+The choice of weighting matrix $\bsW$ that delivers the lowest asymptotic
+variance is $\bsW=\bsOmega^{-1}=\Var[\bsg_n(\bstheta)]^{-1}$, in which
+case the asymptotic variance formulas simplify to
+\begin{align*}
+  \sqrt{N}(\bshattheta-\bstheta)
+  \quad\dto\quad
+  \calN\big(\bso,(\bsG'\bsOmega^{-1}\bsG)^{-1}\big)
+\end{align*}
+\end{prop}
+
+
 \begin{defn}(Two-Step Efficient GMM Estimators)
-In some cases, our goal is to obtain not just consistent estimators, but
-also \emph{efficient} GMM estimators, i.e.\ an estimator $\bshattheta$
-with the lowest possible asymptotic variance.
-That typically presents the following chicken and egg problem:
+Often our goal will be to obtain not just consistent estimators, but
+also \emph{efficient} GMM estimators, i.e.\ estimators
+$\bshattheta$ with the lowest possible asymptotic variance.
+But this typically presents the following chicken and egg problem:
 \begin{enumerate}[label=(\roman*)]
   \item Obtaining the efficient GMM estimator, call it $\bshattheta_2$,
     often requires using a specific/specially-chosen weighting matrix,
-    call it $\bshatW_2$
+    call it $\bshatW_2$.
   \item However, the weighting matrix $\bshatW_2$ that
     delivers the the efficient estimator is often a function of the true
     parameter vector $\bstheta$. Since we don't know the true parameter
@@ -11365,9 +11568,6 @@ The above approach was described for the $\bshatW$ weighting-matrix
 approach of Expression~\ref{eq:bhatmin}. But it also applies analogously
 to the moment selection approach with $\bshata$.
 \end{rmk}
-
-\clearpage
-\subsubsection{Asymptotic Distribution of GMM Estimator}
 
 \clearpage
 \subsubsection{Continuously Updated GMM Estimator (CUE)}
