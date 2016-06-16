@@ -287,6 +287,7 @@
 % - intXY is equivalent to \int^Y_X
 \newcommand{\intab}{\int_a^b}
 \newcommand{\intzN}{\int_0^N}
+\newcommand{\intzo}{\int_0^1}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -304,6 +305,9 @@
 \section{Building Blocks}
 
 \subsection{Utility Functions}
+
+
+\subsection{Risk Aversion and Important Elasticities}
 
 \begin{defn}(Absolute Risk Aversion)
 Given twice-differentiable utility function $u$,
@@ -325,31 +329,81 @@ Given twice-differentiable utility function $u$,
 Given differentiable utility function $u$,
 the \emph{intertemporal elasticity of substitution} is defined
 \begin{align*}
-  IES
+  \text{IES}
   = -\frac{\partial \ln(c_{t+1}/c_t)}{\partial r}
   = -\frac{\partial \ln(c_{t+1}/c_t)}{%
     \partial \ln(u'(c_{t+1})/u'(c_t))}
 \end{align*}
+The IES answers the question ``How much to I change the (log-normalized)
+slope of my consumption profile $\{c_t,c_{t+1}\}$---i.e.\ my consumption
+growth---in response to a change in the interest rate?''
 High IES means that the the consumer will change her consumption
 dramatically given small changes in the interest rate---high elasticity,
 comfortable substituting across time.
-
 Low IES corresponds to a strong smoothing motive. The consumer is
-\emph{not} very responsive to changes in the interest rate.
+\emph{not} very responsive to changes in the interest rate, so the
+consumption profile over time will be flatter.
 \end{defn}
+\begin{rmk}
+Why are these two IES equations equivalent?
+It comes from the savings problem solved by a utility maximizing
+household. Consider the two-period case for simplicity (though it also
+holds in the infinite horizon problem with separable period utility):
+\begin{align*}
+  \max_{a_t} \; &
+  u\big(
+  \underbrace{y_t-a_t}_{c_t}
+  \big)
+  + \beta
+  u\big(
+  \underbrace{y_{t+1}+Ra_t}_{c_{t+1}}
+  \big)
+\end{align*}
+where $y_t$ is exogenously given income at time $t$ and $a_t$ is the amount
+of assets bought at time $t$, which mature at time $t+1$ and have gross
+return $R$. It has first order condition
+\begin{align*}
+  %u'(c_t) = \beta R u'(c_{t+1})
+  %\quad\iff\quad
+  R = \frac{u'(c_t)}{\beta u'(c_{t+1})}
+  \quad\iff\quad
+  r &= -\ln \left(\frac{u'(c_{t+1})}{u'(c_t)}\right) -\ln\beta
+\end{align*}
+where $r=\ln R$. Now this equation must always hold for any consumption
+savings problem with time-separable utility. Moreover, $\beta$ is just a
+fixed parameter; it does not change. Therefore, if we change $r$, the
+agent must change his consumption profile $\{c_t,c_{t+1}\}$ to change
+the log-ratio of marginal utilities $\ln\big(u'(c_{t+1})/u'(c_t)\big)$
+so that this equation is true. Hence,
+$\partial r = \partial \ln(u'(c_{t+1})/u'(c_t))$, which is why the two
+IES expressions are equivalent.
+\end{rmk}
+
+\begin{defn}(Frisch Elasticity of Labor Supply)
+
+\end{defn}
+
+
+
+\clearpage
+\subsection{Power or CRRA Utility}
 
 \begin{defn}(Power Utility or CRRA)
 We define the period power utility function as
 \begin{align*}
-  u(c) &= \frac{c^{1-\sigma}-1}{1-\sigma} \\
+  u(c) &= \frac{c^{1-\sigma}-1}{1-\sigma}
+  \qquad \sigma\geq 0
+  \\
   u'(c) &= c^{-\sigma} \\
   u''(c) &= -\sigma c^{-\sigma-1}
 \end{align*}
-It has the feature that
+where $\sigma\geq 0$ controls the curvature of the utility function.
+For $\sigma=0$, utility is linear.
+It also has the feature that
 \begin{align*}
   \lim_{\sigma\ra 1}
   \frac{c^{1-\sigma}-1}{1-\sigma}
-  = \ln(c)
+  &= \ln(c)
 \end{align*}
 which is why we have $-1$ in the numerator (so we can apply L'Hospital),
 though it's just a constant that doesn't really affect $u$.
@@ -362,11 +416,16 @@ It exhibits constant relative risk aversion
   = -\frac{c (-\sigma c^{-\sigma-1})}{c^{-\sigma}}
   = \sigma
 \end{align*}
-The IES is also tied to the coefficient of relative risk aversion:
+The IES is also tied to the coefficient of relative risk aversion, as
+$\sigma$ is the inverse IES:
 \begin{align*}
   IES
   = \frac{1}{\sigma}
 \end{align*}
+So if $\sigma$ is large, the IES is very low: the agent does not like
+variable consumption. For small $\sigma$, the agent cares less about
+variability in consumption, is willing to substitute across time, and
+exhibits a large intertemporal elasticity of substitution.
 \end{defn}
 
 \begin{prop}
@@ -2509,6 +2568,1222 @@ Possible ways to write the budget constraint:
 
 
 \end{itemize}
+
+
+\clearpage
+\section{New Keynesian Model}
+
+\subsection{Household Problem: Cashless Economy}
+
+Households take wages $W_t$, prices of a zero-coupon discount bound
+$Q_t$, prices $P_t$, profits/dividends from firms $D_t$, and preference
+shifter $Z_t$ as given, and choose consumption $C_t$, hours $N_t$, and
+bounds $B_t$
+\begin{align*}
+  \max_{\{C_t,N_t,B_t\}\tinfz} \;
+  &\E_0\sumtinfz \beta^t U(C_t,N_t;Z_t) \\
+  \text{s.t.}\quad&
+  P_tC_t + Q_{t}B_t \leq B_{t-1} + W_tN_t + D_t\quad \forall t\\
+  &\limT \E_t\bigg[
+    \underbrace{\beta^{T-t} \frac{U_{c,T}}{U_{c,t}}}_{\Lambda_{t,T}}
+    \frac{B_T}{P_T}
+  \bigg]
+  \geq 0
+  \qquad \forall t
+\end{align*}
+where the second constraint is a no-Ponzi condition and
+we define $U_t:=U(C_t,N_t;Z_t)$, partial derivatives
+$U_{x,t}=\partial U_t/\partial X_t$, and stochastic discount factor
+$\Lambda_{t,T}$ between $t$ and $T$.
+First order conditions:
+\begin{alignat*}{3}
+  C_t:&&\quad
+  \beta^t U_{c,t} &= \mu_t P_t
+  \\
+  N_t:&&\quad
+  \beta^t U_{n,t} &= -\mu_t W_t
+  \\
+  B_t:&&\quad
+  \mu_t Q_t &= \mu_{t+1}
+\end{alignat*}
+Divide the FOCs for $C_t$ and $N_t$ by each other, and use the FOC for
+$B_t$ to link the $C_t$ and $C_{t+1}$ FOC. This gives optimality
+conditions:
+\begin{align*}
+  Q_t &=
+  \beta\;
+  \E_t\left[
+    \frac{U_{c,t+1}}{U_{c,t}}
+    \frac{P_t}{P_{t+1}}
+  \right]
+  \\
+  -\frac{U_{n,t}}{U_{c,t}}
+  &=
+  \frac{W_t}{P_{t}} \\
+  0 &=
+  \limT \E_t\bigg[
+    \Lambda_{t,T}
+    \frac{B_T}{P_T}
+  \bigg]
+\end{align*}
+where the third equation is a TVC. It must hold because if the no-Ponzi
+condition held with strict inequality, the consumer could raise
+utility by a discrete amount without decreasing future consumption, and
+that would violate optimality. So the TVC must hold for an optimal
+sequence.
+
+\clearpage
+\subsection{Household Problem: Money in the Utility Function}
+
+Households solve
+\begin{align*}
+  \max_{\{C_t,N_t,B_t,M_t\}\tinfz} \;
+  &\E_0\sumtinfz \beta^t U(C_t,M_t/P_t,N_t;Z_t) \\
+  \text{s.t.}\quad&
+  P_tC_t + Q_{t}B_t + M_t
+  \leq B_{t-1} + M_{t-1} + W_tN_t + D_t\quad \forall t\\
+  &\limT \E_t\bigg[
+    \underbrace{\beta^{T-t} \frac{U_{c,T}}{U_{c,t}}}_{\Lambda_{t,T}}
+    \frac{B_T+M_t}{P_T}
+  \bigg]
+  \geq 0
+  \qquad \forall t
+\end{align*}
+Alternatively, we define cash-on-hand $X_t=M_t+B_t$ and rewrite the
+budget constraint as
+\begin{align*}
+  P_tC_t
+  + Q_{t}X_t
+  + (1-Q_{t})M_t
+  \leq X_{t-1} + W_tN_t + D_t
+\end{align*}
+First order conditions:
+\begin{alignat*}{3}
+  C_t:&&\quad
+  \beta^t U_{c,t} &= \mu_t P_t \\
+  N_t:&&\quad
+  \beta^t U_{n,t} &= -\mu_t W_t \\
+  B_t:&&\quad
+  \mu_t Q_t &= \mu_{t+1} \\
+  M_t:&&\quad
+  \beta^t \frac{U_{m/p,t}}{P_t}
+  &=
+  \mu_t - \mu_{t+1}
+\end{alignat*}
+These conditions yield
+\begin{align*}
+  Q_t &= \beta \E_t\left[
+    \frac{U_{c,t+1}}{U_{c,t}}\frac{P_t}{P_{t+1}}
+  \right]
+  \\
+  -\frac{U_{c,t}}{U_{n,t}} &= \frac{P_t}{W_t}
+  \\
+  \frac{U_{m/p,t}}{U_{c,t}}
+  &=
+  1 - Q_t
+\end{align*}
+
+
+
+\clearpage
+\subsection{Firm Problem: Competitive Firm}
+
+
+Firms choose labor/hours to maximize profits:
+\begin{align*}
+  \max_{N_t} \; &P_tY_t - W_tN_t \\
+  \text{s.t.} \quad &Y_t =A_tN_t^{1-\alpha}
+\end{align*}
+The first order condition is
+\begin{align*}
+  \frac{W_t}{P_t} = (1-\alpha) A_t N_t^{-\alpha}
+\end{align*}
+
+
+\subsection{Firm Problem: Monopolistic Competition}
+
+There are two sectors
+\begin{enumerate}[label=(\roman*)]
+  \item
+    \emph{Final Good}:
+    There is a representative firm in the final goods sector that uses
+    intemediate goods $Y_t(i)$ for $i\in[0,1]$ to produce final good
+    $Y_t$, which the household consumes.
+    It combines the intermediate goods using a CES production function,
+    taking prices of the intermediate goods $P_t(i)$ and the final good
+    $P_t$ as given. Therefore, the firm solves
+    \begin{align*}
+      \max_{Y(i)} &\; P_tY_t - \intzo P_t(i)Y_t(i)\;di \\
+      \text{s.t}\quad &
+      Y_t = \left(
+        \intzo Y_t(i)^{\frac{\varepsilon-1}{\varepsilon}}
+        \; di
+      \right)^{\frac{\varepsilon}{\varepsilon-1}}
+    \end{align*}
+    where $Y_t(i)$ is the quantity of intermediate good $i$ that is used
+    in the production of $Y_t$. The result of this maximization problem
+    is a demand function for intermediate good $Y_t(i)$ as a function of
+    total output $Y_t$ and prices $P_t(i)$:
+    \begin{align}
+      Y_t(i) = Y_t\left(\frac{P_t(i)}{P_t}\right)^{-\varepsilon}
+      \label{nkdemand}
+    \end{align}
+    where $\varepsilon$ is the elasticity of substitution between
+    different intermediate goods. Since the firm faces competitive input
+    and output markets, profits are zero.
+
+  \item
+    \emph{Intermediate Goods}:
+    There is a continuum of monopolistically competitive intermediate
+    goods firms, $i\in[0,1]$. Each $i$th firm uses a CRS production
+    function, hiring labor $N_t(i)$ to produce output $Y_t(i)$ according
+    to
+    \begin{align*}
+      Y_t(i) &= A_t N_t(i)
+      \quad\implies\quad
+      N_t(i) = \frac{Y_t(i)}{A_t}
+      \\
+      \ln A_t = a_t &= \rho_a a_{t-1} + \varepsilon_t^a
+    \end{align*}
+    where marginal productivity of labor $A_t$ is common to all firms
+    and taken as given.  Each intermediate goods firms takes the demand
+    curve for their firm/variety, Equation~\ref{nkdemand}, as given and
+    chooses price (which determines quantity through the demand curve)
+    to max profits. Their choice of price (taking the demand curve as
+    given) depends on their ability to reset prices later on. Therefore,
+    we consider a few cases.
+
+    But first we define a few objects:
+    \begin{align*}
+      \text{Nom. Unit Labor Cost:}\qquad\qquad
+      &\;\frac{W_t}{A_t}
+      \\
+      \text{Nom. Marginal Cost:}\quad
+      M_t^n :=&\; \frac{W_t}{A_t}
+      \\
+      \text{Real. Marginal Cost:}\quad
+      M_t :=&\;
+      \frac{M_t^n}{P_t}
+      =
+      \frac{W_t}{P_tA_t}
+      \\
+      \text{Markup:}\quad\quad
+      \mu:= &\;\frac{\varepsilon}{\varepsilon-1} > 1
+    \end{align*}
+    Nominal unit labor cost represents the nominal amount of money spent
+    on \emph{labor} to produce one more unit of output. Nominal marginal
+    cost is the nominal amount of money spent on \emph{all inputs} to
+    produce one more unit of output. Since there is no capital in this
+    economy (labor is the only input), nominal marginal cost simply
+    equals unit labor cost. With more inputs, these objects would
+    differ. Lastly, we'll see where the name markup comes from below.
+    \begin{itemize}
+      \item \emph{Flexible Prices}:
+        Firms face a sequence of static problems in each period
+        \begin{align*}
+          \max_{P_t(i),Y_t(i),N_t(i)}
+          \;&P_t(i)Y_t(i) - W_tN_t(i)
+          \\
+          \iff\qquad
+          \max_{P_t(i)}
+          \;&
+          \underbrace{%
+          \left(
+          P_t(i)
+          - \frac{W_t}{A_t}
+          \right)
+          }_{\text{Per-Unit Profit}}
+          \underbrace{%
+          Y_t\left(\frac{P_t(i)}{P_t}\right)^{-\varepsilon}
+          }_{\text{Output, $Y_t(i)$}}
+        \end{align*}
+
+        First order conditions to the maximization problem:
+        \begin{align*}
+          P_t(i) =& \;\frac{\varepsilon}{\varepsilon-1}\frac{W_t}{A_t}
+          = \mu M_t^n
+        \end{align*}
+        We see where the markup gets its name: it's the constant markup
+        over nominal or real marginal cost $M_t^n$ that yields the
+        nominal price $P_t(i)$ or the real price $P_t(i)/P_t$,
+        respectively. It depends on the elasticity of demand, not on
+        time. We could also put this in real terms:
+        \begin{align*}
+          \frac{P_t(i)}{P_t} &=
+          \frac{\varepsilon}{\varepsilon-1}\frac{W_t}{A_tP_t}
+          =
+          \mu \frac{M_t^n}{P_t}
+          =
+          \mu M_t
+        \end{align*}
+        Since all firms identical, focus on symmetric equilibrium, which
+        implies
+        \begin{align*}
+          P_t(i)=P_t
+          \quad\implies\quad
+          \mu M_t=1
+          \quad\implies\quad
+          M_t = 1/\mu
+        \end{align*}
+
+      \item \emph{Rottenburg Quadratic Price Adjustment Costs}: Now we
+        consider the case where you can \emph{always} change your price,
+        but at a cost that depends on the amount you change by.  This
+        differs from \emph{menu costs}, where the \emph{size} of the
+        price adjustment does not impact the \emph{cost} of changing
+        prices. If you pay the fixed cost to change menus, you can
+        change as much as you want---there's no marginal cost to larger
+        changes.  Also, Rottenburg is state-dependent rather than
+        time-dependent.
+
+        So now we again solve the problem a firm choosing which price to
+        set, except the problem is recursive (rather than a sequence of
+        static problems). Therefore, we define the firms value function
+        \begin{align*}
+          v\big(P_{t-1}(i)\big) =
+          \max_{P_t(i)}\;\;
+          &
+          Y_t\left(
+          \frac{P_t(i)}{P_t}
+          \right)^{-\varepsilon}
+          \left(
+          P_t(i)-M_t
+          \right)
+          - \frac{1}{2}\theta
+          \left(
+          \frac{P_{t}(i)}{P_{t-1}(i)}-1
+          \right)^2
+          P_tY_t \\
+          &\qquad
+          + \E_t\left[\Lambda_{t,t+1}\;v\big(P_t(i)\big)\right]
+        \end{align*}
+        where the first term is period profits as a function of prices,
+        $\theta$ is a measure of price stickiness, and price adjustment
+        costs are in terms of the cost of total final output.  We use
+        the discount factor
+        $\Lambda_{t,T}=\beta^{T-t}
+        \frac{U_{c,T}}{U_{c,t}}\frac{P_t}{P_T}$---that's the ``correct''
+        one---because firms are owned by households; therefore, firms
+        should discount future profits at the same rate as households.
+
+        First order condition on the RHS:
+        \begin{align*}
+          0 &=
+          \left[
+          1-\varepsilon
+          \frac{P_t(i)-M_t}{P_t(i)}
+          \right]
+          Y_t\left(
+          \frac{P_t(i)}{P_t}
+          \right)^{-\varepsilon}
+          - \theta
+          \left(
+          \frac{P_{t}(i)}{P_{t-1}(i)}-1
+          \right)
+          \frac{P_tY_t}{P_{t-1}(i)}
+          + \E_t\left[\Lambda_{t,t+1}\;v'\big(P_t(i)\big)\right]
+        \end{align*}
+        Envelope condition:
+        \begin{align*}
+          v'\big(P_{t-1}(i)\big)
+          &=
+          \theta
+          \left(
+          \frac{P_{t}(i)}{P_{t-1}(i)}-1
+          \right)
+          \frac{P_{t}(i)}{P_{t-1}(i)^{2}}
+          P_tY_t
+        \end{align*}
+        Next, since all firms are identical, we impose symmetry,
+        $P_t(i)=P_t$, and define $\Pi_t=P_t/P_{t-1}$ to make our lives
+        easier. Doing so simplies the FOC and envelope conditions to
+        \begin{align*}
+          0 &=
+          (1-\varepsilon)Y_t + \varepsilon M_tY_t
+          - \theta
+          \left(
+          \Pi_t-1
+          \right)
+          \Pi_tY_t
+          + \E_t\left[\Lambda_{t,t+1}\;v'\big(P_t\big)\right]
+          \\
+          v'\big(P_{t-1}\big)
+          &=
+          \theta
+          \left(
+          \Pi_t-1
+          \right)
+          \Pi_t^2Y_t
+        \end{align*}
+        Substituting the envelope condition into the FOC and dividing
+        through by $Y_t(\varepsilon-1)$, we get
+        \begin{align*}
+          0 &=
+          -1 + \frac{\varepsilon}{\varepsilon-1} M_t
+          - \frac{\theta}{\varepsilon-1}
+          \left(
+          \Pi_t-1
+          \right)
+          \Pi_t
+          + \frac{\theta}{\varepsilon-1}
+          \E_t\left[
+            \Lambda_{t,t+1}\;
+            (\Pi_{t+1}-1)\Pi^2_{t+1}\frac{Y_{t+1}}{Y_t}
+          \right]
+        \end{align*}
+        We will log-linearize this below
+
+  \end{itemize}
+\end{enumerate}
+
+
+
+
+
+
+\clearpage
+\subsection{Log-Linearizing Optimality Conditions}
+
+
+Some key assumptions and choices
+\begin{enumerate}
+  \item \emph{Utility, Cashless Economy}:
+    We assume that period utility is separable in consumption and labor,
+    with $Z_t$ a preference shifter that effectively changes the
+    discount factor (it will only, therefore, affect intertemporal
+    decisions, not intratemporal decisions). We use the form
+    \begin{align*}
+      U(C_t,N_t,Z_t) &=
+      \left[
+        \frac{C_t^{1-\sigma}-1}{1-\sigma}
+        -
+        \frac{N_t^{1+\varphi}}{1+\varphi}
+      \right] Z_t
+      \qquad \sigma,\varphi \geq 0 \\
+      \text{where}\quad
+      \ln Z_t :=
+      z_t &= \rho_z z_{t-1} + \varepsilon_t^z
+    \end{align*}
+    where $\sigma,\varphi\geq 0$ ensures utility will be concave in
+    consumption and convex in hours worked.
+    This utility function has first derivatives
+    \begin{align*}
+      U_{n,t} &= -Z_t N_t^{\varphi} \\
+      U_{c,t} &= Z_t C_t^{-\sigma}
+    \end{align*}
+    The parameter $\varphi$ is the inverse Frisch labor supply
+    elasticity under our assumed functional form.
+
+  \item \emph{Utility, Money in the Utility Function}:
+    Consumers now also have preferences for real money balances:
+    \begin{align*}
+      U(C_t,M_t/P_t,N_t,Z_t) &=
+      \left[
+        \frac{C_t^{1-\sigma}-1}{1-\sigma}
+        + \frac{(M_t/P_t)^{1-\nu}}{1-\nu}
+        - \frac{N_t^{1+\varphi}}{1+\varphi}
+      \right] Z_t
+      \qquad \sigma,\nu,\varphi \geq 0
+    \end{align*}
+    where $\sigma,\nu,\varphi\geq 0$ ensures utility will be concave in
+    consumption, concave in real money balances, and convex in hours
+    worked. We add first derivative with respect to money:
+    \begin{align*}
+      U_{m/p,t} &= Z_t (M_t/P_t)^{-\nu}
+    \end{align*}
+    Since utility is separable, the other derivatives don't change.
+
+  \item \emph{Logged Variables}:
+    For any model object $X_t$, we define
+    $x_t = \ln X_t$.
+
+  \item \emph{New Variables}:
+    Since $Q_t$ is the nominal price of the zero-coupon discount bound,
+    define the nominal interest rate as $i_t = -\ln Q_t$. Also define
+    $\rho$ as the discount rate implied by $\beta$ the discount factor:
+    $\beta = e^{-\rho}$, and define inflation $\pi_t=\ln(P_{t+1}/P_t)$
+
+  \item \emph{Taylor-Expansion Point}:
+    To linearize non-linear functions, we will often employ a
+    first-order Taylor-expansion
+    \begin{align*}
+      f(x_t) = f(x) + f'(x)(x_t-x)
+    \end{align*}
+    where $x_t$ represents sums and differences of several model
+    objects. For a totally made-up example, we might have $f(y)=\exp(y)$
+    and
+    \begin{align*}
+      x_t = \pi_t + i_t - \rho
+    \end{align*}
+    The point $x$ that we Taylor-expand about is the equivalent of
+    $x_t$, but in a ``steady state'' that is non-stochastic ($\Delta
+    z_t=0$), on a balanced growth path ($\Delta c_t =g$), and has zero
+    inflation ($\pi_t=0$). So in the above example, that would
+    $x=0+i-\rho$.
+
+    Note that growth in consumption $\Delta c_t=g$ will come from growth
+    in productivity, $A_t$, that we will see in the firm problem.
+\end{enumerate}
+We now log-linearize the varous optimality conditions:
+\begin{itemize}
+  \item Intratemporal Labor-Consumption Choice:
+    \begin{align*}
+      -\frac{U_{n,t}}{U_{c,t}}
+      =
+      \frac{W_t}{P_{t}}
+      \quad\implies\quad
+      w_t - p_t
+      =
+      \varphi n_t
+      + \sigma c_t
+    \end{align*}
+    This is effectively the household's labor supply schedule given the
+    real wage, $w_t-p_t$. It's even more clear here that $\varphi$ is
+    the inverse Frisch labor supply elasticity, since we can see that
+    $\varphi$ is the increase in labor supply $n_t$, holding $c_t$ (and
+    hence marginal utility---since that only depends on $c_t$ given our
+    assumed utility function) constant.
+
+  \item Intertemporal Consumption Choice:
+    We log-linearize in a sequence of steps
+    \begin{enumerate}[label=(\roman*)]
+      \item \emph{Substitute in the functional form}:
+        \begin{align*}
+          Q_t =
+          \beta\;
+          \E_t\left[
+            \frac{U_{c,t+1}}{U_{c,t}}
+            \frac{P_t}{P_{t+1}}
+          \right]
+          &=
+          \beta\;
+          \E_t\left[
+            \frac{Z_{t+1}}{Z_{t}}
+            \left(\frac{C_{t+1}}{C_t}\right)^{-\sigma}
+            \frac{P_t}{P_{t+1}}
+          \right] \\
+          \iff\quad
+          1 &=
+          \E_t\left[
+            \exp\left\{
+            \ln
+            \left(
+            \frac{Z_{t+1}}{Z_{t}}
+            \left(\frac{C_{t+1}}{C_t}\right)^{-\sigma}
+            \frac{P_t}{P_{t+1}}
+            \frac{\beta}{Q_t}
+            \right)
+            \right\}
+          \right]
+        \end{align*}
+
+      \item \emph{Rewrite to Prepare for Log-Linearization}:
+        Use the definitions of the logged variables to rewrite the RHS
+        as
+        \begin{align*}
+          1
+          =&\;
+          \E_t\left[
+            \exp\left\{
+            \Delta z_{t+1}
+            -\sigma \Delta c_{t+1}
+            - \pi_{t+1}
+            -\rho
+            + i_t
+            \right\}
+          \right]\\
+          =&\; \E_t[\exp\{x_t\}] \\
+          \text{where} \quad
+          x_{t+1} :=&\;
+            \Delta z_{t+1}
+            -\sigma \Delta c_{t+1}
+            - \pi_{t+1}
+            -\rho
+            + i_t
+        \end{align*}
+
+      \item \emph{Taylor-Expansion}:
+        We now want to log-linearize the exponential in the expectation
+        operator so we can use linearity of expectations. The function is
+        $f(y)=\exp(y)$, and the point we log-linearize aobut is the $x_t$ in
+        the ``steady state'' defined above.
+        \begin{align*}
+          x :=&\; 0 - \sigma g - 0 - \rho + i
+          = -\sigma g-\rho + i\\
+          \implies\quad
+          \exp\{x_t\}
+          \approx&\;
+          \exp\{x\} +
+          \exp\{x\}
+          \left[
+            \big(
+            \Delta z_{t+1}
+            -\sigma \Delta c_{t+1}
+            - \pi_{t+1}
+            -\rho
+            + i_t
+            \big)
+            - x
+          \right]
+        \end{align*}
+        To simplify this a bit, consider what would happen if
+        $x_t=x$---i.e.\ if the economy were in steady state. Then the
+        optimality condition would say that
+        \begin{align*}
+          1 = E_t[\exp\{x\}] = \exp\{x\}
+          \quad\iff\quad
+          0 = x = -\sigma g -\rho +i
+        \end{align*}
+        Therefore, we can rewrite the Taylor expansion as
+        \begin{align*}
+          \exp\{x_t\}
+          &\approx
+          1 +
+          \left[
+            \big(
+            \Delta z_{t+1}
+            -\sigma \Delta c_{t+1}
+            - \pi_{t+1}
+            -\rho
+            + i_t
+            \big)
+            - x
+          \right] \\
+          &=
+          1 +
+            \Delta z_{t+1}
+            -\sigma (\Delta c_{t+1}-g)
+            - \pi_{t+1}
+            + (i_t -i) \\
+          \text{Get rid of $i=\sigma g+\rho$}\quad
+          &=
+          1 +
+            \Delta z_{t+1}
+            -\sigma \Delta c_{t+1}
+            + i_t
+            - \pi_{t+1} -\rho
+        \end{align*}
+
+      \item
+        \emph{Write Optimality Condition in Log-Linear Form}:
+        Sub this last expression into the RHS of optimality
+        condition above:
+        \begin{align*}
+          0
+          =&\;
+          \E_t\big[
+            \Delta z_{t+1}
+            -\sigma \Delta c_{t+1}
+            - \pi_{t+1}
+            -\rho + i_t
+          \big]\\
+          -\sigma c_{t}
+          =&\;
+          \E_t\big[
+            (\rho_z z_t+\varepsilon^z_t) -z_{t}
+            -\sigma c_{t+1}
+            - \pi_{t+1}
+            -\rho + i_t
+          \big]\\
+          c_{t}
+          =&\;
+          \E_t[c_{t+1}]
+          -
+          \frac{1}{\sigma}
+          \big(
+          \underbrace{%
+          i_t-\E_t[\pi_{t+1}]
+          }_{r_t}
+          -\rho
+          \big)
+          +
+          \frac{1}{\sigma}
+          (1-\rho_z) z_t
+        \end{align*}
+        where $r_t=i_t-\E_t[\pi_t]$ is the expected real rate of return.
+    \end{enumerate}
+    Therefore, we end up with the consumption Euler equation:
+    \begin{align*}
+      c_{t}
+      =&\;
+      \E_t[c_{t+1}]
+      -
+      \frac{1}{\sigma}
+      \big(
+      \underbrace{%
+      i_t-\E_t[\pi_{t+1}]
+      }_{r_t}
+      -\rho
+      \big)
+      +
+      \frac{1}{\sigma}
+      (1-\rho_z) z_t
+    \end{align*}
+
+  \item Money Demand:
+    This is only relevant if we consider the money-in-utility economy
+    \begin{align*}
+      \frac{U_{m/p,t}}{U_{c,t}}
+      =
+      1 - Q_t
+      \quad\iff\quad
+      \frac{M_t}{P_t}
+      &=
+      C_t^{\sigma/\nu}(1 - Q_t)^{-1/\nu}
+    \end{align*}
+    We will log-linearize this by writing
+    \begin{align*}
+      \frac{M_t}{P_t}
+      &=
+      C_t^{\sigma/\nu}(1 - e^{-i_t})^{-1/\nu} \\
+      m_t - p_t
+      &=
+      \frac{\sigma}{\nu}c_t
+      -\frac{1}{\nu}\ln (1 - e^{-i_t})
+    \end{align*}
+    Now Taylor-Expand $\ln(1-e^{-i_t})$ about nonstochastic steady state
+    value $i$:
+    \begin{align*}
+      \ln(1-e^{-i_t})\approx
+      \ln(1-e^{-i})
+      + \frac{e^{-i}}{1-e^{-i}}
+      (i_t-i)
+    \end{align*}
+    Ignore the constant terms: the whole first term and the $f'(i)i$
+    part of the second term; the total is just a constant. Though it
+    will change the value of $m_t-p_t$, the ``mistake'' will be constant
+    across time and values of $m_t-p_t$, so we will just have to change
+    our interpretation of $m_t$. Therefore, the log linear equation is
+    \begin{align*}
+      m_t - p_t
+      &\approx
+      \frac{\sigma}{\nu}c_t
+      - \frac{1}{\nu(e^{i}-1)}
+      i_t \\
+      &\approx
+      \frac{\sigma}{\nu}c_t
+      - \frac{1}{\nu i} i_t \\
+      \iff
+      m_t - p_t
+      &=
+      \frac{\sigma}{\nu}c_t
+      - \eta i_t
+    \end{align*}
+    where $\eta=1/(\nu i)$ is the semi interest elasticity of money
+    demand.
+
+
+  \item Production: We have
+    \begin{align*}
+      Y_t = A_t N_t^{1-\alpha}
+      \quad\implies\quad
+      y_t = a_t + (1-\alpha)n_t
+    \end{align*}
+
+  \item Firm Problem: Recall that we have
+    \begin{align*}
+      \frac{W_t}{P_t} = (1-\alpha)A_t N_t^{-\alpha}
+      \quad\implies\quad
+      w_t - p_t
+      = \ln(1-\alpha) + a_t - \alpha n_t
+    \end{align*}
+    We assume that
+    \begin{align*}
+      \ln A_t = a_t = \rho_a a_{t-1} + \varepsilon_t^a
+    \end{align*}
+
+  \item
+    \emph{Inflation under Rottenburg Pricing}:
+    We want to log-linearize the first order optimality condition:
+    \begin{align*}
+      0 &=
+      \underbrace{%
+      -1 + \frac{\varepsilon}{\varepsilon-1} M_t
+      }_{(i)}
+      -
+      \frac{\theta}{\varepsilon-1}
+      \underbrace{%
+      \left(
+      \Pi_t-1
+      \right)
+      \Pi_t
+      }_{(ii)}
+      +
+      \frac{\theta}{\varepsilon-1}
+      \E_t\bigg[
+      \underbrace{%
+        \Lambda_{t,t+1}\;
+        (\Pi_{t+1}-1)\Pi^2_{t+1}\frac{Y_{t+1}}{Y_t}
+      }_{(iii)}
+      \bigg]
+    \end{align*}
+    We go term by term. First
+    \begin{enumerate}[label=(\roman*)]
+      \item Recall the definition of the markup
+        $\mu=\frac{\varepsilon}{\varepsilon-1}$ and that the flexible
+        price marginal cost is $1/\mu$. Therefore, for $M_t$ close to
+        $1/\mu$, we can approximate
+        \begin{align*}
+          -1 + \frac{\varepsilon}{\varepsilon-1} M_t
+          \approx \ln\left(\frac{\varepsilon}{\varepsilon-1} M_t\right)
+          = m_t - \mu =: \tilde{m}_t
+        \end{align*}
+
+      \item Next, we linearize the function
+        \begin{align*}
+          F(\Pi_t) = (\Pi_t-1)\Pi_t
+        \end{align*}
+        about the zero-inflation steady state $\Pi=1$ up to a first
+        order approximation:
+        \begin{align*}
+          F(\Pi_t)
+          &\approx F(\Pi) + F'(\Pi)(\Pi_t-\Pi)
+          \\
+          &= \Pi + (2\Pi-1)(\Pi_t-\Pi)
+          \\
+          \text{$\Pi=1$}\implies\qquad
+          &= \Pi_t-1
+        \end{align*}
+        For $\Pi_t$ close to one, we can approximate this by
+        \begin{align*}
+          (\Pi_t-1)\Pi_t
+          \approx \Pi_t-1 \approx \log(\Pi_t) = \pi_t
+        \end{align*}
+
+      \item
+        To log-linearize (iii)
+        \begin{align*}
+          (iii)
+          =
+          \Lambda_{t,t+1}\;
+          (\Pi_{t+1}-1)\Pi^2_{t+1}\frac{Y_{t+1}}{Y_t}
+        \end{align*}
+        we need to make an assumption on the utility function, whose
+        derivatives enter into the stochastic discount factor. We assume
+        separable power utility, which gives (with market clearing
+        $C_t=Y_t$)
+        \begin{align*}
+          (iii)
+          &=
+          \bigg[
+          \underbrace{%
+          \beta\left(\frac{Y_{t+1}}{Y_t}\right)^{-\sigma}
+          \Pi_{t+1}^{-1}
+          \frac{Z_{t+1}}{Z_t}
+          }_{\Lambda_{t,t+1}}
+          \bigg]
+          (\Pi_{t+1}-1)\Pi^2_{t+1}\frac{Y_{t+1}}{Y_t}
+          \\
+          &=
+          \beta\left(\frac{Y_{t+1}}{Y_t}\right)^{1-\sigma}
+          \frac{Z_{t+1}}{Z_t}
+          (\Pi_{t+1}-1)\Pi_{t+1} \\
+          &=
+          \beta
+          \left[
+          \left(\frac{Y_{t+1}}{Y_t}\right)^{1-\sigma}
+          \frac{Z_{t+1}}{Z_t}
+          \Pi_{t+1}^2
+          -
+          \left(\frac{Y_{t+1}}{Y_t}\right)^{1-\sigma}
+          \frac{Z_{t+1}}{Z_t}
+          \Pi_{t+1}
+          \right]
+          \\
+          &=
+          \beta
+          \bigg[
+          \exp\big\{
+          (1-\sigma)\Delta y_{t+1}
+          + \Delta z_{t+1}
+          + 2\pi_{t+1}
+          \big\}
+          -
+          \exp\big\{
+          (1-\sigma)\Delta y_{t+1}
+          + \Delta z_{t+1}
+          + \pi_{t+1}
+          \big\}
+          \bigg]
+        \end{align*}
+        Now we will linearize the functions in brackets, which can be
+        written as
+        \begin{align*}
+          F(\Delta y_{t+1}, \Delta z_{t+1}, \pi_{t+1})
+          &\approx
+          \exp\big\{
+          (1-\sigma)\Delta y_{t+1}
+          + \Delta z_{t+1}
+          + k\pi_{t+1}
+          \big\}
+        \end{align*}
+        We will now do a first-order Taylor expansion of $F$ about the
+        nonstochastic ($\Delta z_{t+1}=0$), zero inflation
+        ($\pi_{t+1}=0)$, balanced growth ($\Delta y_{t+1}=g_y$) steady
+        state:
+        \begin{align*}
+          F(\Delta y_{t+1}, \Delta z_{t+1}, \pi_{t+1})
+          &\approx
+          F(g_y,0,0)
+          + F_y(g_y,0,0)(\Delta y_{t+1}-g_y)
+          \\
+          &\qquad
+          + F_z(g_y,0,0)(\Delta z_{t+1}-0)
+          + F_\pi(g_y,0,0)(\pi_{t+1}-0)
+          \\
+          &= e^{(1-\sigma)g_y}
+          \left[
+            1+(1-\sigma)(\Delta y_{t+1}-g_y)
+            + \Delta z_{t+1}
+            + k\pi_{t+1}
+          \right]
+        \end{align*}
+        Therefore, (iii) can be written in log-linear form as
+        \begin{align*}
+          (iii) \approx
+          \beta e^{(1-\sigma)g_y}\pi_{t+1}
+        \end{align*}
+    \end{enumerate}
+    Putting everything together, the log-linear first order condition is
+    \begin{align*}
+      0 &=
+      (m_t-\mu)
+      - \frac{\theta}{\varepsilon-1} \pi_t
+      + \frac{\theta}{\varepsilon-1}\tilde{\beta}\E_t[\pi_{t+1}]
+      \qquad \tilde{\beta} := \beta e^{(1-\sigma)g_y}
+    \end{align*}
+    This is a first order linear difference equation in $\pi_t$, which
+    we can solve forward to get
+    \begin{align*}
+       \pi_t
+      %&=
+      %\frac{\varepsilon-1}{\theta}(m_t-\mu)
+      %+\tilde{\beta}\E_t[\pi_{t+1}] \\
+      &=
+      \frac{\varepsilon-1}{\theta}
+      \sum_{k=0} \tilde{\beta}^k
+      \E_t[\tilde{m}_{t+k}]
+      \qquad\text{where}\quad
+      \tilde{m}_{t+k} = m_{t+k}-\mu
+    \end{align*}
+    We get
+    \begin{align*}
+      \pi_t &= \tilde{\beta}\;\E_t\pi_{t+1} + \lambda \tilde{m}_t
+      \\
+      \text{where}\quad
+      \tilde{\beta} &=
+        \beta e^{(1-\sigma)g_y} \\
+      \lambda &=
+        \frac{\varepsilon-1}{\theta}
+    \end{align*}
+
+\end{itemize}
+
+
+\clearpage
+\subsection{Equilibrium}
+
+For given $\{z_t,a_t\}$, an equilibrium is an allocation
+$\{c_t,n_t,y_t\}$ and prices $\{i_t,w_t,p_t\}$ such that
+\begin{alignat*}{3}
+  \text{Household Optimization}:&&
+  \qquad\qquad
+      c_{t}
+      &=
+      \E_t[c_{t+1}]
+      -
+      \frac{1}{\sigma}
+      \big(
+      \underbrace{%
+      i_t-\E_t[\pi_{t+1}]
+      }_{r_t}
+      -\rho
+      \big)
+      +
+      \frac{1}{\sigma}
+      (1-\rho_z) z_t
+      \\
+      &&
+      \omega_t:=
+      w_t - p_t
+      &=
+      \varphi n_t
+      + \sigma c_t
+      \\
+  \text{Firm Optimality}:&&\quad
+      \omega_t:=w_t - p_t &= a_t - \alpha n_t + \ln(1-\alpha)
+      \\
+  \text{Market Clearing}:&&
+    y_t &= c_t \\
+    && y_t &= a_t + (1-\alpha)n_t
+\end{alignat*}
+Since $w_t$ and $p_t$ always enter together, only the real wage
+$\omega_t:=w_t-p_t$ can be identified. But notice that the last four
+equations pin down the four real endogenous variables in the economy
+$\{y_t,n_t,c_t,\omega_t\}$. As a result, they also pin down the
+\emph{real} interest rate by the \emph{first} equation, the consumption
+Euler Equation:
+\begin{align*}
+    \underbrace{%
+    i_t-\E_t[\pi_{t+1}]
+    }_{r_t}
+    &=
+    \rho
+    + \sigma \E_t[\Delta c_{t+1}]
+    + (1-\rho_z) z_t
+\end{align*}
+In the nonstochastic economy, notice that we would have $r_t=\rho$ for
+all $t$.
+
+The only things not pinned down are nominal variables
+$\{i_t,\E_t\pi_{t+1},w_t,p_t\}$. For that we specify monetary policy.
+Notice that monetary policy won't have any \emph{real} effects (which is
+why we need to introduce sticky prices later on). It simply pins down
+nominal variables.
+
+
+\subsection{Monetary Policy through Interest Rate Rules}
+
+Recall that the real interest rate is pinned down by the real side of
+the economy, while the monetary authority sets the nominal interest rate
+$i_t$. Then, given $r_t$ and $i_t$, expected inflation $\E_t\pi_{t+1}$
+responds endogenously through the Fisher equation, which was implicit in
+the definition of the real interest rate:
+\begin{align*}
+  i_t = r_t + \E_t\pi_{t+1}
+  \quad\implies\quad
+  \E_t\pi_{t+1} = i_t - r_t
+\end{align*}
+In the nonstochastic steady state
+\begin{align*}
+  i = \pi + r = \pi + \rho
+  \quad\iff\quad
+  \pi = i - r = i - \rho
+\end{align*}
+We consider different rules:
+\begin{itemize}
+  \item \emph{Exogenous Nominal Interest Rate Path}: Suppose that the
+    nominal interest rate is set
+    \begin{align*}
+      i_t &= i + \nu_t
+      \\
+      \nu_t &= \rho_\nu \nu_{t-1}+\varepsilon_t^\nu
+    \end{align*}
+    where $\nu_t$ is a monetary policy shock. Then, the path of
+    $\E_t\pi_{t+1}$ can be summarized as
+    \begin{align*}
+      \E_t\pi_{t+1} &= i_t - r_t
+      \\
+      &= i + \nu_t - r_t \\
+      &= \pi - (r_t-\rho) + \nu_t \\
+      \iff\quad
+      \pi_{t+1}
+      &= \pi - \hat{r}_t + \nu_t  + \xi_{t+1}
+      \qquad \E[\xi_{t+1}]=0
+    \end{align*}
+    where $\hat{r}_t:=r_t-\rho$ and where $\xi_{t+1}$ are ``sunspot''
+    shocks. As we see, only \emph{expected} inflation is pinned down by
+    the real economy and the interest rate rule; \emph{actual} inflation
+    is not pinned down. In words, we have inflation indeterminacy, hence
+    price indeterminacy, hence indeterminacy of all nominal variables.
+    Given exogenous monetary shocks $\{\nu_t\}$, \emph{any} path of
+    shocks $\{\xi_t\}$ that satisfy $\E_t[\xi_{t+1}]=0$ and the above
+    inflation equation will constitute an equilibrium.
+    This indeterminacy follows because the monetary rule was chosen
+    \emph{independently} of the real side of the economy. If we change
+    that, there will not be indeterminacy, as we see for the next rule.
+
+  \item
+    \emph{Simple Taylor Rule}:
+    Suppose that the Fed sets nominal interest rates according to
+    \begin{align*}
+      i_t &= i + \phi_\pi(\pi_t-\pi) + \nu_t
+      \qquad \phi_\pi > 0
+      \\
+      &= \rho + \pi + \phi_\pi(\pi_t-\pi) + \nu_t
+    \end{align*}
+    Then, expected inflation responds endogenously through the Fisher
+    equation:
+    \begin{align*}
+      E_t\pi_{t+1} &=
+      i_t - r_t
+      \\
+      &=
+      \pi + \rho + \phi_\pi(\pi_t-\pi) + \nu_t - r_t
+      \\
+      E_t\pi_{t+1} -\pi
+      &= \phi_\pi(\pi_t-\pi) - (r_t -\rho) + \nu_t \\
+      E_t\hat{\pi}_{t+1}
+      &= \phi_\pi\hat{\pi}_t - \hat{r}_t + \nu_t
+    \end{align*}
+    Again, $\hat{r}_t$ comes from the real side of the economy, while
+    the monetary shock $\{\nu_t\}$ is exogenously given. If we ask about
+    inflation at $t$, there are a few possibilities
+    \begin{enumerate}[label=(\roman*)]
+      \item $\phi_\pi>1$: We can solve forward the expected inflation
+        equation to get
+        \begin{align*}
+          \hat{\pi}_t
+          &=
+          \phi_\pi^{-1}
+          \big(
+          E_t\hat{\pi}_{t+1} + \hat{r}_t - \nu_t
+          \big) \\
+          &=
+          \sum_{k=0}^\infty
+          \phi_\pi^{-k-1}
+          \E_t[\hat{r}_{t+k}-\nu_{t+k}]
+        \end{align*}
+        This converges since $\phi_\pi>1$, so we can solve for the
+        \emph{unique} nonexplosive equilibrium inflation path
+        $\{\pi_t\}$, which imply unique paths for all other nominal
+        variables.
+
+      \item $\phi_\pi\in[0,1]$: Here, forward solution does not
+        converge. Therefore, we have
+        \begin{align*}
+          E_t\hat{\pi}_{t+1}
+          &= \phi_\pi\hat{\pi}_t - \hat{r}_t + \nu_t \\
+          \hat{\pi}_{t+1}
+          &= \phi_\pi\hat{\pi}_t - \hat{r}_t + \nu_t + \xi_{t+1}
+          \qquad\E_t[\xi_{t+1}]=0
+        \end{align*}
+        Again, we have inflation indeterminacy. Any path of sunspot
+        shocks $\{\xi_t\}$ that satisfy the above equation will do.
+    \end{enumerate}
+    That we must have $\phi_\pi>1$ for a determinite solution is called
+    the \emph{Taylor Principle}.
+\end{itemize}
+
+
+\subsection{Monetary Policy through a Money Supply Rule}
+
+We consider the economy with money in the utility function. The central
+bank sets the money supply $\{m_t\}$ over time. We now compute the
+prices that result. Return to money demand:
+\begin{align*}
+  m_t - p_t
+  &=
+  \frac{\sigma}{\nu}c_t
+  - \eta i_t \\
+  \iff\quad
+  p_t
+  &=
+  m_t
+  - \frac{\sigma}{\nu}c_t
+  + \eta i_t
+\end{align*}
+No substitute the fisher equation in for $i_t$:
+\begin{align*}
+  p_t &=
+  m_t
+  - \frac{\sigma}{\nu}c_t
+  + \eta \big(\E_t[\pi_{t+1}] + r_t\big)
+  \\
+  \iff\quad
+  p_t
+  &=
+  m_t
+  - \frac{\sigma}{\nu}c_t
+  + \eta \big(\E_t[p_{t+1}] - p_t + r_t\big)
+\end{align*}
+We can rearrange to get
+\begin{align*}
+  \E_t[p_{t+1}]
+  &=
+  \left(
+  1+
+  \frac{1}{\eta}
+  \right)p_t
+  -
+  \frac{m_t}{\eta}
+  + \frac{\sigma}{\eta\nu}c_t
+  - r_t
+\end{align*}
+We can solve this forward for prices. Note that there will be a unique
+nonexplosive solution if and only if
+\begin{align*}
+  1+1/\eta>1
+  \quad\iff\quad
+  1/\eta>0
+  \quad\iff\quad
+  \nu > 0
+\end{align*}
+i.e.\ if utility is concave (not linear) in real money balances.
+
+\clearpage
+\subsection{New Keynesian Phillips Curve}
+
+We can combine various conditions to arrive at the
+\emph{New Keynesian Phillips Curve} which relates inflation to the
+output gap and marginal costs. So start with the definition
+\begin{align*}
+  M_t
+  &= \frac{W_t}{P_tA_t} \\
+  \text{Household FOCs}\qquad
+  &= \frac{C_t^\sigma N_t^\varphi}{A_t}
+  \\
+  \text{Market Clearing, then $Y_t=A_tN_t$}\qquad
+  &= \frac{Y_t^\sigma N_t^\varphi}{A_t}
+  =
+  \frac{Y_t^\sigma}{A_t}
+  \left(
+  \frac{Y_t}{A_t}
+  \right)^\varphi \\
+  \implies\quad
+  M_t &= Y_t^{\sigma+\varphi}A_t^{-(\varphi+1)}
+\end{align*}
+Expressed in log deviations from the flexible price counterpart
+\begin{align*}
+  \tilde{m}_t
+  &=
+  \big[(\sigma+\varphi)y_t-(1+\varphi)a_t\big]
+  -
+  \big[(\sigma+\varphi)y^n_t-(1+\varphi)a_t\big]
+  \\
+  &=
+  \left(\sigma+\varphi\right)
+  \tilde{y}_t
+\end{align*}
+Therefore, returning to inflation under Rottenburg pricing:
+\begin{align*}
+  \pi_t &= \tilde{\beta}\;\E_t\pi_{t+1} + \kappa \tilde{m}_t \\
+  \text{where}\quad
+  \tilde{\beta} &=
+    \beta e^{(1-\sigma)g_y} \\
+  \kappa &=
+    \frac{(\varepsilon-1)(\sigma+\varphi)}{\theta}
+\end{align*}
+
+
+\subsection{New Keynesian Phillips Curve}
+
+Next, we use market clearing to rewrite the consumption Euler equation
+as
+\begin{align*}
+  y_t = \E_ty_{t+1}
+  - \frac{1}{\sigma}(r_t-\rho)
+  + \frac{1}{\sigma}(1-\rho_z)z_t
+\end{align*}
+In deviations from the flex-price counterpart:
+\begin{align*}
+  \tilde{y}_t
+  = \E_t\tilde{y}_{t+1}
+  - \frac{1}{\sigma}\tilde{r}_t
+\end{align*}
+If price rigidities vanish as $t\ra\infty$ so that
+$\lim_{k\ra\infty}\tilde{y}_{t+k}=0$ sufficient fast, then we solve
+the above equation forward to get
+\begin{align*}
+  \tilde{y}_t
+  =
+  - \frac{1}{\sigma}
+  \sum_{k=0}^\infty \E_t[\tilde{r}_{t+k}]
+\end{align*}
+
+
+
+
 
 
 
