@@ -6134,7 +6134,7 @@ the density clustered around some mean before tapering off in all
 directions, as below.
 \begin{figure}[h!]
    \centering
-   \includegraphics[scale=0.40]{multivariate.pdf}
+   %\includegraphics[scale=0.40]{multivariate.pdf}
 \end{figure}
 \\
 This figure has mean zero for both $X_1$ and and $X_2$, and
@@ -10366,12 +10366,12 @@ Therefore, we can rearrange to get
 
 
 \clearpage
-\subsection{Extremum Estimators, M-Estimators, Sandwich Estimators}
+\subsection{Extremum Estimators, M- (``Sandwich'') Estimators}
 
 Extremum estimators are quite important. Virtually all estimators of
 interest---MLE, NLS, GMM---are (or can be cast as) extremum
 estimators. We also introduce a particular type of extremum estimator
-called the \emph{M-estimator}, which also nests as special cases MLE and
+called the \emph{M-estimator}, which nests as special cases MLE and
 NLS.
 
 
@@ -10389,7 +10389,7 @@ population objective function $Q(\bstildetheta)$ as $N\ra\infty$ where
   Q(\bstildetheta)
 \end{align*}
 This ensures that $\bshattheta$ is a consistent estimator of true
-$\bstheta$.
+$\bstheta$, the unique maximizer of $Q(\bstildetheta)$.
 \end{defn}
 \begin{rmk}
 Maximum is WLOG because, if we want to minimize, just max the negative.
@@ -10407,27 +10407,32 @@ written as
   \sumnN q(\bsy_n,\bstildetheta)
   }_{Q_N(\bstildetheta)}
   \qquad\implies\qquad
-  0 = Q'_N(\bshattheta)
-  = \frac{1}{N}\sumnN q'(\bsy_n, \bshattheta)
+  \bso
+  = \underbrace{%
+    \frac{1}{N}\sumnN q'(\bsy_n, \bshattheta)
+  }_{Q'_N(\bshattheta)}
 \end{align*}
-for some function $q(\bsy_n,\bstildetheta)$. For differentiable $q$,
-that means the true $\bstheta$ we hope to estimate satisfies
-$\E\big[q'(\bsy_n,\bstheta)\big]=\bso$ where $q'(\,\cdot\,,\bstheta)$ is
-the gradient of $q$ evaluated at true $\bstheta$.
+for some function $q(\bsy_n,\bstildetheta)$.
+This means the true $\bstheta$ we hope to estimate satisfies
+$Q(\bstheta)=\E[q(\bsy_n,\bstheta)]$ and $\bso=\E[q'(\bsy_n,\bstheta)]$
+where $q'(\,\cdot\,,\bstheta)$ is
+$\frac{\partial}{\partial\bstildetheta}[q(\bsy_n,\bstildetheta)]$
+evaluated at true $\bstheta$.
 \end{defn}
 
 \begin{prop}\emph{(Asymptotic Distribution of M-Estimator)}
+\label{prop:masymp}
 Let $\bshattheta_N$ denote the M-estimator constructed with sample size
 $N$. Then
 \begin{align*}
   \sqrt{N}(\bshattheta_N-\bstheta)
   \quad\dto\quad
   \calN\big(0,\;
-  \E\big[q''(\bsy_n,\bstheta)\big]^{-1}
+  \E[q''(\bsy_n,\bstheta)]^{-1}
   \;
-  \Var\big[q'(\bsy_n,\bstheta)\big]
+  \Var[q'(\bsy_n,\bstheta)]
   \;
-  \E\big[q''(\bsy_n,\bstheta)\big]^{-1}
+  \E[q''(\bsy_n,\bstheta)]^{-1}
   \big)
 \end{align*}
 where
@@ -10468,15 +10473,15 @@ asymptotic variance looks like a sandwich.
 \end{rmk}
 
 \begin{proof}
-If $\bstheta\in\R^P$, then $\bshattheta$ must satisfy the following
-$P$-first order conditions for a maximum (ommitting unnecessary $1/N$):
+For $\bstheta\in\R^P$, then $\bshattheta$ must satisfy the following
+$P$ first order conditions for a maximum (ommitting unnecessary $1/N$):
 \begin{align*}
   \bso &=
   \sumnN q'(\bsy_n,\bshattheta)
 \end{align*}
 where the elements of the sum are the derivative of $q$ with respect to
 vector $\bstildetheta$, evaluated at $\bsy_n$ and $\bshattheta$. This is
-a system of $P$-equations in $P$-unknowns.  We can do a Taylor Expansion
+a system of $P$ equations in $P$ unknowns.  We can do a Taylor Expansion
 of \emph{each} equation (separately) about the unknown, true value
 $\bstheta$:
 \begin{align*}
@@ -10517,15 +10522,15 @@ So to finish up, we rearrange,
 By the LLN and the CMT, the first term converges in probability to
 $\E[q''(\bsy_n,\bstheta)]^{-1}$. By the CLT, the second converges to in
 distribution to $\calN\big(0,\Var[q'(\bsy_n,\bstheta)]\big)$. Then, by
-Slutsky, we have
+Slutsky,
 \begin{align*}
   \sqrt{N}(\bshattheta-\bstheta)
   \quad\dto\quad
   \calN\big(0,
   \E[q''(\bsy_n,\bstheta)]^{-1}
-  \cdot
+  \;
   \Var[q'(\bsy_n,\bstheta)]
-  \cdot
+  \;
   \E[q''(\bsy_n,\bstheta)]^{-1}
   \big)
 \end{align*}
@@ -10551,18 +10556,20 @@ to minimize the maximum risk
 \clearpage
 \subsection{Least Squares Estimation}
 
-Suppose we have random variables $y_n$ and $\bsx_n$ and we want to use
-$\bsx_n$ to forecast $y_n$, i.e.\ to find some function $g(\bsx_n)$ that
-does a ``good'' job predicting $y_n$. We say that $g(\bsx_n)$ is
-``good'' if it minimizes the Mean-Square Error of the forecast:
+Suppose we have random variables $y_n$ and $\bsx_n$, and we want to use
+$\bsx_n$ to forecast $y_n$. Then we want to find some function
+$g(\bsx_n)$ that does a ``good'' job predicting $y_n$. We say that
+the mapping $g(\,\cdot\,)$ is ``good'' if it minimizes the Mean-Square
+Error (MSE) of the forecast:
 \begin{align}
-  \min_{g(\bsx_n)} \E\big[(y_n - h(\bsx_n))^2\big]
+  \min_{g(\,\cdot\,)} \; \E\big[(y_n - g(\bsx_n))^2\big]
   =
-  \min_{g(\bsx_n)} \E\left[\E\big[(y_n - h(\bsx_n))^2\big] \;|\;\bsx_n\right]
+  \min_{g(\,\cdot\,)}
+  \E\left[\E\big[(y_n - g(\bsx_n))^2\big] \;|\;\bsx_n\right]
   \label{nlsmotivation}
 \end{align}
 Using the second expression where we iterated expectations, it can be
-shown that the choice of $g(\bsx_n)$ that minimizes the MSE is the
+shown that the choice of $g(\,\cdot\,)$ that minimizes the MSE is the
 conditional expectation function (CEF): $g(\bsx_n)=\E[y_n|\bsx_n]$.
 This motivates the following definition.
 
@@ -10576,12 +10583,17 @@ $g(\bsx_n,\bstildetheta)$, the
   \frac{1}{N}\sumnN \big(y_n-g(\bsx_n,\bstildetheta)\big)^2
   \label{nls}
 \end{align}
+Note that this has first order condition
+$\bso = \sumnN \hat{\varepsilon}_n g'(\bsx_n,\bshattheta)$
+where $\hat{\varepsilon}_n := y_n-g(\bsx_n,\bshattheta)$.
+
 We should think of $g(\bsx_n,\bstildetheta)$ as a parametric form that
 \emph{actually is} or \emph{approximates} the true population CEF.
-Since the true population CEF necessarily minimizes the population
-analog of the above objective function in
-Expression~\ref{nlsmotivation}, we will fit a sample CEF or CEF
-approximation to minimize the sample version in Expression~\ref{nls}.
+Then, since the true population CEF $\E[y_n|\bsx_n]$ necessarily
+minimizes the population objective function in
+Expression~\ref{nlsmotivation}, we are fitting a \emph{sample} CEF (or
+CEF approximation) $g(\bsx_n,\bshattheta)$ to minimize the sample
+objective function in Expression~\ref{nls}.
 \end{defn}
 
 \begin{defn}(Ordinary Least Squares)
@@ -10596,7 +10608,7 @@ Given sample $\{y_n,\bsx_n\}\nN$, let $\{w_n\}\nN$ denote a set of
 weights for the observations. Then the \emph{weighted NLS estimator}
 solves
 \begin{align}
-  \bshattheta_{NLS}
+  \bshattheta_{WNLS}
   = \argmin_{\bstildetheta\in\bsTheta}
   \frac{1}{N}\sumnN w_n^2\big(y_n-g(\bsx_n,\bstildetheta)\big)^2
   \label{wnls}
@@ -10614,12 +10626,18 @@ The NLS estimator has asymptotic distribution
   \big]^{-1}
   \cdot
   \calN\big(0,\;
+  \underbrace{%
   \E\big[\varepsilon_n^2g'(\bsx_n,\bstheta)g'(\bsx_n,\bstheta)'\big]
+  }_{=\Var[\varepsilon_ng'(\bsx_n,\bstheta)]}
   \big)
 \end{align*}
-where $\varepsilon_n:=y_n-g(\bsx_n,\bstheta)$.
-Given $\bshattheta_{NLS}$, we can estimate quantities in asymptotic
-variance by
+where $\varepsilon_n:=y_n-g(\bsx_n,\bstheta)$.  We see that the second
+moment of $\varepsilon_n g'(\bsx_n,\bstheta)$ equals the variance
+because the population first order conditions require
+$\bso = \E[\varepsilon_n g'(\bsx_n,\bstheta)]$.
+
+Given $\bshattheta_{NLS}$, we can estimate population quantities in
+asymptotic variance by their sample counterparts
 \begin{align*}
   \frac{1}{N}\sumnN
   g'(\bsx_n,\bshattheta_{NLS})g'(\bsx_n,\bshattheta_{NLS})'
@@ -10643,7 +10661,7 @@ variance by
 \begin{cor}(Asymptotic Distribution of the OLS Esimtator)
 In the special case where $g$ is linear,
 $g(\bsx_n,\bstildebeta)=\bsx_n'\bstildebeta$ so that
-$g(\bsx_n,\bstildebeta)=\bsx_n$, the associated OLS estimator has
+$g'(\bsx_n,\bstildebeta)=\bsx_n$, the associated OLS estimator has
 asymptotic distribution
 \begin{align*}
   \sqrt{N}(\bshatbeta_{OLS}-\bsbeta)
@@ -10655,11 +10673,12 @@ asymptotic distribution
   \big)
 \end{align*}
 Note that these are the heteroskedasticity-robust standard errors. If we
-were willing to assume homoeskedasticy, the standard errors would
-simplify further.
+are willing to assume homoeskedasticy, then
+$\E[\varepsilon_n^2\bsx_n\bsx_n']=\E[\varepsilon_n^2]\cdot\E[\bsx_n\bsx_n']$
+and the standard errors simplify further.
 \end{cor}
 \begin{proof}
-Notice that the general NLS estimator is an $M$-estimator:
+Notice that the NLS estimator is an $M$-estimator:
 \begin{align*}
   \bshattheta_{NLS}
   = \argmin_{\bstildetheta\in\bsTheta}
@@ -10669,20 +10688,22 @@ Notice that the general NLS estimator is an $M$-estimator:
   q(y_n,\bsx_n,\bstildetheta):=
   \big(y_n-g(\bsx_n,\bstildetheta)\big)^2
 \end{align*}
-Recall the asymptotic distribution for a general M-estimator in terms of
-the derivatives of $q$:
-\begin{align*}
-  \sqrt{N}(\bshattheta_N-\bstheta)
-  \quad\dto\quad
-  \calN\big(0,\;
-  \E\big[q''(y_n,\bsx_n,\bstheta)\big]^{-1}
-  \;
-  \Var\big[q'(y_n,\bsx_n,\bstheta)\big]
-  \;
-  \E\big[q''(y_n,\bsx_n,\bstheta)\big]^{-1}
-  \big)
-\end{align*}
-We now just need to compute the derivatives of our particular $q$:
+%Recall the asymptotic distribution for a general M-estimator in terms of
+%the derivatives of $q$:
+%\begin{align*}
+  %\sqrt{N}(\bshattheta_N-\bstheta)
+  %\quad\dto\quad
+  %\calN\big(0,\;
+  %\E\big[q''(y_n,\bsx_n,\bstheta)\big]^{-1}
+  %\;
+  %\Var\big[q'(y_n,\bsx_n,\bstheta)\big]
+  %\;
+  %\E\big[q''(y_n,\bsx_n,\bstheta)\big]^{-1}
+  %\big)
+%\end{align*}
+We now just need to compute the derivatives of our particular $q$ and
+apply Proposition~\ref{prop:masymp}, which gave the asymptotic
+distribution for general M-estimators in terms of derivatives of $q$.
 \begin{align*}
   q'(y_n,\bsx_n,\bstheta)
   &= \frac{\partial}{\partial \bstildetheta}
@@ -10734,21 +10755,22 @@ compute moments:
   \big]
   \label{nlsproof}
 \end{align}
-And that is enough to plug into the formulas for the desired result.
+And that is enough to plug into Proposition~\ref{prop:masymp} for the
+desired result.
 
 Final note: the simplification to Line~\ref{nlsproof} required
 elimination of the $-2\varepsilon_ng''(\bsx_n,\bstheta)$ term. This
 followed because $\bstheta$ must satisfy the population first order
 necessary conditions, of the minimization problem, which say that
 \begin{align*}
-  0 =
+  \bso =
   \E\big[q'(y_n,\bsx_n,\bstheta)\big]
   &=
   -2\E\big[\varepsilon_ng'(\bsx_n,\bstheta)\big]
 \end{align*}
-Iterating expectations, this says
+Iterating expectations, this last line says
 \begin{align*}
-  0 &=
+  \bso &=
   -2\E\left[
     \E\big[\varepsilon_ng'(\bsx_n,\bstheta)\;|\bsx_n\big]
   \right]
@@ -10757,8 +10779,8 @@ Iterating expectations, this says
     g'(\bsx_n,\bstheta)\cdot \E[\varepsilon_n|\bsx_n]
   \big]
 \end{align*}
-In general, $g'(\bsx_n,\bstheta)\neq 0$, so this implies that
-$\E[\varepsilon_n|\bsx_n]=0$. That is enough, since then
+In general, $g'(\bsx_n,\bstheta)\neq \bso$, so this implies that
+$\E[\varepsilon_n|\bsx_n]=0$. That is sufficient, since then
 \begin{align*}
   \E\big[
   \varepsilon_n
@@ -10778,7 +10800,7 @@ $\E[\varepsilon_n|\bsx_n]=0$. That is enough, since then
   \cdot
   \E[ \varepsilon_n |\bsx_n ]
   \right]
-  =0
+  =\bso
 \end{align*}
 \end{proof}
 
