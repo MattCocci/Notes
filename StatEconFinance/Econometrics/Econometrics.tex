@@ -292,6 +292,8 @@
 \newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
 \newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
 \newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
 
 % Zero vector as \bso
 \renewcommand{\bso}{\boldsymbol{0}}
@@ -10809,30 +10811,30 @@ $\E[\varepsilon_n|\bsx_n]=0$. That is sufficient, since then
 \subsection{Maximum Likelihood Estimation (MLE)}
 
 Maximum likelihood is another framework for estimating parameters from
-the data. The big insight of MLE is to invert our thinking about the
-data generating process and think in terms of likelihoods. In
-particular, suppose we consider a random sample $\bsy_{1:N}$ which has
-true joint likelihood function $f(\bsy_{1:N}|\bstheta)$. There are two
-ways to think about the object $f(\bsy_{1:N}|\bstheta)$:
+the data. The big insight of MLE is to turn the joint probability
+density function on its head and instead think in terms of likelihoods.
+To draw this distinction, we now contrast the density and the
+likelihood:
 \begin{enumerate}[label=(\roman*)]
-  \item Probability theory says that if you know $\bstheta$, you know
-    the data generating process of $\bsy_{1:N}$. You can use
-    $f(\bsy_{1:N}|\bstheta)$ to make probability statements about the
-    distribution and expected realizations of $\bsy_{1:N}$ \emph{ex ante},
-    before observing any data. In that case, $f(\bsy_{1:N}|\bstheta)$ is
-    a map from some hypothetical sample realization $\bsy_{1:N}$ to the
-    probablity of observing that realization if you actually draw a
-    sample.
+  \item Given \emph{fixed}, \emph{known}, true parameter $\bstheta$,
+    $f(\bsy_{1:N}|\bstheta)$ is a \emph{density} function (of
+    $\bsy_{1:N}$) that defines the data generating process.  Given that
+    density, you can make probability statements about the distribution
+    and expected realizations of sample $\bsy_{1:N}$ \emph{ex ante},
+    before observing any data. The density is simply a map from some
+    hypothetical sample realization $\bsy_{1:N}$ to the probablity of
+    observing that realization if you draw a sample.
 
-  \item The MLE approach to estimation inverts that. MLE
-    says instead that \emph{you have an already-realized sample}
-    $\bsy_{1:N}$, but you don't know $\bstheta$.  You therefore think
-    about $f(\bsy_{1:N}|\bstildetheta)$ as a map from hypothetical
-    $\bstildetheta$ (not hypothetical $\bsy_n$) to the the probability
-    of \emph{having observed your realized sample $\bsy_{1:N}$}, given
-    that $\bstildetheta$ was the true parameter vector. Maximum
-    likelihood estimation then says to choose as $\bshattheta$ the
-    vector that would have delivered the highest \emph{ex ante}
+  \item The \emph{likelihood} inverts that thinking. Specifically, we
+    treat our \emph{sample} as fixed, supposing that
+    \emph{we have an already-realized sample} $\bsy_{1:N}$ but we don't
+    know $\bstheta$.  We therefore think about
+    $f(\bsy_{1:N}|\bstildetheta)$ as a map from hypothetical
+    $\bstildetheta$ to the the probability of
+    \emph{having observed realized sample $\bsy_{1:N}$},
+    given that $\bstildetheta$ was the true parameter vector all along.
+    Maximum likelihood estimation then says to choose as $\bshattheta$
+    the vector that would have delivered the highest \emph{ex ante}
     probability of observing the actual realized sample $\bsy_{1:N}$.
 \end{enumerate}
 Now this is all well and good, but we wouldn't care about this logic if
@@ -10851,7 +10853,8 @@ has parameteric form $f(\bsy_{1:N}|\bstildetheta)$. Then the
   &=
   \argmax_{\bstildetheta} f(\bsy_{1:N}|\bstildetheta)
   =
-  \argmax_{\bstildetheta} \ln f(\bsy_{1:N}|\bstildetheta)
+  \argmax_{\bstildetheta}\;
+  \ln f(\bsy_{1:N}|\bstildetheta)
   \label{mlelik}
 \end{align}
 In practice, we almost always work with the log-likelihood. First, in
@@ -10864,9 +10867,10 @@ many observations, so working with the log-likelihood is more stable
 numerically.
 
 Finally, for simple cases, we can often solve the maximization problem
-analytically. We do so by looking at the first order conditions to the
-maximization problem and solving to get the parameter(s) in terms of the
-sample observations. That will generate a map from the sample to the MLE
+analytically. We do so by looking at the first order conditions to
+Maximization Problem~\ref{mlelik}, then solving those first order
+conditions to write the parameter(s) as a function of of the sample
+observations. That will generate a map from the sample to the MLE
 parameter estimates. This approach can also incorporate constraints,
 since we can just use constrained optimization techniques.
 \end{defn}
@@ -10920,7 +10924,7 @@ MLE relies heavily on the assumption that the true likelihood
 \emph{really is} $f(\bsy_{1:N}|\bstildetheta)$, and that all you need to
 do is find the true $\bstheta$ to plug in for $\bstildetheta$. It
 doesn't allow for the fact that you've misspecified your model, i.e.\
-that $f(\bsy_{1:N}|\bstildetheta)$ was, flat out, the wrong likelihood
+that $f(\bsy_{1:N}|\bstildetheta)$ was a flat-out wrong likelihood
 function. So in the case of misspecification, it might \emph{not} be the
 lowest-variance efficient estimator, and we might prefer other
 alternatives. Below, we will see a test for misspecification and a word
@@ -10965,9 +10969,9 @@ observation.
 The maximization problem has FOCs for the sample and the population,
 respectively, of
 \begin{align*}
-  \bso = \sumnN q'(\bsy_n,\bshattheta)
+  \bso = \sumnN q'(\bsy_n,\bshattheta_{MLE})
   =
-  \sumnN S(\bshattheta,\bsy_n)
+  \sumnN S(\bshattheta_{MLE},\bsy_n)
   \qquad
   \bso
   = \E\big[q'(\bsy_n,\bstheta)\big]
@@ -10984,12 +10988,14 @@ We have now set up enough to move onto the proofs.
     \begin{align*}
       \bshattheta_{MLE}
       &=
-      \argmax_{\bstildetheta} \sumnN \ln f(\bsy_{n}|\bstildetheta)
+      \argmax_{\bstildetheta}
+      \frac{1}{N}
+      \sumnN \ln f(\bsy_{n}|\bstildetheta)
     \end{align*}
     Note that as the sample size grows, the LLN gives us
     \begin{align*}
-      \frac{1}{N}\sumnN q(\bsy_n,\bstildetheta)
-      =
+      %\frac{1}{N}\sumnN q(\bsy_n,\bstildetheta)
+      %=
       \frac{1}{N} \sumnN \ln f(\bsy_n|\bstildetheta)
       \quad\pto\quad
       \E_{\bsy|\bstheta}\big[\ln f(\bsy_n|\bstildetheta)\big]
@@ -11090,12 +11096,14 @@ We have now set up enough to move onto the proofs.
         \frac{\partial^2 \ln f(\bsy_n|\bstheta)}{%
           \partial \bstildetheta \,\partial \bstildetheta'}
         \right]
+      =
+      \Var S(\bstheta,\bsy_n)
       = \Var\left[
         \frac{\partial \ln f(\bsy_n|\bstheta)}{%
           \partial \bstildetheta}
         \right]
     \end{align*}
-    So the above expression for asymptotic variance was
+    So the above expression for asymptotic variance is
     $\calI^{-1}\calI\calI^{-1}$, which simplifies to $\calI^{-1}$.
 \end{enumerate}
 \end{proof}
@@ -11122,7 +11130,7 @@ We have now set up enough to move onto the proofs.
       %\end{proof}
 %\end{enumerate}
 
-\subsubsection{Misspecification}
+\subsubsection{Misspecification and Kullback-Leibler Divergence}
 
 Throughout this section, we consider what happens when we have a random
 variable $\bsy$, but we misspecify $\bsy$'s likelihood function.
@@ -11214,12 +11222,102 @@ where
   \qquad
   q''(\bsy_n,\bstildetheta)
   =
-  \frac{\partial^2 \ln f(\bsy_n|\bstildetheta)}{%
+  \frac{\partial^2 \ln g(\bsy_n|\bstildetheta)}{%
     \partial\bstildetheta\,\partial\bstildetheta'}
 \end{align*}
 From there, we just apply the usual formulas.
 \end{proof}
 
+
+\clearpage
+\begin{defn}(Kullback-Leibler Divergence)
+Let $f$ and $g$ be densities. Define the
+\emph{Kullback-Leibler Divergence} as
+\begin{align*}
+  K(g,f)
+  &= \int \ln\left(\frac{g(z)}{f(z)} \right) g(z)\;dz
+  =: \E_g\left[
+  \ln\left(\frac{g(z)}{f(z)} \right)
+  \right]
+\end{align*}
+This is \textbf{not} a \emph{metric} since it is not symmetric. It is,
+however, a divergence since
+\begin{align*}
+  K(g,f)
+  &= \E_g\left[
+  -\ln\left(\frac{f(z)}{g(z)}\right)
+  \right] \\
+  \text{By Jensen's Inequality}\quad
+  &\geq
+  -\ln\left(
+  \E_g\left[
+  \frac{f(z)}{g(z)}
+  \right]  \right)
+  =
+  -\ln\left(
+  \int
+  \frac{f(z)}{g(z)}
+  g(z)
+  \right)
+  \\
+  \implies\quad
+  K(g,f)
+  &\geq
+  -\ln\left(
+  \int
+  f(z)
+  \right)
+  = -\ln(1) = 0
+\end{align*}
+\end{defn}
+
+\begin{prop}\emph{(Misspecified MLE Minimizes KL Divergence)}
+Suppose that the true density for random variable $\bsy_n$ is
+$g(\bsy_n)$, but we mistakenly assume the density is in parametric
+family $f(\bsy_n|\bstildetheta)$. Then all we can say about the pseudo
+``MLE'' estimate $\bshattheta_{KL}$---computed assuming
+$f(\bsy_n|\bstildetheta)$---is that it is a consistent estimator for the
+parameter vector $\bstheta_{KL}$ that minimizes the KL divergence
+between densities $g$ and $f(\,\cdot\,|\bstildetheta)$.
+\end{prop}
+\begin{proof}
+Let's start by looking at the objective function for the misspecified
+pseudo-MLE:
+\begin{align*}
+  \bshattheta_{KL}
+  &=
+  \argmax_{\bstildetheta}\;
+  \frac{1}{N} \sumnN
+  \ln f(\bsy_n|\bstildetheta)
+  \quad
+  \pto\quad
+  \argmax_{\bstildetheta}\;
+  \E_g\left[
+  \ln f(\bsy_n|\bstildetheta)
+  \right]
+\end{align*}
+Where the expectation is take with respect to the true data density,
+$g(\bsy_n)$. Now consider the KL divergence between $g$ and $f$:
+\begin{align*}
+  K\big(g,f(\,\cdot\,|\bstildetheta)\big)
+  &= \E_g\left[
+  \ln\left(\frac{g(\bsy_n)}{f(\bsy_n|\bstildetheta)}\right)
+  \right]
+  =
+  \E_g\left[
+  \ln g(\bsy_n)
+  \right]
+  -
+  \E_g\left[
+  \ln f(\bsy_n|\bstildetheta))
+  \right]
+\end{align*}
+The first term is a constant with respect to $\bstildetheta$. Therefore,
+it's obvious that the minimizer of this expression---the $\bstildetheta$
+that minimizes the KL divergence between $g$ and
+$f(\,\cdot\,|\bstildetheta)$---must also necessarily solve the
+maximization problem above that defined $\bshattheta_{KL}$.
+\end{proof}
 
 
 \clearpage
@@ -11236,17 +11334,17 @@ zero vector:
 \begin{align}
   \label{populationMomentConditions}
   \bsg(\bstheta) := \E[\bsg_n(\bstheta) ]
-  = \E[\bsf(\bsy_n,\bstheta)] = \bso
+  := \E[\bsf(\bsy_n,\bstheta)] = \bso
 \end{align}
-where $\bsg:\R^P\ra \R^M$. Notice that we introduced the shorthand
-notation $\bsg_n(\bstildetheta):=\bsf(\bsy_n,\bstildetheta)$.
+Notice we introduced shorthand notation
+$\bsg_n(\bstildetheta):=\bsf(\bsy_n,\bstildetheta)$
+and $\bsg(\bstildetheta):=\E[\bsg_n(\bstildetheta)]$.
 Our goal is to estimate true $\bstheta$. Quite sensibly, we can estimate
-parameters by drawing a sample $\{\bsy_n\}\nN$, constructing
-$\bsg_n(\bstildetheta)$, and then forming the sample analog $\bsg_N$ of
-the moment conditions
+parameters by drawing a sample $\{\bsy_n\}\nN$ and constructing the
+sample analog of the population moment conditions:
 \begin{align}
   \label{sampleMomentConditions}
-  \bsg_N(\bstildetheta) :=
+  \bsbarg_N(\bstildetheta) :=
   \frac{1}{N} \sumnN \bsg_n(\bstildetheta)
   =
   \frac{1}{N} \sumnN \bsf(\bsy_n,\bstildetheta)
@@ -11263,9 +11361,9 @@ exactly. Therefore, we define the \emph{method of moments estimator} as
 the solution $\bshattheta$ to the following system of
 equations:
 \begin{align*}
-  \bsg_N(\bshattheta) &= \bso
+  \bsbarg_N(\bshattheta) &= \bso
   \qquad\text{when}\quad
-  \bsg_N,\bshattheta \in\R^P
+  \bsbarg_N,\bshattheta \in\R^P
 \end{align*}
 \end{defn}
 
@@ -11274,10 +11372,10 @@ equations:
 \label{defn:gmm}
 When there are more moment conditions than parameters, i.e.\ when $M>P$
 so that the model is \emph{overidentified}, we cannot generally set the
-sample analog of the moment conditions $\bsg_N(\bstildetheta)$ to zero
+sample analog of the moment conditions $\bsbarg_N(\bstildetheta)$ to zero
 \emph{exactly} using some $P$-dimensional $\bstildetheta$.
 Therefore, we instead look for the parameter vector that gets the
-squared-weighted elements of vector $\bsg_N(\bstildetheta)$ jointly as
+squared-weighted elements of vector $\bsbarg_N(\bstildetheta)$ jointly as
 \emph{close} to the scalar zero as possible:
 \begin{align}
   \bshattheta(\bshatW) :=&\;
@@ -11286,7 +11384,7 @@ squared-weighted elements of vector $\bsg_N(\bstildetheta)$ jointly as
   \text{where}\quad
   J(\bstildetheta,\bshatW)
   :=&\;
-  N\cdot \bsg_N(\bstildetheta)' \, \bshatW \, \bsg_N(\bstildetheta)
+  N\cdot \bsbarg_N(\bstildetheta)' \, \bshatW \, \bsbarg_N(\bstildetheta)
   \notag
 \end{align}
 where $\bshattheta(\bshatW)$ is called
@@ -11299,8 +11397,8 @@ crucially on the choice of weighting matrix, which can possibly weight
 the different moment conditions asymmetrically, emphasizing some over
 others.
 We'll talk about choices of the weighting matrix
-$\boldsymbol{W}$ later on. For now though, you might reasonably just
-choose $\boldsymbol{W}=\boldsymbol{I}$, treating all moments
+later on. For now though, you might reasonably just
+choose $\bshatW=\boldsymbol{I}$, treating all moments
 equally.
 But later on, we'll see that most estimators that we care about can be
 expressed as a GMM estimator given an appropriate choice of moment
@@ -11323,12 +11421,12 @@ In particular, rather than solve minimization Problem~\ref{eq:bhatmin},
 the GMM estimator $\bshattheta(\bshata)$ solves this modified, but
 exactly-identified variation on the original moment conditions:
 \begin{align}
-  \bshata \; \bsg_N\big(\bshattheta(\bshata)\big) &= \bso
+  \bshata \; \bsbarg_N\big(\bshattheta(\bshata)\big) &= \bso
   \qquad\text{where}\quad
   \bshattheta(\bshata) \in\R^P\quad \bshata \in \R^{P\times M}
   \label{eq:bhatmina}
 \end{align}
-We see that $\bshata\,\bsg_N(\bstildetheta)$ is like a new set of moment
+We see that $\bshata\,\bsbarg_N(\bstildetheta)$ is like a new set of moment
 conditions, but with the dimensionality reduced from $M>P$ to $P$ so
 that we \emph{can} set this to zero for some
 $\bshattheta(\bshata)\in\R^P$. And we again use notation
@@ -11337,21 +11435,25 @@ choice of $\bshata$.
 
 This selection matrix can depend upon the data---hence the hat in
 $\bshata$. It could also, for example, be mostly ones and zeros to pick
-out the moments in $\bsg_N(\bstildetheta)$ (or form linear combinations
+out the moments in $\bsbarg_N(\bstildetheta)$ (or form linear combinations
 of moments) that we think are most important and definitely want to
 force to zero. But in general, it really can be any arbitrary matrix in
-$R^{P\times M}$.
+$\R^{P\times M}$.
 
-Lastly, just to tie things together, this is actually equivalent to
-Definition~\ref{defn:gmm} if you choose $\bshata$ based on the FOCs to
-the minimization problem defined by Equation~\ref{eq:bhatmin}:
+Lastly, just to tie things together, we can make this
+approach/definition equaivalent to Definition~\ref{defn:gmm} by choosing
+$\bshata$ in a particular way. Specifically, consider the FOCs to the
+minimization problem defined by Equation~\ref{eq:bhatmin}:
 \begin{align}
   \bso
   =
-  \underbrace{\frac{\partial \bsg_N'}{\partial \bstildetheta} \bshatW}_{\bshata}
-  \;\bsg_N(\bstildetheta)
+  \underbrace{\frac{\partial \bsbarg_N'}{\partial \bstildetheta} \bshatW}_{\bshata}
+  \;\bsbarg_N(\bstildetheta)
   \label{eq:equivrep}
 \end{align}
+If, we choose
+$\bshata=\frac{\partial \bsbarg_N'}{\partial \bstildetheta} \bshatW$,
+then $\bshattheta(\bshatW)=\bshattheta(\bshata)$.
 \end{defn}
 
 
@@ -11364,17 +11466,17 @@ The GMM estimator $\bshattheta(\bshatW)$ that solves
   \bshattheta(\bshatW)
   &=
   \argmin_{\bstildetheta}\;
-  N \cdot \bsg_N(\bstildetheta)' \,\bshatW \,\bsg_N(\bstildetheta)
+  N \cdot \bsbarg_N(\bstildetheta)' \,\bshatW \,\bsbarg_N(\bstildetheta)
   \qquad
   \text{where}\quad
-  \bsg_N(\bstildetheta)
+  \bsbarg_N(\bstildetheta)
   := \frac{1}{N}\sumnN
   \underbrace{\bsg_n(\bstildetheta)}_{\bsf_n(\bsy_n,\bstildetheta)}
 \end{align*}
-where $\bshatW\pto\bsW$ (a positive definite matrix)
+for $\bshatW\pto\bsW$ (a positive definite matrix)
 has asymptotic distribution
 \begin{align*}
-  \sqrt{N}(\bshattheta(\bshatW)-\bstheta)
+  \sqrt{N}\big(\bshattheta(\bshatW)-\bstheta\big)
   \quad&\dto\quad
   \big( \bsG' \bsW \bsG \big)^{-1}
   \bsG \bsW
@@ -11382,12 +11484,14 @@ has asymptotic distribution
   \calN\big(\bso,\bsOmega\big)
   \\
   \text{where}\quad
-  \bsOmega &:= \Var[\bsg_n(\bstheta)] \\
+  \bsOmega &:= \Var[\bsg_n(\bstheta)]
+  = \E[\bsg_n(\bstheta)\bsg_n(\bstheta)']
+  \\
   \bsG &:= \E\left[
-    \frac{\partial \bsg(\bstheta)}{\partial \bstildetheta'}
+    \frac{\partial \bsg_n(\bstheta)}{\partial \bstildetheta'}
   \right]
 \end{align*}
-To be clear, $\bsG$ is the Jacobian matrix of the function
+To be clear, $\bsG$ is the expected Jacobian matrix of
 $\bsg_n(\bstildetheta)$ evaluated at true $\bstheta$.
 \end{prop}
 \begin{proof}
@@ -11395,12 +11499,12 @@ For notational convenience, we will simply write $\bshattheta$, rather
 that $\bshattheta(\bshatW)$ throughout this proof. Though it should be
 understood that the estimator depends upon the choice of weighting
 matrix $\bshatW$.
-We also define the Jacobian matrix of $\bsg_N$, evaluated at arbitrary
+We also define the Jacobian matrix of $\bsbarg_N$, evaluated at arbitrary
 $\bsbartheta$:
 \begin{align*}
   \bsG_N(\bsbartheta)
   =
-  \frac{\partial \bsg_N(\bsbartheta)}{\partial \bstildetheta'}
+  \frac{\partial \bsbarg_N(\bsbartheta)}{\partial \bstildetheta'}
   =
   \frac{1}{N}
   \sumnN
@@ -11412,21 +11516,22 @@ the first order necessary conditions of its defining maximization
 problem, i.e.\ we must have:
 \begin{align*}
   \bso &=
-  \frac{\partial \bsg_N(\bshattheta)'}{\partial \bstildetheta}
-  \, \bshatW \, \bsg_N(\bshattheta)
+  \frac{\partial \bsbarg_N(\bshattheta)'}{\partial \bstildetheta}
+  \, \bshatW \, \bsbarg_N(\bshattheta)
   =
   \bsG_N(\bshattheta)'
-  \, \bshatW \, \bsg_N(\bshattheta)
+  \, \bshatW \, \bsbarg_N(\bshattheta)
 \end{align*}
 This is $P$ equations in $P$ unknowns (the elements of $\bshattheta$).
 To derive the asymptotic distribution, do a first order Taylor expansion
-of each equation about the true value $\bstheta$:
+of $\bsbarg_N(\bshattheta)$ for each equation about the true value
+$\bstheta$:
 \begin{align}
   \bso &=
   \bsG_N(\bshattheta)'
   \, \bshatW \,
   \big(
-  \bsg_N(\bstheta)
+  \bsbarg_N(\bstheta)
   +
   \bsG_N(\bsbartheta)
   (\bshattheta-\bstheta)
@@ -11442,10 +11547,14 @@ of each equation about the true value $\bstheta$:
   \, \bshatW \,
   \bsG_N(\bsbartheta)
   \big)^{-1}
+  \big(
   \bsG_N(\bshattheta)'
   \, \bshatW \,
+  \big)
+  \big(
   \sqrt{N}
-  \bsg_N(\bstheta)
+  \bsbarg_N(\bstheta)
+  \big)
   \label{gmm:proof}
 \end{align}
 for some $\bsbartheta$ in between true $\bstheta$ and estimate
@@ -11459,7 +11568,7 @@ We now consider the asymptotic properties of the elements on the RHS of
 Equation~\ref{gmm:proof}. First, by the CLT
 \begin{align*}
   \sqrt{N}
-  \bsg_N(\bstheta)
+  \bsbarg_N(\bstheta)
   =
   \frac{1}{\sqrt{N}}
   \sumnN
@@ -11499,7 +11608,7 @@ results to the terms in Expression~\ref{gmm:proof} individually,
   }
   \quad
   \underbrace{%
-    \bsG_N(\bshattheta)
+    \bsG_N(\bsbartheta)
   }_{%
     \pto \bsG
     \vphantom{\bsG(\bshattheta)'}
@@ -11522,7 +11631,7 @@ results to the terms in Expression~\ref{gmm:proof} individually,
   \quad
   \underbrace{%
   \sqrt{N}
-  \bsg_N(\bstheta)
+  \bsbarg_N(\bstheta)
   }_{\dto\calN\big(\bso,\bsOmega\big)}
 \end{align*}
 From there, we can invoke the continuous mapping theorem to string
@@ -11541,6 +11650,18 @@ everything together and arrive at the asymptotic distribution:
 \clearpage
 \subsubsection{Efficient GMM}
 
+GMM is always consistent, but can we do better?
+Often our goal will be to obtain not just consistent estimators, but
+also \emph{efficient} GMM estimators, i.e.\ estimators $\bshattheta$
+with the lowest possible asymptotic variance.
+
+But \textbf{note}: This section is only relevant when $M>P$, i.e.\ there
+are more moment conditions than parameters. When $M=P$, we can set
+$\bsbarg_N(\bshattheta)=\bso$ exactly to get the method of moments
+estimator. This estimator is efficient \emph{always} and has
+asymptotic variance $(\bsG'\bsOmega^{-1}\bsG)^{-1}$ regardless of
+the weighting matrix (which is moot anyway).
+
 \begin{prop}\emph{(Efficient GMM under Optimal Weighting Matrix)}
 The choice of weighting matrix $\bsW$ that delivers the lowest asymptotic
 variance is $\bsW=\bsOmega^{-1}=\Var[\bsg_n(\bstheta)]^{-1}$, in which
@@ -11552,38 +11673,52 @@ case the asymptotic variance formulas simplify to
 \end{align*}
 \end{prop}
 
+\begin{rmk}
+Here's the intuition for why
+$\bsW=\bsOmega^{-1}=\Var[\bsg_n(\bstheta)]^{-1}$ is the efficient
+choice:
+We're weighting each moment condition by its inverse variance.
+Therefore, when computing $\bshattheta(\bshatW)$, we overweight moment
+conditions with low variance, i.e.\ those moment conditions we have the
+best chance of estimating precisely.  We underweight the high variance
+moment conditions, which would likely just contribute noise to our
+choice of $\bshattheta$.
+\end{rmk}
+
 
 \begin{defn}(Two-Step Efficient GMM Estimators)
-Often our goal will be to obtain not just consistent estimators, but
-also \emph{efficient} GMM estimators, i.e.\ estimators
-$\bshattheta$ with the lowest possible asymptotic variance.
-But this typically presents the following chicken and egg problem:
-\begin{enumerate}[label=(\roman*)]
-  \item Obtaining the efficient GMM estimator, call it $\bshattheta_2$,
-    often requires using a specific/specially-chosen weighting matrix,
-    call it $\bshatW_2$.
-  \item However, the weighting matrix $\bshatW_2$ that
-    delivers the the efficient estimator is often a function of the true
-    parameter vector $\bstheta$. Since we don't know the true parameter
-    vector, we approximate it by a consistent estimate called
-    $\bshattheta_1$.
-\end{enumerate}
-That's the problem: (i) requires $\bshatW_2$ to get efficient
-$\bshattheta_2$, while (ii) requires some consistent estimate
-$\bshattheta_1$ to get the appropriate $\bshatW_2$.
-For this reason, efficient estimation is typically carried out in two
-steps:
+In practice, we often cannot obtain the efficient estimate right off the
+bat.
+The first problem is that we typically don't know the population
+quantity $\bsOmega=\Var[\bsg_n(\bstheta)]$. Therefore, we
+can't just set our weighting matrix to be $\bsW=\bsOmega^{-1}$.
+Of course, we can do the next-best thing: use a consistent estimator
+$\bshatOmega^{-1}\pto\bsOmega^{-1}$ as our weighting matrix instead. But
+that often brings us to a second problem: constructing a consistent
+estimator for $\bsOmega$ typically requires the true $\bstheta$, which
+we don't know. Again, we can get around that by using a consistent
+estimator for $\bstheta$.
+
+All of this suggests the following procedure for obtaining the
+so-called \emph{Two-Step Efficient GMM Estimator}:
 \begin{enumerate}
   \item Choose some arbitrary $\bshatW_1$ ($\bsI$ often works) and solve
-    Expression~\ref{eq:bhatmin} for a preliminary ``inefficient'', but
-    consistent estimator $\bshattheta_1$.
-  \item Use $\bshattheta_1$ to compute the second-stage efficient
-    weighting matrix $\bshatW_2$, and then use this to solve
-    Expression~\ref{eq:bhatmin} again for the now efficient GMM
-    estimator $\bshattheta_2$.
+    for a preliminary ``inefficient'' (but still consistent) estimator
+    $\bshattheta(\bshatW_1)$.
+  \item Use $\bshattheta(\bshatW_1)$ to compute a second-stage weighting
+    matrix $\bshatW_2$ that is a consistent estimator for
+    $\bsOmega^{-1}=\Var[\bsg_n(\bstheta)]^{-1}$. Then use this to solve
+    for the two-step efficient GMM estimator $\bshattheta(\bshatW_2)$.
 \end{enumerate}
-This is all very general, but there will be specific examples of this
-procedure below.
+Note that this is not quite ``efficient''---it's only ``two-step
+efficient''---because our final weighting matrix $\bshatW_2$ is not
+true $\bsOmega^{-1}$, but rather a consistent estimator for that.
+Moreover, our consistent estimator $\bshatW_2$ depends on our initial
+choice of $\bshatW_1$, which was ad-hoc. Therefore, the ``quality'' of
+$\bshatW_2\pto\bsOmega^{-1}$ (i.e. whether it really is a good
+approximation of $\bsOmega^{-1}$) will depend on our initial ad-hoc
+choice of $\bshatW_1$. The next section offers an alternative that
+remedies this slightly undesireable feature.
 \end{defn}
 \begin{rmk}
 The above approach was described for the $\bshatW$ weighting-matrix
@@ -11591,8 +11726,98 @@ approach of Expression~\ref{eq:bhatmin}. But it also applies analogously
 to the moment selection approach with $\bshata$.
 \end{rmk}
 
+
 \clearpage
 \subsubsection{Continuously Updated GMM Estimator (CUE)}
+
+We can think of iterating on the two-step procedure of the last section
+to obtain higher-quality consistent estimators of the efficient
+weighting matrix $\bsOmega^{-1}=\Var[\bsg_n(\bstheta)]^{-1}$. In
+particular, we might guess a weighting matrix $\bshatW_i$, solve for
+$\bshattheta(\bshatW_i)$, use it to compute/update
+$\bshatW_{i+1}\pto\bsOmega^{-1}$, and repeat until $\bshatW_i$ converges
+to some really good approximation of efficient $\bsOmega^{-1}$. This
+next GMM estimator effectively formalizes that and does it all in one
+step (without iterating).
+
+\begin{defn}(Continuously Updating GMM Estimator)
+We define the \emph{Continuously Updating GMM Estimator} (CUE)
+as
+\begin{align}
+  \bshattheta_{CUE}
+  &=
+  \argmin_{\bstildetheta}\;
+  \bsbarg_N(\bstildetheta)'
+  \left(
+  \frac{1}{N}
+  \sumnN
+  \bsg_n(\bstildetheta)
+  \bsg_n(\bstildetheta)'
+  \right)^{-1}
+  \bsbarg_N(\bstildetheta)'
+  \label{gmm:cue}
+  \\
+  \text{where}\quad
+  \bsbarg_N(\bstildetheta)
+  &:= \frac{1}{N}\sumnN \bsg_n(\bstildetheta)
+  \notag
+\end{align}
+Notice that, by the LLN, the weighting matrix that we're using converges
+to $\E[\bsg_n(\bstheta)\bsg_n(\bstheta)']^{-1}$, which precisely equals
+$\bsOmega^{-1}=\Var[\bsg_n(\bstheta)]^{-1}$ since,
+by assumption, $\E[\bsg_n(\bstheta)]=\bso$.
+Advantages of this approach include
+\begin{enumerate}[label=(\roman*)]
+  \item Using a weighting matrix that is consistent for the efficient
+    weighting matrix $\bsOmega^{-1}$, but \emph{without} using an ad-hoc
+    first stage weighting matrix
+  \item Invariant to rotation of $\bsg_n(\bstildetheta)$.
+\end{enumerate}
+\end{defn}
+
+\begin{defn}(CUE Alternative)
+We can also use a different estimate of the efficient weighting matrix
+to define a CUE alternative that might be more appropriate in finite
+samples:
+\begin{align}
+  \bshattheta
+  &=
+  \argmin_{\bstildetheta}\;
+  \bsbarg_N(\bstildetheta)'
+  \,
+  \bsW(\bstildetheta)
+  \,
+  \bsbarg_N(\bstildetheta)'
+  \label{gmm:cue2}
+  \\
+  \text{where}\quad
+  \bsW(\bstildetheta)
+  &=
+  \left(
+  \frac{1}{N}
+  \sumnN
+  \big(
+  \bsg_n(\bstildetheta)
+  -
+  \bsbarg_N(\bstildetheta)
+  \big)
+  \big(
+  \bsg_n(\bstildetheta)
+  -
+  \bsbarg_N(\bstildetheta)
+  \big)'
+  \right)^{-1}
+  \notag
+\end{align}
+Why is this useful?
+As we said before, we can't generally get $\bsbarg_N(\bshattheta)=\bso$
+when $M>P$, i.e. when there are more moment conditions that parameters.
+Therefore, $\bsbarg_N(\bstildetheta)\neq\bso$ generally and the weighting
+matrix in Expression~\ref{gmm:cue} is the inverse sample \emph{second
+moment}, not the inverse sample \emph{variance}.
+By de-meaning, Expression~\ref{gmm:cue2} uses the inverse sample
+variance as the weighting matrix instead.
+\end{defn}
 
 \clearpage
 \subsubsection{Example: OLS as a GMM Estimator}
@@ -11606,17 +11831,19 @@ estimator. In particular, take the model
   \E[(y_n-\bsx_n'\bsbeta)\bsx_n] = \bso
 \end{align*}
 The orthogonality condition $\bsg(\bsbeta)=\E[\varepsilon_n\bsx_n']=\bso$
-will be the moment condition to use. Therefore, we form $\bsg_N$, the
+will be the moment condition to use. Therefore, we form $\bsbarg_N$, the
 sample analog of $\bsg$,
 \begin{align*}
-  \bsg_N(\bsb) &= \frac{1}{N}\sumnN (y_n-\bsx_n'\bsb)\bsx_n
+  \bsbarg_N(\bsb) &= \frac{1}{N}\sumnN (y_n-\bsx_n'\bsb)\bsx_n
   = \frac{1}{N}\bsX'(\bsy - \bsX\bsb)
 \end{align*}
-and estimate the parameters using identity weighting matrix
-$\bsW = \bsI_K$ (ignoring constants like $N$ or $\frac{1}{N}$):
+and estimate the parameters using identity weighting matrix $\bsW =
+\bsI_K$ (ignoring constants like $N$ or $\frac{1}{N}$). Note that the
+weighing matrix won't matter anyway since there are as many parameters
+as moment conditions.
 \begin{align*}
   \bshatbeta(\bsI_K)
-  &= \argmin_{\bsb} \; \bsg_N(\bsb)' \, \bsI_K \, \bsg_N(\bsb) \\
+  &= \argmin_{\bsb} \; \bsbarg_N(\bsb)' \, \bsI_K \, \bsbarg_N(\bsb) \\
   &= \argmin_{\bsb} \;
     (\bsy - \bsX\bsb)'\bsX \bsI_K \bsX'(\bsy - \bsX\bsb)
 \end{align*}
@@ -13667,7 +13894,7 @@ These results and estimators can be used to conduct the following tests:
       \qquad\text{s.t.} \quad \bsa(\bsb) = \bso
     \end{align*}
     where
-    $J(\bsb, \bshatW) := N\cdot \bsg_N(\bsb)' \bshatW \bsg_N(\bsb)$
+    $J(\bsb, \bshatW) := N\cdot \bsbarg_N(\bsb)' \bshatW \bsbarg_N(\bsb)$
     and $\bshatS$ is a consistent estimator
     of $\E[\varepsilon_n^2\bsx_n\bsx_n']$, the inverse of the efficient
     weighting matrix. Then
@@ -14297,7 +14524,7 @@ state that
 \end{align*}
 We construct the sample analog of $\bsg$:
 \begin{align*}
-  \bsg_N(\bsb) &=
+  \bsbarg_N(\bsb) &=
   \left(\frac{1}{N}\sumnN \bsz_n\bsx'_n \right)\bsb
   -\left( \frac{1}{N} \sumnN \bsz_n y_n \right)
   = \frac{1}{N}\left(\bsZ'\bsX\bsb - \bsZ'\bsy\right)
@@ -14306,7 +14533,7 @@ We want to construct the GMM estimator (ignoring scalar constants like
 $N$ and $\frac{1}{N}$):
 \begin{align*}
   \bshatbeta(\bshatW)
-  &= \argmin_{\bsb} \; \bsg_N(\bsb)' \, \bshatW \, \bsg_N(\bsb)
+  &= \argmin_{\bsb} \; \bsbarg_N(\bsb)' \, \bshatW \, \bsbarg_N(\bsb)
   = \argmin_{\bsb} \;
     \left(\bsZ'\bsX\bsb - \bsZ'\bsy\right)'
     \bshatW
@@ -14470,10 +14697,10 @@ procedure:
     \begin{align*}
       \bshatbeta(\bshatW_1) &=
       \argmin_{\bsb}
-      \bsg_N(\bsb)' \, \bshatW_1 \, \bsg_N(\bsb)
+      \bsbarg_N(\bsb)' \, \bshatW_1 \, \bsbarg_N(\bsb)
       \qquad\quad
       \text{where}\quad
-      \bsg_N(\bsb)
+      \bsbarg_N(\bsb)
       = \frac{1}{N} \sumnN (y_n-\bsx_n'\bsb) \bsz_n
     \end{align*}
     Common choices for $\bshatW_1$ include $\bsI$ and $N\cdot
@@ -14493,9 +14720,9 @@ procedure:
     \begin{alignat*}{3}
       \bshatbeta(\bshatW_2) &=
       \argmin_{\bsb}
-      \bsg_N(\bsb)' \, \bshatW_2 \, \bsg_N(\bsb)
+      \bsbarg_N(\bsb)' \, \bshatW_2 \, \bsbarg_N(\bsb)
       \qquad\quad
-      &\bsg_N(\bsb)
+      &\bsbarg_N(\bsb)
         &:= \frac{1}{N} \sumnN (y_n-\bsx_n'\bsb) \bsz_n \\
       \text{where}\quad
       \bshatW_2 &=
@@ -14642,7 +14869,7 @@ tests:
       \label{gmm:lrrestricted}
     \end{align}
     where
-    $J(\bsb, \bshatW) := N\cdot \bsg_N(\bsb)' \bshatW \bsg_N(\bsb)$
+    $J(\bsb, \bshatW) := N\cdot \bsbarg_N(\bsb)' \bshatW \bsbarg_N(\bsb)$
     and $\bshatS$ is a consistent estimator
     of $\E[\varepsilon_n^2\bsz_n\bsz_n']$, the inverse of the efficient
     weighting matrix. Then
@@ -14895,17 +15122,17 @@ $\bsW(\bsb)$. Specifically, we solve
 \begin{align*}
   \bshatbeta_{CUE} :=&\;
   \argmin_{\bsb}\;
-  \bsg_N(\bsb)' \, \big[\bsW(\bsb) \big]\, \bsg_N(\bsb)
+  \bsbarg_N(\bsb)' \, \big[\bsW(\bsb) \big]\, \bsbarg_N(\bsb)
 \end{align*}
 In the model of this section, that means solving
 \begin{align*}
   \bshatbeta_{CUE} :=&\;
   \argmin_{\bsb}\;
-  \bsg_N(\bsb)'
+  \bsbarg_N(\bsb)'
   \left[
     \frac{1}{N}\sumnN \big(y_n - \bsx_n'\bsb\big)^2 \bsz_n\bsz_n'
   \right]^{-1}
-  \bsg_N(\bsb) \\
+  \bsbarg_N(\bsb) \\
   \text{where} \quad
   \bsg_n(\bsb) :=&\;
   \frac{1}{N} \sumnN (y_n-\bsx_n'\bsb)\bsz_n
@@ -15084,7 +15311,7 @@ This can also be equivalently written as
 So then construct the sample analog of $\bsg$, which we will try to get
 close to zero:
 \begin{align*}
-  \bsg_N(\bsb) &=
+  \bsbarg_N(\bsb) &=
   \begin{bmatrix}
     \frac{1}{N}\sumnN \bsz_{1n}y_{1n} \\
     \vdots\\
@@ -15108,7 +15335,7 @@ $N$ and $\frac{1}{N}$) for some weighting matrix
 $\bshatW\in \R^{L\times L}$:
 \begin{align*}
   \bshatbeta(\bshatW)
-  &= \argmin_{\bsb} \; \bsg_N(\bsb)' \, \bshatW \, \bsg_N(\bsb) \\
+  &= \argmin_{\bsb} \; \bsbarg_N(\bsb)' \, \bshatW \, \bsbarg_N(\bsb) \\
   &= \argmin_{\bsb} \;
     \big(\bss_{\bsz\bsy} - \bsS_{\bsz\bsx}\bsb\big)'
     \bshatW
