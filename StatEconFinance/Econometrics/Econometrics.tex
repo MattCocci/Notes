@@ -278,9 +278,15 @@
 \newcommand{\bsalpha}{\boldsymbol{\alpha}}
 \newcommand{\bsbeta}{\boldsymbol{\beta}}
 \newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bsGamma}{\boldsymbol{\Gamma}}
 \newcommand{\bslambda}{\boldsymbol{\lambda}}
+\newcommand{\bsLambda}{\boldsymbol{\Lambda}}
+\newcommand{\bshatLambda}{\boldsymbol{\hat{\Lambda}}}
 \newcommand{\bsdelta}{\boldsymbol{\delta}}
 \newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bsPsi}{\boldsymbol{\Psi}}
+\newcommand{\bspsi}{\boldsymbol{\psi}}
+\newcommand{\bsPhi}{\boldsymbol{\Phi}}
 
 % Special cases like \bshatb for \boldsymbol{\hat{b}}
 \generate[\hat]{bshat}{\boldsymbol}{a,b,y,x,X,V,S,W,A,B,P}
@@ -294,6 +300,9 @@
 \newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
 \newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
 \newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+\newcommand{\bstildey}{\boldsymbol{\tilde{y}}}
+\newcommand{\bstildeX}{\boldsymbol{\tilde{X}}}
+\newcommand{\bstildevarepsilon}{\boldsymbol{\tilde{\varepsilon}}}
 
 % Zero vector as \bso
 \renewcommand{\bso}{\boldsymbol{0}}
@@ -7690,7 +7699,7 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 %\end{defn}
 
 %\clearpage
-\subsection{Stationarity}
+\subsection{Stationarity, Ergodicity, and the Lag Operator}
 
 \begin{defn}(Strict Stationarity)
 A discrete stochastic process $\{y_t\}$ is \emph{strictly stationary} if
@@ -7729,8 +7738,10 @@ traces out a trend.
 A stochasic process $\{y_t\}$ is called \emph{white noise} if it
 satisfies for all $t$
 \begin{align*}
-  \E[y_t] &= 0 \\
-  \E[y_t^2] &= \sigma^2 \\
+  \E[y_t] &= 0
+  \\
+  \E[y_t^2] &= \sigma^2
+  \\
   \E[y_ty_{t-k}] &= 0 \qquad \forall k\neq 0
 \end{align*}
 This process is clearly covariance stationary, and it's one of the
@@ -7742,27 +7753,128 @@ A stochastic process $\{y_t\}$ is a \emph{random walk} if the process
 $\{\Delta y_t\}$ is white noise, where $\Delta y_t = y_t-y_{t-1}$.
 \end{defn}
 
+\begin{defn}(Ergodicity and a Sufficient Condition for Ergodicity)
+Intuitively, \emph{ergodicity} means that there is \textbf{no} common
+component present in all elements of the time series $\{y_t\}$ that
+does not average out over time.
+
+A sufficient condition for ergodicity of stationary series $\{y_t\}$ is
+that, for any two bounded functions $f:\R^k\ra \R$ and $g:\R^\ell\ra\R$,
+we have
+\begin{align*}
+  \lim_{T\ra\infty}
+  \big|
+  \E[
+    f(y_s,\ldots,y_{s+k})
+    \cdot
+    g(y_{s+T},\ldots,y_{s+T+\ell})
+  ]
+  \big|
+  =
+  \big|
+  \E[
+    f(y_s,\ldots,y_{s+k})
+  ]\big|
+    \cdot
+  \big|
+  \E[
+  g(y_{s+T},\ldots,y_{s+T+\ell})]
+  \big|
+\end{align*}
+Strict stationary does \emph{not} imply ergodicity.
+\end{defn}
+
+\begin{defn}(Ergodic for the Mean)
+We say that $\{y_t\}$ is \emph{ergodic for the mean} if
+\begin{align*}
+  \frac{1}{T}\sum^T_{t=1}y_t \ra \E[y_t]
+\end{align*}
+In words, the time average equals the ensemble average. More explicitly,
+for stochastic process $\{y_t(\omega)\}$ living in state space
+$(\Omega,\sF_t,P)$, the average over time indices $t$ for any
+realization $\omega^*$, $\frac{1}{T}\sumtT y_t(\omega^*)$, equals the
+average across $\omega$, fixing the time $t$.
+\end{defn}
+\begin{rmk}
+Later on, we'll see the Ergodic Theorem, which states that a stationary
+ergodic process is ergodic for the mean.
+\end{rmk}
+
+\begin{ex}(Non-Ergodic Series)
+Suppose that we have $y_t=x_t+Z$ where $x_t$ is iid. Then $\{y_t\}$ is
+not an ergodic process because there is a common component that does not
+average out. And that's true even though $\{y_t\}$ \emph{is} strictly
+stationary, again reinforcing that strict stationarity
+\emph{does not imply} ergodicity.
+\end{ex}
+
 
 \clearpage
-\subsection{Lag Operator and Lag Polynomials}
+\subsection{Filters, the Lag Operator, and Lag Polynomials}
+
+\begin{defn}(Filter)
+Let $\{h_j\}_{j=0}^\infty$ be sequence of numbers.
+We define the associated \emph{filter} as the following function:
+\begin{align*}
+  h(z) :=&\; \sum_{j=0}^\infty h_j z^j
+  = h_0 + h_1 z + h_2 z^2 + \cdots
+  \qquad z\in\C
+\end{align*}
+\end{defn}
 
 \begin{defn}(Lag Operator)
 The \emph{lag operator} $L$ is an operator that maps sequences
 into sequences such that $\{y_{t-1}\}=L\left(\{y_t\}\right)$. We often
-simply write $y_{t-1}=Ly_t$. We use powers of the lag operator to
-express lags of more than one time unit:
+simply write, as shorthand, $y_{t-1}=Ly_t$. We use powers of the lag
+operator to express lags of more than one time unit:
 \begin{align*}
   y_{t-k} = L^k y_t
 \end{align*}
-Important, $L$ is a \emph{linear} operator.
+$L$ is a \emph{linear} operator.
 \end{defn}
 
 \begin{defn}(Lag Polynomial)
-The lag operator allows us to write linear difference equations in a
-very terse way. In particular, suppose we have an ARMA($p$, $q$)
+A \emph{lag polynomial} is a filter with the lag operator as its
+argument. For example, every filter $h(z)=h_0+h_1z + h_2z^2+\cdots$ has
+an associated lag polynomial
+\begin{align*}
+  h(L) = \sum_{j=0}^\infty h_j L^j = h_0 + h_1L + h_2 L^2 + \cdots
+\end{align*}
+and vice versa.
+\end{defn}
+
+\begin{defn}(Filtered Series)
+Let $\{x_t\}$ be a covariance-stationary process and let
+$\{h_j\}_{j=0}^\infty$ be an absolutely summable sequence,
+$\sum_{j=0}^\infty |h_j|<\infty$.
+Then we can create a new \emph{filtered series} $\{y_t\}$ by applying
+filter $h(L)$ to the original series $\{x_t\}$:
+\begin{align*}
+  y_t =&\; h(L)x_t
+  = h_0 x_t + h_1x_{t-1} + h_2x_{t-2} + \cdots
+\end{align*}
+Moreover, if the autocovariances of $\{x_t\}$ are absolutely summable,
+then so are the autocovariances of $\{y_t\}$; therefore, filters map the
+space of covariance-stationary processes into itself.
+\end{defn}
+
+\begin{ex}(ARMA Processes)
+Virtually all processes below can be thought of as filtered processes.
+For example, the MA($\infty$) process
+\begin{align*}
+  y_t = \psi(L)\varepsilon_t
+  = \psi_0\varepsilon_t
+  + \psi_1\varepsilon_{t-1}
+  + \psi_2\varepsilon_{t-2}
+  + \cdots
+  \qquad
+  \varepsilon_t \sim WN(0,\sigma^2)
+\end{align*}
+simply takes white noise process $\{\varepsilon_t\}$ and filters it
+with $\{\psi_j\}$. Similarly, consider stationary ARMA($p$,$q$) process
 \begin{align*}
   y_t
-  = \phi_1 y_{t-1}
+  &= \phi_1 y_{t-1}
   +\cdots
   + \phi_p y_{t-p}
   + \varepsilon_t
@@ -7770,30 +7882,34 @@ very terse way. In particular, suppose we have an ARMA($p$, $q$)
   + \cdots
   + \theta_q\varepsilon_{t-q}
 \end{align*}
-This can be written using the lag operator as
-\begin{align*}
+This can be rewritten in lag polynomial notation as
+\begin{align}
+  \iff\qquad
   (1 - \phi_1 L - \cdots - \phi_pL^p)y_t
   &=
   (1+ \theta_1 L + \cdots +\theta_qL^q )\varepsilon_t
-\end{align*}
-From there, we can define \emph{lag polynomials} $\phi(\,\cdot\,)$ and
-$\theta(\,\cdot\,)$ to arrive at the compact expression
-\begin{align*}
+  \notag
+  \\
   \phi(L)y_t
   &=
-  \theta(L)\varepsilon_t \\
+  \theta(L)\varepsilon_t
+  \label{lagarma}
+  \\
   \text{where}\quad
   \phi(z) &:=
   1 - \phi_1 z - \cdots - \phi_pz^p
+  \notag
   \\
   \theta(z)
   &:=
   1+ \theta_1 z + \cdots +\theta_qz^q
-\end{align*}
-where we think of $\phi(\,\cdot\,)$ and $\theta(\,\cdot\,)$ as
-polynomials that we can evaluate at $L$ (the lag operator) or any
-$z\in\C$.
-\end{defn}
+  \notag
+\end{align}
+Equation~\ref{lagarma} says ``process $\{y_t\}$ filtered by
+$\phi(\,\cdot\,)$ equals white noise $\{\varepsilon_t\}$ filtered by
+$\theta(\,\cdot\,)$.''
+\end{ex}
+
 
 \begin{defn}(Lag Polynomial Inverses)
 Consider the following function: $\Psi(z)=(1-z)$. If we want to compute
@@ -7834,6 +7950,7 @@ Of course, this makes clear that we need all roots $|\lambda_i|<1$ to do
 this.
 \end{defn}
 
+
 \clearpage
 \subsection{MA(q), AR(p), and ARMA(p,q) Models}
 
@@ -7856,7 +7973,7 @@ It is easy to work out the mean and covariance function of the process
   \E[y_t] = \mu
   \qquad
   \gamma(k) = \E[y_ty_{t-k}] &=
-    \sum_{j=0}^{q-k} \theta_j \theta_{j+k}
+    \sigma^2 \sum_{j=0}^{q-k} \theta_j \theta_{j+k}
 \end{align*}
 Since neither depends upon $t$, we conclude that \emph{any} MA(q)
 process is covariance stationary. And since the autocovariance function
@@ -7892,13 +8009,16 @@ are given by
 \begin{align*}
   \E[y_t] &= \mu\\
   \gamma(k) = \E[y_ty_{t-k}] &=
-  \begin{cases}
-    \sigma^2\sum_{i=0}^\infty \psi_i^2 & k=0\\
-    \sigma^2
-      \sum_{j=0}^{\infty}
-      \psi_j \psi_{j+k}
-    & k\neq 0
-  \end{cases}
+  \sigma^2
+  \sum_{j=0}^{\infty}
+  \psi_j \psi_{j+k}
+  %\begin{cases}
+    %\sigma^2\sum_{i=0}^\infty \psi_i^2 & k=0\\
+    %\sigma^2
+      %\sum_{j=0}^{\infty}
+      %\psi_j \psi_{j+k}
+    %& k\neq 0
+  %\end{cases}
 \end{align*}
 Note that this object is only well-defined if the coefficients are
 \emph{square-summable}: $\sum_{i=0}^\infty \psi_i^2<\infty$. Square
@@ -8265,33 +8385,6 @@ the lag polynomial to be absolutely summable
 $\sum_{j=0}^\infty|\psi_j|<\infty$.
 \end{prop}
 
-
-\subsection{Filters}
-
-\begin{defn}(Filter)
-Let $\{x_t\}$ be a covariance-stationary process and let $\{h_j\}$ be an
-absolutely summable sequence.  Then we can ``treat'' the data before
-analysis by applying a function $h(\,\cdot\,)$ called a \emph{filter}
-that produces a new, filtered series $\{y_t\}$ defined
-\begin{align*}
-  y_t &= h(L)x_t \\
-  \text{where}\quad
-  h(z) &= \sum_{j=-\infty}^\infty h_j z^j
-\end{align*}
-Moreover, if the autocovariances of $\{x_t\}$ are absolutely summable,
-then so are the autocovariances of $\{y_t\}$; therefore, filters map the
-space of covariance-stationary processes into itself.
-\end{defn}
-
-\begin{rmk}
-Really almost every ARMA process we've dealt with has been a
-``filtered series'' in the sense that the sequence of white noise shocks
-$\{\varepsilon_t\}$ are covariance stationary and, if we can write the
-ARMA as $y_t=\phi(L)^{-1}\theta(L)\varepsilon_t$, then $y_t$ is
-given by applying the filter $\phi(L)^{-1}\theta(L)$ to the covariance
-stationary process $\{\varepsilon_t\}$.
-\end{rmk}
-
 \begin{prop}
 Suppose we filter the MA($\infty$) data series $\{x_t\}$ to produce the
 new series $\{y_t\} = \{h(L)x_t\}$. Then
@@ -8323,6 +8416,7 @@ $\theta(z)$ and $h(z)$ have absolutely summable coefficients.
 \end{proof}
 
 
+
 \clearpage
 \subsection{Spectral Analysis: Time Series in the Frequency Domain}
 
@@ -8332,6 +8426,7 @@ $\theta(z)$ and $h(z)$ have absolutely summable coefficients.
 
 \begin{defn}(Simple Cyclical Process)
 Suppose we construct the cyclical process
+for random $\alpha$ and $\beta$:
 \begin{align*}
   y_t = \alpha \cos(\lambda t) + \beta \sin(\lambda t)
   \qquad
@@ -8347,8 +8442,10 @@ Suppose we construct the cyclical process
 Features of this very particular type of process
 \begin{enumerate}[label=(\roman*)]
   \item Only $\alpha$ and $\beta$ are random. If you know them, you know
-    \emph{exactly} how the process will evolve over time.
-  \item The process is cyclic. For any integer $k$
+    \emph{exactly} how the process will evolve over time since the
+    process $y_t$ is otherwise deterministic.
+  \item The process $\{y_t\}$ is cyclical/periodic, since for any
+    integer $k$
     \begin{align*}
       y_{t+2\pi k/\lambda}
       %&= \alpha \cos\big(\lambda(t+2\pi k/\lambda)\big)
@@ -8362,15 +8459,16 @@ Features of this very particular type of process
     \end{align*}
 
   \item
-    The process has frequency $\lambda/(2\pi)$, i.e.\ completes
-    $\lambda/(2\pi)$ cycles between any $t$ and $t+1$.
-    Equivalently, the process has period $2\pi/\lambda$, i.e.\ it takes
-    $2\pi/\lambda$ units of $t$ to complete one cycle. So if $t$ indexes
-    days, months, or years, the process takes $2\pi/\lambda$ days,
-    months, or years (respectively) to complete a single cycle.
+    More specifically, the process $\{y_t\}$ has frequency
+    $\lambda/(2\pi)$, i.e.\ completes $\lambda/(2\pi)$ cycles between
+    any $t$ and $t+1$.  Equivalently, the process has period
+    $2\pi/\lambda$, i.e.\ it takes $2\pi/\lambda$ units of $t$ to
+    complete one cycle. So if $t$ indexes days, months, or years, the
+    process takes $2\pi/\lambda$ days, months, or years (respectively)
+    to complete a single cycle.
 
   \item The restriction $\lambda \in[0,\pi)$ is without loss of
-      generality since
+    generality since
     \begin{align*}
       \forall t,k
       \quad
@@ -8382,8 +8480,8 @@ Features of this very particular type of process
     $-\beta$ in place of $\alpha$ and $\beta$, which have the same first
     and second moments.
 
-  \item The process has mean zero $\E[y_t]=0$ (clear by inspection) and
-    second moments:
+  \item The process $\{y_t\}$ has mean zero $\E[y_t]=0$ (clear by
+    inspection) and second moments:
     \begin{align*}
       \gamma(k) = \E[y_ty_{t+k}]
         &=
@@ -8421,10 +8519,11 @@ Features of this very particular type of process
     The process is perfectly linearly predictable from past values.
     To show this, guess that $y_t$ can be predicted by just two lags,
     $y_{t-1}$ and $y_{t-2}$, since there are only two unknown parameters
-    of $y_t$ to pin down. Then compute the population regression
-    coefficients of $y_t$ on $(y_{t-1}\;y_{t-2})$ to derive the optimal
-    linear predictor of $y_t$ given $(y_{t-1}\;y_{t-2})$. They turn out
-    to be $(2\cos(\lambda)\; -1)$, suggesting that we can write
+    of $y_t$ to pin down, $\alpha$ and $\beta$. Then compute the
+    population regression coefficients of $y_t$ on $(y_{t-1}\;y_{t-2})$
+    to derive the optimal linear predictor of $y_t$ given
+    $(y_{t-1}\;y_{t-2})$. They turn out to be $(2\cos(\lambda)\; -1)$,
+    suggesting that we can write
     \begin{align*}
       y_t = 2\cos(\lambda) y_{t-1} - y_{t-2} + \varepsilon_t
       \qquad \E[\varepsilon_t] = 0
@@ -8520,10 +8619,10 @@ the scalar coefficients on those sines and cosines. Here, we do the
 same, except the coefficients will be random variables.
 
 \begin{thm}\emph{(Spectral Representation Theorem)}
-Any mean-zero stationary process $\{y_t\}$ with absolutely summable
-autocovariances can be represented as
+Any stationary process $\{y_t\}$ with absolutely summable
+autocovariances and mean $\mu$ can be represented as
 \begin{align}
-  y_t &=
+  y_t &= \mu +
   \int_0^\pi \alpha(\lambda) \cos(\lambda t)\;d\lambda
   + \int_0^\pi \beta(\lambda) \sin(\lambda t)\;d\lambda
   \label{spectralrep}
@@ -8531,26 +8630,29 @@ autocovariances can be represented as
 where $0 = \E[\alpha(\lambda)] = \E[\beta(\lambda)] = \E[\alpha(\lambda)
 \beta(\lambda')] \notag = \E[\alpha(\lambda)\alpha(\lambda')] =
 \E[\beta(\lambda)\beta(\lambda')]$
-for all $\lambda,\lambda' \in [0,\pi)$ and also
+for all $\lambda,\lambda' \in [0,\pi)$ such that $\lambda\neq\lambda'$.
+Also,
 \begin{align*}
     \E[\alpha(\lambda)^2] = \E[\beta(\lambda)^2] = 2f(\lambda)
-    \qquad \forall \lambda,\lambda' \in [0,\pi)
+    \qquad \forall \lambda \in [0,\pi)
 \end{align*}
-where $f(\lambda):[0,\pi]\ra \R$ is called the
-\emph{spectral density function} and captures the contribution to the
-total variance of $y_t$ from cycles/oscillations at each frequency
-$\lambda\in[0,\pi)$.
+where $f(\lambda):[0,\pi]\ra \R_+$ is the nonnegative \emph{spectral
+density function} that captures the contribution of cycles/oscillations
+at each frequency $\lambda\in[0,\pi)$ to the total variance of $y_t$.
+\end{thm}
 
-Note that $\alpha(\lambda)$ and $\beta(\lambda)$ are
-\emph{random functions}.
+\begin{rmk}
+Both $\alpha(\lambda)$ and $\beta(\lambda)$ are \emph{random functions}.
 Just as $y_t$ is implictly a function on the sample space $\Omega$ and
 on the time domain $\Z$, so too are $\alpha$ and $\beta$ implicitly
 functions on sample $\Omega$ and frequency domain $[0,\pi)$.
 Therefore, each particular $\omega\in\Omega$ gives rise to not only an
 entire time series realization $\{y_t(\omega)\}_{t=-\infty}^\infty$, but
-also to corresponding $\alpha(\lambda)$ and $\beta(\lambda)$ function
-realizations that Representation~\ref{spectralrep} true.
-\end{thm}
+also to corresponding $\alpha(\lambda)(\omega)$ and
+$\beta(\lambda)(\omega)$ function realizations that make
+Representation~\ref{spectralrep} true for that particulare
+$\omega$.
+\end{rmk}
 %\begin{rmk}
 %The integrals above are a little handwavey. They really should be
 %interpreted as
@@ -8563,18 +8665,18 @@ realizations that Representation~\ref{spectralrep} true.
 
 
 \begin{cor}(\emph{Alternative Spectral Representation})
-We can alternatively expression $y_t$ with spectral representation as in
-Equation~\ref{spectralrep} by enlarging the domain of $\alpha$ and
-$\beta$ from $[0,\pi)$ to $[-\pi,\pi)$ by defining, for all
-$\lambda \in[0,\pi)$
+Given process $y_t$ with spectral Representation~\ref{spectralrep}, we
+can express the process slightly differently. In particular, we
+enlarge the domain of $\alpha$ and $\beta$ from $[0,\pi)$ to
+$[-\pi,\pi)$ by defining, for all $\lambda \in[0,\pi)$
 \begin{align*}
   \alpha(-\lambda) :=& \;\alpha(\lambda)
   \qquad
-  \beta(-\lambda) :=& \;-\beta(\lambda)
+  \beta(-\lambda) := \;-\beta(\lambda)
 \end{align*}
 which allows us to rewrite the spectral decomposition of $y_t$ as
 \begin{align*}
-  y_t =&\; \int_{-\pi}^\pi \delta(\lambda)e^{i\lambda t}\;d\lambda
+  y_t-\mu =&\; \int_{-\pi}^\pi \delta(\lambda)e^{i\lambda t}\;d\lambda
   =\int_{-\pi}^\pi
   \delta(\lambda)\big(\cos(\lambda t)+i\sin(\lambda t)\big)\;d\lambda
   \\
@@ -8584,7 +8686,7 @@ which allows us to rewrite the spectral decomposition of $y_t$ as
 \end{align*}
 which implies $\delta(-\lambda)=\overline{\delta(\lambda)}$ and
 \begin{align*}
-  \E\left[\delta(\lambda)\overline{\delta(\lambda)}\right] = f(\lambda)
+\E\left[\delta(\lambda)\overline{\delta(\lambda)}\right] = f(\lambda)
 \end{align*}
 \end{cor}
 
@@ -8675,7 +8777,8 @@ result, i.e.\ we want to show that
   \int_{-\pi}^\pi
   e^{i\lambda (j-k)}
   \;d\lambda
-  = \frac{1}{2\pi}
+  \\
+  &= \frac{1}{2\pi}
   \sum_{j=-\infty}^\infty
   \gamma(j)
   \cdot2\pi \mathbf{1}_{\{j=k\}}
@@ -8694,7 +8797,8 @@ area under the population spectrum:
   \gamma(0) = \int_{-\pi}^\pi f(\lambda) \; d\lambda
 \end{align*}
 Therefore, if we integrate over frequency range
-$[\lambda_1,\lambda_2]\subseteq[0,\pi]$
+$[\lambda_1,\lambda_2]\subseteq[0,\pi]$,
+using symmetry of $f(\lambda)$,
 \begin{align*}
   2\int_{\lambda_1}^{\lambda_2} f(\lambda) \; d\lambda
 \end{align*}
@@ -8706,13 +8810,14 @@ $\gamma(0)$ of the process.
 
 \begin{cor}
 \emph{(Spectral Density and the Autocovariance Generating Function)}
-Given the autocovariance function  of a process
+Given the autocovariance generating function of a process
 \begin{align*}
   g(z)=\sum_{k=-\infty}^\infty \gamma(k)z^k
 \end{align*}
 we can immediately recover the spectral density function $f(\lambda)$:
 \begin{align*}
   f(\lambda) = \frac{1}{2\pi} g(e^{-i\lambda})
+  = \frac{1}{2\pi} \sum_{k=-\infty}^\infty \gamma(k) e^{-i\lambda k}
 \end{align*}
 \end{cor}
 
@@ -8778,10 +8883,16 @@ $\gamma(0)$.
 \clearpage
 \subsection{Long-Run Variance}
 
+With iid observations, the variance of a sum of observations
+$\{y_t\}$ is the sum of the variances. When the observations are
+correlated, that is no longer true. Instead, we need to define the
+\emph{long-run variance}---the asymptotic variance of a sum of a series
+(suitably scaled), allowing for correlation.
+
 \begin{prop}\emph{(Long-Run Variance)}
-Suppose that $\{y_t\}$ is a stationary and ergodic process with
-absolutely summable autocovariances and $\E[y_t]=\mu$. Then we define
-the \emph{long-run variance} as
+Suppose $\{y_t\}$ is a stationary and ergodic process with absolutely
+summable autocovariances and $\E[y_t]=\mu$. Define the
+\emph{long-run variance} as
 \begin{align}
   S := \limT \Var\left(\frac{1}{\sqrt{T}}\sumtT (y_t-\mu)\right)
   = \sum_{j=-\infty}^\infty \gamma(j)
@@ -8806,17 +8917,15 @@ and we have to account for them:
  &= T\cdot \gamma(0) + \sum_{j=1}^T (T-|j|)\cdot \gamma(j)
 \end{align*}
 Dividing through on both sides by $T$ and taking the limit as
-$T\ra\infty$ will give the desired expression, since $(T-|j|)/T \ra 1$
-for all $j$ and absolutely summable autocovariances ensures
-convergence.
+$T\ra\infty$ gives the desired expression, since $(T-|j|)/T \ra 1$ for
+all $j$. Absolutely summable autocovariances ensures convergence.
 \end{proof}
 
 
 \begin{prop}
 \emph{(Equivalent Expressions for the Long-Run Variance)}
-Given stationary and ergodic time series $\{y_t\}$ with $\E[y_t]=\mu$,
-the long-run variance $S$ as defined in Expression~\ref{clt:lrvar}
-satisfies
+Given stationary and ergodic $\{y_t\}$ with $\E[y_t]=\mu$, the long-run
+variance $S$ as defined in Expression~\ref{clt:lrvar} satisfies
 \begin{align*}
   S = \sum_{j=-\infty}^\infty \gamma(j) = g(1) = 2\pi f(0)
 \end{align*}
@@ -8843,6 +8952,131 @@ long-run variance formula:
   S = \sigma^2 \psi(1)^2
 \end{align*}
 \end{cor}
+
+\clearpage
+\subsection{Vector Processes}
+
+Everything generalizes quite nicely to vector processes.
+
+\begin{defn}(Vector White Noise Process)
+$\{\bsy_t\}$ a \emph{vector white noise process} if $\forall t$
+\begin{align*}
+  \E[\bsy_t] &= \bso
+  \\
+  \E[\bsy_t\bsy_t'] &= \bsSigma
+  \quad\text{positive definite}
+  \\
+  \E[\bsy_t\bsy_{t-k}']
+  &= \bso \qquad \forall k\neq 0
+\end{align*}
+We here place no restriction on $\bsSigma$ except for
+positive-definiteness. Therefore, we allow for contemporaneous
+correlation between elements of $\bsy_t$.
+\end{defn}
+
+\begin{defn}(Multivariate Filter)
+Given sequence of (possibly non-square) matrices
+$\{\bsH_j\}_{j=0}^\infty$, the associated
+\emph{multivariate filter}
+is defined as
+\begin{align*}
+  \bsH(z)
+  = \sum_{j=1}^\infty \bsH_j z^j
+  = \bsH_0 + \bsH_1 z + \bsH_2z^2 + \cdots
+\end{align*}
+\end{defn}
+
+\begin{defn}(VMA($\infty$) Process)
+Given vector white noise process $\{\bsvarepsilon_t\}$, mean $\bsmu$,
+and multivariate lag polynomial $\bsPsi(L)$, we define the vector
+MA($\infty$) process as
+\begin{align*}
+  (\bsy_t - \bsmu) = \bsPsi(L)\bsvarepsilon_t
+  \qquad \bsvarepsilon_t \sim WN(\bso,\bsSigma)
+\end{align*}
+It has autocovariance function
+\begin{align*}
+  \bsGamma(j)
+  &= \sum_{k=0}^\infty \bsPsi_{j+k}\bsSigma\bsPsi_k'
+\end{align*}
+\end{defn}
+
+\begin{defn}(VAR($p$) Process)
+$\{\bsy_t\}$ is a VAR($p$) process if it can be written
+\begin{align*}
+  \bsPhi(L)(\bsy_t-\bsmu) &= \bsvarepsilon_t
+  \qquad\qquad\qquad\qquad\qquad \bsvarepsilon_t\sim WN(0,\bsSigma)
+  \\
+  \bsPhi(L) &= \bsI - \bsPhi_1 L - \cdots - \bsPhi_pL^p
+\end{align*}
+\end{defn}
+
+\begin{prop}\emph{(Stability Condition)}
+Suppose we have VAR($p$) process
+\begin{align*}
+  \bsPhi(L)\bsy_t &= \bsvarepsilon_t
+  \qquad \bsvarepsilon_t \sim WN(0,\bsSigma)
+  \\
+  \text{\emph{where}}\quad
+  \bsPhi(L) &= \bsI - \bsPhi_1 L - \cdots - \bsPhi_pL^p
+\end{align*}
+The process is covariance stationary if the following statements are
+true (they are equivalent):
+\begin{itemize}
+  \item
+    All roots of the following equation have modulus $>1$:
+    $\det(\bsPhi(z)) = 0$
+  \item
+    All roots of the following equation have modulus $<1$:
+    \begin{align*}
+      \det\big(
+        \bsI z^p - \bsPhi_1z^{p-1}
+        - \cdots - \bsPhi_p z^0
+      \big)
+      =0
+    \end{align*}
+\end{itemize}
+\end{prop}
+
+\begin{defn}(VARMA($p,q$) Process)
+$\{\bsy_t\}$ is a VARMA($p,q$) process if it can be written
+\begin{align*}
+  \bsPhi(L)(\bsy_t-\bsmu) &= \bsTheta(L)\bsvarepsilon_t
+  \qquad\qquad\qquad\qquad\qquad \bsvarepsilon_t\sim WN(0,\bsSigma)
+  \\
+  \bsPhi(L) &= \bsI - \bsPhi_1 L - \cdots - \bsPhi_pL^p
+  \\
+  \bsTheta(L) &= \bsTheta_0 + \bsTheta_1 L + \cdots + \bsTheta_qL^q
+\end{align*}
+\end{defn}
+
+\begin{defn}(Autocovariance Generating Function)
+For vector process $\{\bsy_t\}$, we define the autocovariance generating
+function
+\begin{align*}
+  \bsg_{\bsy}(z) = \sum_{j=-\infty}^\infty \bsGamma(j)z^j
+\end{align*}
+\end{defn}
+
+\begin{defn}(Spectral Density)
+Vector process $\{\bsy_t\}$ has spectral density function
+\begin{align*}
+  \bsf_{\bsy}(\lambda) = \frac{1}{2\pi} \bsg_{\bsy}(e^{-i\lambda})
+\end{align*}
+\end{defn}
+
+\begin{prop}
+Let $\{\bsx_t\}$ be a vector process and $\bsH(z)$ a conformable
+multivariate filter. Then the filtered series
+\begin{align*}
+  \bsy_t = \bsH(L)\bsx_t
+\end{align*}
+has autocovariance generating function
+\begin{align*}
+  \bsg_{\bsx}(z) = \bsH(z)\bsg_{\bsy}(z)\bsH(z^{-1})'
+\end{align*}
+\end{prop}
+
 
 \clearpage
 \section{Large Sample Theory}
@@ -9350,7 +9584,7 @@ $\E[X_n]=\mu<\infty$.
 
 \begin{thm}\emph{(Ergodic Theorem)}
 Suppose that $y_t$ is a stationary and ergodic (vector) process with
-$\E[y_t]=\mu$. Then
+$\E[y_t]=\mu$. Then the process is ergodic for the mean, i.e.
 \begin{align*}
   \frac{1}{T}\sumtT y_t \pto \mu
 \end{align*}
@@ -10556,7 +10790,7 @@ to minimize the maximum risk
 \end{ex}
 
 \clearpage
-\subsection{Least Squares Estimation}
+\subsection{Nonlinear Least Squares Estimation}
 
 Suppose we have random variables $y_n$ and $\bsx_n$, and we want to use
 $\bsx_n$ to forecast $y_n$. Then we want to find some function
@@ -10660,7 +10894,7 @@ asymptotic variance by their sample counterparts
   \notag
 \end{align*}
 \end{prop}
-\begin{cor}(Asymptotic Distribution of the OLS Esimtator)
+\begin{cor}\emph{(Asymptotic Distribution of the OLS Esimtator)}
 In the special case where $g$ is linear,
 $g(\bsx_n,\bstildebeta)=\bsx_n'\bstildebeta$ so that
 $g'(\bsx_n,\bstildebeta)=\bsx_n$, the associated OLS estimator has
@@ -11867,6 +12101,1054 @@ The first order conditions of the minimization problem are
 which is exactly the OLS estimator formula.
 
 
+\clearpage
+\subsection{Estimating Spectral Densities and Long-Run Variance}
+
+\subsubsection{Sample Periodogram}
+
+In this section, given observations $\{y_t\}\tT$, we construct an
+estimate, called the \emph{sample periodogram}, for the spectral density
+$f(\lambda)$ (a population concept).
+But first, recall that the spectral representation theorem lets us
+express any covariance-stationary process $\{y_t\}$ as the ``sum'' of
+oscillations at different frequencies, as follows
+\begin{align*}
+  y_t =&\; \int_{-\pi}^\pi \delta(\lambda)e^{i\lambda t}\;d\lambda
+\end{align*}
+First, we are integrating over $\lambda\in(-\pi,\pi]$---the set of all
+frequencies that can be identified (i.e.\ excluding unidentifiable
+multiples). Next, for a fixed $t$, $e^{i\lambda t}$ represents
+oscillations at frequency $\lambda$, and as we integrate over $\lambda$,
+we are adding up oscillations at \emph{all} frequencies in $(-\pi,\pi]$.
+Next, $\delta(\lambda)$ (which is unique to $\{y_t\}$) gives the weight
+to place on oscillations at frequency $\lambda$.  Finally, recall that
+there was a one-to-one mapping between $\delta(\lambda)$ and the
+spectral density, $f(\lambda)$.  Namely,
+$\E[\delta(\lambda)\overline{\delta(\lambda)}] = f(\lambda)$.
+Therefore, if we can estimate $\delta(\lambda)$, we can presumably use
+that estimate to construct an estimate of $f(\lambda)$, as we will see.
+
+Okay, we now want a sample counterpart to all of this. To do so, we
+appeal to the discrete Fourier transform, writing a discrete version of
+the above spectral representation:
+\begin{align}
+  y_t =
+  %\frac{1}{\sqrt{T}}
+  \sum_{\lambda_\ell\in (-\pi,\pi]} \delta_\ell \; e^{i\lambda_\ell t}
+  \label{discretespectralrep}
+\end{align}
+Instead of integrating over all $\lambda\in(-\pi,\pi]$, we add over a
+finite set of \emph{Fourier frequencies} (denoted by $\lambda_\ell$'s)
+within that range. And instead of the function $\delta(\lambda)$, we now
+have weights $\delta_\ell$, each associated with a corresponding
+frequency $\lambda_\ell$. Now for the details.
+
+\begin{defn}(Fourier Frequencies)
+Depending upon whether $T$ is odd or even, define Fourier integers
+\begin{align*}
+  F_T^{odd}
+  &= \left\{-\frac{T-1}{2},\ldots,\frac{T-1}{2}\right\}
+  \subseteq\Z
+  \qquad
+  F_T^{even}
+  = \left\{-\frac{T-2}{2},\ldots,\frac{T}{2}\right\}
+  \subseteq\Z
+\end{align*}
+Letting $F_T$ denote the appropriate choice of integers (depending on
+whether $T$ is odd or even), the \emph{Fourier Frequencies} are given by
+\begin{align*}
+  \lambda_\ell = (2\pi\ell)/T
+  \qquad \ell \in F_T
+\end{align*}
+The choice of Fourier integers and specification of the frequencies
+ensures that, for all $T$, we have $\lambda_\ell\in(-\pi,\pi]$.
+These are the frequencies at which we will estimate the weights and the
+spectral density.
+By construction, there are always $T$ such frequencies.
+\end{defn}
+
+\begin{ex}
+Just to give an example of the Fourier integers to make thing concrete:
+\begin{align*}
+  F_{51} = \{-25,-24,\ldots,24,25\}
+  \qquad
+  F_{50} = \{-24,-23,\ldots,24,25\}
+\end{align*}
+\end{ex}
+
+\begin{defn}(Some Orthonormal Bases for $\C^T$ and $\R^T$)
+\label{defn:periobasis}
+Stack the data $\{y_t\}\tT$ into a column vector and denote this vector
+as $\bsy_{1:T}=(y_1,\ldots,y_T)'\in\R^T\subset\C^T$.  We will construct
+two orthonormal bases: one relevant for when we think of
+$\bsy_{1:T}\in\C^T$, and one for when we think of $\bsy_{1:T}\in\R^T$.
+Even though all of the observations are real-valued, it will still be
+useful to work with $\C^T$ in this section, which is why we go to the
+trouble.
+\begin{itemize}
+  \item $\C^T$:
+    For the space $\C^T$, we define the following collection of vectors:
+    \begin{align*}
+      \bse_\ell = \frac{1}{\sqrt{T}}
+      \begin{pmatrix}
+        e^{i\lambda_\ell} &
+        e^{i2\lambda_\ell} &
+        e^{i3\lambda_\ell} &
+        \cdots &
+        e^{iT\lambda_\ell}
+      \end{pmatrix}'
+      \qquad \ell \in F_T
+    \end{align*}
+    This collection of vectors $\{\bse_\ell\}_{\ell\in F_T}$ forms an
+    orthonormal basis for $\C^T$ (recall $F_T$ has exactly $T$ elements,
+    by construction). There is one basis vector $\bse_\ell$ for each
+    Fourier frequency $\lambda_\ell$.
+
+  \item $\R^T$:
+    Next (and we'll see where these definition come from later), define
+    \begin{align*}
+      \bsu_\ell^{\cos} &=
+      \sqrt{\frac{2}{T}}
+      \begin{pmatrix}
+        \cos(\lambda_\ell) &
+        \cos(2\lambda_\ell) &
+        \cdots &
+        \cos(T\lambda_\ell)
+      \end{pmatrix}'
+      \qquad \ell = 1,\ldots,\left\lfloor\frac{T-1}{2}\right\rfloor
+      \\
+      \bsu_\ell^{\sin} &=
+      \sqrt{\frac{2}{T}}
+      \begin{pmatrix}
+        \sin(\lambda_\ell) &
+        \sin(2\lambda_\ell) &
+        \cdots &
+        \sin(T\lambda_\ell)
+      \end{pmatrix}'
+      %\qquad \ell = 1,\ldots,\left\lfloor\frac{T-1}{2}\right\rfloor
+    \end{align*}
+    Using $e^{ix}=\cos x + i\sin x$, this lets us write for all
+    $\ell\in\{1,\ldots,\lfloor (T-1)/2\rfloor\}\subset\Z$
+    \begin{align*}
+      \bse_\ell
+      &= \frac{1}{\sqrt{T}}
+      \begin{pmatrix}
+        e^{i\lambda_\ell} \\
+        e^{i2\lambda_\ell}\\
+        \cdots \\
+        e^{iT\lambda_\ell}
+      \end{pmatrix}
+      = \frac{1}{\sqrt{T}}
+      \begin{pmatrix}
+        \cos(\lambda_\ell) + i \sin(\lambda_\ell)\\
+        \cos(2\lambda_\ell) + i \sin(2\lambda_\ell)\\
+        \cdots \\
+        \cos(T\lambda_\ell) + i \sin(T\lambda_\ell)
+      \end{pmatrix}
+      = \frac{%
+      \left(
+      \bsu_\ell^{\cos} + i\bsu_\ell^{\sin}
+      \right)
+      }{\sqrt{2}}
+    \end{align*}
+    Note that since $\cos$ is an even and $\sin$ an odd function and
+    since $\lambda_\ell=-\lambda_{-\ell}$, we also have that
+    \begin{align*}
+      \bsu^{\cos}_\ell = \bsu^{\cos}_{-\ell}
+      \qquad
+      \bsu^{\sin}_\ell = -\bsu^{\sin}_{-\ell}
+      \quad\implies\quad
+      \bse_{-\ell} =
+      \frac{(\bsu_\ell^{\cos} - i\bsu_\ell^{\sin})}{\sqrt{2}}
+    \end{align*}
+    We will take as our orthonormal basis for $\R^T$
+    \begin{align*}
+      \left\{\bse_0,\bsu^{\cos}_1,\bsu^{\sin}_1,\ldots,
+        \bsu^{\cos}_{\lfloor (T-1)/2\rfloor},
+        \bsu^{\sin}_{\lfloor (T-1)/2\rfloor},
+        \bse_{T/2}\right\}
+    \end{align*}
+    with the last vector excluded if $T$ is odd.
+    Note that this also has exactly $T$ elements by construction, as we
+    need to have a proper basis for $\R^T$.
+    Oh, and don't worry about the fact that $\bse_{T/2}$ is in $\C^T$,
+    not $\R^T$.
+\end{itemize}
+\end{defn}
+
+
+%\begin{proof}
+%We now prove $\{\bse_\ell\}_{\ell\in F_T}$ is, indeed, an orthonormal
+%basis. So compute inner product
+%\begin{align*}
+  %\langle \bse_\ell, \bse_k\rangle
+  %&=
+  %\frac{1}{T}
+  %\sumtT
+  %e^{i\lambda_\ell t}
+  %\cdot
+  %\overline{ e^{i\lambda_k t}}
+  %=
+  %\frac{1}{T}
+  %\sumtT
+  %e^{i(\lambda_\ell -\lambda_k) t}
+%\end{align*}
+%First, if $k=\ell$, we do indeed have that the inner product equals one: \begin{align*}
+  %\langle \bse_\ell, \bse_\ell\rangle
+  %=
+  %\frac{1}{T}
+  %\sumtT
+  %e^{i(\lambda_\ell -\lambda_\ell) t}
+  %= 1
+%\end{align*}
+%For $k\neq \ell$, write out the $\lambda_\ell$ terms and exponential
+%more fully:
+%\begin{align*}
+  %\langle \bse_\ell, \bse_k\rangle
+  %=
+  %\frac{1}{T}
+  %\sumtT
+  %e^{i(\lambda_\ell -\lambda_k) t}
+  %&=
+  %\frac{1}{T}
+  %\sumtT
+  %\cos\left(
+  %(\lambda_\ell -\lambda_k) t
+  %\right)
+  %+i
+  %\sin\left(
+  %(\lambda_\ell -\lambda_k) t
+  %\right)
+  %\\
+  %&=
+  %\frac{1}{T}
+  %\sumtT
+  %\cos\left(
+  %\frac{2\pi}{T}(\ell -k) t
+  %\right)
+  %+i
+  %\sin\left(
+  %\frac{2\pi}{T}(\ell -k) t
+  %\right)
+%\end{align*}
+%\end{proof}
+
+\clearpage
+\begin{defn}(Discrete Fourier Transform, $\bsy_{1:T}\in\C^T$)
+Since $\{\bse_\ell\}_{\ell\in F_T}$ forms a orthonormal basis for
+$\C^T$, we know from Fourier analysis that we can express the vector
+$\bsy_{1:T}\in\C^T$ in terms of this basis by doing a discrete Fourier
+transform:
+\begin{align*}
+  \bsy_{1:T} &= \sum_{\ell\in F_T} \delta_\ell \bse_\ell
+  \qquad
+  \text{where}\quad
+  \delta_\ell
+  = \langle \bsy_{1:T},\bse_\ell \rangle
+  = \frac{1}{\sqrt{T}}\sum_{t=1}^T y_t e^{-i\lambda_\ell t}
+\end{align*}
+If we look at element $t$ of $\bsy_{1:T}$, i.e. at observation $y_t$,
+the above says that
+$y_t = \sum_{\ell\in F_T} \delta_\ell e^{i\lambda_\ell t}$.
+This is essentially Representation~\ref{discretespectralrep} above
+(rewritten slightly but equivalent), which was our goal from the
+start.
+\end{defn}
+
+\begin{defn}(Discrete Fourier Transform, $\bsy_{1:T}\in\R^T$)
+\label{defn:realdft}
+The previous DFT imagined $\bsy_{1:T}\in\C^T$.
+But really $\bsy_{1:T}\in\R^T$, which allows us to rewrite the DFT into
+an equivalent representation that deals with only real numbers (almost).
+In particular, if we use orthonormal basis for $\R^T$ from
+Definition~\ref{defn:periobasis}, we can write
+\begin{align*}
+  \bsy_{1:T}
+  &=
+  \delta_0 \bse_0
+  +
+  \sum_{\ell=1}^{\left\lfloor \frac{T-1}{2} \right\rfloor}
+  \big[
+  z_\ell^{\cos}
+  \bsu_\ell^{\cos}
+  -
+  z_\ell^{\sin}
+  \bsu_\ell^{\sin}
+  \big]
+  + \delta_{\frac{T}{2}}\bse_{\frac{T}{2}}
+    \cdot\mathbf{1}\{\text{$T$ Even}\}
+\end{align*}
+where the coefficients are given for
+$\ell\in\{1,\ldots,\lfloor (T-1)/2\rfloor\}\subset\Z$
+are given by projecting the data $\bsy_{1:T}$ onto the basis elements:
+\begin{alignat*}{3}
+  z_{\ell}^{\cos}
+  &= \langle \bsy_{1:T}, \bsu_{\ell}^{\cos}\rangle
+  = \sqrt{\frac{2}{T}}\sum_{t=1}^T y_t\cos(t\lambda_\ell)
+  \qquad\quad
+  &z_{\ell}^{\sin}
+  &= \langle \bsy_{1:T}, \bsu_{\ell}^{\sin}\rangle
+  = \sqrt{\frac{2}{T}}\sum_{t=1}^T y_t\sin(t\lambda_\ell)
+  \\
+  \delta_0
+  &= \langle \bsy_{1:T}, \bse_0\rangle
+  = \frac{1}{\sqrt{T}} \sumtT y_t
+  \qquad
+  &\delta_{T/2}
+  &= \langle \bsy_{1:T}, \bse_{T/2}\rangle
+  %= \frac{1}{\sqrt{T}}\sum_{t=1}^T
+    %y_t e^{-it\lambda_{T/2}}
+  = \frac{1}{\sqrt{T}}\sum_{t=1}^T
+    y_t e^{-it\pi}
+\end{alignat*}
+\end{defn}
+
+\begin{defn}(Periodogram)
+Given the DFT coefficients $\{\delta_\ell\}_{\ell\in F_T}$, we can
+construct the periodogram $I(\lambda_\ell)$ which is defined at each
+Fourier frequency $\lambda_\ell$ as
+\begin{align*}
+  I(\lambda_\ell)
+  := |\delta_\ell|^2
+  = \delta_\ell \overline{\delta}_\ell
+\end{align*}
+If we used the alternate DFT in $\R^T$, we can instead compute
+\begin{align*}
+  I(\lambda_\ell) =
+  \frac{\left(z_\ell^{\cos}\right)^2+\left(z_\ell^{\sin}\right)^2}{2}
+\end{align*}
+\end{defn}
+
+\begin{rmk}
+We can usefully think of the periodogram as an ``analysis of variance''
+that decomposes the sample second moment
+$\lVert \bsy_{1:T}\rVert^2
+=\langle \bsy_{1:T},\bsy_{1:T}\rangle
+=\sum_{t=1}^T y_t^2$ into periodogram pieces:
+\begin{align*}
+  \lVert\bsy_{1:T}\rVert^2
+  &= \langle \bsy_{1:T},\bsy_{1:T}\rangle
+  \underset{(i)}{=}
+  \left\langle \sum_{\ell \in F_T}\delta_\ell \bse_\ell,\bsy_{1:T}\right\rangle
+  \underset{(ii)}{=}
+  \sum_{\ell \in F_T}\delta_\ell \left\langle \bse_\ell,\bsy_{1:T}\right\rangle
+  \underset{(iii)}{=}
+  \sum_{\ell \in F_T}\delta_\ell \overline{\delta}_\ell
+  \\
+  &\underset{(iv)}{=}
+  \sum_{\ell \in F_T}I(\lambda_\ell)
+\end{align*}
+Equality (i) followed by substituting in the DFT representation of
+$\bsy_{1:T}$ described above.  Equality (ii) used linearity of inner
+products. Equality (iii) followed from the definition of $\delta_\ell$
+and the complex inner product. Equality (iv) was simply the definition
+of $I(\lambda_\ell)=\delta_\ell\overline{\delta}_\ell$.
+\end{rmk}
+
+
+\begin{proof}
+Now we just need to justify all of this shit.
+The DFT in $\C^T$ was clear. That's just basic Fourier analysis. We now
+derive the DFT in $\R^T$ from the one in $\C^T$.
+So first, start by regrouping terms in the sum from the original DFT in
+$\C^T$:
+\begin{align*}
+  \bsy_{1:T}
+  = \sum_{\ell\in F_T} \delta_\ell \bse_\ell
+  &=
+  \delta_0 \bse_0
+  +
+  \sum_{\ell=1}^{\left\lfloor (T-1)/2 \right\rfloor}
+  \left(
+  \delta_\ell \bse_\ell
+  +
+  \delta_{-\ell} \bse_{-\ell}
+  \right)
+  + \delta_{\frac{T}{2}}\bse_{\frac{T}{2}}
+    \cdot\mathbf{1}\{\text{$T$ Even}\}
+\end{align*}
+Next, since since $\bsy_{1:T}\in \R^T$, we know that
+\begin{align*}
+  \delta_\ell =
+  \langle \bsy_{1:T}, \bse_\ell \rangle
+  = \frac{1}{\sqrt{T}} \sumtT y_t e^{-i\lambda_\ell t}
+  = \overline{%
+      \left(\frac{1}{\sqrt{T}} \sumtT y_t e^{i\lambda_\ell t}\right)
+    }
+  = \overline{\langle \bsy_{1:T}, \bse_{-\ell} \rangle}
+  = \overline{\delta}_{-\ell}
+\end{align*}
+which also implies that also implies
+$\delta_{-\ell}=\overline{\delta}_\ell$, so we use this to rewrite the
+sum terms
+\begin{align}
+  \bsy_{1:T}
+  &=
+  \delta_0 \bse_0
+  +
+  \sum_{\ell=1}^{\left\lfloor (T-1)/2 \right\rfloor}
+  \left(
+  \delta_\ell \bse_\ell
+  +
+  \overline{\delta}_{\ell} \bse_{-\ell}
+  \right)
+  + \delta_{\frac{T}{2}}\bse_{\frac{T}{2}}
+    \cdot\mathbf{1}\{\text{$T$ Even}\}
+  \label{realdft}
+\end{align}
+Next, we want to simplify the terms of the sum further.
+First, since $\delta_\ell$ is a complex number, we know it has polar
+representation $\delta_\ell = r_\ell e^{i\theta_\ell}
+= r_\ell(\cos\theta_\ell+i\sin \theta_\ell)$ for some $r_\ell$ and
+$\theta_\ell$. We will use that. Next, recall from
+Definition~\ref{defn:periobasis} that our orthonormal basis for $\R^T$
+satisfies
+$\bse_\ell = (\bsu_\ell^{\cos}+i\bsu_\ell^{\cos})/\sqrt{2}$
+and
+$\bse_{-\ell} = (\bsu_\ell^{\cos}-i\bsu_\ell^{\cos})/\sqrt{2}$.
+So use both of these facts to simplify the expression for the terms in
+the sum of Equation~\ref{realdft}:
+\begin{align*}
+  \delta_\ell \bse_\ell
+  +
+  \overline{\delta}_{\ell} \bse_{-\ell}
+  &=
+  \big(r_\ell(\cos\theta_\ell+i\sin \theta_\ell)\big)
+  (\bsu_\ell^{\cos} + i \bsu_\ell^{\sin})/ \sqrt{2}
+  +
+  \big(r_\ell(\cos\theta_\ell-i\sin \theta_\ell)\big)
+  (\bsu_\ell^{\cos} - i \bsu_\ell^{\sin})/ \sqrt{2}
+  \\
+  &=
+  \frac{r_\ell}{\sqrt{2}}
+  \big[
+  \cos \theta_\ell
+  \big(
+  (\bsu_\ell^{\cos} + i \bsu_\ell^{\sin})
+  + (\bsu_\ell^{\cos} - i \bsu_\ell^{\sin})
+  \big)
+  +
+  i\sin \theta_\ell
+  \big(
+  (\bsu_\ell^{\cos} + i \bsu_\ell^{\sin})
+  -
+  (\bsu_\ell^{\cos} - i \bsu_\ell^{\sin})
+  \big)
+  \big]
+  \\
+  &=
+  \sqrt{2}r_\ell
+  \big[
+  \cos \theta_\ell
+  \bsu_\ell^{\cos}
+  -
+  \sin \theta_\ell
+  \bsu_\ell^{\sin}
+  \big]
+\end{align*}
+Therefore, we can rewrite Expression~\ref{realdft} as
+\begin{align}
+  \bsy_{1:T}
+  &=
+  \delta_0 \bse_0
+  +
+  \sum_{\ell=1}^{\left\lfloor (T-1)/2 \right\rfloor}
+  \sqrt{2}r_\ell
+  \big[
+  \cos \theta_\ell
+  \bsu_\ell^{\cos}
+  -
+  \sin \theta_\ell
+  \bsu_\ell^{\sin}
+  \big]
+  + \delta_{\frac{T}{2}}\bse_{\frac{T}{2}}
+    \cdot\mathbf{1}\{\text{$T$ Even}\}
+    \notag
+  %\\
+  %&=
+  %\delta_0 \bse_0
+  %+
+  %\sum_{\ell=1}^{\left\lfloor \frac{T-1}{2} \right\rfloor}
+  %\big[
+  %z_\ell^{\cos}
+  %\bsu_\ell^{\cos}
+  %-
+  %z_\ell^{\sin}
+  %\bsu_\ell^{\sin}
+  %\big]
+  %+ \delta_{\frac{T}{2}}\bse_{\frac{T}{2}}
+    %\cdot\mathbf{1}\{\text{$T$ Even}\}
+\end{align}
+Lastly, we can get exactly what we had in Definition~\ref{defn:realdft}
+if we define
+\begin{align*}
+  z_\ell^{\cos} = \sqrt{2}r_\ell\cos\theta_\ell
+  \qquad\qquad
+  z_\ell^{\sin} = \sqrt{2}r_\ell\sin\theta_\ell
+\end{align*}
+\end{proof}
+
+\begin{proof}
+Next, we show how to compute $I(\lambda_\ell)$ from $z_\ell^{\cos}$ and
+$z_\ell^{\sin}$ values. Recall $\delta_\ell\in\C$ has polar
+representation $\delta_\ell=r_\ell(\cos\theta_\ell+i\sin \theta_\ell)$.
+Therefore, the definition of $I(\lambda_\ell)$ implies
+\begin{align*}
+  I(\lambda_\ell)
+  &= |\delta_\ell|^2
+  = |r_\ell (\cos\theta_\ell+i\sin\theta_\ell)|^2
+  = r_\ell^2 (\cos^2\theta_\ell+\sin^2\theta_\ell)
+  = r_\ell^2 \cdot 1
+\end{align*}
+But recall that
+\begin{align*}
+  \begin{rcases}
+  z_\ell^{\cos} = \sqrt{2}r_\ell\cos\theta_\ell
+  \\
+  z_\ell^{\sin} = \sqrt{2}r_\ell\sin\theta_\ell
+  \end{rcases}
+  \implies\quad
+  \frac{\left(z_\ell^{\cos}\right)^2 + \left(z_\ell^{\sin}\right)^2}{2}
+  =
+  \frac{%
+    \left(\sqrt{2}r_\ell\cos\theta_\ell\right)^2
+    +
+    \left(\sqrt{2}r_\ell\sin\theta_\ell\right)^2
+  }{2}
+  = r_\ell^2
+  = I(\lambda_\ell)
+\end{align*}
+\end{proof}
+
+
+\clearpage
+\subsubsection{Periodogram as Estimate of Spectral Density, Whittle
+Likelihood}
+
+\begin{prop}\emph{(Similar Relationship to Autocovariance Function)}
+The periodogram for $\bsy_{1:T}$ satisfies
+\begin{align*}
+  I(\lambda_\ell)
+  =
+  \begin{cases}
+  \sum_{|k|<T} \hat{\gamma}(k)e^{-ik\lambda_\ell}
+  & \lambda_\ell \neq 0
+  \\
+  T \bar{y}^2 & \lambda_\ell=0
+  \end{cases}
+  \qquad
+  \text{where}\quad
+  \begin{cases}
+  \hat{\gamma}(k)
+  = \frac{1}{T}\sum_{t=1}^{T-k}
+    (y_{t+k}-\bar{y})
+    (y_{t}-\bar{y})
+  \\
+  \bar{y} = \frac{1}{T} \sumtT y_t
+  \end{cases}
+\end{align*}
+\end{prop}
+\begin{rmk}
+This looks a lot like the definition of the spectral density function we
+saw before,
+$f(\lambda) =
+\frac{1}{2\pi}\sum_{k=-\infty}^\infty \gamma(k)
+e^{-ik\lambda}$
+so it seems natural that they would be related.
+\end{rmk}
+\begin{proof}
+Start with the definition of
+$I(\lambda_\ell) = \delta_\ell \overline{\delta}_\ell =
+\langle \bsy_{1:T}, \bse_\ell\rangle$
+\begin{align*}
+  I(\lambda_\ell)
+  &=
+  \left(
+  \frac{1}{\sqrt{T}}
+  \sumtT y_t e^{-it\lambda_\ell}
+  \right)
+  \overline{%
+  \left(
+  \frac{1}{\sqrt{T}}
+  \sumtT y_t e^{-it\lambda_\ell}
+  \right)
+  }
+  =
+  \frac{1}{T}
+  \left(
+  \sumtT y_t e^{-it\lambda_\ell}
+  \right)
+  \left(
+  \sumtT y_t e^{it\lambda_\ell}
+  \right)
+\end{align*}
+For $\lambda_\ell=0$, obvious. To tackle $\lambda_\ell\neq0$, note that
+for any $\lambda_\ell\neq 0$, we have
+\begin{align}
+  S =
+  \sum_{t=1}^T \exp\left({it\lambda_\ell}\right)
+  =
+  \sum_{t=1}^T \exp\left({\frac{i2\pi \ell}{T}t}\right)
+  = 0
+  \label{orthzero}
+\end{align}
+Therefore, we can add zero within both parentheses by adding
+$-m\sum_{t=1}^T e^{it\lambda_\ell}$---for some $\ell\neq0$---and
+maintain equality (including $-\lambda_\ell=\lambda_{-\ell}$:
+\begin{align*}
+  I(\lambda_\ell)
+  &=
+  \frac{1}{T}
+  \left(
+  \sumtT y_t e^{-it\lambda_\ell}
+  - m\sumtT e^{-it\lambda_\ell}
+  \right)
+  \left(
+  \sumtT y_t e^{it\lambda_\ell}
+  - m\sumtT e^{it\lambda_\ell}
+  \right)
+  \\
+  &=
+  \frac{1}{T}
+  \left(
+  \sumtT
+  (y_t - m)e^{-it\lambda_\ell}
+  \right)
+  \left(
+  \sumtT
+  (y_t - m)e^{it\lambda_\ell}
+  \right)
+  \\
+  \implies\quad I(\lambda_\ell)
+  &=
+  \frac{1}{T}
+  \sumtT
+  \sum_{s=1}^T
+  (y_t - m)
+  (y_s - m)e^{-i(t-s)\lambda_\ell}
+  = \sum_{|k|<T} \hat{\gamma}(k)e^{-ik\lambda_\ell}
+\end{align*}
+as desired.
+Lastly, just to tie up the only loose end.
+Equality~\ref{orthzero} follows from the even spacing of the
+Fourier frequencies $\lambda_\ell$'s:
+\begin{align*}
+  S
+  &=
+  \left[
+  \exp\left({i\frac{2\pi\ell}{T}}\right)
+  + \exp\left(i2\frac{2\pi\ell}{T}\right)
+  +\cdots+
+  \exp\left(iT\frac{2\pi\ell}{T}\right)
+  \right]
+  \\
+  \implies\quad
+  \exp\left({i\frac{2\pi \ell}{T}}\right)S
+  &=
+  \left[
+  \exp\left({i2\frac{2\pi\ell}{T}}\right)
+  + \exp\left({i3\frac{2\pi\ell}{T}}\right)
+  +\cdots+
+  \exp\left({i(T+1)\frac{2\pi\ell}{T}}\right)
+  \right]
+\end{align*}
+Subtract the second line from the first and factor out a
+$\exp(i(2\pi\ell)/T)$ on the RHS
+\begin{align*}
+  S\left[1- \exp\left({i\frac{2\pi \ell}{T}}\right)\right]
+  &=
+  \exp\left({i\frac{2\pi\ell}{T}}\right)
+  \left[
+  1-\exp\left({iT\frac{2\pi\ell}{T}}\right)
+  \right]
+  %\\
+  %&=
+  %\exp\left({i\frac{2\pi\ell}{T}}\right)
+  %\left[
+  %1-
+  %(\cos(2\pi\ell)+i\sin(2\pi\ell))
+  %\right]
+\end{align*}
+Since $\ell$ is an integer, $\exp(i2\pi\ell)=1$.  Therefore, the RHS of
+the above equality is zero, so the LHS must be as well. Since
+$\lambda_\ell\neq 0$ by assumption, the bracketed term on the LHS cannot
+be zero; therefore it must be that $S=0$, as desired.
+\end{proof}
+
+
+\begin{prop}
+For any mean-zero stationary series with absolutely summable
+autocovariances, pairwise expected \emph{correlations} between the
+$T$ random variables constructed in the DFT converge to zero as
+$T\ra\infty$:
+\begin{align*}
+  \sup_{\ell\neq\ell'} \E[z^{\cos}_\ell z^{\cos}_{\ell'}]
+  \ra 0
+  \qquad
+  \sup_{\ell\neq\ell'} \E[z^{\sin}_\ell z^{\cos}_{\ell'}]
+  \ra 0
+  \qquad
+  \sup_{\ell,\ell'} \E[z^{\cos}_\ell z^{\cos}_{\ell'}]
+  \ra 0
+\end{align*}
+i.e.\ the RV are asymptotically uncorrelated.
+Moreover, the expected second moments converges to the spectral density:
+\begin{align*}
+    \sup_{\ell\leq (T-1)/2}
+    \big\lvert\;
+      \E[(z^{\cos}_\ell)^2]
+      - 2\pi f(\lambda_\ell)
+    \;\big\rvert
+    &\ra 0
+    \qquad
+    \sup_{\ell\leq (T-1)/2}
+    \big\lvert\;
+      \E[(z^{\sin}_\ell)^2]
+      - 2\pi f(\lambda_\ell)
+    \;\big\rvert
+    \ra 0
+\end{align*}
+Therefore, the DFT converts autocovariance in $\{y_t\}\tT$ into
+heteroskedasticity (across $\ell$) of $\{z_\ell^{\cos},z_\ell^{\sin}\}$
+terms, with the shape of heteroskedasticity determined by the spectral
+density $f(\lambda)$.
+\end{prop}
+
+\begin{cor}
+Let $I_T(\lambda_\ell)$ denote the periodogram constructed from $T$
+observations.
+\begin{align*}
+  \text{As $T\ra\infty$}\quad
+  \E\left[
+    I_T(\lambda_\ell)
+  \right]
+  \ra
+  2\pi f(\lambda_\ell)
+\end{align*}
+This follows from the previous proposition since the expectations of the
+DFT coefficients (which are used to construct
+$I_T=[(z_\ell^{\cos})^2+(z_\ell^{\cos})^2]/2$) converge.
+\end{cor}
+
+\begin{note}
+(Important)
+Convergence in the above proposition and corollary is \emph{not} in
+probability; it is in the analysis sense of convergence of sequences.
+Specifically, we're saying that sequences of expectations (which are
+sequences of \emph{numbers}, not RV's) are converging.
+We're \emph{not} saying that $z^{\cos}_\ell$, $z^{\sin}_\ell$, and
+$I_T(\lambda_\ell)$ (which are random variables) converge in probability
+something.  No, we're saying that \emph{expectations} involving these
+random variables are converging.
+
+It is for this reason that we \emph{smooth} the periodogram.
+Essentially, we should think of the periodogram as the underlying
+spectral density plus noise. The above convergence result says only
+that, as $T\ra\infty$, that noise will be \emph{mean-zero}---\emph{but}
+there's still noise there that we can't get rid of, except by smoothing
+across Fourier frequencies to improve the quality of our estimates. And
+that's the best we can do.
+\end{note}
+
+
+
+\begin{cor}\emph{(Whittle Likelihood)}
+If $\{y_t\}$ is an mean-zero stationary Gaussian
+process, then $z^{\cos}_\ell$ and $z^{\sin}_\ell$---as weighted averages
+of $\{y_t\}$---will also be Gaussian s.t.
+\begin{align*}
+  z_\ell^{\cos} &\sim N(0,2\pi f(\lambda_\ell))
+  \qquad
+  z_\ell^{\sin} \sim N(0,2\pi f(\lambda_\ell))
+\end{align*}
+Now let $f(\lambda;\theta)$ denote the the spectral density function at
+frequency $\lambda$ as a function of parameters $\theta$.
+%Also let $\phi(z;\sigma^2)$ denote the density of normal with mean zero
+%and variance $\sigma^2$.
+Then we can write the likelihood of the model as
+\begin{align*}
+  \calL(\theta)
+  %&= \prod_{\ell=1}^{\lfloor(T-1)/2\rfloor}
+  %\phi\big(
+    %z_\ell^{\cos},\;2\pi f(\lambda_\ell;\theta)
+  %\big)
+  %\phi\big(
+    %z_\ell^{\sin},\;2\pi f(\lambda_\ell;\theta)
+  %\big)
+  %\\
+  &= \prod_{\ell=1}^{\lfloor(T-1)/2\rfloor}
+  \left[
+  \frac{1}{2\pi \sqrt{f(\lambda_\ell;\theta)}}
+  \exp\left(
+    -\frac{(z_\ell^{\cos})^2}{2\cdot 2\pi f(\lambda_\ell;\theta))}
+  \right)
+  \right]
+  \left[
+  \frac{1}{2\pi \sqrt{f(\lambda_\ell;\theta)}}
+  \exp\left(
+    -\frac{(z_\ell^{\sin})^2}{2\cdot 2\pi f(\lambda_\ell;\theta))}
+  \right)
+  \right]
+  \\
+  &= \prod_{\ell=1}^{\lfloor(T-1)/2\rfloor}
+  \frac{1}{(2\pi)^2 f(\lambda_\ell;\theta)}
+  \exp\left(
+    -\frac{I_T(\lambda_\ell)}{2\pi f(\lambda_\ell;\theta))}
+  \right)
+\end{align*}
+where we used that
+$I_T(\lambda_\ell)=[(z_\ell^{\cos})^2+(z_\ell^{\sin})^2]/2$ to simplify
+the exponential.
+\clearpage
+Now take logs, ignore the constant term, and arrive at the Whittle
+log-likelihood:
+\begin{align*}
+  \ln\calL(\theta)
+  &=
+  %\frac{T}{2}\log(2\pi)
+  -\sum_{\ell=1}^{\lfloor(T-1)/2\rfloor}
+    \log\big(2\pi f(\lambda_\ell;\theta)\big)
+  -\sum_{\ell=1}^{\lfloor(T-1)/2\rfloor}
+  \frac{I_T(\lambda_\ell)}{2\pi f(\lambda_\ell;\theta)}
+\end{align*}
+We can maximize this object (even if the data is not Gaussian) for
+approximate model estimation.
+\end{cor}
+
+\begin{ex}
+If we suppose $y_t$ follows an AR(1)
+\begin{align*}
+  y_t=\rho y_{t-1}+\varepsilon_t
+  \quad\iff\quad
+  y_t = (1-\rho L)^{-1}\varepsilon_t
+\end{align*}
+where the $\varepsilon_t$ innovations are Gaussian, then we know that
+\begin{align*}
+  f(\lambda; \rho,\sigma^2)
+  =
+  \frac{\sigma^2}{2\pi}
+  (1-\rho e^{i\lambda})^{-1}
+  (1-\rho e^{-i\lambda})^{-1}
+\end{align*}
+Then, given data $\{y_t\}\tT$, we can compute $I_T(\lambda_\ell)$ at the
+Fourier frequencies, plug $I_T(\lambda_\ell)$ and this expression for
+$f(\lambda;\rho,\sigma^2)$ into the log likelihood above, and maximize
+for $\rho$ and $\sigma^2$.
+\end{ex}
+
+
+\clearpage
+\subsubsection{Estimating the Long-Run Variance}
+\label{sec:hac}
+
+In this subsection, we suppose that we have a sample $\{y_t\}\tT$ for
+some covariance stationary process.
+We want to estimate the long-run variance, which can be written in any
+of the following three equivalent ways in terms of the autocovariances,
+the autocovariance generating function $g(z)$, or the spectral density
+$f(\lambda)$, respectively:
+\begin{align*}
+  S &= \sum_{j=-\infty}^\infty \gamma(j)
+  = g(1)
+  = 2\pi f(0)
+\end{align*}
+
+\begin{defn}(Non-Parametric Estimator)
+The non-parametric approach estimates sample covariances
+$\{\hat{\gamma}(j)\}$ and then constructs
+\begin{align*}
+  \hat{S} = \sum_{j=-m}^m \hat{\gamma}(j)
+  \qquad \text{where}\quad
+  \hat{\gamma}(j) = \frac{1}{T-j}\sum_{t=j+1}^T y_t y_{t-j}
+\end{align*}
+where $m<T-1$ is some truncation parameter.
+\end{defn}
+
+\begin{defn}(Kernel Based Estimators and the Newey-West Estimator)
+Here we define a class of nonparametric estimators that still uses estimates
+of the sample covariances $\{\hat{\gamma}(j)\}$, but applies a weighting
+kernel to prevent sample error from imprecisely estimated (far-apart,
+$j$ close to $T$) covariances influencing $\hat{S}$ too much or inducing
+a negative long-run variance:
+\begin{align*}
+  \hat{S} = \sum_{j=-(T-1)}^{T-1} k(j/b_T)\hat{\gamma}(j)
+\end{align*}
+where $\{b_T\}$ is a sequence of bandwith parameters such that
+$b_T\ra \infty$ and where $k$ is a weighting kernel that satisfies
+\begin{enumerate}[label=(\roman*)]
+  \item Even, $k(-x)=k(x)$
+  \item $k(0)=1$
+  \item $\lim_{x\ra\infty}k(x)=0$
+\end{enumerate}
+Therefore, $\hat{S}$ is a class of estimators indexed by different
+choices of $k$ and $b_T$.
+In practice, $k$ is often chosen to be the \emph{Bartlett Kernel}
+\begin{align*}
+  k(x) &=
+  \begin{cases}
+    (1-|x|) & |x|<1 \\
+    0 &\text{otherwise}
+  \end{cases}
+\end{align*}
+and the resulting estimator is called the \emph{Newey-West Estimator}.
+Rule of thumb from Stock and Watson for a series with moderate
+persistence: $b_T=0.75 T^{1/3}$.
+\end{defn}
+
+
+\begin{defn}(Parametric Estimator)
+If we're willing to assume that $\{y_t\}$ is an ARMA process
+\begin{align*}
+  \phi(L)(y_t-\mu) = \theta(L)\varepsilon_t
+  \qquad \varepsilon_t\sim(0,\sigma^2)
+\end{align*}
+we can estimate the parameters $\hat{\sigma}^2$, $\hat{\phi}(z)$, and
+$\hat{\theta}(z)$ and then compute the implied spectral density at zero
+$2\pi f(0)$ or (equivalently) the autocovariance generating function at
+unity $g(1)$:
+\begin{align*}
+  \hat{S} = \hat{\sigma}^2 \frac{\hat{\theta}(1)^2}{\hat{\phi}(1)^2}
+  = \hat{\sigma}^2
+  \frac{(1+\hat{\theta}_1 + \cdots + \hat{\theta}_q)^2}{%
+    (1-\hat{\phi}_1 - \cdots - \hat{\phi}_p)^2}
+\end{align*}
+\end{defn}
+
+\begin{defn}(Pre-Whitened Estimator)
+This next approach combines both the parametric and non-parameteric
+approaches. Suppose that $y_t$ follows an MA($\infty$) process
+\begin{align*}
+  (y_t -\mu) = \psi(L)\varepsilon_t
+  \qquad \varepsilon_t\sim (0,\sigma^2_\varepsilon)
+\end{align*}
+An MA($\infty$) process can be reasonably well approximated by an AR(1),
+so factor out an AR(1) polynomial from $\psi(L)$ to write $y_t$ as
+\begin{align}
+  (y_t  - \mu) &=
+  \underbrace{(1-\rho L)^{-1} \theta(L)}_{\psi(L)}
+  \varepsilon_t
+  \qquad
+  \varepsilon_t\sim (0,\sigma^2_\varepsilon)
+  \notag
+  \\
+  &=
+  (1-\rho L)^{-1} u_t
+  \qquad\qquad
+  u_t := \theta(L)\varepsilon_t
+  \label{prewhiten}
+  \\
+  \iff\quad
+  (y_t -\mu) &= \rho (y_{t-1}-\mu) + u_t
+  %\quad\quad\;\,
+  %u_t := \theta(L)\varepsilon_t
+  %\label{prewhiten}
+  \notag
+\end{align}
+Then we can construct an estimate of the long-run variance for $\{y_t\}$
+by computing
+\begin{align*}
+  \hat{S}_y = \frac{\hat{S}_u}{(1-\hat{\rho})^2}
+\end{align*}
+where $\hat{\rho}$ is the coefficient from OLS regression of
+$(y_t-\mu)$ on $(y_{t-1}-\mu)$ and $\hat{S}_u$ is a nonparametric
+estimate (probably a Newey-West estimator) of the long-run variance of
+the residuals.
+
+The idea is that the first stage OLS regression of $(y_t-\mu)$ on
+$(y_{t-1}-\mu)$ will remove a lot of the autocorrelation while still
+only estimating one parameter, $\hat{\rho}$. As a result, the
+nonparametric estimate of the residual long-run variance
+$\sum_{j=-\infty}^\infty\gamma_u(j)$ (an infinite sum we approximate
+with a finite sum) will be much higher quality since the autocovariances
+for long langs won't contribute as much---the first state removed lots
+of the autocorrelation already.
+\end{defn}
+\begin{proof}
+To see why the formula for $\hat{S}_y$ takes that form, we work with the
+autocovariance generating functions. First recall that the long-run
+variance of $\{x_t\}$ is $S_x=g_x(1)$ where $g_x(z)$ is the
+autocovariance generating function of $\{x_t\}$.
+
+Next, if we write $y_t$ as in expression \ref{prewhiten} where $\{u_t\}$
+is a covariance stationary process with autocovariance generating
+function $g_u(z)$, then we can view $\{y_t\}$ as simply $\{u_t\}$
+filtered by $h(z)=(1-\rho z)^{-1}$. But we know to compute the
+autocovariance generating functions of filtered processes:
+\begin{align*}
+  g_y(z) = h(z)h(z^{-1}) g_u(z)
+  = (1-\rho z)^{-1}(1-\rho z^{-1})^{-1}g_u(z)
+\end{align*}
+Given this expression, we can compute the long-run variance of $y$:
+\begin{align*}
+  S_y = g_y(1) = \frac{g_u(1)}{(1-\rho)^{2}}
+\end{align*}
+But notice that $g_u(1)$ is simply the long-run variance of $u$, denoted
+$S_u$.  Therefore,
+\begin{align*}
+  S_y = g_y(1) = \frac{S_u}{(1-\rho)^{2}}
+\end{align*}
+Notice that we don't actually care about the parametric form that $S_u$
+takes. It's just a number we want to estimate nonparametrically.
+\end{proof}
+
+\begin{defn}(Parametric GLS Approach)
+We suppose that the process follows
+\begin{align*}
+  y_t &= x_t'\beta + u_t \\
+  u_t &= \psi(L)\varepsilon_t
+  \qquad \varepsilon_t\sim (0,\sigma^2)
+\end{align*}
+where $x_t$ is a vector of predetermined values (maybe just a constant)
+and $u_t$ is some covariance stationary process with MA($\infty$)
+representation as above with lag polynomial $\psi(L)$.  As stated, the
+errors $u_t$ are correlated across observations. We can turn this into a
+regression with uncorrelated errors by inverting $c(L)$ to get
+\begin{align*}
+  \psi(L)^{-1}y_t &= \psi(L)^{-1}x_t'\beta + \varepsilon_t \\
+  \iff\qquad
+  \tilde{y}_t &= \tilde{x}_t\beta + \varepsilon_t
+\end{align*}
+Then the OLS estimator from the regression of $\tilde{y}$ on $\tilde{x}$
+will be the best linear unbiased estimator by Gauss-Markov since the
+errors are now iid.
+
+Of course, this supposes that we know $\psi(L)$. In general we don't, so
+we have to estimate it and do feasible GLS. Therefore, we can do the
+following:
+\begin{enumerate}[label=(\roman*)]
+  \item Run the regression $y_t=x_t'\beta +u_t$ to get a vector of
+    estimated residuals $\hat{u}_t$.
+  \item Using $\hat{u}_t$, estimate the parameters $\hat{\psi}(z)$
+  \item Use the estimated $\hat{\psi}(z)$ to construct $\tilde{y}_t$ and
+    $\tilde{x}_t$
+  \item Run OLS regression $\tilde{y}=\tilde{x}\beta + \varepsilon_t$.
+\end{enumerate}
+The result is a better estimate of $\beta$ and resulting asymptotic
+variance
+\begin{align*}
+  \hat{\beta}_{GLS}
+  &=
+  \left[ \sumtT \tilde{x}_t\tilde{x}_t'\right]^{-1}
+  \left[ \sumtT \tilde{x}_t\tilde{y}_t\right]
+\end{align*}
+However, we need $\E[\tilde{x}_t\varepsilon_t]=0$ for consistency of the
+FGLS estimator. In general that means we need not only
+\emph{predetermined} (aka \emph{weakly endogenous}) regressors
+$\E[u_t|x_t,x_{t-1},\ldots]=0$, but also \emph{strictly endogenous}
+regressors $\E[u_t|x_{t+1},x_t,x_{t-1},\ldots]=0$, which is generally a
+bad assumption.
+
+
+\end{defn}
+
+
+
+
+
+
+
+
+
 
 \clearpage
 \section{Classical Hypothesis Testing}
@@ -12048,326 +13330,11 @@ after setting the value of the Type I error equal to $\alpha$.
 
 
 \clearpage
-\section{Estimating Spectral Densities and Long-Run Variance}
-
-\subsection{Sample Periodogram}
-
-\begin{defn}(Discrete Fourier Transform)
-Consider $\{y_t\}_{t=1}^T$ and assume $T$ is odd. The discrete fourier
-transform maps the series into the mean and $T-1$ trigonometrically
-weighted averages:
-\begin{align*}
-  \hat{\mu} &= \frac{1}{T}\sumtT y_t \\
-  Z^{\cos}_\ell &= \frac{\sqrt{2}}{\sqrt{T}}
-    \sumtT \cos(\lambda_\ell (t-1))y_t
-  \qquad \ell=1,\ldots,T-1
-  \\
-  Z^{\sin}_\ell &= \frac{\sqrt{2}}{\sqrt{T}}
-    \sumtT \sin(\lambda_\ell (t-1))y_t
-  \qquad \ell=1,\ldots,T-1
-\end{align*}
-for $\lambda_\ell = (2\pi \ell)/T$ where, again, $\ell=1,\ldots,T-1$.
-\end{defn}
-
-\begin{prop}
-For any mean-zero stationary series with absolutely summable
-autocovariances, the pairwise \emph{correlations} between the $T$ random
-variables that are constructed in the DFT converge to zero
-asymptotically:
-\begin{align*}
-  \sup_{\ell\neq\ell'} \E[Z^{\cos}_\ell Z^{\cos}_{\ell'}]
-  \pto 0
-  \qquad
-  \sup_{\ell\neq\ell'} \E[Z^{\sin}_\ell Z^{\cos}_{\ell'}]
-  \pto 0
-  \qquad
-  \sup_{\ell,\ell'} \E[Z^{\cos}_\ell Z^{\cos}_{\ell'}]
-  \pto 0
-\end{align*}
-i.e.\ the random variables are asymptotically uncorrelated.
-Moreover, their variance converges to the spectral density:
-\begin{align*}
-    \sup_{\ell\leq (T-1)/2}
-    \bigg\lvert\;
-      \E[(Z^{\cos}_\ell)^2]
-      - 2\pi f(\lambda_\ell)
-    \;\bigg\rvert
-    &\pto 0 \\
-    \sup_{\ell\leq (T-1)/2}
-    \bigg\lvert\;
-      \E[(Z^{\sin}_\ell)^2]
-      - 2\pi f(\lambda_\ell)
-    \;\bigg\rvert
-    &\pto 0
-\end{align*}
-\end{prop}
-
-\begin{defn}
-We define the \emph{periodogram} at the Fourier frequencies
-$\lambda_\ell = (2\pi\ell)/T$:
-\begin{align*}
-  I_T(\lambda_\ell) =
-  \frac{(Z^{\cos}_\ell)^2 +(Z^{\sin}_\ell)^2}{2}
-  \qquad \ell = 1,\ldots,T-1
-\end{align*}
-where from the previous proposition
-\begin{align*}
-  \E[I_T(\lambda_\ell)] = 2\pi f(\lambda_\ell)
-  \qquad \ell = 1,\ldots,T-1
-\end{align*}
-\end{defn}
-
-\begin{prop}\emph{(Whittle Likelihood)}
-If $\{y_t\}$ is a Gaussian process, then $Z^{\cos}_\ell$ and
-$Z^{\sin}_\ell$ will be Gaussian such that
-\begin{align*}
-  Z_\ell^{\cos} &\sim N(0,2\pi f(\lambda_\ell)) \\
-  Z_\ell^{\sin} &\sim N(0,2\pi f(\lambda_\ell))
-\end{align*}
-for $\ell=1,\ldots,T-1$. Now let $f(\lambda;\theta)$ denote the the
-spectral density function at frequency $\lambda$ as a function of
-parameters $\theta$. Then we can write the log-likelihood of the model
-as
-\begin{align*}
-  \frac{T}{2}\log(2\pi)
-  - \sum_{\ell=1}^{(T-1)/2} \log\big(2\pi f(\lambda_\ell;\theta)\big)
-  - \sum_{\ell=1}^{(T-1)/2}
-  \frac{I_T(\lambda_\ell)}{2\pi f(\lambda_\ell;\theta)}
-\end{align*}
-
-\end{prop}
-
-\begin{ex}
-If we suppose $y_t$ follows an AR(1)
-\begin{align*}
-  y_t=\rho y_{t-1}+\varepsilon_t
-  \quad\iff\quad
-  y_t = (1-\rho L)^{-1}\varepsilon_t
-\end{align*}
-where the $\varepsilon_t$ innovations are Gaussian, then we know that
-\begin{align*}
-  f(\lambda; \rho,\sigma^2)
-  =
-  \frac{\sigma^2}{2\pi}
-  (1-\rho e^{i\lambda})^{-1}
-  (1-\rho e^{-i\lambda})^{-1}
-\end{align*}
-\end{ex}
-
-
-\clearpage
-\subsection{HAC Estimators for the Long-Run Variance}
-
-In this subsection, we suppose that we have a sample $\{y_t\}\tT$ for
-some covariance stationary process.
-We want to estimate the long-run variance, which can be written in any
-of the following three equivalent ways in terms of the autocovariances,
-the autocovariance generating function $g(z)$, or the spectral density
-$f(\lambda)$, respectively:
-\begin{align*}
-  S &= \sum_{j=-\infty}^\infty \gamma(j)
-  = g(1)
-  = 2\pi f(0)
-\end{align*}
-
-\begin{defn}(Non-Parametric Estimator)
-The non-parametric approach estimates sample covariances
-$\{\hat{\gamma}(j)\}$ and then construct
-\begin{align*}
-  \hat{S} = \sum_{j=-m}^m \hat{\gamma}(j)
-\end{align*}
-where $m<T-1$ is some truncation parameter.
-\end{defn}
-
-\begin{defn}(Kernel Based Estimators and the Newey-West Estimator)
-Here we define a class of nonparametric estimators that still uses estimates
-of the sample covariances $\{\hat{\gamma}(j)\}$, but applies a weighting
-kernel to prevent sample error from imprecisely estimated (far-apart,
-$j$ close to $T$) covariances influencing $\hat{S}$ too much or inducing
-a negative long-run variance:
-\begin{align*}
-  \hat{S} = \sum_{j=-(T-1)}^{T-1} k(j/b_T)\hat{\gamma}(j)
-\end{align*}
-where $\{b_T\}$ is a sequence of bandwith parameters such that
-$b_T\ra \infty$ and where $k$ is a weighting kernel that satisfies
-\begin{enumerate}[label=(\roman*)]
-  \item Even, $k(-x)=k(x)$
-  \item $k(0)=1$
-  \item $\lim_{x\ra\infty}k(x)=0$
-\end{enumerate}
-Therefore, $\hat{S}$ is a class of estimators indexed by different
-choices of $k$ and $b_T$.
-In practice, $k$ is often chosen to be the \emph{Bartlett Kernel}
-\begin{align*}
-  k(x) &=
-  \begin{cases}
-    (1-|x|) & |x|<1 \\
-    0 &\text{otherwise}
-  \end{cases}
-\end{align*}
-and the resulting estimator is called the \emph{Newey-West Estimator}.
-Rule of thumb from Stock and Watson for a series with moderate
-persistence: $b_T=0.75 T^{1/3}$.
-\end{defn}
-
-
-\begin{defn}(Parametric Estimator)
-If we're willing to assume that $\{y_t\}$ is an ARMA process
-\begin{align*}
-  \phi(L)(y_t-\mu) = \theta(L)\varepsilon_t
-  \qquad \varepsilon_t\sim(0,\sigma^2)
-\end{align*}
-we can estimate the parameters $\hat{\sigma}^2$, $\hat{\phi}(z)$, and
-$\hat{\theta}(z)$ and then compute the implied spectral density at zero
-$2\pi f(0)$ or (equivalently) the autocovariance generating function at
-unity $g(1)$:
-\begin{align*}
-  \hat{S} = \hat{\sigma}^2 \frac{\hat{\theta}(1)^2}{\hat{\phi}(1)^2}
-  = \hat{\sigma}^2
-  \frac{(1+\hat{\theta}_1 + \cdots + \hat{\theta}_q)^2}{%
-    (1+\hat{\phi}_1 - \cdots - \hat{\phi}_p)^2}
-\end{align*}
-\end{defn}
-
-\begin{defn}(Pre-Whitened Estimator)
-This next approach combines both the parametric and non-parameteric
-approaches. Suppose that $y_t$ follows an MA($\infty$) process
-\begin{align*}
-  y_t = \mu + \psi(L)\varepsilon_t
-  \qquad \varepsilon_t\sim (0,\sigma^2_\varepsilon)
-\end{align*}
-An MA($\infty$) process can be reasonably well approximated by an AR(1),
-so factor out an AR(1) polynomial from $\psi(L)$ to write $y_t$ as
-\begin{align}
-  y_t  - \mu &=
-  \underbrace{(1-\rho L)^{-1} \theta(L)}_{\psi(L)}
-  \varepsilon_t
-  \qquad
-  \varepsilon_t\sim (0,\sigma^2_\varepsilon)
-  \notag
-  \\
-  &=
-  (1-\rho L)^{-1} u_t
-  \qquad\qquad
-  u_t := \theta(L)\varepsilon_t
-  \label{prewhiten}
-  \\
-  \iff\quad
-  y_t -\mu &= \rho (y_{t-1}-\mu) + u_t
-  %\quad\quad\;\,
-  %u_t := \theta(L)\varepsilon_t
-  %\label{prewhiten}
-  \notag
-\end{align}
-Then we can construct an estimate of the long-run variance for $\{y_t\}$
-by computing
-\begin{align*}
-  \hat{S}_y = \frac{\hat{S}_u}{(1-\hat{\rho})^2}
-\end{align*}
-where $\hat{\rho}$ is the coefficient from an OLS regression of $y_t-\mu$ on
-$y_{t-1}-\mu$ and $\hat{S}_u$ is a nonparametric estimate (probably a
-Newey-West estimator) of the long-run variance of the residuals.
-
-The idea is that the first stage OLS regression of $y_t-\mu$ on
-$y_{t-1}-\mu$ will remove a lot of the dependence  while estimating only
-one parameter $\hat{\rho}$. As a result, the nonparametric
-estimate of the residual long-run variance
-$\sum_{j=-\infty}^\infty\gamma_u(j)$ (an infinite sum we approximate
-with a finite sum) will be much higher quality since the autocovariances
-for long langs won't contribute as much---the first state removed lots of
-the autocorrelation already.
-\end{defn}
-\begin{proof}
-To see why the formula for $\hat{S}_y$ takes that form, we work with the
-autocovariance generating functions. First recall that the long-run
-variance of $\{x_t\}$ is $S_x=g_x(1)$ where $g_x(z)$ is the
-autocovariance generating function of $\{x_t\}$.
-
-Next, if we write $y_t$ as in expression \ref{prewhiten} where $\{u_t\}$
-is a covariance stationary process with autocovariance generating
-function $g_u(z)$, then we can view $\{y_t\}$ as simply $\{u_t\}$
-filtered by $h(z)=(1-\rho z)^{-1}$. But we know to compute the
-autocovariance generating functions of filtered processes:
-\begin{align*}
-  g_y(z) = h(z)h(z^{-1}) g_u(z)
-  = (1-\rho z)^{-1}(1-\rho z^{-1})^{-1}g_u(z)
-\end{align*}
-Given this expression, we can compute the long-run variance of $y$:
-\begin{align*}
-  S_y = g_y(1) = \frac{g_u(1)}{(1-\rho)^{2}}
-\end{align*}
-But notice that $g_u(1)$ is simply the long-run variance of $u$, denoted
-$S_u$.  Therefore,
-\begin{align*}
-  S_y = g_y(1) = \frac{S_u}{(1-\rho)^{2}}
-\end{align*}
-Notice that we don't actually care about the parametric form that $S_u$
-takes. It's just a number we want to estimate nonparametrically.
-\end{proof}
-
-\begin{defn}(GLS Approach)
-We suppose that the process follows
-\begin{align*}
-  y_t &= x_t'\beta + u_t \\
-  u_t &= \psi(L)\varepsilon_t
-  \qquad \varepsilon_t\sim (0,\sigma^2)
-\end{align*}
-where $x_t$ is a vector of predetermined values (maybe just a constant)
-and $u_t$ is some covariance stationary process with MA($\infty$)
-representation as above with lag polynomial $\psi(L)$.  As stated, the
-errors $u_t$ are correlated across observations. We can turn this into a
-regression with uncorrelated errors by inverting $c(L)$ to get
-\begin{align*}
-  \psi(L)^{-1}y_t &= \psi(L)^{-1}x_t'\beta + \varepsilon_t \\
-  \iff\qquad
-  \tilde{y}_t &= \tilde{x}_t\beta + \varepsilon_t
-\end{align*}
-Then the OLS estimator from the regression of $\tilde{y}$ on $\tilde{x}$
-will be the best linear unbiased estimator by Gauss-Markov since the
-errors are now iid.
-
-Of course, this suppose that we know $\psi(L)$. In general we don't, so
-we have to estimate it and do feasible GLS. Therefore, we can do the
-following:
-\begin{enumerate}[label=(\roman*)]
-  \item Run the regression $y_t=x_t'\beta +u_t$ to get the vector of
-    residuals $\hat{u}_t$.
-  \item Using $\hat{u}_t$, estimate the parameters $\hat{\psi}(z)$
-  \item Use the estimated $\hat{\psi}(z)$ to construct $\tilde{y}_t$ and
-    $\tilde{x}_t$
-  \item Run OLS regression $\tilde{y}=\tilde{x}\beta + \varepsilon_t$.
-\end{enumerate}
-The result is a better estimate of $\beta$ and resulting asymptotic
-variance
-\begin{align*}
-  \hat{\beta}_{GLS}
-  &=
-  \left[ \sumtT \tilde{x}_t\tilde{x}_t'\right]^{-1}
-  \left[ \sumtT \tilde{x}_t\tilde{y}_t\right]
-\end{align*}
-However, we need $\E[\tilde{x}_t\varepsilon_t]$ for consistency of the
-FGLS estimator. In general that means we need not only
-\emph{predetermined} (aka \emph{weakly endogenous}) regressors
-$\E[u_t|x_t,x_{t-1},\ldots]=0$, but also \emph{strictly endogenous}
-regressors $\E[u_t|x_{t+1},x_t,x_{t-1},\ldots]=0$, which is generally a
-bad assumption.
-
-
-\end{defn}
-
-
-
-
-
-
-
-
-\clearpage
-\section{Classical Linear Regression: Finite Samples Properties of OLS}
+\section{Classical Linear Regression in Finite Samples}
 
 \subsection{Setup and Assumptions}
 
-In this section, I follow Hayashi and assume that the $n\times k$
+In this section, I follow Hayashi and assume that the $N\times K$
 regressor matrix $\bsX$ is \emph{random} rather than fixed, since that
 seems more appropriate for a non-experimental discipline like economics
 where the RHS ``independent'' variables are not under the control of the
@@ -12385,11 +13352,11 @@ such applications.
 \begin{enumerate}
   \item Linearity: We assume the model can be written
     \begin{align}
-      \underbrace{\bsy}_{(N\times 1)}
+      \underset{(N\times 1)}{\bsy}
       =
-      \underbrace{\vphantom{\bsy} \bsX}_{(N\times K)}
-      \underbrace{\vphantom{\bsy} \bsbeta}_{(K\times 1)}
-      + \underbrace{\vphantom{\bsy} \bsvarepsilon}_{(N\times 1)}
+      \underset{(N\times K)}{\vphantom{\bsy} \bsX}
+      \underset{(K\times 1)}{\vphantom{\bsy} \bsbeta}
+      + \underset{(N\times 1)}{\vphantom{\bsy} \bsvarepsilon}
       \label{regyx}
     \end{align}
   \item Strict Exogeneity: $\E[\varepsilon_n |\bsX]=0$ for
@@ -12445,33 +13412,8 @@ such applications.
 \end{defn}
 
 \clearpage
-\begin{defn}(Conditional and Unconditional Homoskedasticity)
-Given the classical regression model, we define two concepts for
-homoskedasticity that differ subtly in the Hayashi random-$\bsX$
-approach:
-\begin{enumerate}
-  \item \emph{Unconditional homoskedasticity}:
-    $\E[\varepsilon_n^2] = \sigma^2$ for all $n$.
-  \item \emph{Conditional Homoskedasticity}:
-    $\E[\varepsilon_n^2 | \bsx_n]
-    =\E[\varepsilon_n^2 | \bsX] = \sigma^2$
-\end{enumerate}
-Most importantly, we can have unconditional homoskedasticity
-(i.e.\ $\E[\varepsilon_n^2]=\sigma^2$ a constant) \emph{without}
-conditional homoskedasticity (i.e.\ $\E[\varepsilon_n^2|\bsx_n]$
-\emph{not} a constant).  In particular, the \emph{conditional} second
-moment $\E[\varepsilon_n^2|\bsx_n]$ could be a \emph{function}---not
-just a number/constant---that depends on $\bsx_n$. For example, maybe it
-blows up for small and large values of $\bsx_n$ but it does so
-symmetrically, so that the average
-$\E[\varepsilon_n^2]=\E[\E[\varepsilon_n^2|\bsx_n]]=\sigma^2$.
-
-We need to make this distinction because Hayashi assumes $\bsX$
-is random. His formulation is not a ``fixed $\bsX$'' approach, where
-Assumptions 2 and 4 are merely $\E[\varepsilon_i]=0$ and
-$\E[\bsvarepsilon\bsvarepsilon']=\sigma^2\bsI_N$ without the
-conditioning.
-\end{defn}
+\subsection{Discussion of Random Sampling and Heteroskedasticity}
+\label{sec:discusshetero}
 
 \begin{defn}(Classical Regression Model with Random Samples)
 The classical regression model with random sampling assumes that the
@@ -12482,7 +13424,7 @@ $(y_n,\bsx_n)$ implies that $(\varepsilon_n, \bsx_n)\perp \bsx_m$ for
 $n\neq m$.
 So Assumptions 1 and 4 on $\varepsilon_n$ (which we always
 conditioned on $\bsX$) will simplify to conditioning on individual
-$\bsx_n$:
+$\bsx_n$ as follows:
 \begin{alignat*}{5}
   \text{Assumption 2} &&\qquad
    \E[\varepsilon_n | \bsX] &=
@@ -12495,33 +13437,64 @@ $\bsx_n$:
    \E[\varepsilon_n|\bsx_n] \E[\varepsilon_m|\bsx_m]
    &&=0
 \end{alignat*}
-Moreover, these objects (which are, in general, functions of $\bsx_n$)
-will be identical across observations.
-
-Now it might seem like $\E[\varepsilon_n^2|\bsx_n]=\sigma^2$ (i.e.\
-conditional homosekedasticy) is an unnecessary and worthless assumption,
-since it would seem to follow \emph{immediately} from assuming iid
-observations. In the ``fixed-$\bsX$'' approach, this is certainly true,
-but in Hayashi's ``random-$\bsX$'' approach, this is not true for the
-reasons mentioned above.
-
-Assuming an iid sample only ensures that $\E[\varepsilon_n^2|\bsx_n]$ is
-identical across observations.  But, in general, that guy is a function
-of random variable $\bsx_n$.  Though identical across observations, that
-function is not necessarily a number/constant. Of course, if we iterate
-expectations and integrate out $\bsx_n$ by computing
-$\E[\varepsilon_n^2]=\E[\E[\varepsilon_n^2|\bsx_n]]$, the result will be
-a constant. Hence, an iid sample implies \emph{unconditional}
-homoskedasticity. But as we said above, the iid sample assumption does
-not automatically imply \emph{conditional} homoskedasticity where
-$\E[\varepsilon_n^2 | \bsx_n]
-=\E[\varepsilon_n^2 | \bsX] = \sigma^2$.
-Therefore, assuming $\E[\varepsilon_n^2|\bsx_n]=\sigma^2$ a constant
-still has some bite.
 \end{defn}
 
+\begin{defn}(Conditional and Unconditional Homoskedasticity)
+Suppose that we have an iid sample, so conditioning on $\bsX$ can be
+replaced with conditioning on $\bsx_n$.
+We make a distinction here (which will be reused again later in the OLS
+Asymptotics section) about two types of homo-/heteroskedasticity:
+\emph{conditional} and \emph{unconditional} (where the conditioning
+refers to $\bsx_n$). They are defined as follows:
+\begin{enumerate}[label=(\roman*)]
+  \item \emph{Unconditional Homoskedasticity}:
+    $\E[\varepsilon_n^2] = \sigma^2$ for all $n$.
+  \item \emph{Unconditional Heteroskedasticity}:
+    $\E[\varepsilon_n^2] = \sigma^2_n$, i.e. depends upon the index $n$
+  \item \emph{Conditional Homoskedasticity}:
+    $\E[\varepsilon_n^2 | \bsX]
+    =\E[\varepsilon_n^2 | \bsx_n] = \sigma^2$, a constant
+  \item \emph{Conditional Heteroskedasticity}:
+    $\E[\varepsilon_n^2 | \bsX] =\E[\varepsilon_n^2 | \bsx_n] =
+    \sigma^2(\bsx_n)$, which is a deterministic function of $\bsx_n$.
+\end{enumerate}
+They are related as follows.
+\begin{itemize}
+  \item Both (i) and (ii) \emph{cannot} be true at the same time
+  \item Both (iii) and (iv) \emph{cannot} be true at the same time
+  \item (iii) $\implies$ (i) by iterated expectations:
+    $\E[\varepsilon_n^2]=
+    \E[\E[\varepsilon_n^2|\bsx_n]]
+    \underset{\text{By (iii)}}{=}
+    \E[\sigma^2] = \sigma^2$
+
+  \item (iv) $\implies$ (i) by iterated expectations:
+    $\E[\varepsilon_n^2]=
+    \E[\E[\varepsilon_n^2|\bsx_n]]
+    \underset{\text{By (iv)}}{=}
+    \E[\sigma^2(\bsx_n)] = \sigma^2$
+    where the final expectation was take by averaging over $\bsx_n$.
+\end{itemize}
+The model we will use throughout this section and in the next on OLS
+asymptotics will generally allow for Conditional Heteroskedasticity as
+in (iv). That is, assuming a random sample and using Assumptions 1-3
+above is only enough to get us to case (iv) where we still allow for
+\emph{conditional heteroskedasticity}. The random sampling assumption
+plus Assumptions 1-3 say only that there is a deterministic function
+$\sigma^2(\bsx_n)$ that is \emph{identical across $n$} such that
+$\E[\varepsilon_n^2|\bsx_n]=\sigma^2(\bsx_n)$. That's it.
+
+Sometimes, however, we will choose to use additionally Assumption 4
+above, which switches us to case (iii) and says
+$\sigma^2(\bsx_n)=\sigma^2$, a constant. Regardless though, as shown, we
+will have (i) for free. And when we refer to ``heteroskedasticity robust
+standard errors'' below, we are referring to \emph{conditional}
+heteroskedasticity robustness as in (iv).
+\end{defn}
+
+
 \clearpage
-\subsection{Estimation}
+\subsection{Estimation Formulas}
 
 \begin{defn}(Sum of Squared Residuals)
 Define the \emph{sum of squared residuals} as
@@ -12532,7 +13505,7 @@ Define the \emph{sum of squared residuals} as
 
 
 \begin{defn}(OLS Estimates)
-The \emph{OLS Estimator} minimizes the sum of squared residuals:
+The \emph{OLS Estimator} minimizes the SSR:
 \begin{align*}
   \bshatbeta_{OLS}
   =
@@ -13422,97 +14395,153 @@ converges in distribution to $\Chi_k^2/k$.
 \clearpage
 \subsection{Weighted and Generalized Least Squares (WLS, GLS)}
 
-\subsubsection{Weighted Least Squares (WLS) Estimator}
-
+\begin{defn}
 While OLS minimized the sum of squared residuals, the
 \emph{weighted least squares (WLS) estimator} $\bshatbeta_{WLS}$
-minimizes the weighted sum of squared residuals:
-\begin{align*}
+minimizes the \emph{weighted} sum of squared residuals:
+\begin{align}
   \bshatbeta_{WLS}
-  :=&\; \argmin_{\bsb}
-  \sumnN w_n^2(y_n - \bsx_n'\bsb)^2
+  %:=&\; \argmin_{\bsb}
+  %\sumnN w_n^2(y_n - \bsx_n'\bsb)^2
   = \argmin_{\bsb}
   (\bsy - \bsX\bsb)'\bsW(\bsy - \bsX\bsb)
-\end{align*}
-where $\{w_n\}\nN$ is a sequence of sample weights and $\bsW :=
-\diag\{w_1^2,\ldots,w_N^2\}$.  Obviously, they must be chosen or
-observed.
-From the first order conditions, we get the expression
+  \label{wlsmax}
+\end{align}
+for some (typically symmetric) positive definite weighting matrix
+$\bsW$. Note that it could depend on or be constructed from the data.
+
+As a special case, we might choose diagonal $\bsW :=
+\diag\{w_1^2,\ldots,w_N^2\}$ given sample weights $\{w_n\}\nN$ so that
 \begin{align*}
   \bshatbeta_{WLS}
-  &= \left(
-  \sumnN w_n^2 \bsx_n\bsx_n'
-  \right)^{-1}
-  \left(
-  \sumnN w_n^2 \bsx_ny_n
-  \right)
+  = \argmin_{\bsb}
+  (\bsy - \bsX\bsb)'\bsW(\bsy - \bsX\bsb)
+  :=&\; \argmin_{\bsb}
+  \sumnN w_n^2(y_n - \bsx_n'\bsb)^2
+\end{align*}
+Solving the first order conditions to maximization Problem~\ref{wlsmax}
+for the WLS estimator gives
+\begin{align*}
+  \bshatbeta_{WLS}
   = \left( \bsX'\bsW\bsX \right)^{-1} \bsX'\bsW \bsy
 \end{align*}
-Substiting in $y_n=\bsx_n\bsbeta+\varepsilon_n$, we get
+Substituting in $\bsy=\bsX\bsbeta+\bsvarepsilon$, we get
 \begin{align*}
   \bshatbeta_{WLS} - \bsbeta
-  &= \left(
-  \sumnN w_n^2 \bsx_n\bsx_n'
-  \right)^{-1}
-  \left(
-  \sumnN w_n^2 \bsx_n\varepsilon_n
-  \right)
   = \left( \bsX'\bsW\bsX \right)^{-1} \bsX'\bsW \bsvarepsilon
 \end{align*}
-The estimator is consistent if $\E[w_n^2\bsx_n\varepsilon_n]=0$. That is
-implied by $\E[\varepsilon_n|\bsx_n\bsw_n]=0$.
+The estimator is consistent if the RHS $\pto \bso$.
+In the case of a diagonal weighting matrix, this occurs if
+$\E[w_n^2\bsx_n\varepsilon_n]=0$, which is implied by
+$\E[\varepsilon_n|\bsx_nw_n]=0$.
+\end{defn}
 
-\subsubsection{Generalized Least Squares (GLS) Estimator}
-
+Naturally, we might ask ``What is a good choice for $\bsW$?'' Enter GLS.
 Gauss-Markov says that under spherical errors
 $\Var(\bsvarepsilon|\bsX)=\sigma^2\bsI$ (i.e. conditional
 homoskedasticity), the OLS estimator is \emph{efficient}. However, if
-the errors are \emph{heteroskedastic} this is not the case. But we could
-construct sample weights so that the \emph{weighted} observations are
-conditionally homosekedastic, compute the WLS estimator with these
-weights (which is equivalent to OLS on the homosekedastic weighted
-observations), and then apply Gauss-Markov to say that the resulting the
-WLS estimator is efficient. This is GLS.
+the errors are \emph{heteroskedastic} and/or correlated (they often are)
+this is not the case. GLS therefore employs a special choice of the
+weighting matrix effectively to ``uncorrelate and make homoskedastic''
+the data.
 
-\begin{defn}(GLS Estimator)
-Suppose the errors are conditionally heteroskedastic with mean and
-covariance matrix
+But first, a word of caution: OLS has nice asymptotic properties, while
+GLS does not. GLS can only really be motivated by the fact that it
+\emph{might} perform better in finite samples---and even then, you often
+have to know a lot about the data generating process or parameters for
+that to be the case. So GLS should only be used with care. OLS, in
+general, does something approximately correct most of the time, while
+GLS has no such gaurantee.
+
+
+\begin{prop}\emph{(GLS Estimator)}
+Suppose the errors correlated with mean and covariance
 \begin{align*}
   \E[\bsvarepsilon|\bsX]= \bso
   \qquad
   \Var(\bsvarepsilon|\bsX)
-  = \diag\{\sigma_1^2,\ldots,\sigma^2_N\}
+  = \bsLambda
+  = (\bsP'\bsP)^{-1} \neq \sigma^2\bsI
 \end{align*}
-That suggests weights $w_n=\sigma^{-1}_n$. Then the WLS estimator under
-these weights is equivalent to the OLS estimator of regression
+Then the GLS estimator, defined as,
 \begin{align*}
-  \frac{y_n}{\sigma_n} = \left(\frac{\bsx_n}{\sigma_n}\right)'\bsbeta
-  + \frac{\varepsilon_n}{\sigma_n}
+  \bshatbeta_{GLS} =
+  \big(\bsX'\bsLambda^{-1}\bsX)^{-1}\bsX'\bsLambda^{-1}\bsy
 \end{align*}
-Since, for this regression, we have homoskedasticity
-$\Var(\bsvarepsilon|\bsX)=\bsI$, the OLS estimator is efficient. But
-since it's equivalent to the WLS estimator given weights
-$w_n=\sigma^{-1}_n$, the WLS estimator is efficient, and it gets the
-special name: the \emph{GLS estimator}.
+has lower variance than the OLS estimator.
+\end{prop}
+\begin{proof}
+Since $\Var(\bsvarepsilon|\bsX)\neq\sigma^2\bsI$, we cannot apply
+Gauss-Markov to say that OLS has lowest variance. So let's multiply
+through the regression equation by $\bsP$ to get
+\begin{align}
+  \underbrace{\bstildey}_{\bsP \bsy}
+  &=
+  \underbrace{\bstildeX\vphantom{\bstildey}}_{\bsP \bsX}
+  \bsbeta
+  + \underbrace{\bstildevarepsilon\vphantom{\bstildey}}_{\bsP \bsvarepsilon}
+  \label{glsmod}
+\end{align}
+Notice that
+\begin{align*}
+  \Var(\bstildevarepsilon|\bsX)
+  &=
+  \Var(\bsP\bsvarepsilon|\bsX)
+  =
+  \bsP\Var(\bsvarepsilon|\bsX)\bsP'
+  =
+  \bsP (\bsP'\bsP)^{-1} \bsP'
+  = \bsI
+\end{align*}
+Therefore, the errors in Equation~\ref{glsmod} \emph{are} spherical, so
+if we do OLS regression of $\bstildey$ on $\bstildeX$, Gauss-Markov says
+the resulting estimator will have the lowest variance:
+\begin{align*}
+  \bshatbeta
+  &= [\bstildeX'\bstildeX]^{-1}\bstildeX'\bstildey
+  = [(\bsP\bsX)'(\bsP\bsX)]^{-1}
+      (\bsP\bsX)'(\bsP\bsy)
+  = [\bsX'\bsP'\bsP\bsX]^{-1}
+      \bsX'\bsP'\bsP\bsy
+\end{align*}
+Making the substitution that $\bsLambda^{-1}=\bsP'\bsP$, we get exactly
+$\bshatbeta_{GLS}$.
+\end{proof}
 
+\begin{cor}\emph{(GLS with Heteroskedasticity Only)}
+Suppose the errors are uncorrelated, but conditionally heteroskedastic
+with mean and covariance matrix
+\begin{align*}
+  \E[\bsvarepsilon|\bsX]= \bso
+  \qquad
+  \Var(\bsvarepsilon|\bsX)
+  = \bsLambda = \text{\emph{diag}}\{\sigma_1^2,\ldots,\sigma^2_N\}
+\end{align*}
+Then we can see from he above formula that GLS is exactly like doing WLS
+with weights $w_n=\sigma^{-1}_n$ in weighting matrix
+$\bsW=\bsLambda^{-1}$.
+\end{cor}
+\begin{rmk}
 The weighting structure $w_n=\sigma_n^{-1}$ clearly \emph{overweights}
-those observations that have small conditional variance. Intuitively,
-GLS uses those observations that are measured most precisely to
-construct an more efficient estimator than plain OLS.
-\end{defn}
+those observations that have small conditional variance. Intuitively, we
+use those observations that are measured most precisely to construct a
+more efficient estimator than plain OLS.
+\end{rmk}
 
 \begin{defn}(FGLS Estimator)
-Of course, we don't know the $\{\sigma_n^2\}\nN$ terms in practice that
-we need to construct the optimal weights. So we instead specify
-functional form
+Of course in practice, we don't know $\bsLambda$ or (in the case of
+heteroskedasticity only) the $\{\sigma_n^2\}\nN$ terms that we need to
+construct the weighting matrix. So we instead specify functional form
 \begin{align*}
-  \sigma_n^2 = g(\bsx_n,\bsalpha)
+  \bsLambda = \bsg(\bsX,\bstheta)
 \end{align*}
-for some $\bsalpha$ that we can either observe or estimate.
-Then the WLS estimator using weights $w_n=g(\bsx_n,\alpha)^{-1}$ is
-called the \emph{Feasible Generalized Least Squares (FGLS) Estimator}.
+for some $\bstheta$ that we can either observe or estimate.
+Then we plug in the data $\bsX$ along with our estimates of
+the parameters $\bshattheta$ to construct
+$\bsW=\bshatLambda^{-1}=\bsg(\bsX,\bshattheta)^{-1}$ and compute the GLS
+estimator. This is called the \emph{Feasible Generalized Least Squares
+(FGLS) Estimator}.
 \end{defn}
-
 
 
 \clearpage
@@ -13530,8 +14559,7 @@ underlying data-generating process to derive joint
 fixed, finite sample.
 
 \begin{defn}(Assumptions)
-Here, we state a few assumptions that will be referenced for different
-results:
+Here, we state assumptions to be referenced below:
 \begin{enumerate}
   \item \emph{Linearity}: $y_n = \bsx_n' \bsbeta + \varepsilon_n$
     where $\bsx_n$ and $\bsbeta$ are $(K\times 1)$ vectors
@@ -13540,9 +14568,14 @@ results:
     ergodic. This would be implied by iid, but is a weaker assumption.
 
   \item \emph{Predetermined Regressors}:
-    $\E[\bsx_n (y_n - \bsx'_n \bsbeta)]=\E[\bsx_n \varepsilon_n]= \bso$
-    for all $n$.
-
+    For all $n$, we have
+    \begin{align*}
+      \E[\bsx_n (y_n - \bsx'_n \bsbeta)]=\E[\bsx_n \varepsilon_n] =
+      \E[\bsg_n]= \bso
+      \qquad
+      \text{where}\quad
+      \bsg_n := \bsx_n\varepsilon_n
+    \end{align*}
     This is implied by (but weaker than) assuming
     $\E[\varepsilon_n|\bsx_n]=0$.  It is also implied by (but weaker
     than) assuming strict exogeneity, which requires
@@ -13556,18 +14589,21 @@ results:
     %$\bsSigma_{\bsx\bsx}:=\E[\bsx_n\bsx_n']$ exists, is finite, and has
     $\E[\bsx_n\bsx_n']$ exists, is finite, and has full rank
 
-  \item \emph{Martingale Difference Sequence $\bsx_n\varepsilon_n$}:
+  \item \emph{Martingale Difference Sequence
+    $\bsg_n:=\bsx_n\varepsilon_n$, i.e. no autocorrelation in $\bsg_n$}:
     We strengthen Assumption 3 above. In particular,
-    we suppose that $\bsx_n\varepsilon_n$ has finite second moment,
-    i.e.\ $\E[\varepsilon_n^2\bsx_n\bsx_n']<\infty$, and is a
-    martingale difference sequence relative to some filtration (the
-    natural filtration will do just fine), i.e.\
-    \begin{align*}
-      \E[\bsx_n\varepsilon_n\;|\;
-      \bsx_{n-1}\varepsilon_{n-1},\bsx_{n-2}\varepsilon_{n-2},\ldots]
+    we suppose $\bsg_n=\bsx_n\varepsilon_n$ has finite variance/second
+    moment, i.e.\
+    $\Var[\bsg_n]=\E[\bsg_n\bsg_n']=\E[\varepsilon_n\bsx_n\bsx_n']<\infty$, and is a
+    martingale difference sequence relative to some filtration
+    (the natural filtration works):
+    \begin{align}
+      \E[\bsg_n|\;
+      \bsg_{n-1},\bsg_{n-2},\ldots]
       = \bso
-    \end{align*}
-    A sufficient condition for $\bsx_n\varepsilon_n$ to be a MDS is
+      \label{guncorr}
+    \end{align}
+    A sufficient condition for $\bsg_n$ to be a MDS is
     \begin{align*}
       \E[\varepsilon_n\;|\;
       \varepsilon_{n-1},
@@ -13576,34 +14612,94 @@ results:
       \bsx_{n-1}, \ldots]
       = \bso
     \end{align*}
+    By iterated expectations,
+    Statement~\ref{guncorr} implies $\E[\bsg_n\bsg_{n-k}']=\bso$ for all
+    $k>0$. Together with Assumption 3, Assumption 5 amounts to saying
+    that $\bsg_n$ is \emph{not} autocorrelated.
+    We will not maintain this assumption for all of the analysis below,
+    but it's useful to have a labeled condition that we can refer to
+    when we do want to invoke it.
     %For later, we define
     %\begin{align*}
       %\bsS := \E[\bsx_n\varepsilon^2_n\bsx_n']
     %\end{align*}
 \end{enumerate}
 \end{defn}
+
 \begin{rmk}
-Since $(y_n,\bsx_n)$ is stationary, the error term $\varepsilon_n$ is
-also stationary so that $\E[\varepsilon^2_n]$ is constant across $n$,
-i.e.\ the model is unconditionally homoskedastic.
-However, the setup above allows $\E[\varepsilon_n^2|\bsx_n]$ to depend
-upon $\bsx_n$, so that the model permits \emph{conditional}
-heteroskedasticity. For that reason, we will develop
-heteroskedasticity-robust standard errors.
+This model also allows for \emph{conditional heteroskedasticity}, as
+discussed in Section~\ref{sec:discusshetero}. Therefore, we will
+develop conditional heteroskedasticity-robust standard errors.
+
+However, we will also have \emph{un}conditional \emph{homo}skedasticity.
+This follows because $(y_n,\bsx_n)$ is assumed stationary, which implies
+the error term $\varepsilon_n$ is consequently also stationary.
+For that to be the case, it must be that the unconditional error
+variance is constant across $n$, i.e. $\E[\varepsilon^2_n]=\sigma^2$, a
+constant that does not depend upon $n$. That is the definition of
+unconditional homoskedasticity.
 \end{rmk}
 
+
 \clearpage
+\subsection{%
+  Discussion of Autocorrelation in $\bsg_n=\bsx_n\varepsilon_n$ and
+  of Asymptotic Variance $\bsOmega$
+}
+
+When we derive the asymptotic properities of the OLS estimator below, we
+will use a Central Limit Theorem on $\bsg_n=\bsx_n\varepsilon_n$ to say
+that
+\begin{align*}
+  \frac{1}{\sqrt{T}}\sumtT \bsg_n\bsg_n'
+  = \frac{1}{\sqrt{T}}\sumtT \varepsilon_n^2\bsx_n\bsx_n'
+  \quad\dto\quad \calN(0,\bsOmega)
+\end{align*}
+The correlation structure of $\bsg_n$ will determine what we take as
+the asymptotic variance $\bsOmega$. In particular, if we are willing to
+impose Assumption 5, then we are saying $\bsg_n$ has no autocorrelation,
+as discussed. In that case
+\begin{align*}
+  \frac{1}{\sqrt{T}}\sumtT \bsg_n\bsg_n'
+  =
+  \frac{1}{\sqrt{T}}\sumtT \varepsilon_n^2\bsx_n\bsx_n'
+  \quad&\dto\quad
+  \calN\big(\bso,
+        \underbrace{\E[\bsg_n\bsg_n']}_{=\E[\varepsilon_n^2\bsx_n\bsx_n']}
+        \big)
+\end{align*}
+If, on the other hand, we want to allow for $\bsg_n$ to be
+autocorrelated, we know that
+\begin{align*}
+  \frac{1}{\sqrt{T}}\sumtT \bsg_n\bsg_n'
+  \quad&\dto\quad
+  \calN(\bso,\bsS)
+\end{align*}
+where $\bsS$ is the long-run variance.
+
+Because the asymptotic distribution will depend on our assumptions about
+the autocorrelation structure of $\bsg_n$, I will simply use $\bsOmega$
+from here on out to denote the appropriate asymptotic variance. Whether
+$\bsOmega$ is $\E[\bsg_n\bsg_n']$ or the long-run variance is up to the
+econometricition to decide. But after that, the econometrics is the
+same.
+
+
+\clearpage
+\subsection{Asymptotic Properties of the OLS Estimator}
+
 \begin{prop}\emph{(OLS Estimator)}
 The OLS estimator has the following properties
 \begin{enumerate}
   \item \emph{Consistent}: Under Assumptions 1-4 above,
     $\bshatbeta_{OLS}\pto \bsbeta$
-  \item \emph{Asymptotic Normality}: Under assumptions 1-5
+  \item \emph{Asymptotic Normality}: Under assumptions 1-4
     \begin{align*}
       \sqrt{N}(\bshatbeta_N- \bsbeta) \dto
-      N(0,\E[\bsx_i\bsx_i']^{-1}\;\E[\varepsilon^2_n\bsx_n\bsx_n']\;\E[\bsx_i\bsx_i']^{-1})
+      N(0,\E[\bsx_i\bsx_i']^{-1}\;\bsOmega\;\E[\bsx_i\bsx_i']^{-1})
+      %N(0,\E[\bsx_i\bsx_i']^{-1}\;\E[\varepsilon^2_n\bsx_n\bsx_n']\;\E[\bsx_i\bsx_i']^{-1})
     \end{align*}
-    Assuming conditional homoeskedasticy
+    Adding Assumption 5 and assuming conditional homoeskedasticy
     $\E[\varepsilon_n^2|\bsx_n]=\E[\varepsilon_n^2]=\sigma^2$, the
     distribution simplifies
     \begin{align*}
@@ -13611,31 +14707,42 @@ The OLS estimator has the following properties
       N(0,\sigma^2\E[\bsx_i\bsx_i']^{-1})
     \end{align*}
 
-  \item Since $\bshatbeta_{OLS}$ is a consistent estimator for
-    $\bsbeta$, the estimated residuals
+  \item Using Assumptions 5, since $\bshatbeta_{OLS}$ is a consistent
+    estimator for $\bsbeta$, the estimated residuals
     $e_n = y_n - \bsx_n' \bshatbeta$ can be used to construct a
     consistent estimator for $\E[\varepsilon_n^2\bsx_n\bsx_n']$:
-    \begin{align*}
+    \begin{align}
       \frac{1}{N} \sumnN e^2_n \bsx_n \bsx_n'
       \quad\pto\quad
       \E[\varepsilon_n^2\bsx_n\bsx_n']
-    \end{align*}
-    provided $\E[\varepsilon_n\bsx_n\bsx_n']$ exists and is finite, and
-    the regressors have finite fourth moments
+      \label{consistentomega}
+    \end{align}
+    provided $\E[\varepsilon_n^2\bsx_n\bsx_n']$ exists and is finite,
+    and the regressors have finite fourth moments
     $\E[(x_{ni}x_{nj})^2]<\infty$ for all $i,j$.
 
-    From there, we can form a consistent heteroskedasticity-robust
-    estimator of the asymptotic variance of $\bshatbeta_{OLS}$:
+  \item
+    Let $\bshatOmega$ denote a consistent estimator for the asymptotic
+    variance $\bsOmega$.\footnote{%
+      If we use Assymption 5, that consistent estimator can be
+      Line~\ref{consistentomega} above. If not, see
+      Subsection~\ref{sec:hac} on how to construct $\bshatOmega$ for
+      long-run variance $\bsOmega$.
+    }
+    Then we can form a consistent, heteroskedasticity and
+    autocorrelation robust (HAC) estimator of the asymptotic variance
+    for $\bshatbeta_{OLS}$:
     \begin{align*}
-      \bigg(
+      \bigg[
         \frac{1}{N} \underbrace{\sumnN \bsx_n\bsx_n'}_{\bsX'\bsX}
-      \bigg)^{-1}
-      \left(\frac{1}{N} \sumnN \bse^2_n \bsx_n \bsx_n'\right)
-      \bigg(
+      \bigg]^{-1}
+      \;
+      \bshatOmega\;
+      \bigg[
         \frac{1}{N} \underbrace{\sumnN \bsx_n\bsx_n'}_{\bsX'\bsX}
-      \bigg)^{-1}
+      \bigg]^{-1}
       \;\pto\;
-      \E[\bsx_i\bsx_i']^{-1}\;\E[\varepsilon^2_n\bsx_n\bsx_n']\;\E[\bsx_i\bsx_i']^{-1}
+      \E[\bsx_i\bsx_i']^{-1}\;\bsOmega\;\E[\bsx_i\bsx_i']^{-1}
     \end{align*}
 
   \item Under Assumptions 1-4, the OLS error variance estimator $s^2$
@@ -13685,19 +14792,18 @@ We prove each in turn
     $\bshatbeta_N$ to $\bsbeta$ by LLN.
 
   \item
-    Rearrange Equation~\ref{beta-asymptotic} and multiply by $\sqrt{N}$
-    to get
+    Rearrange Equation~\ref{beta-asymptotic}, replace
+    $\bsx_n\varepsilon_n$ with $\bsg_n$, and multiply by $\sqrt{N}$ to
+    get
     \begin{align}
       \sqrt{N}(\bshatbeta_N - \bsbeta)
       &= \left[\frac{1}{N}\sumnN \bsx_n\bsx_n' \right]^{-1}
-        \sqrt{N}\left[\frac{1}{N} \sumnN \bsx_n\bsvarepsilon_n \right]
+        \left[\frac{1}{\sqrt{N}} \sumnN \bsg_n \right]
     \end{align}
     Again, the first term on the RHS converges in probability to
-    $\E[\bsx_n\bsx_n']$, while the second term, which is an average of
-    expectation-zero terms, converges in distribution to
-    $N(0,\Var(\bsx_n\bsvarepsilon_n))
-    =N(0,\E[\bsvarepsilon_n^2\bsx_n\bsx_n']))$
-    by the CLT.  Then by Slutsky, the desired result follows.
+    $\E[\bsx_n\bsx_n']$, while the second term
+    converges in distribution to $N(0,\bsOmega)$ by an appropriate CLT.
+    Then by Slutsky, the desired result follows.
 
   \item
     Recall that
@@ -13816,11 +14922,11 @@ above-proposed consistent estimator for its asymptotic variance:
   \bshatSigma :=
   N\cdot
   \left(\bsX'\bsX\right)^{-1}
-  \left(\sumnN \bse^2_n \bsx_n \bsx_n'\right)
+  \bshatOmega
   \left(\bsX'\bsX\right)^{-1}
   \quad&\pto\quad
   \bsSigma :=
-  \E[\bsx_i\bsx_i']^{-1}\;\E[\varepsilon^2_n\bsx_n\bsx_n']\;\E[\bsx_i\bsx_i']^{-1}
+  \E[\bsx_i\bsx_i']^{-1}\;\bsOmega\;\E[\bsx_i\bsx_i']^{-1}
   \notag\\
   \text{where}\quad
   \sqrt{N}(\bshatbeta_{OLS} - \bsbeta)
@@ -13842,11 +14948,9 @@ These results and estimators can be used to conduct the following tests:
 
   \item \emph{Wald Statistic for Testing Linear Hypotheses}:
     Suppose we want to test null hypothesis
-    \begin{align*}
-      H_0: \bsR'\bsbeta = \bsr
-      \qquad \text{where} \quad \bsR \in \R^{K \times C}
-    \end{align*}
-    and where $\bsR$ has full column rank,
+    $H_0: \bsR'\bsbeta = \bsr$
+    where $\bsR \in \R^{K \times C}$
+    and has full column rank,
     $\rank(\bsR) = C$, i.e.\ no redundant constraints.
     Then
     \begin{align*}
@@ -13882,16 +14986,18 @@ These results and estimators can be used to conduct the following tests:
     i.e. $\bsA$ is the derivative of $\bsa$ evaluated at true parameter
     vector $\bsbeta$.
 
-  \item \emph{``LR'' Test for Testing Non-Linear Hypotheses}:
+  \item \emph{``LR'' Test for Non-Linear Hypotheses}:
     Given Null Hypothesis $H_0: \bsa(\bsbeta) = \bso$ for some function
     $\bsa:\R^K\ra \R^C$ above,  we consider restricted and unrestricted
     efficient GMM estimates
     \begin{align*}
       \bshatbeta
-      :=&\; \argmin_{\bsb}\; J(\bsb, \bshatS^{-1}) \\
-      \bsbarbeta
       :=&\; \argmin_{\bsb}\; J(\bsb, \bshatS^{-1})
-      \qquad\text{s.t.} \quad \bsa(\bsb) = \bso
+      %\\
+      \qquad
+      \bsbarbeta
+      :=\; \argmin_{\text{$\bsb$ \emph{:} $\bsa(\bsb) = \bso$}}\;
+      J(\bsb, \bshatS^{-1})
     \end{align*}
     where
     $J(\bsb, \bshatW) := N\cdot \bsbarg_N(\bsb)' \bshatW \bsbarg_N(\bsb)$
@@ -13994,8 +15100,9 @@ Now we consider each in turn:
 \end{proof}
 
 \clearpage
-\subsection{Estimation of AR($p$) Model}
+\subsection{Estimation of ARMA Models, AIC, BIC}
 
+\begin{ex}(AR($p$) Model)
 Suppose that we have AR($p$) model
 \begin{align*}
   y_t &= \phi_1y_{t-1} + \cdots + \phi_py_{t-p}
@@ -14035,8 +15142,48 @@ which implies that
   \sqrt{T}(\bshatbeta_{OLS}-\bsbeta)
   \dto N\big(0,\sigma^2\E[\bsx_t\bsx_t']^{-1}\big)
 \end{align*}
+\end{ex}
 
 
+\begin{defn}(AIC and BIC)
+We typically select the number of lags $p$ in an AR($p$) model by the
+Akaike Information Criterion (AIC) or the Bayesian Information Criterion
+(BIC).
+
+Suppose that we want to choose the number of lags $p\in\{1,\ldots,P\}$
+given $\{y_t\}_{t=1}^T$.
+Then for each $\tilde{p}\in\{1,\ldots,P\}$, we estimate
+\begin{align*}
+  y_t &= \bsx_t^{(\tilde{p})} {}' \bsbeta^{(\tilde{p})}
+  + \varepsilon_t^{(\tilde{p})}
+  \qquad t=P+1,\ldots,T
+  \\
+  \text{where}\quad
+  \bsx_t^{(\tilde{p})}
+  &= (y_{t-1},\;\ldots,\;y_{t-\tilde{p}})
+\end{align*}
+as in the above example. By using only observations $t=P+1,\ldots,T$ on
+the LHS for each $\tilde{p}$, we ensure that we can estimate and compare
+the results across different lag sizes.
+Next, compute the sum of squared residuals
+\begin{align*}
+  SSR(\tilde{p})
+  &= \sum_{t=P+1}^T
+  \left(y_t - \bsx_t^{(\tilde{p})}{}'\bshatbeta^{(\tilde{p})}\right)^2
+\end{align*}
+We then choose $p$ the lag size that minimizes either
+\begin{align*}
+  AIC(\tilde{p})
+  &= \ln\left(\frac{SSR(\tilde{p})}{T-P}\right) + \frac{2\tilde{p}}{T-P}
+  \\
+  BIC(\tilde{p})
+  &= \ln\left(\frac{SSR(\tilde{p})}{T-P}\right)
+  + \tilde{p}\frac{\ln(T-P)}{T-P}
+\end{align*}
+As $T\ra\infty$, with probability converging to one, the AIC will
+\emph{not} choose too small of a model and the BIC will choose the
+\emph{correct} model.
+\end{defn}
 
 
 
@@ -14855,8 +16002,8 @@ tests:
     i.e. $\bsA$ is the derivative of $\bsa$ evaluated at true parameter
     vector $\bsbeta$.
 
-  \item \emph{``LR'' Test for Testing Non-Linear Hypotheses}:
-    Given Null Hypothesis $H_0: \bsa(\bsbeta) = \bso$ for some function
+  \item \emph{``LR'' Test for Non-Linear Hypotheses}:
+    Given null hypothesis $H_0: \bsa(\bsbeta) = \bso$ for some function
     $\bsa:\R^K\ra \R^C$ above,  we consider restricted and unrestricted
     efficient GMM estimates
     \begin{align}
@@ -15996,75 +17143,6 @@ $\bsg_T(\bshatb)$ of rank $m-p$. So there are
 only $m-p$ squared standard normals to add up for our $\Chi^2$
 distribution.
 
-\clearpage
-\subsection{Efficient Estimates}
-
-I've so far been agnostic about the choice of $\boldsymbol{a}_T$ or
-weighting matrix $\boldsymbol{W}$ in our two alternative definitions of
-estimate $\bshatb$:
-\begin{align}
-  \bshatb &= \arg\min_{\bsb}\;
-  \bsg_T(\bsb)' \boldsymbol{W}
-  \bsg_T(\bsb)
-  \label{eq:bhatmin2}\\
-  0 &= \boldsymbol{a}_T
-    \;
-    \bsg_T(\bshatb)
-  \label{eq:bhatdef2}
-\end{align}
-There is a a statistically \emph{efficient} choice:
-\begin{align}
-  \boldsymbol{W} &= \bsS^{-1} \label{eq:efficient1}\\
-  \Leftrightarrow \quad
-  \boldsymbol{a} &= \bsd' \bsS^{-1}
-  \label{eq:efficient2}
-\end{align}
-I'll start with the very intuitive choice of weighting matrix in
-Equation~\ref{eq:efficient1}.
-
-Remember that $\bsS$ is the variance-covariance matrix of
-$\bsg(\bsb)$. So if we weight each element of vector
-$\bsg(\bsb)$ by the \emph{inverse} variance, we're
-mechanically forcing the minimization in Equation~\ref{eq:bhatmin2} to
-pay more attention to the low-variance elements. That's because low
-variance means large inverse variance, so we heavily weight those
-elements of $\bsg(\bsb)$ that are \emph{more
-precisely measured}. So the weighting will make these elements of
-$\bsg(\bsb)$ more sensitive to choice of parameters.
-
-To understand the choice of $\boldsymbol{a}$ matrix in
-Equation~\ref{eq:efficient2}, recall Equation~\ref{eq:equivrep}, which
-showed how to translate the $\boldsymbol{W}$ matrix in
-Representation~\ref{eq:bhatmin2} into an equivalent $\boldsymbol{a}$
-matrix in Representation~\ref{eq:bhatdef2}.
-
-A bonus to all of this is that many of the formulas simplify
-considerably. By plugging Equation~\ref{eq:efficient2} into the formulas
-we had for the various estimates we had, they reduce to the following
-with a little bit of algebra:
-\begin{align*}
-  \sqrt{T}\left(\bshatb-\bsb_0\right)
-  &\xrightarrow{d}
-  N\left(0,
-  (\bsd' \bsS^{-1} \bsd)^{-1}
-  \right)\\
-  \sqrt{T}\bsg_T(\bshatb)
-  &\xrightarrow{d}
-  N\left(
-  0,
-  \bsS
-  -\bsd(\bsd' \bsS^{-1} \bsd)^{-1}
-  \bsd'
-  \right)\\
-  T
-  \bsg_T(\bshatb)'
-  \bsS^{-1}
-  \bsg_T(\bshatb)
-  &\xrightarrow{d} \Chi^2_{m-p}
-\end{align*}
-where the last line follows from Hansen's paper (the result is not an
-immediately clear simplification of the more general formula above, at
-least to me).
 
 
 %%%% APPPENDIX %%%%%%%%%%%
