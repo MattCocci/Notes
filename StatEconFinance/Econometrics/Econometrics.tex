@@ -297,6 +297,7 @@
 \newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
 \newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
 \newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bstildePsi}{\boldsymbol{\tilde{\Psi}}}
 \newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
 \newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
 \newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
@@ -380,6 +381,7 @@
   {\end{aligned}\right\rbrace}
 
 % Various probability and statistics commands
+\newcommand{\wn}{\sim\operatorname{WN}}
 \newcommand{\iid}{\overset{iid}{\sim}}
 \newcommand{\vc}{\operatorname{vec}}
 \newcommand{\Cov}{\operatorname{Cov}}
@@ -7688,7 +7690,7 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 
 
 \clearpage
-\section{Time Series}
+\section{Univariate Time Series}
 
 %\subsection{Linear Difference Equations}
 
@@ -8954,9 +8956,25 @@ long-run variance formula:
 \end{cor}
 
 \clearpage
-\subsection{Vector Processes}
+\section{Multivariate Time Series}
 
-Everything generalizes quite nicely to vector processes.
+\subsection{Generalizing the Univariate Concepts and Formulas}
+
+\begin{defn}(Covariance Stationary Process)
+A vector stochastic process $\{\bsy_t\}$ is
+\emph{covariance stationary} if the mean and the autocovariance function
+does not depend upon time. Now though, the mean is a vector and the
+autocovariance function that maps into matrices:
+\begin{align*}
+  \E[\bsy_t] &= \bsmu
+  \qquad
+  \Cov(\bsy_t,\bsy_{t+k})
+  = \E[(\bsy_t-\bsmu)(\bsy_t-\bsmu)']
+  = \bsGamma(k)
+\end{align*}
+Again, $\bsGamma(k)$ is an autocovariance function that doesn't depend
+upon time, just lag length $k$.
+\end{defn}
 
 \begin{defn}(Vector White Noise Process)
 $\{\bsy_t\}$ a \emph{vector white noise process} if $\forall t$
@@ -8964,12 +8982,12 @@ $\{\bsy_t\}$ a \emph{vector white noise process} if $\forall t$
   \E[\bsy_t] &= \bso
   \\
   \E[\bsy_t\bsy_t'] &= \bsSigma
-  \quad\text{positive definite}
+  \quad\text{symmetric positive definite}
   \\
   \E[\bsy_t\bsy_{t-k}']
   &= \bso \qquad \forall k\neq 0
 \end{align*}
-We here place no restriction on $\bsSigma$ except for
+We here place no other restriction on $\bsSigma$ except for symmetric
 positive-definiteness. Therefore, we allow for contemporaneous
 correlation between elements of $\bsy_t$.
 \end{defn}
@@ -8986,7 +9004,45 @@ is defined as
 \end{align*}
 \end{defn}
 
-\begin{defn}(VMA($\infty$) Process)
+\begin{defn}(Lag Polynomial Inverse)
+Let $\bsH(L)$ be a lag polynomial formed from filter $\bsH(z)$ with
+square-matrix elements. Define the lag polynomial inverse as the filter
+$\bsH(L)^{-1}$ such that
+\begin{align*}
+  \bsH(L)^{-1}\bsH(L) =
+  \bsH(L)\bsH(L)^{-1} = \bsI
+\end{align*}
+\end{defn}
+
+\begin{defn}(Autocovariance Generating Function)
+For vector process $\{\bsy_t\}$, we define the autocovariance generating
+function
+\begin{align*}
+  \bsg_{\bsy}(z) = \sum_{j=-\infty}^\infty \bsGamma(j)z^j
+\end{align*}
+\end{defn}
+
+\begin{defn}(Spectral Density)
+Vector process $\{\bsy_t\}$ has spectral density function
+\begin{align*}
+  \bsf_{\bsy}(\lambda) = \frac{1}{2\pi} \bsg_{\bsy}(e^{-i\lambda})
+\end{align*}
+\end{defn}
+
+\begin{prop}
+Let $\{\bsx_t\}$ be a vector process and $\bsH(z)$ a conformable
+multivariate filter. Then filtered series
+$\bsy_t = \bsH(L)\bsx_t$
+has autocovariance generating function
+\begin{align*}
+  \bsg_{\bsy}(z) = \bsH(z)\bsg_{\bsx}(z)\bsH(z^{-1})'
+\end{align*}
+\end{prop}
+
+\clearpage
+\subsection{VMA, VAR, and VARMA Models}
+
+\begin{defn}(VMA Process)
 Given vector white noise process $\{\bsvarepsilon_t\}$, mean $\bsmu$,
 and multivariate lag polynomial $\bsPsi(L)$, we define the vector
 MA($\infty$) process as
@@ -9000,6 +9056,12 @@ It has autocovariance function
   &= \sum_{k=0}^\infty \bsPsi_{j+k}\bsSigma\bsPsi_k'
 \end{align*}
 \end{defn}
+
+\begin{prop}\emph{(Invertibility of VMA Process)}
+The VMA process with lag polynomial $\bsPsi(L)$ is invertible if and
+only if all roots of $\text{\emph{det}}(\bsPsi(z))=0$ are outside the
+complex unit circle.
+\end{prop}
 
 \begin{defn}(VAR($p$) Process)
 $\{\bsy_t\}$ is a VAR($p$) process if it can be written
@@ -9050,32 +9112,372 @@ $\{\bsy_t\}$ is a VARMA($p,q$) process if it can be written
 \end{align*}
 \end{defn}
 
-\begin{defn}(Autocovariance Generating Function)
-For vector process $\{\bsy_t\}$, we define the autocovariance generating
-function
+\clearpage
+\subsection{Impulse Response Function and Variance Decomposition}
+
+In this section, we suppose that we have a model with VMA representation
 \begin{align*}
-  \bsg_{\bsy}(z) = \sum_{j=-\infty}^\infty \bsGamma(j)z^j
+  \bsy_t = \bsPsi(L)\bsvarepsilon_t
+  \qquad
+  \bsvarepsilon_t \wn(\bso,\bsSigma)
+  \qquad\bsy_t,\bsvarepsilon_t\in \R^M
 \end{align*}
+The zero-mean assumption for $\bsy_t$ is without loss of generality.
+
+\begin{defn}(Impulse Response Function)
+The \emph{impulse respose function} of variable $i$ to shock $j$ after
+$k$ periods is given by
+\begin{align*}
+  IRF_{ij}(k)
+  &=
+  \frac{\partial y_{t,i}}{\partial \varepsilon_{t-k,j}}
+  =
+  \frac{\partial y_{t+k,i}}{\partial \varepsilon_{t,j}}
+  = \Psi_{k,ij}
+\end{align*}
+We think of this as a function of $k$.
 \end{defn}
 
-\begin{defn}(Spectral Density)
-Vector process $\{\bsy_t\}$ has spectral density function
+\begin{defn}(Variance Decomposition)
+Assume that $\bsSigma$ is a diagonal matrix. As we will see below, this
+is typical for structural models.
+To obtain a (forecast error) \emph{variance decomposition}, we let
+$R^2_{ij}(h)$ denote the fraction of $h$-period-ahead forecast error
+variance for $i$th observable $y_{t,i}$ that comes from the $j$th
+exogenous shock. It is given by
+\begin{align}
+  R^2_{ij}(h)
+  %= \frac{\text{Contribution of $\varepsilon_{t,j}$}}{%
+          %\text{Total for $y_{t,i}$}}
+  %=
+  %\frac{ }{%
+    %\left[
+    %\sum_{k=0}^{h-1} \bsPsi_k\bsSigma \bsPsi_k'
+    %\right]_{ii}
+  %}
+  =
+  \frac{%
+    \sum_{k=0}^{h-1}
+    \Sigma_{jj} \Psi_{k,ij}^2
+  }{%
+    \sum_{k=0}^{h-1} \sum_{m=1}^{M_\varepsilon}
+    \Sigma_{mm} \Psi_{k,im}^2
+  }
+  \label{vardecomp}
+\end{align}
+To see where this comes from, note that the best linear forecast of
+$\bsy_{t+h}$ given $\bsvarepsilon_t,\bsvarepsilon_{t-1},\ldots$ is given
+by the conditional expectation
 \begin{align*}
-  \bsf_{\bsy}(\lambda) = \frac{1}{2\pi} \bsg_{\bsy}(e^{-i\lambda})
+  \E_t[\bsy_{t+h}]
+  =
+  \E_t\big[
+    \bsPsi_0\bsvarepsilon_{t+h}
+    + \bsPsi_1\bsvarepsilon_{t+h-1}
+    + \cdots
+  \big]
+  = [\bsPsi(L)L^{-h}]_+\;\bsvarepsilon_t
+  = [\bsPsi(L)L^{-h}]_+\;L^h\bsvarepsilon_{t+h}
 \end{align*}
+where $[\;\cdot\;]_+$ denotes ``take only those terms where the lag term
+is nonnegative,'' i.e.\ those $L^k$ where $k\geq 0$.
+This implies that the forecast error is given by
+\begin{align*}
+  \bsy_{t+h} - \E_t[\bsy_{t+h}]
+  &=
+  \bsPsi(L)\varepsilon_{t+h}
+  - [\bsPsi(L)L^{-h}]_+\;L^h\bsvarepsilon_{t+h}
+  =
+  \sum_{k=0}^{h-1}
+  \bsPsi_k \varepsilon_{t+h-k}
+\end{align*}
+The total variance matrix for the forecast error is therefore given by
+\begin{align}
+  \Var\big(
+  \bsy_{t+h} - \E_t[\bsy_{t+h}]
+  \big)
+  &=
+  \Var\left(
+  \sum_{k=0}^{h-1}
+  \bsPsi_k \varepsilon_{t+h-k}
+  \right)
+  =
+  \sum_{k=0}^{h-1} \bsPsi_k \Var\left(
+  \varepsilon_{t+h-k}
+  \right)\bsPsi_k'
+  =
+  \sum_{k=0}^{h-1}
+  \bsPsi_k\bsSigma \bsPsi_k'
+  \label{totalvar}
+\end{align}
+where we made use of the fact that the shocks $\bsvarepsilon_t$ are
+white noise with zero autocorrelation.
+
+To get to Expression~\ref{vardecomp}, first note that the $ii$ element
+of the matrix in Expression~\ref{totalvar} represents the total amount
+variance of the forecast error for the $i$th element of $\bsy_t$.
+Naturally, we then ask ``What fraction of the forecast error variance
+for observable $i$ in $\bsy_t$ is driven by shock $j$ in
+$\bsvarepsilon_t$?'' Since $\bsSigma$ is a diagonal matrix, the formulas
+simplify nicely to Expression~\ref{vardecomp} after writing everything
+out.
 \end{defn}
 
-\begin{prop}
-Let $\{\bsx_t\}$ be a vector process and $\bsH(z)$ a conformable
-multivariate filter. Then the filtered series
+
+
+\clearpage
+\subsection{Identification of Structural VMA($q$)}
+
+
+Suppose that the data $\{\bsy_t\}$ follows MA($q$) process where
+$\bsy_t\in\R^{M_y}$, $\bsvarepsilon_t\in\R^{M_\varepsilon}$, and
 \begin{align*}
-  \bsy_t = \bsH(L)\bsx_t
+  \bsy_t &=
+  \bsPsi_0\bsvarepsilon_t
+  +
+  \bsPsi_1\bsvarepsilon_{t-1}
+  +\dots+
+  \bsPsi_q\bsvarepsilon_{t-q}
+  \qquad \bsvarepsilon_t \sim WN(\bso,\bsSigma)
 \end{align*}
-has autocovariance generating function
+Our goal is to identify parameters in $\bsPsi_0,\ldots,\bsPsi_q$ and
+$\bsSigma$ given observations of the data $\{\bsy_t\}$.
+Since \emph{both} $\bsvarepsilon_t$ and the parameters are unknown, we
+can reasonably suspect that we might have identification problems.
+We start with reasonable restrictions that resolve some of this.
+\\
+\\
+(\emph{Obvious and Innocuous Assumptions})
+We start with non-controversial stuff:
+\begin{enumerate}[label=(\roman*)]
+  \item $M_y\geq M_\varepsilon$: Clearly, this restriction must be true.
+    Otherwise, we would have an ``extra'' unobserved shock that we have
+    no hope of identifying from the data.
+  \item \emph{Number of Parameters to Identify}, $M:=M_y=M_\varepsilon$:
+    This assumption is often used in practice, so I will also adopt it.
+    Therefore, the number of parameters to estimate is
+    \begin{align*}
+      (\text{Number of Parameters to Estimate})
+      &= (q+1) M^2
+      + M(M+1)/2
+    \end{align*}
+    The first term counts the number of parameters in unknown matrices
+    $\bsPsi_0,\ldots,\bsPsi_q$. The second term counts unknown
+    parameters in symmetric covariance matrix $\bsSigma$.
+  \item \emph{Information in the Data}: Given $\{\bsy_t\}$, all the
+    information we have for identification comes from estimating the
+    autocovariance structure of the data $\bsGamma(k)$, for
+    $k=0,\ldots,q$ (the nonzero autocovariance matrices up to assumed
+    order $q$). Therefore, the data pins down the following number of
+    parameters
+    \begin{align*}
+      (\text{Number of Data-Identified Parameters})
+      = q M^2
+      + M(M+1)/2
+    \end{align*}
+    The first term counts the number of parameters in non-symmetric
+    matrices $\bsGamma(1),\ldots,\bsGamma(k)$. The second term counts
+    the number of parameters in symmetric $\bsGamma(0)$.
+
+  \item \emph{The Problem}: The number of data-identified parameters
+    is less than the number of parameters to idenify in the VMA model.
+    The difference is $M^2$ parameters.
+
+  \item \emph{Scale Normalization}: We often assume that
+    $\Psi_{0,ii}=1$, i.e.\ ones on the diagonal. Thus a
+    one-unit $\bsvarepsilon_t$ shock (i.e.\ where
+    $\varepsilon_{t,i}=1$ for all $i$) translates into a one-unit
+    increase in each element of $\bsy_t$. The scale of $\bsvarepsilon_t$
+    and $\bsy_t$ are thus normalized to be the same. Consequently,
+    $\sqrt{\Sigma_{ii}}$ is the standard deviation---thus the
+    average size---of the $i$th shock.
+
+    Alternatively, we could set $\Sigma_{ii}=1$ on the diagonal.
+    Then $\bsSigma$ is a correlation matrix with $\sqrt{\Psi_{0,ii}}$
+    giving the standard dev. of shock $i$. Either way, we've identified
+    $M$ parameters.
+
+  \item \emph{Diagonal $\bsSigma$}: This implies no contemporaneous
+    correlation between exogenous shocks $\bsvarepsilon_t$. Even though
+    we want contemporaneous correlation between elements of $\bsy_t$,
+    this assumption makes sure that the correlation is driven by
+    parameters in $\bsPsi_0$---by the endogenous response of
+    the system---not by correlation between the \emph{fundamental},
+    \emph{structural} shocks $\bsvarepsilon_t$.
+    This means we have identified an extra $\frac{M(M+1)}{2} -
+    M = \frac{M(M-1)}{2}$ parameters.
+\end{enumerate}
+(\emph{Remaining Scale \& Space of Underidentification})
+Now that we've gotten all of the obvious and innocuous stuff out of the
+way, we still have the following degree of underidentification:
 \begin{align*}
-  \bsg_{\bsx}(z) = \bsH(z)\bsg_{\bsy}(z)\bsH(z^{-1})'
+  \underset{(iv)}{M^2\vphantom{M(M-1)/2}} -
+  \underset{(v)}{M\vphantom{M(M-1)/2}}
+  - \underset{(vi)}{M(M-1)/2}
+  = M(M-1)/2
 \end{align*}
-\end{prop}
+Term (iv) is the initial number of unidentified parameters from point
+(iv) above. Term (v) is the number of parameters we identified by scale
+normalization. Term (vi) is the number of parameters we identified by
+diagonal $\bsSigma$.
+
+We can be more precise about all of this by saying ``the
+\emph{space of underidentification} is spanned by the set of $M\times M$
+orthogonal matrices (i.e. $\bsQ\bsQ'=\bsI_M$) with $M(M-1)/2$ free
+parameters.'' To see this, assume diagonal $\bsSigma$ and use the
+alternative scale normalization approach, which together imply
+$\bsSigma=\bsI_M$ with $\bsPsi_0$ totally unrestricted.  Now take
+\emph{any} $M\times M$ orthogonal matrix with $M(M-1)/2$ free
+parameters, $\bsQ$. Then
+\begin{align*}
+  \Var(\bsQ\bsvarepsilon_t)
+  &= \bsQ\Var(\bsvarepsilon_t)\bsQ'
+  \underset{(a)}{=} \bsQ\bsI_M\bsQ'
+  \underset{(b)}{=} \bsI_M
+\end{align*}
+where equality (a) followed from scale normalization and (b) from
+orthogonality of $\bsQ$. In words, $\bsQ$ just rotates the errors while
+still preserving their covariance matrix. Then
+\begin{align*}
+  \bsy_t
+  &=
+  \bsPsi_0\bsQ \bsvarepsilon_t
+  + \bsPsi_1\bsQ \bsvarepsilon_{t-1}
+  + \cdots +
+  + \bsPsi_q\bsQ \bsvarepsilon_{t-q}
+  \qquad \bsvarepsilon_t\sim WN(\bso,\bsI_M)
+  \\
+  &=
+  \bstildePsi_0 \bsvarepsilon_t
+  + \bstildePsi_1 \bsvarepsilon_{t-1}
+  + \cdots +
+  + \bstildePsi_q \bsvarepsilon_{t-q}
+\end{align*}
+has identical dynamics and 2nd order properties as the original
+representation with $\bsPsi_0,\ldots,\bsPsi_q$.
+
+Therefore, without further assumptions, we can rotate things by
+orthogonal matrices in $\R^{M\times M}$ that have $M(M-1)/2$ free
+parameters and \emph{not change anything}. This is the sense in which
+the system is underidentified. We now consider the various approaches we
+have to deal with this underidentification problem.
+\\
+\\
+(\emph{Resolving Remaining Underidentification})
+From this point, we can proceed by any of the following proposed routes
+for resolving the underidentification problem.
+\begin{itemize}
+  \item \emph{Recursive/Zero Restrictions} (Sims):
+    Assume certain elements of $\bsPsi_0$ equal zero. These kinds of
+    assumptions are essentially ``We think a money supply shock hits
+    measured M2 right away, but not GDP right away---that adjusts with a
+    lag.'' These types of restrictions imply a triangular structure for
+    $\bsPsi_0$, which establishes identification.
+  \item \emph{Long-Run Restrictions} (Blanchard and Quah): Place
+    restrictions on the long run effects of some shocks. In particular,
+    we might assume that variable $i$ has no long-run response to an
+    exogenous $j$ shock, i.e.\ that
+    \begin{align*}
+      \sum_{k=0}^q IRF_{ij}(k)
+      \sum_{k=0}^q \Psi_{k,ij}
+      = \Psi(1)_{ij}
+      = 0
+    \end{align*}
+  \item \emph{Sign Restrictions} (Uhlig): Just impose restrictions on
+    the signs of coefficients, rather than on their values or some
+    function of their values. This only set-identifies the model, since
+    there is clearly a range of parameter values for which the sign
+    restriction is true. Therefore, Bayesian methods are typically used.
+\end{itemize}
+
+
+\clearpage
+\subsection{Structural VARs}
+
+\begin{defn}(SVAR Representation)
+Assume that the lag polynomial of the VMA representation, $\bsPsi(L)$,
+is invertible with $\bsPsi(L)^{-1}=\bsA(L)$. Then the SVAR
+representation is
+\begin{align*}
+  \bsA_0\bsy_t
+  - \bsA_1\bsy_{t-1}
+  - \bsA_2\bsy_{t-2}
+  - \cdots
+  = \bsA(L)\bsy_t
+  = \bsvarepsilon_t
+  \qquad \bsvarepsilon_t \sim WN(\bso,\bsSigma)
+\end{align*}
+If $\bsA(L)$ is of order $p$, then it has SVAR($p$) representation
+\begin{align}
+  \bsA_0\bsy_t
+  =
+  \bsA_1\bsy_{t-1}
+  + \cdots
+  + \bsA_p\bsy_{t-p}
+  + \bsvarepsilon_t
+  \label{svarp}
+\end{align}
+Note that this requires invertibility of $\bsPsi(L)$, which is not
+guaranteed. But even if we can't estimate this SVAR, we can estimate
+the reduced form VAR.
+\end{defn}
+
+\begin{defn}(Identification of SVAR)
+Just like with the SVMA, there are identification issues for the SVAR.
+But everything we did in the SVMA has an analog here:
+\begin{itemize}
+  \item \emph{Diagonal $\bsSigma$}: This again rules out contemporaneous
+    correlation between the fundamendal, structural shocks
+    $\bsvarepsilon_t$, implying that contemporaneous correlation between
+    elements of $\bsy_t$ is driven by the endogenous response of the
+    system.
+  \item \emph{Scale Normalization}: For the SVAR, this means
+    $\bsA_{0,ii}=1$.
+  \item \emph{Recursive, Triangular Structure}: Imposing triangular
+    $\bsA_0$ is the same as imposing a triangular $\bsPsi_0$. It implies
+    a recursive structure on the endogenous respose, with some variables
+    being unable to respond contemporaneously to changes in other
+    variables.
+  \item \emph{Long Run Restrictions}: Imposing long-run restrictions is
+    equivalent to imposing restrictions on $\bsA(1)^{-1}$, which sums up
+    the IRFs associated with the structural VAR that has lag polynomial
+    $\bsA(L)$.
+\end{itemize}
+\end{defn}
+
+\begin{defn}(Reduced Form VAR($p$))
+Given data $\{\bsy_t\}$, we can always estimate a
+\emph{reduced form VAR($p$)},
+\begin{align}
+  \bsy_t =
+  \bsPhi_1\bsy_{t-1}
+  + \cdots + \bsPhi_1\bsy_{t-p} + \bsu_t
+  \qquad
+  \bsu_t \sim WN(\bso,\bsOmega)
+  \label{varp}
+\end{align}
+If $\{\bsy_t\}$ does indeed have a VAR($p$) representation, then it's
+clear from comparing Expressions~\ref{svarp} and \ref{varp} that
+\begin{align*}
+  \bsPhi_i = \bsA_0^{-1}\bsA_i
+  \qquad
+  \bsu_t = \bsA_0^{-1}\bsvarepsilon_t
+  \qquad
+  \bsOmega = \big(\bsA_0^{-1}\big)\bsSigma\big(\bsA_0^{-1}\big)'
+\end{align*}
+\end{defn}
+\begin{rmk}
+This is always possible to estimate---even if $\bsPsi(L)$ is not
+invertible---and it poses no identification issues. The only downside is
+that $\bsu_t\neq \bsvarepsilon_t$ and $\bsOmega\neq\bsSigma$ (with
+$\bsOmega$ \emph{not} diagonal in general) so that the shocks have no
+clear economic interpretation. This is why it's called
+\emph{reduced form}, not \emph{structural}
+\end{rmk}
+
+
+
+
 
 
 \clearpage
