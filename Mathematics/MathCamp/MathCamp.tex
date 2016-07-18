@@ -928,13 +928,245 @@ $A$ has $n$ (positive) singular values   && $A$ has $r<n$ singular values
 
 Matrix decompositions are useful for a few key reasons
 \begin{enumerate}
+\item They express arbitrary matrix $A$ in some canonical form, allowing
+  the application of standard, more efficient algorithms to invert the
+  matrix, solve system $Ax =b$, etc. Examples: LU and Cholesky
 \item They more explicitly express properties of matrices
 \item They often suggest a geometric intepretation of matrix properties
   or operations.
-\item They express an arbitrary matrix $A$ in some canonical form, allowing
-  the application of standard, more efficient algorithms and procedures
-  to invert the matrix, solve a system like $Ax =b$, etc.
 \end{enumerate}
+
+\subsubsection{$LU$ Decomposition}
+
+First, a result that will be useful below: If we want to swap rows of a
+matrix, we can express that as matrix multiplication. More specifically,
+given $A\in\R^{m\times n}$, we can swap rows $i$ and $j$ via
+matrix multiplication $PA$, where $P$ is simply the identity matrix
+$I_m$ with its rows $i$ and $j$ swapped. This generalizes, so if
+we want to rearrange more rows of $A$, simply reorder the rows of the
+identity matrix $I_m$ according to how you want the rows of $A$ ordered.
+
+\begin{defn}
+Given square matrix $A\in\R^{n\times n}$, the \emph{LU decomposition}
+is written
+\begin{align}
+  PA = LU
+  \label{ludecomp}
+\end{align}
+where $L$ is lower triangular, $U$ is upper triangular, and $P$ is a
+permutation matrix that reorders rows of $A$ for greater numerical
+stability in the implementation.
+\end{defn}
+
+\begin{prop}\emph{(Solving System with LU Decomposition)}
+Suppose we have system $Ax=b$ and $LU$ decomposition of $A$ as in
+Expression~\ref{ludecomp}. Then we can write the system
+\begin{align*}
+  Ax = b
+  \quad\iff\quad
+  PAx = LUx = Pb
+\end{align*}
+We can easily solve this sytem by defining $c=Ux$ and then solving
+triangular system (i) forward for $c$, then triangular system (ii)
+backward for $x$:
+\begin{align*}
+  \text{(i)}\quad Lc = Pb
+  \qquad
+  \text{(ii)}\quad Ux = c
+\end{align*}
+\end{prop}
+\begin{rmk}
+This is what Matlab does for mldivide, \texttt{A\textbackslash b}.
+The fact that, after the LU decomposition, everything is triangular,
+means that the system can be solved very easily.
+
+Geometrically, we should think of this as follows. Vector $c$ is just
+vector $x$, but reexpressed in new coordinates after rotation/stretching
+by $U$ since $c=Ux$. This convenient change of coordinates gives us a
+triangular system $Lc = Pb$ that we can solve very quickly. Then we just
+have to solve $Ux = c$ to change back to the original coordinate system.
+\end{rmk}
+
+\begin{proof}(How to Construct $LU$ Decomposition)
+Main idea:
+construct $L$ and $U$ through simple Gaussian elimination.
+$U$ is the upper-triangular result of elimination, while
+$L$ encodes the sequence of elimination steps.
+(Ignore permutation matrix $P$ for now---assume $P=I_n$).
+
+Most generally, let $B^{(k)}$ denote the matrix that results after $k$
+Gaussian elimination steps applied to $B^{(0)}=A$. We can write
+$B^{(k-1)}$ in full/explicit notation then a more compact block form
+that ignores some superscripts, respectively, as:
+\begin{align*}
+  B^{(k-1)}
+  &=
+  \begin{pmatrix}
+    b_{11}^{(k-1)} & \cdots & b_{1k}^{(k-1)} & \cdots & b_{1n}^{(k-1)}\\
+    & \ddots & \vdots  & & \vdots\\
+    & & b_{kk}^{(k-1)} & \cdots & b_{kn}^{(k-1)} \\
+    & & \vdots & & \vdots \\
+    & & b_{nk}^{(k-1)} & \cdots & b_{nn}^{(k-1)}
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    b_{11} & \\
+    & \ddots &  & \\
+    & & b_{kk} & \beta_{k2} \\
+    & & \beta_{2k} & \beta_{22}
+  \end{pmatrix}
+\end{align*}
+Then we can express Gaussian elimination step $k$ as simple matrix
+multiplication. Letting $M_k$ denote the matrix that implements
+elimination step $k$, we can write
+\begin{align*}
+  B^{(k)} = M_k B^{(k-1)}
+  &=
+  \begin{pmatrix}
+    1 & \\
+      & \ddots & & \\
+      &  & 1 & 0 \\
+      &  & -\frac{\beta_{2k}}{b_{kk}} & I_{n-k}\\
+  \end{pmatrix}
+  \begin{pmatrix}
+    b_{11} & \\
+    & \ddots &  & \\
+    & & b_{kk} & \beta_{k2} \\
+    & & \beta_{2k} & \beta_{22}
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    b_{11} & \\
+    & \ddots &  & \\
+    & & b_{kk} & \beta_{k2}  \\
+    & & 0 & \beta_{22}
+      - \frac{\beta_{21}\beta_{12}}{a_{11}}
+  \end{pmatrix}
+\end{align*}
+In this way, we can write the entire sequence of Gaussian elimination
+steps as a sequence of matrix multiplications until we get an
+upper-triangular matrix:
+\begin{align*}
+  U = B^{(n-1)} = M_{n-1}\cdots M_1 A
+  \qquad
+  \text{where}\quad
+  M_k
+  =
+  \begin{pmatrix}
+    1 & &\\
+    & \ddots &\\
+    & & 1 & 0\\
+    & & m_k & I_{n-k} \\
+  \end{pmatrix}
+  \qquad m_k \in\R^{n-k}
+\end{align*}
+with $m_k = -\beta_{2k}/b_{kk}$.
+This then suggests that
+\begin{align*}
+  U = \big(M_{n-1}\cdots M_1\big)A
+  = L^{-1} A
+  \quad\implies\quad
+  L = M_1^{-1}\cdots M_{n-1}^{-1}
+\end{align*}
+We can verify that $L$ is lower triangular by computing the product of
+inverses of $M_k$. First, the special form of each $M_k$ implies that
+\begin{align*}
+  M_k^{-1} =
+  \begin{pmatrix}
+    1 & &\\
+    & \ddots &\\
+    & & 1 & 0\\
+    & & -m_k &I_{n-k} \\
+  \end{pmatrix}
+  \qquad m_k \in\R^{n-k}
+\end{align*}
+That is, just negate $M_k$ below the diagonal to get $M_{k}^{-1}$;
+therefore, each $M_k^{-1}$ is also lower diagonal. Since the product of
+lower diagonal matrices is lower diagonal,
+$L=M_1^{-1}\cdots M_{n-1}^{-1}$ is lower diagonal. What's more, the
+special form implies that
+\begin{align*}
+  L=
+  \begin{pmatrix}
+    1 & &\\
+    \uparrow& \ddots &\\
+     & & 1 \\
+    -m_1 & \cdots & -m_k &\ddots \\
+    \downarrow & & \downarrow & & 1 \\
+  \end{pmatrix}
+\end{align*}
+The permuation matrix arises if, during the course of Gaussian
+elimination, we swap rows to prevent the multipliers from becoming huge.
+In particular, when we compute $-\beta_{2k}/b_{kk}$, we run the risk of
+$b_{kk}$ being very small and the resulting vector of multipliers being
+huge. That will lead to numerical precision issues. Therefore, we
+sometimes swap rows, called ``pivoting.'' So in Gaussian elimination
+step $k$, we swap the $k$th row with a later row $i>k$ that has
+$b_{ik}>b_{kk}$. We just need to track the swaps and provide a
+permutation matrix $P$ at the end that reorders things correctly.
+\end{proof}
+
+
+
+\subsubsection{Cholesky Decomposition}
+
+The Cholesky Decomposition applies to all symmetric positive definite
+matrices; therefore, it finds a number of applications in dealing with
+covariance matrices.
+
+\begin{thm}
+Suppose that $A$ is a positive definite matrix. Then it
+can be decomposed
+\begin{equation}
+  A = L L^T
+\end{equation}
+where $L$ is lower triagular with positive diagonal elements.
+\end{thm}
+
+\begin{rmk}
+The Cholesky represents something like the ``square root'' of $A$.
+What's more, it's more numerically stable that the $LU$ (provided the
+matrix is positive definite so that the Cholesky exists). Therefore, we
+don't worry about pivoting/row-swapping as with the $LU$.
+\end{rmk}
+
+\begin{prop}\emph{(Solving System with the Cholesky Decomposition)}
+This is completely analogous to solving via the LU decomposition. So
+suppose that we have system $Ax=b$ with $A$ positive definite so that it
+permits a Cholesky decomposition. Then we can write the system
+\begin{align*}
+  Ax = LL^Tx&=b
+\end{align*}
+We can easily solve this sytem by defining $c=L^Tx$ and then solving
+lower triangular system (i) forward for $c$, then upper triangular
+system (ii) backward for $x$:
+\begin{align*}
+  \text{(i)}\quad Lc = b
+  \qquad
+  \text{(ii)}\quad L^Tx = c
+\end{align*}
+\end{prop}
+
+\begin{ex}(Generating Multivariate Random Normals)
+We know how to draw the following multivariate random normal $Z$:
+\begin{align*}
+  Z \sim N(0,I)
+\end{align*}
+Just draw a bunch of iid $N(0,1)$ RV's and stack them into a vector.
+But suppose we want to draw from more complicated MVN RV's with
+arbitrary mean and covariance matrix
+\begin{align*}
+  X \sim N(\mu, \Sigma)
+\end{align*}
+We do this by the Cholesky decomposition. Namely, since $\Sigma$ is a
+covariance matrix, it is positive definite and admits a Cholesky
+decomposition $\Sigma=LL^T$. Therefore, to draw $X\sim N(\mu,\Sigma)$
+\begin{enumerate}
+  \item Draw $Z\sim N(0,I)$ (again, draw iid $N(0,1)$ RVs and stack)
+  \item Set $X=\mu+LZ$, which implies $X\sim N(\mu,LL^T)=N(\mu,\Sigma)$.
+\end{enumerate}
+\end{ex}
+
 
 \subsubsection{Eigenvalue Decomposition}
 \label{subsec:eigenvaluedecomp}
@@ -1051,112 +1283,6 @@ satsfies $\lambda_i = S_{ii} / T_{ii}$ where $S$ and $T$ are the upper
 triangular matrices from the QZ decomposition.
 \end{thm}
 
-\subsubsection{$LU$ Decomposition}
-
-\subsubsection{Cholesky Decomposition}
-
-The Cholesky Decomposition applies to all positive definite matrices;
-therefore, it finds a number of applications in dealing with covariance
-matrices.
-
-\begin{thm}
-Suppose that $A$ is a positive definite matrix. Then it
-can be decomposed
-\begin{equation}
-  A = L L^T
-\end{equation}
-where $L$ is a lower triagular matrix with positive diagonal elements.
-It represents something like the ``square root'' of $A$.
-\end{thm}
-
-\subsubsection{Applications}
-
-\paragraph{Solving $Ax=b$} The Cholesky decomposition allows us to
-quickly solve systems of equations because of the triangular
-structure. Specifically, we can solve the problem as follows
-\begin{align*}
-  Ax = LL^Tx&=b\\
-  \Leftrightarrow \quad \quad Lz&=b \qquad \text{where }z = L^T x
-\end{align*}
-Once we have it in this form, we have a system that is very easy to
-solve by exploiting the structure using \emph{forward substitution}:
-\begin{align*}
-  \begin{pmatrix}
-    l_{11} & 0      & 0 & \cdots & 0 \\
-    l_{21} & l_{22} & 0 & \cdots & 0\\
-    l_{31} & l_{32} & l_{33}& \cdots & 0\\
-    \vdots & \vdots & \vdots & \ddots & \vdots\\
-    l_{n1} & l_{n2} & l_{n3} &\cdots & l_{nn}\\
-  \end{pmatrix}
-  \begin{pmatrix}
-    z_1 \\ z_2 \\ z_3 \\ \vdots \\ z_n
-  \end{pmatrix}
-  &=
-  \begin{pmatrix}
-    b_1 \\ b_2 \\ b_3 \\ \vdots \\ b_n
-  \end{pmatrix}
-\end{align*}
-\begin{align*}
-  \Rightarrow \qquad
-  z_1 &= b_1/l_{11} \\
-  z_2 &= (b_2 - l_{21}z_1)/l_{22} \\
-  \vdots \; &= \quad \vdots\\
-  z_n &= (b_n - l_{n1}z_1 - \cdots - l_{n,n-1}z_{n-1})/l_{nn}
-\end{align*}
-Then, to get from $z$ to $x$, we again solve a triangular system $L^Tx =
-z$, doing something very similar, just in reverse, called \emph{backward
-substitution}:
-\begin{align*}
-  \begin{pmatrix}
-    l_{11} & l_{21}  & l_{31} & \cdots & l_{n1}  \\
-    0 & l_{22} &  l_{32} & \cdots & l_{n2}\\
-    0 & 0 & l_{33}& \cdots & l_{n3}\\
-    \vdots & \vdots & \vdots & \ddots & \vdots\\
-    0 & 0 & 0 &\cdots & l_{nn}\\
-  \end{pmatrix}
-  \begin{pmatrix}
-    x_1 \\ x_2 \\ x_3 \\ \vdots \\ x_n
-  \end{pmatrix}
-  &=
-  \begin{pmatrix}
-    z_1 \\ z_2 \\ z_3 \\ \vdots \\ z_n
-  \end{pmatrix}
-\end{align*}
-\begin{align*}
-  \Rightarrow \qquad
-  x_n &= z_n/l_{nn} \\
-  x_{n-1} &= (z_{n-1} - l_{n,n-1}x_n)/l_{n-1,n-1} \\
-  \vdots \; &= \quad \vdots\\
-  x_1 &= (z_1 - l_{n1}x_n - \cdots - l_{21}x_{2})/l_{11}
-\end{align*}
-
-\paragraph{Generating Multivariate Random Normals}
-We know how to draw the following multivariate random normal $Z$:
-\begin{align*}
-  Z \sim N(0,I)
-\end{align*}
-Just draw a bunch of iid $N(0,1)$ RV's and stack them into a vector.
-
-But suppose we want to draw from more complicated MVN RV's with
-arbitrary mean and covariance matrix
-\begin{align*}
-  X \sim N(\mu, \Sigma)
-\end{align*}
-We do this by the Cholesky decomposition and some simple results for
-Normal RVs. Namely,
-\begin{align}
-  Z \sim N(0,I) \quad \Rightarrow \quad
-  \mu+LZ \sim N(\mu, LL^T)
-  \label{cholalg}
-\end{align}
-{\sl Algorithm}\: Result~\ref{cholalg} suggests a straightforward way
-to draw $X\sim N(\mu,\Sigma)$.
-\begin{enumerate}
-  \item Since $\Sigma$ is a covariance matrix, it is positive definite.
-    So we can compute the Cholesky decomposition $\Sigma=LL^T$.
-  \item Draw $Z\sim N(0,I)$.
-  \item Set $X=\mu+LZ$.
-\end{enumerate}
 
 \subsubsection{Singular Value Decomposition (SVD)}
 
