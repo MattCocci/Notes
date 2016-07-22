@@ -241,7 +241,9 @@
 % Blackboard
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\Rm}{\mathbb{R}^m}
 \newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
 \newcommand{\Rnn}{\mathbb{R}^{n\times n}}
 \newcommand{\Rkn}{\mathbb{R}^{k\times n}}
 \newcommand{\Rnk}{\mathbb{R}^{n\times k}}
@@ -259,6 +261,9 @@
   {\end{aligned}\right\rbrace}
 
 % Various probability and statistics commands
+\newcommand{\nul}{\operatorname{null}}
+\newcommand{\range}{\operatorname{range}}
+%\newcommand{\span}{\operatorname{span}}
 \newcommand{\interior}{\operatorname{int}}
 \newcommand{\Cov}{\operatorname{Cov}}
 \newcommand{\rank}{\operatorname{rank}}
@@ -499,15 +504,89 @@ That is, base vector $e_i$ is zero everywhere except for the $i$the
 element, which equals unity.
 \end{defn}
 
-\begin{defn}
-The \emph{nullspace} of a matrix $A$ ($m\times n$), which is denoted
-$N(A)$, is the set of all $x \in \mathbb{R}^n$ such that $Ax=0$.
-Intuitively, the nullspace consists of all vectors that can linearly
-combine the columns of $A$ to get the zero vector.
-
-It is \emph{always} the case that the zero vector is in $N(A)$, so the
-set can never be empty.
+\begin{defn}(Span)
+Given set of vectors $X=(x_1,\ldots,x_n)$ each in $\Rm$, the
+\emph{span} of $X$ is the set of all vectors in $\Rm$ that can be
+written as a linear combination of vectors in $X$.
 \end{defn}
+
+\begin{defn}(Range)
+Given $A\in\Rmn$, the \emph{range} is the set of all vectors in $\Rm$
+that you can create from linear combinations of columns of $A$:
+\begin{align*}
+  \range(A)
+  =\{Ax\in\Rm\;|\; x\in\Rn\}
+\end{align*}
+\end{defn}
+
+\begin{defn}(Nullspace)
+The \emph{nullspace} of a matrix $A$ ($m\times n$), denoted
+$\nul(A)$, is defined
+\begin{align*}
+  \nul(A)
+  = \{x\in\Rn\;|\; Ax = 0\}
+\end{align*}
+In words, the nullspace consists of all vectors that can linearly
+combine the columns of $A$ to get the zero vector.
+Since the zero vector is \emph{always} in $\nul(A)$, the set can never
+be empty.
+\end{defn}
+
+\begin{defn}(Orthogonal Complement)
+The \emph{orthogonal complement} of subspace $V$ is
+\begin{align*}
+  V^\perp = \{ y\; | \; \forall x\in V,\; x\cdot y=0\}
+\end{align*}
+\end{defn}
+
+\begin{prop}
+\emph{(Orthogonal Complement of Range is Null Space of Transpose)}
+The \emph{orthogonal complement of the range} is the null space of the
+transpose
+\begin{align*}
+  \range(A)^{\perp}
+  &= \nul(A^T)
+\end{align*}
+\end{prop}
+\begin{proof}
+Write out the definition, writing the dot product as $x\cdot y=y^Tx$:
+\begin{align*}
+  \range(A)^{\perp}
+  &= \{y \in\Rm\;|\; \forall x\in \range(A), \; y^T x = 0\}
+  \\
+  &= \{y \in\Rm\;|\; \forall z\in\Rn, \; y^T (Az) = 0\}
+\end{align*}
+Since $Az$ isn't necessarily zero, each $y\in\range(A)^\perp$ must
+linearly combine the rows of $A$ to be zero, so we're looking for those
+$y\in\R^m$ in the nullspace of $A^T$, implying
+$\range(A)^{\perp} = \nul(A^T)$
+\end{proof}
+
+\begin{prop}
+\emph{(Orthogonal Complement of Null Space is )}
+The \emph{orthogonal complement of the null space} is the range of the
+transpose or, equivalently, the span of the rows:
+\begin{align*}
+  \nul(A)^{\perp}
+  &= \range(A^T)
+\end{align*}
+\end{prop}
+\begin{proof}
+Write out the definition, writing the dot product $x\cdot y$ as $x^Ty$:
+\begin{align*}
+  \nul(A)^{\perp}
+  &= \{y \in\Rn\;|\; \forall x\in \nul(A), \; x^Ty = 0\}
+  \\
+  &= \{A^Tz \in\Rn\;|\; \forall x\in \nul(A), \; x^T (A^Tz) = 0\}
+  \\
+  &\qquad\quad
+  \cup \{y\not\in \range(A^T)\;|\;\forall x\in \nul(A), \; x^Ty = 0\}
+\end{align*}
+Now for all $x\in\nul(A)$, we know $Ax=0$, or $x^TA^T=0^T$. Hence, in
+the first set of the union, \emph{any} $z$ works, i.e. any vector in
+$\range(A^T)$ works.
+The second set is also empty somehow.
+\end{proof}
 
 \begin{defn}{(Hermitian Transpose)}
 Given matrix $A$, the \emph{Hermitian transpose} is the conjugate
@@ -519,7 +598,7 @@ Matrix $A$ is a \emph{Hermitian matrix} if $A=A^*$.
 \end{defn}
 
 \begin{defn}{(Symmetric)}
-Matrix $A$ is \emph{symmetric} if it is a real Hermitian matrix:
+$A$ is \emph{symmetric} if it is a real Hermitian matrix:
 $A=A^T$.
 \end{defn}
 
@@ -538,8 +617,8 @@ $A^{-1} = A^T$ so that $AA^T = A^T A = I$.
 \end{defn}
 
 \begin{defn}{(Normal)}
-Matrix $A$ is \emph{normal} if $A^* A = A^*$. Hermitian and unitary
-matrices are normal.
+$A$ is \emph{normal} if $A^* A = A^*$. Hermitian plus unitary
+implies normal.
 \end{defn}
 
 \begin{defn}{(Sparse)}
@@ -627,28 +706,27 @@ exists an invertible matrix $V\in \Rnn$ such that
 Calculating higher powers of matrix $B$ also have a nice relationship to
 higher powers of $A$:
 \begin{align*}
-  B^k &= \left(V^{-1} A V\right)^k \\
-      &= \underbrace{\left(V^{-1} A V\right)\left(V^{-1} A V\right)
-      \cdots  \left(V^{-1} A V\right)}_{k \;\text{times}} \\
-      &= V^{-1} A^k V
+  B^k &= \left(V^{-1} A V\right)^k
+      = \underbrace{\left(V^{-1} A V\right)\left(V^{-1} A V\right)
+      \cdots  \left(V^{-1} A V\right)}_{k \;\text{times}}
+      = V^{-1} A^k V
 \end{align*}
 This will prove extremely useful in the next definition.
 \end{defn}
 
 \begin{defn}{(Diagonalizable)}
-Matrix $A$ is \emph{diagonalizable} if it is similar to some diagonal
-matrix $D$.
+$A$ is \emph{diagonalizable} if similar to some diagonal matrix $D$.
 \end{defn}
 \begin{rmk}
 This is hugely important for calculating powers of matrices. We saw that
 powers of diagonal matrices are extremely easy to compute, while
 Definition~\ref{defn:similar} also showed a nice and easy way to relate
 powers of $A$ to powers of $D$. So we can bypass the tougher problem of
-computing $A^k$ and simply calculate $V^{-1} D^k V$.
-
+computing $A^k$ and simply calculate $V^{-1} D^k V$.\footnote{%
 The question of whether matrices $V$ and $D$ exist for arbitrary $A$
 will be answered in Section~\ref{subsec:eigenvaluedecomp}, which covers
 the Eigenvalue Decomposition.
+}
 \end{rmk}
 
 Next, we want to generalize the concepts of ``positive'' and
@@ -667,7 +745,7 @@ Now for matrices, we'll employ a similar idea, suitably modified to
 handle matrices.
 
 \begin{defn}{(Positive- and Negative-(Semi)definite Matrices)}
-Suppose that we have a Hermitian matrix $A \in \C^{n\times n}$ or simply
+Suppose we have Hermitian $A \in \C^{n\times n}$ or simply
 symmetric if $A \in \R^{n\times n}$. We classify it as follows, with
 each classification defined for $A$ complex or real
 \begin{itemize}
@@ -703,6 +781,10 @@ For matrix $A\in \R^{m \times n}$, the rank is the number of linearly
 independent columns or, alternatively, rows of $A$.\footnote{Whether you
 check rows or columns doesn't matter, those numbers will be equal.} The
 rank $r$ is such that $r \leq n$ and $r\leq m$.
+\end{defn}
+
+\begin{defn}(Moore-Penrose Pseudoinverse)
+This is defined $A^\dagger = (A^TA)^{-1}A^T$.
 \end{defn}
 
 \subsection{The Determinant}
@@ -787,7 +869,298 @@ We prove each in turn
 \end{enumerate}
 \end{proof}
 
+\clearpage
+\subsection{Orthogonal Matrices}
+
+We now give an alternate definition to the one above for orthogonal
+matrices, show the earlier definition is implied by this one, and then
+derive various properties of orthogonal matrices.
+
+\begin{defn}(Orthogonal Matrix and Transformation)
+Square matrix $Q\in\Rnn$ with columns $(q_1,\ldots,q_n)$ is
+\emph{orthogonal} if its columns form an an \emph{orthonormal basis} for
+$\Rn$, i.e. if
+\begin{itemize}
+  \item All columns unit length, $\lVert q_i\rVert = 1$
+  \item All columns mutually perpendicular,
+    $\langle q_i, q_j\rangle =0$ for all $i\neq j$
+\end{itemize}
+Multiplication by an orthogonal matrix corresponds geometrically to
+\emph{reflection} and \emph{rotation}. So if we have vector $x$, the
+orthogonal transformation $Qx$ returns another vector that is a
+reflection and rotation of the original $x$ about some axes.
+\end{defn}
+
+\begin{defn}(Changing Coordinates with an Orthogonal Matrix and its Basis)
+Orthogonal matrices make it very easy to change coordinates.
+To see this, recall how we change coordinates.
+Given point $b\in\Rn$ expressed in the standard basis, we can reexpress
+point $b$ in some other basis $(a_1,\ldots,a_n)$ by placing column
+vectors $a_i\in\Rn$ in matrix $A=(a_1,\ldots,a_n)$ and solving $Ax=b$.
+Then $x=A^{-1}b$ will express point $b$ in terms of basis
+$(a_1,\ldots,a_n)$.
+
+Now suppose that $Q=(q_1,\ldots,q_n)$ is an
+orthogonal matrix, implying that the columns represent an orthonormal
+basis. Then we can reexpress point $b$ as $x=Q^{-1}b=Q^Tb$, taking
+advantage of the result $Q^{-1}=Q^T$ that we will prove below.
+Therefore, we see that we can \emph{easily} change coordinates from the
+standard basis to $(q_1,\ldots,q_n)$ by simple dot products $x=Q^Tb$,
+rather than computing an expensive matrix inverse $x=A^{-1}b$.
+\end{defn}
+
+\begin{prop}\emph{(Properties of Orthogonal Matrices)}
+If $Q\in\Rnn$ is orthogonal, then
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item $Q^TQ=I_n$ and $QQ^T=I_n$
+  \item $Q^{-1}=Q^T$. This is a hugely important property. It means
+    computing inverses of orthogonal matrices are really, really cheap
+    and easy numerically
+  \item $\langle Qx, Qy \rangle=\langle x, y \rangle$. In words,
+    the inner product of $x$ and $y$ equals the inner product of $x$ and
+    $y$ rotated by $Q$. Hence, $Q$ rotates in a way that preserves inner
+    products
+  \item $\lVert Qx \rVert =\lVert x\rVert$.
+    In words, transforming $x$ to $Qx$ preserves the length in terms of
+    the standard Euclidean norm.
+  \item $\det Q = \pm 1$
+\end{enumerate}
+\end{prop}
+\begin{proof}
+We prove each in turn, letting $(q_1,\ldots,q_n)=Q$ denote the columns
+of $Q$
+\begin{enumerate}[label=(\roman*)]
+  \item Let $A=Q^TQ$. Then the $i,j$ element is given by
+    \begin{align*}
+      A_{ij} = \langle q_i, q_j\rangle
+      = \begin{cases}
+          1 & i=j \\
+          0 & i\neq j \\
+        \end{cases}
+    \end{align*}
+    Therefore $A=I_n$. Moreover,
+    \begin{align*}
+      Q^TQ = I_n
+      \quad\implies\quad
+      QQ^TQ = Q I_n
+      \quad\implies\quad
+      (QQ^T)Q = Q
+      \quad\implies\quad
+      QQ^T=I_n
+    \end{align*}
+
+  \item
+    Start from a result in (i): $QQ^T = I_n$. Then clearly
+    $Q^T = Q^{-1}$
+  \item
+    We simply use properties of the inner product, along with result
+    (i):
+    \begin{align*}
+      \langle Qx, Qy \rangle
+      =
+      (Qx)^T Qy
+      = x^T Q^TQ y = x^T I_n y = \langle x, y\rangle
+    \end{align*}
+  \item
+    We can apply result (iii) directly:
+    \begin{align*}
+      \lVert Qx\rVert
+      =
+      \sqrt{%
+      \langle Qx,Qx\rangle
+      }
+      =
+      \sqrt{%
+      \langle x,x\rangle
+      }
+      = \lVert x\rVert
+    \end{align*}
+\end{enumerate}
+\end{proof}
+
+\begin{prop}\emph{(Reflecting Vectors across a Hyperplane)}
+\label{prop:reflect}
+Suppose that we have a hyperplane in $\Rn$ defined by perpendicular
+unit vector $v$. Then we can reflect $x$ about the hyperplane by
+computing
+\begin{align*}
+  x - 2\langle x,v\rangle v
+\end{align*}
+\end{prop}
+\begin{proof}
+First, $\langle x,v\rangle$ gives the projection of $x$ onto $v$.
+Subtract off two of these projects from $x$ to get to the hyperplane,
+then to the other side.
+\end{proof}
+
+\begin{defn}(Householder Matrix)
+Given vector $u\in\R^n$, we define the associated
+\emph{Householder matrix}
+\begin{align*}
+  H = I_n - 2\frac{uu^T}{\lVert u\rVert^2}
+\end{align*}
+Note that every Householder matrix is associated with a vector $u$; they
+are tied together.
+\end{defn}
+
+\begin{prop}\emph{(Householder Matrices Reflect Vectors)}
+Given vector $u\in\Rn$, we form the associated Householder matrix $H$.
+The vector $u$ is also perpendicular to an implicit hyperplane, and
+we can reflect any $x\in\Rn$ about this hyperplane by simple matrix
+multiplication, $Hx$.
+\end{prop}
+\begin{proof}
+First, $u$ is any arbitrary vector, and it's perpendicular to some
+implicit hyperplane. We can compute the unit vector perpendicular to
+that same hyperplane by standardizing: $v=u/\lVert u\rVert$.
+Then, by Proposition~\ref{prop:reflect}, we can reflect $x\in\Rn$ about
+the hyperplane perpendicular to unit-length $v$ (in direction of $u$) by
+using $\langle x,v\rangle=x^Tv=v^Tx\in\R$ to write
+\begin{align*}
+  x - 2\langle x,v\rangle v
+  =
+  x - 2 v(v^Tx)
+  =
+  \big( I_n - 2 vv^T\big)x
+\end{align*}
+The above computation reflects vector $x$; therefore, we just define
+\begin{align*}
+  H
+  = I_n - 2 vv^T
+  = I_n
+  - 2 \left(\frac{u}{\lVert u\rVert}\right)
+  \left(\frac{u}{\lVert u\rVert}\right)^T
+  = I_n - 2 \frac{uu^T}{\lVert u\rVert^2}
+\end{align*}
+which is exactly the definition of the Householder matrix associated
+with $u$ and, by construction, makes $Hx$ a reflection about the
+hyperplane perpendicular to $u$ and $v$.
+\end{proof}
+
+\clearpage
+Below, we plot an example.
+We want to reflect vector $x$ (blue) about the dotted line.
+(In higher dimensions, the dotted line would instead be a hyperplane.)
+That dotted line is defined/pinned down by an orthogonal vector $u$
+(black), with $v$ (gray) representing the unit-length version of $u$.
+To start, the dashed blue line travels from $x$ to
+$\langle x, v\rangle v$, the projection of $x$ onto $v$ (orange).  The
+two dashed orange lines show $x-2\langle x,v\rangle v$, i.e.  adding two
+negative copies of the projection vector (orange) to $x$ (blue) to
+arrive at reflected $x$ in Quadrant IV.
+
+\begin{figure}[htbp!]
+\centering
+\begin{tikzpicture}[xscale=1.5, yscale=1.5, shorten >= -3pt, shorten <= -3pt]
+  % Axes
+  \draw[d4black, <->] (0,-0.5) -- (0,0) -- (0,2.5);
+  \draw[d4black, <->] (-3,0) -- (0,0) -- (3,0);
+
+  % Dashed line giving line/hyperplane to reflected about
+  \draw[d4black, thick, dotted] (-1,2) -- (0.25,-0.5);
+  \node[d4black] at (-2.5,2.2) {Reflection Line/Plane};
+
+  % Vector u orthogonal to the line/hyperplane
+  \draw[d4black, ultra thick, ->] (0.00,0.00) -- (2,1);
+  \node[d4black] at (2.2,1.2) {$u$};
+
+  % -<x,v> v, the two negative orange vectors
+  \draw[d4orange, ultra thick, dashed, ->] (1,2) -- (-0.55,1.25); % (-0.6,1.2)
+  \draw[d4orange, ultra thick, dashed, ->] (-0.55,1.25) -- (-2.15,0.45); % (-2.2, 0.4)
+
+  % Vector x
+  \draw[d4blue, ultra thick, ->] (0.00,0.00) -- (1,2);
+  \node[d4gray] at (1.3,2.0) {$x$};
+  \node[d4blue] at (1.3,2.0) {$x$};
+
+  % <x,v> v, i.e. projecting x onto v
+  \draw[d4blue, thick, dashed, ->] (1,2) -- (1.5,0.9);
+  \draw[d4orange, ultra thick, ->] (0,0) -- (1.50,0.75); % (1.6,0.8)
+  \node[d4gray, thick] at (2.05,0.6) {$\langle x,v\rangle v$};
+  \node[d4orange, thick] at (2.05,0.6) {$\langle x,v\rangle v$};
+
+  % Vector v, the unit-length version of u
+  \draw[d4gray, ultra thick, ->] (0.00,0.00) -- (0.894427,0.447214);
+  \node[d4black, thick] at (1.3,0.2) {$v=u/\lVert u\rVert$};
+  \node[d4gray, thick] at (1.3,0.2) {$v=u/\lVert u\rVert$};
+
+  % Reflected x
+  \draw[d4blue, ultra thick, ->] (0,0) -- (-2.15,0.4);
+  \node[d4gray] at (-3,0.5) {Reflected $x$};
+  \node[d4blue] at (-3,0.5) {Reflected $x$};
+\end{tikzpicture}
+\end{figure}
+
+
+\begin{prop}\emph{(Householder Matrix Properties)}
+For any $u\in\Rn$, associated $H$ satisfies
+\begin{enumerate}[label=\emph{(\roman*)}]
+    \item If $u,w\in\Rn$ point in the same direction, the associated
+      Householder matrices are equal.
+  \item $H$ symmetric \& orthogonal.
+    The latter is unsurprising. As stated, orthogonal matrices
+    encode reflection and rotation, and (as shown) Householder matrices
+    reflect vectors.
+  \item $\rank(H)=1$, hence multiplication $HA$ is referred to as a
+    \emph{``rank-1 update of $A$''}
+\end{enumerate}
+\end{prop}
+\begin{proof}
+We prove each in turn
+\begin{enumerate}[label=(\roman*)]
+  \item
+    Since $u,w$ point in the same direction, the corresponding unit
+    vectors are equal: $u/\lVert u\rVert=w/\lVert w\rVert$.  So the
+    implicit perpendicular hyperplane we reflect about is the same.
+  \item
+    Symmetry:
+    Write out the formula, using $v=u/\lVert u\rVert$,
+      $H^T
+      = \big(I_n- 2vv^T\big)^T
+      %= I_n^T - 2(vv^T)^T
+      = I_n - 2vv^T = H$
+
+    To prove $H$ is orthogonal, we will show $H^TH=I_n$, i.e.
+    $(H^TH)_{ij}=\mathbf{1}\{i=j\}$.
+    So let $H=(h_1,\ldots,h_n)$ where $h_i$ denotes the $i$th column of
+    $H$, let $e_i$ denote the $i$th standard basis element, and let
+    $v=u/\lVert u\rVert$ so that $H=I_n-2vv^T$ and
+    $\langle v,v\rangle=v^Tv=1$. Then
+    \begin{align*}
+      \big(H^TH\big)_{ij}
+      =
+      \langle h_i, h_j\rangle
+      = h_i^Th_j
+      &=
+      \big(e_i - 2v_iv\big)^T
+      \big(e_j - 2v_jv\big)
+      \\
+      &=
+      e_i^Te_j - 2v_je_i^T v
+      - 2v_i v^Te_j + 4v_iv_j v^Tv
+      \\
+      &=
+      \mathbf{1}\{i=j\}
+      - 2v_jv_i
+      - 2v_iv_j + 4v_iv_j\cdot 1
+      \\
+      \implies\quad
+      \big(H^TH\big)_{ij}
+      &=
+      \mathbf{1}\{i=j\}
+    \end{align*}
+
+  \item
+    Recall $H=I_n-2vv^T$, where $v=u/\lVert u\rVert$.
+    Clearly, $vv^T$ is a matrix with all columns parallel to $v$. Hence,
+    $\rank(vv^T)=1$. Consequently, $H=I_n-2vv^T$ also has $\rank=1$.
+\end{enumerate}
+\end{proof}
+
+\clearpage
 \subsection{The Eigenvalue Problem}
+
+\subsubsection{Basic Eigenvalue Problem}
 
 \begin{defn}{(Eigenvalue Problem)}
 For a square matrix $A \in \R^{n\times n}$, a \emph{right eigenvector}
@@ -880,7 +1253,7 @@ $V_\lambda$ is a subspace of $\Rn$.
 \end{proof}
 
 
-\subsection{The Generalized Eigenvalue Problem}
+\subsubsection{The Generalized Eigenvalue Problem}
 
 \begin{defn}{(The Generalized Eigenvalue Problem)}
 For square $n\times n$ matrices $A$ and $B$, an \emph{eigenvector of
@@ -1167,7 +1540,451 @@ decomposition $\Sigma=LL^T$. Therefore, to draw $X\sim N(\mu,\Sigma)$
 \end{enumerate}
 \end{ex}
 
+\subsubsection{QR Decomposition}
 
+\begin{prop}\emph{(QR decomposition)}
+We can express matrix $A\in\Rmn$ as
+\begin{align*}
+  A = QR
+\end{align*}
+where $R$ is upper triangular and $Q$ is orthogonal, $Q^TQ=I_m$.
+\end{prop}
+\begin{proof}
+Main idea: Multiply by a sequence of Householder matrices to produce
+upper triangular matrix $R$. The product of the Householder matrices
+will also serve as our orthogonal $Q$.
+Letting $H_i$ denote the $i$th Householder matrix update and
+$p=\min\{m,n\}$, that means
+\begin{align}
+  R &= H_{n} \cdots H_1 A \label{qrform} \\
+  \implies\quad
+  Q &= \big(H_{n} \cdots H_1\big)^{-1}
+  = H_{1}^{-1} \cdots H_{p}^{-1}
+  = H_{1} \cdots H_{p}
+  \notag
+\end{align}
+where we used that $H^{-1}_i=H_i'=H_i$ since Householder matrix $H_i$ is
+orthogonal and symmetric.
+
+We just need to construct the correct Householder matrices. To do so,
+start with $A$.  We can get all zeros under the diagonal in the
+first column if we multiply by Householder matrix
+\begin{align*}
+  H_1 = I_m - \frac{2}{\lVert u_1\lVert^2}u_1u_1^T
+  \qquad \text{where}\quad
+  \begin{cases}
+    u_1 = a_1 -\alpha e_1 \\
+    \text{$a_1$ is first column of $A$} \\
+    \alpha = -\text{sign}(A_{11})\cdot \lVert a_1\rVert
+  \end{cases}
+\end{align*}
+To prove that $u_1$ is the correct vector for constructing the Householder
+matrix, first compute
+\begin{align*}
+  \lVert u_1\rVert^2
+  =
+  \langle u_1, u_1\rangle
+  = u_1^T u_1
+  &=
+  \big(a_1 - \alpha e_1\big)^T
+  \big(a_1 - \alpha e_1\big)
+  =
+  a_1^Ta_1 - \alpha a_1^Te_1 - \alpha e_1^Ta_1 +\alpha^2e_1^Te_1
+  \\
+  &=
+  \lVert a_1\rVert^2
+  - \alpha A_{11} - \alpha A_{11} +\alpha^2\cdot 1
+  \\
+  \implies\quad
+  \lVert u_1\rVert^2
+  &=
+  2\alpha(\alpha- A_{11})
+\end{align*}
+where I used $\alpha^2 =\lVert a_1\rVert^2$.
+Next, we compute the Householder transformation of the first column of
+$A$, and verify that it is all zero below the diagonal:
+\begin{align*}
+  H_1a_1
+  = \left(I_m - \frac{2}{\lVert u_1\rVert^2}u_1u_1^T\right)a_1
+  &= a_1 - \frac{2}{\lVert u_1\rVert^2}u_1u_1^Ta_1
+  = a_1
+  - \frac{2}{\lVert u_1\rVert^2}(a_1-\alpha e_1)(a_1-\alpha e_1)^Ta_1
+  %\\
+  %&= a_1
+    %- \frac{2}{\lVert u_1\rVert^2}
+    %\big(
+      %a_1a_1^T - \alpha a_1e_1^T - \alpha e_1a_1^T
+      %+ \alpha^2e_1e_1^T
+    %\big)
+    %a_1
+  \\
+  &= a_1
+    - \frac{2}{\lVert u_1\rVert^2}
+    \big(
+      a_1a_1^Ta_1 - \alpha a_1e_1^Ta_1 - \alpha e_1a_1^Ta_1
+      + \alpha^2e_1e_1^Ta_1
+    \big)
+  \\
+  &= a_1
+    - \frac{2}{\lVert u_1\rVert^2}
+    \big(
+      \alpha^2a_1
+      - \alpha A_{11}a_1
+      -\alpha^3 e_1
+      + \alpha^2A_{11}e_1
+    \big)
+  \\
+  \implies\quad H_1a_1
+  &= a_1
+    -
+    \big(
+      a_1
+      - \alpha e_1
+    \big)
+  =\alpha e_1
+\end{align*}
+Thus, we see that $H_1A$ turns the first column into $\alpha e_1$, which
+means all zeros below the diagonal exactly as desired.
+
+This takes care of the first column. After that, we can think of
+reducing the remaining lower-right $(m-1)\times (n-1)$ matrix block in a
+completely analogous way. In particular, if $A^{(i)}$ represents the
+matrix that results after $i$ Householder elimination steps, let
+\begin{align}
+  a_i =
+  \big(
+  \underbrace{0,\cdots, 0}_{\text{$i-1$ of them}},
+  A_{ii}^{(i-1)}, ,\ldots,A_{mi}^{(i-1)}
+  \big)'
+  \label{qrai}
+\end{align}
+That is, take column $i$ of $A^{(i-1)}$ (the matrix after $i-1$
+Householder elimination steps) and zero everything out above the $i$th
+element. Then construct
+\begin{align*}
+  H_i = I_m - \frac{2}{\lVert u_i\lVert^2}u_iu_i^T
+  \qquad \text{where}\quad
+  \begin{cases}
+    u_i = a_i -\alpha e_i \\
+    \text{$a_i$ as in \ref{qrai}} \\
+    \alpha = -\text{sign}\big(A_{ii}^{(i-1)}\big)\cdot \lVert a_1\rVert
+  \end{cases}
+\end{align*}
+It can be shown that applying this $H_i$ as the $i$th Householder step
+will zero out everything below the diagonal in column $i$. This is easy
+to see since everything in $a_i$ from element $i$ down is exactly as in
+the first step above, but just working on the remaining non-reduced
+$(m-i+1)\times (n-i+1)$ matrix in the lower right. At the same time, the
+zeros above element $i$ in $a_i$ ensure that the resulting Householder
+matrix just has a $I_{i-1}$ identity matrix in the upper left corner to
+preserve the upper diagonal structure from the previous $i-1$
+Householder elimination steps.
+
+Finally, we define $Q$ and $R$ as in the Expressions~\ref{qrform}.
+\end{proof}
+
+\begin{prop}\emph{(Solving Square Systems with QR Decomposition)}
+Suppose we have system $Ax=b$, and let $A=QR$ denote the
+QR-decomposition of $A$.
+Then we can easily solve this sytem by defining $c=Rx$,
+solving system (i) as $c=Q^{-1}b=Q^Tb$, taking advantage of the
+orthogonal structure of $Q$, and then solving upper triangular system
+(ii) backward for $x$:
+\begin{align*}
+  \text{(i)}\quad
+  Qc = b
+  \qquad
+  \text{(ii)}\quad
+  Rx = c
+\end{align*}
+The easy inverse $Q^{-1}=Q^T$ of (i) and upper triangular form of (ii)
+makes this easy to solve.
+\end{prop}
+
+
+\clearpage
+\subsubsection{Least Squares Problem for Overdetermined Systems}
+
+We now consider an \emph{overdetermined} system we can only solve
+approximately
+\begin{align*}
+  Ax\approx b
+  \qquad \text{where $A\in\Rmn$, $b\in\Rm$, and $m>n$}
+\end{align*}
+Choose $x$ to make the equation approximately true. But first, we
+look at the geometry of the problem.
+
+We should think of $b$ as a point in the space of $\Rm$ that we want to
+approximately write as a linear combination of the columns of
+$A\in\Rmn$. Here's the complication though: Since $n<m$, the columns of
+$A$ aren't enough to completely span the space $\Rm$. Rather, the
+columns define the subspace
+$\range(A)\subseteq \Rn \subset \Rm$.
+And in general, $b\not\in\range(A)\subset \Rm$, so we have to
+insead find a vector $x\in\Rn$ that gives a linear combination of
+columns $Ax\in\range(A)\subset\Rm$ that is as close as possible to
+$b\in\Rm$ (though we almost certainly won't equal it exactly).
+
+Let's take an example. Suppose $m=2$ and $n=1$. Then we have two
+data points, with one independent variable. Letting $a_1$ denote the
+first (and only) column, we have something like the picture below.
+The black vector is the first (and only) column of independent variable
+data, $a_1$. The dashed line behind $a_1$ is
+$\range(A)$, i.e. it captures all the points we can get by stretching
+the single column $a_1$. Our goal is to choose $x$ so that $Ax\approx
+b$, i.e. the point $Ax=a_1x$ on that dashed line is as close as possible
+to dependent variable $b$.
+
+As an example fitted value, we plot the orange vector.
+This particularly attractive choice is the least-squares choice---the
+projection of $b$ onto $\range(A)$. The gray vector is the residual that
+separates the dependent variable data $b$ from the fitted value
+$Ax=a_1x$, the tip of the orange vector. As we see the
+residual is orthogonal to $\range(A)$.
+
+\begin{figure}[htbp!]
+\centering
+\begin{tikzpicture}[xscale=1.5, yscale=1.5, shorten >= -3pt, shorten <= -3pt]
+  % Axes
+  \draw[d4black, <->] (0,-0.5) -- (0,0) -- (0,2.5);
+  \draw[d4black, <->] (-2,0) -- (0,0) -- (3.5,0);
+
+  % a_1 vector and dashed line
+  \draw[d4black, thick, dashed] (-1,-0.5) -- (3,1.5);
+  \draw[d4black, ultra thick, ->] (0.05,0.05) -- (2,1);
+  \node[d4black] at (2.9,0.85) {$a_1$};
+  \node[d4black] at (3.7,1.6) {$\range(A)$};
+
+  % Projection of b onto a_1
+  \draw[d4orange, ultra thick, ->] (0.05,0.05) -- (1.5,0.75);
+  \node[d4orange, thick] at (1.7,0.35) {$\frac{\langle b, a_1\rangle}{\lVert a_1\rVert}a_1$};
+
+  % Residual
+  \draw[d4gray, ultra thick, <-] (1.05,1.95) -- (1.55,0.85);
+  \node[d4gray] at (1.5,1.5) {$r$};
+
+  % Vector b
+  \draw[d4blue, ultra thick, ->] (0.05,0.05) -- (1,2);
+  \node[d4gray] at (1,2.3) {$b$};
+  \node[d4blue] at (1,2.3) {$b$};
+
+  %\draw[d4blue, ultra thick, domain=0.05:3] plot (\x, {-pow(\x,2)+3.5*\x+1});
+  %\draw[d4gray, thick, domain=0.05:2] plot (\x, {1.5*\x+2});
+  %\draw[d4gray, thick, dashed] (1,0.1) -- (1,3.4);
+\end{tikzpicture}
+\end{figure}
+
+From this picture, we see the standard two-step least-squares approach
+to solving overdetermined systems $Ax\approx b$ or $Ax+r=b$:
+\begin{enumerate}
+  \item Project the dependent variable data $b$ (blue vector) onto the
+    column space $\range(A)$ (dashed line) to get fitted values $Ax$
+    (orange vector)
+  \item Solve for the coefficient vector $x$ that gives this
+    projection/fitted values
+\end{enumerate}
+Notice that the orthogonal residual vector $r$ (gray line) falls right
+out of this approach.
+
+\clearpage
+Now, we consider what happens if we change $m$ and $n$. First, if we
+increase $n$ to $n=m=2$, then we add another column of data to $A$.
+Provided that $a_2$ is not parallel to $a_1$, we have a proper basis for
+$\R^2$ and we can find coefficients $x$ such that we \emph{perfectly}
+fit $Ax=b$. This should be no surprise because $m=n$ with full-rank $A$
+implies a square system.
+
+Next, suppose we increase $m=3$ keeping $n=1$. Then that 2-dimensional
+picture above would need to be lifted to 3-dimensions. Again,
+$\range(A)$ is a line, and we project $b\in\R^3$ onto that line. If we
+were to introduce another (non-parallel) column to $A$ so that $m=3$ and
+$n=2$, then $\range(A)$ would expand to a 2-dimensional subspace of
+$\R^3$---a hyperplane. This hyperplane represents the set of all points
+we could construct by linearly combining columns of $A$. Again,
+$b\in\R^3$ is likely not on this plane, in which case we project $b$
+onto that hyperplane $\range(A)$ to find the fitted value. The $x$ such
+that $Ax$ equals that fitted point is the coefficient vector.
+
+\clearpage
+\begin{prop}
+\emph{(Solving Overdetermined/Least-Squares Problems with QR)}
+Suppose we have $A\in\Rmn$ and $b\in\Rm$ for $m>n$.
+Then we have an overdetermined system that we can only solve
+approximately, $Ax\approx b$. To solve for $x$,
+define the residual $r=b-Ax$ and choose
+\begin{align}
+  x = \argmin_x \;\lVert r\rVert^2 =
+  \argmin_x \;\lVert b-Ax\rVert^2
+  \label{qrls}
+\end{align}
+Next, suppose we have the $QR$ decomposition of $A$:
+\begin{align*}
+  \underset{(m\times n)}{A}
+  =
+  \underset{(m\times m)}{Q}
+  \underset{(m\times n)}{R\vphantom{Q}}
+  =
+  \underbrace{%
+    \begin{pmatrix}
+      \underset{(m\times n)}{Q_1}
+      & \underset{(m\times m-n)}{Q_2}
+    \end{pmatrix}
+  }_{(m\times m)}
+  \underbrace{%
+    \begin{pmatrix}
+      \underset{(n\times n)}{R_1}
+      \\
+      \underset{(m-n\times n)}{0}
+    \end{pmatrix}
+  }_{(m\times n)}
+  =
+  \underset{(m\times n)}{Q_1}
+  \underset{(n\times n)}{R_1\vphantom{Q_1}}
+\end{align*}
+Then the solution to Problem~\ref{qrls} can be written as an exactly
+identified square problem
+\begin{align}
+  R_1 x = Q_1^T b
+  \label{qrlssoln}
+\end{align}
+\end{prop}
+\begin{rmk}
+First, notice we don't need $Q_2$ to solve the least-squares problem via
+Problem~\ref{qrlssoln}. We just need $Q_1$ and $R_1$; therefore, in
+practice, we don't need the entire $QR$ factorization.
+
+Second, note that Problem~\ref{qrls} is just one approach to solving
+overdetermined system problem $Ax\approx b$. That overdetermined system
+is our original problem, while minimization Problem~\ref{qrls} is simply
+a particularly attractive approach to tackling it. We might have chosen
+other approaches to choosing an $x$, it's just that this approach has
+nice features. For example, since the norm $\lVert\;\cdot\;\rVert$ is a
+continuous function, $\lVert b-Ax\lVert$ is a continuous function of
+$x$. Moreover, the resulting solution that comes out of solving
+Problem~\ref{qrlssoln} has nice geometric properties, as we will discuss
+below.
+\end{rmk}
+\begin{proof}
+Since $Q$ and $Q^T=Q^{-1}$ are orthogonal matrices that preserve
+length, $\lVert r\rVert = \lVert Q^Tr\rVert$, so we can write our
+minimization problem as
+\begin{align*}
+  \min_x \lVert r\rVert^2
+  =
+  \min_x \left\lVert Q^Tr\right\rVert^2
+  =
+  \min_x \left\lVert Q^T(b-Ax)\right\rVert^2
+\end{align*}
+Replace $A$ with its $QR$ decomposition and simplify $Q^TQ=Q^{-1}Q=I_m$
+to get
+\begin{align*}
+  \min_x \lVert r\rVert^2
+  =
+  \min_x \left\lVert Q^T(b-QRx)\right\rVert^2
+  =
+  \min_x \left\lVert Q^Tb-Rx\right\rVert^2
+\end{align*}
+Now replace $Q$ and $R$ with their block-matrix form.
+\begin{align*}
+  \min_x \lVert r\rVert^2
+  =
+  \min_x
+  \left\lVert
+  \begin{pmatrix}
+    Q_1^T \\ Q_2^T
+  \end{pmatrix}
+  b-
+  \begin{pmatrix}
+    R_1 \\ 0
+  \end{pmatrix}
+  x
+  \right\rVert^2
+  =
+  \min_x
+  \left\lVert
+  \begin{pmatrix}
+    Q_1^Tb - R_1x \\
+    Q_2^Tb
+  \end{pmatrix}
+  \right\rVert^2
+\end{align*}
+Because of the block structure of the matrix, this simplifies nicely to
+\begin{align*}
+  \min_x \lVert r\rVert^2
+  =
+  \min_x
+  \left\lVert
+    Q_1^Tb - R_1x
+  \right\rVert^2
+  +
+  \left\lVert
+    Q_2^Tb
+  \right\rVert^2
+\end{align*}
+Notice that the second term is unnaffected by choice of $x$. Therefore,
+we can focus on minimizing the first term. But also notice that we can
+set the first term to zero \emph{exactly} by back-solving the
+square upper-triangular system given by Equation~\ref{qrlssoln}.
+\end{proof}
+
+%\begin{prop}
+%\emph{(Solving Undetermined Problems with the QR)}
+%Suppose that we have $A\in\Rmn$ and $b\in\Rm$ with $m<n$. Then we have
+%an undetermined system $Ax=b$ that has many solutions---we just need to
+%pick one.
+%\end{prop}
+
+
+
+\clearpage
+\subsubsection{Singular Value Decomposition (SVD)}
+
+The singular value decomposition is a useful decomposition that works
+for \emph{any} matrix. Moreover, given the singular value decomposition
+of some matrix $A$, many of properties of $A$ can be read off directly
+from the decomposition.
+
+\begin{thm}
+For an arbitrary $m\times n$ matrix $A$, there exist orthogonal matrices
+$U$ ($m\times m$) and $V$ ($n\times n)$ plus a diagonal matrix
+$\Sigma=diag(\sigma_1, \ldots,\sigma_p)$ where $p=\min\{m,n\}$ such
+that
+\begin{align*}
+  A = U\Sigma V^T
+\end{align*}
+Moreover, supposing that we order the singular values $\sigma_1 \geq
+\sigma_2\geq\cdots\geq \sigma_r\geq \sigma_{r+1}=\cdots = \sigma_p=0$,
+we have that
+\begin{enumerate}
+\item $rank(A)=r$
+\item $null(A)=span\{v_{r+1},\ldots,v_n\}$
+\item $range(A)=span\{u_{1},\ldots,u_r\}$
+\item $\sigma_i = \sqrt{\lambda_i}$ for $i=1,\ldots,p$ where $\lambda_i$
+  is the $i$th largest eigenvalue of $A^TA$.
+\item $v_i$ are orthonormal basis for the domain of $A$.
+\item $u_i$ are orthonormal basis for the range of $A$.
+\end{enumerate}
+\end{thm}
+
+\subsubsection{SVD Intuition}
+
+Geometrically, given an $n\times 1$ vector $x$, the SVD of a matrix $A$
+says that the multiplication $Ax = U\Sigma V^T x$ is a sequence of three
+operations on $x$:
+\begin{enumerate}
+\item Express $x$ in terms of the orthonormal basis defined by the
+  columns of $V$. The multiplication $V^T x$ does this, resulting
+  effectively in a rotation of $x$ from the standard basis for
+  $\mathbb{R}^n$ onto the basis defined by $V$.
+\item Stretch the result of the first step along the $i$th dimension or
+  axis by $\sigma_i$, for $i=1,\ldots,p$. This is a stretching along the
+  axes defined by $V$.
+\item Rotate one final time by $U$, expressing $\Sigma V^Tx$ in terms of
+  the orthonormal basis defined by columns $U$ (rather than $V$ or the
+  standard basis).
+\end{enumerate}
+
+\clearpage
 \subsubsection{Eigenvalue Decomposition}
 \label{subsec:eigenvaluedecomp}
 
@@ -1283,53 +2100,6 @@ satsfies $\lambda_i = S_{ii} / T_{ii}$ where $S$ and $T$ are the upper
 triangular matrices from the QZ decomposition.
 \end{thm}
 
-
-\subsubsection{Singular Value Decomposition (SVD)}
-
-The singular value decomposition is a useful decomposition that works
-for \emph{any} matrix. Moreover, given the singular value decomposition
-of some matrix $A$, many of properties of $A$ can be read off directly
-from the decomposition.
-
-\begin{thm}
-For an arbitrary $m\times n$ matrix $A$, there exist orthogonal matrices
-$U$ ($m\times m$) and $V$ ($n\times n)$ plus a diagonal matrix
-$\Sigma=diag(\sigma_1, \ldots,\sigma_p)$ where $p=\min\{m,n\}$ such
-that
-\begin{align*}
-  A = U\Sigma V^T
-\end{align*}
-Moreover, supposing that we order the singular values $\sigma_1 \geq
-\sigma_2\geq\cdots\geq \sigma_r\geq \sigma_{r+1}=\cdots = \sigma_p=0$,
-we have that
-\begin{enumerate}
-\item $rank(A)=r$
-\item $null(A)=span\{v_{r+1},\ldots,v_n\}$
-\item $range(A)=span\{u_{1},\ldots,u_r\}$
-\item $\sigma_i = \sqrt{\lambda_i}$ for $i=1,\ldots,p$ where $\lambda_i$
-  is the $i$th largest eigenvalue of $A^TA$.
-\item $v_i$ are orthonormal basis for the domain of $A$.
-\item $u_i$ are orthonormal basis for the range of $A$.
-\end{enumerate}
-\end{thm}
-
-\subsubsection{SVD Intuition}
-
-Geometrically, given an $n\times 1$ vector $x$, the SVD of a matrix $A$
-says that the multiplication $Ax = U\Sigma V^T x$ is a sequence of three
-operations on $x$:
-\begin{enumerate}
-\item Express $x$ in terms of the orthonormal basis defined by the
-  columns of $V$. The multiplication $V^T x$ does this, resulting
-  effectively in a rotation of $x$ from the standard basis for
-  $\mathbb{R}^n$ onto the basis defined by $V$.
-\item Stretch the result of the first step along the $i$th dimension or
-  axis by $\sigma_i$, for $i=1,\ldots,p$. This is a stretching along the
-  axes defined by $V$.
-\item Rotate one final time by $U$, expressing $\Sigma V^Tx$ in terms of
-  the orthonormal basis defined by columns $U$ (rather than $V$ or the
-  standard basis).
-\end{enumerate}
 
 \subsection{Symmetric Matrices}
 
