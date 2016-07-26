@@ -209,7 +209,7 @@
 % Misc Math
 \newcommand{\Prb}{\mathrm{P}}
 \newcommand{\ra}{\rightarrow}
-\newcommand{\diag}{\text{diag}}
+\newcommand{\diag}{\operatorname{diag}}
 \newcommand{\ch}{\text{ch}}
 \newcommand{\dom}{\text{dom}}
 
@@ -244,6 +244,7 @@
 \newcommand{\Rm}{\mathbb{R}^m}
 \newcommand{\Rk}{\mathbb{R}^k}
 \newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rmm}{\mathbb{R}^{m\times m}}
 \newcommand{\Rnn}{\mathbb{R}^{n\times n}}
 \newcommand{\Rkn}{\mathbb{R}^{k\times n}}
 \newcommand{\Rnk}{\mathbb{R}^{n\times k}}
@@ -263,10 +264,10 @@
 % Various probability and statistics commands
 \newcommand{\nul}{\operatorname{null}}
 \newcommand{\range}{\operatorname{range}}
-%\newcommand{\span}{\operatorname{span}}
 \newcommand{\interior}{\operatorname{int}}
 \newcommand{\Cov}{\operatorname{Cov}}
 \newcommand{\rank}{\operatorname{rank}}
+\newcommand{\spann}{\operatorname{span}}
 \newcommand{\Corr}{\operatorname{Corr}}
 \newcommand{\Var}{\operatorname{Var}}
 \newcommand{\asto}{\xrightarrow{a.s.}}
@@ -1542,13 +1543,53 @@ decomposition $\Sigma=LL^T$. Therefore, to draw $X\sim N(\mu,\Sigma)$
 
 \subsubsection{QR Decomposition}
 
+
 \begin{prop}\emph{(QR decomposition)}
-We can express matrix $A\in\Rmn$ as
+We can express matrix $A\in\Rmn$ as the product of upper-triangular $R$
+and orthogonal matrix $Q$ (i.e. $Q^TQ=I_m$):
 \begin{align*}
-  A = QR
+  \underset{(m\times n)}{A\vphantom{Q}}
+  =
+  \underset{(m\times m)}{Q}
+  \underset{(m\times n)}{R\vphantom{Q}}
 \end{align*}
-where $R$ is upper triangular and $Q$ is orthogonal, $Q^TQ=I_m$.
 \end{prop}
+
+\begin{rmk}
+As always, orthogonal matrices have an easy inverse $Q^{-1}=Q^T$, making
+it easy to convert coordinate systems. This will be particular useful
+for solving a system of equations and the least-squares problem. That's
+predominantly why we care about the QR.
+
+On top of that, the QR decomposition also provides useful information
+about the range (column space) of $A$. In particular, suppose
+we have a tall-matrix, $m>n$, with full-column rank, $\rank(A)=n$. In
+this case, the columns of $A$ do not span all of $\Rm$. Rather, they
+span subspace $\range(A)\subset \Rm$. Now, write the orthogonal matrix
+$Q\in\R^{m\times m}$ as
+\begin{align*}
+  \underset{(m\times m)}{Q} =
+  \begin{pmatrix}
+    \underset{(m\times n)}{Q_1}
+    & \underset{(m\times m-n)}{Q_2}
+  \end{pmatrix}
+\end{align*}
+By construction, the columns of $Q_1$ serve as a basis for
+$\range(A)\subset\Rm$, while the columns of $Q_2$ serve as a basis for
+the rest of $\Rm$ that the columns of $A$ do not span. Thus, the QR
+decomposition furnishes a set of bases for important subspaces of
+$\Rm$ related to $A$.\footnote{%
+  Note that, for a tall matrix, the row space isn't really interesting
+  since full column rank, $\rank(A)=n$, implies $\Rn$ is spanned
+  completely. (The Singular Value Decomposition below handles cases
+  where this is not true.) Also, if the matrix is wide $n>m$, everything
+  flips: we run the decomposition on $A^T$, $\Rn$ is not spanned by the
+  rows of $A$, and the column space $\Rm$ is spanned, hence
+  uninteresting.
+}
+\end{rmk}
+
+
 \begin{proof}
 Main idea: Multiply by a sequence of Householder matrices to produce
 upper triangular matrix $R$. The product of the Householder matrices
@@ -1643,9 +1684,8 @@ $A$, and verify that it is all zero below the diagonal:
     \big)
   =\alpha e_1
 \end{align*}
-Thus, we see that $H_1A$ turns the first column into $\alpha e_1$, which
-means all zeros below the diagonal exactly as desired.
-
+Thus, $H_1A$ turns the first column into $\alpha e_1$, i.e. all zeros
+below the diagonal as desired.
 This takes care of the first column. After that, we can think of
 reducing the remaining lower-right $(m-1)\times (n-1)$ matrix block in a
 completely analogous way. In particular, if $A^{(i)}$ represents the
@@ -1678,9 +1718,8 @@ $(m-i+1)\times (n-i+1)$ matrix in the lower right. At the same time, the
 zeros above element $i$ in $a_i$ ensure that the resulting Householder
 matrix just has a $I_{i-1}$ identity matrix in the upper left corner to
 preserve the upper diagonal structure from the previous $i-1$
-Householder elimination steps.
-
-Finally, we define $Q$ and $R$ as in the Expressions~\ref{qrform}.
+elimination steps. Do this and then just define $Q$ and $R$ as in the
+Expressions~\ref{qrform}.
 \end{proof}
 
 \begin{prop}\emph{(Solving Square Systems with QR Decomposition)}
@@ -1776,7 +1815,7 @@ residual is orthogonal to $\range(A)$.
 
 From this picture, we see the standard two-step least-squares approach
 to solving overdetermined systems $Ax\approx b$ or $Ax+r=b$:
-\begin{enumerate}
+\begin{enumerate}[label=(\roman*)]
   \item Project the dependent variable data $b$ (blue vector) onto the
     column space $\range(A)$ (dashed line) to get fitted values $Ax$
     (orange vector)
@@ -1804,6 +1843,14 @@ we could construct by linearly combining columns of $A$. Again,
 $b\in\R^3$ is likely not on this plane, in which case we project $b$
 onto that hyperplane $\range(A)$ to find the fitted value. The $x$ such
 that $Ax$ equals that fitted point is the coefficient vector.
+
+Want a 3D picture here
+
+We now introduce a solution method for the least squares problem that
+does not entail using the normal equation formula $(A^TA)^{-1}A^Tb$.
+Rather than form $A^TA$ (and square things), we will instead just
+row-reduce and solve an upper triangular system. This is much more
+numerically stable.
 
 \clearpage
 \begin{prop}
@@ -1851,7 +1898,7 @@ identified square problem
 \begin{rmk}
 First, notice we don't need $Q_2$ to solve the least-squares problem via
 Problem~\ref{qrlssoln}. We just need $Q_1$ and $R_1$; therefore, in
-practice, we don't need the entire $QR$ factorization.
+practice, we don't need the full $QR$ factorization.
 
 Second, note that Problem~\ref{qrls} is just one approach to solving
 overdetermined system problem $Ax\approx b$. That overdetermined system
@@ -1927,6 +1974,36 @@ set the first term to zero \emph{exactly} by back-solving the
 square upper-triangular system given by Equation~\ref{qrlssoln}.
 \end{proof}
 
+
+\begin{rmk}({Stability and Conditioning})
+Now a word about numerical stability and conditioning concerns when
+solving the least squares problem. Recall the two steps to solving
+$Ax\approx b$:
+\begin{enumerate}[label=(\roman*)]
+  \item Project $b$ onto the column space $\range(A)$ to get fitted
+    values $Ax$
+  \item Solve for the coefficient vector $x$ that gives this
+    projection/fitted values
+\end{enumerate}
+There are possible problems with each step, and they are as follows:
+\begin{enumerate}[label=(\roman*)]
+  \item
+    If $b$ is nearly orthogonal to $\range(A)$, then the projection of
+    $b$ onto $\range(A)$ can change a lot in response to small
+    perturbations of the $b$ vector. This problem is easy to spot
+    though, because $b$ is nearly orthogonal to $\range(A)$ only for
+    dumb, terrible regressions where the fit is garbage. So we can
+    generally spot the problem.
+  \item If the columns of $A$ are highly correlated so that $A$ is
+    nearly less than full column rank, it's generally tough to solve for
+    the $x$ such that $Ax$ equals the projection (or at least solve for
+    a \emph{uniquely} identified $x$). Here, we say the problem is
+    \emph{ill-conditioned}. It is precisely these types of issues where
+    the QR decomposition is useful.
+\end{enumerate}
+\end{rmk}
+
+
 %\begin{prop}
 %\emph{(Solving Undetermined Problems with the QR)}
 %Suppose that we have $A\in\Rmn$ and $b\in\Rm$ with $m<n$. Then we have
@@ -1935,54 +2012,220 @@ square upper-triangular system given by Equation~\ref{qrlssoln}.
 %\end{prop}
 
 
-
 \clearpage
 \subsubsection{Singular Value Decomposition (SVD)}
 
-The singular value decomposition is a useful decomposition that works
-for \emph{any} matrix. Moreover, given the singular value decomposition
-of some matrix $A$, many of properties of $A$ can be read off directly
-from the decomposition.
+The SVD is  useful because it works for \emph{any} matrix, including and
+especially rank deficient matrices. Moreover, many properties of a
+matrix can be read off directly from its SVD.
 
 \begin{thm}
-For an arbitrary $m\times n$ matrix $A$, there exist orthogonal matrices
-$U$ ($m\times m$) and $V$ ($n\times n)$ plus a diagonal matrix
-$\Sigma=diag(\sigma_1, \ldots,\sigma_p)$ where $p=\min\{m,n\}$ such
-that
+For any arbitrary $A\in\Rmn$, there exist orthogonal matrices $U\in\Rmm$
+and $V\in\Rnn$ plus non-square ``diagonal'' $\Sigma\in\Rmn$ such that
 \begin{align*}
-  A = U\Sigma V^T
+  A
+ =
+  \underset{(m\times m)}{U}
+  \underset{(m\times n)}{\Sigma}
+  \underset{(n\times n)}{V^T}
 \end{align*}
-Moreover, supposing that we order the singular values $\sigma_1 \geq
-\sigma_2\geq\cdots\geq \sigma_r\geq \sigma_{r+1}=\cdots = \sigma_p=0$,
-we have that
-\begin{enumerate}
-\item $rank(A)=r$
-\item $null(A)=span\{v_{r+1},\ldots,v_n\}$
-\item $range(A)=span\{u_{1},\ldots,u_r\}$
-\item $\sigma_i = \sqrt{\lambda_i}$ for $i=1,\ldots,p$ where $\lambda_i$
-  is the $i$th largest eigenvalue of $A^TA$.
-\item $v_i$ are orthonormal basis for the domain of $A$.
-\item $u_i$ are orthonormal basis for the range of $A$.
-\end{enumerate}
+Letting $r=\rank(A)$, we also define
+\begin{itemize}
+  \item \emph{Left Singular Vectors}: $u_1,\ldots,u_m$, columns of
+    orthogonal $U$, form a basis for $\Rm$
+  \item \emph{Right Singular Vectors}: $v_1,\ldots,v_n$, columns of
+    orthogonal $V$, form a basis for $\Rn$
+  \item \emph{Singular Values}: $\sigma_i=\Sigma_{ii}$ for
+    $i=1,\ldots,\min\{m,n\}$. Zero $\forall i> r$, nonzero
+    otherwise
+\end{itemize}
+For $m>n$, and rank $r$ possibly less than $n$, these matrices look like
+\begin{align}
+  \underset{(m\times n)}{A}
+  =
+  \underbrace{%
+    \begin{pmatrix}
+      \underset{(m\times r)}{U_1}
+      &
+      \underset{(m\times m-r)}{U_2}
+    \end{pmatrix}
+    \vphantom{%
+    \begin{pmatrix}
+      \underset{(r\times n)}{V_1^T}
+      \\
+      \underset{(n-r\times n)}{V^T_2}
+    \end{pmatrix}
+    }
+  }_{(m\times m)}
+  \underbrace{%
+    \begin{pmatrix}
+      \underset{(r\times r)}{\Sigma_1}
+      &
+      \underset{(r\times n-r)}{0}
+      \\
+      \underset{(m-r\times r)}{0}
+      &
+      \underset{(m-r\times n-r)}{0}
+    \end{pmatrix}
+    \vphantom{%
+    \begin{pmatrix}
+      \underset{(r\times n)}{V_1^T}
+      \\
+      \underset{(n-r\times n)}{V^T_2}
+    \end{pmatrix}
+    }
+  }_{(m\times n)}
+  \underbrace{%
+    \begin{pmatrix}
+      \underset{(r\times n)}{V_1^T}
+      \\
+      \underset{(n-r\times n)}{V^T_2}
+    \end{pmatrix}
+  }_{(n\times n)}
+  =
+  \underset{(m\times r)}{U_1}
+  \underset{(r\times r)}{\Sigma_1}
+  \underset{(r\times n)}{V_1^T}
+  \label{svd}
+\end{align}
 \end{thm}
 
-\subsubsection{SVD Intuition}
-
-Geometrically, given an $n\times 1$ vector $x$, the SVD of a matrix $A$
-says that the multiplication $Ax = U\Sigma V^T x$ is a sequence of three
-operations on $x$:
+\begin{rmk}(Intuition)
+The SVD makes explicit the geometry of linear transformations. In
+particular, if we start with the unit circle in $\Rn$ and multiply every
+point of it by $A$, we get an ellipse with axes
+$\sigma_1u_1,\ldots,\sigma_mu_m\in\Rm$. Correspondingly, vector
+$v_i\in\Rn$ is the vector on the unit circle in domain $\Rn$ that gets
+mapped to $\sigma_iu_i\in\Rm$ in the range. To see this, write
+\begin{align*}
+  Av_i = U\Sigma V^T v_i = U\Sigma e_i
+  = U\sigma_i e_i = \sigma_iu_i
+\end{align*}
+More generally, the SVD breaks up the multiplication of any point $Ax$
+into three steps:
 \begin{enumerate}
-\item Express $x$ in terms of the orthonormal basis defined by the
-  columns of $V$. The multiplication $V^T x$ does this, resulting
-  effectively in a rotation of $x$ from the standard basis for
-  $\mathbb{R}^n$ onto the basis defined by $V$.
-\item Stretch the result of the first step along the $i$th dimension or
-  axis by $\sigma_i$, for $i=1,\ldots,p$. This is a stretching along the
-  axes defined by $V$.
-\item Rotate one final time by $U$, expressing $\Sigma V^Tx$ in terms of
-  the orthonormal basis defined by columns $U$ (rather than $V$ or the
-  standard basis).
+  \item
+    Rotation from ``input'' coordinates in $\Rn$ to more
+    convenient coordinate system in $\Rn$.
+
+    Since $V\in\Rnn$ orthogonal, we know $V^{-1}=V^T$, multiplication by
+    $V$ or $V^T$ induces rotation, and $v_1,\ldots,v_n$ are an
+    orthonormal basis for $\Rn$. Therefore, $V^Tx$ (the solution to
+    $Vy=x$) converts $x$ from coordinates in the standard basis to basis
+    $v_1,\ldots,v_n$.
+
+  \item Stretching and dimension adjustments in this new, more
+    convenient coordinate system.
+
+    First, dim. adjustments. If $m>n$ so $A$ and $\Sigma$ tall,
+    multiplication $\Sigma V^Tx$ takes $V^Tx\in\Rn$ and spits out
+    $\Sigma V^Tx$ in larger $\Rm$ with zeros tacked onto the bottom (to
+    account for the space enlargement). If $m<n$ so $A$ and $\Sigma$
+    wide, we take $V^Tx\in\Rn$ and spit out $\Sigma V^Tx$ in smaller
+    $\Rm$, shutting down some dimensions, projecting onto subspace
+    $\Rm\subset\Rn$.
+
+    Next, stretching. Given $V^Tx$ and ``diagonal'' $\Sigma$, aside from
+    shutting down dimensions or tacking them on, multiplication $\Sigma
+    V^Tx$ will stretch column $i$ of $V^Tx$ by $\Sigma_{ii}$.
+
+  \item Convert to ``output'' coordinates in $\Rm$.
+    $U\Sigma V^Tx\in\Rm $ expresses $Ax$ as a linear combination of
+    columns $u_1,\ldots,u_m\in\Rm$, with weights given by $\Sigma V^Tx$.
 \end{enumerate}
+\end{rmk}
+
+\clearpage
+\begin{cor}\emph{(SVD Properties)}
+Given SVD of matrix $A\in\Rmn$ as in Expression~\ref{svd} with $n\leq
+m$, $\rank(A)=r\leq n$, and singular values ordered from largest to
+smallest in $\Sigma$
+\begin{itemize}
+  \item As mentioned, the columns $u_1,\ldots,u_m$ are an orthonormal
+    basis for $\Rm$, while the columns $v_1,\ldots,v_n$ are an
+    orthonormal basis for $\Rn$
+  \item $\range(A)=\range(U_1)=\spann\{u_{1},\ldots,u_r\}$. In words,
+    the first $r$ left singular vectors form an orthonormal basis for
+    subspace $\range(A)$ of $\Rm$
+  \item
+    $\range(A)^\perp=\range(U_2)=\spann\{u_{r+1},\ldots,u_m\}$.
+    Obviously, this is only relevant if $r<m$.
+    In words, if the matrix $A$ is rank-deficient, the last $m-r$ left
+    singular vectors form an orthonormal basis for $\range(A)^\perp$,
+    the part of $\Rm$ \emph{not} spanned by the columns of $A$.
+  \item $\nul(A)=\range(V_2)=\spann\{v_{r+1},\ldots,v_n\}$
+    Obviously only relevant if $r<n$.
+    In words, any vector $x$ in the span of the last $n-r$ right
+    singular vectors is mapped to zero by $Ax$
+  \item $\range(A^T)=\range(V_1)=\spann\{v_1,\ldots,v_r\}$.
+    In words, the first $r$ right singular vectors form an orthonormal
+    basis for the subspace $\range(A^T)$ of $\Rn$.
+  \item $\sigma_i = \sqrt{\lambda_i}$ for $i=1,\ldots,r$ where
+    $\lambda_i$ is the $i$th largest eigenvalue of $A^TA$.
+\end{itemize}
+\end{cor}
+
+\begin{prop}
+\emph{(Solving Possibly Rank-Deficient Square System of Equations with SVD)}
+Suppose we have system $Ax=b$ and $SVD$ of $A\in\Rnn$.
+Then we can write the system
+\begin{align*}
+  Ax = b
+  \quad\iff\quad
+  U\Sigma V^Tx
+  =
+  U_1\Sigma_1 V_1^Tx
+  = b
+\end{align*}
+There are two possibilities, depending on the rank of $A$:
+\begin{enumerate}
+  \item \emph{Full} $\rank(A)=n$: This implies $U_1=U$,
+    $\Sigma_1=\Sigma$, $V_1=V$ with $\sigma_i\neq 0$ $\forall i$.
+    Therefore, we can easily solve the system by matrix multiplication
+    since since $U$, $V$ are orthogonal and
+    $\Sigma=\diag\{\sigma_1,\ldots,\sigma_n\}$ (which has simple inverse
+    $\Sigma^{-1}=\diag\{\sigma_1^{-1},\ldots,\sigma_n^{-1}\}$):
+    \begin{align*}
+      x
+      = (U\Sigma V^T)^{-1}b
+      = V\Sigma^{-1}U^Tb
+        = V_1\Sigma_1^{-1}U_1^Tb
+    \end{align*}
+
+  \item \emph{Deficient} $\rank(A)=r<n$:
+    Here $\range(A)\neq\Rn$ so no guarantee $b\in\range(A)$. Therefore,
+    the system is, in some sense, ``overdetermined'' despite square $A$,
+    and we can probably only solve $Ax\approx b$.  But it also
+    ``undetermined'' in that any solution is not
+    unique since $Ax=A(x+y)$ for any $y\in\null(A)$, which is
+    non-trivial given rank deficiency.  Lastly, notice we cannot
+    form $\Sigma^{-1}$ since rank deficiency implies that at least one
+    $\sigma_i=0$.  However, we can still play ball despite all this
+    using $U_1, \Sigma, V_1$ to compute
+    \begin{align*}
+      x = V_1\Sigma_1^{-1}U_1^Tb
+    \end{align*}
+    This sequence of multiplications does three things:
+    (1) $U_1^Tb$ to convert $b$ to basis given by $U_1$ which spans
+    subspace $\range(A)\subset \Rm$, ignoring components we can't
+    match anyway, (2) $\Sigma_1^{-1}$ to undo scaling, (3) $V_1$ to
+    transform out of orthonormal basis given by $V_1$.
+\end{enumerate}
+\end{prop}
+
+\begin{defn}(Pseudoinverse from SVD)
+Suppose $A\in\Rnn$ is deficient $\rank(A)=r<n$. Then we can
+still form a pseudoinverse from its SVD as in Expression~\ref{svd}:
+\begin{align*}
+  A^+ =
+  \big(
+  U_1\Sigma_1 V^T_1
+  \big)^{-1}
+  =
+  V_1\Sigma_1^{-1}U_1^T
+\end{align*}
+\end{defn}
+
 
 \clearpage
 \subsubsection{Eigenvalue Decomposition}
@@ -2101,6 +2344,7 @@ triangular matrices from the QZ decomposition.
 \end{thm}
 
 
+\clearpage
 \subsection{Symmetric Matrices}
 
 Symmetric matrices are a very special class of matrices. They come up a
@@ -2108,14 +2352,48 @@ lot since covariance matrices and Hessian matrices are symmetric.
 Therefore, this section will detail many nice results that are unique to
 symmetric matrices.
 
-\begin{thm}
+\begin{thm}\emph{(Eigenvalue Decomposition)}
 \label{thm:symmetric-diag}
-If $A$ is a symmetric matrix, then $A$ is diagonalizable. Moreover,
-there exists a orthogonal $V$ such that $V^T = V$ so that
+If $A\in\Rnn$ is a symmetric matrix, then $A$ is
+diagonalizable by orthogonal matrix $V$ such that
 \begin{align*}
   D = V^T A V
 \end{align*}
+The columns of $V$ are eigenvectors of $A$, normalized to unit length.
+$D$ is a diagonal matrix of corresponding eigenvalues.
 \end{thm}
+\begin{proof}
+To show $V$ is indeed orthogonal, we need to show that its columns
+$v_1,\ldots,v_n$ are mutually orthogonal. So start with
+\begin{align*}
+  \lambda_j \langle v_i, v_j \rangle
+  =
+  \langle v_i, \lambda_j v_j \rangle
+  = v_i^T (\lambda_j v_j)
+  = v_i^T (A v_j)
+\end{align*}
+where the last simplification used the vect that $v_j$ is the $j$th
+eigenvector with eigenvalue $\lambda_j$ so that $Av_j=\lambda_j v_j$.
+By symmetry, $A=A^T$ so we can simplify the last element in the chain
+\begin{align*}
+  \lambda_j \langle v_i, v_j \rangle
+  = v_i^T (A^T v_j)
+  = (v_i^T A^T) v_j
+  = (Av_i)^T v_j
+  = (\lambda_i v_i)^T v_j
+  = \langle \lambda_i v_i, v_j \rangle
+  = \lambda_i \langle v_i, v_j \rangle
+\end{align*}
+Comparing the two ends of this chain, we have
+\begin{align*}
+  \lambda_j \langle v_i, v_j \rangle
+  = \lambda_i \langle v_i, v_j \rangle
+  \quad\implies\quad
+  (\lambda_j-\lambda_i) \langle v_i, v_j \rangle
+  = 0
+\end{align*}
+This proves the result, hence $V$ is an orthogonal matrix.
+\end{proof}
 
 \begin{prop}
 Symmetric matrices have \emph{real} eigenvalues.
@@ -2275,6 +2553,7 @@ $\rank(B)=k$, this cannot happen.
 \end{proof}
 
 
+\clearpage
 \subsection{Quadratic Forms}
 
 Quadratic functions map $f:\R\rightarrow\R$ and look like $f(x)=ax^2 +
@@ -2292,6 +2571,65 @@ A \emph{quadratic form} is a function $f:\Rn\rightarrow\R$ of the form
 Now this is a very short subsection, but we'll see in later sections
 that quadratic forms are extremely useful for characterizing convex
 functions and differentiability via function approximations.
+
+
+\clearpage
+\subsection{Principal Component Analysis}
+
+Suppose we have tall matrix of data $X\in\Rmn$ with $m>n$.
+We think of $m$ as the number of observations and $n$ as the number of
+features or covariates.\footnote{%
+  This notation is deliberately chosen, even though we usually use $n$
+  for the number of observations, to keep with notational conventions of
+  the rest of this section, where all matrices were generally
+  $m\times n$.
+}
+Without loss of generality, assume each
+column has mean zero and unit standard deviation. This is a
+harmless normalization.
+
+\begin{defn}(PCA from Eigenvalue Decomposition)
+The matrix $X^TX\in\Rnn$ is (obviously) symmetric; therefore, it has
+eigenvalue decomposition
+\begin{align*}
+  X^TX = VDV^T
+\end{align*}
+where $D$ is a diagonal matrix of eigenvalues of $X^TX$ ordered from
+largest to smallest (they are all nonnegative), and the columns of $V$
+are the corresponding eigenvalues.
+Given $V$, we can then write the matrix $T$ of principal components of
+the data as
+\begin{align*}
+  T = XV
+\end{align*}
+The $j$th column of $V$, denoted $v_j$, is the vector of weights we
+apply to compute the $j$th principal component. In other words,
+$X_{i\cdot}v_j$ gives the $j$th principal component for row/observation
+$i$.
+\end{defn}
+
+\begin{defn}(PCA from SVD)
+One problem with computing the SVD as above: You need to compute $X^TX$,
+effectively ``squaring'' the matrix and making it less stable
+numerically. Instead, we can take an SVD approach. So suppose we have
+\begin{align*}
+  X = U\Sigma V^T
+\end{align*}
+Then it's clear that
+\begin{align*}
+  X^TX
+  = \big(U\Sigma V^T\big)^TU\Sigma V^T
+  = V\Sigma^T U^TU\Sigma V^T
+  = V\Sigma^2 V^T
+\end{align*}
+where we used the orthogonality of $U$ so $U^TU=I_m$ and the diagonal
+structure of $\Sigma$. Evidently, $\Sigma^2=D$ from the Eigenvalue
+Decomposition approach above and $V$ is the same. Therefore, rather that
+compute the eigenvalue decomposition of $X^TX$ to get $V$, we could
+alternatively just compute the SVD of $X$, which is more numerically
+stable.
+\end{defn}
+
 
 \clearpage
 \section{Differential Equations}
