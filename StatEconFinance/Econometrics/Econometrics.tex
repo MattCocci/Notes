@@ -9852,12 +9852,50 @@ a state space representation.
 
 
 \newpage
-\subsection{The Kalman Filter}
+\subsection{Kalman Filter: Likelihood Computation \& State Estimation}
 
-Within the state space framework detailed above, we now face the task of
-computing the model likelihood and estimating the sequence of (possibly
-unobserved) states. To do so, we typically use the Kalman filter, a
-quick recursive procedure for doing just that.
+Given a state space model as in Equations~\ref{ste} and~\ref{moe},
+parameter values $\bstheta$, and sequence of data points
+$\{\bsy_t\}\tT$, we now want to compute the model
+likelihood $\calL(\bstheta)=p(\bsy_{1:T}|\bstheta)$ and estimate the
+sequence of (possibly unobserved) states $\{\bss_t\}\tT$.
+The Kalman filter, a quick recursive procedure, does just that.
+
+Of course, since we generally can't know with certainty the true value
+of possibly unobserved states,\footnote{%
+  Unless a state is mapped \emph{directly} to an observable
+  \emph{without} measurement error
+}
+we will estimate a sequence of full \emph{distributions}
+$p(\bss_{t}|\calI_{t-1},\bstheta)$ for
+the states.
+This generalizes many introductions to the Kalman Filter,
+which instead frame the recursive process in terms of the evolution of
+only the \emph{mean} and \emph{variance} of states $\{\bss_t\}$ over
+time, $\E[\bss_t|\calI_t]$ and $\text{Var}(\bss_t|\calI_t)$.
+Well, if we assume Gaussian errors $\bsvarepsilon_t$ and $\bseta_t$,
+then $\E[\bss_t|\calI_t]$ and $\text{Var}(\bss_t|\calI_t)$ pin down
+$p(\bss_t|\calI_t)$ \emph{entirely},\footnote{%
+  This is a feature of multivariate normal random variables.
+}
+so it's all the same. But to stay general, I will start with full
+distributions in the subsection ``The General Kalman Filter''
+before specializing to the particular case of Gaussian errors, which
+isn't as ridiculous an assumption as it seems.\footnote{%
+  Regardless of the true error distributions, the Kalman Filter assuming
+  normal errors gives the best linear projection estimates of the
+  states. It's like when you know your data isn't normally distributed,
+  but you still run regressions because it gives the best linear
+  approximation to the CEF.
+}
+
+Going forward, the remainder of this section will put some more
+structure on this basic procedure, filling in the mathematical details.
+In the process, it will be convenient to refer to time-$t$ information
+set, denoted
+\begin{align*}
+  \calI_t := \{\bsy_1,\ldots,\bsy_t\}
+\end{align*}
 
 %Subsection~\ref{subsec:kfoutline} sketches the basic sequence of steps
 %for deriving the distributions of the (possibly unobserved) states and
@@ -9868,39 +9906,69 @@ quick recursive procedure for doing just that.
 %of Gaussian errors, relying on conditional expectations for MVN Random
 %Variables as described in Appendix~\ref{sec:mvncond}.
 
-Throughout this entire section, we take $\bstheta$ as given, implying
-that the matrices defined in Equation~\ref{ste} and Equation~\ref{moe}
-are entirely \emph{known}. The Kalman Filter algorithm offers a way to
-compute the likelihood $\calL(\bstheta)=p(\bsy_{1:T}|\bstheta)$
-and estimates of the states $\{\bss_t\}_{t=1}^T$ \emph{given}
-parameter vector $\bstheta$. But to estimate these
-parameters (which we will discuss in more detail below), just kick
-$\bstheta$ around the parameter space, compute the likehood via the
-Kalman Filter, and choose the parameters that delivered the highest
-value as your maximum likelihood estimate. But more on that later.
+
+\subsubsection{State Space Model Likelihood and MLE}
+
+First, we unpack the likelihood $\calL(\bstheta)=p(\bsy_{1:T}|\bstheta)$
+of a canonical state space model as written in Equations~\ref{ste}
+and~\ref{moe}, which will motivate some steps of the Kalman Filter
+procedure. Taking $\bstheta$ as given so all system matrices are
+\emph{fixed}, use successive conditioning to write
+\begin{align*}
+  \calL(\bstheta)
+  = p(\bsy_{1:T}|\bstheta)
+  = p(\bsy_T|\bsy_{1:T-1},\bstheta)\cdot p(\bsy_{1:T-1}|\bstheta)
+  = \cdots
+  &= \prodtT p(\bsy_t|\bsy_{t-1},\ldots,\bsy_1,\bstheta)
+  %\\
+  %\implies\quad
+  %\calL(\bstheta)
+  %&= \prodtT p(\bsy_t|\calI_{t-1},\bstheta)
+\end{align*}
+Replace $\{\bsy_{t-1},\ldots,\bsy_1\}$ with $\calI_{t-1}$ to arrive at a
+final expression for the likelihood:
+\begin{align}
+  \calL(\bstheta)
+  = \prodtT p(\bsy_t|\calI_{t-1},\bstheta)
+  \label{statespacelik}
+\end{align}
+This is our guiding expression for the Kalman Filter. It's what we want
+to compute.
+
+We now move onto the recursive Kalman Filter procedure that will let us
+compute Expression~\ref{statespacelik} by giving us each term in the
+product (as well as distributions for the states).
+But again this all takes $\bstheta$ as \emph{given}.
+To \emph{estimate} $\bstheta$ via maximum likelihood, just kick
+$\bstheta$ around the parameter space, compute
+Expression~\ref{statespacelik} via the Kalman Filter procedure, and choose
+the parameter values that delivered the highest value as your MLE.
+
 
 \subsubsection{Outline of the Recursive Procedure}
 \label{subsec:kfoutline}
 
-Here's the basic Kalman Filter algorithm for any linear state space
-model as written in Equations~\ref{ste} and~\ref{moe}, again taking
-parameters $\bstheta$ and data $\bsy_{1:T}:=\{\bsy_t\}_{t=1}^T$ as
-given. Throughout, I will use $\calI_{t}=\{\bsy_s\}_{s=1}^t$ to denote
-the set of information available at time $t$.
+Here's the basic Kalman Filter algorithm for any linear state
+space model as written in Equations~\ref{ste} and~\ref{moe}, again
+taking parameters $\bstheta$ and data $\bsy_{1:T}:=\{\bsy_t\}_{t=1}^T$
+as given. For brevity, I supress explicit conditioning on $\bstheta$ in
+all distributions, though it is there implicitly.
 \begin{enumerate}
 \item
   \emph{Prior}:
-  Start with a prior for the state vector at time $t$, denoted
-  $p(\bss_t |\; \calI_{t-1})$.\footnote{%
+  Start with a prior for the states, denoted $p(\bss_t |\;
+  \calI_{t-1})$.\footnote{%
     If $t=1$, then $\calI_0=\emptyset$ so this is a true unconditional
     prior $p(\bss_1)$.
   }
+  (This, Meas. Equation~\ref{moe}, plus an assumed distribution for
+  errors $\bseta_t$ imply a value/number for $p(\bsy_t|\calI_{t-1})$.)
 
 \item
   \emph{Filtering}:
   Use Bayes' Rule to incorporate time $t$ data realization $\bsy_t$,
-  ``filtering'' out the noise, to get $p(\bss_t |\; \calI_{t})$, the
-  \emph{filtering distribution}.
+  ``filtering'' out the noise, to update our estimate of the states from
+  prior to \emph{filtering distribution}, $p(\bss_t |\; \calI_{t})$.
 
 \item
   \emph{Forecast}:
@@ -9909,77 +9977,70 @@ the set of information available at time $t$.
   from Step (3) and the model's law of motion as specified in the
   Transition Equation.
 
-\item Increment $t$ and return to step 1, taking predictive
-  distribution $p(\bss_{t+1} |\; \calI_{t})$ as the prior.
+\item \emph{Recurse}: Increment $t$, take predictive distribution
+  $p(\bss_{t+1} |\; \calI_{t})$ as the prior, return to (1).
 
+\item \emph{Likelihood}:
+  Compute Equation~\ref{statespacelik} from sequence of
+  $p(\bsy_t|\calI_{t-1})$ values in prior step.
 \end{enumerate}
-Note that many introductions to the Kalman Filter often frame the
-recursive process in terms of the evolution of only the \emph{mean} and
-\emph{variance} of $\{\bss_t\}$ over time. This is done because we often
-assume normal errors $\bsvarepsilon_t$ and $\bseta_t$, in which case the
-mean and variance pin down the successive distributions
-{entirely}.\footnote{%
-  This is a feature of multivariate normal random variables.
-}
-However, the procedure outlined above and in
-the next subsection is ``General'' in that it frames the recursive
-process in terms of the full \emph{distributions} for $\{\bss_t\}$ over
-time---i.e. $p(\bss_t|\calI_t)$ rather than
-$\E[\bss_t|\calI_t]$ and $\text{Var}(\bss_t|\calI_t)$.
-Such an exposition then remains valid even when errors have a non-normal
-distribution.
-
-Going forward, the remainder of this section will put some more
-structure on this basic procedure, filling in the mathematical details.
-It will also cover that special case of normal errors, and say why this
-assumption might not be as dumb as it seems.\footnote{%
-  Hint: Regardless of the true error distributions, the Kalman Filter
-  gives the best linear projection estimates of the states. It's kind of
-  like when you know your data isn't normally distributed, but you still
-  run regressions because it gives the best linear approximation to the
-  CEF.
-}
-%For that discussion, follow a minor yet very important detour in two
-%subsections.
 
 
-\subsection{The General Kalman Filter}
+\subsubsection{The General Kalman Filter}
 \label{subsec:kfdetails}
 
-Given a sequence of data points $\{\bsy_t\}_{t=1}^T$ our goal is to
-estimate the sequence of states $\{\bss_t\}^T_{t=1}$. Of course, this
-will all be probabilistic. Unless a state is mapped directly to an
-observable (without measurement error or other shocks), we generally
-won't be able to know with certainty the true value of the states. We'll
-instead compute a sequence of probability distributions for the states
-at each point in time. Again, we assume that the matrices of our linear
-state space model defined by Equations~\ref{ste} and~\ref{moe} are
-entirely known.
-
+Again, assume $\bstheta$ (hence the system matrices) of our model are
+\emph{fixed}. For brevity, suppress $\bstheta$ until the
+likelihood step, even though everything is implicitly conditioned on
+$\bstheta$.
 \begin{enumerate}
-  \item \emph{Prior Step}:
-    Standing at time $t-1$, suppose that we have a prior for $\bss_t$,
-    given $\calI_{t-1}$,\footnote{%
-      When $t-1=0$, this is a true unconditional prior since
-      $\calI_{0}=\emptyset$, and we have no available observations as
-      a basis for this prior. However, when $t>1$, the recursive Kalman
-      Filter procedure furnishes a prior as we'll see.
-    }
+  \item \emph{Prior}:
+    Standing at time $t-1$, we have a prior for $\bss_t$ given
+    $\calI_{t-1}$,
     \begin{equation}
       \text{Prior:} \quad p(\bss_t | \; \calI_{t-1})
       \label{pri}
     \end{equation}
+    When $t-1=0$, this is a true unconditional prior since
+    $\calI_{0}=\emptyset$, and we have no available observations as a
+    basis for this prior. However, when $t>1$, the recursive Kalman
+    Filter procedure furnishes a prior as we'll see.
+    In either case, this is a function of $\bss_t$.
 
-  \item \emph{Filtering Step}:
-    Given prior $p(\bss_t|\calI_{t-1})$, we should then incorporate the
-    information in our next observed data point $\bsy_t$ to update our
-    estimate of the distribution for $\bss_t$.
-    This step is called the ``Filtering Step'' because our combination
-    of both prior and data $\bsy_t$ allows us to ``filter out'' the
-    noise in our estimates for $\bss_t$.
+    Note that this prior directly implies a value/number for
+    $p(\bsy_t|\calI_{t-1})$. To see this, start with
+    \begin{align*}
+      p(\bsy_{t}|\calI_{t-1})
+      &=
+      \int p(\bsy_{t},\bss_{t}|\calI_{t-1})\;d\bss_{t}
+      =
+      \int p(\bsy_{t}|\bss_{t},\calI_{t-1})
+        \cdot p(\bss_{t}|\calI_{t-1})
+      \;d\bss_{t}
+    \end{align*}
+    Next, by construction in Measurement Equation~\ref{moe},
+    $\calI_{t-1}=\{\bsy_1,\ldots,\bsy_{t-1}\}$ provides no further
+    information if we know $\bss_{t}$. Hence,
+    $p(\bsy_{t}|\bss_{t},\calI_{t-1})=p(\bsy_{t}|\bss_{t})$
+    and
+    \begin{align}
+      p(\bsy_{t}|\calI_{t-1})
+      &=
+      \int p(\bsy_{t}|\bss_{t})
+      \cdot p(\bss_{t}|\calI_{t-1})
+      \;d\bss_{t}
+    \end{align}
+    We have $p(\bss_t|\calI_{t-1})$ in the form of a prior in
+    Expression~\ref{pri}. At the same time, Measurement
+    Equation~\ref{moe} and an assumed distribution for errors $\bseta_t$
+    together pin down $p(\bsy_t|\bss_t)$. Therefore, we have everything
+    we need to compute the above integral and get a value (a single
+    number) for $p(\bsy_{t}|\calI_{t-1})$.
 
-    To do so, use Bayes' rule along with the fact that
-    $\calI_{t} = \{\bsy_1, \ldots, \bsy_t\}=\calI_{t-1} \cup \bsy_t$:
+  \item \emph{Filtering}:
+    Given prior dist. $p(\bss_t|\calI_{t-1})$, use Bayes' rule to
+    incorporate the information in our next observed data point $\bsy_t$
+    and update our estimated distribution for $\bss_t$
     \begin{align*}
       p(\bss_t | \calI_{t}) =
       p(\bss_t | \; \bsy_t, \calI_{t-1}) =
@@ -9987,46 +10048,48 @@ entirely known.
         \cdot p(\bss_t|\; \calI_{t-1})
       }{p(\bsy_t | \; \calI_{t-1})}
     \end{align*}
-    This doesn't look like we've gotten anywhere, but we can simplify a
-    bit. By the setup and assumptions of Equations~\ref{ste}
-    and~\ref{moe}, we know that past values $\bsy_1, \ldots, \bsy_{t-1}$
-    have no bearing upon $\bsy_t$ if we already know the state,
-    $\bss_t$. Hence $p(\bsy_t|\bss_t, \calI_{t-1}) = p(\bsy_t|\bss_t)$.
-    In addition, since the denominator is just a normalizing constant,
-    we can simplify to
+    We call this ``filtering'' because the combination of prior and data
+    $\bsy_t$ allows us to ``filter out'' noise in our estimates for
+    $\bss_t$.
+    And though it doesn't yet look like we've gotten anywhere, we
+    can simplify. By Equations~\ref{ste} and~\ref{moe}, past values
+    $\bsy_1, \ldots, \bsy_{t-1}$ have no bearing upon $\bsy_t$ if we
+    already know $\bss_t$.
+    Hence $p(\bsy_t|\bss_t, \calI_{t-1}) = p(\bsy_t|\bss_t)$ as we
+    already saw, giving
+    %Plus, we can ignore $p(\bsy_t|\calI_{t-1})$ as a constant that does
+    %not depend on $\bss_t$. Hence
     \begin{equation}
       \label{filt}
       \text{Filtering Distribution:} \quad
-      p(\bss_t | \calI_{t}) \propto p(\bsy_t | \bss_t) \cdot
-      p(\bss_t | \calI_{t-1})
+      p(\bss_t | \calI_{t})
+      %\propto
+      =
+      \frac{%
+        p(\bsy_t | \bss_t) \cdot
+        p(\bss_t | \calI_{t-1})
+      }{p(\bsy_t|\calI_{t-1})}
     \end{equation}
     This is convenient since we already have
-    $p(\bss_t | \calI_{t-1})$---it's our prior from above---while
-    Equation~\ref{moe} plus the assumed distribution on the errors
-    $\bseta_t$ entirely pins down $p(\bsy_t|\bss_t)$.
-    %But no matter what distribution we assume for
-    %the errors $\bseta_t$, our assumptions on their mean and variance in
-    %Equation~\ref{moe} imply
-    %\begin{align*}
-      %\E[\bsy_t|\bss_t] = \bsD + \bsM \bss_t
-      %\qquad
-      %\text{Var}(\bsy_t|\bss_t) = \bsH
-    %\end{align*}
+    $p(\bss_t | \calI_{t-1})$ and $p(\bsy_t|\calI_{t-1})$ from
+    our prior step, while Equation~\ref{moe} plus the assumed
+    distribution on errors $\bseta_t$ entirely pin down
+    $p(\bsy_t|\bss_t)$, as mentioned before.
 
-  \item \emph{Forecast Step}: Given the filtering distribution, we
+  \item \emph{Forecast}: Given the filtering distribution, we
     compute the \emph{forecast distribution}, which is the one-step
     ahead distribution of $\bss_{t+1}$ given $\calI_{t}$.
-    Again, use Bayes' Rule
+    Again, use conditioning
     \begin{align*}
       p(\bss_{t+1} | \; \calI_{t}) &=
         \int p(\bss_{t+1}, \bss_t |\; \calI_{t}) \; d\bss_t
       = \int p(\bss_{t+1} |  \bss_t, \calI_{t})
         p(\bss_t |  \calI_{t}) \; d\bss_t
     \end{align*}
-    But note that $p(\bss_{t+1}|\bss_t, \calI_{t})=p(\bss_{t+1}|\bss_t)$
-    since according to the State Transition Equation, if we know
-    $\bss_{t}$, observations $\bsy_1, \ldots, \bsy_t$ provide no
-    additional information. This yields final expression
+    But note $p(\bss_{t+1}|\bss_t, \calI_{t})=p(\bss_{t+1}|\bss_t)$
+    since according to Equation~\ref{ste}, observations $\bsy_1, \ldots,
+    \bsy_t$ provide no additional information if we know $\bss_{t}$.
+    This gives final expression
     \begin{align}
       \text{Forecasting Distribution:} \quad
       p(\bss_{t+1} | \; \calI_{t})
@@ -10040,43 +10103,8 @@ entirely known.
     $p(\bss_{t+1}|\bss_t)$ is entirely pinned down by State Transition
     Equation~\ref{ste} and the assumed distribution for the errors
     $\bsvarepsilon_t$.
-    %But no matter what distribution we assume for the errors, our
-    %assumptions on their mean and variance in Equation~\ref{ste} imply
-    %\begin{align*}
-      %\E[\bss_{t+1}|\bss_t] = \bsC + \bsT\bss_t
-      %\qquad
-      %\text{Var}(\bss_{t+1}|\bss_t) = \bsR
-    %\end{align*}
 
-    Lastly, we can also get a forecasting distribution for the
-    observables. In particular,
-    \begin{align*}
-      p(\bsy_{t+1}|\calI_t)
-      &=
-      \int p(\bsy_{t+1},\bss_{t+1}|\calI_t)\;d\bss_{t+1}
-      =
-      \int p(\bsy_{t+1}|\bss_{t+1},\calI_t)
-        \cdot p(\bss_{t+1}|\calI_t)
-      \;d\bss_{t+1}
-    \end{align*}
-    Now, $p(\bsy_{t+1}|\bss_{t+1},\calI_t)=p(\bsy_{t+1}|\bss_{t+1})$
-    since $\calI_t=\{\bsy_1,\ldots,\bsy_t\}$ provides no further
-    information if we know $\bss_{t+1}$. Hence,
-    \begin{align}
-      p(\bsy_{t+1}|\calI_t)
-      &=
-      \int p(\bsy_{t+1}|\bss_{t+1})
-        \cdot p(\bss_{t+1}|\calI_t)
-      \;d\bss_{t+1}
-      \label{foredistobs}
-    \end{align}
-    The distribution $p(\bsy_{t+1}|\bss_{t+1})$ is entirely pinned down
-    by the distribution we assume for the errors $\bseta_{t+1}$, while
-    we also computed $p(\bss_{t+1}|\calI_t)$ above. Therefore, we have
-    everything we need to comptue this object.
-
-
-  \item \emph{Recursive Step}:
+  \item \emph{Recurse}:
     Increment $t$ and return to Step 1, taking
     $p(\bss_{t+1}|\;\calI_{t})$ that we just computed as our new prior
     for the next period. Repeat until we get to time $T$.
@@ -10084,38 +10112,34 @@ entirely known.
   \item \emph{Compute the Likelihood}:
     We now un-surpress the $\bstheta$ that was in the background of the
     conditional distributions $p(\cdot\,|\,\cdot)$ all along and compute
-    the likelihood $\calL(\bstheta)$. By successive conditioning and
-    $\calI_t=\{\bsy_1,\ldots,\bsy_t\}$, we get
+    the likelihood.
+    Simply take the sequence of values/numbers
+    $\{p(\bsy_t|\calI_{t-1})\}\tT$ from the Prior Step to compute the
+    likelihood
     \begin{align*}
-      \calL(\bstheta)
-      = p(\bsy_{1:T}|\bstheta)
-      &= p(\bsy_T|\bsy_{1:T-1},\bstheta)\cdot p(\bsy_{1:T-1}|\bstheta)
-      = \cdots \\
-      %&= \prodtT p(\bsy_t|\bsy_{t-1},\ldots,\bsy_t,\bstheta)
-      %\\
-      \implies\quad
       \calL(\bstheta)
       &= \prodtT p(\bsy_t|\calI_{t-1},\bstheta)
     \end{align*}
-    But we know the terms of the product; they are given by
-    Expression~\ref{foredistobs} above.
+    Hence the likelihood is a function of the one-step-ahead conditional
+    forecast likelihoods $p(\bsy_t|\calI_{t-1},\bstheta)$, with true
+    value $\bsy_t$ plugged in.
 \end{enumerate}
 
 \clearpage
 
-\subsection{Kalman Filter Under Normal Errors}
+\subsubsection{Kalman Filter Under Normal Errors}
 \label{subsec:kfnormal}
 
-We now develop the Kalman Filter procedure in the special case of
+We now develop the Kalman Filter in the special case of
 Gaussian $\bsvarepsilon_t$ and $\bseta_t$ errors, which implies
-Gaussian $\{\bss_t\}_{t=0}^T$.
+Gaussian $\{\bsy_t,\bss_t\}_{t=0}^T$.
 Since the normal distribution is pinned down entirely by mean and
 variance, we need only characterize the evolution of these two objects
 to characterize the evolution of the full distributions for $\bss_t$.
 For simplicity, assume $\bsC=\bsD=\bso$.
 
-But first, we introduce notation.
-Letting $\bsmu$ and $\bsSigma$ represent the mean and variance, define
+But first, we introduce compact notation to represent the conditional
+mean and variance:
 %\begin{alignat*}{8}
   %\bsmu_{t|t-1} &:=
   %\E_{t-1}[\bss_t] &&:=
@@ -10147,8 +10171,8 @@ So rather than directly specifying the sequence of distributions (prior,
 filtering, and forecast), we need only specify the sequence of prior,
 filtering, forecast \emph{means and variances}.
 \begin{enumerate}
-  \item \emph{Prior Step}: Suppose that we have a Guassian prior for
-    $s_t$, given $\calI_{t-1}$.\footnote{%
+  \item \emph{Prior}: Suppose that we have a Guassian prior for $s_t$,
+    given $\calI_{t-1}$.\footnote{%
       If $t-1=0$, this is a true unconditional prior.  When $t>1$, the
       procedure gives a prior.
     }
@@ -10156,12 +10180,36 @@ filtering, forecast \emph{means and variances}.
       \bss_t | \; \calI_{t-1}
       \sim \calN(\bsmu_{t|t-1}, \bsSigma_{t|t-1})
     \end{align*}
+    Meas. Equation~\ref{moe}, assumed zero-mean of $\bseta_t$, and
+    assumed $\bss_t\perp\bseta_t$ imply
+    \begin{alignat*}{3}
+        \E_{t-1}[\bsy_t ] &=
+        \E_{t-1}[\bsM\bss_t + \bseta_t ]
+        %= \bsM\E_{t-1}[\bss_t] + \E_{t-1}[\bseta_t ]
+        &&= \bsM\bsmu_{t|t-1}
+        \\
+        \Var_{t-1}(\bsy_t)
+        &= \Var_{t-1}(\bsM\bss_t)
+        + \Var_{t-1}(\bseta_t)
+        %\text{Property of covariance matrices} &\qquad
+          %&&= \bsM \,\Var_{t-1}(\bss_t)\, \bsM'
+          %+ \Var(\bseta_t) \\
+        %\text{From Equations~\ref{moe} and \ref{kalnot}}
+        %&\qquad
+        &&= \bsM\bsSigma_{t|t-1} \bsM' + \bsH
+    \end{alignat*}
+    Hence, we have
+    \begin{align*}
+      \bsy_t | \; \calI_{t-1}
+      \sim \calN(\bsM\bsmu_{t|t-1}, \;\bsM\bsSigma_{t|t-1}\bsM'+\bsH)
+    \end{align*}
 
-  \item \emph{Filtering Step}:
-    Recall the goal is to compute filtering distribution
-    $p(\bss_t|\calI_{t})=p(\bss_t|\bsy_t, \calI_{t-1})$.
-    To do so, we will make use of the joint Gaussian distribution of
-    $\bss_t$ and $\bsy_t$ (which follows from assumed Gaussian errors):
+  \item \emph{Filtering}:
+    To compute the filtering distribution
+    $p(\bss_t|\calI_{t})=p(\bss_t|\bsy_t, \calI_{t-1})$,
+    note that the assumed Gaussian errors
+    imply a joint Gaussian distribution for
+    $(\bss_t\;\;\bsy_t)'|\calI_{t-1}$
     \begin{align*}
       \begin{bmatrix} \bss_t \\ \bsy_t \end{bmatrix} | \;
       \calI_{t-1}
@@ -10176,41 +10224,19 @@ filtering, forecast \emph{means and variances}.
         \end{bmatrix}
       \right)
     \end{align*}
-    which is true for some values $\bsmu_{i}$ and $\bsSigma_{jk}$ that
-    we now pin down.
+    for some values $\bsmu_{i}$ and $\bsSigma_{jk}$ that we now pin
+    down.
     \begin{itemize}
-      \item $\bsmu_1$ and $\bsSigma_{11}$: These terms correspond to the
-        mean and variance for $\bss_t |\; \calI_{t-1}$. But we
-        defined them in the prior step above to be $\bsmu_{t|t-1}$ and
-        $\bsSigma_{t|t-1}$, respectively.
+      \item $\bsmu_1$ and $\bsSigma_{11}$:
+        Mean and variance for $\bss_t |\; \calI_{t-1}$ computed in the
+        prior step.
 
-      \item $\bsmu_2$ and $\bsSigma_{22}$: First, use Measurement
-        Equation~\ref{moe} to get the mean
-        \begin{align*}
-          \bsmu_2 :=
-            \E_{t-1}[\bsy_t ] &=
-            \E_{t-1}[\bsM\bss_t + \bseta_t ] =
-            \bsM\E_{t-1}[\bss_t]
-            + \E_{t-1}[\bseta_t ]
-            = \bsM\bsmu_{t|t-1}
-        \end{align*}
-        Now that we have the mean, let's get the variance of $\bsy_t$:
-        \begin{alignat*}{2}
-          \text{Equation~\ref{moe} and $\bss_t\perp\bseta_t$} &\qquad
-            \bsSigma_{22}
-            =
-            \Var_{t-1}(\bsy_t)
-            &&= \Var_{t-1}(\bsM\bss_t)
-            + \Var_{t-1}(\bseta_t)\\
-          %\text{Property of covariance matrices} &\qquad
-            %&&= \bsM \,\Var_{t-1}(\bss_t)\, \bsM'
-            %+ \Var(\bseta_t) \\
-          \text{From Equations~\ref{moe} and \ref{kalnot}} &\qquad
-            &&= \bsM\bsSigma_{t|t-1} \bsM' + \bsH
-        \end{alignat*}
+      \item $\bsmu_2$ and $\bsSigma_{22}$:
+        Mean and variance for $\bsy_t |\; \calI_{t-1}$ computed in the
+        prior step.
 
-      \item $\bsSigma_{12} = (\bsSigma_{21})^T$: Start with the
-        definition
+      \item $\bsSigma_{12} = \bsSigma_{21}^T$: Appeal directly to the
+        definition of the covariance:
         \begin{align*}
           \bsSigma_{21}
           = \E_{t-1}\left[
@@ -10254,8 +10280,8 @@ filtering, forecast \emph{means and variances}.
       \right) \label{normfilt}
     \end{alignat}
     From there, we can then easily compute the mean and variance of the
-    filtering distribution $p(\bss_t | \;\calI_{t})$ by computing the
-    conditional multivariate normal formuls and using
+    filtering distribution $p(\bss_t | \;\calI_{t})$ by appealing to the
+    conditional multivariate normal formulas and the fact that
     $\calI_{t}=\calI_{t-1} \cup \{\bsy_t\}$:
     \begin{alignat}{3}
       \bsmu_{t|t} =&& \E[\bss_t|\bsy_t, \calI_{t-1}]
@@ -10271,14 +10297,23 @@ filtering, forecast \emph{means and variances}.
     These pin down our filtering distribution $p(\bss_t|\calI_t)$ and
     have a nice interpretation. We see that our estimate of the filtered
     mean $\bsmu_{t|t}$ is the sum of the prior mean $\bsmu_{t|t-1}$ plus
-    the scaled error for $\bsy_t$ relative to it's prior expectation
-    $\bsM\bsmu_{t|t-1}$. In addition, the information provided by
-    $\bsy_t$ allows us to reduce our the variance in our estimate of
+    the scaled error $(\bsy_t-\bsM\bsmu_{t|t-1})$ where $\bsy_t$ is the
+    observed value and $\bsM\bsmu_{t|t-1}$ is the prior
+    forecast/expectation.
+    The scaling factor in front of this error is simply the coefficient
+    from a multivariate regression of $\bss_t$ on $\bsy_t$.
+    Lastly, the information provided by
+    $\bsy_t$ allows us to reduce the variance in our estimate of
     $\bss_t$ to $\bsSigma_{t|t}$ relative to the prior variance
-    $\bsSigma_{t|t-1}$.
+    $\bsSigma_{t|t-1}$ by subtracting off the second term.
+
+    But note that the matrix we invert is
+    $\dim(\bsy_t)\times\dim(\bsy_t)$.  But often
+    $\dim(\bsy_t)>>\dim(\bss_t)$ so the inverse involves a large matrix.
+    To simplify, we appeal to the matrix identity
 
   \item
-    \emph{Forecast Step}: Now that we have our filtered mean and
+    \emph{Forecast}: Now that we have our filtered mean and
     variance estimates, we can apply the law of motion as written in
     State Transition Equation~\ref{ste} to get the mean and variance of
     the forecast for the states:
@@ -10294,886 +10329,562 @@ filtering, forecast \emph{means and variances}.
       + \bsR\;\Var(\bsvarepsilon_t|\;\calI_{t})\;\bsR' \\
       && &= \bsT\bsSigma_{t|t}T' + \bsR\bsQ\bsR'
     \end{alignat*}
-    A similarly straightforward application and writing-out of the
-    measurement equation will yield the following forecast mean and
-    variance for the observables:
+
+  \item \emph{Recurse}:
+    Increment $t$ and return to Step 1, taking
+    $p(\bss_{t+1}|\;\calI_{t})$ that we just computed as our new prior
+    for the next period. Repeat until we get to time $T$.
+
+  \item \emph{Likelihood}:
+    Simply use the observations $\{\bsy_t\}\tT$ and distributions
+    $\bsy_t|\calI_{t-1}$ that we computed in the prior step to evaluate
+    the likelihood
     \begin{align*}
-      \E[\bsy_{t+1}|\;\calI_{t}] &= \bsT\bsmu_{t|t} \\
-      \Var(\bsy_{t+1}|\;\calI_{t})
-        &= \bsM\left(\bsT\bsSigma_{t|t}\bsT' + \bsR\bsQ\bsR'\right)\bsM'
-        + \bsH
+      \calL(\bstheta)
+      &= \prodtT p(\bsy_t|\calI_{t-1},\bstheta)
+      = \prodtT
+        \phi\big(
+          \bsy_t, \;
+          \bsM\bsmu_{t|t-1}, \;
+          \bsM\bsSigma_{t|t-1}\bsM' + \bsH
+        \big)
     \end{align*}
+    where $\phi(\bsx,\bsmu,\bsSigma)$ is the density of a multivariate
+    normal RV with mean $\bsmu$ and variance $\bsSigma$, evaluated at
+    vector $\bsx$.
 \end{enumerate}
 
+\clearpage
+\subsubsection{%
+  Long-Horizon Forecasts from Filtered States under Gaussian Errors
+}
 
+The Kalman Filter procedure above only construted one-step-ahead
+forecast distributions.
+However, once we reach the end of the sample and derive
+$p(\bss_T | \calI_{T})$, we will often want to forecast $\bss_{T+1}$,
+$\bss_{T+2}$, $\ldots$ along with $\bsy_{T+1}$, $\bsy_{T+2}$, $\ldots$
+So let's now characterize the distributions of our forecasts.
+For simplicity, ignore the constant terms $\bsC$ and $\bsD$.
 
-\subsection{Innovation Representation}
-
-Instead of working directly with the states, we can work with the
-innovations:
+\begin{defn}(Long-Horizon State Forecasts)
+Start by applying the transition matrix to get the mean. All of the
+error terms will drop out:
 \begin{align*}
-  v_t &:= y_t - \bsmu_{t|t-1}\\
-  P_t &:= \bsSigma_{t|t-1} \\
+  \bsmu_{t+m|t} =
+  \E_t[\bss_{t+m}] =
+  \bsT^m \bsmu_{t|t}
 \end{align*}
-
-\subsection{Long-Horizon Forecasts}
-
-The section has so far only discussed the consruction of one step ahead
-forecast distributions for states and observables. However, once we
-reach the end of the sample and derive $p(s_T | \mathcal{I}_{T})$, we
-will often want to forecast $s_{T+1}$, $s_{T+2}$, etc.\ along with
-$y_{T+1}$, $y_{T+2}$, etc. So let's now characterize the distributions
-of our forecasts.
-
-For simplicity, we ignore the constant terms $C$ and $D$. We will also construct the $m$-step ahead distributions for any $t=1,\ldots,T$, not just $t=T$ since the results are the same.
-
-\paragraph{State Forecasts} Start by applying the transition matrix to get the mean. All of the error terms will drop out:
-\[
-  E[s_{t+m} | \mathcal{I}_{t}] =
-  T^m \mu_{t|t} =: \mu_{t+m|t}
-\]
-Now for the covariance matrix, we first construct the error:
+Now for the covariance matrix, first construct the error:
 \begin{align*}
-  s_{t+m} - \mu_{t+m|t} &=
-  \left(T^m s_t + T^{m-1} R\varepsilon_{t+1}
+  \bss_{t+m} - \bsmu_{t+m|t} &=
+  \left(\bsT^m \bss_t + \bsT^{m-1} \bsR\bsvarepsilon_{t+1}
   + \ldots
-  + TR\varepsilon_{t+m-1} + R\varepsilon_{t+m}\right)
-  - T^m \mu_{t|t}\\
-  &= T^m (s_t-\mu_{t|t}) + T^{m-1} R\varepsilon_{t+1}
-  + \ldots
-  + TR\varepsilon_{t+m-1} + R\varepsilon_{t+m}
+  + \bsT\bsR\bsvarepsilon_{t+m-1} + \bsR\bsvarepsilon_{t+m}\right)
+  - \bsT^m \bsmu_{t|t}\\
+  %&= \bsT^m (\bss_t-\bsmu_{t|t}) + \bsT^{m-1} \bsR\bsvarepsilon_{t+1}
+  %+ \ldots
+  %+ \bsT\bsR\bsvarepsilon_{t+m-1} + \bsR\bsvarepsilon_{t+m}
+  %\\
+  &= \bsT^m (\bss_t-\bsmu_{t|t})
+  + \sum_{i=0}^{m-1} \bsT^i\bsR\bsvarepsilon_{t+m-i}
 \end{align*}
-Now take the expectation of the squared error above to get the covariance matrix:
+Now take the expectation of the squared error above to get the
+covariance matrix:
 \begin{align*}
-  \Sigma_{t+m|t} &:=
-    E[(s_{t+m} - \mu_{t+m|t})'(s_{t+m} - \mu_{t+m|t})]\\
-    &= T^m \Sigma_{t|t} (T^m)' + T^{m-1}RQ(RT^{m-1})'
-      + \cdots + TRQR'T' + RQR'
+  \bsSigma_{t+m|t} &:=
+    \E_t[(\bss_{t+m} - \bsmu_{t+m|t})(\bss_{t+m} - \bsmu_{t+m|t})']
+    = \bsT^m \bsSigma_{t|t}(\bsT^m)'
+      + \sum_{i=0}^{m-1} \bsT^i\bsR\bsQ\bsR'(\bsT^i)'
 \end{align*}
-
-\paragraph{Observable Forecasts} From there, it's easy to see how we get the forecast distribution of the observables. To get the mean, recall the measurement equation:
+Hence, we have
 \begin{align*}
-  E[y_{t+m}|\;\mathcal{I}_{t}] &=
-    E[Ms_{t+m} + \eta_{t+m}|\;\mathcal{I}_{t}]
-    = ME[s_{t+m}|\;\mathcal{I}_{t}]
-    + E[\eta_{t+m}|\;\mathcal{I}_{t}]\\
-  &= M\mu_{t+m|t} + 0 = M T^m \mu_{t|t}
-\end{align*}
-Next, we construct the error of the forecast, which we then square to get the covariance matrix:
-\begin{align*}
-  y_{t+m} - E[y_{t+m}|\;\mathcal{I}_{t}] &=
-    \left(Ms_{t+m} + \eta_{t+m}\right)
-    - M\mu_{t+m|t}\\
-  &= M\left(s_{t+m}-\mu_{t+m|t}\right) + \eta_{t+m}\\
-  \Rightarrow\qquad
-  E\left\{y_{t+m} - E[y_{t+m}|\;\mathcal{I}_{t-1}]
-  \right\} &= M\Sigma_{t+m|t}M' + H
-\end{align*}
-
-
-\clearpage
-\subsection{Smoothing}
-
-The last section laid out in detail the recursive Kalman Filter
-procedure for computing the likelihood and deriving a sequence of
-distributions for the states:
-\begin{equation}
-  \label{distseq}
-  N(\mu_{1|1}, \Sigma_{1|1}) \quad \ldots \quad  N(\mu_{T|T}, \Sigma_{T|T})
-\end{equation}
-If you only care about forecasting $s_{T+i}$ and $y_{T+i}$ for $i>0$,
-then you're done.  The Kalman Filter gave you the best possible estimate
-of the distribution of $s_T$.  Forecast forward from there.
-
-However, we're typically not only interested in forecasting; we often
-want to draw/simulate paths from the joint distribution of states and
-obtain the best possible estimates of the distribution of states
-from $t=1,\ldots,T$. More precisely, we want
-\begin{enumerate}
-  \item To draw/simulate paths $\{\tilde{s}_1,\ldots,\tilde{s}_T\}$
-    from $p(s_{1:T}|\theta, y_{1:T})$, and
-  \item Obtain estimates $\mu_{t|T} := E[s_t|\mathcal{I}_T]$ and
-    $\Sigma_{t|T} := \text{Var}(s_t|\mathcal{I}_T)$ where
-    $\mathcal{I}_T$ is the full information set.
-\end{enumerate}
-
-In both of these tasks, we see why the Kalman Filter is not enough.
-Specifically, we shouldn't simply simulate a path
-$\{\tilde{s}_1,\ldots,\tilde{s}_T\}$ by drawing $\tilde{s}_1$ from
-$N(\mu_{1|1}, \Sigma_{1|1})$, then drawing $\tilde{s}_2$ from
-$N(\mu_{2|2}, \Sigma_{2|2})$, and so on. That approach wouldn't account
-for the correlation between successive draws of states (since
-$\tilde{s}_1$ and $\tilde{s}_2$ are not independent). More precisely, we
-want to draw paths from a sequence of \emph{conditional} distributions
-of the states, not \emph{marginal} distributions that ignore
-autocorrelation between states.
-
-Second, Kalman Filter estimates of the state distributions don't use the
-full information set.  The Kalman Filter proceeds from $t=1$ to $t=T$
-without ever looking back and revising early estimates of
-$\mu_{t|t}$ or $\Sigma_{t|t}$ for $t<T$ in light of later
-information.
-
-For all of these reasons, smoothing methods have been developed to solve
-all of these problems, using the full information set $\mathcal{I}_T$ to
-draw paths of the states and provide better estimates of the marginal
-means and variances.
-
-\subsection{The Key Conditional Distribution in Smoothing}
-\label{sec:smoothresult}
-
-Just as the normal-erros Kalman Filter used the result about conditional
-distributions for MVN RV's (detailed in Appendix~\ref{sec:mvncond}),
-we'll again apply this result in the context of smoothing under Gaussian
-disturbances. Only now, we'll think about the effect that knowing the
-future state $s_{t+1}$ has on our estimate of $s_t$, consistent with our
-desire to do ``backward'' revisions/updates of the states.
-
-From the forecast step in the Kalman filter procedure, we can fill in
-almost everything we need, having already computed most objects of
-interest:
-\begin{equation}
-  \label{smoothsetup}
-  \left. \begin{bmatrix} s_t \\ s_{t+1} \end{bmatrix} \;\right\rvert
-  \mathcal{I}_t
-  \sim N\left(
-  \begin{bmatrix} \mu_{t|t} \\ T\mu_{t|t} \end{bmatrix},
-  \begin{bmatrix} \Sigma_{t|t} & \cdot \\
-                  \cdot & T\Sigma_{t|t} T'+R \end{bmatrix},
-  \right)
-\end{equation}
-Only the correlation between $s_t$ and $s_{t+1}$ remains to compute:
-\begin{align*}
-  E\left[(s_t-\mu_{t|t})(s_{t+1}-T\mu_{t|t})' | \mathcal{I}_t\right] &=
-    E\left[(s_t-\mu_{t|t})(Ts_t + R\varepsilon_{t+1}-T\mu_{t|t})' |\;
-      \mathcal{I}_t\right] \\
-  \text{Distributing} \qquad
-    &= E\left[(s_t-\mu_{t|t})(Ts_t -T\mu_{t|t})' |\;
-      \mathcal{I}_t\right]
-    + E\left[(s_t-\mu_{t|t})(R\varepsilon_{t+1})' |\;
-      \mathcal{I}_t\right] \\
-  &= E\left[(s_t-\mu_{t|t})(s_t -\mu_{t|t})' |\;
-      \mathcal{I}_t\right] T' \\
-    &\qquad
-    + E\left[s_t\varepsilon_{t+1}' |\;
-      \mathcal{I}_t\right] R'
-    + \mu_{t|t}\left(E\left[\varepsilon_{t+1}' |\;
-      \mathcal{I}_t\right]\right)R' \\\\
-  \Rightarrow\quad \text{Cov}(s_t, s_{t+1}|\; \mathcal{I}_t)
-      &= \Sigma_{t|t}T'
-\end{align*}
-where the last two terms dropped because $s_t \perp \varepsilon_{t+1}$
-and $E[\varepsilon_t]=0$ for all $t$.
-
-Finally, now that we have filled out all of the terms in
-Equation~\ref{smoothsetup}, we can use the result in
-Appendix~\ref{sec:mvncond} to derive the conditional distribution that
-represents the key relationship in smoothing given normal errors:
-\begin{alignat}{3}
-  &&\left. \begin{bmatrix} s_t \\ s_{t+1} \end{bmatrix} \;\right\rvert
-    \mathcal{I}_t
-    &\sim N\left(
-    \begin{bmatrix} \mu_{t|t} \\ T\mu_{t|t} \end{bmatrix},
-    \begin{bmatrix} \Sigma_{t|t} & \Sigma_{t|t}T' \\
-                    T\Sigma_{t|t} & T\Sigma_{t|t} T'+R \end{bmatrix}
-    \right) \notag\\\label{smoothresult}\\
-  \Rightarrow \quad
-  %\mu_{t|T} :=
-  &&E[s_t|s_{t+1}, \mathcal{I}_t] &=
-      \mu_{t|t} + \Sigma_{t|t}T'\left(T\Sigma_{t|t} T'+R\right)^{-1}
-      (s_{t+1}-T\mu_{t|t}) \notag\\
-  %\Sigma_{t|T} :=
-  &&\text{Var}\left(s_t|s_{t+1},\mathcal{I}_t\right)
-    &= \Sigma_{t|t} - \Sigma_{t|t}T' \left(T\Sigma_{t|t} T'+R\right)^{-1}
-      T\Sigma_{t|t}
-  \notag
-\end{alignat}
-We'll come back to this recursive relationship in subsequent sections as
-we draw from the full posterior distribution of the states.
-
-
-\subsection{Simplifying the Joint Posterior of States}
-
-Throughout this section, recall that our goal is to draw from the
-posterior distribution of states
-\begin{equation}
-  p(s_{0:T}|\theta, y_{1:T})
-\end{equation}
-We will do this in a sequnce of steps:
-\begin{enumerate}
-  \item First, we can break this joint probability up into a product of
-    conditionals:
-    \begin{equation}
-      \label{key2}
-      p(s_{0:T}|y_{1:T},\theta) =
-      \left[ \prod_{t=0}^{T-1} p(s_t|s_{t+1:T},y_{1:T},\theta) \right]
-      p(s_T|y_{1:T},\theta)
-    \end{equation}
-  \item Next, we simplify further by recognizing that,
-    $p(s_t|s_{t+1:T},y_{1:T},\theta) = p(s_t|s_{t+1:T},y_{1:t},\theta)$.
-    That is because, conditional on future states $s_{t+1:T}$ and past
-    data $y_{1:t}$, future observations $y_{t+1:T}$ provide no
-    additional information about $s_t$:
-    \begin{align*}
-      y_{t+i} &= M s_{t+i} + \eta_{t+i}
-      \quad \text{with } \eta_{t+i} \perp \{\varepsilon_0, \ldots,
-      \varepsilon_t\} \qquad \forall \; i \geq 1 \\
-      \Rightarrow\qquad
-      p(s_t|s_{t+1:T},y_{1:T},\theta)
-      &= p(s_t|s_{t+1:T},y_{1:t},\theta)
-    \end{align*}
-    That allows us to write Equation~\ref{key2} as
-    \begin{equation}
-      p(s_{0:T}|y_{1:T},\theta) =
-      \left[ \prod_{t=0}^{T-1} p(s_t|s_{t+1:T},y_{1:t},\theta) \right]
-      p(s_T|y_{1:T},\theta)
-    \end{equation}
-  \item Lastly, we can simplify again by recognizing that
-    $p(s_t|s_{t+1}, y_{1:t},\theta) = p(s_t|s_{t+1:T},y_{1:t},\theta)$.
-    Conditional on past data $y_{1:t}$ and the next state $s_{t+1}$, the
-    entire future sequence of states $s_{t+2:T}$ provides no additional
-    information about $s_t$.  To see this, first note that
-    \begin{align}
-      s_{t+1+i} = T^i s_{t+1} + \sum^i_{j=1} T^{i-j} R \varepsilon_{t+1+j}
-      \qquad \forall \; i \geq 1
-      \label{st1i}
-    \end{align}
-    We want to show that for all $i\geq1$, conditional on $s_{t+1}$ and
-    $y_{1:t}$, the states $s_{t+1+i}$ and $s_t$ are independent.  Since
-    everything is Guassian, it suffices to prove merely that
-    $s_{t+1+i}|s_{t+1},y_{1:t}$ and $s_t|s_{t+1},y_{1:t}$ are
-    uncorrelated.  So let's try that approach and write the
-    conditional covariance matrix:
-    \begin{align*}
-      &E\left\{
-        \left(s_t - E[s_t|s_{t+1},y_{1:t}]\right)
-        \left(s_{t+1+i} - E[s_{t+1+i}|s_{t+1},y_{1:t}]\right)'
-        | s_{t+1},y_{1:t}
-      \right\}  \\
-      \text{By~\ref{st1i}}
-      &\quad\qquad =
-      E\left\{\left.
-        \left(s_t - E[s_t|s_{t+1},y_{1:t}]\right)
-        \left(\sum^i_{j=1} T^{i-j} R \varepsilon_{t+1+j}\right)'
-        \right\rvert s_{t+1},y_{1:t}
-      \right\}  \\
-      &\quad\qquad =
-      E\left\{\left.
-        \zeta_t
-        \left(\sum^i_{j=1} T^{i-j} R \varepsilon_{t+1+j}\right)'
-        \right\rvert s_{t+1},y_{1:t}
-      \right\} \\\\
-      &\text{where }
-      \zeta_t :=  \left(s_t - E[s_t|s_{t+1},y_{1:t}]\right)
-    \end{align*}
-    But we can deduce the distribution of $\zeta_t | s_{t+1}, y_{1:t}$
-    from work we did in Section~\ref{sec:smoothresult}, recalling
-    Result~\ref{smoothresult} in particular:
-    \begin{equation}
-      \zeta_t| s_{t+1}, y_{1:t}\sim
-      N(0, \Sigma_{t|t} - \Sigma_{t|t}T'
-           \left(T\Sigma_{t|t} T'+R\right)^{-1} T\Sigma_{t|t})
-    \end{equation}
-    Now note that the distribution of $\zeta_t$ is only a function of
-    $\Sigma_{t|t}$, which is independent of past realized values
-    $y_{1:t}$. Moreover,
-
-\end{enumerate}
-
-
-
-
-
-
-
-\subsection{Simulation Smoother}
-
-
-
-\subsection{Outline of the Recursive Procedure}
-
-Again, we seek the distribution of $s_t$ given data $\{y_t\}^T_1$. This
-applies to all linear state space models as written in
-Equation~\ref{ste} and Equation~\ref{moe}:
-\begin{enumerate}
-  \item Run the Kalman Filter, storing the filtered
-    probability distributions (or relevant parameters
-    defining those distributions),
-    $p(s_t|\mathcal{I}_{t-1})$ from $t=1,\ldots,T$.
-  \item
-\end{enumerate}
-
-
-\clearpage
-\subsection{Time-Varying State Space Models}
-
-Suppose we want to consider time series models that
-include time-varying coefficients. We can easily extend
-the state space framework developed above to accommodate.
-
-
-
-
-%\section{Filtering}
-%
-%Suppose we want to measure some latent state variable $x$. We will
-%assume a \emph{prior} that is multivariate normal such that
-%    \[ s_t \sim \text{N}(\hat{s}_t, \Sigma) \]
-%Next, we ``measure'' $x$ by matching it to an observable in
-%a \emph{measurement equation}:
-%    \[ y = G x + v \qquad v\sim \text{N}(0, R) \]
-%where $R$ is positive definite, while $G$ and $R$ are both
-%$2 \times 2$. This forms the \emph{likelihood}.
-%\\
-%\\
-%We then ``filter'' out the noise, updating our view of $x$ in
-%light of the data in the filtering step using Bayes' Rule.
-%Note, this is called ``filtering'' because we don't use the prior
-%and likelihood to forecast into
-%the future. We combine the prior with the likelihood only to filter
-%out noise and get closer to the true value of $x$ based on
-%the data, summarized in the posterior, or the
-%\emph{filtering distribution}:
-%\begin{align}
-%    p(x \; | \; y) &= \frac{p(y \; | \; x) \cdot p(x)}{p(y)}
-%    \propto p(y \; | \; x) \cdot p(x) \label{xgiveny} \\
-%    &\propto \exp\left\{-\frac{1}{2}
-%	\left( y - Gx \right)' R^{-1} \left(y-Gx\right)
-%	\right\} \exp\left\{-\frac{1}{2}( x - \hat{x} )'
-%	\Sigma^{-1} (x-\hat{x})\right\} \notag
-%\end{align}
-%Now let's expand the term in the lefthand exponential:
-%\begin{align*}
-%    A = \left( y - Gx \right)' R^{-1} \left(y-Gx\right) &=
-%	\left( y' - x'G' \right) R^{-1} \left(y-Gx\right)
-%    = \left( y'R^{-1} - x'G'R^{-1} \right)  \left(y-Gx\right) \\
-%    &= \left( y'R^{-1}y - y'R^{-1} Gx - x'G'R^{-1} y
-%	+ x'G'R^{-1} Gx\right)
-%\end{align*}
-%And now the same for the righthand exponential:
-%\begin{align}
-%     B = ( x - \hat{x} )' \Sigma^{-1} (x-\hat{x})
-%	&= ( x' - \hat{x}' ) \Sigma^{-1} (x-\hat{x}) \notag\\
-%    &=  (x'\Sigma^{-1} - \hat{x}'\Sigma^{-1})
-%	(x-\hat{x}) \notag \\
-%    &=  x'\Sigma^{-1} x - x'\Sigma^{-1} \hat{x} -
-%	\hat{x}'\Sigma^{-1} x
-%	+ \hat{x}'\Sigma^{-1} \hat{x} \label{B}
-%\end{align}
-%Adding the two exponentials, we get:
-%\begin{align*}
-%    C = A + B &= x' \left( \Sigma^{-1} + G'R^{-1}G\right) x
-%	- x' (\Sigma^{-1} \hat{x} + G'R^{-1}y)
-%	- (\hat{x}' \Sigma^{-1} + y' R^{-1}G) x  \\
-%	& \qquad + \hat{x}' \Sigma^{-1} \hat{x} + y' R^{-1} y
-%\end{align*}
-%Now notice that Expression \ref{xgiveny} is the probability
-%distribution of $x$ \emph{conditional} on $y$ and pretty
-%much anything else that isn't $x$.  And because of the
-%wonderful properties of the exponential function and the
-%black-hole powers of the proportionality constant, we'll be
-%able to simplify things nicely (and we'll worry that the
-%distribution $p(x|y)$ integrates to one later on).
-%
-%So in the expression for $C$, the two terms
-%in the second row \emph{don't} depend upon $x$. Therefore,
-%letting $C(x)$ be the portion of $C$ that depends upon
-%$x$, and letting $C(\lnot x)$ bet the additive terms which
-%don't depend upon $x$, we can simplify
-%\begin{align*}
-%    p(x\; | \; y) &\propto \exp\left\{ -\frac{1}{2}
-%	C \right\} = \exp\left\{ -\frac{1}{2}
-%	\left[C(x) + C(\lnot x) \right]\right\}  \\
-%    &\propto \exp\left\{ -\frac{1}{2}
-%	C(x)\right\} +  \exp\left\{ -\frac{1}{2} C(\lnot x)
-%	\right\}  \\
-%    &\propto \exp\left\{ -\frac{1}{2}
-%	C(x)\right\}
-%\end{align*}
-%We just absorb the portion not relevant to $p(x|y)$ into
-%the proportionality constant.  This means our the work we
-%did above to get $C$ simplifies our target expression to
-%\begin{align}
-%    p(x\;|\;y) &\propto \exp\left\{-\frac{1}{2} \left[
-%	x' \left( \Sigma^{-1} + G'R^{-1}G\right) x
-%	- x' (\Sigma^{-1} \hat{x} + G'R^{-1}y)
-%	- (\hat{x}' \Sigma^{-1} + y' R^{-1}G) x  \right]\right\}
-%	\label{tosimp}
-%\end{align}
-%\paragraph{Goal}
-%Now this doesn't look too helpful, but with a little bit of
-%work, we can turn this into the probability distribution
-%for a multivariate normal random variable.
-%In fact, the rest of the section may look complicated, but
-%keep in mind the big picture: the likelihood and prior
-%were both multivariate normal, so
-%the posterior $p(x|y)$ is going to be normal. We just want
-%to identify the mean vector and variance-covariance matrix;
-%then we're home.
-%
-%\paragraph{Variance} So first, the {variance} of the
-%normal distribution corresponding to $p(x|y)$ can
-%be derived by examining Equation \ref{tosimp} and likening
-%it to Equation \ref{B} (which gives the contents of the
-%exponential in the prior MVN distribution of $x$).
-%
-%Namely, the inverse of the new variance,
-%which we'll denote as $\Sigma^F$ will be sandwiched in
-%between $x'$ and $x$ in Equation \ref{tosimp}, just as it
-%was sandwiched between $x'$ and $x$ in Equation \ref{B}.
-%We use this fact, along with the
-%the Woodbury matrix identity (stated in
-%the appendix) to derive:
-%\begin{align}
-%    \Sigma^{F} &= \left( \Sigma^{-1} + G'R^{-1}G\right)^{-1}
-%	\notag \\
-%    \text{Woodbury Identity} \Rightarrow
-%	\qquad &=  \Sigma - \Sigma G'(R
-%	    + G\Sigma G')^{-1}
-%	    G\Sigma
-%	    \label{covar}
-%\end{align}
-%\paragraph{Mean}
-%Next, we want to get the {mean} of the distribution of
-%$p(x|y)$, which we'll denote by $\hat{x}^F$.  Again, once we
-%take a second and compare Expression \ref{tosimp}
-%to Expression \ref{B}, it's becomes clear from inspection
-%that we must have
-%\begin{equation}
-%    \label{notobvious}
-%    (\Sigma^{-1} \hat{x} + G'R^{-1}y)
-%	= \left( \Sigma^{-1} + G'R^{-1}G\right) Z
-%\end{equation}
-%To see this,
-%liken the lefthand side of Equation \ref{notobvious} (which
-%itself comes from Expression \ref{tosimp}) to
-%the result of the matrix multiplication $\Sigma^{-1}\hat{x}$ in
-%Equation \ref{B}. To get the righthand side, use the fact
-%that we \emph{know} the Equation \ref{notobvious} analogue
-%to Equation \ref{B}'s $\Sigma^{-1}$, which we just
-%derived in the variance section and called $\Sigma^F$.
-%\\
-%\\
-%So all that's left to do is solve for $Z$ in Equation
-%\ref{notobvious}.  The result will turn out to be our mean
-%vector for the posterior, $\hat{x}_F$:
-%\begin{align}
-%    \label{mean}
-%    \hat{x}^F = Z
-%        &= \hat{x}
-%        + \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
-%        \left( y - G \hat{x} \right)
-%\end{align}
-%If you want to see the nasty linear algebra that gets you
-%to this result, you can check out the appendix. Or you can
-%you just take this result as given and save yourself an
-%hour of painstaking derivation and eye-crossing complications,
-%unlike myself.\footnote{But if you \emph{do} look at the appendix,
-%you might just give my semi-wasted hour some meaning, in which
-%case---thank you.}
-%\\
-%\\
-%Putting together the expressions for the mean and variance
-%(see Equations \ref{mean} and \ref{covar}, respectively)
-%of the posterior estimate for $x|y$ (i.e. the ``filtering
-%distribution''), we get that
-%\begin{align}
-%    x | y &\sim \text{N} \left(\hat{x}^F, \; \Sigma^F\right)
-%    \label{filtered} \\
-%    \notag\\
-%    \text{where} \quad \hat{x}^F &= \hat{x}
-%	+ \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
-%	\left( y - G \hat{x} \right)  \notag \\
-%    \Sigma^F &= \Sigma - \Sigma G'(R
-%	    + G\Sigma G')^{-1}
-%	    G\Sigma \notag
-%\end{align}
-%Notice that our new ``filtered'' mean is simply a
-%combination of our prior mean, $\hat{x}$, and
-%a transformation of the ``error'' between our
-%observed value and the prior guess for that
-%observable ($y - G\hat{x}$).
-%
-%\newpage
-%\paragraph{Recap} Okay, so what did we just do?
-%\begin{enumerate}
-%    \item We took a Multivariate Normal (MVN) prior to
-%	summarize our beliefs about a latent, imperfectly
-%    observable state variable $x$.
-%    \item Knowing that we'll observe some data, $y$, which
-%	provides a ``noisy'' measure of $x$, we postulated a
-%	likelihood $p(y|x)$ that is also MVN.
-%    \item Then, using Bayes' Rule, we combine the information
-%	contained in our prior $p(x)$ and the data (via
-%	the likelihhod $p(y|x)$) to get a ``filtered''
-%	distribution of $x$, $p(x|y)$, given the data and our
-%	prior.
-%\end{enumerate}
-%Why might this long, tortuous, painful process help us in
-%economics?  Well, imagine that in our model, there's some
-%state for the ``natural rate of unemployment,'' denoted by $x$.
-%Now of course, we can't observe that value.  But we'll have
-%economic statistics, like measurements of unemployment itself along
-%with other informative statistics such as GDP
-%and hours, which might provide information about the natural
-%rate of unemployment.
-%However, those statistics are imperfect and noisy.  The
-%Kalman Filter gives us a way to combine those noisy estimates
-%in with our beliefs in a principled, sensible manner.
-%
-%
-%\section{Forecasting Step}
-%
-%Now let's make our model a little more dynamic and consider
-%forecasting ahead. To do so, we specify a model
-%of how the state, $x$, evolves.  To make it easy on ourselves,
-%let's assume everything's Gaussian (woohoo! that's easy):
-%\begin{equation}
-%    \label{lom}
-%    x_{t+1} = Ax_t + w_{t+1} \qquad w_t \sim \text{N}(0, H)
-%\end{equation}
-%Now, we want to come up with a \emph{predictive distribution}
-%given our prior and the current information encapsulated in
-%our filtering distribution, $p(x|y)$. Since we're assuming
-%everything is normal, we need only pin down the
-%mean and variance of the forecast, since linear combinations
-%of Gaussian variables are Gaussian.
-%
-%Of course, these kinds of things are well known for
-%MVN random variables, which has the nice properties
-%\begin{align*}
-%    E[AX] &= A E[X] = A \mu \\
-%    \text{Var}(AX) &= A \text{Var}(X) A' = A\Sigma A' \\
-%    \text{where} \quad X &\sim \text{N}(\mu, \Sigma)
-%\end{align*}
-%Now let's use these facts, along with the assumption
-%that we're predicting $x_{t+1}$ by starting with a
-%\emph{filtered} $x_t$ (denoted $x^F_t$ which has the
-%distribution in Equation \ref{filtered}), and
-%assuming $x^F_t$ is uncorrelated with $w_{t+1}$:
-%\begin{align}
-%    E[x_{t+1}] &= E\left[A{x}^F_{t} + w_{t+1} \right]
-%        = AE\left[{x}^F_{t}\right] + E\left[w_{t+1}
-%            \right] \notag\\
-%        &= A \hat{x}^F_{t} + 0 = A \hat{x}^{F}_t
-%            \label{intfore_mean}\\
-%    \text{Var}({x}_{t+1}) &=
-%        \text{Var}(A{x}^F_{t} + w_{t+1})
-%        = A\text{Var}\left({x}^F_{t}\right)A'
-%            +\text{Var}(w_{t+1})\notag \\
-%        &= A\Sigma^F_t A' + H \label{intfore_var}
-%\end{align}
-%where $\hat{x}^F_t$ and $\Sigma_t^F$ are as above in Equation
-%\ref{filtered}. This characterizes the distribution for the
-%one step ahead forecasting distribution.
-%
-%\newpage
-%Now, we can simplify what we have a bit more by defining
-%the \emph{Kalman Gain}:
-%\begin{equation}
-%    \label{kalgain}
-%    K_\Sigma = A\Sigma G' (R + G\Sigma G')^{-1}
-%\end{equation}
-%We see the practical use of this by subbing in the full
-%expressions for $\hat{x}_t^F$ and $\Sigma_t^F$ into Equations
-%\ref{intfore_mean} and \ref{intfore_var} above,
-%and then simplifying our expressions for the
-%mean and variance as a function of the Kalman Gain:
-%\begin{align}
-%    \hat{x}_{t+1} &= E[x_{t+1}] =
-%        A\left\{ \hat{x}_t
-%	    + \left[\Sigma_t G' (R + G \Sigma_t G')^{-1}  \right]
-%        \left( y - G \hat{x}_t \right) \right\} \notag \\
-%        &= A\hat{x}_t + K_{\Sigma_t} (y - G \hat{x}_t)
-%        \label{foremean} \\
-%    \Sigma_{t+1} &= \text{Var}(x_{t+1}) =
-%        A \left\{ \Sigma_t - \Sigma_t G'(R
-%	    + G\Sigma_t G')^{-1}
-%        G\Sigma_t \right\} A' + H \notag \\
-%    &= A\Sigma_t A' - K_{\Sigma_t} G \Sigma_t A' + H
-%        \label{forevar}
-%\end{align}
-%
-%
-%\section{Full Recursive Procedure}
-%
-%Now we need to build up the recursive algorithm to forecast
-%further into the future. Let $t$ be the current time period,
-%and we proceed as follows:
-%\begin{enumerate}
-%    \item Start with a prior in the current period at
-%        time $t$, as given above
-%        \[ p_{t}(x) \sim \text{N}\left(\hat{x}_t, \;
-%            \Sigma_t\right) \]
-%    \item Observe the current measurement, $y_t$.
-%    \item Update and filter out the noise as we did in
-%        the Filtering Section to get, you guessed it,
-%        the filtering distribution: $p_t(x | y) =
-%        \text{N}(\hat{x}^F_t, \Sigma^F_t)$.
-%    \item Compute the predictive distribution
-%        $p_{t+1}(x) = \text{N}(\hat{x}_{t+1}, \Sigma_{t+1})$
-%        from the filtering distribution, $p_t(x|y)$, and
-%        the law of motion in Equation \ref{lom}.
-%    \item Increment $t$. Return to step 1, taking
-%        the predictive distribution, $p_{t+1}(x)$, as
-%        the prior.
-%\end{enumerate}
-%
-%
-%\section{Convergence}
-%
-%Now since $x_{t}$ is random from the perspective
-%of time $t-1$ (i.e. there is some irreducable uncertainty
-%resulting from shocks at time $t$), we know that $\Sigma_t$
-%will never be zero, unless $w_t$ in Equation \ref{lom} is
-%degenerate. However, we might ask whether $\Sigma_t$, our
-%measure of uncertainty for our prediction $\hat{x}_t$
-%of $x_t$, will ever converge to a \emph{constant} matrix over
-%time.
-%
-%Recall how $\Sigma_t$ evolves, as specified in Equation
-%\ref{forevar} (substituting in for the Kalman Gain,
-%$K_\Sigma$), which gives the non-linear difference equation:
-%\begin{equation}
-%    \label{sig_euler}
-%    \Sigma_{t+1} = A\Sigma_t A' - K_{\Sigma_t} G \Sigma_t A' + H
-%\end{equation}
-%If it were the case that $\Sigma_t$ converges to some fixed
-%matrix, then there would be a fixed point, $\Sigma^*$, satisfying
-%Equation \ref{sig_euler} as follows:
-%\begin{equation}
-%    \label{riccati}
-%    \Sigma^* =
-%        A\Sigma^* A' - A\Sigma^* G' (R + G\Sigma^* G')^{-1} G \Sigma^* A' + H
-%\end{equation}
-%This is known as the \emph{Discrete Time Algebraic Riccati Equation}.
-%A sufficient condition for convergence is that all the eigenvalues of
-%$A$, $\lambda_i$, satisfy $|\lambda_i|<1$.
-%
-
-
-\clearpage
-\subsection{Just the Equations}
-
-Bare bones section that just collects equations in one place. Assumes
-linear state space models of form
-\begin{align}
-  \text{Transition:} \quad
-    s_{t} &= C(\theta) + T(\theta) s_{t-1}
-    + R(\theta)\varepsilon_{t}\
-    \quad \mathbb{E}[\varepsilon_t] = 0
-    \quad \mathbb{E}[\varepsilon_t \varepsilon'_t] =  Q(\theta) \\
-  \text{Measurement:} \quad
-    y_{t} &= D(\theta) + M(\theta) s_{t} + \eta_{t}
-    \qquad\qquad \mathbb{E}[\eta_t] =  0
-    \quad \mathbb{E}[\eta_t \eta'_t] =  H(\theta)
-\end{align}
-
-
-\subsection{Kalman Filter under Normal Errors}
-
-Forecast step, given $\mu_{t|t-1}$ and $\Sigma_{t|t-1}$:
-\begin{alignat*}{3}
-  \mu_{t|t-1} &= C + T\mu_{t-1|t-1} \\
-  \Sigma_{t|t-1} &= T\Sigma_{t-1|t-1}T' + RQR'
-\end{alignat*}
-Filtering step:
-\begin{alignat}{3}
-  \mu_{t|t}
-    &= \mu_{t|t-1} + \Sigma_{t|t-1} M'
-    \left(M\Sigma_{t|t-1}M' + H\right)^{-1} (y_t-D-M\mu_{t|t-1}) \notag\\
-  \Sigma_{t|t}
-    &= \Sigma_{t|t-1} - \Sigma_{t|t-1}M'
-    \left(M\Sigma_{t|t-1}M' + H\right)^{-1} M\Sigma_{t|t-1} \notag
-\end{alignat}
-
-
-\subsection{Conditional Distributions with Normal Errors}
-\label{sec:mvncond}
-
-Suppose that there is a multivariate normal random variable $Z$---a
-vector that can be partitioned into two pieces and written
-\[
-  Z \sim N(\mu, \Sigma) \quad\Leftrightarrow\quad
-  \begin{bmatrix} Y \\ X \end{bmatrix}
+  \bss_{t+m}|\calI_t
   \sim
-  N\left(\begin{bmatrix} \mu_Y \\ \mu_X \end{bmatrix},
-  \begin{bmatrix} \Sigma_{YY} & \Sigma_{YX} \\
-  \Sigma_{XY} & \Sigma_{XX} \end{bmatrix}
+  \calN\left(
+    \bsT^m\bsmu_{t|t},\quad
+    \bsT^m \bsSigma_{t|t}(\bsT^m)'
+      + \sum_{i=0}^{m-1} \bsT^i\bsR\bsQ\bsR'(\bsT^i)'
   \right)
-\]
-Then the distribution of $Y$ given $X$ is
-\begin{align}
-  Y | X \sim &N(\hat{\mu}, \hat{\Sigma})  \notag\\
-  \label{reg} \\
-  \text{where} \quad
-  \hat{\mu} = \mu_Y + \Sigma_{YX} \Sigma^{-1}_{XX}
-  (X_X-\mu_X)  & \quad \quad
-  \hat{\Sigma} = \Sigma_{YY} - \Sigma_{YX} \Sigma^{-1}_{XX}
-    \Sigma_{XY}
-  \notag
-\end{align}
-
-\paragraph{Intuition}
-Consider the case where $Y$ and $X$ are scalars, not vectors. Then we
-see in the second term of the sum for $\hat{\mu}$ that an above-average
-realization of $X$ will lead us to \emph{upwardly} revise a purely
-unconditional forecast of $Y$ above the mean $\mu_Y$ (provided
-$\Sigma_{YX}>0$, otherwise we revise down).
-
-In addition, provided that the correlation $\Sigma_{YX} = \Sigma_{XY}$
-is non-zero, we will revise \emph{down} the variance of $Y$ relative to
-the baseline of $\Sigma_{YY}$. This follows because the observation of
-$X$ has provided valuable information about $X$.
-
-
-\paragraph{The Normality Assumption}
-Consider your basic regression with
-\begin{align}
-  \label{regex}
-  Y_i = \alpha + \beta X_i + \varepsilon_t
-\end{align}
-In Intro Stat, any discussion of regression analysis starts by assuming
-that the errors, $\varepsilon_t$, are normally distributed, which is
-equivalent to assuming that $Y_i$ and the regressors in $X_i$ are,
-together, jointly normally distributed---i.e.  $\begin{bmatrix} Y_i &
-  X^T_i \end{bmatrix}^T$ is  multivariate normal.
-
-Then, if you get to intermediate Stat, your professor starts to retreat
-on the normality assumptions. In particular, you learn that it doesn't
-have to be the case that the variables are, in fact, jointly normally
-distributed. It could just be that you want the best \emph{linear
-predictor} of $Y_i$ given $X_i$. In that case, you care about regression
-estimates only because they provide the best linear approximation of the
-conditional expectation function, $E[Y_i|X_i]$. Alternatively, you might
-also hear that linear regression gives the best linear ``projection'' of
-$Y_i$ onto $X_i$.
-
-Well, that's our ticket. If you look at Result~\ref{reg}, you'll notice
-that we're getting a kind of \emph{regression estimate} of $Y$ given
-$X$. To be even more explicit, we might write
-\[
-  E[Y|X] = \mu_Y + \beta (X - \mu_X)
-\]
-where $\beta= \Sigma_{YX}\Sigma^{-1}_{XX}$. This is just like
-Regression~\ref{regex} above, only here, we regress \emph{vector} (not
-scalar) $Y$ on vector $X$. However, the intuition remains the same.
-
-Therefore, Kalman Filter estimates that assume normally distributed
-errors are not as nefarious as they seem. Since Kalman Filter estimates
-of the states under the normality assumption will follow directly from
-Result~\ref{reg} above (as we will see in the next subsection), we can
-motive the Kalman Filter with normal errors by framing it as a recursive
-procedure to find the best \emph{linear estimates} or \emph{projection
-estimates} of the states.
-
-
-
-\subsection{Woodbury Matrix Identity}
-
-For matrices $A$, $U$, $C$, and $V$:
-\begin{equation}
-    (A+UCV)^{-1} = A^{-1} - A^{-1} U(C^{-1} + VA^{-1}U)^{-1}
-	VA^{-1}
-\end{equation}
-Now consider the special case we have above with the
-Kalman filter:
-\begin{equation}
-    \label{special}
-    (A + V'CV)^{-1} = A^{-1} - A^{-1} V'(C^{-1} + VA^{-1}V')^{-1}
-	VA^{-1}
-\end{equation}
-
-\subsection{Derivation of the Mean}
-
-Recall what we want to show.  For $\hat{x}_F \equiv Z$, we want
-to show that
-\begin{align*}
-    (\Sigma^{-1} \hat{x} + G'R^{-1}y)
-	&= \left( \Sigma^{-1} + G'R^{-1}G\right) Z \\
-    \Rightarrow
-    \hat{x}_F = Z
-        &= \hat{x}
-        + \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
-        \left( y - G \hat{x} \right)
 \end{align*}
-And so we solve this equation by using the Woodbury matrix
-identity representation from above:
+\end{defn}
+
+\begin{defn}(Long Horizon Observable Forecasts)
+From there, it's easy to see how we get the forecast distribution of
+observables. To get the mean, recall the measurement equation and the
+fact that the measurement errors are mean-zero:
 \begin{align*}
-    (\Sigma^{-1} \hat{x} + G'R^{-1}y) &=
-	\left( \Sigma^{-1} + G'R^{-1}G\right) Z \\
-    \Rightarrow \quad Z &=
-	\left( \Sigma^{-1} + G'R^{-1}G\right)^{-1}
-	(\Sigma^{-1} \hat{x} + G'R^{-1}y) \\
-    Z &=
-	\left( \Sigma - \Sigma G'(R
-	+ G\Sigma G')^{-1}
-	G\Sigma\right) \left(\Sigma^{-1} \hat{x}
-	+ G'R^{-1}y\right)
+  \E_t[\bsy_{t+m}] &=
+    \bsM\bsmu_{t+m|t} =
+    \bsM \bsT^m \bsmu_{t|t}
 \end{align*}
-Now let's simplify $\hat{x}_F = Z$ a bit,
-expanding out the multiplication:
+Next, construct the error of the forecast
 \begin{align*}
-    \hat{x}_F = Z &=
-	\left( \Sigma - \Sigma G'(R
-	+ G\Sigma G')^{-1}
-	G\Sigma\right) \left(\Sigma^{-1} \hat{x}
-	+ G'R^{-1}y\right) \\
-    \text{FOIL} \quad &= \hat{x} + \Sigma G' R^{-1} y -
-	\left[\Sigma G' (R + G \Sigma G')^{-1} G \Sigma\right]
-	\left[ \Sigma^{-1} \hat{x} \right]  \\
-    &\qquad - \left[\Sigma G' (R+ G \Sigma G')^{-1}G\Sigma \right]
-	\left[G' R^{-1} y \right] \\
-    \text{Simpify} \quad &= \hat{x} + \Sigma G' R^{-1} y -
-	\left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
-	\left( G \hat{x} \right)  \\
-    &\qquad - \Sigma G' (R+ G \Sigma G')^{-1}G\Sigma
-	G' R^{-1} y  \\
-    \text{Change Order} \quad &= \hat{x}
-	- \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
-	\left( G \hat{x} \right)  \\
-    &\qquad
-	+ \Sigma G'  R^{-1} y
-	- \Sigma G' (R+ G \Sigma G')^{-1}G\Sigma
-	G' R^{-1} y \\
-    \text{Regroup} \quad &= \hat{x}
-	- \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
-	\left( G \hat{x} \right)  \\
-    &\qquad
-	+ \Sigma G'  \left\{ R^{-1}
-	-  (R+ G \Sigma G')^{-1}G\Sigma
-	G' R^{-1} \right\} y
+  \bsy_{t+m} - \E_t[\bsy_{t+m}] &=
+    \left(\bsM\bss_{t+m} + \bseta_{t+m}\right)
+    - \bsM\bsT^m\bsmu_{t|t}
+  \\
+  &= \bsM\left(\bss_{t+m}-\bsT^m\bsmu_{t|t}\right) + \bseta_{t+m}
 \end{align*}
-Okay, now let's take a breather.  We'll make this a bit
-easier on ourselves, and just consider simplifying the guy
-in the brackets, $\{\}$ by using
-$A^{-1} A = I$ with a very special choice of $A$:
+Now square this error and take expectation to get the covariance matrix
 \begin{align*}
-    \left\{ R^{-1}  -  (R+ G \Sigma G')^{-1}G\Sigma
-	G' R^{-1} \right\}   &=
-	(R+ G \Sigma G')^{-1} (R+ G \Sigma G') R^{-1}  \\
-    &\qquad -  (R+ G \Sigma G')^{-1}G\Sigma
-	G' R^{-1} \\
-    \text{Group} \quad &=   (R+ G \Sigma G')^{-1} \left[ (R+ G \Sigma G') R^{-1}
-	-  G\Sigma   G' R^{-1}\right] \\
-    \text{Distribute} \quad &=   (R+ G \Sigma G')^{-1} \left[ RR^{-1}
-	+ G \Sigma G'R^{-1} -  G\Sigma   G' R^{-1}\right] \\
-    \text{Simplify} \quad &=   (R+ G \Sigma G')^{-1} \left[ I
-	+ 0\right] \\
-    &=   (R+ G \Sigma G')^{-1}
+  \E_t\left\{
+    \big(
+    \bsy_{t+m} - \E_t[\bsy_{t+m}]
+    \big)
+    \big(
+    \bsy_{t+m} - \E_t[\bsy_{t+m}]
+    \big)'
+  \right\} &= \bsM\bsSigma_{t+m|t}\bsM' + \bsH
 \end{align*}
-Substituting back in above for the term in braces,
-$\{\}$, we get the following expression
-for $Z = \hat{x}_F$:
-\begin{align}
-    \hat{x}_F = Z &= \hat{x}
-	- \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
-	\left( G \hat{x} \right)
-	+ \Sigma G'  (R+ G \Sigma G')^{-1} y \notag \\
-    &= \hat{x}
-	+ \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
-	\left( y - G \hat{x} \right)
-\end{align}
+Hence, we have
+\begin{align*}
+  \bsy_{t+m}|\calI_t
+  \sim
+  \calN\left(
+    \bsM\bsT^m\bsmu_{t|t},\quad
+    \bsM\left[
+    \bsT^m \bsSigma_{t|t}(\bsT^m)'
+      + \sum_{i=0}^{m-1} \bsT^i\bsR\bsQ\bsR'(\bsT^i)'
+    \right]\bsM'
+    +\bsH
+  \right)
+\end{align*}
+\end{defn}
+
+
+%\clearpage
+%\subsection{Smoothing}
+
+%The last section laid out in detail the recursive Kalman Filter
+%procedure for computing the likelihood and deriving a sequence of
+%distributions for the states:
+%\begin{equation}
+  %\label{distseq}
+  %N(\mu_{1|1}, \Sigma_{1|1}) \quad \ldots \quad  N(\mu_{T|T}, \Sigma_{T|T})
+%\end{equation}
+%If you only care about forecasting $s_{T+i}$ and $y_{T+i}$ for $i>0$,
+%then you're done.  The Kalman Filter gave you the best possible estimate
+%of the distribution of $s_T$.  Forecast forward from there.
+
+%However, we're typically not only interested in forecasting; we often
+%want to draw/simulate paths from the joint distribution of states and
+%obtain the best possible estimates of the distribution of states
+%from $t=1,\ldots,T$. More precisely, we want
+%\begin{enumerate}
+  %\item To draw/simulate paths $\{\tilde{s}_1,\ldots,\tilde{s}_T\}$
+    %from $p(s_{1:T}|\theta, y_{1:T})$, and
+  %\item Obtain estimates $\mu_{t|T} := E[s_t|\mathcal{I}_T]$ and
+    %$\Sigma_{t|T} := \text{Var}(s_t|\mathcal{I}_T)$ where
+    %$\mathcal{I}_T$ is the full information set.
+%\end{enumerate}
+
+%In both of these tasks, we see why the Kalman Filter is not enough.
+%Specifically, we shouldn't simply simulate a path
+%$\{\tilde{s}_1,\ldots,\tilde{s}_T\}$ by drawing $\tilde{s}_1$ from
+%$N(\mu_{1|1}, \Sigma_{1|1})$, then drawing $\tilde{s}_2$ from
+%$N(\mu_{2|2}, \Sigma_{2|2})$, and so on. That approach wouldn't account
+%for the correlation between successive draws of states (since
+%$\tilde{s}_1$ and $\tilde{s}_2$ are not independent). More precisely, we
+%want to draw paths from a sequence of \emph{conditional} distributions
+%of the states, not \emph{marginal} distributions that ignore
+%autocorrelation between states.
+
+%Second, Kalman Filter estimates of the state distributions don't use the
+%full information set.  The Kalman Filter proceeds from $t=1$ to $t=T$
+%without ever looking back and revising early estimates of
+%$\mu_{t|t}$ or $\Sigma_{t|t}$ for $t<T$ in light of later
+%information.
+
+%For all of these reasons, smoothing methods have been developed to solve
+%all of these problems, using the full information set $\mathcal{I}_T$ to
+%draw paths of the states and provide better estimates of the marginal
+%means and variances.
+
+%\subsection{The Key Conditional Distribution in Smoothing}
+%\label{sec:smoothresult}
+
+%Just as the normal-erros Kalman Filter used the result about conditional
+%distributions for MVN RV's (detailed in Appendix~\ref{sec:mvncond}),
+%we'll again apply this result in the context of smoothing under Gaussian
+%disturbances. Only now, we'll think about the effect that knowing the
+%future state $s_{t+1}$ has on our estimate of $s_t$, consistent with our
+%desire to do ``backward'' revisions/updates of the states.
+
+%From the forecast step in the Kalman filter procedure, we can fill in
+%almost everything we need, having already computed most objects of
+%interest:
+%\begin{equation}
+  %\label{smoothsetup}
+  %\left. \begin{bmatrix} s_t \\ s_{t+1} \end{bmatrix} \;\right\rvert
+  %\mathcal{I}_t
+  %\sim N\left(
+  %\begin{bmatrix} \mu_{t|t} \\ T\mu_{t|t} \end{bmatrix},
+  %\begin{bmatrix} \Sigma_{t|t} & \cdot \\
+                  %\cdot & T\Sigma_{t|t} T'+R \end{bmatrix},
+  %\right)
+%\end{equation}
+%Only the correlation between $s_t$ and $s_{t+1}$ remains to compute:
+%\begin{align*}
+  %E\left[(s_t-\mu_{t|t})(s_{t+1}-T\mu_{t|t})' | \mathcal{I}_t\right] &=
+    %E\left[(s_t-\mu_{t|t})(Ts_t + R\varepsilon_{t+1}-T\mu_{t|t})' |\;
+      %\mathcal{I}_t\right] \\
+  %\text{Distributing} \qquad
+    %&= E\left[(s_t-\mu_{t|t})(Ts_t -T\mu_{t|t})' |\;
+      %\mathcal{I}_t\right]
+    %+ E\left[(s_t-\mu_{t|t})(R\varepsilon_{t+1})' |\;
+      %\mathcal{I}_t\right] \\
+  %&= E\left[(s_t-\mu_{t|t})(s_t -\mu_{t|t})' |\;
+      %\mathcal{I}_t\right] T' \\
+    %&\qquad
+    %+ E\left[s_t\varepsilon_{t+1}' |\;
+      %\mathcal{I}_t\right] R'
+    %+ \mu_{t|t}\left(E\left[\varepsilon_{t+1}' |\;
+      %\mathcal{I}_t\right]\right)R' \\\\
+  %\Rightarrow\quad \text{Cov}(s_t, s_{t+1}|\; \mathcal{I}_t)
+      %&= \Sigma_{t|t}T'
+%\end{align*}
+%where the last two terms dropped because $s_t \perp \varepsilon_{t+1}$
+%and $E[\varepsilon_t]=0$ for all $t$.
+
+%Finally, now that we have filled out all of the terms in
+%Equation~\ref{smoothsetup}, we can use the result in
+%Appendix~\ref{sec:mvncond} to derive the conditional distribution that
+%represents the key relationship in smoothing given normal errors:
+%\begin{alignat}{3}
+  %&&\left. \begin{bmatrix} s_t \\ s_{t+1} \end{bmatrix} \;\right\rvert
+    %\mathcal{I}_t
+    %&\sim N\left(
+    %\begin{bmatrix} \mu_{t|t} \\ T\mu_{t|t} \end{bmatrix},
+    %\begin{bmatrix} \Sigma_{t|t} & \Sigma_{t|t}T' \\
+                    %T\Sigma_{t|t} & T\Sigma_{t|t} T'+R \end{bmatrix}
+    %\right) \notag\\\label{smoothresult}\\
+  %\Rightarrow \quad
+  %%\mu_{t|T} :=
+  %&&E[s_t|s_{t+1}, \mathcal{I}_t] &=
+      %\mu_{t|t} + \Sigma_{t|t}T'\left(T\Sigma_{t|t} T'+R\right)^{-1}
+      %(s_{t+1}-T\mu_{t|t}) \notag\\
+  %%\Sigma_{t|T} :=
+  %&&\text{Var}\left(s_t|s_{t+1},\mathcal{I}_t\right)
+    %&= \Sigma_{t|t} - \Sigma_{t|t}T' \left(T\Sigma_{t|t} T'+R\right)^{-1}
+      %T\Sigma_{t|t}
+  %\notag
+%\end{alignat}
+%We'll come back to this recursive relationship in subsequent sections as
+%we draw from the full posterior distribution of the states.
+
+
+%\subsection{Simplifying the Joint Posterior of States}
+
+%Throughout this section, recall that our goal is to draw from the
+%posterior distribution of states
+%\begin{equation}
+  %p(s_{0:T}|\theta, y_{1:T})
+%\end{equation}
+%We will do this in a sequnce of steps:
+%\begin{enumerate}
+  %\item First, we can break this joint probability up into a product of
+    %conditionals:
+    %\begin{equation}
+      %\label{key2}
+      %p(s_{0:T}|y_{1:T},\theta) =
+      %\left[ \prod_{t=0}^{T-1} p(s_t|s_{t+1:T},y_{1:T},\theta) \right]
+      %p(s_T|y_{1:T},\theta)
+    %\end{equation}
+  %\item Next, we simplify further by recognizing that,
+    %$p(s_t|s_{t+1:T},y_{1:T},\theta) = p(s_t|s_{t+1:T},y_{1:t},\theta)$.
+    %That is because, conditional on future states $s_{t+1:T}$ and past
+    %data $y_{1:t}$, future observations $y_{t+1:T}$ provide no
+    %additional information about $s_t$:
+    %\begin{align*}
+      %y_{t+i} &= M s_{t+i} + \eta_{t+i}
+      %\quad \text{with } \eta_{t+i} \perp \{\varepsilon_0, \ldots,
+      %\varepsilon_t\} \qquad \forall \; i \geq 1 \\
+      %\Rightarrow\qquad
+      %p(s_t|s_{t+1:T},y_{1:T},\theta)
+      %&= p(s_t|s_{t+1:T},y_{1:t},\theta)
+    %\end{align*}
+    %That allows us to write Equation~\ref{key2} as
+    %\begin{equation}
+      %p(s_{0:T}|y_{1:T},\theta) =
+      %\left[ \prod_{t=0}^{T-1} p(s_t|s_{t+1:T},y_{1:t},\theta) \right]
+      %p(s_T|y_{1:T},\theta)
+    %\end{equation}
+  %\item Lastly, we can simplify again by recognizing that
+    %$p(s_t|s_{t+1}, y_{1:t},\theta) = p(s_t|s_{t+1:T},y_{1:t},\theta)$.
+    %Conditional on past data $y_{1:t}$ and the next state $s_{t+1}$, the
+    %entire future sequence of states $s_{t+2:T}$ provides no additional
+    %information about $s_t$.  To see this, first note that
+    %\begin{align}
+      %s_{t+1+i} = T^i s_{t+1} + \sum^i_{j=1} T^{i-j} R \varepsilon_{t+1+j}
+      %\qquad \forall \; i \geq 1
+      %\label{st1i}
+    %\end{align}
+    %We want to show that for all $i\geq1$, conditional on $s_{t+1}$ and
+    %$y_{1:t}$, the states $s_{t+1+i}$ and $s_t$ are independent.  Since
+    %everything is Guassian, it suffices to prove merely that
+    %$s_{t+1+i}|s_{t+1},y_{1:t}$ and $s_t|s_{t+1},y_{1:t}$ are
+    %uncorrelated.  So let's try that approach and write the
+    %conditional covariance matrix:
+    %\begin{align*}
+      %&E\left\{
+        %\left(s_t - E[s_t|s_{t+1},y_{1:t}]\right)
+        %\left(s_{t+1+i} - E[s_{t+1+i}|s_{t+1},y_{1:t}]\right)'
+        %| s_{t+1},y_{1:t}
+      %\right\}  \\
+      %\text{By~\ref{st1i}}
+      %&\quad\qquad =
+      %E\left\{\left.
+        %\left(s_t - E[s_t|s_{t+1},y_{1:t}]\right)
+        %\left(\sum^i_{j=1} T^{i-j} R \varepsilon_{t+1+j}\right)'
+        %\right\rvert s_{t+1},y_{1:t}
+      %\right\}  \\
+      %&\quad\qquad =
+      %E\left\{\left.
+        %\zeta_t
+        %\left(\sum^i_{j=1} T^{i-j} R \varepsilon_{t+1+j}\right)'
+        %\right\rvert s_{t+1},y_{1:t}
+      %\right\} \\\\
+      %&\text{where }
+      %\zeta_t :=  \left(s_t - E[s_t|s_{t+1},y_{1:t}]\right)
+    %\end{align*}
+    %But we can deduce the distribution of $\zeta_t | s_{t+1}, y_{1:t}$
+    %from work we did in Section~\ref{sec:smoothresult}, recalling
+    %Result~\ref{smoothresult} in particular:
+    %\begin{equation}
+      %\zeta_t| s_{t+1}, y_{1:t}\sim
+      %N(0, \Sigma_{t|t} - \Sigma_{t|t}T'
+           %\left(T\Sigma_{t|t} T'+R\right)^{-1} T\Sigma_{t|t})
+    %\end{equation}
+    %Now note that the distribution of $\zeta_t$ is only a function of
+    %$\Sigma_{t|t}$, which is independent of past realized values
+    %$y_{1:t}$. Moreover,
+
+%\end{enumerate}
+
+
+%\clearpage
+%\subsection{Just the Equations}
+
+%Bare bones section that just collects equations in one place. Assumes
+%linear state space models of form
+%\begin{align}
+  %\text{Transition:} \quad
+    %s_{t} &= C(\theta) + T(\theta) s_{t-1}
+    %+ R(\theta)\varepsilon_{t}\
+    %\quad \mathbb{E}[\varepsilon_t] = 0
+    %\quad \mathbb{E}[\varepsilon_t \varepsilon'_t] =  Q(\theta) \\
+  %\text{Measurement:} \quad
+    %y_{t} &= D(\theta) + M(\theta) s_{t} + \eta_{t}
+    %\qquad\qquad \mathbb{E}[\eta_t] =  0
+    %\quad \mathbb{E}[\eta_t \eta'_t] =  H(\theta)
+%\end{align}
+
+
+%\subsection{Kalman Filter under Normal Errors}
+
+%Forecast step, given $\mu_{t|t-1}$ and $\Sigma_{t|t-1}$:
+%\begin{alignat*}{3}
+  %\mu_{t|t-1} &= C + T\mu_{t-1|t-1} \\
+  %\Sigma_{t|t-1} &= T\Sigma_{t-1|t-1}T' + RQR'
+%\end{alignat*}
+%Filtering step:
+%\begin{alignat}{3}
+  %\mu_{t|t}
+    %&= \mu_{t|t-1} + \Sigma_{t|t-1} M'
+    %\left(M\Sigma_{t|t-1}M' + H\right)^{-1} (y_t-D-M\mu_{t|t-1}) \notag\\
+  %\Sigma_{t|t}
+    %&= \Sigma_{t|t-1} - \Sigma_{t|t-1}M'
+    %\left(M\Sigma_{t|t-1}M' + H\right)^{-1} M\Sigma_{t|t-1} \notag
+%\end{alignat}
+
+
+%\subsection{Conditional Distributions with Normal Errors}
+%\label{sec:mvncond}
+
+%Suppose that there is a multivariate normal random variable $Z$---a
+%vector that can be partitioned into two pieces and written
+%\[
+  %Z \sim N(\mu, \Sigma) \quad\Leftrightarrow\quad
+  %\begin{bmatrix} Y \\ X \end{bmatrix}
+  %\sim
+  %N\left(\begin{bmatrix} \mu_Y \\ \mu_X \end{bmatrix},
+  %\begin{bmatrix} \Sigma_{YY} & \Sigma_{YX} \\
+  %\Sigma_{XY} & \Sigma_{XX} \end{bmatrix}
+  %\right)
+%\]
+%Then the distribution of $Y$ given $X$ is
+%\begin{align}
+  %Y | X \sim &N(\hat{\mu}, \hat{\Sigma})  \notag\\
+  %\label{reg} \\
+  %\text{where} \quad
+  %\hat{\mu} = \mu_Y + \Sigma_{YX} \Sigma^{-1}_{XX}
+  %(X_X-\mu_X)  & \quad \quad
+  %\hat{\Sigma} = \Sigma_{YY} - \Sigma_{YX} \Sigma^{-1}_{XX}
+    %\Sigma_{XY}
+  %\notag
+%\end{align}
+
+%\paragraph{Intuition}
+%Consider the case where $Y$ and $X$ are scalars, not vectors. Then we
+%see in the second term of the sum for $\hat{\mu}$ that an above-average
+%realization of $X$ will lead us to \emph{upwardly} revise a purely
+%unconditional forecast of $Y$ above the mean $\mu_Y$ (provided
+%$\Sigma_{YX}>0$, otherwise we revise down).
+
+%In addition, provided that the correlation $\Sigma_{YX} = \Sigma_{XY}$
+%is non-zero, we will revise \emph{down} the variance of $Y$ relative to
+%the baseline of $\Sigma_{YY}$. This follows because the observation of
+%$X$ has provided valuable information about $X$.
+
+
+%\paragraph{The Normality Assumption}
+%Consider your basic regression with
+%\begin{align}
+  %\label{regex}
+  %Y_i = \alpha + \beta X_i + \varepsilon_t
+%\end{align}
+%In Intro Stat, any discussion of regression analysis starts by assuming
+%that the errors, $\varepsilon_t$, are normally distributed, which is
+%equivalent to assuming that $Y_i$ and the regressors in $X_i$ are,
+%together, jointly normally distributed---i.e.  $\begin{bmatrix} Y_i &
+  %X^T_i \end{bmatrix}^T$ is  multivariate normal.
+
+%Then, if you get to intermediate Stat, your professor starts to retreat
+%on the normality assumptions. In particular, you learn that it doesn't
+%have to be the case that the variables are, in fact, jointly normally
+%distributed. It could just be that you want the best \emph{linear
+%predictor} of $Y_i$ given $X_i$. In that case, you care about regression
+%estimates only because they provide the best linear approximation of the
+%conditional expectation function, $E[Y_i|X_i]$. Alternatively, you might
+%also hear that linear regression gives the best linear ``projection'' of
+%$Y_i$ onto $X_i$.
+
+%Well, that's our ticket. If you look at Result~\ref{reg}, you'll notice
+%that we're getting a kind of \emph{regression estimate} of $Y$ given
+%$X$. To be even more explicit, we might write
+%\[
+  %E[Y|X] = \mu_Y + \beta (X - \mu_X)
+%\]
+%where $\beta= \Sigma_{YX}\Sigma^{-1}_{XX}$. This is just like
+%Regression~\ref{regex} above, only here, we regress \emph{vector} (not
+%scalar) $Y$ on vector $X$. However, the intuition remains the same.
+
+%Therefore, Kalman Filter estimates that assume normally distributed
+%errors are not as nefarious as they seem. Since Kalman Filter estimates
+%of the states under the normality assumption will follow directly from
+%Result~\ref{reg} above (as we will see in the next subsection), we can
+%motive the Kalman Filter with normal errors by framing it as a recursive
+%procedure to find the best \emph{linear estimates} or \emph{projection
+%estimates} of the states.
+
+
+
+%\subsection{Woodbury Matrix Identity}
+
+%For matrices $A$, $U$, $C$, and $V$:
+%\begin{equation}
+    %(A+UCV)^{-1} = A^{-1} - A^{-1} U(C^{-1} + VA^{-1}U)^{-1}
+	%VA^{-1}
+%\end{equation}
+%Now consider the special case we have above with the
+%Kalman filter:
+%\begin{equation}
+    %\label{special}
+    %(A + V'CV)^{-1} = A^{-1} - A^{-1} V'(C^{-1} + VA^{-1}V')^{-1}
+	%VA^{-1}
+%\end{equation}
+
+%\subsection{Derivation of the Mean}
+
+%Recall what we want to show.  For $\hat{x}_F \equiv Z$, we want
+%to show that
+%\begin{align*}
+    %(\Sigma^{-1} \hat{x} + G'R^{-1}y)
+	%&= \left( \Sigma^{-1} + G'R^{-1}G\right) Z \\
+    %\Rightarrow
+    %\hat{x}_F = Z
+        %&= \hat{x}
+        %+ \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+        %\left( y - G \hat{x} \right)
+%\end{align*}
+%And so we solve this equation by using the Woodbury matrix
+%identity representation from above:
+%\begin{align*}
+    %(\Sigma^{-1} \hat{x} + G'R^{-1}y) &=
+	%\left( \Sigma^{-1} + G'R^{-1}G\right) Z \\
+    %\Rightarrow \quad Z &=
+	%\left( \Sigma^{-1} + G'R^{-1}G\right)^{-1}
+	%(\Sigma^{-1} \hat{x} + G'R^{-1}y) \\
+    %Z &=
+	%\left( \Sigma - \Sigma G'(R
+	%+ G\Sigma G')^{-1}
+	%G\Sigma\right) \left(\Sigma^{-1} \hat{x}
+	%+ G'R^{-1}y\right)
+%\end{align*}
+%Now let's simplify $\hat{x}_F = Z$ a bit,
+%expanding out the multiplication:
+%\begin{align*}
+    %\hat{x}_F = Z &=
+	%\left( \Sigma - \Sigma G'(R
+	%+ G\Sigma G')^{-1}
+	%G\Sigma\right) \left(\Sigma^{-1} \hat{x}
+	%+ G'R^{-1}y\right) \\
+    %\text{FOIL} \quad &= \hat{x} + \Sigma G' R^{-1} y -
+	%\left[\Sigma G' (R + G \Sigma G')^{-1} G \Sigma\right]
+	%\left[ \Sigma^{-1} \hat{x} \right]  \\
+    %&\qquad - \left[\Sigma G' (R+ G \Sigma G')^{-1}G\Sigma \right]
+	%\left[G' R^{-1} y \right] \\
+    %\text{Simpify} \quad &= \hat{x} + \Sigma G' R^{-1} y -
+	%\left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+	%\left( G \hat{x} \right)  \\
+    %&\qquad - \Sigma G' (R+ G \Sigma G')^{-1}G\Sigma
+	%G' R^{-1} y  \\
+    %\text{Change Order} \quad &= \hat{x}
+	%- \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+	%\left( G \hat{x} \right)  \\
+    %&\qquad
+	%+ \Sigma G'  R^{-1} y
+	%- \Sigma G' (R+ G \Sigma G')^{-1}G\Sigma
+	%G' R^{-1} y \\
+    %\text{Regroup} \quad &= \hat{x}
+	%- \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+	%\left( G \hat{x} \right)  \\
+    %&\qquad
+	%+ \Sigma G'  \left\{ R^{-1}
+	%-  (R+ G \Sigma G')^{-1}G\Sigma
+	%G' R^{-1} \right\} y
+%\end{align*}
+%Okay, now let's take a breather.  We'll make this a bit
+%easier on ourselves, and just consider simplifying the guy
+%in the brackets, $\{\}$ by using
+%$A^{-1} A = I$ with a very special choice of $A$:
+%\begin{align*}
+    %\left\{ R^{-1}  -  (R+ G \Sigma G')^{-1}G\Sigma
+	%G' R^{-1} \right\}   &=
+	%(R+ G \Sigma G')^{-1} (R+ G \Sigma G') R^{-1}  \\
+    %&\qquad -  (R+ G \Sigma G')^{-1}G\Sigma
+	%G' R^{-1} \\
+    %\text{Group} \quad &=   (R+ G \Sigma G')^{-1} \left[ (R+ G \Sigma G') R^{-1}
+	%-  G\Sigma   G' R^{-1}\right] \\
+    %\text{Distribute} \quad &=   (R+ G \Sigma G')^{-1} \left[ RR^{-1}
+	%+ G \Sigma G'R^{-1} -  G\Sigma   G' R^{-1}\right] \\
+    %\text{Simplify} \quad &=   (R+ G \Sigma G')^{-1} \left[ I
+	%+ 0\right] \\
+    %&=   (R+ G \Sigma G')^{-1}
+%\end{align*}
+%Substituting back in above for the term in braces,
+%$\{\}$, we get the following expression
+%for $Z = \hat{x}_F$:
+%\begin{align}
+    %\hat{x}_F = Z &= \hat{x}
+	%- \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+	%\left( G \hat{x} \right)
+	%+ \Sigma G'  (R+ G \Sigma G')^{-1} y \notag \\
+    %&= \hat{x}
+	%+ \left[\Sigma G' (R + G \Sigma G')^{-1}  \right]
+	%\left( y - G \hat{x} \right)
+%\end{align}
 
 
 
