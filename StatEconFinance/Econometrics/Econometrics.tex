@@ -11704,24 +11704,24 @@ to refer to the whole sample $\{\bsy_n\}\nN$.
 
 Finally, when we talk about maximum likelihood, we suppose that the
 sample $\bsy_{1:N}$ is drawn from the \emph{true} joint likelihood
-function $f(\bsy_{1:N}|\bstheta)$ which uses the true parameter value
+function $p(\bsy_{1:N}|\bstheta)$ which uses the true parameter value
 $\bstheta$. In the special case of an iid sample, the individual
-$\bsy_n$ are drawn from true likelihood $f(\bsy_n|\bstheta)$ which
+$\bsy_n$ are drawn from true likelihood $p(\bsy_n|\bstheta)$ which
 implies joint likelihood
-$f(\bsy_{1:N}|\bstheta)=\prod\nN f(\bsy_n|\bstheta)$.
+$p(\bsy_{1:N}|\bstheta)=\prod\nN p(\bsy_n|\bstheta)$.
 
 Of course, we often don't know the true parameter value $\bstheta$ (or,
 by implication, the true likelihood), though we will typically assume
-that we know the functional form $f(\bsy_n|\bstildetheta)$, called
+that we know the functional form $p(\bsy_n|\bstildetheta)$, called
 simply the \emph{likelihood} function (ditching the ``true'' modifier).
 We sometimes restrict $\bstildetheta$ to lie in some subspace
 $\bsTheta\subseteq\R^p$ to implement nonnegativity constraints or other
 parameter resrictions---though in principle, $\bsTheta$ could be all of
 $\R^P$). Therefore, we will think of
-$\{f(\bsy_n|\bstildetheta)\}_{\bstildetheta\in\bsTheta}$ as a family of
+$\{p(\bsy_n|\bstildetheta)\}_{\bstildetheta\in\bsTheta}$ as a family of
 possible true likelihoods. The goal of maximum likelihood estimation
 (MLE) will be to use the sample $\bsy_{1:N}$ to find the correct
-likelihood in that family, $f(\bsy_n|\bstheta)$.
+likelihood in that family, $p(\bsy_n|\bstheta)$.
 
 \begin{defn}(Estimator and Estimate)
 An \emph{estimator} $\bshattheta$ of parameter $\bstheta$ is a function
@@ -11762,23 +11762,22 @@ estimation that provide good estimators.
 
 \subsubsection{Loss and Risk}
 
-In this section, we again consider the quality of estimators.  The key
+In this section, we again consider the quality of estimators. The key
 concepts are \emph{loss} which defines a quantitative penalty for poor
-estimates, and \emph{risk} which characterizes expected loss---an
-average of the loss using some suitable weighting function. Computing
-risk (expected loss) can be carried out in a few different ways, but all
-of them involve averaging the loss with some weighting function (that
-will differ depending upon the particular definition of risk) to arrive
-at expected loss. Of course, computing risk requires choice of a loss
-function, and there are many possible loss functions that an
-econometrician could reasonably use. We will see a few examples.
+estimates, and \emph{risk} which characterizes average/expected loss.
+To compute risk, we must choose a particular loss function---ideally
+tailored to our underlying economic application, though standard choices
+are often used in practice---along with a specific weighting function to
+use when averaging over this loss function. We present two particular
+notions of risk, which correspond to different choices of weighting
+function.
 
 \begin{defn}(Loss Function)
-The \emph{loss function} $L(\bshattheta,\bstheta)$ is a function that
-maps the true parameter value $\bstheta$ and an estimate $\bshattheta$
-into negative utility. It returns the ``loss''---a number---quantifying
-how bad it was to use $\bshattheta$ when the true value was $\bstheta$.
-We can think of it as a penalty function.
+The \emph{loss function} $L(\bshattheta,\bstheta)$ is a function mapping
+true parameter value $\bstheta$ and estimate $\bshattheta$ into negative
+utility. It returns ``loss''---a number---quantifying how bad it was to
+use $\bshattheta$ when the true value was $\bstheta$. It's a penalty
+function.
 \end{defn}
 
 \begin{defn}{(Classical or Frequentist Risk Function)}
@@ -11790,46 +11789,44 @@ Given loss function $L(\bshattheta,\bstheta)$, the \emph{classical} or
 \end{align*}
 where $\E_{\bsy|\bstheta}$ indicates that the expectation is taken over
 realizations of $\bsy_{1:N}$ generated from true likelihood
-$f(\bsy_{1:N}|\bstheta)$.
-The loss tells us the penalty or negative utility \emph{given} an
-estimate $\bshattheta$ and the true value $\bstheta$. But an estimate
-$\bshattheta$ is a random variable that depends on the sample.
-So by averaging over sample draws of $\bsy_{1:N}$ (generated from true
-$\bstheta$), we are indirectly averaging over the values $\bshattheta$
-takes on to compute the risk.
+$p(\bsy_{1:N}|\bstheta)$.
+Loss tells us the penalty or negative utility \emph{given} estimate
+$\bshattheta$ and true value $\bstheta$. But an estimate $\bshattheta$
+is an RV that depends on the sample.
+So by averaging over sample draws of $\bsy_{1:N}$ (generated with true
+$\bstheta$), we are computing risk by indirectly averaging over the
+values $\bshattheta$ takes on.
 
-The ``Classical'' and ``Frequentist'' qualifiers follow from the fact
-that $R(\bshattheta,\bstheta)$ does not integrate over different values
-that $\bstheta$ can take on since frequentists want to treat $\bstheta$
-as a fixed constant, not a random variable.
+The ``Classical'' and ``Frequentist'' qualifiers follow because
+$R(\bshattheta,\bstheta)$ does not integrate over different values that
+$\bstheta$ can take on since frequentists treat $\bstheta$ as fixed, not
+an RV.
 \end{defn}
 
 \begin{ex}(Quadratic Loss and Mean Squared Error)
 Often, a good loss function is the \emph{quadratic loss} function
+with associated \emph{mean squared error} risk:
 \begin{align*}
   L(\bshattheta,\bstheta) = (\bshattheta-\bstheta)^2
-\end{align*}
-which penalizes more steeply the further away you are from the true
-value. It has associated \emph{mean squared error} risk:
-\begin{align*}
-  R(\bshattheta,\bstheta) = \E_{\bsy|\bstheta}[(\bshattheta-\bstheta)^2]
+  \qquad
+  R(\bshattheta,\bstheta)
+  = \E_{\bsy|\bstheta}[(\bshattheta-\bstheta)^2]
 \end{align*}
 \end{ex}
 
-\clearpage
 \begin{defn}(Average or Bayes Risk)
 \label{defn:bayesrisk}
-Given a prior distribution $w(\bstheta)$ for parameter $\bstheta$, the
-\emph{Average} or \emph{Bayes risk} denoted $r(\bshattheta)$ averages
-the classical or frequentist risk over the values of $\bstheta$, weighted
-by $w(\bstheta)$:
+Given a prior $w(\bstheta)$ for $\bstheta$, the \emph{Average} or
+\emph{Bayes risk} denoted $r(\bshattheta)$ averages
+classical/frequentist risk over the values of $\bstheta$, weighted by
+$w(\bstheta)$:
 \begin{align*}
   r(\bshattheta)
   = \int R(\bshattheta,\bstheta) w(\bstheta) \; d\bstheta
   = \E_{\bstheta}\big[ R(\bshattheta,\bstheta)\big]
 \end{align*}
-Note that we can express that a few different ways in terms of
-expectation operators, all of which offer different type of intuition:
+Note we can express that a few different, all of which offer different
+type of intuition:
 \begin{align*}
   r(\bshattheta)
   = \E_{\bstheta}\big[ R(\bshattheta,\bstheta)\big]
@@ -11853,6 +11850,7 @@ In general, different priors or $w(\bstheta)$ functions give
 different Bayes risk estimates.
 %Choose wisely.
 \end{rmk}
+\clearpage
 
 \begin{defn}{(Posterior Risk or Posterior Expected Loss)}
 This is the expected loss conditional on a sample realization:
@@ -12039,7 +12037,7 @@ An estimator is \emph{unbiased} if
   %\underbrace{\int \cdots \int}_{n\; times}
   \int
     \bshattheta(\bsy_{1:N}) \;
-    f(\bsy_{1:N}|\bstheta) \; d\bsy_{1:N} = \bstheta
+    p(\bsy_{1:N}|\bstheta) \; d\bsy_{1:N} = \bstheta
 \end{align*}
 The \emph{bias} is defined as
 \begin{align*}
@@ -12082,22 +12080,22 @@ call the estimator \emph{$\sqrt{N}$-consistent}.
 \clearpage
 \subsubsection{Score and Information}
 
-More on notation. In this section, $f(\bsy|\bstildetheta)$ for
+More on notation. In this section, $p(\bsy|\bstildetheta)$ for
 $\bstildetheta\in\bsTheta$ is the likelihood function as a function of
-$\bstildetheta$, while $f(\bsy|\bstheta)$ is the true likelihood
+$\bstildetheta$, while $p(\bsy|\bstheta)$ is the true likelihood
 function.  To avoid clutter, this notation will be used as shorthand to
 refer to either the \emph{joint} likelihood
-$f(\bsy_{1:N}|\bstildetheta)$ or the likelihood of a single observation
-$f(\bsy_n|\bstildetheta)$.  So it should be understood that $\bsy$ is
+$p(\bsy_{1:N}|\bstildetheta)$ or the likelihood of a single observation
+$p(\bsy_n|\bstildetheta)$.  So it should be understood that $\bsy$ is
 either a single observation or a sample of $N$ observations.  But this
 section is about likelihood functions, not about samples. So the results
-hold whether $f(\bsy|\bstildetheta)$ is the likelihood function for a
+hold whether $p(\bsy|\bstildetheta)$ is the likelihood function for a
 single draw or the joint likelihood for a sample draw.
 
 Again, data is generated according to a \emph{true likelihood} function
-$f(\bsy|\bstheta)$. Hence expectations involving functions of $\bsy$
+$p(\bsy|\bstheta)$. Hence expectations involving functions of $\bsy$
 should be computed using the true likelihood function
-$f(\bsy|\bstheta)$, which is why we will explicitly write
+$p(\bsy|\bstheta)$, which is why we will explicitly write
 $\E_{\bsy|\bstheta}[\;\cdot\;]$ whenever we have to compute expectations
 below.
 
@@ -12110,7 +12108,7 @@ The score function $\bsS(\bstildetheta,\bsy)$ is the derivative of the
 log-likelihood function with respect to $\bstildetheta$:
 \begin{align}
   \bsS(\bstildetheta,\bsy) &:=
-  \frac{\partial \ln f(\bsy|\bstildetheta)}{\partial \bstildetheta}
+  \frac{\partial \ln p(\bsy|\bstildetheta)}{\partial \bstildetheta}
   \label{score1}
 \end{align}
 By the above definition, we can simplify the derivative of the log and
@@ -12118,15 +12116,15 @@ write
 \begin{align}
   \bsS(\bstildetheta,\bsy)
   &=
-  %\frac{\partial \ln f(\bsy|\bstildetheta)}{\partial \bstildetheta}
+  %\frac{\partial \ln p(\bsy|\bstildetheta)}{\partial \bstildetheta}
   %=
-  \frac{1}{f(\bsy|\bstildetheta)}
-  \frac{\partial f(\bsy|\bstildetheta)}{\partial \bstildetheta}
+  \frac{1}{p(\bsy|\bstildetheta)}
+  \frac{\partial p(\bsy|\bstildetheta)}{\partial \bstildetheta}
   \label{score2} \\
   \implies\quad
-  f(\bsy|\bstildetheta) \cdot \bsS(\bstildetheta,\bsy)
+  p(\bsy|\bstildetheta) \cdot \bsS(\bstildetheta,\bsy)
   &=
-  \frac{\partial f(\bsy|\bstildetheta)}{\partial \bstildetheta}
+  \frac{\partial p(\bsy|\bstildetheta)}{\partial \bstildetheta}
   \label{score3}
 \end{align}
 Since the score depends upon random variable $\bsy$, the score function
@@ -12155,7 +12153,7 @@ $\E_{\bsy|\bstheta}[\bsS(\bstheta,\bsy)]=\bso$.
 Start with an identity that holds for any $\bstildetheta$ (whether it
 equals $\bstheta$ or not):
 \begin{align*}
-  1 &= \int f(\bsy|\bstildetheta) \; d\bsy
+  1 &= \int p(\bsy|\bstildetheta) \; d\bsy
 \end{align*}
 Provided the support doesn't depend upon $\bstildetheta$, differentiate
 with respect to $\bstildetheta$ and take the derivative operator inside:
@@ -12165,43 +12163,43 @@ with respect to $\bstildetheta$ and take the derivative operator inside:
   &=
   \frac{d}{d\bstildetheta}
   \left[
-    \int f(\bsy|\bstildetheta) \; d\bsy
+    \int p(\bsy|\bstildetheta) \; d\bsy
   \right] \\
   \iff\qquad
   \bso
   &=
-  \int \frac{df(\bsy|\bstildetheta)}{d\bstildetheta}  \; d\bsy
+  \int \frac{dp(\bsy|\bstildetheta)}{d\bstildetheta}  \; d\bsy
 \end{align*}
 Now use Equation~\ref{score3} from above to substitute in for the
 partial derivative term:
 \begin{align}
-  \bso &= \int \bsS(\bstildetheta,\bsy)\cdot f(\bsy|\bstildetheta)
+  \bso &= \int \bsS(\bstildetheta,\bsy)\cdot p(\bsy|\bstildetheta)
   \; d\bsy
   \label{trueonly}
 \end{align}
 If we evaluate this at the true $\tilde{\theta}=\theta$, then
 \begin{align*}
-  \bso &= \int \bsS(\bstheta,\bsy)\cdot f(\bsy|\bstheta) \; d\bsy
+  \bso &= \int \bsS(\bstheta,\bsy)\cdot p(\bsy|\bstheta) \; d\bsy
 \end{align*}
 But then just identify the integral as
 \begin{align*}
-  \bso &= \int \bsS(\bstheta,\bsy)\cdot f(\bsy|\bstheta) \; d\bsy
+  \bso &= \int \bsS(\bstheta,\bsy)\cdot p(\bsy|\bstheta) \; d\bsy
   = \E_{\bsy|\bstheta}\big[\bsS(\bstheta,\bsy)\big]
 \end{align*}
 \end{proof}
 \begin{rmk}
 It's important that this works \emph{only} if we evaluate the score at
 the true value $\bstildetheta=\bstheta$ because the data $\bsy$ are
-generated by \emph{true} likelihood function $f(\bsy|\bstheta)$.
+generated by \emph{true} likelihood function $p(\bsy|\bstheta)$.
 %Therefore, the expectation of the score function is
 %\begin{align*}
   %\E_{\bsy|\bstheta}\big[\bsS(\bstildetheta,\bsy)\big]
-  %= \int \bsS(\bstildetheta,\bsy) \cdot f(\bsy|\bstheta) \; d\bsy
+  %= \int \bsS(\bstildetheta,\bsy) \cdot p(\bsy|\bstheta) \; d\bsy
 %\end{align*}
 In the key step in the proof, Equation~\ref{trueonly}, to get the
 integral to be the corresponding integral for
 $\E_{\bsy|\bstheta}[\;\cdot\;]$, we had to choose
-$\bstildetheta=\bstheta$ so that the likelihood was $f(\bsy|\bstheta)$.
+$\bstildetheta=\bstheta$ so that the likelihood was $p(\bsy|\bstheta)$.
 But that choice of $\bstildetheta$ also had to apply to the score
 function $\bsS(\bstheta,\bsy)$. So we only get the ``expectation equals
 zero'' result if $\bstildetheta=\bstheta$.
@@ -12217,7 +12215,7 @@ The \emph{information} is defined
   \right]
   =
   -\E_{\bsy|\bstheta}\left[
-    \frac{\partial^2 \ln f(\bsy|\bstheta)}{%
+    \frac{\partial^2 \ln p(\bsy|\bstheta)}{%
       \partial\bstildetheta\;\partial\bstildetheta'}
   \right]
 \end{align*}
@@ -12266,10 +12264,10 @@ Differentiate with respect to $\bstildetheta$ again:
   \int
   \left[
   \frac{\partial \bsS(\bstildetheta,\bsy)}{\partial\bstildetheta'}
-  f(\bsy|\bstildetheta)
+  p(\bsy|\bstildetheta)
   +
   \bsS(\bstildetheta,\bsy)
-  \frac{\partial f(\bsy|\bstildetheta)}{\partial\bstildetheta'}
+  \frac{\partial p(\bsy|\bstildetheta)}{\partial\bstildetheta'}
   \;
   d\bsy
   \right]
@@ -12279,11 +12277,11 @@ Differentiate with respect to $\bstildetheta$ again:
   \bso &=
   \int
   \frac{\partial \bsS(\bstildetheta,\bsy)}{\partial\bstildetheta'}
-  f(\bsy|\bstildetheta)
+  p(\bsy|\bstildetheta)
   \; d\bsy
   +
   \int
-  \bsS(\bstildetheta,\bsy)\bsS(\bstildetheta,\bsy)' f(\bsy|\bstildetheta) \;
+  \bsS(\bstildetheta,\bsy)\bsS(\bstildetheta,\bsy)' p(\bsy|\bstildetheta) \;
   d\bsy
 \end{align*}
 Now evaluate these expressions at the true value,
@@ -12292,11 +12290,11 @@ $\bstildetheta=\bstheta$:
   \bso &=
   \int
   \frac{\partial \bsS(\bstheta,\bsy)}{\partial\bstildetheta'}
-  f(\bsy|\bstheta)
+  p(\bsy|\bstheta)
   \; d\bsy
   +
   \int
-  \bsS(\bstheta,\bsy)\bsS(\bstheta,\bsy)' f(\bsy|\bstheta) \;
+  \bsS(\bstheta,\bsy)\bsS(\bstheta,\bsy)' p(\bsy|\bstheta) \;
   d\bsy
   \\
   \iff\quad
@@ -12364,7 +12362,7 @@ semidefinite matrix.
 Let $\bshattheta$ be any unbiased estimator of $\bstheta$, i.e.\ it
 satisfies
 \begin{align*}
-  \bstheta = \int \bshattheta f(\bsy|\bstheta) \; d\bsy
+  \bstheta = \int \bshattheta p(\bsy|\bstheta) \; d\bsy
 \end{align*}
 Next, note that $\bshattheta$ is a function/mapping from sample
 observations to a vector in $\R^P$. Though the data generating process
@@ -12381,11 +12379,11 @@ we get
   &=
   \frac{\partial}{\partial\bstheta'}
   \left[
-  \int \bshattheta f(\bsy|\bstheta) \; d\bsy
+  \int \bshattheta p(\bsy|\bstheta) \; d\bsy
   \right]
   \\
   \bsI_P
-  &= \int \bshattheta \bsS(\bstheta,\bsy)' f(\bsy|\bstheta)\; d\bsy \\
+  &= \int \bshattheta \bsS(\bstheta,\bsy)' p(\bsy|\bstheta)\; d\bsy \\
   \iff\quad
   \bsI_P
   &= \E\big[\bshattheta \bsS(\bstheta,\bsy)'\big]
@@ -12862,7 +12860,7 @@ To draw this distinction, we now contrast the density and the
 likelihood:
 \begin{enumerate}[label=(\roman*)]
   \item Given \emph{fixed}, \emph{known}, true parameter $\bstheta$,
-    $f(\bsy_{1:N}|\bstheta)$ is a \emph{density} function (of
+    $p(\bsy_{1:N}|\bstheta)$ is a \emph{density} function (of
     $\bsy_{1:N}$) that defines the data generating process.  Given that
     density, you can make probability statements about the distribution
     and expected realizations of sample $\bsy_{1:N}$ \emph{ex ante},
@@ -12874,7 +12872,7 @@ likelihood:
     treat our \emph{sample} as fixed, supposing that
     \emph{we have an already-realized sample} $\bsy_{1:N}$ but we don't
     know $\bstheta$.  We therefore think about
-    $f(\bsy_{1:N}|\bstildetheta)$ as a map from hypothetical
+    $p(\bsy_{1:N}|\bstildetheta)$ as a map from hypothetical
     $\bstildetheta$ to the the probability of
     \emph{having observed realized sample $\bsy_{1:N}$},
     given that $\bstildetheta$ was the true parameter vector all along.
@@ -12891,20 +12889,20 @@ properties, as we'll see below. But first, we have to define MLEs.
 
 \begin{defn}(Maximum Likelihood Estimator)
 Suppose we think that the joint likelihood of our sample $\bsy_{1:N}$
-has parameteric form $f(\bsy_{1:N}|\bstildetheta)$. Then the
+has parameteric form $p(\bsy_{1:N}|\bstildetheta)$. Then the
 \emph{maximum likelihood estimator} solves
 \begin{align}
   \bshattheta_{MLE}
   &=
-  \argmax_{\bstildetheta} f(\bsy_{1:N}|\bstildetheta)
+  \argmax_{\bstildetheta} p(\bsy_{1:N}|\bstildetheta)
   =
   \argmax_{\bstildetheta}\;
-  \ln f(\bsy_{1:N}|\bstildetheta)
+  \ln p(\bsy_{1:N}|\bstildetheta)
   \label{mlelik}
 \end{align}
 In practice, we almost always work with the log-likelihood. First, in
 the special case where $\bsy_{1:N}$ is an iid sample so that
-$f(\bsy_{1:N}|\bstildetheta)=\prod\nN f(\bsy_n|\bstildetheta)$, the
+$p(\bsy_{1:N}|\bstildetheta)=\prod\nN p(\bsy_n|\bstildetheta)$, the
 product simplifies to a sum in the log-likelihood. Second, when we
 actually program up this maximization problem on a computer, the
 numerical value of the likelihood will often be very, very tiny given
@@ -12928,7 +12926,7 @@ show), that's fine enough.
 
 \begin{prop}\emph{(Properties of Maximum Likelihood Estimators)}
 Given MLE estimator $\bshattheta_{MLE}$ and iid sample $\{\bsy_n\}\nN$
-with likelihood $f(\bsy_{1:N}|\bstheta) =\prodnN f(\bsy_n|\bstheta)$,
+with likelihood $p(\bsy_{1:N}|\bstheta) =\prodnN p(\bsy_n|\bstheta)$,
 \begin{enumerate}[label=\emph{(\roman*)}]
   \item $\bshattheta_{MLE}$ is consistent, i.e.\
     $\bshattheta_{MLE}\pto\bstheta$.
@@ -12944,16 +12942,16 @@ with likelihood $f(\bsy_{1:N}|\bstheta) =\prodnN f(\bsy_n|\bstheta)$,
     \begin{align*}
       \calI
       = -\E\left[
-        \frac{\partial^2 \ln f(\bsy_n|\bstheta)}{%
+        \frac{\partial^2 \ln p(\bsy_n|\bstheta)}{%
           \partial \bstildetheta \,\partial \bstildetheta'}
         \right]
       = \Var\left[
-        \frac{\partial \ln f(\bsy_n|\bstheta)}{%
+        \frac{\partial \ln p(\bsy_n|\bstheta)}{%
           \partial \bstildetheta}
         \right]
     \end{align*}
     where the derivatives are derivatives of log-likelihood function
-    $\ln f(\bsy_n|\bstildetheta)$ with respect to $\bstildetheta$ and
+    $\ln p(\bsy_n|\bstildetheta)$ with respect to $\bstildetheta$ and
     evaluated at true $\bstheta$.
 \end{enumerate}
 \end{prop}
@@ -12966,10 +12964,10 @@ better than MLE as your sample grows large.
 
 But there's a catch: misspecification.
 MLE relies heavily on the assumption that the true likelihood
-\emph{really is} $f(\bsy_{1:N}|\bstildetheta)$, and that all you need to
+\emph{really is} $p(\bsy_{1:N}|\bstildetheta)$, and that all you need to
 do is find the true $\bstheta$ to plug in for $\bstildetheta$. It
 doesn't allow for the fact that you've misspecified your model, i.e.\
-that $f(\bsy_{1:N}|\bstildetheta)$ was a flat-out wrong likelihood
+that $p(\bsy_{1:N}|\bstildetheta)$ was a flat-out wrong likelihood
 function. So in the case of misspecification, it might \emph{not} be the
 lowest-variance efficient estimator, and we might prefer other
 alternatives. Below, we will see a test for misspecification and a word
@@ -12982,10 +12980,10 @@ log-likelihood:
 \begin{align*}
   \bshattheta_{MLE}
   &=
-  \argmax_{\bstildetheta} \; \ln f(\bsy_{1:N}|\bstildetheta)
+  \argmax_{\bstildetheta} \; \ln p(\bsy_{1:N}|\bstildetheta)
   =
   \argmax_{\bstildetheta} \;
-  \ln\left(\prodnN f(\bsy_n|\bstildetheta)\right)
+  \ln\left(\prodnN p(\bsy_n|\bstildetheta)\right)
   \\
   \iff\qquad
   \bshattheta_{MLE}
@@ -12993,19 +12991,19 @@ log-likelihood:
   \argmax_{\bstildetheta}
   \sumnN
   \underbrace{%
-  \ln f(\bsy_{n}|\bstildetheta)
+  \ln p(\bsy_{n}|\bstildetheta)
   }_{q(\bsy_n,\bstildetheta)}
 \end{align*}
 where
 \begin{align*}
   q'(\bsy_n,\bstildetheta)
   =
-  \frac{\partial \ln f(\bsy_n|\bstildetheta)}{\partial \bstildetheta}
+  \frac{\partial \ln p(\bsy_n|\bstildetheta)}{\partial \bstildetheta}
   = S(\bstildetheta,\bsy_n)
   \qquad
   q''(\bsy_n,\bstildetheta)
   =
-  \frac{\partial^2 \ln f(\bsy_n|\bstildetheta)}{%
+  \frac{\partial^2 \ln p(\bsy_n|\bstildetheta)}{%
     \partial\bstildetheta\,\partial\bstildetheta'}
 \end{align*}
 where $S(\bstildetheta,\bsy_n)$ is the score function for a single
@@ -13035,38 +13033,38 @@ We have now set up enough to move onto the proofs.
       &=
       \argmax_{\bstildetheta}
       \frac{1}{N}
-      \sumnN \ln f(\bsy_{n}|\bstildetheta)
+      \sumnN \ln p(\bsy_{n}|\bstildetheta)
     \end{align*}
     Note that as the sample size grows, the LLN gives us
     \begin{align*}
       %\frac{1}{N}\sumnN q(\bsy_n,\bstildetheta)
       %=
-      \frac{1}{N} \sumnN \ln f(\bsy_n|\bstildetheta)
+      \frac{1}{N} \sumnN \ln p(\bsy_n|\bstildetheta)
       \quad\pto\quad
-      \E_{\bsy|\bstheta}\big[\ln f(\bsy_n|\bstildetheta)\big]
+      \E_{\bsy|\bstheta}\big[\ln p(\bsy_n|\bstildetheta)\big]
     \end{align*}
     where $\E_{\bsy|\bstheta}[\;\cdot\;]$ denotes the expectation,
     averaging over $\bsy_n$, using true likelihood function
-    $f(\bsy_n|\bstheta)$.
+    $p(\bsy_n|\bstheta)$.
     For $\bshattheta_{MLE}$ to be consistent, we need to check that
     true $\bstheta$ is a maximizer of this limiting expectation.
     Otherwise, the MLE estimator would be converging to another
     parameter vector entirely.
 
     The true $\bstheta$ is a maximizer of
-    $\E_{\bsy|\bstheta}\big[\ln f(\bsy_n|\bstildetheta)\big]$ if and
+    $\E_{\bsy|\bstheta}\big[\ln p(\bsy_n|\bstildetheta)\big]$ if and
     only if
     \begin{align*}
-      \E_{\bsy|\bstheta}\big[\ln f(\bsy_n|\bstheta+\bsdelta)\big]
+      \E_{\bsy|\bstheta}\big[\ln p(\bsy_n|\bstheta+\bsdelta)\big]
       &\leq
-      \E_{\bsy|\bstheta}\big[\ln f(\bsy_n|\bstheta)\big]
+      \E_{\bsy|\bstheta}\big[\ln p(\bsy_n|\bstheta)\big]
       \qquad\forall \bsdelta
     \end{align*}
     We can rearrange and alternatively say that $\bstheta$ is a
     maximizer if and only if
     \begin{align*}
       \E_{\bsy|\bstheta}\left[
-        \ln\left(\frac{f(\bsy_n|\bstheta + \bsdelta)}{f(\bsy_n|\bstheta)}\right)
+        \ln\left(\frac{p(\bsy_n|\bstheta + \bsdelta)}{p(\bsy_n|\bstheta)}\right)
       \right]
       &\leq 0
       \qquad\forall \bsdelta
@@ -13076,33 +13074,33 @@ We have now set up enough to move onto the proofs.
     \begin{align*}
       \forall\bsdelta\qquad
       \E_{\bsy|\bstheta}\left[
-        \ln\left(\frac{f(\bsy_n|\bstheta + \bsdelta)}{f(\bsy_n|\bstheta)}\right)
+        \ln\left(\frac{p(\bsy_n|\bstheta + \bsdelta)}{p(\bsy_n|\bstheta)}\right)
       \right]
       &\leq
       \ln \left(
       \E_{\bsy|\bstheta}\left[
-        \frac{f(\bsy_n|\bstheta + \bsdelta)}{f(\bsy_n|\bstheta)}
+        \frac{p(\bsy_n|\bstheta + \bsdelta)}{p(\bsy_n|\bstheta)}
       \right]
       \right)
       \\
       &=
       \ln \left(
       \int
-      \frac{f(\bsy_n|\bstheta + \bsdelta)}{f(\bsy_n|\bstheta)}
-      \cdot f(\bsy_n|\bstheta)
+      \frac{p(\bsy_n|\bstheta + \bsdelta)}{p(\bsy_n|\bstheta)}
+      \cdot p(\bsy_n|\bstheta)
       \; d\bsy_n
       \right) \\
       &=
       \ln \left(
       \int
-      f(\bsy_n|\bstheta + \bsdelta)
+      p(\bsy_n|\bstheta + \bsdelta)
       \; d\bsy_n
       \right)
       = \ln(1) = 0
       %\\
       %\implies\quad
       %\E_{\bsy|\bstheta}\left[
-        %\ln\left(\frac{f(\bsy_n|\bstheta + \bsdelta)}{f(\bsy_n|\bstheta)}\right)
+        %\ln\left(\frac{p(\bsy_n|\bstheta + \bsdelta)}{p(\bsy_n|\bstheta)}\right)
       %\right]
       %&\leq 0
     \end{align*}
@@ -13118,16 +13116,16 @@ We have now set up enough to move onto the proofs.
       \;\dto\;
       \calN\left(0,\;
       \E\left[
-      \frac{\partial^2 \ln f(\bsy_n|\bstheta)}{%
+      \frac{\partial^2 \ln p(\bsy_n|\bstheta)}{%
         \partial\bstildetheta\,\partial\bstildetheta'}
       \right]^{-1}
       \;
       \Var\left[
-        \frac{\partial \ln f(\bsy_n|\bstheta)}{\partial \bstildetheta}
+        \frac{\partial \ln p(\bsy_n|\bstheta)}{\partial \bstildetheta}
       \right]
       \;
       \E\left[
-      \frac{\partial^2 \ln f(\bsy_n|\bstheta)}{%
+      \frac{\partial^2 \ln p(\bsy_n|\bstheta)}{%
         \partial\bstildetheta\,\partial\bstildetheta'}
       \right]^{-1}
       \right)
@@ -13138,13 +13136,13 @@ We have now set up enough to move onto the proofs.
     \begin{align*}
       \calI
       := -\E\left[
-        \frac{\partial^2 \ln f(\bsy_n|\bstheta)}{%
+        \frac{\partial^2 \ln p(\bsy_n|\bstheta)}{%
           \partial \bstildetheta \,\partial \bstildetheta'}
         \right]
       =
       \Var S(\bstheta,\bsy_n)
       = \Var\left[
-        \frac{\partial \ln f(\bsy_n|\bstheta)}{%
+        \frac{\partial \ln p(\bsy_n|\bstheta)}{%
           \partial \bstildetheta}
         \right]
     \end{align*}
@@ -13181,9 +13179,9 @@ Throughout this section, we consider what happens when we have a random
 variable $\bsy$, but we misspecify $\bsy$'s likelihood function.
 In particular, we assume the \emph{wrong} parameteric form
 $g(\bsy|\bstildetheta)$ for the likelihood function, instead of the true
-parameteric functional form $f(\bsy|\bstildetheta)\neq
+parameteric functional form $p(\bsy|\bstildetheta)\neq
 g(\bsy|\bstildetheta)$. While there is a true $\bstheta$ for the correct
-likelihood function $f(\bsy|\bstildetheta)$, there is no such ``true''
+likelihood function $p(\bsy|\bstildetheta)$, there is no such ``true''
 parameter for the misspecified likelihood. Nonetheless, it will be
 useful to define a vector $\bstheta_{KL}$ (that we will justify and
 explain below) to put in all the places where we would normally use true
@@ -13208,7 +13206,7 @@ variance of the pseudo-score
   \Var_{\bsy|f}[\bsS_p(\bstheta_{KL},\bsy)]
 \end{align*}
 where $\E_{\bsy|f}[\;\cdot\;]$ is the expectation over $\bsy$ computed
-with the true likelihood $f(\bsy|\bstheta)$.
+with the true likelihood $p(\bsy|\bstheta)$.
 \end{prop}
 \begin{proof}
 No real proof except to say that we have no reason to expect the
@@ -13280,9 +13278,9 @@ Let $f$ and $g$ be densities. Define the
 \emph{Kullback-Leibler Divergence} as
 \begin{align*}
   K(g,f)
-  &= \int \ln\left(\frac{g(z)}{f(z)} \right) g(z)\;dz
+  &= \int \ln\left(\frac{g(z)}{p(z)} \right) g(z)\;dz
   =: \E_g\left[
-  \ln\left(\frac{g(z)}{f(z)} \right)
+  \ln\left(\frac{g(z)}{p(z)} \right)
   \right]
 \end{align*}
 This is \textbf{not} a \emph{metric} since it is not symmetric. It is,
@@ -13290,18 +13288,18 @@ however, a divergence since
 \begin{align*}
   K(g,f)
   &= \E_g\left[
-  -\ln\left(\frac{f(z)}{g(z)}\right)
+  -\ln\left(\frac{p(z)}{g(z)}\right)
   \right] \\
   \text{By Jensen's Inequality}\quad
   &\geq
   -\ln\left(
   \E_g\left[
-  \frac{f(z)}{g(z)}
+  \frac{p(z)}{g(z)}
   \right]  \right)
   =
   -\ln\left(
   \int
-  \frac{f(z)}{g(z)}
+  \frac{p(z)}{g(z)}
   g(z)
   \right)
   \\
@@ -13310,7 +13308,7 @@ however, a divergence since
   &\geq
   -\ln\left(
   \int
-  f(z)
+  p(z)
   \right)
   = -\ln(1) = 0
 \end{align*}
@@ -13319,11 +13317,11 @@ however, a divergence since
 \begin{prop}\emph{(Misspecified MLE Minimizes KL Divergence)}
 Suppose that the true density for random variable $\bsy_n$ is
 $g(\bsy_n)$, but we mistakenly assume the density is in parametric
-family $f(\bsy_n|\bstildetheta)$. Then all we can say about the pseudo
+family $p(\bsy_n|\bstildetheta)$. Then all we can say about the pseudo
 ``MLE'' estimate $\bshattheta_{KL}$---computed assuming
-$f(\bsy_n|\bstildetheta)$---is that it is a consistent estimator for the
+$p(\bsy_n|\bstildetheta)$---is that it is a consistent estimator for the
 parameter vector $\bstheta_{KL}$ that minimizes the KL divergence
-between densities $g$ and $f(\,\cdot\,|\bstildetheta)$.
+between densities $g$ and $p(\,\cdot\,|\bstildetheta)$.
 \end{prop}
 \begin{proof}
 Let's start by looking at the objective function for the misspecified
@@ -13333,20 +13331,20 @@ pseudo-MLE:
   &=
   \argmax_{\bstildetheta}\;
   \frac{1}{N} \sumnN
-  \ln f(\bsy_n|\bstildetheta)
+  \ln p(\bsy_n|\bstildetheta)
   \quad
   \pto\quad
   \argmax_{\bstildetheta}\;
   \E_g\left[
-  \ln f(\bsy_n|\bstildetheta)
+  \ln p(\bsy_n|\bstildetheta)
   \right]
 \end{align*}
 Where the expectation is take with respect to the true data density,
 $g(\bsy_n)$. Now consider the KL divergence between $g$ and $f$:
 \begin{align*}
-  K\big(g,f(\,\cdot\,|\bstildetheta)\big)
+  K\big(g,p(\,\cdot\,|\bstildetheta)\big)
   &= \E_g\left[
-  \ln\left(\frac{g(\bsy_n)}{f(\bsy_n|\bstildetheta)}\right)
+  \ln\left(\frac{g(\bsy_n)}{p(\bsy_n|\bstildetheta)}\right)
   \right]
   =
   \E_g\left[
@@ -13354,13 +13352,13 @@ $g(\bsy_n)$. Now consider the KL divergence between $g$ and $f$:
   \right]
   -
   \E_g\left[
-  \ln f(\bsy_n|\bstildetheta))
+  \ln p(\bsy_n|\bstildetheta))
   \right]
 \end{align*}
 The first term is a constant with respect to $\bstildetheta$. Therefore,
 it's obvious that the minimizer of this expression---the $\bstildetheta$
 that minimizes the KL divergence between $g$ and
-$f(\,\cdot\,|\bstildetheta)$---must also necessarily solve the
+$p(\,\cdot\,|\bstildetheta)$---must also necessarily solve the
 maximization problem above that defined $\bshattheta_{KL}$.
 \end{proof}
 
