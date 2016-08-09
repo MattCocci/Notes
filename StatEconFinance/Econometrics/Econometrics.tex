@@ -15197,105 +15197,134 @@ bad assumption.
 
 There are two main approaches to \emph{hypothesis testing}: the
 \emph{Classical Approach} and the \emph{Bayesian Approach}.  This
-section will focus exclusively on the classical approach. To do so, we
-introduce a table that will be of use in our discussion that documents
-the types of outcomes we might observe in hypothesis testing:
+section focuses exclusively on the classical approach.
+
+\subsection{Five Basic Steps}
+
+Loosely, hypthesis testing seeks learn and conduct inference about
+parameter values.
+In the classical approach, there are five main steps. Note that four
+happen \emph{ex ante}, before we touch the data.
+\begin{enumerate}
+  \item
+    Set up \emph{explicit} null and alternative hypotheses about
+    parameter values, denoted $H_0$ and $H_a$ respectively.
+    There are two forms a hypothesis (either null or alternative) can
+    take:
+    \begin{itemize}
+      \item[-] {\sl Simple}: All parameters are specified
+          numerically. For example
+          \[ H_0: \beta = 0, \qquad H_a:\theta = 0.6\]
+      \item[-] {\sl Composite}: Not all parameters are specified
+          numerically. Examples include:
+          \begin{align*}
+            \text{One-Sided: } \;
+            \theta > 0.5 \;\text{or} \; \theta < 0.5
+            \qquad
+            \text{Two-Sided: } \; \theta \neq 0.5
+          \end{align*}
+    \end{itemize}
+
+  \item Choose a \emph{test-statistic} (mapping sample data to a number)
+    that we will compute in order to decide whether to accept or
+    reject $H_0$ depending upon the computed numerical value.
+    Since data realizations are inherently random, the test statistic
+    and accept/reject decision are inherently random too.\footnote{%
+      If the accept/reject decision were \emph{not} random, then we're
+      either rejecting or accepting $H_0$ \emph{regardless} of the data
+      we collect, which obviously defeats the purpose.
+    }
+    Below, we discuss optimal test statistics that essentially ensure
+    that our accept/reject decisions are sensible in light of the data.
+
+  \item Adopt a tolerable Type I error rate on the basis of observed
+    data, denoted by $\alpha$:
+    \begin{align*}
+      \alpha = P(\text{Type I error})
+      = P(\text{Reject $H_0$ | $H_0$ True})
+    \end{align*}
+    This value is chosen at the discretion of the econometrician.
+
+  \item Given $\alpha$, establish the \emph{critical region}, so that if
+    the test-statistic falls within the region, we reject $H_0$ in favor
+    of $H_a$. The size of the critical region is chosen so that the Type
+    I error rate equals $\alpha$---i.e. if $H_0$ is true, the computed
+    value of the statistic will fall inside the critical region (leading
+    us to reject $H_0$) only $\alpha\%$ of the time in repeated
+    sampling.
+
+  \item Finally, collect data, calculate the test statistic, and accept
+    or reject the null based on whether the test stat falls falls within
+    the critical region.
+\end{enumerate}
+Alternatively, we could also work with \emph{p-values}, replacing Steps
+4 and 5 with
+\begin{itemize}
+  \item[4.*]
+    Collect data; compute the test stat and \emph{p-value}---the
+    probability of observing the computed value of the test stat (or a
+    more extereme value) given that $H_0$ is true.
+  \item[5.*] Reject $H_0$ if p-value $<\alpha$.
+\end{itemize}
+
+\clearpage
+\subsection{Type I \& II Error, Power, and the Fundamental Tradeoff}
+
+We now introduce the following table that will guide discussion:
 \begin{center}
    \begin{tabular}{r c}
-      $\quad\qquad$ & $\qquad$ {\sl What We Claim}\\
+      $\quad\qquad$ & $\qquad$ {\sl Decision}\\
    \end{tabular}
    \\
    \begin{tabular}{l | c c}
-      {\sl True Situation} & $H_0$ True & $H_0$ False \\\hline
+      {\sl True Situation} & Accept $H_0$ & Reject $H_0$\\\hline
       $H_0$ True & \checkmark & \textbf{Type I Error}\\
       $H_0$ False & \textbf{Type II Error} & \checkmark
    \end{tabular}
 \end{center}
-Our hypothesis testing will invariably require us to collect
-\emph{data}, which we explicitly define as observed
-values, or realizations, of random variables; therefore,
-randomness is built into the decision.
+The table above frames the inherent tradeoff in hypothesis testing.
+To starkly illustrate that tradeoff, notice that
+\begin{itemize}
+  \item We can eliminate Type I error \emph{entirely} if we \emph{never}
+    reject $H_0$. But that's obviously ridiculous since sometimes $H_0$
+    is false, and we do want to reject.
+  \item Similarly, we can eliminate the risk of Type II error
+    \emph{entirely} if we \emph{always} reject $H_0$.
+    But that is also obviously ridiculous.
+\end{itemize}
+These examples illustrate two extremes of the inherent tradeoff:
+Reducing the chance of committing a Type I error often increases the
+chance of committing a Type II error, and vice versa.
 
+Now notice what we did in the previous subsection to handle this
+tradeoff. We \emph{fixed} the Type I error rate at $\alpha$.  We said
+``We're willing to live with an \emph{ex ante} probability of (at most)
+$\alpha$ for committing a Type I error.'' This resolves the tradeoff.
+It's then just a matter of choosing an accept/reject strategy that
+keeps $P(\text{Type I error})\leq\alpha$.
+And to discuss \emph{optimal} accept/reject strategies, we need to
+introduce the following definition.
 
-\subsection{Five Basic Steps}
-
-In the classical approach to hypothesis testing, there are five
-main steps which we will summarize here:
-\begin{enumerate}
-   \item Set up a null hypothesis, denoted $H_0$, \emph{explicitly}.
-      Also, set up an explicit alternative hypothesis, denoted
-      $H_1$. There are two forms a hypothesis, either null or
-      alternative, can take:
-      \begin{itemize}
-	 \item[-] {\sl Simple}: All parameters are specified
-	    numerically. For example
-	    \[ H_0: \beta = 0, \qquad H_1:\theta = 0.6\]
-	 \item[-] {\sl Composite}: Not all parameters are specified
-	    numerically. Examples include:
-	    \begin{align*}
-	       \text{One-Sided Composite } \qquad& \theta > 0.5,
-	       \qquad \theta < 0.5\\
-	       \text{Two-Sided Composite } \qquad& \theta \neq 0.5
-	    \end{align*}
-      \end{itemize}
-   \item We next adopt our Type I error rate.
-      on the basis of observed data,  which equals the
-      $\alpha$ level. Just to be explicit:
-	 \[ \alpha = P(\text{Type I error}) \]
-   \item Next, we decide on the \emph{test-statistic} that we
-      will compute in order to decide whether to accept or reject
-      $H_0$ depending upon the resulting numerical value. Ideally,
-      this test statistic will be chosen based on some
-      ``optimality properties'' which we will consider below.
-   \item Next, we establish the \emph{critical region} within
-      which we will reject the null in favor of the alternative
-      hypothesis.
-   \item Finally, we will collect data, calculate the value of the
-      test statistic, and accept or reject the null based on
-      whether the value of the test statistic falls within some
-      critical region.
-\end{enumerate}
-
-\subsection{Using p-values}
-
-{\sl Definition}: You can alternatively conduct Hypothesis Tests using
-p-values. A p-value is the probability of getting the
-\emph{actually observed} value (given the data) of the test
-statistic---or a value more extreme than the observed value---when
-$H_0$ is true. We accept or reject using the rule
-\[ \text{p-value} \leq P(\text{Type I error}) \quad
-   \Rightarrow \quad \text{Reject $H_0$} \]
-Note that when working with p-values, the alternative hypothesis
-specification is Duncan Hines irrelevant. You work only with the
-values specified in the null.\footnote{Note that this process doesn't
-really take into account model uncertainty.}
-
-
-\subsection{Power}
-
-Our Type I error is fixed at whatever value of $\alpha$ that we
-chose in Step 2. But given that value of $\alpha$, we would like
-to know the \emph{power} of the test, defined as
+\begin{defn}(Power)
+The \emph{power} of any given strategy for accepting/reject $H_0$ is
+defined
 \begin{align*}
    \text{Power} &= P(\text{Reject $H_0$} | H_0 \text{ False})
    =1 - P(\text{Type II Error})
 \end{align*}
-In the case where $H_1$ is \emph{simple}, the
-power is a number, but if $H_1$ is \emph{composite}, there is
-no unique value for the power.  Rather, we will have a
-\emph{power curve}
-or \emph{power surface}. So suppose without loss
-of generality, that the \emph{true} value of the parameter, $\theta^*$,
-is greater than the \emph{null} value, $\theta_0$.
-In that case the power curve
-will look something like the following.
-Notice that the probability of rejection increases as
-$\theta^*-\theta_0$ increases:
-%\begin{figure}[h!]
-   %\centering
-   %\includegraphics[scale=0.7]{SamplePowerCurve.pdf}
-%\end{figure}
+In the case where $H_a$ is \emph{simple}, power is simply a number, but
+if $H_a$ is \emph{composite}, there is no unique value for the power.
+Rather, we have a \emph{power curve} or \emph{power surface}.
+\end{defn}
 
+This suggests how to look for optimal accept/reject strategies for
+hypothesis testing.
+Specifically, we will seek tests that \emph{maximize power} (i.e.
+minimize the probability of Type II error), subject to keeping
+$P(\text{Type I error})\leq\alpha$.
+
+
+\clearpage
 \subsection{Neyman-Pearson Lemma}
 
 {\sl Simple $H_0$, Simple $H_1$}: We first consider the case where
