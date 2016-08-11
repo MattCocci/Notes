@@ -91,6 +91,7 @@
 %% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \usepackage{tikz}
+\usepackage{tikz-3dplot}
 \usetikzlibrary{decorations.pathreplacing,arrows}
 \usepackage{graphicx}
 \usepackage{subfigure}
@@ -210,6 +211,7 @@
 \newcommand{\Prb}{\mathrm{P}}
 \newcommand{\ra}{\rightarrow}
 \newcommand{\diag}{\operatorname{diag}}
+\newcommand{\proj}{\operatorname{proj}}
 \newcommand{\ch}{\text{ch}}
 \newcommand{\dom}{\text{dom}}
 
@@ -1835,16 +1837,67 @@ implies a square system.
 
 Next, suppose we increase $m=3$ keeping $n=1$. Then that 2-dimensional
 picture above would need to be lifted to 3-dimensions. Again,
-$\range(A)$ is a line, and we project $b\in\R^3$ onto that line. If we
-were to introduce another (non-parallel) column to $A$ so that $m=3$ and
-$n=2$, then $\range(A)$ would expand to a 2-dimensional subspace of
-$\R^3$---a hyperplane. This hyperplane represents the set of all points
-we could construct by linearly combining columns of $A$. Again,
-$b\in\R^3$ is likely not on this plane, in which case we project $b$
-onto that hyperplane $\range(A)$ to find the fitted value. The $x$ such
-that $Ax$ equals that fitted point is the coefficient vector.
+$\range(A)$ is a line, and we project $b\in\R^3$ onto that line.
 
-Want a 3D picture here
+Lastly, suppose we introduce another (non-parallel) column to $A$ so
+that $m=3$ and $n=2$. In the figure below, we plot an example.
+Vectors $a_1$ and $a_2$ represent the $n=2$ columns of $A$, while the
+gray triangle defined by those two vectors is part of $\range(A)$.
+(Only part because the entire $\range(A)$ is a plane extending
+infinitely in each direction out from the triangle. We plot only the
+triangle to reduce clutter.)
+Therefore, $\range(A)$ is a 2-dimensional subspace of $\R^3$---i.e. it's
+a hyperplane. This hyperplane represents the set of all points we could
+construct by linearly combining columns of $A$.  Again, $b\in\R^3$ is
+likely not on this plane (as shown), in which case we project $b$ onto
+that hyperplane $\range(A)$ to find the fitted value, $Ax$, the solve
+for the coefficient vector $x$ that linearly combines the columns to get
+as close to $b$ as possible while keeping in $\range(A)$.
+
+\begin{figure}[htbp!]
+\centering
+\tdplotsetmaincoords{70}{15}
+\begin{tikzpicture}[scale=2.5,tdplot_main_coords]
+    % Define axes
+    \draw[d4black,<->] (-0.5,0,0) -- (3,0,0) node[anchor=north west]{$x$};
+    \draw[d4black,<->] (0,-0.5,0) node[anchor=north east]{$y$} -- (0,3,0);
+    \draw[d4black,<->] (0,0,-0.5) -- (0,0,2.5) node[anchor=south]{$z$};
+
+    \def\x{.5}
+
+    % Draw the vectors a1=(1,3,1) and a2=(3,1,1)
+    \draw[ultra thick,->] (0,0,0) -- (1,3,1) node[anchor=south west]{$a_1$};
+    \draw[ultra thick,->] (0,0,0) -- (3,1,1) node[anchor=south west]{$a_2$};
+
+    % Draw fitted value
+    \draw[d4orange, ultra thick,->] (0,0,0) -- (1.33333,1.33333,0.666666);
+    \node[d4orange] at (1.10,1.10,0.40) {$Ax$};
+
+    % Draw vector b=(1,1,2)
+    \draw[d4blue, ultra thick,->] (0,0,0) -- (1,1,2);
+    \node[d4gray] at (0.7,0.7,1.8) {$b$};
+    \node[d4blue] at (0.7,0.7,1.8) {$b$};
+
+    % Draw residual
+    \draw[d4gray, ultra thick,->] (1.33333,1.33333,0.666666) -- (1,1,2);
+    \node[d4gray] at (1.15,1.15,1.7) {$r$};
+
+    % Draw square to denote right angle
+    \draw[d4black] (1.2,1.2,0.60) -- (1.15,1.15,0.80) -- (1.2833333, 1.2833333, 0.8666667);
+
+
+    % Draw the plane
+    \node[d4black] at (1.7,1.7,1) {$\range(A)$};
+    \fill[
+        %draw=d4gray,%
+        fill=d4gray,%
+        fill opacity=0.3,%
+    ] (0,0,0)
+            -- (1,3,1)
+            -- (3,1,1)
+            -- cycle;
+\end{tikzpicture}
+\end{figure}
 
 We now introduce a solution method for the least squares problem that
 does not entail using the normal equation formula $(A^TA)^{-1}A^Tb$.
@@ -4396,32 +4449,30 @@ can find $\bar{x}$ such that
 \end{align*}
 \end{proof}
 
+
 \clearpage
 \section{Banach and Hilbert Spaces}
 \label{sec:banachhilbert}
 
 Often, we first encounter \emph{norms} and \emph{inner products} as
-special functions on vector space $\Rn$ or $\Cn$ that measure the
-\emph{length} of a vector or the \emph{angle} between vectors,
-respectively.  However, the definition permits much more general
-functions over much more general spaces (as we'll see).
+special functions on vector space $\Rn$ that measure the \emph{length}
+of a vector or the \emph{angle} between vectors, respectively.  However,
+the definition permits much more general functions over much more
+general spaces (as we'll see).
 
 \subsection{Vector Space}
 
 \begin{defn}(Field)
-We say that $K\subseteq \C$ is a \emph{field} if it satisfies the following
-conditions:
+Set $K\subseteq \C$ or $K\subseteq\R$ is a \emph{field} if it satisfies
+all of the following:
 \begin{enumerate}[label=(\roman*)]
   \item \emph{Identity Elements} $0,1\in K$
-  \item \emph{Closed under Addition}:
-      $x,y\in K \implies x+y\in K$
-  \item \emph{Closed under Multiplication}:
-      $x,y\in K \implies xy\in K$
-  \item \emph{Additive Inverse}: $x\in K \implies -x\in K$
-  \item \emph{Multiplicative Inverse}: $x\in K$ and $x\neq 0$, then
-    $x^{-1}\in K$.
+  \item \emph{Closed under Addition and Multiplication}:
+      $x,y\in K \implies$ $x+y\in K$ and $xy\in K$
+  \item \emph{Additive and Multiplicative Inverse}:
+    $x\in K \implies -x\in K$
+    and (if $x\neq 0$) $x^{-1}\in K$.
 \end{enumerate}
-Note that we could have $K \subseteq \R$ since $\R\subset\C$.
 \end{defn}
 
 \begin{defn}(Vector Space)
@@ -4443,9 +4494,9 @@ satisfying the following properties for all $u,v,w\in V$ and $a,b\in K$:
   \item \emph{Distributive Property over Scalar Addition}:
     $(a+b)v = av + bv$
   \item \emph{Multiplicative Associativity}: $(ab)v = a(bv)$
-  \item \emph{Additive Identity Element}: There exists a zero element
-    $0\in V$ such that $v+0 = 0+v=0$.
-  \item \emph{Multiplicative Identity Element}: $1\cdot u = u$.
+  \item \emph{Additive and Multiplicative Identity Element}:
+    There exists a zero element $0\in V$ such that $v+0 = 0+v=0$ and a
+    unit element $1\cdot u = u$.
 \end{enumerate}
 \end{defn}
 
@@ -4680,24 +4731,27 @@ we must show it satisfies all of the properties.
 
 \begin{defn}(Inner Product Space)
 We use the term \emph{inner product space} for a complex (or real)
-vector space $V$ that is equipped with an inner product.
+vector space $V$ that is equipped with an inner product
+$\langle\,\cdot,\,\cdot\rangle$, denoted
+$(V,\langle\,\cdot,\,\cdot\rangle)$.
 \end{defn}
 
 \begin{defn}(Hilbert Space)
-We use the term \emph{Hilbert Space} for an inner product space where
-the \emph{induced norm} $\lVert x\rVert=\sqrt{\langle x,x\rangle}$ gives
-us a metric
+We use the term \emph{Hilbert Space} for a \emph{complete} inner product
+space $(V,\langle\,\cdot,\,\cdot\rangle)$,
+i.e.\ where the \emph{induced norm} gives us a metric
 \begin{align*}
   d(x,y) = \lVert x-y\rVert
   = \sqrt{\langle x-y,\; x-y\rangle}
 \end{align*}
-under which the underlying vector space is \emph{complete}.  Therefore,
-all Hilbert are Banach spaces---complete under metric $d$ above.
+under which all Cauchy sequences in the vector space are convergent.
+Therefore, all Hilbert are Banach spaces---complete under metric $d$
+above.
 \end{defn}
 
 \begin{lem}
-Let $\{x_n\}$ be a sequence on an inner product space which has induced
-norm $\lVert\,\cdot\,\rVert$. Then
+Given sequence $\{x_n\}$ on an inner product space with induced norm
+$\lVert\,\cdot\,\rVert$,
 \begin{align*}
   \lVert x_n - x \rVert \ra 0
   \quad\implies\quad
@@ -4788,7 +4842,7 @@ converge to zero, the whole object converges to zero.
 
 \begin{prop}\emph{(Parallelogram Law and Polarization Identity)}
 Let $\lVert\,\cdot\,\rVert$ be the induced norm from some inner product
-over a complex vector space.
+space.
 Then we have the \emph{parallelogram law}
 \begin{align*}
   \lVert x+y\rVert^2 +
@@ -4804,9 +4858,9 @@ If the vector space is \emph{real}, then we also have the
 \end{align*}
 \end{prop}
 \begin{rmk}
-Though this might appear at first glance to be a proposition about norms
-in general, it is not. It holds \emph{only} for norms induced by an
-inner product.
+Though this might appear to be a proposition about norms in general,
+it's \emph{not}. It holds \emph{only} for norms induced by inner
+products, which is why it's presented in this subsection.
 \end{rmk}
 \begin{proof}
 First the parallelogram law:
@@ -4855,8 +4909,35 @@ $\langle x,y\rangle = \langle y,x\rangle$.
   &=
   4\langle x, y\rangle
 \end{align*}
-
 \end{proof}
+
+\begin{ex}($L^2(\Omega,\sF,P)$)
+The space $\sL^2(\Omega,\sF,P)$ consists of all complex random variables
+(measurable functions) $X:\Omega\ra \R$ on probabability space
+$(\Omega,\sF,P)$ with finite second moment:
+\begin{align*}
+  \int_\Omega |X(\omega)|^2 \; P(d\omega) <\infty
+\end{align*}
+We can easily verify that $\sL^2(\Omega,\sF,P)$ is a vector space by
+checking that sums of random variables $X+Y$ and
+products of random variables $X\cdot Y$ for $X,Y\in L^2(\Omega,\sF,P)$
+are also in $\sL^2(\Omega,\sF,P)$, as well as verifying the other that
+must hold for vector spaces.
+
+Next, define $L^2(\Omega,\sF,P)$ by identifying all equivalence clases
+in $\sL^2(\Omega,\sF,P)$, i.e. by treating distinct $X$ and $Y$
+in $\sL^2(\Omega,\sF,P)$ as a single object in $L^2(\Omega,\sF,P)$ if
+they are equal almost everywhere, $P(X=Y)=1$. Then
+$L^2(\Omega,\sF,P)$ equipped with inner product
+\begin{align*}
+  \langle X,Y \rangle
+  = \E[X\overline{Y}]
+  = \int_\Omega X(\omega)\overline{Y(\omega)} \; P(d\omega)
+\end{align*}
+is a complex Hilbert space, which is verified by checking all the
+properties.
+\end{ex}
+
 
 
 \clearpage
@@ -4941,8 +5022,9 @@ inequality for the RHS of the above expression to conclude
 \end{proof}
 
 
+
 \clearpage
-\subsection{Orthogonality and Projections}
+\subsection{Orthogonality}
 
 \begin{defn}(Angle)
 Given \emph{any} real inner product space, define the \emph{angle}
@@ -4952,16 +5034,15 @@ between any two non-zero elements as
   \frac{\langle x,y \rangle}{\lVert x\rVert \cdot \lVert y \rVert}
   \right)
 \end{align*}
-
 \end{defn}
 
 \begin{defn}(Orthogonal)
-We say that two vectors, $v,u\in V$ \emph{orthogonal} if $\langle
-u,v\rangle=0$ or, equivalently, their angle is $\theta=\pi/2$. We denote
-orthogonality by $u\perp v$.
+Two vectors, $v,u\in V$ \emph{orthogonal} if $\langle u,v\rangle=0$ or,
+equivalently (for a real inner product space), their angle is
+$\theta=\pi/2$. We denote orthogonality by $u\perp v$.
 \end{defn}
 
-\begin{defn}(Orthogonal and Orthonormal Family)
+\begin{defn}(Orthogonal and Orthonormal Families)
 We call a collection of vectors $\{v_i\}$ an \emph{orthogonal family} if
 $v_i\perp v_j$ for all $i\neq j$. We call the family \emph{orthonormal}
 if, in addition to being an orthogonal family, $\lVert v_i\rVert=1$ for
@@ -5006,7 +5087,102 @@ Since $x\perp y$, we know that $\langle x,y \rangle = \langle y,x
 \end{align*}
 \end{proof}
 
+\begin{defn}(Orthogonal Complement)
+Given Hilbert space $\calH=(V,\langle\,\cdot,\,\cdot\rangle)$, the
+\emph{orthogonal complement} of $A\subseteq V$ in $\calH$, denoted
+$A^\perp$, is defined
+\begin{align*}
+  A^\perp :=
+  \{
+    x \in V \;|\; \langle x,y\rangle = 0
+    \quad \forall y\in A
+  \}
+\end{align*}
+\end{defn}
 
+\clearpage
+\subsection{Projections and the Projection Theorem}
+
+\begin{thm}\emph{(Projection Theorem)}
+Given Hilbert space $\calH=(V,\langle\,\cdot,\,\cdot\rangle)$,
+suppose that $A\subseteq V$ is a \emph{closed} subspace of $V$.
+Then for any $x\in V$, there exists a \emph{unique}
+$\hat{x}\in A$ s.t.
+\begin{align}
+  \lVert x-\hat{x} \rVert =
+  \inf_{y\in A} \; \lVert x-y\rVert
+  \label{projthm}
+\end{align}
+where $\lVert\;\cdot\;\rVert$ is the norm induced by the inner product
+of $\calH$. In words, this theorem says that there is a unique element
+$\hat{x}\in A$ that does, in fact, attain the infimum and minimize the
+distance between $x$ and subspace $A$.
+\end{thm}
+
+\begin{defn}(Orthogonal Projection)
+The element $\hat{x}\in A$ is called the \emph{orthogonal projection} of
+$x$ onto $A$. To emphasize the space that $x$ is projected onto, we
+sometimes denote $\hat{x}=\proj(x|A)$.
+\end{defn}
+
+\begin{defn}(Error/Residual)
+Given $\hat{x}=\proj(x|A)$, we can define the \emph{error} or
+\emph{residual}
+\begin{align*}
+  \varepsilon:=x-\hat{x}
+  \quad\iff\quad
+  x=\hat{x}+\varepsilon=\proj(x|A)+\varepsilon
+\end{align*}
+\end{defn}
+
+\begin{cor}
+\emph{(Alternative Characteriziation of $\hat{x}=\proj(x|A)$ using
+$\varepsilon$)}
+Alternatively, we can characterize the projection $\hat{x}=\proj(x|A)$
+satisfying Expression~\ref{projthm} as the unique point in $A$ such that
+the resulting error $\varepsilon=x-\hat{x}$ is orthogonal to all
+elements of $A$:
+\begin{align*}
+  \langle \varepsilon, y\rangle =0
+  \quad\forall y\in A
+  \quad\iff\quad
+  \varepsilon\in A^\perp
+\end{align*}
+\end{cor}
+
+\begin{prop}(Properties of Projections)
+Given Hilbert space $\calH=(V,\langle\,\cdot,\,\cdot\rangle)$,
+for all $x,y\in V$, $A\subseteq V$, and $a,b\in\C$,
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item \emph{Projections are linear}:
+    $\proj(ax+by|A) = a\proj(x|A)+b\proj(y|A)$
+  \item \emph{Projections decompose length}:
+    $\lVert x\rVert^2
+    = \lVert\hat{x}\rVert^2 + \lVert \varepsilon\rVert^2$
+  \item $x\in A\subseteq V$ if and only if $\hat{x}=\proj(x|A)=x$.
+  \item $x\in A^\perp \subseteq V$ if and only if
+    $\hat{x}=\proj(x|A)=0$.
+\end{enumerate}
+\end{prop}
+\begin{proof}
+We prove each in turn
+\begin{enumerate}[label=(\roman*)]
+  \item
+  \item As discussed, $\varepsilon\perp y$ for all $y\in A$.
+    Since $\hat{x}\in A$, we have $\varepsilon\perp \hat{x}$.
+    Then the Pythagorean relation and $x=\hat{x}+\varepsilon$ gives us
+    $\lVert x\rVert^2 = \lVert \hat{x}+\varepsilon\rVert^2 =\lVert
+    \hat{x}\rVert^2 + \lVert \varepsilon\rVert^2$
+  \item
+    ($\Rightarrow$)
+    If $x\in A$, we can minimize Expression~\ref{projthm}
+    all the way to zero by choosing $\hat{x}=\proj(x|A)=x\in A$.
+
+    ($\Leftarrow$) If $\hat{x}=x$, the fact that we require
+    $\hat{x}\in A$ implies that $x\in A$.
+  \item Similar to (iii)
+\end{enumerate}
+\end{proof}
 
 
 \clearpage
