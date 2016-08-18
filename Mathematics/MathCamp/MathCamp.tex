@@ -7880,7 +7880,152 @@ So $v^*$ is well-defined, while the max in
 Problem~\ref{prob:sequential-short} does not automically exist.
 \end{defn}
 
+\clearpage
+\subsubsection{``Classical'' Solution Method for Canonical Sequential
+Formulation}
 
+\begin{thm}
+Given dynamic optimization Problem~\ref{prob:sequential-short}, suppose
+additionally that $F$ is a continuously differentiable concave function
+on a compact set, while the constraint set is convex. Then the following
+conditions are necessary and sufficient for a sequence
+$\{x_{t+1}\}\tinfz$ to be optimal if
+$x_{t+1}\in \interior(\Gamma(x_t))$,
+\begin{alignat*}{3}
+  \text{\emph{(EE)}}:&&
+  \qquad
+  U_2(x_{t},x_{t+1}) + \beta U_1(x_{t+1},x_{t+2})
+  &= 0
+  \qquad\forall t
+  \\
+  \text{\emph{(TVC)}}:&&
+  \lim_{T\ra\infty}
+  \beta^T U_2(x_{T},x_{T+1})
+  x_{T+1}
+  &= 0
+\end{alignat*}
+(EE) is the Euler Equation---a first order difference equation in state
+variable $x_{t+1}$. If $x_t$ is a vector, then $U_1$ and $U_2$ are
+column vectors and this is a system of equations.
+(TVC) is the \emph{Transversality Condition}, which plays the role of a
+boundary condition.\footnote{%
+  By substituting (EE) into (TVC), we have alternative
+  and equivalent representation for the (TVC):
+  \begin{align*}
+    \lim_{T\ra\infty}
+    \beta^{T}
+    U_1(x_{T},x_{T+1})
+    x_{T}
+    &= 0
+  \end{align*}
+}
+\end{thm}
+\begin{rmk}
+The assumption that $x_{t+1}\in\interior(\Gamma(x_t))$ for all $t$
+reminds us that this is a \emph{state-only} representation.
+General, control variables \emph{do} run up against budget or other
+constraints, so you need to have used these relationships to remove
+all endogenous control avariables from the problem.
+
+For example, in the standard growth model, this assumption
+means that you have \emph{written out} consumption $c_t$ from the
+problem, using the budget constraint $c_t = f(k_t) - k_{t+1} +
+(1-\delta) k_t$ to get the problem in terms of the only state variable
+$x_t=k_t$---not leaving in endogenous control $c_t$.  From there, the
+Inada conditions ensure $x_{t+1}\in \interior(\Gamma(x_t))$.
+\end{rmk}
+\begin{proof}
+Existence of a solution gauranteed by Extreme Value Theorem
+(Weierstrass): We are optimizing a continuous function over a compact
+domain, hence a maximum exists. Uniqueness is guaranteed by concave $F$
+and convex constraint set.
+\end{proof}
+
+
+\clearpage
+\begin{ex}{(Necessity of TVC)}
+In this example, we set up a problem whose Bellman Equation formulation
+has a solution, while the sequential problem has no optimal value
+function solution. Now onto the problem.
+
+Consider a simple consumption/investment decision:
+\begin{align*}
+  \max_{\{c_t\}_0^\infty} \; &\sumtinfz \beta^t c_t \\
+  & c_t + a_{t+1} = (1+r)a_t\\
+  & c_t \geq 0
+\end{align*}
+where $a_0$ is given as initial endowment. We can express this problem
+in standard form with $a_t$ as the state variable
+\begin{align*}
+  \max_{\{a_{t+1}\}_0^\infty} \;
+  &\sumtinfz \; \beta^t [(1+r)a_t - a_{t+1}] \\
+  & (1+r)a_t - a_{t+1} \geq 0
+\end{align*}
+where $F(a_t,a_{t+1}) = (1+r)a_t - a_{t+1}$.
+We place \emph{no restrictions} on each $a_t$---they can be arbitrarily
+negative, and that will be important.
+Under some assumptions $1+r = \frac{1}{\beta}$.
+
+So now we can write the Bellman Equation formulation:
+\begin{align*}
+  v(a) = \max_{a'} \; \left(\frac{a}{\beta} - a'\right) + \beta \, v(a')
+\end{align*}
+Now we use the guess and verify method. The guess is $v(a) = a/\beta$.
+\begin{align*}
+  \text{Check} \qquad
+  \frac{a}{\beta}
+  &= \max_{a'} \;
+  \left(\frac{a}{\beta} - a'\right)
+  + \beta \left(\frac{a'}{\beta}\right)\\
+  \frac{a}{\beta}
+  &= \max_{a'} \;
+  \frac{a}{\beta}
+  =
+  \frac{a}{\beta}
+\end{align*}
+So this solves the Bellman Equation.
+
+Time to see why this won't work. Pick initial consumption $c_0$ to be
+\emph{huge}. That is, borrow a lot so you consume a lot in the first
+period, consuming $c_0 >> a_0$.
+Thereafter, consume nothing: $c_t=0$ for $t>0$. This results in an
+investment profile of
+\begin{align*}
+  a_{1} &= \frac{a_0}{\beta} - c_0 < 0 \\
+  \Rightarrow \quad
+  a_{t+1} &= \frac{a_t}{\beta}
+  = \frac{a_0}{\beta^{t+1}} - \frac{c_0}{\beta^t}
+\end{align*}
+Since $a_1$ is negative and $\beta<1$, we see that $a_{t+1}$ will blow
+up to negative infinity.
+Now in each period, $a_{t+1}$ is a finite, very negative, but
+still-feasible number since we didn't put any borrowing constraints on.
+And that's exactly the problem. The agent could go on borrowing forever.
+
+Let's now make the violation of the transversality condition more
+%explicit, checking the limit in Assumption~\ref{assump:transversality}.
+To simplify the math, let $a_0=0$. Recall that $v(a) = a/\beta$.
+\begin{align*}
+  \lim_{t\rightarrow\infty} \beta^t v(a_t)
+  = \lim_{t\rightarrow\infty} \beta^t \left(\frac{a_t}{\beta}\right)
+  = \lim_{t\rightarrow\infty} \beta^t
+  \left(
+  \frac{-c_0/\beta^{t-1}}{\beta}
+  \right)
+  = \lim_{t\rightarrow\infty}
+  -c_0
+  = -c_0 \neq 0
+\end{align*}
+In other words, the value function is not ``small'' in the infinite
+future.
+
+So in summary, there is no optimal value function $v^*$, though we were
+able to find a function satisfying the Bellman equation. In general,
+only checking the transversality condition catches this kind of problem.
+\end{ex}
+
+
+\clearpage
 \subsubsection{Canonical Recursive Formulation}
 
 Looking at Expression~\ref{vstar}, we might reasonably think that we can
@@ -7979,49 +8124,7 @@ Equation approach.
 
 
 \clearpage
-\subsubsection{Bellman Operator}
-
-We now define a useful object called the \emph{Bellman Operator}, which
-(together with the Contraction Mapping Theorem and some assumptions)
-will let us assert existence, uniqueness, and properties (increasing,
-concave, etc.) of a solution $v_B$ to functional Equation~\ref{eq:vB}.
-
-\begin{defn}(Bellman Operator)
-Given Bellman Equation~\ref{eq:vB}, define the associated
-\emph{Bellman operator} $T$ acting on the set of real-valued functions
-as
-%$T:\mathscr{B}(X,\R)\rightarrow\mathscr{B}(X,\R)$
-\begin{align}
-  T[w(x)]
-  &= \sup_{x'\in\Gamma(x)}
-  F(x,x') + \beta w(x')
-  \label{defn:bellman-operator}
-\end{align}
-This takes in a function $w$ and spits out another function.
-If it exists, a solution $v_B$ to Bellman Equation~\ref{eq:vB} is
-necessarily a fixed point of the operator, i.e. $T[v_B(x)]=v_B(x)$.
-\end{defn}
-
-\begin{rmk}
-We sometimes restrict $T$ to act only on the set of real \emph{bounded}
-functions. They could be bounded either because we explicitly bound the
-range of the functions, \emph{or} we consider only continuous functions
-on a compact domain (so the range is consequently bounded).
-\end{rmk}
-
-%\begin{prop}
-%Suppose that $v$ is a continuous function in $\sB(X,\R)$, the set of
-%bounded real-valued functions. Then $T[v]$ is a continuous function
-%of $x$ and the optimal policy $x'_*(x)$ is a UHC correspondence. If
-%$x'_*(x)$ is a function, then it is continuous.
-%\end{prop}
-
-%\begin{prop}{\emph{(Bellman Operator is a Contraction Map)}}
-%\end{prop}
-
-
-
-\subsubsection{Principal of Optimality: Equivalence of Sequential and
+\subsubsection{Principal of Optimality: Equivalence of Sequential \&
 Recursive Reps}
 
 This subsection considers a dynamic optimization problem written in
@@ -8033,14 +8136,14 @@ for the moment.
 Recall $v^*$, the optimal value of the objective function in the
 sequential formulation
 \begin{align}
+  \label{eq:vstar}
   v^*(x_0) := \sup_{\{x_{t+1}\}_{t=0}^\infty}
   \; &\sumtinfz \beta^t F(x_t,x_{t+1})
-  \label{eq:vstar}
-  %\\
+  \\
   \qquad \text{s.t.}\quad
-  %&
+  &
   \text{$x_{t+1} \in \Gamma(x_t)$ $\;\forall t$, $x_0$ given}
-  %\notag
+  \notag
 \end{align}
 along with $v_B$, the solution to the functional Bellman Equation
 in the recursive formulation,\footnote{%
@@ -8055,10 +8158,13 @@ in the recursive formulation,\footnote{%
   F(x,x') +
   \beta v_B(x')
 \end{align}
-This section merely hopes to establish when we can refer to $v^*$ and
-$v_B$ interchangeably given properties of the problem primitives
-$(X,F,\beta,\Gamma)$, where
+These problems are characterized by the problem primitives
+$(\beta,X,\Gamma,F)$ where
 \begin{itemize}
+  \item $\beta$: Discount factor. Can also usefully think of this as
+    the \emph{probabability} that the agent survives to tomorrow to
+    yield future returns, rather than a $(1-\beta)$ probability of
+    expiring and earning zero returns henceforth.
   \item $X$: set of possible values the state today $x$ and the
     state tomorrow $x'$ can take on
   \item $\Gamma:X \rightrightarrows X$: constraint set, which encodes
@@ -8069,8 +8175,9 @@ $(X,F,\beta,\Gamma)$, where
       A:=\{(x,y) \in X\times X \;|\; y \in\Gamma(x)\}
     \end{align*}
 \end{itemize}
-For convenience, we also define objects
+From these primitives, it will also be convenient to define
 \begin{itemize}
+
   \item Feasible Plans $\Pi(x_0)$:
     Given $x_0$,
     we define
@@ -8080,23 +8187,23 @@ For convenience, we also define objects
       %\Pi(x_0) :=
       %\big\{ \{x_t\}\tinfz \;|\; x_{t+1} \in \Gamma(x_t) \big\}
     %\end{align*}
+
   \item Policy Function $g(x)$: this function maps today's state $x$
     into an optimal choice of tomorrow's state $x'$. This is a byproduct
     of solving the functional Bellman Equation~\ref{eq:vB2}.
 \end{itemize}
 
-
 \clearpage
-\begin{thm}
-\label{thm:vstar-solves-bellman}
-We lay out and label the following assumptions:
+\begin{assump}(Assumptions for Principal of Optimality)
+We lay out and label some assumptions that we will use for proving the
+Principal of Optimality.
 \begin{enumerate}
-  \item \emph{(Nonempty Feasible Sets)}:
+  \item[A1.] \emph{Nonempty Feasible Sets}:
     $\Gamma(x)\neq\emptyset$ for all $x\in X$
     %so that we can
     %always construct a feasible sequence given any starting point.
 
-  \item \emph{(Well-Defined Limit)}:
+  \item[A2.] \emph{Well-Defined Limit}:
     For all feasible $\{x_{t}\}_{t=0}^\infty \in \Pi(x_0)$,
     the following limit exists\footnote{%
       Don't need a \emph{finite} limit here. Could be $\pm \infty$. Just
@@ -8110,76 +8217,30 @@ We lay out and label the following assumptions:
     $\beta \in (0,1)$.
     % See Esteban week 1 slides, slide 54
 
-  \item \emph{(Transversality Condition)}:
+  \item[A3.] \emph{Transversality Condition}:
     For all $x_0\in X$ and for all
     $\{x_{t}\}_{t=0}^\infty \in \Pi(x_0)$,\footnote{%
       Emphasis on double ``for all'' qualifiers.
     }
-    $v_B$ satisfies
+    solution $v_B$ to the Bellman Equation satisfies
     \begin{align*}
       \lim_{t\rightarrow\infty} \beta^t v_B(x_t) = 0
     \end{align*}
     Loosely says ``the value of stuff in the infinite future doesn't
-    matter'' no matter the starting $x_0$ and subsequent path
+    matter'' no matter starting $x_0$ or subsequent path
     $\{x_{t+1}\}_{t=0}^\infty$.
-
-  \item
-    \emph{(Continuous $\Gamma$ on Convex $X$)}:
-    $X$ is a convex subset of $\R^L$ and the correspondence
-    $\Gamma:X\rightrightarrows X$ is compact-valued and continuous.
-
-  \item
-    \emph{(Bounded, Continuous $F$ plus Discounting)}:
-    The function $F:A\ra \R$ is bounded and continuous, and
-    $\beta\in (0,1)$.
-
-  \item
-    \emph{(Monotone $\Gamma$)}:
-    If $x \leq y$, then $\Gamma(x) \subseteq \Gamma(y)$.
-
-  \item
-    \emph{(Strictly Increasing $F$)}:
-    For fixed $x'$, function $F(\cdot,x')$ is strictly increasing in
-    each of the $L$ components of $x\in X\subseteq \R^L$.
-
-  \item
-    \emph{(Strictly Concave $F$)}:
-    If $F$ is strictly concave in $(x,x')\in A$, i.e.\ for all distinct
-    pairs $(x,x'), (y,y') \in A$ and $\alpha \in (0,1)$
-    \begin{align*}
-      F\left(\alpha x + (1-\alpha)y, \; \alpha x' + (1-\alpha)y'\right)
-      >
-      \alpha F(x,x') + (1-\alpha)F(y,y')
-    \end{align*}
-
-  \item
-    \emph{(Convex $\Gamma$)}:
-    For all $\alpha\in[0,1]$, we have
-    \begin{align*}
-      \begin{rcases}
-        x,y &\in X \\
-        x'&\in \Gamma(x) \\
-        y'&\in \Gamma(y)
-      \end{rcases}
-      \quad\implies\quad
-      \alpha x' + (1-\alpha) y'
-      \in \Gamma(\alpha x + (1-\alpha) y)
-      %\qquad\forall \alpha\in[0,1]
-    \end{align*}
-
-  \item
-    \emph{(Continuously Differentiable $F$)}:
-    The period return function $F$ is continuously differentiable on the
-    interior of $A$.
 \end{enumerate}
-\clearpage
-We have the following results:
-\begin{enumerate}
+\end{assump}
+
+\begin{thm}\emph{(Principal of Optimality)}
+\label{thm:vstar-solves-bellman}
+Relationship between $v^*$ and $v_B$:
+\begin{enumerate}[label=\emph{(\roman*)}]
   \item
     \emph{($v^*$ solves Bellman Equation)}:
-    If Assumptions 1 and 2 hold, then the solution $v^*$ to the
-    sequential problem in Equation~\ref{eq:vstar} satisfies the Bellman
-    Equation~\ref{eq:vB2}. i.e.\
+    If A1-2 hold, then solution $v^*$ to the sequential problem in
+    Equation~\ref{eq:vstar} satisfies the Bellman Equation~\ref{eq:vB2}.
+    i.e.\
     \begin{align*}
       v^*(x) =
       \sup_{x' \in \Gamma(x)}
@@ -8188,7 +8249,7 @@ We have the following results:
 
   \item
     \emph{(Characterization of Optimal Policies)}:
-    If Assumptions 1 and 2 hold and we have sequence
+    If A1-2 hold and we have sequence
     $\{x^*_t\}\tinfz\in\Pi(x_0)$ that \emph{attains the supremum} in
     sequential problem Equation~\ref{eq:vstar} (not saying such a plan
     will exist, but if it does), then
@@ -8223,50 +8284,9 @@ We have the following results:
     plan generated by policy function $g(x)$ as $\hat{x}_{t+1} =
     g(\hat{x}_t)$ starting from $\hat{x}_0=x_0$ is an optimal,
     supremum-attaining plan.
-
-  \item
-    \emph{(Uniqueness of Solution $v_B$)}:
-    If Assumptions 1-5 hold, then for Bellman Operator $T$
-    \begin{enumerate}[label=\emph{(\alph*)}]
-      \item $T$ obviously maps the space of bounded continuous functions
-        $\sC(X,\R)$ into itself, i.e.\ we have
-        $Tv \in \sC(X,\R)$ for all $v\in\sC(X,\R)$.
-      \item
-        $T$ is a contraction map on $(\sC(X,\R),d_\infty)$ with a unique
-        fixed point $v \in\sC(X,\R)$, and
-        $\forall v_0 \in \sC(X,\R)$, we have
-        $d(T^n[v_0],v) \leq \beta^n d(v_0,v)$
-      \item
-        The policy correspondence $g$ is compact-valued and upper
-        hemicontinuous.
-    \end{enumerate}
-
-  \item
-    \emph{(Monotonicity of Value Function)}:
-    Under assumptions 1-7, the unique fixed point $v$ of $T$ is strictly
-    increasing.
-
-  \item
-    \emph{(Strict Concavity of Value Function and Uniqueness of Policy)}:
-    Under assumptions 1-5 and 8-9, the unique fixed point $v$ of $T$ is
-    strictly concave and the optimal policy $g$ is a single-valued
-    continuous function.
-
-  \item
-    \emph{(Benveniste-Scheinkman)}:
-    Under Assumptions 1-5 and 8-10, if $x_0\in \interior(X)$ and
-    $g(x_0)\in\interior(\Gamma(x_0))$, the unique fixed point $v$
-    of $T$ is continuously differentable at $x_0$ with
-    \begin{align*}
-      \frac{\partial v(x_0)}{\partial x^i}
-      =
-      \frac{\partial F(x_0, g(x_0))}{\partial x^i}
-    \end{align*}
 \end{enumerate}
 \end{thm}
 
-
-%\clearpage
 %\begin{proof}
 %\end{proof}
 
@@ -8417,91 +8437,166 @@ We have the following results:
 %(Show A2) Next,
 %\end{proof}
 
-\begin{ex}{(Why We Need Transversality)}
-In this example, we set up a problem whose Bellman Equation formulation
-has a solution, while the sequential problem has no optimal value
-function solution. Now onto the problem.
+\clearpage
+\subsubsection{%
+Bellman Operator \& Existence, Uniqueness, Properties of $v_B$
+}
 
-Consider a simple consumption/investment decision:
-\begin{align*}
-  \max_{\{c_t\}_0^\infty} \; &\sumtinfz \beta^t c_t \\
-  & c_t + a_{t+1} = (1+r)a_t\\
-  & c_t \geq 0
-\end{align*}
-where $a_0$ is given as initial endowment. We can express this problem
-in standard form with $a_t$ as the state variable
-\begin{align*}
-  \max_{\{a_{t+1}\}_0^\infty} \;
-  &\sumtinfz \; \beta^t [(1+r)a_t - a_{t+1}] \\
-  & (1+r)a_t - a_{t+1} \geq 0
-\end{align*}
-where $F(a_t,a_{t+1}) = (1+r)a_t - a_{t+1}$.
-We place \emph{no restrictions} on each $a_t$---they can be arbitrarily
-negative, and that will be important.
-Under some assumptions $1+r = \frac{1}{\beta}$.
+We now define a useful object called the \emph{Bellman Operator}, which
+(together with the Contraction Mapping Theorem and some additional
+assumptions) lets us assert existence, uniqueness, and properties
+(increasing, concave, etc.) of solution $v_B$ to Bellman
+Equation~\ref{eq:vB}.
 
-So now we can write the Bellman Equation formulation:
-\begin{align*}
-  v(a) = \max_{a'} \; \left(\frac{a}{\beta} - a'\right) + \beta \, v(a')
-\end{align*}
-Now we use the guess and verify method. The guess is $v(a) = a/\beta$.
-\begin{align*}
-  \text{Check} \qquad
-  \frac{a}{\beta}
-  &= \max_{a'} \;
-  \left(\frac{a}{\beta} - a'\right)
-  + \beta \left(\frac{a'}{\beta}\right)\\
-  \frac{a}{\beta}
-  &= \max_{a'} \;
-  \frac{a}{\beta}
-  =
-  \frac{a}{\beta}
-\end{align*}
-So this solves the Bellman Equation.
+Throughout this section, we will also assume that Assumptions A1-3 from
+the previous section are satisfied, so the Principal of Optimality
+applies, $v_B=v^*$. Otherwise, we don't really care about the properties
+of $v_B$ if it's not related to the solution $v^*$ of the original
+dynamic optimization problem.
 
-Time to see why this won't work. Pick initial consumption $c_0$ to be
-\emph{huge}. That is, borrow a lot so you consume a lot in the first
-period, consuming $c_0 >> a_0$.
-Thereafter, consume nothing: $c_t=0$ for $t>0$. This results in an
-investment profile of
-\begin{align*}
-  a_{1} &= \frac{a_0}{\beta} - c_0 < 0 \\
-  \Rightarrow \quad
-  a_{t+1} &= \frac{a_t}{\beta}
-  = \frac{a_0}{\beta^{t+1}} - \frac{c_0}{\beta^t}
-\end{align*}
-Since $a_1$ is negative and $\beta<1$, we see that $a_{t+1}$ will blow
-up to negative infinity.
-Now in each period, $a_{t+1}$ is a finite, very negative, but
-still-feasible number since we didn't put any borrowing constraints on.
-And that's exactly the problem. The agent could go on borrowing forever.
+\begin{defn}(Bellman Operator)
+Given Bellman Equation~\ref{eq:vB}, define the associated
+\emph{Bellman operator} $T$ acting on the set of real-valued functions
+as
+%$T:\mathscr{B}(X,\R)\rightarrow\mathscr{B}(X,\R)$
+\begin{align}
+  T[w(x)]
+  &= \sup_{x'\in\Gamma(x)}
+  F(x,x') + \beta w(x')
+  \label{defn:bellman-operator}
+\end{align}
+This takes in a function $w$ and spits out another function.
+If it exists, a solution $v_B$ to Bellman Equation~\ref{eq:vB} is
+necessarily a fixed point of the operator, i.e. $T[v_B(x)]=v_B(x)$.
+\end{defn}
 
-Let's now make the violation of the transversality condition more
-%explicit, checking the limit in Assumption~\ref{assump:transversality}.
-To simplify the math, let $a_0=0$. Recall that $v(a) = a/\beta$.
-\begin{align*}
-  \lim_{t\rightarrow\infty} \beta^t v(a_t)
-  = \lim_{t\rightarrow\infty} \beta^t \left(\frac{a_t}{\beta}\right)
-  = \lim_{t\rightarrow\infty} \beta^t
-  \left(
-  \frac{-c_0/\beta^{t-1}}{\beta}
-  \right)
-  = \lim_{t\rightarrow\infty}
-  -c_0
-  = -c_0 \neq 0
-\end{align*}
-In other words, the value function is not ``small'' in the infinite
-future.
+\begin{rmk}
+We sometimes restrict $T$ to act only on the set of real \emph{bounded}
+functions. They could be bounded either because we explicitly bound the
+range of the functions, \emph{or} we consider only continuous functions
+on a compact domain (so the range is consequently bounded).
+\end{rmk}
 
-So in summary, there is no optimal value function $v^*$, though we were
-able to find a function satisfying the Bellman equation. In general,
-only checking the transversality condition catches this kind of problem.
-\end{ex}
+%\begin{prop}
+%Suppose that $v$ is a continuous function in $\sB(X,\R)$, the set of
+%bounded real-valued functions. Then $T[v]$ is a continuous function
+%of $x$ and the optimal policy $x'_*(x)$ is a UHC correspondence. If
+%$x'_*(x)$ is a function, then it is continuous.
+%\end{prop}
+
+%\begin{prop}{\emph{(Bellman Operator is a Contraction Map)}}
+%\end{prop}
+
+\begin{assump}
+Assumptions we will reference in the next theorem, on top of A1-A3:
+\begin{enumerate}
+  \item[A4.]
+    \emph{Continuous $\Gamma$ on Convex $X$}:
+    $X$ is a convex subset of $\R^L$ and the correspondence
+    $\Gamma:X\rightrightarrows X$ is compact-valued and continuous.
+
+  \item[A5.]
+    \emph{Bounded, Continuous $F$ plus Discounting}:
+    Period return function $F$ is bounded \& continuous,
+    $\beta\in (0,1)$.
+
+  \item[A6.]
+    \emph{Monotone $\Gamma$}:
+    If $x \leq y$, then $\Gamma(x) \subseteq \Gamma(y)$.
+
+  \item[A7.]
+    \emph{Strictly Increasing $F$}:
+    For fixed $x'$, function $F(\cdot,x')$ is strictly increasing in
+    each of the $L$ components of $x\in X\subseteq \R^L$.
+
+  \item[A8.]
+    \emph{Strictly Concave $F$}:
+    If $F$ is strictly concave in $(x,x')\in A$, i.e.\ for all distinct
+    pairs $(x,x'), (y,y') \in A$ and $\alpha \in (0,1)$
+    \begin{align*}
+      F\left(\alpha x + (1-\alpha)y, \; \alpha x' + (1-\alpha)y'\right)
+      >
+      \alpha F(x,x') + (1-\alpha)F(y,y')
+    \end{align*}
+
+  \item[A9.]
+    \emph{Convex $\Gamma$}:
+    For all $\alpha\in[0,1]$ and $x,y\in X$, we have
+    \begin{align*}
+      \begin{rcases}
+        x'&\in \Gamma(x) \\
+        y'&\in \Gamma(y)
+      \end{rcases}
+      \quad\implies\quad
+      \alpha x' + (1-\alpha) y'
+      \in \Gamma(\alpha x + (1-\alpha) y)
+      %\qquad\forall \alpha\in[0,1]
+    \end{align*}
+
+  \item[A10.]
+    \emph{Continuously Differentiable $F$}:
+    Period return function $F$ is continuously differentiable on
+    $\interior(A)$.
+\end{enumerate}
+\end{assump}
+
+\begin{thm}(Existence, Uniqueness, Properties of $v_B$)
+Given solution $v_B$ to the recursive Bellman Equation,
+we have the following results:
+\begin{enumerate}
+  \item
+    \emph{(Uniqueness of Solution $v_B$)}:
+    If Assumptions 1-5 hold, then for Bellman Operator $T$
+    \begin{enumerate}[label=\emph{(\alph*)}]
+      \item $T$ obviously maps the space of bounded continuous functions
+        $\sC(X,\R)$ into itself, i.e.\ we have
+        $Tv \in \sC(X,\R)$ for all $v\in\sC(X,\R)$.
+      \item
+        $T$ is a contraction map on $(\sC(X,\R),d_\infty)$ with a unique
+        fixed point $v \in\sC(X,\R)$, and
+        $\forall v_0 \in \sC(X,\R)$, we have
+        $d(T^n[v_0],v) \leq \beta^n d(v_0,v)$
+      \item
+        The policy correspondence $g$ is compact-valued and upper
+        hemicontinuous.
+    \end{enumerate}
+
+  \item
+    \emph{(Monotonicity of $v$)}:
+    Under A1-7, unique fixed point $v$ of $T$ is strictly increasing.
+
+  \item
+    \emph{(Strict Concavity of $v$ and Uniqueness of $g$)}:
+    Under A1-5 and 8-9, the unique fixed point $v$ of $T$ is
+    strictly concave and optimal policy $g$ is a single-valued
+    continuous function.
+
+  \item
+    \emph{(Benveniste-Scheinkman)}:
+    Under Assumptions 1-5 and 8-10, if $x_0\in \interior(X)$ and
+    $g(x_0)\in\interior(\Gamma(x_0))$, the unique fixed point $v$
+    of $T$ is continuously differentable at $x_0$ with
+    \begin{align*}
+      \frac{\partial v(x_0)}{\partial x^i}
+      =
+      \frac{\partial F(x_0, g(x_0))}{\partial x^i}
+    \end{align*}
+\end{enumerate}
+\end{thm}
+
 
 
 \clearpage
-\subsubsection{Solving by Guess and Verify}
+\subsubsection{Solving the Recursive Bellman Equation for $v_B$}
 
+\begin{defn}(Value Function Iteration)
+By the theorem of the previous subsection, if the assumptions are
+satisfied so that $T$ is a contraction map, we can start with an initial
+guess $v_0$ and iterate on the value function with the Bellman Operator
+ $v_{n+1}(x)=T[v_n(x)$ until convergence.
+\end{defn}
+
+\begin{defn}(Guess and Verify)
 Suppose that we have Bellman Equation
 \begin{align*}
   v(x) = \max_{y\in\Gamma(x)} F(x,y) + \beta v(y)
@@ -8539,6 +8634,8 @@ The method of ``guess and verify'' is a three-step procedure
     It at is at this stage that you collect terms and identify any
     undetermined coefficients.
 \end{enumerate}
+\end{defn}
+
 
 
 \begin{ex}
@@ -8627,7 +8724,7 @@ Equation.
 \end{ex}
 
 
-
+\clearpage
 \subsection{Continuous-Time Deterministic Dynamic Optimization}
 \label{sec:continuous-dynamic}
 
