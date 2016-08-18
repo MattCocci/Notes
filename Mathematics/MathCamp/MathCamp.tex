@@ -7694,18 +7694,57 @@ we are faced with the problem
 \end{align}
 Then the optimum $x^*$ satisfies
 
+
 \clearpage
-\section{Discrete-Time Deterministic Dynamic Programming}
+\section{Dynamic Optimization}
+
+In the last section, we saw how to solve \emph{static} optimization
+problems (i.e. one-shot problems not involving time) with a finite
+number of constraints.
+In this section, we tackle \emph{dynamic} optimization problems that
+require choosing allocations \emph{over time}---especially into the
+infinite future---subject to certain constraints in each period.
+
+Given a dynamic optimization problem, there are three steps
+\begin{enumerate}[label=(\roman*)]
+  \item \emph{Classify the Problem}:
+    There are two important axes for classifying a given dynamic
+    optimization problem: discrete- vs. continuous time and determistic
+    vs. stochastic.
+  \item \emph{Formulate the Problem}: In other words, write it down.
+    Broadly, there are two formulations/representations: sequential or
+    recursive.
+    In deterministic problems, either works; \emph{however}, for
+    stochastic problems, really only the recursive approach is feasible
+    or useful.
+  \item \emph{Propose Solution Method}:
+    Different \emph{classifications} and \emph{formulations} of a
+    dynamic optimization problem recommend different solution methods.
+    Sequential formulations can be solved with regular calculus FOCs or
+    calculus of variations. A \emph{recursive} formulation requires
+    dynamic programming techniques.
+\end{enumerate}
+The table below sorts and summarizes particular solution methods based
+on both \emph{classification} and \emph{formulation} of a given dynamic
+optimization. We discuss each in this section.
+\begin{table}[htbp!]
+\centering
+\begin{tabular}{|r|cc|cc|}
+  \hline
+  & \multicolumn{2}{c}{Discrete Time}
+  & \multicolumn{2}{|c|}{Continuous Time} \\\cline{2-3}\cline{4-5}
+  & Sequential & Recursive & Sequential & Recursive \\\hline\hline
+  Deterministic & ``Classical'' & Bellman & Hamiltonian & HJB \\\hline
+  Stochastic & &Bellman & &HJB \\\hline
+\end{tabular}
+\end{table}
+
+
+
+\subsection{Discrete-Time Deterministic Dynamic Optimization}
 \label{sec:discrete-dynamic}
 
-In the last section, we saw how to find optimal points for optimization
-problems with a finite number of constraints. In this section, we tackle
-optimization problems that require choosing allocations over
-time---especially into the infinite future---subject to certain
-constraints.
-
-\clearpage
-\subsection{Preliminaries: Theorem of the Maximum}
+\subsubsection{Preliminaries: Theorem of the Maximum}
 
 \begin{thm}{\emph{(Theorem of the Maximum)}}
 Given objective function $f:X\times Y\rightarrow\R$ and correspondence
@@ -7733,76 +7772,84 @@ function.
 
 
 \clearpage
-\subsection{Canonical Sequential Problem and its Bellman Formulation}
+\subsubsection{Canonical Sequential Formulation}
 
+\begin{defn}{(Canonical Sequential Formulation: Control-State Rep)}
+\label{defn:sequential-altrep}
+The control-state \emph{Canonical Sequential Formulation} requires
+choosing sequence $\{y_{t}\}_{t=0}^\infty$ that maximizes
+\begin{align}
+  \label{prob:altrep}
+  \max_{\{y_t\}_{t=0}^\infty}
+  \quad &\sumtinfz \beta^t \tilde{F}(x_t,y_t)
+  \qquad \text{s.t.}\quad
+  \begin{cases}
+  y_t \in \tilde{\Gamma}(x_t) \;\; \forall t\\
+  \text{$x_{t+1} = g(x_t,y_t)$ $\;\forall t$, $x_0$ given}
+  \end{cases}
+\end{align}
+The problem involves
+\begin{enumerate}
+  \item \emph{State}, $x_t$: At each time $t$, variable
+    $x_t$---called the state---is something like a ``sufficient
+    statistic'' for the problem, encoding all relevant information about
+    the state of the world and about feasible options for $y_t$
+  \item \emph{Control}, $y_{t}$: At time $t$, taking the current state
+    $x_t$ as given, the agent chooses $y_{t}$.
+    Since this object is chosen and controlled by the agent, $y_{t}$ is
+    called the \emph{control}.
+    Choice of $y_t$ influences next period's state $x_{t+1}$ by the law
+    of motion $g$.
+  %\item \emph{Period Return Function} $\tilde{F}(x_t,y_t)$:
+    %This is often a utility function describing the return the agent
+    %gets in time $t$ given state and control choice $(x_t,y_t)$.
+  \item \emph{Law of Motion} $g(x_t,y_t)$: Given the current state $x_t$
+    and the choice of control $y_t$, the law of motion $g$
+    deterministically spits out the state next period,
+    $x_{t+1}=g(x_t,y_t)$.  Often, there will often be some tradeoff
+    between more $y_t$ today and less $x_{t+1}$ tomorrow.
 
-\begin{defn}{(Canonical Sequential Problem)}
-We want to solve problems of the form
+  \item \emph{Feasibility Constraints}, $\tilde{\Gamma}(x_t)$:
+    Correspondence $\tilde{\Gamma}(x_t)$ is a set of feasible values
+    for $y_{t}$.
+\end{enumerate}
+While Representation~\ref{prob:altrep} is often easiest to
+\emph{write down}, the following (equivalent) canonical sequential
+formulation is easiest to \emph{solve}.
+Specifically, choice of $y_t$ and deterministic law of motion
+$g(x_t,y_t)$ together pin down $x_{t+1}$ entirely.
+Choice of $y_t$ \emph{implies} a choice of $x_{t+1}$.  So if we can
+invert law of motion $g$ to get $y_t=h(x_t,x_{t+1})$, we can sub
+$h(x_t,x_{t+1})$ for $y_t$ everywhere to instead frame the problem as
+a \emph{direct} choice of next-period state $x_{t+1}$
+\end{defn}
+
+\begin{defn}{(Canonical Sequential Formulation: State-Only Rep)}
+The state-only \emph{Canonical Sequential Formulation} requires choosing
+a sequence $\{x_{t+1}\}_{t=0}^\infty$ that maximizes
 \begin{align}
   \label{prob:sequential-short}
   \max_{\{x_{t+1}\}_{t=0}^\infty}
-  \quad &\sumtinfz \beta^t F(x_t,x_{t+1})\\
-  &x_{t+1} \in \Gamma(x_t) \qquad \forall t\notag\\
-  &x_0 \; \text{given}\notag
+  \quad &\sumtinfz \beta^t F(x_t,x_{t+1})
+  \qquad \text{s.t.}\quad
+  \text{$x_{t+1} \in \Gamma(x_t)$ $\;\forall t$, $x_0$ given}
 \end{align}
-This the \emph{Canonical Sequential Problem}, since the task involves
-choosing a sequence $\{(x_{t+1})\}_{t=1}^\infty$ that maximizes the
-value of the objective function.
-\begin{enumerate}
-  \item \emph{State}, $x_t$: At each time $t$, the variable
-    $x_t$---called the state---is something like a ``sufficient
-    statistic'' for the problem, encoding information about feasible
-    allocations and options for $x_{t+1}$ or ``continuation sequences.''
-  \item \emph{Control}, $x_{t+1}$: At time $t$, taking the current state
-    $x_t$ as given, the agent chooses tomorrow's state $x_{t+1}$
-    directly (since this world is deterministic). Since this object is
-    chosen and controlled by the agent, $x_{t+1}$ is called the
-    \emph{control} from the perspective of time $t$ (it then becomes the
-    \emph{state} at time $t+1$).
-  \item \emph{Feasibility Constraints}, $\Gamma(x_t)$: The
-    correspondence $\Gamma(x_t)$ returns a set of feasible values that
-    $x_{t+1}$ can take on.
-\end{enumerate}
+Note that the period return function changes to
+$F(x_t,x_{t+1})=\tilde{F}(x_t,h(x_t,x_{t+1}))$ while we replace
+feasibility correspondence $\tilde{\Gamma}(x_t)$ for $y_t$ with
+$\Gamma(x_t)$ for $x_{t+1}$.
 \end{defn}
 
-\begin{defn}{(Alternate Representation: Canonical Sequential Problem)}
-\label{defn:sequential-altrep}
-For completeness, here's another, perfectly equivalent way the canonical
-representation problem might be written. This corresponds to the Sargent
-representation.
-\begin{align}
-  \label{prob:altrep}
-  \max_{\{(y_t,x_{t+1})\}_{t=0}^\infty}
-  \quad &\sumtinfz \beta^t F(x_t,x_{t+1},y_t)\\
-  &x_{t+1} \in \Gamma(x_t,y_t) \qquad \forall t\notag\\
-  &x_0 \; \text{given}\notag
-\end{align}
-Everything is the same except for the introduction of $y_t$ and a slight
-change in terminology. Rather than choosing the state $x_{t+1}$ directly
-at time $t$ (and calling \emph{that} the control), the agent chooses
-$y_t$ at time $t$, which we now call the control in
-Problem~\ref{prob:altrep}.  This choice of $y_t$ then influences or
-determines the next period's state, $x_{t+1}$, according to some
-deterministic law of motion. Of course, the key insight is that we can
-always use this deterministic law of motion to write $y_t =
-g(x_t,x_{t+1})$ for some deterministic function $g$ and have the agent
-choose $x_{t+1}$---dispensing with the need to include $y_t$ at all.
+\begin{rmk}
+In this subsection, I stick mostly to
+Representation~\ref{prob:sequential-short} for proofs since it's
+equivalent and more compact.
+But I wanted to start with more verbose Representation~\ref{prob:altrep}
+since it's also standard and often easier to write down, plus it
+generalizes most naturally when we go to the \emph{continuous time},
+deterministic sequential formulation.
+\end{rmk}
 
-Therefore, I will mostly stick to the representation in
-Problem~\ref{prob:sequential-short} throughout this section. It's an
-equivalent but more compact way to write these problems, and that seems
-desirable for the upcoming proofs.
-But I wanted to mention the more verbose representation in
-Problem~\ref{prob:altrep} since it's also standard, and since this
-representation generalizes most naturally when we go to continuous time
-dynamic programming problems in Section~\ref{sec:continuous-dynamic}.
-\end{defn}
-\begin{note}
-Function $F$ and correspondence $\Gamma$ in Problem~\ref{prob:altrep}
-are different in functional form from that of
-Problem~\ref{prob:sequential-short}.  I used identical notation purely
-for simplicitly and because they represent the same concepts.
-\end{note}
 
 %\begin{defn}{(Set of Feasible Plans)}
 %Given Problem~\ref{prob:sequential-short} and starting value $x_0$,
@@ -7818,328 +7865,231 @@ for simplicitly and because they represent the same concepts.
 %constraints.
 %\end{defn}
 
-\begin{defn}{(Bellman Equation Formulation and Value Function)}
-\label{defn:bellman}
-Suppose that we face Problem~\ref{prob:sequential-short}.  Also suppose
-that we have access to a function $v_B(x_0)$ called the \emph{value
-function} that returns the value of the objective function in
-Problem~\ref{prob:sequential-short} \emph{after} maximizing over the set
-of all feasible plans for starting point $x_0$. (We'll prove that such a
-function does exist later. For now, just take it as given.) This
-function can be written
-\begin{align*}
-  v_B(x_0) :=
-  \max_{\{x_{t+1}\}^\infty_{t=1}}\;
-  \sumtinfz \beta^t F(x_t,x_{t+1})
-  \qquad x_{t+1}\in\Gamma(x_t)\;\forall t
-\end{align*}
-But this can instead be written recursively as
-\begin{align*}
-  v_B(x_0)
-  %&=
-  %\max_{\{x_{t+1}\}^\infty_{t=1}}\;
-  %F(x,x_1) +
-  %\sum^\infty_{t=1} \beta^t F(x_t,x_{t+1})\\
-  &=
-  \max_{\{x_{t+1}\}^\infty_{t=1}}\;
-  F(x_0,x_1) +
-  \beta \sum^\infty_{t=0} \beta^{t+1} F(x_{t+1},x_{t+2})\\
-  \Leftrightarrow\qquad
-  &=
-  \max_{x_1\in\Gamma(x_0)}\;
-  F(x_0,x_1) +
-  \beta v_B(x_1)
-\end{align*}
-Generalizing notation a bit, we have what's called the \emph{Bellman
-Equation}
-\begin{align}
-  \label{eq:vB}
-  v_B(y) &=
-  \max_{y\in\Gamma(x)}\;
-  F(x,y) +
-  \beta v_B(y)
-\end{align}
-where $F$ is the \emph{period return function}, $x$ the state,
-$y$ the control, and $\Gamma(x)$ the constraint set.
-
-This formulation exploits the stationarity of the problem to
-produce a recursive representation.  Given today's starting value $x$,
-rather than choose an infinite sequence $\{x_{t+1}\}_{t=0}^\infty$, I
-need only choose tomorrow's starting value $y$.  Since the value
-function tells me how much the starting value $y$ is worth, I can frame
-the problem as a tradeoff between $F(x,y)$ today and the discounted
-value of tomorrow's $v_B(y)$.
-
-So we've amazingly turned an infinite-dimensional sequential problem of
-finding $\{x_{t+1}\}^\infty_{t=0}$ into something much simpler, provided
-that $v_B$ exists (we'll still have to prove it does).  That means
-solving Functional Equation~\ref{eq:vB} for fixed point $v_B$, a
-real-valued function. Then, once we have $v_B$, we can think about
-determining the optimal sequence.
-\end{defn}
-
 \begin{defn}{(Optimal Value)}
 \label{defn:vstar}
 Given Problem~\ref{prob:sequential-short}, define the optimal value as
 \begin{align}
   v^*(x_0) := \sup_{\{x_{t+1}\}_{t=0}^\infty}
   \; &\sumtinfz \beta^t F(x_t,x_{t+1})
-  \qquad \text{where}\;
-  \forall t, \; x_{t+1} \in \Gamma(x_t)
+  \qquad \text{s.t.}\quad
+  \text{$x_{t+1} \in \Gamma(x_t)$ $\;\forall t$, $x_0$ given}
+  \label{vstar}
 \end{align}
-Note that I changed the max to a sup since the latter always exists, so
-this is well-defined. That's in stark contrast to $v_B$ in the Bellman
-Equation formulation, which was merely assumed to exist and also implied
-existence of a feasible plan $\{x_t\}_{t=0}^\infty$ that maximized the
-objective function. Now we'll show under what conditions $v^*$ and $v_B$
-are equal---i.e.\ the conditions under which the optimal value is
-obtained.
-
-The reason we care \emph{at all} about the Bellman Formulation of
-Equation~\ref{eq:vB} is that a solution to that problem might give us a
-solution to Canonical Sequential Problem~\ref{prob:sequential-short}.
-There will be occasions when $v_B$ exists but $v^*$ does not, and in
-those cases, we really don't care about $v_B$.
+Note that I changed the max to a sup since the latter always exists.
+So $v^*$ is well-defined, while the max in
+Problem~\ref{prob:sequential-short} does not automically exist.
 \end{defn}
 
 
+\subsubsection{Canonical Recursive Formulation}
+
+Looking at Expression~\ref{vstar}, we might reasonably think that we can
+break up the sum into a recursive formula
+\begin{align*}
+  v^*(x_0)
+  %&=
+  %\max_{\{x_{t+1}\}^\infty_{t=1}}\;
+  %F(x,x_1) +
+  %\sum^\infty_{t=1} \beta^t F(x_t,x_{t+1})\\
+  &=
+  \sup_{\{x_{t+1}\}^\infty_{t=1}}
+  F(x_0,x_1) +
+  \beta \sum^\infty_{t=0} \beta^{t+1} F(x_{t+1},x_{t+2})
+  %\\
+  %\Leftrightarrow\qquad
+  =
+  \sup_{x_1\in\Gamma(x_0)}
+  F(x_0,x_1) +
+  \beta v^*(x_1)
+\end{align*}
+This leads us to the following definition.
+
+\begin{defn}{(Canonical Recursive Formulation and Value Function)}
+\label{defn:bellman}
+The \emph{Canonical Recursive Formulation} is given by
+\emph{value function} $v_B$ and defining \emph{Bellman Equation}
+\begin{align}
+  \label{eq:vB}
+  v_B(x') &=
+  \sup_{x'\in\Gamma(x)}\;
+  F(x,x') +
+  \beta v_B(x')
+\end{align}
+where $F$ is period return function, $x$ current state,
+$x'$ next-period state, $\Gamma(x)$ constraint set.
+\end{defn}
+
+\begin{note}
+Equation~\ref{eq:vB} \emph{defines} $v_B$.
+That's why we make the notational distinction between $v_B$ and $v^*$,
+which we originally used to motivate this definition.
+Functions $v_B$ and $v^*$ are \emph{possibly distinct} because
+they are defined \emph{completely differently}:
+Equation~\ref{vstar} defines $v^*$, while
+Equation~\ref{eq:vB} defines $v_B$.
+It's not obvious that $v^*=v_B$.
+
+Now in general, the reason we care \emph{at all} about
+Representation~\ref{eq:vB} is that sometimes we actually do get
+$v^*=v_B$ under certain assumptions.\footnote{%
+  Though there are occasions when $v_B$ exists but $v^*$ not.
+  In those cases, we don't really care about $v_B$.
+}
+But that's something to \emph{prove}.  We don't get that for free.
+We take up this task in subsequent sections.
+\end{note}
+
+Lastly, why go this route? Why is recursive
+Representation~\ref{eq:vB} useful? Well, we exploited the stationarity
+of original Problem~\ref{prob:sequential-short} to produce a
+somewhat more tractable problem.  Given today's state $x$, rather than
+choose infinite sequence $\{x_{t+1}\}_{t=0}^\infty$,
+I need only choose tomorrow's state $x'$. Since value function $v_B$
+tells me how much starting value $x'$ is worth, I can frame the
+problem as a tradeoff between $F(x,x')$ today and the discounted value
+of tomorrow's $v_B(x')$.  So we've turned an infinite-dimensional
+sequential problem of finding $\{x_{t+1}\}^\infty_{t=0}$ into something
+much simpler, provided we know $v_B$.
+
+Of course, we generally don't know $v_B$ or that $v_B=v^*$.
+Therefore, Representation~\ref{eq:vB} is only useful if we can carry
+out the following three steps:
+\begin{enumerate}[label=(\roman*)]
+  \item
+    \emph{Prove $v_B=v^*$}:
+    We need a theorem telling us when $v_B$ satisfying (\ref{eq:vB})
+    equals $v^*$ and thus is a solution to original
+    Problem~\ref{prob:sequential-short}
+
+  \item \emph{Find $v_B$}:
+    Solve functional Equation~\ref{eq:vB} for fixed point $v_B$, an
+    unknown real-valued function. Step (i) guarantees $v_B=v^*$ so that
+    we've indeed solved the problem.
+
+  \item \emph{Compute Optimal Sequence}:
+    Given $v_B$, we can determine the \emph{policy function} that
+    spits out an optimal $x'$ (given $x$) that appropriately trades off
+    $F(x,x')$ and $v_B(x')$. That policy function can then be used to
+    generate an optimal sequence $\{x_{t+1}\}\tinfz$.
+\end{enumerate}
+These steps will guide our subsequent discussion below for solving
+discrete-time dynamic optimization problems via the recursive Bellman
+Equation approach.
+
+
+
 \clearpage
-\subsection{Bellman Operator}
+\subsubsection{Bellman Operator}
 
-Does a Bellman Equation ahve a solution? And if so, How do you actually
-go about solving a Bellman Equation? In this section, we describe the
-Bellman Operator and some results about it which answer that question.
-
+We now define a useful object called the \emph{Bellman Operator}, which
+(together with the Contraction Mapping Theorem and some assumptions)
+will let us assert existence, uniqueness, and properties (increasing,
+concave, etc.) of a solution $v_B$ to functional Equation~\ref{eq:vB}.
 
 \begin{defn}(Bellman Operator)
-Define the \emph{Bellman operator} $T$
+Given Bellman Equation~\ref{eq:vB}, define the associated
+\emph{Bellman operator} $T$ acting on the set of real-valued functions
+as
 %$T:\mathscr{B}(X,\R)\rightarrow\mathscr{B}(X,\R)$
-acting on the set of real-valued functions as
 \begin{align}
-  T[v(x)]
-  &= \max_{y\in\Gamma(x)}
-  F(x,y) + \beta v(y)
+  T[w(x)]
+  &= \sup_{x'\in\Gamma(x)}
+  F(x,x') + \beta w(x')
   \label{defn:bellman-operator}
 \end{align}
-This takes in a function $v$ and spits out another function.
-
-Importantly, Bellman Operators tell us about the existence of solutions
-to a Bellman Equation. Specifically, if $v_B$ satisfies
-\begin{align*}
-  T[v_B] = v_B
-\end{align*}
-i.e.\ if $v_B$ is a fixed point of operator $T$, then it solves the
-Bellman Equation associated with the operator $T$ defined in
-Equation~\ref{defn:bellman-operator}.
-From there, to show uniqueness, we would typically show that $T$ is a
-contraction map, and then appeal to the contraction mapping theorem.
+This takes in a function $w$ and spits out another function.
+If it exists, a solution $v_B$ to Bellman Equation~\ref{eq:vB} is
+necessarily a fixed point of the operator, i.e. $T[v_B(x)]=v_B(x)$.
 \end{defn}
+
 \begin{rmk}
-We might consider defining $T$ to act only on the set of \emph{bounded}
-functions. Those functions could be bounded either because we explicitly
-bound the range of the functions over the whole domain, \emph{or} we
-consider only continuous functions on a compact domain (so the range is
-consequently bounded).
+We sometimes restrict $T$ to act only on the set of real \emph{bounded}
+functions. They could be bounded either because we explicitly bound the
+range of the functions, \emph{or} we consider only continuous functions
+on a compact domain (so the range is consequently bounded).
 \end{rmk}
 
-\begin{prop}
-Suppose that $v$ is a continuous function in $\sB(X,\R)$, the set of
-bounded real-valued functions. Then $T[v]$ is a continuous function
-of $x$ and the optimal policy $y^*(x)$ is a UHC correspondence. If
-$y^*(x)$ is a function, then it is continuous.
-\end{prop}
+%\begin{prop}
+%Suppose that $v$ is a continuous function in $\sB(X,\R)$, the set of
+%bounded real-valued functions. Then $T[v]$ is a continuous function
+%of $x$ and the optimal policy $x'_*(x)$ is a UHC correspondence. If
+%$x'_*(x)$ is a function, then it is continuous.
+%\end{prop}
 
-\begin{prop}{\emph{(Bellman Operator is a Contraction Map)}}
-\end{prop}
-
-
+%\begin{prop}{\emph{(Bellman Operator is a Contraction Map)}}
+%\end{prop}
 
 
 
+\subsubsection{Principal of Optimality: Equivalence of Sequential and
+Recursive Reps}
 
+This subsection considers a dynamic optimization problem written in
+sequential (\ref{prob:sequential-short}) and recursive (\ref{eq:vB}) form
+and seeks to clarify the relationship between $v^*$ and $v_B$.
+Nothing more. We postpone actually \emph{solving} for $v^*$ and $v_B$
+for the moment.
 
-\clearpage
-\subsection{Solving by Guess and Verify}
-
-Suppose that we have Bellman Equation
-\begin{align*}
-  v(x) = \max_{y\in\Gamma(x)} F(x,y) + \beta v(y)
-\end{align*}
-The method of ``guess and verify'' is a three-step procedure
-\begin{enumerate}
-  \item Come up with a guess for $v$.
-
-    Note that often, we merely guess and check a functional form like
-    $v(x)=a + b\log(x)$ (without specifying constant coefficients). And
-    so during the ``guess and check'' procedure, we need to solve for
-    the coefficient values as well. We see this in Step 3 and in the
-    next example.
-
-  \item Solve the RHS for the policy function $y^*(x)$: Substitute your
-    guess for $v$ into the RHS and find the max over all feasible
-    $y\in\Gamma(x)$.  Often, everything is differentiable, so this means
-    differentiate the RHS, set equal to zero, solve for $y^*(x)$:
-    \begin{align*}
-      \text{$y^*(x)$ solves} \qquad
-      0 &= \frac{\partial}{\partial y}
-      \left[
-        F(x,y) + \beta\, v(y)
-      \right]
-    \end{align*}
-    I use $y^*(x)$ to highlight the dependence of the optimal value on
-    the state $x$.
-
-  \item Evaluate the RHS at the optimum: Plug the optimum $y^*(x)$ into
-    the RHS. Check that the resulting function is identical to the
-    original $v$ on the LHS, i.e.\ check
-    \begin{align*}
-      v(x) &= F(x,y^*(x)) + \beta\, v(y^*(x))
-    \end{align*}
-    It at is at this stage that you collect terms and identify any
-    undetermined coefficients.
-\end{enumerate}
-
-
-\begin{ex}
-Suppose that we face problem
-\begin{align*}
-  v(k) = \max_{k'\in[0,f(k)]} u(f(k)-k') + \beta\, v(k')
-\end{align*}
-where $u=\log(c)$ and $f(k)=k^\alpha$.
-
-First step: divine inspiration says guess $v(k) = a + b \; \log(k)$ for
-some constants $a$ and $b$ that we'll pin down later.
-Now, differentiate the RHS:
-\begin{align*}
-  \frac{\partial}{\partial k'}
-  \left[
-  u(f(k)-k') + \beta\, v(k')
-  \right]
-  &=
-  \frac{\partial}{\partial k'}
-  \left[
-    \log\left(
-    k^\alpha - k'
-    \right)
-    + \beta (a + b\, \log(k'))
-  \right] \\
-  &= -\frac{1}{k^\alpha-k'}
-  + \frac{b\beta}{k'}
-\end{align*}
-Set that equal to zero and solve for $k'$
-\begin{align*}
-  0
-  &= -\frac{1}{k^\alpha-k'}
-  + \frac{b\beta}{k'}\\
-  \Rightarrow\quad
-  k' &= \frac{b\beta}{1+b\beta} k^\alpha
-\end{align*}
-Now substitute this into the RHS, and try to work it into something that
-looks like $v(k) = a + b\,\log(k)$:
-\begin{align*}
-  RHS = u(f(k)-k') + \beta \, v(k')
-  &=
-  \log\left(
-    k^\alpha - \frac{b\beta}{1+b\beta} k^\alpha
-  \right)
-  + \beta
-    \left[
-      a + b\,\log\left(\frac{b\beta}{1+b\beta} k^\alpha\right)
-    \right] \\
-  &=
-  \log\left(
-    \frac{k^\alpha}{1+b\beta}
-  \right)
-  + a\beta + b\beta\,\log\left(\frac{b\beta}{1+b\beta} k^\alpha\right) \\
-  &=
-  [a\beta
-  + b\beta\,\log\left(b\beta\right)
-  - (1+b\beta)\log\left( 1+b\beta \right)]
-  +\alpha(1+b\beta)\log\left( k \right)
-\end{align*}
-Bit of a monster, but we have isolated a bunch of constants and a
-constant times $\log k$. We just need to match up constants, so start
-with the coefficient on $\log k$:
-\begin{align*}
-  b\log(k)
-  &= \alpha(1+b\beta) \log(k) \\
-  \Rightarrow\quad
-  b &= \frac{\alpha}{1-\alpha \beta}
-\end{align*}
-Next, match up the constants to $a$ and solve for $a$ (leaving $b$ as
-is):
-\begin{align*}
-  a
-  &=
-  a\beta + b\beta\,\log\left(b\beta\right)
-  - (1+b\beta)\log\left( 1+b\beta \right) \\
-  \Rightarrow\qquad
-  a
-  &=
-  \frac{1}{1-\beta}
-  \left[
-    b\beta\,\log\left(b\beta\right)
-  - (1+b\beta)\log\left( 1+b\beta \right) \right]
-\end{align*}
-For this choice of constants, $v(k) = a + b\,\log(k)$ solves the Bellman
-Equation.
-\end{ex}
-
-
-\clearpage
-\subsection{Principal of Optimality: Equivalence of Sequential and
-Bellman Formulations}
-
-In this section we look at conditions under which the optimal value
-function $v^*$ for the sequential problem
+Recall $v^*$, the optimal value of the objective function in the
+sequential formulation
 \begin{align}
-  v^*(x_0) :=& \;
-  \sup_{\{x_{t+1}\}_{t=0}^\infty}
-  \sumtinfz \beta^t F(x_t,x_{t+1})
+  v^*(x_0) := \sup_{\{x_{t+1}\}_{t=0}^\infty}
+  \; &\sumtinfz \beta^t F(x_t,x_{t+1})
   \label{eq:vstar}
-  \\
-  \text{s.t.} & \quad x_{t+1}\in \Gamma(x_t) \notag \\
-  & \quad x_{0}\;\text{given}
-  \notag
+  %\\
+  \qquad \text{s.t.}\quad
+  %&
+  \text{$x_{t+1} \in \Gamma(x_t)$ $\;\forall t$, $x_0$ given}
+  %\notag
 \end{align}
-matches the solution $v_B$ to the functional Bellman Equation
+along with $v_B$, the solution to the functional Bellman Equation
+in the recursive formulation,\footnote{%
+  We replaced max with sup so that we can refer to $v_B$ without
+  worrying about existence. But, in general, we work with problems where
+  the max is obtained.
+}
 \begin{align}
   \label{eq:vB2}
-  v_B(y) &=
-  \sup_{y\in\Gamma(x)}\;
-  F(x,y) +
-  \beta v_B(y)
+  v_B(x) &=
+  \sup_{x'\in\Gamma(x)}\;
+  F(x,x') +
+  \beta v_B(x')
 \end{align}
-and vice versa, where
+This section merely hopes to establish when we can refer to $v^*$ and
+$v_B$ interchangeably given properties of the problem primitives
+$(X,F,\beta,\Gamma)$, where
 \begin{itemize}
-  \item $x$: the state variable
-  \item $y$: the control, which is equivalent to the state tomorrow in
-    this formulation
-  \item $g(x)$: A policy function that maps the state $x$ into an
-    optimal choice of $y$. This is a byproduct of solving the functional
-    Bellman Equation~\ref{eq:vB2}.
-  \item $X$: the set of possible values the state today $x$ and the
-    contrl/state tomorrow can take on
-  \item $\Gamma:X \rightrightarrows X$: the constraint set, which
-    encodes information about the feasible sets and plans
-  \item Feasible Plans $\Pi(x_0)$:
-    Given $x_0$,
-    \begin{align*}
-      \Pi(x_0) :=
-      \big\{ \{x_t\}\tinfz \;|\; x_{t+1} \in \Gamma(x_t) \big\}
-    \end{align*}
+  \item $X$: set of possible values the state today $x$ and the
+    state tomorrow $x'$ can take on
+  \item $\Gamma:X \rightrightarrows X$: constraint set, which encodes
+    information about the feasible sets and plans
   \item $F:A\ra \R$: the period return function where $A$ is the
     graph of $\Gamma$, defined
     \begin{align*}
       A:=\{(x,y) \in X\times X \;|\; y \in\Gamma(x)\}
     \end{align*}
 \end{itemize}
-The primitives are $(X,F,\beta,\Gamma)$.
+For convenience, we also define objects
+\begin{itemize}
+  \item Feasible Plans $\Pi(x_0)$:
+    Given $x_0$,
+    we define
+    $\Pi(x_0) :=
+    \big\{ \{x_t\}\tinfz \;|\; x_{t+1} \in \Gamma(x_t) \; \forall t\big\}$
+    %\begin{align*}
+      %\Pi(x_0) :=
+      %\big\{ \{x_t\}\tinfz \;|\; x_{t+1} \in \Gamma(x_t) \big\}
+    %\end{align*}
+  \item Policy Function $g(x)$: this function maps today's state $x$
+    into an optimal choice of tomorrow's state $x'$. This is a byproduct
+    of solving the functional Bellman Equation~\ref{eq:vB2}.
+\end{itemize}
+
 
 \clearpage
 \begin{thm}
 \label{thm:vstar-solves-bellman}
-Consider the following assumptions:
+We lay out and label the following assumptions:
 \begin{enumerate}
   \item \emph{(Nonempty Feasible Sets)}:
     $\Gamma(x)\neq\emptyset$ for all $x\in X$
@@ -8147,31 +8097,31 @@ Consider the following assumptions:
     %always construct a feasible sequence given any starting point.
 
   \item \emph{(Well-Defined Limit)}:
-    For all feasible sequences $\{x_{t+1}\}_{t=0}^\infty \in \Pi(x_0)$,
-    and the following limit exists\footnote{%
-      We don't necessarily need the limit to be \emph{finite}. It could
-      $\pm \infty$. We just need it to exist and not bounce around in
-      the tail.
+    For all feasible $\{x_{t}\}_{t=0}^\infty \in \Pi(x_0)$,
+    the following limit exists\footnote{%
+      Don't need a \emph{finite} limit here. Could be $\pm \infty$. Just
+      need it to exist and not bounce around in the tail.
     }
     \begin{align*}
       \lim_{T\rightarrow\infty} \sum_{t=0}^T \beta^t F(x_t,x_{t+1})
       %\quad\text{exists}
     \end{align*}
-    We can ensure this limit exists if $F(x,y)$ is a bounded function
-    and $\beta \in (0,1)$.
+    Can ensure this limit exists if $F(x,x')$ is a bounded function and
+    $\beta \in (0,1)$.
     % See Esteban week 1 slides, slide 54
 
   \item \emph{(Transversality Condition)}:
-    Given function $v_B$, the solution to the functional equation,
-    %for all $x_0\in X$ and all feasible sequences
+    For all $x_0\in X$ and for all
+    $\{x_{t}\}_{t=0}^\infty \in \Pi(x_0)$,\footnote{%
+      Emphasis on double ``for all'' qualifiers.
+    }
+    $v_B$ satisfies
     \begin{align*}
       \lim_{t\rightarrow\infty} \beta^t v_B(x_t) = 0
     \end{align*}
-    for all $x_0\in X$ and for all
-    $\{x_{t+1}\}_{t=0}^\infty \in \Pi(x_0)$.\footnote{%
-    Emphasis on double ``for all'' qualifiers.
-    In words, this condition says that the value of stuff in the
-    infinite future doesn't matter.}
+    Loosely says ``the value of stuff in the infinite future doesn't
+    matter'' no matter the starting $x_0$ and subsequent path
+    $\{x_{t+1}\}_{t=0}^\infty$.
 
   \item
     \emph{(Continuous $\Gamma$ on Convex $X$)}:
@@ -8185,21 +8135,21 @@ Consider the following assumptions:
 
   \item
     \emph{(Monotone $\Gamma$)}:
-    If $x \leq x'$, then $\Gamma(x) \subseteq \Gamma(x')$.
+    If $x \leq y$, then $\Gamma(x) \subseteq \Gamma(y)$.
 
   \item
     \emph{(Strictly Increasing $F$)}:
-    For fixed $y$, the function $F(\cdot,y)$ is strictly increasing in
+    For fixed $x'$, function $F(\cdot,x')$ is strictly increasing in
     each of the $L$ components of $x\in X\subseteq \R^L$.
 
   \item
     \emph{(Strictly Concave $F$)}:
-    If $F$ is strictly concave in $(x,y)\in A$, i.e.\ for all distinct
-    pairs $(x,y), (x',y') \in A$ and $\alpha \in (0,1)$
+    If $F$ is strictly concave in $(x,x')\in A$, i.e.\ for all distinct
+    pairs $(x,x'), (y,y') \in A$ and $\alpha \in (0,1)$
     \begin{align*}
-      F\left(\alpha x + (1-\alpha)x', \; \alpha y + (1-\alpha)y'\right)
+      F\left(\alpha x + (1-\alpha)y, \; \alpha x' + (1-\alpha)y'\right)
       >
-      \alpha F(x,y) + (1-\alpha)F(x',y')
+      \alpha F(x,x') + (1-\alpha)F(y,y')
     \end{align*}
 
   \item
@@ -8207,13 +8157,13 @@ Consider the following assumptions:
     For all $\alpha\in[0,1]$, we have
     \begin{align*}
       \begin{rcases}
-        x,x' &\in X \\
-        y&\in \Gamma(x) \\
-        y'&\in \Gamma(x')
+        x,y &\in X \\
+        x'&\in \Gamma(x) \\
+        y'&\in \Gamma(y)
       \end{rcases}
       \quad\implies\quad
-      \alpha y + (1-\alpha) y
-      \in \Gamma(\alpha x + (1-\alpha) x')
+      \alpha x' + (1-\alpha) y'
+      \in \Gamma(\alpha x + (1-\alpha) y)
       %\qquad\forall \alpha\in[0,1]
     \end{align*}
 
@@ -8222,6 +8172,7 @@ Consider the following assumptions:
     The period return function $F$ is continuously differentiable on the
     interior of $A$.
 \end{enumerate}
+\clearpage
 We have the following results:
 \begin{enumerate}
   \item
@@ -8231,16 +8182,16 @@ We have the following results:
     Equation~\ref{eq:vB2}. i.e.\
     \begin{align*}
       v^*(x) =
-      \sup_{y \in \Gamma(x)}
-      F(x,y) + \beta v^*(y)
+      \sup_{x' \in \Gamma(x)}
+      F(x,x') + \beta v^*(x')
     \end{align*}
 
   \item
     \emph{(Characterization of Optimal Policies)}:
     If Assumptions 1 and 2 hold and we have sequence
-    $\{x^*_t\}\tinfz\in\Pi(x_0)$ that attains the supremum in sequential
-    problem Equation~\ref{eq:vstar} (not saying it will exist, but if it
-    does), then
+    $\{x^*_t\}\tinfz\in\Pi(x_0)$ that \emph{attains the supremum} in
+    sequential problem Equation~\ref{eq:vstar} (not saying such a plan
+    will exist, but if it does), then
     \begin{align*}
       v^*(x^*_t) = F(x^*_t,x^*_{t+1}) + \beta v^*(x^*_{t+1})
       \qquad \forall t
@@ -8262,21 +8213,21 @@ We have the following results:
 
   \item
     \emph{($v^*=v_B$)}:
-    If Assumptions 1, 2, and 3 hold, then $v_B = v^*$, i.e.\
-    the solution $v_B$ to the functional Bellman Equation~\ref{eq:vB2}
-    equals $v^*$ the solution to the sequential problem in
-    Equation~\ref{eq:vstar}.
+    If Assumptions 1, 2, and 3 hold, then $v_B = v^*$---i.e.\ solution
+    $v_B$ to recursive Bellman Eqn (\ref{eq:vB2}) equals
+    optimal value function $v^*$ for sequential formulation
+    (\ref{eq:vstar}).
 
     Moreover, since $v_B=v^*$ and since Assumption 3 implies
-    Condition~\ref{weak-tvc}, Result 2 tells us that the feasible plan
-    generated by policy function $g(x)$ as $\hat{x}_{t+1} =
-    g(\hat{x}_t)$ (for given $\hat{x}_0=x_0$) is an optimal,
+    Condition~\ref{weak-tvc}, Result 2 above tells us that the feasible
+    plan generated by policy function $g(x)$ as $\hat{x}_{t+1} =
+    g(\hat{x}_t)$ starting from $\hat{x}_0=x_0$ is an optimal,
     supremum-attaining plan.
 
   \item
     \emph{(Uniqueness of Solution $v_B$)}:
     If Assumptions 1-5 hold, then for Bellman Operator $T$
-    \begin{enumerate}
+    \begin{enumerate}[label=\emph{(\alph*)}]
       \item $T$ obviously maps the space of bounded continuous functions
         $\sC(X,\R)$ into itself, i.e.\ we have
         $Tv \in \sC(X,\R)$ for all $v\in\sC(X,\R)$.
@@ -8303,8 +8254,8 @@ We have the following results:
 
   \item
     \emph{(Benveniste-Scheinkman)}:
-    Under assumptions 1-5 and 8-10, if $x_0\in \interior(X)$ and
-    $g(x_0)\in\interior(\Gamma(x_0))$, then the unique fixed point $v$
+    Under Assumptions 1-5 and 8-10, if $x_0\in \interior(X)$ and
+    $g(x_0)\in\interior(\Gamma(x_0))$, the unique fixed point $v$
     of $T$ is continuously differentable at $x_0$ with
     \begin{align*}
       \frac{\partial v(x_0)}{\partial x^i}
@@ -8315,7 +8266,11 @@ We have the following results:
 \end{thm}
 
 
-\clearpage
+%\clearpage
+%\begin{proof}
+%\end{proof}
+
+
 %\begin{proof}
 %For arbitrary $x\in X$, we want to show that the value $v^*(x)$ equals
 %%the RHS of Equation~\ref{vstar-solves-bellman}---i.e.\ that it is indeed
@@ -8544,9 +8499,136 @@ only checking the transversality condition catches this kind of problem.
 \end{ex}
 
 
-
 \clearpage
-\section{Continuous-Time Deterministic Dynamic Programming}
+\subsubsection{Solving by Guess and Verify}
+
+Suppose that we have Bellman Equation
+\begin{align*}
+  v(x) = \max_{y\in\Gamma(x)} F(x,y) + \beta v(y)
+\end{align*}
+The method of ``guess and verify'' is a three-step procedure
+\begin{enumerate}
+  \item Come up with a guess for $v$.
+
+    Note that often, we merely guess and check a functional form like
+    $v(x)=a + b\log(x)$ (without specifying constant coefficients). And
+    so during the ``guess and check'' procedure, we need to solve for
+    the coefficient values as well. We see this in Step 3 and in the
+    next example.
+
+  \item Solve the RHS for the policy function $y^*(x)$: Substitute your
+    guess for $v$ into the RHS and find the max over all feasible
+    $y\in\Gamma(x)$.  Often, everything is differentiable, so this means
+    differentiate the RHS, set equal to zero, solve for $y^*(x)$:
+    \begin{align*}
+      \text{$y^*(x)$ solves} \qquad
+      0 &= \frac{\partial}{\partial y}
+      \left[
+        F(x,y) + \beta\, v(y)
+      \right]
+    \end{align*}
+    I use $y^*(x)$ to highlight the dependence of the optimal value on
+    the state $x$.
+
+  \item Evaluate the RHS at the optimum: Plug the optimum $y^*(x)$ into
+    the RHS. Check that the resulting function is identical to the
+    original $v$ on the LHS, i.e.\ check
+    \begin{align*}
+      v(x) &= F(x,y^*(x)) + \beta\, v(y^*(x))
+    \end{align*}
+    It at is at this stage that you collect terms and identify any
+    undetermined coefficients.
+\end{enumerate}
+
+
+\begin{ex}
+Suppose that we face problem
+\begin{align*}
+  v(k) = \max_{k'\in[0,f(k)]} u(f(k)-k') + \beta\, v(k')
+\end{align*}
+where $u=\log(c)$ and $f(k)=k^\alpha$.
+
+First step: divine inspiration says guess $v(k) = a + b \; \log(k)$ for
+some constants $a$ and $b$ that we'll pin down later.
+Now, differentiate the RHS:
+\begin{align*}
+  \frac{\partial}{\partial k'}
+  \left[
+  u(f(k)-k') + \beta\, v(k')
+  \right]
+  &=
+  \frac{\partial}{\partial k'}
+  \left[
+    \log\left(
+    k^\alpha - k'
+    \right)
+    + \beta (a + b\, \log(k'))
+  \right] \\
+  &= -\frac{1}{k^\alpha-k'}
+  + \frac{b\beta}{k'}
+\end{align*}
+Set that equal to zero and solve for $k'$
+\begin{align*}
+  0
+  &= -\frac{1}{k^\alpha-k'}
+  + \frac{b\beta}{k'}\\
+  \Rightarrow\quad
+  k' &= \frac{b\beta}{1+b\beta} k^\alpha
+\end{align*}
+Now substitute this into the RHS, and try to work it into something that
+looks like $v(k) = a + b\,\log(k)$:
+\begin{align*}
+  RHS = u(f(k)-k') + \beta \, v(k')
+  &=
+  \log\left(
+    k^\alpha - \frac{b\beta}{1+b\beta} k^\alpha
+  \right)
+  + \beta
+    \left[
+      a + b\,\log\left(\frac{b\beta}{1+b\beta} k^\alpha\right)
+    \right] \\
+  &=
+  \log\left(
+    \frac{k^\alpha}{1+b\beta}
+  \right)
+  + a\beta + b\beta\,\log\left(\frac{b\beta}{1+b\beta} k^\alpha\right) \\
+  &=
+  [a\beta
+  + b\beta\,\log\left(b\beta\right)
+  - (1+b\beta)\log\left( 1+b\beta \right)]
+  +\alpha(1+b\beta)\log\left( k \right)
+\end{align*}
+Bit of a monster, but we have isolated a bunch of constants and a
+constant times $\log k$. We just need to match up constants, so start
+with the coefficient on $\log k$:
+\begin{align*}
+  b\log(k)
+  &= \alpha(1+b\beta) \log(k) \\
+  \Rightarrow\quad
+  b &= \frac{\alpha}{1-\alpha \beta}
+\end{align*}
+Next, match up the constants to $a$ and solve for $a$ (leaving $b$ as
+is):
+\begin{align*}
+  a
+  &=
+  a\beta + b\beta\,\log\left(b\beta\right)
+  - (1+b\beta)\log\left( 1+b\beta \right) \\
+  \Rightarrow\qquad
+  a
+  &=
+  \frac{1}{1-\beta}
+  \left[
+    b\beta\,\log\left(b\beta\right)
+  - (1+b\beta)\log\left( 1+b\beta \right) \right]
+\end{align*}
+For this choice of constants, $v(k) = a + b\,\log(k)$ solves the Bellman
+Equation.
+\end{ex}
+
+
+
+\subsection{Continuous-Time Deterministic Dynamic Optimization}
 \label{sec:continuous-dynamic}
 
 In this section, we extend the work of
@@ -8556,7 +8638,7 @@ difference equations become \emph{differential} equations.  The
 formulation we generalize is Problem~\ref{prob:altrep} rather than the
 equivalent and more compact Problem~\ref{prob:sequential-short}.
 
-\subsection{Canonical Problem and the Hamiltonian}
+\subsubsection{Canonical Problem and the Hamiltonian}
 
 Give some objective function $F(x,y,t)$, we want to choose functions
 of time, $x_t$ and $y_t$, to solve
