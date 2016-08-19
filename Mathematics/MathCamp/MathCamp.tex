@@ -7785,7 +7785,7 @@ choosing sequence $\{y_{t}\}_{t=0}^\infty$ that maximizes
   \qquad \text{s.t.}\quad
   \begin{cases}
   y_t \in \tilde{\Gamma}(x_t) \;\; \forall t\\
-  \text{$x_{t+1} = g(x_t,y_t)$ $\;\forall t$, $x_0$ given}
+  \text{$x_{t+1} = G(x_t,y_t)$ $\;\forall t$, $x_0$ given}
   \end{cases}
 \end{align}
 The problem involves
@@ -7799,14 +7799,14 @@ The problem involves
     Since this object is chosen and controlled by the agent, $y_{t}$ is
     called the \emph{control}.
     Choice of $y_t$ influences next period's state $x_{t+1}$ by the law
-    of motion $g$.
+    of motion $G$.
   %\item \emph{Period Return Function} $\tilde{F}(x_t,y_t)$:
     %This is often a utility function describing the return the agent
     %gets in time $t$ given state and control choice $(x_t,y_t)$.
-  \item \emph{Law of Motion} $g(x_t,y_t)$: Given the current state $x_t$
-    and the choice of control $y_t$, the law of motion $g$
+  \item \emph{Law of Motion} $G(x_t,y_t)$: Given the current state $x_t$
+    and the choice of control $y_t$, the law of motion $G$
     deterministically spits out the state next period,
-    $x_{t+1}=g(x_t,y_t)$.  Often, there will often be some tradeoff
+    $x_{t+1}=G(x_t,y_t)$.  Often, there will often be some tradeoff
     between more $y_t$ today and less $x_{t+1}$ tomorrow.
 
   \item \emph{Feasibility Constraints}, $\tilde{\Gamma}(x_t)$:
@@ -7817,9 +7817,9 @@ While Representation~\ref{prob:altrep} is often easiest to
 \emph{write down}, the following (equivalent) canonical sequential
 formulation is easiest to \emph{solve}.
 Specifically, choice of $y_t$ and deterministic law of motion
-$g(x_t,y_t)$ together pin down $x_{t+1}$ entirely.
+$G(x_t,y_t)$ together pin down $x_{t+1}$ entirely.
 Choice of $y_t$ \emph{implies} a choice of $x_{t+1}$.  So if we can
-invert law of motion $g$ to get $y_t=h(x_t,x_{t+1})$, we can sub
+invert law of motion $G$ to get $y_t=h(x_t,x_{t+1})$, we can sub
 $h(x_t,x_{t+1})$ for $y_t$ everywhere to instead frame the problem as
 a \emph{direct} choice of next-period state $x_{t+1}$
 \end{defn}
@@ -7894,18 +7894,18 @@ $x_{t+1}\in \interior(\Gamma(x_t))$,
 \begin{alignat*}{3}
   \text{\emph{(EE)}}:&&
   \qquad
-  U_2(x_{t},x_{t+1}) + \beta U_1(x_{t+1},x_{t+2})
+  F_2(x_{t},x_{t+1}) + \beta F_1(x_{t+1},x_{t+2})
   &= 0
   \qquad\forall t
   \\
   \text{\emph{(TVC)}}:&&
   \lim_{T\ra\infty}
-  \beta^T U_2(x_{T},x_{T+1})
+  \beta^T F_2(x_{T},x_{T+1})
   x_{T+1}
   &= 0
 \end{alignat*}
 (EE) is the Euler Equation---a first order difference equation in state
-variable $x_{t+1}$. If $x_t$ is a vector, then $U_1$ and $U_2$ are
+variable $x_{t+1}$. If $x_t$ is a vector, then $F_1$ and $F_2$ are
 column vectors and this is a system of equations.
 (TVC) is the \emph{Transversality Condition}, which plays the role of a
 boundary condition.\footnote{%
@@ -7914,7 +7914,7 @@ boundary condition.\footnote{%
   \begin{align*}
     \lim_{T\ra\infty}
     \beta^{T}
-    U_1(x_{T},x_{T+1})
+    F_1(x_{T},x_{T+1})
     x_{T}
     &= 0
   \end{align*}
@@ -7941,6 +7941,17 @@ domain, hence a maximum exists. Uniqueness is guaranteed by concave $F$
 and convex constraint set.
 \end{proof}
 
+\begin{defn}(Steady State)
+Steady state $x^*$ is a point such that $x_0=x^*$ implies $x_t=x^*$ for
+all $t\geq 1$.
+Given the Euler Equation of the form (EE) above, steady state $x^*$
+satisfies
+\begin{align*}
+  F_2(x^*,x^*) + \beta F_1(x^*,x^*)
+  &= 0
+\end{align*}
+\end{defn}
+
 
 \clearpage
 \begin{ex}{(Necessity of TVC)}
@@ -7950,12 +7961,18 @@ function solution. Now onto the problem.
 
 Consider a simple consumption/investment decision:
 \begin{align*}
-  \max_{\{c_t\}_0^\infty} \; &\sumtinfz \beta^t c_t \\
-  & c_t + a_{t+1} = (1+r)a_t\\
-  & c_t \geq 0
+  \max_{\{c_t\}_0^\infty} \; &\sumtinfz \beta^t c_t
+  \qquad
+  %&
+  \text{s.t}\quad
+  c_t + a_{t+1} = (1+r)a_t
+  %\\
+  %&
+  ,\quad
+  c_t \geq 0
 \end{align*}
 where $a_0$ is given as initial endowment. We can express this problem
-in standard form with $a_t$ as the state variable
+in state-only form
 \begin{align*}
   \max_{\{a_{t+1}\}_0^\infty} \;
   &\sumtinfz \; \beta^t [(1+r)a_t - a_{t+1}] \\
@@ -7965,7 +7982,6 @@ where $F(a_t,a_{t+1}) = (1+r)a_t - a_{t+1}$.
 We place \emph{no restrictions} on each $a_t$---they can be arbitrarily
 negative, and that will be important.
 Under some assumptions $1+r = \frac{1}{\beta}$.
-
 So now we can write the Bellman Equation formulation:
 \begin{align*}
   v(a) = \max_{a'} \; \left(\frac{a}{\beta} - a'\right) + \beta \, v(a')
@@ -7976,9 +7992,12 @@ Now we use the guess and verify method. The guess is $v(a) = a/\beta$.
   \frac{a}{\beta}
   &= \max_{a'} \;
   \left(\frac{a}{\beta} - a'\right)
-  + \beta \left(\frac{a'}{\beta}\right)\\
-  \frac{a}{\beta}
-  &= \max_{a'} \;
+  + \beta \left(\frac{a'}{\beta}\right)
+  %\\
+  %\frac{a}{\beta}
+  %&=
+  =
+  \max_{a'} \;
   \frac{a}{\beta}
   =
   \frac{a}{\beta}
@@ -8217,7 +8236,7 @@ Principal of Optimality.
     $\beta \in (0,1)$.
     % See Esteban week 1 slides, slide 54
 
-  \item[A3.] \emph{Transversality Condition}:
+  \item[A3.] \emph{Value Function Limit}:
     For all $x_0\in X$ and for all
     $\{x_{t}\}_{t=0}^\infty \in \Pi(x_0)$,\footnote{%
       Emphasis on double ``for all'' qualifiers.
@@ -8466,8 +8485,8 @@ as
   \label{defn:bellman-operator}
 \end{align}
 This takes in a function $w$ and spits out another function.
-If it exists, a solution $v_B$ to Bellman Equation~\ref{eq:vB} is
-necessarily a fixed point of the operator, i.e. $T[v_B(x)]=v_B(x)$.
+If a solution $v_B$ to Bellman Equation~\ref{eq:vB} exists, it is
+necessarily a fixed point of this operator, i.e. $T[v_B(x)]=v_B(x)$.
 \end{defn}
 
 \begin{rmk}
@@ -8735,143 +8754,155 @@ difference equations become \emph{differential} equations.  The
 formulation we generalize is Problem~\ref{prob:altrep} rather than the
 equivalent and more compact Problem~\ref{prob:sequential-short}.
 
-\subsubsection{Canonical Problem and the Hamiltonian}
-
-Give some objective function $F(x,y,t)$, we want to choose functions
-of time, $x_t$ and $y_t$, to solve
-%of time, $x_t$ with range $\Rn$ and $y_t$ with range $\R^k$, to solve
-\begin{align}
-  \max_{x_t,y_t} \; W(x_t,y_t) &=
-  \max_{x_t,y_t} \; \int^{T}_{0} F(x_t,y_t,t) \; dt
-  \label{prob:cts-dynamic} \\\notag\\
-  \text{s.t.} \;
-   \dot{x}_t &= G(x_t,y_t,t) \notag \\
-  %& y_t \in Y_t \subseteq \R^k \quad \forall t\notag \\
-   y_t &\in Y_t \quad \forall t\notag \\
-   x_0  &\;\text{given} \notag
-\end{align}
-We will consider problems where the terminal time $T$ is finite and
-where it is infinite.
-Again, the key features of this problem are
-\begin{enumerate}
-  \item \emph{State}, $x_t$:
-    %A ``sufficient statistic'' encoding information about feasible sets.
-    Its evolution is summarized by a differential equation, where
-    $\dot{x}_t := \frac{\partial x_t}{\partial t}$. The evolution of the
-    state is influenced by the current state, the choice of control, and
-    time.
-  \item \emph{Control}, $y_t$: Chosen by the agent in response to the
-    state $x_t$. This influences the evolution of the state in the
-    future.
-  \item \emph{Feasibility Constraints}, $y_t\in Y_t$: At each time
-    period, there is some feasible set $Y_t$ in $\R$ or $\Rk$ (if there
-    are multiple control variables). We require the choice of control
-    $y_t$ lies in $Y_t$ at each period.
-  \item \emph{Admissable Pair}, $(x_t,y_t)$: The pair of functions
-    $(x_t,y_t)$ is called an admissable pair if they satisfy both
-    $\dot{x}_t = G(x_t,y_t,t)$ and $y_t\in Y_t$ for all $t$.
-\end{enumerate}
-
-\begin{defn}{(Hamiltonian)}
-Given Problem~\ref{prob:cts-dynamic}, define the \emph{Hamiltonian}
-\begin{align*}
-  H(x,y,\lambda,t) := F(x_t,y_t,t) + \lambda_t G(x_t,y_t,t)
-\end{align*}
-where $\lambda_t$ is a function called the \emph{co-state}.
-This is very much like the static-optimizaton Lagrangian, only now,
-we're doing dynamic optimization that involves more than one time
-period.
-\end{defn}
-
-\begin{defn}{(Necessary Conditions)}
-Suppose that we are faced with Problem~\ref{prob:cts-dynamic} where
-$T<\infty$ and $F$ and $G$ are continuously differentiable functions.
-Suppose that the problem has an interior continuous solution
-$y_t$---i.e.\ $y_t$ is continuous and $y_t\in \text{int} \, Y_t$ for all
-$t$---with corresponding state variable $x_t$ such that $W(x_t,y_t) \geq
-W(\hat{x}_t,\hat{y}_t)$ for all admissable pairs
-$(\hat{x}_t,\hat{y}_t)$.\footnote{%
-The assumptions that $y$ is an ``interior continuous function''
-eliminates the possibility that $y$ is a corner case or discontinuous.
-}
-
-Then there exists a continuously differentiable co-state function
-$\lambda_t$ such that $(y_t,x_t,\lambda_t)$ satisfy the following
-necessary conditions:
-\begin{enumerate}
-  \item $H_y (x_t,y_t,\lambda_t,t) = 0$
-  \item $\dot{\lambda}_t = - H_x(x_t, y_t, \lambda_t, t)$
-  \item $\dot{x}_t = H_\lambda(x_t,y_t,\lambda_t,t) = G(x_t, y_t, t)$
-  \item $x_0=x_0$ given
-  \item $\lambda_T=0$
-\end{enumerate}
-for all $t\in[0,T]$.
-\end{defn}
-\begin{rmk}
-In the ``proof,'' we will look for the necessary conditions of an
-optimal solution by using the \emph{variational principle} of the
-calculus of variations.  This will work by assuming that we have an
-optimal solution, perturbing that supposedly-optimal solution by small
-amounts to get a family of new candidate solutions, and seeing what
-necessary conditions we need to place on the original supposedly-optimal
-solution so that none of the new candidate solution are any better.
+In continuous time, we use the more natural state-control representation
+to set up the sequential problem, so that our task involves choosing an
+optimal \emph{function} (over time) $y_t$ that then influences the
+evolution of the state $x_t$ through some law of motion.
+To find the optimal path for the control, we use the
+\emph{variational principle} of the calculus of variations.
+Specifically, we derive necessary conditions of an optimal solution
+$y_t^*$ by perturbing a supposedly-optimal solution by small amounts
+$y^*_t+\varepsilon$ to generate new candidate solutions.
+We then see what necessary conditions we need to place on the original
+supposedly-optimal solution $y^*_t$ so that none of the new candidate
+solutions $y^*_t+\varepsilon$ are any better.
 
 Given that description, it's maybe not surprising that the necessary
 conditions are for a \emph{local} optimum rather than a global optimum.
-We're simply specifying necessary conditions on some solution $y_t$ that
-will rule out better solutions in the neighborhood of $y_t$. We saw a
-similar result in the KKT section. But also as in the KKT conditions, a
-few extra conditions having to do with convexity can guarantee the
-solution is globablly optimal.
-\end{rmk}
+We're simply specifying necessary conditions on some solution $y_t^*$
+that will rule out better solutions in the neighborhood of $y_t^*$. We
+saw a similar result in the KKT section. But also as in the KKT
+conditions, a few extra conditions having to do with convexity can
+guarantee the solution is globablly optimal.
 
-\begin{proof}{(Kinda)}
-Let $y_t$ represent the assumed interior continuous solution, with $x_t$
-representing the corresponding state variable. The pair $(y_t,x_t)$ is
-assumed optimal so that $W(x_t,y_t) \geq W(\hat{x}_t,\hat{y}_t)$ for all
-admissable pairs $(\hat{x}_t,\hat{y}_t)$.
+\subsubsection{Canonical Sequential Formulation and the Hamiltonian}
 
-(Construct the Variations)
-To generate a family of other ``nearby'' continuous solutions, choose
-and fix a continuous function $\eta_t$ and define
+\begin{defn}{(Canonical Sequential Formulation: Control-State Rep)}
+\label{defn:sequential-altrep-cts}
+The \emph{Canonical Sequential Formulation} requires choosing
+\emph{function of time} $y_t:[0,\infty) \ra Y$ that maximizes
+\begin{align}
+  \label{prob:cts-dynamic}
+  %\max_{y_t}\;
+  %W(y_t):=
+  \max_{y_t}\;
+  &\int_0^\infty e^{-\rho t} F(x_t,y_t) \; dt
+  \notag\\
+  %\qquad
+  %\begin{cases}
+  \text{s.t.}\quad
+  &\text{$\dot{x}_{t} = G(x_t,y_t)$ $\;\forall t$, $x_0$ given}
+  \notag\\
+  &
+  y_t \in Y \;\; \forall t\in[0,\infty)
+  %\end{cases}
+\end{align}
+This is an obvious generalization of the control-state formulation in
+discrete time, where
+\begin{enumerate}
+  \item \emph{State}, $x_t$:
+    like a ``sufficient statistic'' for the problem, encoding all
+    relevant information about the state of the world and about feasible
+    options for $y_t$
+
+  \item \emph{Control}, $y_{t}$: Chosen by the agent given state $x_t$.
+    Affects instantaneous return and influences the evolution of the
+    state.
+
+  \item \emph{Instantaneous Return}, $F(x_t,y_t)$: Given state $x_t$ and
+    choice of control $y_t$, the agent gets instantaneous return
+    $F(x_t,y_t)$ at time $t$, discounted back to the present at rate
+    $\rho$.
+
+  \item \emph{Law of Motion} $G(x_t,y_t)$: Given the current state $x_t$
+    and the choice of control $y_t$,
+    $x_t$ evolves according to differential equation
+    $\dot{x}_t=G(x_t,y_t)$.
+  \item \emph{Admissable Pair}, $(x_t,y_t)$: The pair of functions
+    $(x_t,y_t)$ is called an admissable pair if they satisfy both
+    $\dot{x}_t = G(x_t,y_t)$ and $y_t\in Y$ for all $t$.
+\end{enumerate}
+\end{defn}
+
+
+
+\clearpage
+\subsubsection{Hamiltonian for Solving the Canonical Sequential
+Formulation}
+
+\begin{defn}{(Current-Value Hamiltonian)}
+The \emph{Current-Value Hamiltonian} associated with
+Problem~\ref{prob:cts-dynamic} is
 \begin{align*}
-  y_t(\varepsilon) := y_t + \varepsilon\eta_t
+  H(x,y,\lambda) := F(x_t,y_t) + \lambda_t G(x_t,y_t)
 \end{align*}
-\end{proof}
-For each fixed $\varepsilon$, the \emph{variation} $y_t(\varepsilon)$ is
-a continuous function. By varying $\varepsilon$, we generate a
-\emph{family} of continuous variations. Given each variation of the
-control $y_t(\varepsilon)$, define corresponding $x_t(\varepsilon)$
-satisfying
+where $\lambda_t$ is a function of time called the \emph{co-state}.
+The Hamiltonian is much like the Lagrangian of static optimization
+problems, only for dynamic optimization.
+\end{defn}
+
+\begin{prop}\emph{(Necessary Conditions for Optimum)}
+Given Problem~\ref{prob:cts-dynamic} with $F$ and $G$ continuously
+differentiable, an interior continuous solution $y_t$ with corresponding
+state variable function $x_t$ ($x_0$ given) satisfies the following
+necessary conditions for all $t\geq 0$:
+\begin{enumerate}
+  \item $H_y (x_t,y_t,\lambda_t) = 0$
+  \item $\dot{\lambda}_t = \rho\lambda_t- H_x(x_t, y_t, \lambda_t)$
+  \item $\dot{x}_t = H_\lambda(x_t,y_t,\lambda_t) = G(x_t, y_t)$
+\end{enumerate}
+with the boundary condition for costate $\lambda_t$ given by TVC
+$\limT e^{-\rho T} \lambda(T)x(T)=0$.
+\end{prop}
+
+\begin{proof}{(Kinda for Finite Horizon)}
+Suppose we only go out to horizon $T$ (rather than indefinitely), and we
+have interior continuous solution $y^*_t$ with associated path for the
+state variable $x_t^*$. We want to characterize the necessary conditions
+that $y_t^*$ must satisfy to be a genuine (local) optimum.
+
+Start by looking at ``variations'' on $y_t^*$. Specifically,
+fix arbitrary continuous function $\eta_t$ and add a
+scaled-by-$\varepsilon$ version of this function to our solution $y_t^*$
+to generate variation $y_t(\varepsilon)$:
+\begin{align*}
+  y_t(\varepsilon) := y_t^* + \varepsilon\eta_t
+\end{align*}
+Since $\eta_t$ is continuous, $y_t(\varepsilon)$ is continuous for any
+$\varepsilon\in\R$.
+Moreover, we think of $\varepsilon$ indexing a family variations on the
+solution $y_t^*$ (i.e. we can sweep out the family of variations on
+$y_t^*$ by varying $\varepsilon$). For $\varepsilon$ small, these
+variations $y_t(\varepsilon)$ are all close to the solution
+$y_t^*$.\footnote{%
+  To ensure feasibility of the variations, note that for fixed $\eta_t$,
+  $\eta_t$ is continuous on a compact interval, hence bounded.
+  Therefore, you can always choose an $\varepsilon_\eta$ such that
+  $|\varepsilon| < \varepsilon_\eta$
+  implies $y_t(\varepsilon) \in \text{int}(Y_t)$.
+  Since we're looking for a local optimum, this is fine.
+}
+
+Given each variation of the control $y_t(\varepsilon)$, define
+corresponding $x_t(\varepsilon)$ satisfying
 \begin{align}
   \dot{x}_t(\varepsilon)
-  = G(x_t(\varepsilon), y_t(\varepsilon), t)
+  = G(x_t(\varepsilon), y_t(\varepsilon))
   \qquad x_0(\varepsilon)=x_0
   \label{xvardef}
 \end{align}
 Given admissable pair $(x_t(\varepsilon), y_t(\varepsilon))$, let's also
 define
 \begin{align}
-  W(\varepsilon) := W(x_t(\varepsilon), y_t(\varepsilon))
-  = \int^{T}_0 F(x_t(\varepsilon), y_t(\varepsilon), t) \, dt
-  &\underbrace{\leq W(0)} \label{Weps} \\
-  &\;\text{Since $(x_t,y_t)$ optimal}
-  \notag
+  W(\varepsilon) :=
+  \int^{T}_0 F(x_t(\varepsilon), y_t(\varepsilon)) \, dt
+  &\leq W(0) \label{Weps}
 \end{align}
-Lastly, to ensure feasibility of the variations, note that for fixed
-$\eta_t$, the function is continuous on a compact interval, hence
-$\eta_t$ is bounded.  Therefore, you can always choose an
-$\varepsilon_\eta$ such that
-\begin{align*}
-  |\varepsilon| < \varepsilon_\eta
-  \implies
-  y_t(\varepsilon) \in \text{int} \, Y_t \quad\forall t
-\end{align*}
-For the reasons mentioned in the remark about, this restriction to
-variations with $\varepsilon<\varepsilon_\eta$ is not a problem.
+where the last inequality followed because $y_t(0)=y_t^*$, which was
+optimal.
 
 Now that we have this family of variations, let's derives the necessary
-conditions we need to put on $y_t$ so that none of the
+conditions we need to put on $y_t^*$ so that none of the
 $y_t(\varepsilon)$ are better.
 
 (Prove the Conditions)
@@ -8916,6 +8947,8 @@ the $\lambda$ into $\dot{\lambda}$ and $x$ into $\dot{x}$, you get
 \begin{align*}
   \int^{t_1}_0 \lambda_t \dot{x}_t(\varepsilon) \, dt
 \end{align*}
+\end{proof}
+
 
 \end{document}
 
