@@ -20,6 +20,8 @@
     %   Allows landscape pages
 %\usepackage{layout}
     %   Allows plotting of picture of formatting
+\usepackage{multicol}
+\setlength{\columnsep}{1cm}
 
 
 
@@ -46,6 +48,7 @@
 %% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{amsfonts}
 \usepackage{mathrsfs}
 \usepackage{amsthm} %allows for labeling of theorems
@@ -59,6 +62,7 @@
 \theoremstyle{definition}
 \newtheorem{defn}[thm]{Definition}
 \newtheorem{ex}[thm]{Example}
+\newtheorem{assump}[thm]{Assumption}
 
 \theoremstyle{remark}
 \newtheorem*{rmk}{Remark}
@@ -79,15 +83,42 @@
 \usepackage{lmodern}
 \usepackage[utf8]{inputenc}
 %\usepackage{blindtext}
+\usepackage{courier}
 
 
 %% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\usepackage{tikz}
+%\usepackage{tikz-3dplot}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{patterns}
 \usepackage{graphicx}
 \usepackage{subfigure}
     %   For plotting multiple figures at once
 %\graphicspath{ {Directory/} }
     %   Set a directory for where to look for figures
+
+%\pgfdeclarepatternformonly[\LineSpace]{my north east lines}{\pgfqpoint{-1pt}{-1pt}}{\pgfqpoint{\LineSpace}{\LineSpace}}{\pgfqpoint{\LineSpace}{\LineSpace}}%
+%{
+    %\pgfsetlinewidth{0.4pt}
+    %\pgfpathmoveto{\pgfqpoint{0pt}{0pt}}
+    %\pgfpathlineto{\pgfqpoint{\LineSpace + 0.1pt}{\LineSpace + 0.1pt}}
+    %\pgfusepath{stroke}
+%}
+
+%\pgfdeclarepatternformonly[\LineSpace]{my north west lines}{\pgfqpoint{-1pt}{-1pt}}{\pgfqpoint{\LineSpace}{\LineSpace}}{\pgfqpoint{\LineSpace}{\LineSpace}}%
+%{
+    %\pgfsetlinewidth{0.4pt}
+    %\pgfpathmoveto{\pgfqpoint{0pt}{\LineSpace}}
+    %\pgfpathlineto{\pgfqpoint{\LineSpace + 0.1pt}{-0.1pt}}
+    %\pgfusepath{stroke}
+%}
+
+%\newdimen\LineSpace
+%\tikzset{
+    %line space/.code={\LineSpace=#1},
+    %line space=3pt
+%}
 
 
 %% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -108,6 +139,12 @@
 \definecolor{codegreen}{RGB}{28,172,0}
 \definecolor{codelilas}{RGB}{170,55,241}
 
+% David4 color scheme
+\definecolor{d4blue}{RGB}{100,191,255}
+\definecolor{d4gray}{RGB}{175,175,175}
+\definecolor{d4black}{RGB}{85,85,85}
+\definecolor{d4orange}{RGB}{255,150,100}
+
 
 %% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -118,7 +155,7 @@
 
 \lstdefinestyle{bash}{%
   language=bash,%
-  basicstyle=\ttfamily,%
+  basicstyle=\footnotesize\ttfamily,%
   showstringspaces=false,%
   commentstyle=\color{gray},%
   keywordstyle=\color{blue},%
@@ -126,29 +163,30 @@
   xrightmargin=0.25in
 }
 
-\definecolor{codegreen}{RGB}{28,172,0}
-\definecolor{codelilas}{RGB}{170,55,241}
+\lstdefinestyle{matlab}{%
+  language=Matlab,%
+  basicstyle=\footnotesize\ttfamily,%
+  breaklines=true,%
+  morekeywords={matlab2tikz},%
+  keywordstyle=\color{blue},%
+  morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+  identifierstyle=\color{black},%
+  stringstyle=\color{codelilas},%
+  commentstyle=\color{codegreen},%
+  showstringspaces=false,%
+    %   Without this there will be a symbol in
+    %   the places where there is a space
+  numbers=left,%
+  numberstyle={\tiny \color{black}},%
+    %   Size of the numbers
+  numbersep=9pt,%
+    %   Defines how far the numbers are from the text
+  emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
+    %   Some words to emphasise
+}
+
 \newcommand{\matlabcode}[1]{%
-    \lstset{language=Matlab,%
-        basicstyle=\footnotesize,%
-        breaklines=true,%
-        morekeywords={matlab2tikz},%
-        keywordstyle=\color{blue},%
-        morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
-        identifierstyle=\color{black},%
-        stringstyle=\color{codelilas},%
-        commentstyle=\color{codegreen},%
-        showstringspaces=false,%
-            %   Without this there will be a symbol in
-            %   the places where there is a space
-        numbers=left,%
-        numberstyle={\tiny \color{black}},%
-            %   Size of the numbers
-        numbersep=9pt,%
-            %   Defines how far the numbers are from the text
-        emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{red},%
-            %   Some words to emphasise
-    }%
+    \lstset{style=matlab}%
     \lstinputlisting{#1}
 }
     %   For including Matlab code from .m file with colors,
@@ -156,9 +194,10 @@
 
 %% Bibliographies %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%\usepackage{natbib}
+\usepackage{natbib}
     %---For bibliographies
 %\setlength{\bibsep}{3pt} % Set how far apart bibentries are
+
 
 %% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -177,6 +216,263 @@
 \newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
     %   Bigger Chi
 
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\proj}{\operatorname{proj}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bseta}{\boldsymbol{\eta}}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsTheta}{\boldsymbol{\Theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bssigma}{\boldsymbol{\sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bsGamma}{\boldsymbol{\Gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+\newcommand{\bsLambda}{\boldsymbol{\Lambda}}
+\newcommand{\bshatLambda}{\boldsymbol{\hat{\Lambda}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsdelta}{\boldsymbol{\delta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bsPsi}{\boldsymbol{\Psi}}
+\newcommand{\bspsi}{\boldsymbol{\psi}}
+\newcommand{\bsPhi}{\boldsymbol{\Phi}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{a,b,y,x,X,V,S,W,A,B,P}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bsbartheta}{\boldsymbol{\bar{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bstildePsi}{\boldsymbol{\tilde{\Psi}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+\newcommand{\bstildey}{\boldsymbol{\tilde{y}}}
+\newcommand{\bstildeX}{\boldsymbol{\tilde{X}}}
+\newcommand{\bstildevarepsilon}{\boldsymbol{\tilde{\varepsilon}}}
+\newcommand{\bstildes}{\boldsymbol{\tilde{s}}}
+\newcommand{\bstildeT}{\boldsymbol{\tilde{T}}}
+\newcommand{\bstildeC}{\boldsymbol{\tilde{C}}}
+
+% Zero vector as \bso
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+\newenvironment{rcases}
+  {\left.\begin{aligned}}
+  {\end{aligned}\right\rbrace}
+
+% Various probability and statistics commands
+\newcommand{\wn}{\sim\operatorname{WN}}
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\range}{\operatorname{range}}
+\newcommand{\Prb}{\operatorname{P}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\tTz}{_{t=0}^T}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -190,8 +486,488 @@
 
 \tableofcontents
 
-\newpage
-\section{Stochastic Calculus Review}
+
+\clearpage
+\begin{multicols*}{2}
+\section{Key Formulas}
+
+\subsection{Prices and Payoffs}
+
+Agent problem: two periods, period endowments $e_t$ and $e_{t+1}$, rate
+of \emph{time} (but \emph{not} risk) discounting $\beta$. Can buy/sell
+any amount of asset (hence can make arbitrarily small marginal
+adjustments), cost today $p_t$, payoff $x_{t+1}$ (random var realized at
+$t+1$).
+\begin{align*}
+  \max_{\xi\in\R}
+  \;
+  &u(c_t) + \beta\E_t[u(c_{t+1})] \\
+  \text{s.t.}\qquad
+  c_t &= e_t - \xi p_t \\
+  c_{t+1} &= e_{t+1} + \xi x_{t+1}
+\end{align*}
+FOCs give price in terms of \emph{stochastic discount factor}
+$m_{t+1}$ (also a RV),\footnote{%
+  $m_{t+1}$ also sometimes called marginal rate of substitution, state
+  price density, change of measure
+}
+\begin{align}
+  p_t = \E_t[m_{t+1}x_{t+1}],
+  \quad
+  m_t := \beta \frac{u'(c_{t+1})}{u'(c_t)}
+  \label{pemx1}
+  %\\
+  %\text{where}\quad
+  %m_t :=&\; \beta \frac{u'(c_{t+1})}{u'(c_t)}
+  %\label{mdf}
+\end{align}
+Eq.~\ref{pemx1} holds \emph{after} agent has made all
+desired investments \& reached optimal allocation.\footnote{%
+  For utility, we often use \emph{power utility}
+  $u(c) = \frac{c^{1-\gamma}-1}{1-\gamma}$
+  which implies $u(c)=\log(c)$ as $\gamma\ra 1$ and
+  $u'(c) = c^{-\gamma}$
+}
+\\
+\\
+\emph{Returns} have unit price, RV payoff $R_{t+1}$:
+\begin{align}
+  1 &= \E_t[m_{t+1}R_{t+1}]
+  \label{ret}
+\end{align}
+Eq.~\ref{pemx1} is a map/operator $p[x]$ from RV payoff $x(\omega)$ to
+price $p$. Eq.~\ref{ret} is instead a condition that a unit-price asset
+(a return) must satisfy.
+Payoffs across states $R(\omega)$ co-move with $m(\omega)$
+such that Eq.~\ref{ret} holds.
+
+\emph{Excess return} $R^e=R^i-R^j$ is long return $R^i$, short $R^j$.
+With both $R^i,R^j$ unit price, portfolio is zero cost:
+\begin{align*}
+  0 = \E_t[m_{t+1}R^e_{t+1}]
+  %= \E_t[m_{t+1}(R^i_{t+1}-R_{t+1}^j)]
+\end{align*}
+\emph{Risk-free rate} $R^f$ satisfies $\E_t[R^f_{t+1}]=R^f_{t+1}$
+(though $R^f_t\neq R^f_s$), hence Eq.~\ref{ret} gives
+\begin{align}
+  R^f
+  &= 1/\;\E[m]
+  \label{rf}
+\end{align}
+To interpret pricing Eq.~\ref{pemx1}, use Eq.~\ref{rf} and
+$\Cov(x,y)=\E[xy] - \E[x]\E[y]$ on $\E[mx]$:
+\begin{align*}
+  p =  \frac{\E[x]}{R^f} + \Cov(m,x)
+\end{align*}
+Price is discounted expected payoff plus a risk
+correction for covariance of payoff $x$ with $m$.
+Risk neutrality implies $u'$, hence $m$, constant, in which case
+$\Cov(m,x)=0$.
+
+If $x_{t+1}$ is a return $R^i$, the above becomes
+\begin{align}
+  \E[R^i] - R^f =  -R^f \Cov(m,R^i)
+  \label{riskadjret}
+\end{align}
+Thus assets only generate average excess (above $R^f$) returns if
+correlated with $m$.
+
+\subsection{Contingent Claims}
+
+Let $pc(\omega)$ denote price of a \emph{contingent claim} paying \$1
+if state $\omega$ realized, \$0 otherwise.
+Assume \emph{complete markets} with a contingent claim traded
+for each $\omega$, hence $pc(\omega)$ defined $\forall
+\omega\in\Omega$.\footnote{
+  Don't strictly need contingent claims $\forall\omega$.
+  But must be able to synthesize/replicate with other traded assets.
+  If fewer assets traded than total no. of states, can get
+  complete markets if \emph{dynamic trading} allowed.
+}
+Can price any payoff $x:\Omega\ra\R$
+\begin{align}
+  p[x]
+  = \sum_\omega pc(\omega) x(\omega)
+  \label{eq:contingentprice}
+\end{align}
+Letting $\pi(\omega)$ denote state probs, can get discount factor $m$
+and pricing Eq.~\ref{pemx1}
+\begin{align*}
+  p[x]
+  &= \sum_\omega
+  \pi(\omega)
+  \underbrace{%
+  \left(
+  \frac{pc(\omega)}{\pi(\omega)}
+  \right)
+  }_{m(\omega)}
+  x(\omega)
+  = \E[mx]
+\end{align*}
+Alternatively, can also rewrite Equation~\ref{eq:contingentprice} using
+\emph{risk neutral probs} $\pi^*(\omega)$
+\begin{align*}
+  p[x]
+  &= \frac{1}{R^f} \sum_\omega
+  \underbrace{R^f pc(\omega)}_{\pi^*(\omega)}x(\omega)
+  = \frac{\E^*[x(\omega)]}{R^f}
+\end{align*}
+
+\clearpage
+\subsection{State Space Geometry}
+
+For this section, assume finite state space
+$\Omega=\{\omega_1,\ldots,\omega_S\}$.\footnote{%
+  Everything generalizes to the infinite case with careful math.
+}
+Therefore, any state-contingent payoff $x(\omega)$ can be represented as
+a vector in $\R^S$
+\begin{align*}
+  \bsx
+  &:= \big(x(\omega_1),\; \ldots,\; x(\omega_S)\big)'
+  \in\R^S
+\end{align*}
+Define \emph{payoff space} $\underline{X}\subseteq \R^S$ as the set of
+all payoffs that can be bought, sold, or synthesized
+$a\bsx_1 + b\bsx_2$ for $a,b\in\R$ and $\bsx_1,\bsx_2\in\underline{X}$.
+(Assumes free portfolio formation, i.e. no bid-ask
+spread, short-sale constraints, etc.)
+
+
+\subsubsection{Complete Markets}
+
+Assume complete markets with contingent claims (or a market where claims
+can be replicated/synthsized).
+Define the contingent claim price vector in payoff space $\R^S$:
+\begin{align*}
+  \bsp\bsc
+  &:= \big(pc(\omega_1),\; \ldots,\; pc(\omega_S)\big)'
+  \in\R^S
+\end{align*}
+Hence pricing Eq.~\ref{eq:contingentprice} is just an inner product
+\begin{align}
+  p[x]=\langle \bsp\bsc, \bsx\rangle
+  = \lVert \bsp\bsc\rVert \times \lVert \proj(\bsx|\bsp\bsc)\rVert
+  \label{vectorprice}
+\end{align}
+Second equality is a property of inner products.  It implies
+\emph{identical price hyperplanes} in $\R^{S-1}$, which lie at right
+angles to $\bsp\bsc\in\R^S$ \& connect payoffs $\bsx\in\R^S$ of
+identical price.
+If $S=2$, the payoff space looks like
+\vspace{10pt}
+
+\begin{tikzpicture}[xscale=1.6, yscale=1.6] %, shorten >= 3pt
+  % Axes
+  \draw[d4black, <->] (0,-1) -- (0,0) -- (0,2)
+                      node[left]{$x(\omega_2)$};
+  \draw[d4black, <->] (-1,0) -- (0,0) -- (2,0)
+                      node[above right]{$x(\omega_1)$};
+
+  % Contingent claims price vector, pc = (0.6, 0.9)
+  % Hence p = 0.6x1 + 0.9x2 => x2 = (10/9)p - (2/3) x1
+  \draw[d4gray, dashed] (-0.3,-0.45) -- (1.2,1.8);
+  \draw[d4blue, ultra thick, ->] (0.0,0.0) -- (0.6,0.9);
+  \node[d4gray] at (0.5,1.05) {$\bsp\bsc$};
+  \node[d4blue] at (0.5,1.05) {$\bsp\bsc$};
+
+  % Risk free rate
+  \draw[d4black, thick, dotted] (0.0,0.0) -- (1.5,1.5);
+  \node[d4black] at (1.7,1.6) {$45^{\circ}$};
+  \draw[d4orange, ultra thick, ->] (0.0,0.0) -- (0.6666666,0.6666666);
+  \node[d4gray] at (0.6,0.4) {$R^f$};
+  \node[d4orange] at (0.6,0.4) {$R^f$};
+
+  % Space of excess returns, x2 = -(2/3) x1
+  \draw[d4black, thin] (-0.9, 0.6) -- (1.5, -1.0);
+  \node[d4black] at (2.2,-1.1) {$\underline{R^e}$ i.e. $p=0$};
+
+  % Space of returns, x2 = (10/9) - (2/3) x1
+  \draw[d4black, thin] (-0.6, 1.5111111) -- (1.75,-0.05555555);
+  \node[d4black] at (2.2,-0.3) {$\underline{R}$ i.e. $p=1$};
+
+  % Space of p=2, x2 = (10/9)*2 - (2/3) x1
+  \draw[d4black, thin] (0.0, 2.2222222) -- (2,0.88888888);
+  \node[d4black] at (2.4,0.888888888) {$p=2$};
+\end{tikzpicture}
+%\begin{align*}
+  %pc &= (0.6, \; 0.9)\\
+ %p &= 0.6x_1 +  0.9x_2 \\
+  %x_2 &= \frac{10}{9}p - \frac{2}{3}x_1
+%\end{align*}
+
+We can also use vector geometry to understand $p=\E[mx]$, i.e.\ pricing
+with SDF
+\begin{align*}
+  \bsm=(m(\omega_1),\ldots,m(\omega_S))\in\R^S
+\end{align*}
+instead of contingent claims prices $pc(\omega)$.
+To do so, simply switch the underlying inner product and norm from
+Euclidean to $L^2$:
+\begin{align*}
+  \langle x,y \rangle := \E[xy]
+  \qquad
+  \lVert x\rVert := \sqrt{\E[x^2]}
+\end{align*}
+However, take note:
+we will continue to draw vectors, visualize projections, and reason in
+Euclidean space. \emph{But} every dot/inner product is really $\E[xy]$
+underneath.
+
+For example, we update the picture to
+\vspace{10pt}
+
+\begin{tikzpicture}[xscale=1.6, yscale=1.6] %, shorten >= 3pt
+  % Axes
+  \draw[d4black, <->] (0,-1) -- (0,0) -- (0,2)
+                      node[left]{$x(\omega_2)$};
+  \draw[d4black, <->] (-1,0) -- (0,0) -- (2,0)
+                      node[above right]{$x(\omega_1)$};
+
+  % Contingent claims price vector, pc = (0.6, 0.9)
+  % Hence p = 0.6x1 + 0.9x2 => x2 = (10/9)p - (2/3) x1
+  \draw[d4gray, dashed] (-0.3,-0.45) -- (1.2,1.8);
+  \draw[d4blue, ultra thick, ->] (0.0,0.0) -- (0.6,0.9);
+  \node[d4gray] at (0.5,1.05) {$\bsp\bsc$};
+  \node[d4blue] at (0.5,1.05) {$\bsp\bsc$};
+
+  % Risk free rate
+  \draw[d4black, thick, dotted] (0.0,0.0) -- (1.5,1.5);
+  \node[d4black] at (1.7,1.6) {$45^{\circ}$};
+  \draw[d4orange, ultra thick, ->] (0.0,0.0) -- (0.6666666,0.6666666);
+  \node[d4gray] at (0.6,0.4) {$R^f$};
+  \node[d4orange] at (0.6,0.4) {$R^f$};
+
+  % Space of excess returns, x2 = -(2/3) x1
+  \draw[d4black, thin] (-0.9, 0.6) -- (1.5, -1.0);
+  \node[d4black] at (2.2,-1.1) {$\underline{R^e}$ i.e. $p=0$};
+
+  % Space of returns, x2 = (10/9) - (2/3) x1
+  \draw[d4black, thin] (-0.6, 1.5111111) -- (1.75,-0.05555555);
+  \node[d4black] at (2.2,-0.3) {$\underline{R}$ i.e. $p=1$};
+
+  % Space of p=2, x2 = (10/9)*2 - (2/3) x1
+  \draw[d4black, thin] (0.0, 2.2222222) -- (2,0.88888888);
+  \node[d4black] at (2.4,0.888888888) {$p=2$};
+\end{tikzpicture}
+
+\clearpage
+\subsubsection{Incomplete Markets}
+
+Assume $\underline{X}\subsetneq \R^S$, i.e. tradeable assets do not
+\emph{span} the state space. As an example consider the picture below
+where $S=3$, but $\underline{X}=\R^2$, i.e. an infinite plane extending
+out in each direction from the edges of the triangle.
+
+\vspace{10pt}
+%\tdplotsetmaincoords{70}{15}
+\begin{tikzpicture}[scale=1.5] %,tdplot_main_coords
+    % Define axes
+    \draw[d4black,<->] (-0.5,0,0) -- (3,0,0) node[above]{$x$};
+    \draw[d4black,<->] (0,-0.5,0) -- (0,2.5,0) node[right]{$y$};
+    \draw[d4black,<->] (0,0,-2.5) -- (0,0,1.5) node[anchor=south]{$z$};
+
+    % Draw the plane
+    \fill[
+        draw=d4gray,%
+        fill=d4gray,%
+        fill opacity=0.3,%
+    ] (0,1,-2)
+      -- (3,1,0)
+      -- (0,0,0)
+      -- cycle;
+
+    % Draw reference points
+    %\node[d4black] at (0.7,0.7,1.8) {$b$};
+\end{tikzpicture}
+
+Suppose further that we don't have an economic model giving us a
+discount factor $m$ that prices payoffs $x\in\underline{X}$ according to
+$p=\E[mx]$. Can we still rescue something like the pricing formula
+$p=\E[mx]$?
+
+\begin{assump}
+For all $\forall x_1,x_2\in \underline{X}$ and $a,b\in\R$,
+we might assume
+\begin{itemize}
+  \item[A1.] \emph{Portfolio formation}:
+    $ax_1+bx_2\in\underline{X}$.
+  \item[A2.] \emph{Linearity/Law Of One Price} (LOOP):
+    $p[ax_1+bx_2] = ap[x_1]+bp[x_2]$
+  \item[A3.] \emph{Absence of Arbitrage}:
+    If $x(\omega)\geq x'(\omega)$ for all $\omega\in\Omega$ and
+    strict for at least one $\omega$, then $p[x]>p[x']$.
+
+    Given A1 and A2, equivalent to:
+    If $x(\omega)\geq 0$ for all $\omega$ and
+    strict for at least one, then $p[x]>0$.
+    In words, ``No zero-cost portfolios that might pay.''
+\end{itemize}
+Note that people colloquially ``no arbitrage'' to refer to violations of
+LOOP, \emph{not} A3.
+\end{assump}
+
+\begin{thm}
+We care about two directions
+\begin{itemize}
+  \item
+    \emph{($\Rightarrow$)}
+    Given a discount factor $m$ from an economic model pricing all
+    assets $p=\E[mx]$, A2 (LOOP) holds.
+  \item
+    \emph{($\Leftarrow$)}
+    Assuming A1 \& A2, $\exists$ a discount factor
+    $x^*\in\underline{X}$ pricing all assets in $\underline{X}$,
+    i.e. s.t. $p=\E[x^*x]$ for all $x\in\underline{X}$
+\end{itemize}
+\end{thm}
+\begin{proof}
+($\Rightarrow$) $p[ax_1+bx_2] = \E[m(ax_1+bx_2)]$. Linearity of
+$\E$ to conclude.
+($\Leftarrow$)
+\end{proof}
+
+
+\clearpage
+\subsection{Exp. Return $\beta$ Rep}
+
+\subsubsection{With Discount Factor, $m_t$}
+
+Given discount factor $m$, Eqs~\ref{rf} \&~\ref{riskadjret} imply
+\begin{align}
+  \E[R^i]
+  &=
+  R^f +
+  \frac{\Cov(m,R^i)}{\Var(m)}
+  \left(
+  -\frac{\Var(m)}{\E[m]}
+  \right)
+  \notag
+  \\
+  &=
+  R^f +
+  \underbrace{\beta_{i,m}}_{\substack{\text{Quantity}\\\text{of Risk}}}
+  \times
+  \underbrace{\lambda_m}_{\substack{\text{Price}\\\text{of Risk}}}
+  \label{eq:betarep}
+\end{align}
+where $\beta_{i,m}$ is the population coefficient from a time series
+regression of $R^i_t$ on $m_t$.
+
+\subsubsection{With Reduced-Form Factors}
+
+If we \emph{don't} have a discount factor $m$, we work backwards: we
+model expected return $\E[R^i]$ for any asset $i$ as
+\begin{align}
+  %\text{(CS)}\;
+  \E[R^i]
+  = \gamma + \beta_{i,a}\lambda_a + \beta_{i,b} \lambda_b + \cdots
+  %\qquad i = 1,\ldots,N
+  \label{eq:expbetarep}
+\end{align}
+where the $\beta$'s are population coeffs from a time-series regression
+of $R^i$ on some factors $f^a, f^b,\ldots$ that proxy for the SDF $m$
+\begin{align}
+  %\text{(TS)}\quad
+  R_t^i = c_i + \beta_{i,a} f_t^a + \beta_{i,b} f_t^b + \cdots
+  + \varepsilon^i_t
+  %\qquad t = 1,\ldots,T
+  \label{eq:getbetas}
+\end{align}
+We estimate the model in two regressions
+\begin{enumerate}[label=(\roman*)]
+  \item
+    \emph{Time Series}:
+    For each $i=1,\ldots,N$, estimate $\beta$'s (exposure to factors) by
+    running Regression~\ref{eq:getbetas}
+  \item
+    \emph{Cross Section}:
+    Given estimates $\hat{\beta}$ for each asset $i$ (now RHS
+    variables), estimate risk/factor prices ($\lambda$'s)
+    by reg
+    \begin{align*}
+      \frac{1}{T}\sumtT
+      R^i_t
+      = \gamma + \hat{\beta}_{i,a}\lambda_a + \hat{\beta}_{i,b}
+      \lambda_b + \cdots
+      + \alpha_i
+    \end{align*}
+\end{enumerate}
+The $\alpha_i$'s from cross-sectional reg are errors/divergences
+from the model's defining Equation~\ref{eq:expbetarep}. If the model is
+exactly true (and no meas. error), the $\alpha_i$'s are exactly
+zero.
+\columnbreak
+
+\emph{Factor Choice}: The factors are things that proxy for $m$ or,
+equivalently, marginal utility (MU) growth---things like consumption
+growth or the return on the market portfolio.
+The factors $f_t^z$ are \emph{common} time-$t$ variables that depend
+only on the underlying state of the economy. Factors \emph{cannot}
+include firm/return/asset-$i$-specific characteristics like firm size or
+form book-to-market.\footnote{%
+  Though we could use average, economy-wide \emph{returns} to holding a
+  portfolio of small or low book-to-market firms, since average
+  returns to a specific portfolio offer information about the state of
+  the economy broadly.
+}
+The factors $f^z_t$ are indexed by $t$, \emph{not} by $it$.
+
+\emph{Zero-$\beta$ Rate, $\gamma$}:
+In estimating the cross-sectional regression, we can impose restriction
+$\gamma=R^f$ if the risk-free rate is observed in the market.
+If not, we estimate $\gamma$ when running the cross-sectional.
+We can ignore this issue entirely if we work strictly with excess
+returns, in which case $\gamma$ is differenced out from
+Eq~\ref{eq:expbetarep} and the cross-sectional regression to give model
+\begin{align}
+  \E[R^e]
+  = \beta_{i,a}\lambda_a + \beta_{i,b} \lambda_b + \cdots
+\end{align}
+
+\emph{Returns as Factors}:
+Suppose one of the factors is itself a return, wlog $f^a=R^a$.
+Since Eq.~\ref{eq:expbetarep} holds for all returns, it must hold for
+$R^a=f^a$ too. Then from Eq.~\ref{eq:getbetas}, $\beta_{a,a}=1$ and
+$\beta_{a,z}=0$ for $z\neq a$.  Hence from Eq.~\ref{eq:expbetarep},
+$\lambda_a=\E[R^a]-\gamma=\E[f^a]-\gamma$.
+
+If all factors are excess returns, then the model can be written
+\begin{align}
+  %\text{(CS)}\;
+  \E[R^{ei}]
+  = \beta_{i,a}\E[f^a] + \beta_{i,b} \E[f^b] + \cdots
+\end{align}
+Can then estimate $\beta$'s by forming sample equivalents of $\E[R^e]$
+and $\E[f^z]=\E[R^{ez}]$.
+
+\clearpage
+\subsubsection{Mean-Variance Frontier}
+
+Rewrite the covariance
+\begin{align*}
+  \E(R^i) - R^f
+  &= -\frac{1}{\E(m)} \; \rho_{m,R^i} \; \sigma_{R^i} \; \sigma_m
+\end{align*}
+Since correlation $|\rho_{m,R^i}|\leq 1$,
+\begin{align*}
+  \frac{\left\lvert\E(R^i) - R^f\right\rvert}{\sigma_{R^i}}
+  &\leq \frac{\sigma_m}{\E(m)}
+\end{align*}
+$R^f$ risk-free so $\sigma_{R^f}=0$ and $\sigma_{R^i-R^f}=\sigma_{R^i}$,
+hence can write the above as a bound on the exp. Sharpe Ratio for excess
+return $R^e=R^i-R^f$:
+\begin{align*}
+  \frac{\left\lvert\E(R^i) - R^f\right\rvert}{\sigma_{R^i-R^f}}
+  =
+  \frac{\left\lvert\E(R^e)\right\rvert}{\sigma_{R^e}}
+  &\leq \frac{\sigma_m}{\E(m)}
+\end{align*}
+Whether we think of returns $R^i$ or excess return $R^e=R^i-R^f$,
+returns of all assets lie within a wedge-shaped region.
+Boundary of the region is the \emph{mean-variance frontier}.
+
+\end{multicols*}
 
 \newpage
 \section{Introduction}
@@ -389,34 +1165,7 @@ discount factor $m_{t+1}$ for everything. So the price of \emph{any
 asset} is determined by the expectation of its payoffs, weighted and
 adjusted for risk by $m_{t+1}$.
 
-\subsection{Utility and the Investor's Objective Function}
 
-So first, we'll consider a simple utility function for two-period
-consumption, which covers $t$ and $t+1$---the relevant time periods
-in Equation~\ref{pemx}. Spefically, we'll define
-\begin{equation}
-    \label{util}
-    U(c_t, c_{t+1}) = u(c_t) + \beta \;\mathbb{E}_t\left[u(c_{t+1})\right]
-\end{equation}
-where $\beta$ is the discount factor with respect to \emph{time} (how
-much an investor discounts a dollar tomorrow), \textbf{not} risk which
-will depend upon the shape of the utility function. Note that
-Equation~\ref{util} above is a very simple utility function which we can
-generalize further if we so choose. See Section for a discussion of
-non-separabilities in utility with an example where the investor values
-high leisure as well, not just consumption in isolation.
-\\
-\\
-For the \emph{internal}, one-period utility function, $u(\cdot)$, we'll
-want the normal properties of utility, $u'>0$ and $u''<0$, which can be
-expressed in the simple, often-useful \emph{power utility} function
-\begin{equation}
-    \label{upwr}
-    u(c) = \frac{c^{1-\gamma}-1}{1-\gamma} \quad\Rightarrow\quad
-	u'(c) = c^{-\gamma}
-\end{equation}
-This utility function also has the property that as
-$\lim_{\gamma\rightarrow 1}u(c) = \ln c$.
 
 \subsection{Understanding the Components}
 
@@ -433,7 +1182,8 @@ before we derive it:
     a bet (nothing today, +1 tomorrow if I win, -1 if I lose).  No money
     changes hands.
 
-  \item $m_{t+1}$: Recall Equation~\ref{util} above.  It left us free
+  \item $m_{t+1}$:
+    %Recall Equation~\ref{util} above.  It left us free
     parameters, $\beta$ and $\gamma$, which allow us to tweak
     ``impatience,'' or time sensitivity of consumption ($\beta$), as
     well as risk-aversion via curvature in the utility function
@@ -490,44 +1240,6 @@ each at some point going forward.
 
 \subsubsection{Discrete-Time Two Period Case}
 
-Let's now figure out the price an investor assigns to a risky
-payoff.  It reduces to a utility maximization problem:
-\begin{align}
-    \max_{\xi} \quad &u(c_t) + \beta E_t\left[u(c_{t+1})\right]
-    \label{foc}\\
-    c_t &= e_t - \xi p_t  \notag\\
-    c_{t+1} &= e_{t+1} + \xi x_{t+1} \notag\\\notag\\
-    \text{foc wrt $\xi$} \qquad
-    0 &= -p_t u'(c_t) + \beta E_t\left[ x_{t+1} u'(c_{t+1})\right]
-    \notag
-\end{align}
-This maximization problem, in words, means ``Start at some initial
-consumption, $e_t$ (like an endowment or wage income at $t$). Give up
-some fraction $\xi$ of that consumption at price $p_t$ today ($\xi p_t$)
-in exchange for some fraction of of the uncertain payoff tomorrow $(\xi
-x_{t+1})$.''
-
-We can rearrange the first order condition above to get to the
-fundamental pricing equation:
-\begin{align}
-    p_t &= E_t\left[
-	\beta\frac{u'(c_{t+1})}{u'(c_{t})} x_{t+1} \right]
-    = E_t\left[ m_{t+1} x_{t+1} \right]
-	\label{fullpemx}
-\end{align}
-where $m_{t+1}$ is the \emph{stochastic discount factor}.
-
-Note that Equation~\ref{fullpemx} reflects the investor's condition for
-an optimal consumption and portfolio choice. The investor buys more of
-the asset until that relationship holds exactly, adjusting her
-consumption schedule given the market price and expected payoffs. As a
-result, this condition holds only \emph{after} investment---after the
-investor has bought all of the asset that she wants to. In effect, the
-investor is a price-taker, increasing consumption if there are marginal
-utility gains to be had at the current price until (\ref{fullpemx})
-holds exactly.  Only after the investor has finished buying and selling
-(or equivalently, adjusting her two-period consumption schedule) does
-Equation~\ref{fullpemx} hold.
 
 Finally, price, $p_t$, is a \emph{marginal} concept---what an investor
 would willingly pay at the margin to hold an extra piece of the asset.
@@ -541,7 +1253,7 @@ today (from the cost of buying a tiny bit more of the asset).
 Condition, and Rational Bubbles}
 
 Stocks have price $p_t$ and payoff $p_{t+1} + d_{t+1}$, where $d_{t+1}$
-denotes the dividend payment. Using Pricing Equation~\ref{fullpemx}, we
+%denotes the dividend payment. Using Pricing Equation~\ref{fullpemx}, we
 have
 \begin{align}
   p_t &= E_t\left[
@@ -713,7 +1425,7 @@ define the one-period and two-period utility functions
   u(c_t,\ell_t) + \beta \mathbb{E}[u(c_{t+1},\ell_{t+1}]
 \end{align*}
 This doesn't change much. Before, in the consumer's portfolio problem
-(\ref{foc}), we had an endowment $e_t$ and $e_{t+1}$, and the price was
+%(\ref{foc}), we had an endowment $e_t$ and $e_{t+1}$, and the price was
 determined by the consumer's consumption and marginal utility.
 
 Now, we simply replace endowment with labor income (that follows from
@@ -759,13 +1471,6 @@ representations, etc.
 
 \subsection{Risk-Free Rate}
 
-In discrete time, the \emph{risk-free rate} $R^f$ is given by
-\begin{align}
-    1 &= \mathbb{E}_t\left[m_{t+1} R^f_{t+1}\right]
-    =  \mathbb{E}_t\left(m_{t+1}\right) R^f_{t+1} \notag \\
-    \Rightarrow \quad R^f_{t+1}
-    &= \frac{1}{\mathbb{E}_t(m_{t+1})}
-\end{align}
 In continuous time, we can describe the risk-free bond in two ways:
 \begin{enumerate}
   \item An asset whose price grows deterministically at $r_t^f$
@@ -791,93 +1496,9 @@ Plugging (\ref{rfcont}) into (\ref{pemxcont}), we get
   r^f_t dt = -\mathbb{E}_t\left(\frac{d\Lambda_t}{\Lambda_t}\right)
 \end{align}
 
-\subsection{Risk Corrections, Risk Premia, and Covariance with $m$}
-
-Using the identity $\text{Cov}(m,x) = \mathbb{E}(mx) -
-\mathbb{E}(m)\mathbb{E}(x)$, the equation $p=\mathbb{E}(mx)$ can be
-expressed as
-\begin{align}
-  p &= \mathbb{E}(m)\mathbb{E}(x) + \text{Cov}(m,x)\notag\\
-  p &= \frac{\mathbb{E}(x)}{R^f} + \text{Cov}(m,x)
-    \label{eq:riskcorrectPrice}
-\end{align}
-The first term is simple discounted present value, while the second term
-adjusts for risk. Moreover, this risk-adjustment only bites (as we
-would expect) if investors are risk-averse and $u'$ is non-constant (varies
-with $c$) so that $\text{Cov}(m,x)\neq 0$.  On the other hand, in a
-risk-neutral world, $u$ is linear, so $u'$ is constant, so $m$ is
-constant, so $\text{Cov}(m,x)$ is zero.
-
-Now to restate this with \emph{excess returns} on asset $i$ (instead of
-price) using the covariance trick again along with fact that
-$R^f=1/\mathbb{E}(m)$:
-\begin{align}
-  1 = \mathbb{E}(mR^i)
-  &= \mathbb{E}(m) \mathbb{E}(R^i) + \text{Cov}(m,R^i)\notag\\
-  \Leftrightarrow \qquad
-  \mathbb{E}(R^i) - R^f
-  &= - R^f \; \text{Cov}(m,R^i)\label{eq:riskcorrect}
-\end{align}
-So assets that are uncorrelated with the discount factor, no matter
-their variance (!) will have zero excess returns compared to the
-risk-free rate. Assets with non-zero covariance will have some
-adjustment.
-
-To summarize both the price and excess return statetements,
-\begin{center}
-\begin{centering}
-  High $c_{t+1}$ $\quad\Rightarrow\quad$
-  Low $u'(c_{t+1})$ $\quad\Rightarrow\quad$
-  Low $m_{t+1}$
-\end{centering}
-\end{center}
-\begin{center}
-\begin{centering}
-  Cov$(m,x)>0$  $\quad\Rightarrow\quad$
-  High $p$, low $R$
-\end{centering}
-\end{center}
-\begin{center}
-\begin{centering}
-  Cov$(m,x)<0$  $\quad\Rightarrow\quad$
-  Low $p$, high $R$
-\end{centering}
-\end{center}
-Assets whose payoffs covary positively with consumption (and negatively
-with $m$) will have lower prices because they pay precisely when you
-don't need it (when times are good and marginal utility is low).
-Conversely, assets that pay when times are bad will have high prices for
-their insurance value.
 
 \subsection{Expected Return-Beta Representation}
 
-We can rewrite return risk-correction Equation~\ref{eq:riskcorrect} in a
-way that is very useful for describing the cross section of stock
-returns across assets:
-\begin{align}
-  \mathbb{E}(R^i) &=  R^f - R^f \; \text{Cov}(m,R^i) \notag\\
-  &=  R^f + \left(\frac{\text{Cov}(m,R^i)}{\text{Var}(m)}\right)
-  \left(-\;\frac{\text{Var}(m)}{\mathbb{E}(m)}\right)\notag\\\notag\\
-  \mathbb{E}(R^i)
-  &=  R^f +
-  \underbrace{\beta_{i,m}}_{\substack{\text{Quantity}\\\text{of risk}}}
-  \times
-  \underbrace{\lambda_m}_{\substack{\text{Price}\\\text{of Risk}}}
-  \label{eq:betarep}
-\end{align}
-This prescribes a two-step process for determining expected returns for
-the cross section of assets:
-\begin{enumerate}
-  \item Define a single factor $\lambda_m$ (for all assets) as above
-    which captures the price of risk and depends upon the volatility of
-    the discount factor.
-
-  \item For each asset, regress returns for asset $i$ on the discount
-    factor $m$ to get $\beta_{i,m}$, which is asset-specific.
-\end{enumerate}
-Multiply (1) and (2), add the risk-free rate, and get expected returns.
-\\
-\\
 A few things to note:
 \begin{enumerate}
   \item We never actually estimate Equation~\ref{eq:betarep} directly.
@@ -932,39 +1553,6 @@ on the y-axis (where variance is zero).
 See below for further discussion of the mean-variance frontier and
 various interpretations.
 
-\subsection{$p=E(mx)$ Approach}
-
-The $p=E(mx)$ stochastic discount factor approach is even more direct
-than the portfolio approach, though the goal is the same: To bound the
-space of all possible asset returns within a frontier.
-\begin{enumerate}
-  \item Bounding $R^i$: Start with Equation~\ref{eq:riskcorrect}, and
-    manipulate as follows
-    \begin{align*}
-      \mathbb{E}(R^i) - R^f
-      &= -R^f \; \text{Cov}(m,R^i)\\
-      \mathbb{E}(R^i) - R^f
-      &= -\frac{1}{\mathbb{E}(m)} \; \rho_{m,R^i} \; \sigma_{R^i} \; \sigma_m\\
-      \frac{\left\lvert\mathbb{E}(R^i) - R^f\right\rvert}{\sigma_{R^i}}
-      &\leq \frac{\sigma_m}{\mathbb{E}(m)}
-    \end{align*}
-    where the inequality follows because $\rho_{m,R^i}\leq 1$ by definition.
-    Note also that since $R^f$ is a risk free rate (with no variance or
-    covariance with $R^i$, we can treat $\sigma_{R^i}$ in the denominator as
-    the standard deviation of $R^i-R^f$, an excess return.
-
-  \item Bounding $R^e$: Take any two assets $a$ and $b$ and construct
-    Equation~\ref{eq:riskcorrectPrice} for excess return $R^e=R^a-R^b$
-    \begin{align*}
-      0 &= \frac{\mathbb{E}(R^e)}{R^f} + \text{Cov}(m,R^e)\\
-      \mathbb{E}(R^e)
-      &= -R^f \; \rho_{m,R^e} \; \sigma_m \; \sigma_{R^e}\\
-      \frac{\left\lvert\mathbb{E}(R^e)\right\rvert}{\sigma_{R^e}}
-      &\leq \frac{\sigma_m}{\mathbb{E}(m)} \\
-    \end{align*}
-\end{enumerate}
-In either case, the returns of all assets lie within a wedge-shaped
-region. The boundary of the region is the \emph{mean-variance frontier}.
 
 \subsection{About the Mean-Variance Frontier}
 
@@ -1060,113 +1648,7 @@ in both approaches.
 \clearpage
 \section{Contingent Claims and Risk-Neutral Pricing}
 
-\subsection{Contingent Claims}
-\begin{defn}
-Suppose that there are $S$ possible states of nature tomorrow.  A
-\emph{contingent claim} pays \$1 in one particular state tomorrow, \$0
-otherwise.
-
-The contingent claim price function $pc(s)$ returns the price of a
-contingent claim for state $s$. In discrete space, we can also think of
-$pc(s)$ as a vector.
-\end{defn}
-
-\begin{defn}
-In a \emph{complete market}, contingent claims are available for
-all possible states of nature, or contingent claims for all states of
-nature can be synthesized from other available assets, i.e.\ these other
-securities \emph{span} the set of contingent claims.
-\end{defn}
-\begin{rmk}
-You can also get complete markets with fewer assets than states if
-dynamic trading is allowed.
-\end{rmk}
-
-\begin{rmk}
-Throughout this section, I will assume complete markets.
-\end{rmk}
-
-
-\begin{ax}{\emph{(Law of One Price)}}
-Let $pc(s)$ denote a function that prices all contingent claims in a
-complete market.  Then let $x(s)$ denote a payoff function that varies
-with state of nature $s$.
-
-We can define $p$, a pricing functional,\footnote{I think that's the
-correct term\dots} that maps payoff function $x$ to price $p(x)$ as
-follows
-\begin{align}
-  \text{Discrete $S$} \qquad
-  p(x) &= \sum_s pc(s) x(s) \label{eq:contingentprice}
-\end{align}
-In words, we can replicate the payoff $x(s)$ in state $s$ by buying
-$x(s)$ units of contingent claim $s\in S$ for price $pc(s)$. Do this
-across all states, and sum. Assets with identical payoffs in all states
-of nature, no matter how those payoffs are packaged (single bundle or
-sum of contingent claims), should have the same price.
-\end{ax}
-
-\begin{defn}
-We can define a discount factor $m(s) = \frac{pc(s)}{\pi(s)}$, where
-$\pi(s)$ is the probability of state $s$, such that we can price any
-payoff function $x(s)$ by
-\begin{align}
-  p = \mathbb{E}(mx)
-  \qquad \text{where}
-  \quad m(s) := \frac{pc(s)}{\pi(s)}
-  \label{eq:contingent}
-\end{align}
-Thus in complete markets with the law of one price, the stochastic
-discount factor $m$ exists and is unique. Moreover, its value in each
-state is simply the price of the contingent claim scaled by true
-probabilities.
-\end{defn}
-\begin{proof}
-Start with Equation~\ref{eq:contingentprice}, multiply and divide by the
-probabilities $\pi(s)$ of the states:
-\begin{align*}
-  p(x) &= \sum_s pc(s) x(s)
-  = \sum_s \pi(s) \frac{pc(s)}{\pi(s)} x(s)
-  = \sum_s \pi(s) m(s) x(s)
-  = \mathbb{E}(mx)
-\end{align*}
-\end{proof}
-\begin{rmk}
-The above proof also makes it clear why $m$ is also sometimes called the
-\emph{state price density}.
-\end{rmk}
-
 \subsection{Risk-Neutral Pricing}
-
-\begin{thm}
-We can define risk neutral probabilities $\pi^*(s)$ for each state such
-that we can price any payoff by
-\begin{align}
-  p(x) =\frac{E^*(x)}{R^f}
-  \qquad
-  \text{where}\quad
-  \pi^*(s) := \frac{pc(s)}{\sum_s pc(s)}
-  = R^f pc(s)
-  \label{eq:riskneutral}
-\end{align}
-\end{thm}
-\begin{proof}
-A risk free asset pays \$1 in every state; therefore, you can construct
-this asset by buying a contingent claim to all states for price $\sum_s
-pc(s)$. This implies a risk-free return
-\begin{align*}
-  R^f = \frac{1}{\sum_s pc(s)}
-\end{align*}
-Now use that result to unpack Representation~\ref{eq:riskneutral}:
-\begin{align*}
-  p(x) = \frac{E^*(x)}{R^f}
-  &= \frac{1}{R^f} \sum_s \pi^*(s) x(s) \\
-  &= \frac{1}{R^f} \sum_s R^f pc(s) x(s) \\
-  &= \sum_s pc(s) x(s)
-\end{align*}
-which is exactly the pricing function we defined in when we introduced
-contingent claims.
-\end{proof}
 
 \begin{rmk}
 Risk-neutral pricing is very deep and interesting. It provides a
@@ -1283,33 +1765,6 @@ investors having preferences for date and state contingent consumption
 (both of which are captured in the discount factor), and letting the
 usual indifference curve logic take over from there.
 
-
-\section{State Diagram and Price Function}
-
-\begin{defn}
-Represent contingent claims prices $pc$ and payoffs $x$ as vector in
-$\mathbb{R}^S$.
-\begin{align*}
-  pc &= \begin{pmatrix} pc(1) & pc(2) &\cdots & pc(S)\end{pmatrix}'\\
-  x &= \begin{pmatrix} x(1) & x(2) &\cdots & x(S)\end{pmatrix}'\\
-\end{align*}
-Some facts given this representation
-\begin{enumerate}
-\item $pc$ plots into the positive orthant since contingent claims
-  prices are positive (since marginal utility $m$ and probabilities are
-  always positive).
-\item We can represent the price of any payoff $x$ as an inner product
-  \begin{align*}
-    p(x) = pc'x = \sum_s pc(s) x(s)
-  \end{align*}
-\item Building off the inner product intuition, any vector with price
-  zero must be orthogonal to vector $pc$.
-\item There exist constant price planes that are perpendicular (i.e. at
-  right angles to $pc$, but not necessarily orthogonal so that $pc'x=0$)
-\end{enumerate}
-\end{defn}
-
-
 \section{Expected Return Beta Representations}
 
 \subsection{The Motivation}
@@ -1317,12 +1772,7 @@ Some facts given this representation
 Often, we want to express expected returns for different assets as
 being driven by some common factors $f^a$, $f^b$, \ldots That leads to
 the following representation for expected returns:
-\begin{align}
-  \mathbb{E}[R^i]
-  = \gamma + \beta_{i,a}\lambda_a + \beta_{i,b} \lambda_b + \cdots
-  \qquad i = 1,\ldots,N
-  \label{eq:expbetarep}
-\end{align}
+
 Don't think about estimating this guy for now. Assume everything is
 given, and let's just think about about the economics. Here are the
 components of Equation~\ref{eq:expbetarep}, in words, that determine the
@@ -1352,13 +1802,7 @@ First, we want to get the exposure of asset $i$ to the different
 factors, we want the $\beta$ terms. To get them, we run a time series
 regression (a separate one for each $i$) with actual returns to measure
 the asset's historical exposure to the asset.
-\begin{align}
-  \text{Time Series Regression:}\qquad
-  R_t^i = a_i + \beta_{i,a} f_t^a + \beta_{i,b} f_t^b + \cdots
-  + \varepsilon^i_t
-  \qquad t = 1,\ldots,T
-  \label{eq:getbetas}
-\end{align}
+
 Once we get estimates of the $\beta$ terms for each asset, we can plug
 them into the expected return model, Equation~\ref{eq:expbetarep}.
 
@@ -1455,116 +1899,6 @@ running the cross-sectional regression.
 
 \newpage
 \appendix
-\section{The Geometry of Linear Projections}
-
-This section summarizes the geometry of linear projections, which are
-useful for visualizing, describing, and deriving many asset pricing
-results. This is a purely mathematical review. Asset pricing
-interpretations are given above in the main text.
-
-So first, begin with some vector $a=(2,1)$.
-\begin{figure}[htpb!]
-  \centering
-  \includegraphics[scale=0.5, trim={2cm, 7cm, 2cm, 7cm}, clip]{Plots/StateSpaceGeometry1.pdf}
-\end{figure}
-
-Next suppose that there is some other vector $b=(1,1)$. We want to know
-what is the \emph{projection} of blue line $b$ onto black line $a$.
-How much does $b$ point in the $a$ direction? How much of movement in
-direction $b$ can be ``explained'' by movement in direction $a$?
-To answer these questions, project $b$ onto $a$.
-\begin{figure}[htpb!]
-  \centering
-  \includegraphics[scale=0.5, trim={2cm, 7cm, 2cm, 7cm}, clip]{Plots/StateSpaceGeometry2.pdf}
-\end{figure}
-
-Mathematically, projection just means ``linear regression without a
-constant''
-\begin{align*}
-  b &= \beta a + \varepsilon \\\\
-  \text{where}\qquad
-  \beta &= (a'a)^{-1}a'b\\
-  \varepsilon &= b - \beta \alpha
-\end{align*}
-So we can think of vector $b$ as the sum of some vector in the $a$
-direction (i.e. $a$ rescaled by a constant $\beta$) plus some component
-$\varepsilon$ completely unrelated to the direction of $a$.
-
-Below, the blue vector (1.2,0.6) is the part of $b$ that points in the
-$a$ direction ($\beta a$), while the orange vector is $\varepsilon$, the
-part unrelated to the black line $a$ direction.
-
-\begin{figure}[htpb!]
-  \centering
-  \includegraphics[scale=0.5, trim={2cm, 7.2cm, 2cm, 7.2cm}, clip]{Plots/StateSpaceGeometry3.pdf}
-\end{figure}
-
-Geometrically, projection also gives the closest point on black line $a$
-to the tip of blue line $b$. As is typical, we find this point by
-traveling on a straight line---the orange vector---from the tip of $b$
-to some point on $a$, moving at \emph{right angles} to the direction of
-$a$.  Motivated another way, the new dashed line below hits the tip of
-$b$ while also intersecting $a$ at a right angle.
-\begin{figure}[htpb!]
-  \centering
-  \includegraphics[scale=0.4, trim={2cm, 7.2cm, 2cm, 7.2cm}, clip]{Plots/StateSpaceGeometry4.pdf}
-\end{figure}
-
-\clearpage
-Moreover, this dashed line extending infinitely in either direction from
-the orange line traces out the set of all vectors that have an
-\emph{identical} projection onto $a$. For every vector ending at some
-point on this dashed line, the quickest right angle path to $a$ follows
-the dashed line and lands at exactly the same point: (1.2,0.6).
-
-\begin{figure}[htpb!]
-  \centering
-  \includegraphics[scale=0.5, trim={2cm, 7cm, 2cm, 7cm}, clip]{Plots/StateSpaceGeometry5.pdf}
-\end{figure}
-
-But there are also infinitely many lines perpendicular to the direction
-of $a$ (parallel to our original orange and dashed line). The figure
-below shows one more example. This new dashed line traces out another
-infinite set of vectors with an identical projection onto $a$.
-
-\begin{figure}[htpb!]
-  \centering
-  \includegraphics[scale=0.6, trim={2cm, 7cm, 2cm, 7cm}, clip]{Plots/StateSpaceGeometry6.pdf}
-\end{figure}
-
-Lastly, I just want to flip this logic around. Above, I defined
-projection as ``Linear regression without a constant.'' Well, we can
-think of linear regression in terms of projections. Write a regression
-formula as
-\begin{align*}
-  y_i = \beta x_i + \varepsilon_i
-\end{align*}
-where $x_i$ is a vector of $k$ regressors that might include a constant
-term. Think of $x_i$ as a point in $\mathbb{R}^k$, and think of
-$\begin{pmatrix}y_i & x_i'\end{pmatrix}'$ as a point in
-$\mathbb{R}^{k+1}$.
-
-Now regression finds $\beta$ such that
-\begin{enumerate}
-  \item You minimize $\varepsilon_i$
-  \item $\mathbb{E}[x_i\varepsilon_i]=0$
-\end{enumerate}
-You can do this by traveling in a straight line from the point
-$\begin{pmatrix}y_i & x_i'\end{pmatrix}'$ in $\mathbb{R}^{k+1}$ to the
-point $x_i$ in $\mathbb{R}^k$. That will be the ``quickest'' (i.e.\
-smallest $\varepsilon_i$) route. Moreover, by traveling along this
-straight line, you're traveling at a \emph{right angle} to point $x_i
-\in \mathbb{R}^k$ so that $\mathbb{E}[x_i\varepsilon_i]=0$.
-
-Geometrically, the projection of $y_i$ onto $x_i$ is really the
-projection of point $\begin{pmatrix}y_i & x_i'\end{pmatrix}'$ onto
-$x_i$, and it finds how much of the direction of $y_i$ can be
-``explained'' by the direction of $x_i$. The $\varepsilon_i$ is simply
-an extra residual that is completely unrelated to $x_i$ and its
-direction.
-
-
-
 
 \section{Price-Dividend and Return Linearizations}
 
