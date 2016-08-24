@@ -493,11 +493,17 @@
 
 \subsection{Prices and Payoffs}
 
-Agent problem: two periods, period endowments $e_t$ and $e_{t+1}$, rate
+Agent problem: two periods, endowments $e_t$ and $e_{t+1}$, rate
 of \emph{time} (but \emph{not} risk) discounting $\beta$. Can buy/sell
-any amount of asset (hence can make arbitrarily small marginal
-adjustments), cost today $p_t$, payoff $x_{t+1}$ (random var realized at
-$t+1$).
+any amount of asset,\footnote{
+  Critical assumption.
+  Implies agent can make \emph{arbitrarily small} portfolio adjustments,
+  hence justified in using FOCs to characterize optimum.
+  Thus price $p_t$ will be a \emph{marginal} concept---what an investor
+  would pay to hold a tiny extra piece of the asset.
+  Doesn't work for large venture cap all-or-nothing type investments.
+}
+price $p_t$, payoff $x_{t+1}$ (RV realized $t+1$).
 \begin{align*}
   \max_{\xi\in\R}
   \;
@@ -515,27 +521,27 @@ $m_{t+1}$ (also a RV),\footnote{%
   p_t = \E_t[m_{t+1}x_{t+1}],
   \quad
   m_t := \beta \frac{u'(c_{t+1})}{u'(c_t)}
-  \label{pemx1}
+  \label{pemx}
   %\\
   %\text{where}\quad
   %m_t :=&\; \beta \frac{u'(c_{t+1})}{u'(c_t)}
   %\label{mdf}
 \end{align}
-Eq.~\ref{pemx1} holds \emph{after} agent has made all
-desired investments \& reached optimal allocation.\footnote{%
+Eq.~\ref{pemx} holds \emph{after} agent has made all
+desired investments \& reached optimal allocation.
+\footnote{%
   For utility, we often use \emph{power utility}
   $u(c) = \frac{c^{1-\gamma}-1}{1-\gamma}$
   which implies $u(c)=\log(c)$ as $\gamma\ra 1$ and
   $u'(c) = c^{-\gamma}$
 }
-\\
-\\
+
 \emph{Returns} have unit price, RV payoff $R_{t+1}$:
 \begin{align}
   1 &= \E_t[m_{t+1}R_{t+1}]
   \label{ret}
 \end{align}
-Eq.~\ref{pemx1} is a map/operator $p[x]$ from RV payoff $x(\omega)$ to
+Eq.~\ref{pemx} is a map/operator $p[x]$ from RV payoff $x(\omega)$ to
 price $p$. Eq.~\ref{ret} is instead a condition that a unit-price asset
 (a return) must satisfy.
 Payoffs across states $R(\omega)$ co-move with $m(\omega)$
@@ -554,7 +560,7 @@ With both $R^i,R^j$ unit price, portfolio is zero cost:
   &= 1/\;\E[m]
   \label{rf}
 \end{align}
-To interpret pricing Eq.~\ref{pemx1}, use Eq.~\ref{rf} and
+To interpret pricing Eq.~\ref{pemx}, use Eq.~\ref{rf} and
 $\Cov(x,y)=\E[xy] - \E[x]\E[y]$ on $\E[mx]$:
 \begin{align*}
   p =  \frac{\E[x]}{R^f} + \Cov(m,x)
@@ -591,7 +597,7 @@ Can price any payoff $x:\Omega\ra\R$
   \label{eq:contingentprice}
 \end{align}
 Letting $\pi(\omega)$ denote state probs, can get discount factor $m$
-and pricing Eq.~\ref{pemx1}
+and pricing Eq.~\ref{pemx}
 \begin{align*}
   p[x]
   &= \sum_\omega
@@ -633,12 +639,14 @@ $a\bsx_1 + b\bsx_2$ for $a,b\in\R$ and $\bsx_1,\bsx_2\in\underline{X}$.
 (Assumes free portfolio formation, i.e. no bid-ask
 spread, short-sale constraints, etc.)
 
+A market is \emph{complete} if $\underline{X}=\R^S$, \emph{incomplete}
+if $\underline{X}\subsetneq\R^S$. In a complete market, contingent
+claims to all states of nature either exist or can be
+replicated/synthesized.
 
 \subsubsection{Complete Markets}
 
-Assume complete markets with contingent claims (or a market where claims
-can be replicated/synthsized).
-Define the contingent claim price vector in payoff space $\R^S$:
+Contingent claim price vector $\underline{X}=\R^S$:
 \begin{align*}
   \bsp\bsc
   &:= \big(pc(\omega_1),\; \ldots,\; pc(\omega_S)\big)'
@@ -650,7 +658,7 @@ Hence pricing Eq.~\ref{eq:contingentprice} is just an inner product
   = \lVert \bsp\bsc\rVert \times \lVert \proj(\bsx|\bsp\bsc)\rVert
   \label{vectorprice}
 \end{align}
-Second equality is a property of inner products.  It implies
+Second equality is a property of inner products. It implies
 \emph{identical price hyperplanes} in $\R^{S-1}$, which lie at right
 angles to $\bsp\bsc\in\R^S$ \& connect payoffs $\bsx\in\R^S$ of
 identical price.
@@ -709,10 +717,16 @@ Euclidean to $L^2$:
   \qquad
   \lVert x\rVert := \sqrt{\E[x^2]}
 \end{align*}
-However, take note:
+%What's more, we even have a version of Expression~\ref{vectorprice}:
+%\begin{align*}
+  %\langle x,y \rangle
+  %= \lVert y\rVert \times \lVert \proj(x|y)\rVert
+%\end{align*}
+\emph{However}, important note:
 we will continue to draw vectors, visualize projections, and reason in
-Euclidean space. \emph{But} every dot/inner product is really $\E[xy]$
-underneath.
+Euclidean space. We use this visual metapher \emph{even though} every
+dot/inner product is really $\E[xy]$ underneath, involving RVs $x,y$
+rather than vectors $\bsx,\bsy$.
 
 For example, we update the picture to
 \vspace{10pt}
@@ -754,10 +768,10 @@ For example, we update the picture to
 \clearpage
 \subsubsection{Incomplete Markets}
 
-Assume $\underline{X}\subsetneq \R^S$, i.e. tradeable assets do not
-\emph{span} the state space. As an example consider the picture below
-where $S=3$, but $\underline{X}=\R^2$, i.e. an infinite plane extending
-out in each direction from the edges of the triangle.
+Assume $\underline{X}\subsetneq \R^S$, i.e. tradeable assets don't
+\emph{span} the state space. For ex, the figure below shows
+$\dim(\underline{X})=2<S=3$. $\underline{X}$ is a plane extending out
+from the triangle.
 
 \vspace{10pt}
 %\tdplotsetmaincoords{70}{15}
@@ -780,31 +794,31 @@ out in each direction from the edges of the triangle.
     % Draw reference points
     %\node[d4black] at (0.7,0.7,1.8) {$b$};
 \end{tikzpicture}
-
-Suppose further that we don't have an economic model giving us a
-discount factor $m$ that prices payoffs $x\in\underline{X}$ according to
-$p=\E[mx]$. Can we still rescue something like the pricing formula
-$p=\E[mx]$?
+\\
+\emph{Goal}: Suppose we don't have an economic model giving SDF $m$
+pricing payoffs $x\in\underline{X}$ according to $p=\E[mx]$.
+Can we go backwards and \emph{find} a SDF to price assets?
 
 \begin{assump}
-For all $\forall x_1,x_2\in \underline{X}$ and $a,b\in\R$,
-we might assume
+For all $x_1,x_2\in \underline{X}$ and $a,b\in\R$, we might assume
 \begin{itemize}
   \item[A1.] \emph{Portfolio formation}:
     $ax_1+bx_2\in\underline{X}$.
   \item[A2.] \emph{Linearity/Law Of One Price} (LOOP):
-    $p[ax_1+bx_2] = ap[x_1]+bp[x_2]$
-  \item[A3.] \emph{Absence of Arbitrage}:
-    If $x(\omega)\geq x'(\omega)$ for all $\omega\in\Omega$ and
-    strict for at least one $\omega$, then $p[x]>p[x']$.
+    $p[ax_1+bx_2] = ap[x_1]+bp[x_2]$.
+    \footnote{
+      Note: people colloquially use ``no arb'' to refer to
+      violations of A2/LOOP, \emph{not} A3 (which is stronger).
+    }
+  \item[A3.] \emph{No Arbitrage}:
+    If $x(\omega)\geq x'(\omega)$ $\forall \omega\in\Omega$,
+    strict for at least one $\omega$, $p[x]>p[x']$.
 
-    Given A1 and A2, equivalent to:
-    If $x(\omega)\geq 0$ for all $\omega$ and
-    strict for at least one, then $p[x]>0$.
-    In words, ``No zero-cost portfolios that might pay.''
+    With A1-2, equivalent to:
+    If $x(\omega)\geq 0$ $\forall\omega$,
+    strict for at least one, $p[x]>0$.
+    (``No free assets that might pay'')
 \end{itemize}
-Note that people colloquially ``no arbitrage'' to refer to violations of
-LOOP, \emph{not} A3.
 \end{assump}
 
 \begin{thm}
@@ -812,11 +826,11 @@ We care about two directions
 \begin{itemize}
   \item
     \emph{($\Rightarrow$)}
-    Given a discount factor $m$ from an economic model pricing all
-    assets $p=\E[mx]$, A2 (LOOP) holds.
+    Given SDF $m$ from an economic model pricing all assets/payoffs in
+    $\R^S$ by $p=\E[mx]$, A2 (LOOP) holds.
   \item
     \emph{($\Leftarrow$)}
-    Assuming A1 \& A2, $\exists$ a discount factor
+    Assuming A1 \& A2, $\exists\,!$ a discount factor
     $x^*\in\underline{X}$ pricing all assets in $\underline{X}$,
     i.e. s.t. $p=\E[x^*x]$ for all $x\in\underline{X}$
 \end{itemize}
@@ -824,7 +838,168 @@ We care about two directions
 \begin{proof}
 ($\Rightarrow$) $p[ax_1+bx_2] = \E[m(ax_1+bx_2)]$. Linearity of
 $\E$ to conclude.
+
+($\Leftarrow$) First, A1-2 imply \emph{parallel, linear} price
+hyperplanes in $\underline{X}$.
+Figure below depicts this for $\dim(\underline{X})=2$.
+Dashed line $\perp$ to the price planes
+pins down direction of $x^*$.
+Then just fix length so $1=\E[x^*R]$ $\forall R\in\underline{R}$.
+
+\vspace{10pt}
+
+\begin{tikzpicture}[xscale=1, yscale=1] %, shorten >= 3pt
+  % Axes
+  \draw[d4black, <->] (0,-1) -- (0,0) -- (0,2);
+  \draw[d4black, <->] (-1.5,0) -- (0,0) -- (2,0);
+
+  % Contingent claims price vector, pc = (0.6, 0.9)
+  % Hence p = 0.6x1 + 0.9x2 => x2 = (10/9)p - (2/3) x1
+  \draw[d4gray, dashed] (-0.3,-0.45) -- (1.2,1.8);
+  \draw[d4blue, ultra thick, ->] (0.0,0.0) -- (0.4,0.6);
+  \node[d4gray] at (0.5,0.3) {$x^*$};
+  \node[d4blue] at (0.5,0.3) {$x^*$};
+
+  % Space of excess returns, x2 = -(2/3) x1
+  \draw[d4black, thin] (-0.9, 0.6) -- (1.5, -1.0);
+  \node[d4black] at (2.2,-1.1) {$\underline{R^e}$ i.e. $p=0$};
+
+  % Space of returns, x2 = (10/9) - (2/3) x1
+  \draw[d4black, thin] (-0.6, 1.5111111) -- (1.75,-0.05555555);
+  \node[d4black] at (2.2,-0.3) {$\underline{R}$ i.e. $p=1$};
+
+  % Space of p=2, x2 = (10/9)*2 - (2/3) x1
+  \draw[d4black, thin] (0.0, 2.2222222) -- (2,0.88888888);
+  \node[d4black] at (2.4,0.888888888) {$p=2$};
+\end{tikzpicture}
+\\
+Algebra: If $\dim(\underline{X})=N\leq S$, can choose $N$ basis payoffs
+in $\underline{X}$ that span. Stack these payoffs \& their prices
+into vectors
+$X(\omega):=(x_1(\omega)\ldots x_N(\omega))'$ and
+$P:=(p_1\ldots p_N)'$
+
+Since $x^*\in\underline{X}$ and assets in $X$ span $\underline{X}$, must
+be $x^*=X'c$ for some weights $c$. Construct $c$ so $x^*$ prices basis
+assets:
+\begin{align*}
+  P &= \E[x^*X] = \E[X(X'c)] = \E[XX']c
+\end{align*}
+We can solve for $c$ to get
+\begin{align*}
+  %\implies\;
+  %c &= \E[XX']^{-1}P \\
+  %\implies
+  x^* &= P'\;\E[XX']^{-1}X
+\end{align*}
+Clearly, $x^*\in\underline{X}$, unique, prices assets in $X$ by
+construction, and since they span $\underline{X}$, those assets can
+replicate any other payoff in $\underline{X}$. So by A2, $x^*$ prices
+everything else.
+\end{proof}
+
+
+\begin{cor}
+Regarding unique $x^*\in \underline{X}$:
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item $\dim(\underline{X})=S$ implies $x^*$ unique in $\R^S$.
+  \item $\underline{X}\subsetneq \R^S$ implies infinitely many
+    SDFs that price all assets $x\in\underline{X}$ by
+    formula $p=\E[\tilde{x}^*x]$ where
+    \begin{align*}
+      \tilde{x}^*
+      = x^* + \varepsilon
+      \;\;
+      \text{where}\;
+      \E[\varepsilon x] = 0,
+      \; \forall x\in\underline{X}
+    \end{align*}
+  \item If $m$ is the unique, true SDF pricing all payoffs in $\R^S$,
+    $x^*=\proj(m|\underline{X})$.
+\end{enumerate}
+\end{cor}
+
+%Since $x^*\in\underline{X}$, it's clear that we might have
+%$x^*(\omega)=0$ for some $\omega\in\Omega$.
+
+\clearpage
+
+Our next goal is to extend SDF $x^*\in\underline{X}$ (which prices
+payoffs in $\underline{X}$) to ensure that we can \emph{also} price
+payoffs in $\R^S\setminus\underline{X}$ \emph{without} implying
+arbitrage opportunities.
+
+While the last theorem guaranteed a unique $x^*\in\underline{X}$, it
+did \emph{not} guarantee a \emph{strictly positive} $x^*$---and that's
+\emph{key} for preventing arbitrage $\R^S\setminus\underline{X}$.
+For example, suppose $\underline{X}\subsetneq\R^S$ is zero along
+some axis. In other words, there exists a $\omega'\in\Omega$ such that
+\begin{align*}
+  x(\omega') = 0
+  \qquad \forall x\in \underline{X}
+\end{align*}
+Then $x^*\in\underline{X}$ necessarily has $x^*(\omega')=0$.
+But that could imply arbitrage opportunties (free portfolios that might
+pay) if we try to price assets/payoffs \emph{outside} of
+$\underline{X}$.
+
+\begin{thm}
+Again, two directions
+\begin{itemize}
+  \item \emph{($\Rightarrow$):}
+    SDF $m$ from an economic model pricing all assets/payoffs
+    in $\R^S$ by $p=\E[mx]$ plus A1 imply A2-3 hold.
+  \item
+    \emph{($\Leftarrow$):}
+    Given A1-3, $\exists$ a
+    \emph{strictly positive}\footnote{
+      i.e. $m^*(\omega)>0$ for all $\omega\in\Omega$
+    }
+    SDF $m^*\in\R^S$ pricing all payoffs
+    \begin{align*}
+      p=\E[m^*x]
+      \qquad
+      \forall
+      x\in \R^S\supseteq \underline{X}
+    \end{align*}
+    Note $m^*$ generally not unique or in $\underline{X}$ unless
+    $\dim(\underline{X})=S$.
+    Typically,
+    \begin{align*}
+      m^*=x^*+\varepsilon
+      \;\text{where}\;
+      \E[\varepsilon x]=0,\,
+      \forall x\in\underline{X}
+    \end{align*}
+    All such SDFs agree about prices of
+    $x\in\underline{X}$, generally disagree for
+    $x\not\in\underline{X}$.
+\end{itemize}
+\end{thm}
+\begin{proof}
+($\Rightarrow$)
+A2 holds by previous thm.
+Since $m$ from economic model, it represents MU and is strictly
+positive $m(\omega)>0$. Hence, for $x(\omega)\geq 0$ with $x(\omega')>0$
+for at least one $\omega'$, clearly have $\E[mx]>0$, hence A3.
+\\
+\\
 ($\Leftarrow$)
+A3/no-arb means any payoff in the nonnegative orthant of
+$\R^S$ (excluding the origin) has positive price.
+Again, there are parallel, linear price planes cutting through
+$\underline{X}$.\footnote{%
+  If $\dim(\underline{X})<S$, we have some freedom in the angle at which
+  they cut through $\underline{X}$; otherwise, pinned down.
+}
+That includes the zero price plane, which intersects the nonnegative
+orthant only at the origin. Thus $\exists$ a separating hyperplane
+through the origin, separating the zero price hyperplane and
+nonnegative orthant, with perpendicular vector pointing into the
+positive orthant. This perpendicular vector pins down the direction of
+$m^*$. To pin down length, simply normalize so it prices all returns
+$1=\E[m^*R]$.
+
 \end{proof}
 
 
@@ -1153,20 +1328,6 @@ at a given time.
 \clearpage
 \section{Asset Pricing Theory Overview: $p=E(mx)$}
 
-This section is about understanding the fundamental formula for
-all of asset pricing, where an \emph{asset} is anything
-that promises a future stream of payments:
-\begin{equation}
-    \label{pemx}
-    p_t = \mathbb{E}_t[m_{t+1} x_{t+1}]
-\end{equation}
-This is huge because it lets us define a \emph{single} stochastic
-discount factor $m_{t+1}$ for everything. So the price of \emph{any
-asset} is determined by the expectation of its payoffs, weighted and
-adjusted for risk by $m_{t+1}$.
-
-
-
 \subsection{Understanding the Components}
 
 Now let's take each component of Equation~\ref{pemx} in turn
@@ -1234,20 +1395,9 @@ A few things to emphasize
 \newpage
 \subsection{Deriving $p=E(mx)$}
 
-We'll first consider the two-period case for simplicity and
-exposition. Then we'll extend to an infinite-horizon. We'll use
-each at some point going forward.
-
 \subsubsection{Discrete-Time Two Period Case}
 
 
-Finally, price, $p_t$, is a \emph{marginal} concept---what an investor
-would willingly pay at the margin to hold an extra piece of the asset.
-As a result, this pricing equation cannot really be used with large
-venture capital-type investments where the investor either puts up \$5
-million or nothing. It's really about balancing utility gains next
-period (from a tiny bit more of the asset's payoff) with utility losses
-today (from the cost of buying a tiny bit more of the asset).
 
 \subsubsection{Discrete Time Present Value Statement, Transverasality
 Condition, and Rational Bubbles}
