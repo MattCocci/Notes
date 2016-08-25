@@ -562,9 +562,10 @@ With both $R^i,R^j$ unit price, portfolio is zero cost:
 \end{align}
 To interpret pricing Eq.~\ref{pemx}, use Eq.~\ref{rf} and
 $\Cov(x,y)=\E[xy] - \E[x]\E[y]$ on $\E[mx]$:
-\begin{align*}
+\begin{align}
   p =  \frac{\E[x]}{R^f} + \Cov(m,x)
-\end{align*}
+  \label{riskadj}
+\end{align}
 Price is discounted expected payoff plus a risk
 correction for covariance of payoff $x$ with $m$.
 Risk neutrality implies $u'$, hence $m$, constant, in which case
@@ -618,6 +619,154 @@ Alternatively, can also rewrite Equation~\ref{eq:contingentprice} using
   \underbrace{R^f pc(\omega)}_{\pi^*(\omega)}x(\omega)
   = \frac{\E^*[x(\omega)]}{R^f}
 \end{align*}
+
+
+\clearpage
+\subsection{Continuous Time}
+
+The agent maximizes utility of consumption given his endowment by
+buying/selling an asset over time. The asset pays dividends continuously
+at rate $D_t$ and has price $p_t$ which evolves according to
+a diffusion process.\footnote{%
+  Price follows
+  $dp_t/p_t = \mu(\,\cdot\,)\; dt + \sigma(\,\cdot\,) \; dW_t$
+  where $\mu(\,\cdot\,)$ and $\sigma(\,\cdot\,)$ are functions that can
+  depend upon $t$, $p_t$, or other state variables.
+  Even though $W_t$ is Brownian motion (inherently normal), the fact
+  that drift and variance are functions allows us to generate
+  non-Gaussian dynamics.
+}
+The agent solves
+\begin{align*}
+  \max \;
+  \E_t \int_{0}^\infty e^{-\rho s} u(c_{t+s})\; ds
+\end{align*}
+This has first order condition
+%\begin{align*}
+  %p_tu'(c_t)
+  %= \E_t
+  %\int_{0}^\infty e^{-\delta s} u'(c_{t+s})D_{t+s}\; ds
+%\end{align*}
+%Equivalently, we have
+\begin{align}
+  p_t\Lambda_t
+  =&\; \E_t
+  \int_{0}^\infty \Lambda_{t+s}D_{t+s}\; ds
+  \label{pemxcont1}
+  \\
+  \Lambda_t :=&\; e^{-\rho t} u'(c_t)
+\end{align}
+$\Lambda_t$---analogue of SDF $m_{t+1}$---represents
+discounted level of marginal utility.
+
+Difference Eq.~\ref{pemxcont1} between $t+\Delta$ and $t$ and take
+conditional exp. $\E_t$ of both sides
+\begin{align*}
+  \E_t
+  \left[
+  \Lambda_{t+\Delta}p_{t+\Delta}
+  -\Lambda_tp_t
+  \right]
+  %\\
+  %&= \E_t\left[
+  %\int_{0}^\infty \Lambda_{t+\Delta+s}D_{t+\Delta+s}\; ds
+  %-
+  %\int_{0}^\infty \Lambda_{t+s}D_{t+s}\; ds
+  %\right]
+  %\\
+  &=
+  -\E_t
+  \int_{0}^\Delta \Lambda_{t+s}D_{t+s}\; ds
+  %\\
+  %\implies\quad
+\end{align*}
+Sending $\Delta\ra 0$ and rearranging, we get
+fundamental pricing equation
+\begin{align}
+  \boxed{%
+  0 = \Lambda_t D_t \;dt + \E_t[d(\Lambda_tp_t)]
+  }
+  \label{pemxcont2}
+\end{align}
+If $D_t=0$, martingale MU-weighted price.
+
+We can also use Ito's Lemma to break up $d(\Lambda_tp_t)$ and obtain
+another representation of the fundamental pricing equation:
+\begin{align}
+  \boxed{%
+  0 = \Lambda D \,dt
+  + \E_t[p \,d\Lambda + \Lambda \, dp + d\Lambda \,dp]
+  }
+  \label{pemxcont3}
+\end{align}
+If $\Lambda$ and $p$ never zero, divide through by $\Lambda p$
+for yet another representation
+\begin{align}
+  \boxed{%
+  0 = \frac{D}{p} \,dt
+  + \E_t\left[
+    \frac{d\Lambda}{\Lambda} + \frac{dp}{p}
+    + \frac{d\Lambda}{\Lambda}\frac{dp}{p}
+    \right]
+  }
+  \label{pemxcont4}
+\end{align}
+Now from prices to \emph{returns}.
+Since the asset pays divs at rate $D_t$ per unit time, an agent
+holding the asset at $t$ earns total \emph{net payoff} $dp_t + D_t dt$
+over the next instant. Hence total instantaneous \emph{net return} at
+$t$
+%(denoted $dR_t$\footnote{
+  %To see that $dR_t$ is the proper notation for a net return, consider a
+  %net return in discrete time, which equals
+  %$R_{t+1}-1= (p_{t+1}+D_{t+1})/p_t - p_t/p_t=R_{t+1}-R_t$.
+%})
+is given by that net payoff over price
+\begin{align}
+  %dR_t =
+  \frac{dp_t}{p_t}
+  + \frac{D_t}{p_t} dt
+  \label{returnscont}
+\end{align}
+The \emph{risk free asset} pays instantaneous net return
+%$dR_t=r^f_t dt$,
+$r^f_t dt$,
+where $r^f_t$ is the level of the risk free rate at
+$t$.\footnote{%
+  As in discrete time, this is \emph{not} risk free in the sense of
+  constant $r^f_t$. Generally, $r^f_t\neq r^f_s$.
+  Instead, it's risk free in the sense that the net rate of return over
+  the next instant has no Brownian term and is simply $r^f_t\;dt$.
+}
+Equating $r^f_t\;dt$ and Eq.~\ref{returnscont}, we see two ways to model
+this asset:
+\begin{enumerate}[label=(\roman*)]
+  \item Constant $p_t=1$ with $D_t=r_t^f$
+  \item $dp_t/p_t=r^f_t\;dt$ with $D_t=0$
+\end{enumerate}
+Using either in Eq.~\ref{pemxcont4}, we can get the continuous time
+analog of Eq.~\ref{rf}:
+\begin{align}
+  r^f_t\;dt =
+  -\E_t\left[ \frac{d\Lambda_t}{\Lambda_t} \right]
+  \label{rfcts}
+\end{align}
+Now use Eq.~\ref{rfcts} to get the continuous time analog of the risk
+adjustment formula (\ref{riskadjret})
+\begin{align*}
+  \E_t\left[
+     \frac{dp_t}{p_t}
+  \right]
+  +
+  \frac{D_t}{p_t} dt
+  =
+  r^f_t\;dt
+  - \E_t\left[
+     \frac{d\Lambda_t}{\Lambda_t}\frac{dp_t}{p_t}
+    \right]
+  %\label{pemxcont5}
+\end{align*}
+
 
 \clearpage
 \subsection{State Space Geometry}
@@ -999,7 +1148,6 @@ nonnegative orthant, with perpendicular vector pointing into the
 positive orthant. This perpendicular vector pins down the direction of
 $m^*$. To pin down length, simply normalize so it prices all returns
 $1=\E[m^*R]$.
-
 \end{proof}
 
 
@@ -1116,31 +1264,135 @@ If all factors are excess returns, then the model can be written
 Can then estimate $\beta$'s by forming sample equivalents of $\E[R^e]$
 and $\E[f^z]=\E[R^{ez}]$.
 
-\clearpage
-\subsubsection{Mean-Variance Frontier}
 
-Rewrite the covariance
+\clearpage
+\subsection{Mean-Variance Frontier}
+
+\subsubsection{With Discount Factor $m$}
+
+Rewrite covariance in risk-adjustment Eq.~\ref{riskadjret}
 \begin{align*}
   \E(R^i) - R^f
   &= -\frac{1}{\E(m)} \; \rho_{m,R^i} \; \sigma_{R^i} \; \sigma_m
 \end{align*}
-Since correlation $|\rho_{m,R^i}|\leq 1$,
-\begin{align*}
-  \frac{\left\lvert\E(R^i) - R^f\right\rvert}{\sigma_{R^i}}
-  &\leq \frac{\sigma_m}{\E(m)}
-\end{align*}
-$R^f$ risk-free so $\sigma_{R^f}=0$ and $\sigma_{R^i-R^f}=\sigma_{R^i}$,
-hence can write the above as a bound on the exp. Sharpe Ratio for excess
-return $R^e=R^i-R^f$:
+With corr $|\rho_{m,R^i}|\leq 1$,
+letting $R^e=R^i-R^f$,
 \begin{align*}
   \frac{\left\lvert\E(R^i) - R^f\right\rvert}{\sigma_{R^i-R^f}}
   =
   \frac{\left\lvert\E(R^e)\right\rvert}{\sigma_{R^e}}
   &\leq \frac{\sigma_m}{\E(m)}
 \end{align*}
-Whether we think of returns $R^i$ or excess return $R^e=R^i-R^f$,
-returns of all assets lie within a wedge-shaped region.
-Boundary of the region is the \emph{mean-variance frontier}.
+Thus expected excess returns for \emph{all} assets have \emph{bounded}
+Sharpe Ratios and lie within a wedge-shaped
+\emph{mean-variance frontier}.
+
+\subsubsection{Incomplete Markets}
+
+Given payoff space $\underline{X}\subseteq\R^S$, define subspaces of
+returns \& excess returns (equivalently, the space of unit \& zero price
+payoffs):
+\begin{align*}
+  \underline{R}
+  &:=\{x\;|\; p[x]=1\}
+  \quad
+  \underline{R^e}
+  :=\{x\;|\; p[x]=0\}
+\end{align*}
+Given unique SDF $x^*\in\underline{X}$ pricing assets $p=\E[x^*x]$,
+define
+\begin{align*}
+  R^* &:=
+  \frac{x^*}{p[x^*]}
+  %= \frac{x^*}{\E[(x^*)^2]}
+  \qquad
+  R^{e*} :=
+  \proj(1\;|\;\underline{R^e})
+\end{align*}
+Last line says $1 = R^{e*} + \varepsilon$ where
+$\E[\varepsilon R^e]=0$ for all $R^e\in\underline{R^e}$.
+Hence $R^{e*}$ represents \emph{mean} returns with an inner product the
+way that $x^*$ represents prices with an inner product
+\begin{align*}
+  \E[R^e]
+  =
+  \E[1 \; R^e ]
+  =
+  \E[(R^{e*}+\varepsilon)R^e]
+  %\\
+  %\varepsilon\perp R^e\;
+  %\implies\quad
+  %\E[R^e]
+  %&=
+  =
+  \E[R^{e*}R^e]
+\end{align*}
+In other words, as $p=\langle x^*, x \rangle$ for all
+$x\in\underline{X}$, so too
+$\E[R^e]=\langle R^{e*}, R^e \rangle$ for all $R^e\in\underline{R^e}$.
+
+\begin{thm}
+Can decompose any return
+\begin{align*}
+  R^i = R^* + w^i R^{e*} + n^i
+\end{align*}
+for some scalar $w^i\in\R$ and some excess return
+$n^i\in\underline{R^e}$ that is mean zero $\E[n^i]=0$, with
+all components mutually orthogonal:
+\begin{align*}
+  \E[R^*R^{e*}]
+  =
+  \E[R^*n^i]
+  =
+  \E[R^{e*}n^i]
+  = 0
+\end{align*}
+\end{thm}
+\begin{proof}
+First, the constant \emph{price} hyperplanes running perpendicular to
+$x^*$ also run perp to $R^*$, which is just $x^*$ stretched to hit
+$\underline{R}$.
+
+Next, constant \emph{mean} hyperplanes run perp to $R^{e*}$.
+Note that any ${R^{e}}'\in\underline{R^e}$ such that
+${R^{e}}'=R^e+\varepsilon$ and $\varepsilon\perp R^{e*}$
+implies
+\begin{align*}
+  \E[R^{e*}{R^{e}}']
+  =
+  \E[R^{e*}(R^{e}+\varepsilon)]
+  = \E[R^{e*}R^e]
+\end{align*}
+And since $\E[R^{e*}R^e]=\E[R^e]$
+$\forall R^e,{R^e}'\in\underline{R^e}$, conclude that
+$\E[{R^{e}}']=\E[R^{e}]$.
+
+Algebra:
+Given $R^*$, $R^{e*}$, define
+\begin{align*}
+  n^i = R^i - R^* -w^i R^{e*}
+\end{align*}
+Choosing $w^i$ so $n^i$ is indeed mean zero, we get
+$w^i = (\E[R^i] - \E[R^*])/\E[R^{e*}]$.
+
+With $R^*$, $R^{e*}$, and $n^i$ pinned down, just show orthogonality.
+First, for any $R^e\in\underline{R^e}$
+\begin{align*}
+  \E[R^*R^e]=\E[x^*R^e]/p[x^*]=0
+\end{align*}
+$R^{e*}\in\underline{R^e}$ and $R^*,R^i\in\underline{R}$
+imply $n^i,R^{e*}\in\underline{R^e}$ by construction and definition,
+resp., so
+\begin{align*}
+  \E[R^*n_i]=\E[R^*R^{e*}]=0
+\end{align*}
+Lastly, $w^i$ was chosen so $\E[n^i]=0$, plus
+$\E[R^{e*}R^e]=\E[R^e]$ for all $R^e\in\underline{R^e}$ (including
+$n^i$). Hence, $0=\E[n^i] =\E[R^{e*}n^i]$.
+\end{proof}
+
+\clearpage
+$R^*$ is also the minimum second moment return.
 
 \end{multicols*}
 
@@ -1482,45 +1734,6 @@ dumb) reason.
 
 \subsection{Continuous Time}
 
-In continuous time, we want to think about an asset that pays a
-deterministic and continuous stream of dividends at rate $D_t$ with a
-price that evolves according to a diffusion:
-\begin{align*}
-  \frac{dp_t}{p_t}
-  &= \mu(t,p_t)\; dt + \sigma(t,p_t) \;dz_t
-\end{align*}
-Combining the above price process with dividends $D_t$, total returns
-$R_t$ evolve according to diffusion
-\begin{align*}
-  dR_t = \frac{dp_t}{p_t} + \frac{D_t}{p_t}dt
-\end{align*}
-To get the pricing equation, we generalize the discrete-time infinite
-period objective function (\ref{infobjfcn}) to continuous time as
-follows:
-\begin{align*}
-  U(\{c_t\}) = \mathbb{E}
-  \left[\int^\infty_0 e^{-\delta t} u(c_{t}) \; dt\right]
-\end{align*}
-Supposing that dividends (the payoff) come at a constant rate of $D_t$
-per period, we get the first order conditions
-\begin{align*}
-  p_t u'(c_t)
-  &=
-  \mathbb{E}_t\left[
-  \int^\infty_0 e^{-\delta s} u'(c_{t+s}) D_{t+s} \; ds
-  \right] \\
-  \Leftrightarrow \qquad
-  p_t \Lambda_t
-  &=
-  \mathbb{E}_t\left[
-  \int^\infty_0 \Lambda_{t+s} D_{t+s} \; ds
-  \right]\\
-  \Lambda_t &= e^{-\delta t}u'(c_t)
-\end{align*}
-This, of course, all looks quite similar to the first order conditions
-we got from (\ref{infobjfcn}). I'm just defining the stochastic discount
-factor $\Lambda_t$ in levels (rather than a ratio of marginal
-utilities), since that works better for continuous time.
 
 This leads to the continuous time main pricing equation (in a few
 variants):
