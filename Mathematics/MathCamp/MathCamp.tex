@@ -2639,16 +2639,16 @@ functions and differentiability via function approximations.
 
 
 \clearpage
-\subsection{Principal Component Analysis}
+\subsection{Principal Component Analysis (PCA)}
 
 In this section, we look for factor structure in data arranged into data
 matrix $X\in\R^{n\times k}$ where $n>k$ is the number of observations
-and $k$ is the number of features/covariates per observation.
-Assume WLOG that the columns are mean zero (innocuous normalization).
+and $k$ is the number of features/covariates per observation.  Assume
+WLOG that the columns are mean zero (an innocuous normalization).
 
-Principal component analysis uses information in the covariance matrix.
-Given observations $\{X_{i,\cdot}\}_{i=1}^n$, that means
-studying population and sample covariance, respectively\footnote{%
+PCA uses information in the covariance matrix.  Given observations
+$\{X_{i,\cdot}\}_{i=1}^n$, that means studying population and sample
+covariance matrices, respectively\footnote{%
   Assumes unconditional covariance $\Omega=\Cov(X_{i,\cdot})$ exists.
   Cov. stationarity of underlying process sufficient.
 }
@@ -2664,8 +2664,8 @@ Both $\Omega$ and $\hat{\Omega}$ are (i) symmetric and (ii) positive
 semidefinite, facts we will refer to below.
 
 \begin{defn}(PCA from Eigenvalue Decomposition)
-Start with population covariance matrix $\Omega$ for intuition.  By (i),
-$\Omega\in\Rnn$ has eigenvalue decomposition
+Start with population covariance matrix $\Omega$.  By (i), matrix
+$\Omega\in\R^{k\times k}$ has eigenvalue decomposition
 \begin{align*}
   \Omega = Q\Lambda Q^T
   \qquad\text{where}\quad
@@ -2686,14 +2686,50 @@ $j$th PC of the data in $X$
   X = YQ^T
   \label{PCA}
 \end{align}
-What's so great about this?
+If we don't know population covariance matrix $\Omega$ (and we often
+don't), we instead take an eigenvalue decomposition of
+$\hat{\Omega}=X^TX/n$ and construct PCs with the resulting sample
+$\hat{Q}$.
+\end{defn}
+
+
+\begin{defn}(Sample PCA from SVD)
+One problem with doing PCA on sample $\hat{\Omega}$:
+If you take an eigenvalue decomposition of $\hat{\Omega}=X^TX/n$, you
+need to compute $X^TX$, effectively ``squaring'' the matrix and making
+it less stable numerically. Can instead take an SVD:
+\begin{align*}
+  X = U\Sigma V^T
+\end{align*}
+From there, can compute $X^TX$ and use orthogonality of $U$ so
+$U^TU=I_n$ to get
+\begin{align*}
+  X^TX
+  = \big(U\Sigma V^T\big)^TU\Sigma V^T
+  = V\Sigma^T U^TU\Sigma V^T
+  = V\Sigma^2 V^T
+\end{align*}
+Evidently, $\Sigma^2=n\Lambda$ and $V=Q$ where $\Lambda$ and $Q$ are
+from the Eigenvalue Decomposition approach above. Therefore, rather than
+compute the eigenvalue decomposition of $X^TX/n$ to get weights/loadings
+$Q$, we could alternatively just compute the SVD of $X$ to get $V=Q$,
+which is a more numerically stable procedure overall.
+\end{defn}
+
+\clearpage
+What's so great about PCA anyway?
+Let's discuss, assuming we have the orthogonal matrix
+$Q=(q_1,\ldots,q_k)$ and the diagonal $\Lambda$ from the eigenvalue
+decomposition of the \emph{population} covariance matrix $\Omega$. We
+conclude with a discussion of the sample counterpart.
 \begin{enumerate}[label=(\roman*)]
   \item
     \emph{PCs Uncorrelated}:
-    $Y$ is just a linear transformation of data $X$ onto new
-    axes---those defined by the orthog. eigenvects of $\Omega$.
-    Useful because the population cov. matrix of the transformed
-    data (transformed with fixed/nonstochastic population weights $Q$)
+    First, $Y$ is simply a linear transformation of data $X$ onto new
+    axes---those defined by the orthogonal eigenvectors of $\Omega$.
+    Useful because the population covariance matrix of the
+    \emph{transformed} data (transformed with fixed/nonstochastic
+    population weights $Q$)
     \begin{align}
       \Cov(Y_{i,\cdot}) = \Cov(XQ) = Q^T\Cov(X)Q=
       Q^T \Omega Q = \Lambda
@@ -2729,51 +2765,20 @@ What's so great about this?
     \end{align}
 
   \item
-    \emph{Data compression}: By Eqs.~\ref{pcacovfrac}
-    and~\ref{pcaloadings}, if first $p$ PCs capture/``explain'' most
-    variance,
+    \emph{Data compression}: By Equations.~\ref{pcacovfrac}
+    and~\ref{pcaloadings}, if the first $p$ PCs capture/``explain'' most
+    variance, we can approximate
     \begin{align}
-      \text{Approximate}\;
       X \approx
       Y_{\cdot,1}q_1^T + \cdots + Y_{\cdot,p}q_p^T
     \end{align}
 \end{enumerate}
-\end{defn}
-\clearpage
-
-\begin{rmk}
-If we don't know population covariance matrix $\Omega$ (and we often
-don't), simply redo everything by taking the eigenvalue decomposition
-of $\hat{\Omega}=X^TX/n$. Everything goes through with the qualification
+Lastly, sample PCA computed from $\hat{\Omega}$.
+Everything goes through with the qualification
 that we have \emph{sample} weights/loadings that give \emph{sample} PCs
 that are orthogonal \emph{in sample} and explain \emph{sample} variance
-in proportion to the in-sample eigenvalues.
-\end{rmk}
+in proportion to the computed \emph{in-sample} eigenvalues.
 
-
-\begin{defn}(Sample PCA from SVD)
-One problem with doing PCA on sample $\hat{\Omega}$ as above:
-If you take an eigenvalue decomposition of $\hat{\Omega}=X^TX/n$, you
-need to compute $X^TX$, effectively ``squaring'' the matrix and making
-it less stable numerically. Instead, we can take an SVD of the matrix
-$X$
-\begin{align*}
-  X = U\Sigma V^T
-\end{align*}
-From there, it's clear that
-\begin{align*}
-  X^TX
-  = \big(U\Sigma V^T\big)^TU\Sigma V^T
-  = V\Sigma^T U^TU\Sigma V^T
-  = V\Sigma^2 V^T
-\end{align*}
-where we used the orthogonality of $U$ so $U^TU=I_n$ and the diagonal
-structure of $\Sigma$. Evidently, $\Sigma^2=n\Lambda$ from the Eigenvalue
-Decomposition approach above and $V=Q$. Therefore, rather than compute
-the eigenvalue decomposition of $X^TX/n$ to get weights/loadings $Q$, we
-could alternatively just compute the SVD of $X$ to get $V=Q$, which is a
-more numerically stable procedure.
-\end{defn}
 
 
 \clearpage
