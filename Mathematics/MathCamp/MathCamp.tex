@@ -6404,6 +6404,1090 @@ at $x$. The functions are \emph{strictly} convex or concave if you
 swap ``semidefinite'' for ``definite'' in the conditions above.
 \end{thm}
 
+
+\section{The Riemann-Stieltjes Integral}
+
+This definition of the integral was made rigorous in the 1800s by
+Riemann, Darboux, and Stieltjes.  It's an intuitive way to define the
+area under a curve, and it works well with numerical integration
+(approximations). \emph{However}, it is incomplete in the sense that
+there are functions of interest that we cannot integrate in a Riemann
+sense but can in a Lebesgue sense, which retains Riemann as a special
+case.
+
+Throughout this section, unless otherwise noted, we'll largely stick to
+bounded functions that are univariate from a compact interval to
+$\mathbb{R}$:
+\begin{align*}
+  f: [a, b] \rightarrow \mathbb{R}
+\end{align*}
+We'll begin by discussing \emph{partitions} of that interval $[a,b]$
+into smaller pieces, from which we'll construct sums that approximate
+the area under the curve. This will lead us to a definition of the
+Riemann Integral. Then, we'll generalize and allow the \emph{weight} we
+place on the sub-intervals (when summing over the entire interval) to
+vary, which will give us the Riemann-Stieltjes integral. From there, we
+discuss the relationships between the approximating sums and the
+integral.
+
+\subsection{Partitions}
+
+\begin{defn}(Partition)
+A \emph{partition}, $P$, is an ordered tuple representing a finite
+sequence on the interval $[a,b]$,
+\begin{align*}
+  a = x_0 < x_1 < \cdots < x_n = b
+  \qquad \text{with} \quad \Delta x_i := x_i - x_{i-1}
+\end{align*}
+\end{defn}
+
+\begin{defn}(Partition Norm)
+The \emph{norm} of a partition $P$, sometimes denoted ``mesh $P$''
+represents
+\begin{align*}
+  || P || = \text{norm}(P) := \max_i |x_i - x_{i-1}| =
+  \max_i |\Delta x_i|
+\end{align*}
+\end{defn}
+
+\begin{defn} $Q$ is a \emph{refinement} of $P$ if $Q \supset P$ where $Q$ and $P$ are both partitions of $[a,b]$. $Q$ the intervals \emph{finer}.
+\end{defn}
+
+\begin{defn} For two partitions, $P_1$ and $P_2$, their \emph{common refinement} is $P_1 \cup P_2$.
+\end{defn}
+
+\begin{defn} A \emph{tagged partition} is a couplet $(P,T)$, where $P$ is some partition $\{x_0, \ldots, x_n\}$ and $T$ is a set of evaluation points, $\{t_1, \ldots, t_n\}$, for the function $f$  such that
+    \[ x_{i-1} \leq t_i \leq x_i \]
+\end{defn}
+
+\begin{note} We will now generalize to allow weighting of the sub-intervals within the partition, defined for an \emph{increasing} function $\alpha: [a,b] \rightarrow \mathbb{R}$, where 
+    \[ \Delta \alpha_i = \alpha(x_i) - \alpha(x_{i-1}) > 0 \]
+This is the main difference between the plain Riemann sum and integral, versus the Riemann-Stieltjes (RS) sum and integral.  The latter retains the former as a special case by taking $\alpha(x) = x$.  Therefore, the RS version is just a generalization of Riemann, weighting the contribution of the sub-intervals to the total sum/integral by the function $\alpha$, \emph{not} by the length of the sub-interval.
+\end{note}
+
+\subsection{Sum Definitions}
+
+We now define the various sums approximating the Riemann and RS integrals.
+
+\begin{defn} We define the upper and lower \emph{Darboux Sums}, respectively, as follows 
+    \begin{align*}
+        U(f,P) &:= \sum^n_{i=1} M_i(f)(x_i - x_{i-1}) 
+            \quad\text{where} \quad 
+            M_i(f) := \sup_{x \in [x_i, x_{i-1}]} f(x)\\
+        L(f,P) &:= \sum^n_{i=1} m_i(f)(x_i - x_{i-1})
+            \quad\text{where} \quad 
+            m_i(f) := \inf_{x \in [x_i, x_{i-1}]} f(x) 
+    \end{align*}
+\end{defn}
+
+\begin{defn} Given $f$ (bounded) and tagged partition $(P,T)$ we define the \emph{Riemann Sum} as 
+    \begin{equation}
+        S(f,P,T) := \sum^n_{i=1} f(t_i) (x_i - x_{i-1})
+    \end{equation}
+\end{defn}
+
+\begin{defn} 
+\label{RSD}
+We define the upper and lower \emph{RS-Darboux Sums}, respectively, as follows 
+    \begin{align*}
+        U_\alpha(f,P) &:= \sum^n_{i=1} M_i(f) \Delta \alpha_i
+            \quad\text{where} \quad 
+            M_i(f) := \sup_{x \in [x_i, x_{i-1}]} f(x) \\
+        L_\alpha(f,P) &:= \sum^n_{i=1} m_i(f)\Delta \alpha_i
+            \quad\text{where} \quad 
+            m_i(f) := \inf_{x \in [x_i, x_{i-1}]} f(x) 
+    \end{align*}
+\end{defn}
+
+\begin{defn} 
+\label{RSS}
+Given $f$ (bounded) and tagged partition $(P,T)$ we define the \emph{Riemann-Stieltjes Sum} as 
+    \begin{equation}
+        S_\alpha(f,P,T) := \sum^n_{i=1} f(t_i) \Delta \alpha_i
+    \end{equation}
+\end{defn}
+
+\subsection{Sum Relations}
+
+\begin{rmk} Clearly, by Definitions \ref{RSD} and \ref{RSS}, for all $T$ associated with $P$
+    \[ L_\alpha(f,P) \leq S_\alpha(f,P,T) \leq U_\alpha(f,P) \]
+\end{rmk}
+
+\begin{thm} 
+\label{sumineq}
+    If $Q \supset P$, i.e. if $Q$ refines $P$, then
+    \[ L_\alpha(f,P) \leq L_\alpha(f,Q) \leq U_\alpha(f,Q) 
+        \leq U_\alpha(f,P) \]
+\end{thm}
+\begin{proof} The proof proceeds by induction. Assume that $Q = P \cup \{x^*\}$, a single point. Then $x^*\in [x_{i-1}, x_i]$ for some interval, and it's easy show the relation from there.
+\end{proof}
+
+\begin{thm} 
+\label{pineq}
+    For all partitions $P_1, P_2$, 
+    \[ L_\alpha(f,P_1) \leq U_\alpha(f,P_2) \]
+\end{thm}
+\begin{proof} Let $Q = P_1 \cup P_2$. Then by Theorem \ref{sumineq}, 
+    \[ L_\alpha(f,P_1) \leq L_\alpha(f,Q) \leq U_\alpha(f,Q) 
+        \leq U_\alpha(f,P_2) \]
+\end{proof}
+
+
+\subsection{Definition of $\mathscr{R}_\alpha([a,b])$}
+
+
+\begin{defn} We define \emph{the upper and lower Riemann-Stieltjes integrals}, respectively, in terms of the RS-Darboux Sums
+    \begin{align*} 
+        \overline{\int^b_a} f d\alpha &:= \inf_P U_\alpha(f,P) \\
+        \underline{\int^b_a} f d\alpha &:= \sup_P L_\alpha(f,P)
+    \end{align*}
+We can assert that the sup and inf exist because $f$ is bounded. From Theorem \ref{pineq}, it's clear that $\underline{\int} f d\alpha \leq \overline{\int} f d\alpha$.
+\\
+\\
+\emph{Note}: This means the value of the upper (lower) integral might not be \emph{in} the set of upper (lower) sums, just like a real number will not be in a sequence of approaching rationals. 
+\end{defn}
+
+\begin{defn} We say  $f$ is \emph{Riemann-Stieltjes integrable} on $[a,b]$---i.e. $f \in \mathscr{R}_\alpha([a,b])$---if 
+    \[ \overline{\int^b_a} f d\alpha  =
+        \underline{\int^b_a} f d\alpha 
+        := {\int^b_a} f d\alpha
+        \]
+\end{defn}
+
+\begin{ex} A case where $f \notin \mathscr{R}_\alpha([a,b])$ is where 
+    \[ f(x) = \chi_{\mathbb{Q}\cap [a,b]}
+        =\begin{cases} 1 & $x$\text{ rational} \\
+            0 & $x$\text{ irrational} \end{cases}\]
+for $x\in[0,1]$. In this case, the upper integral is always 1, while the lower integral is always zero.
+\end{ex}
+
+\begin{thm}
+\emph{(Riemann's Condition)}
+\label{riemcond}
+$f \in \mathscr{R}_\alpha([a,b])$ if and only if there exists a partition $P$ such that the upper and lower RS-Darboux sums can be made arbitrarily close given that $P$, i.e.
+    \[  U_\alpha(f,P) - L_\alpha(f,P) \leq \varepsilon \]
+\end{thm}
+\begin{proof} First, the $\Leftarrow$ direction. Use Theorems \ref{sumineq} and \ref{pineq}. It's obvious. Next, for the $\Rightarrow$ direction. By the definition of the RS integral and the RS-Darboux sums, 
+\begin{equation}
+    \label{p1}
+    U_\alpha(f,P_1) < \int^b_a f d\alpha + \varepsilon/2 \qquad
+    L_\alpha(f,P_2) > \int^b_a f d\alpha - \varepsilon/2
+\end{equation}
+Taking the common refinement, and using Theorem \ref{sumineq}, we get that 
+\begin{align*}
+    U_\alpha(f,P_1 \cup P_2) - L_\alpha(f,P_1 \cup P_2) &\leq 
+    U_\alpha(f,P_1) - L_\alpha(f,P_2) \\
+    &= \left(\int^b_a f d\alpha + \varepsilon/2\right) - 
+        \left(\int^b_a f d\alpha -\varepsilon/2  \right) \\
+    \text{By Expression \ref{p1}}\qquad &\leq \varepsilon/2 + \varepsilon/2
+\end{align*}
+\end{proof}
+
+\subsection{Properties of $\mathscr{R}_\alpha([a,b])$}
+
+\begin{thm} 
+    \label{contthm}    
+The set of all continuous functions on $[a,b]$, denoted ${C}([a,b])$, is a subset of $\mathscr{R}([a,b])$.\footnote{Note that we need continuity over \emph{all} of $[a,b]$. If $f$ isn't continuous at the endpoints, we can't apply this proof directly. We instead need to split up $[a,b]$ into ``good'' and ``bad'' parts.}
+\end{thm}
+\begin{proof} 
+By Theorem \ref{riemcond}, we want to show that, for all $\epsilon>0$, there exists a partition $P$ such that 
+\begin{align*}
+    U_\alpha(f,P) - L_\alpha(f,P) < \epsilon  \\
+    \Leftrightarrow
+    \sum^n_{i=1} (M_i(f) - m_i(f)) \Delta\alpha_i < \epsilon 
+\end{align*}
+Now since $f$ is continuous on a compact interval, $[a,b]$, $f$ is \emph{uniformly continuous} on $[a,b]$. That means, given our $\epsilon$ from above, 
+    \[ \exists \; \delta >0 \quad \text{ s.t. } \quad
+        |x_{i} - x_{i-1}| < \delta \quad \Rightarrow \quad
+        |f(x_{i}) - f(x_{i-1})| < \frac{\epsilon}{\alpha(b)-\alpha(a)} \]
+So we can choose $P$ such that that $||P|| < \delta$.  This means that 
+\begin{align*}
+    \sum^n_{i=1} [M_i(f) - m_i(f)] \Delta\alpha_i &\leq
+    \sum^n_{i=1} \frac{\epsilon}{\alpha(b)-\alpha(a)} 
+        \Delta\alpha_i  
+    =\frac{\epsilon}{\alpha(b)-\alpha(a)}\sum^n_{i=1}  
+        \Delta\alpha_i \\
+    &\leq\frac{\epsilon}{\alpha(b)-\alpha(a)} \cdot [\alpha(b)-\alpha(a)] = \epsilon
+\end{align*}
+\end{proof}
+Now for some useful properties of the set of Riemann-Stieltjes integrable functions. Consider $f,g \in \mathscr{R}_\alpha([a,b])$
+and $c \in \mathbb{R}$.
+\begin{itemize}
+    \item \textbf{Linearity}: $f+g \in \mathscr{R}_\alpha([a,b])$
+        and $cf \in \mathscr{R}_\alpha([a,b])$, with 
+        \[ \int^b_a cf \; d\alpha = c \int^b_a f\; d\alpha  
+            \qquad \text{and} \qquad 
+            \int^b_a f+g\; d\alpha = \int^b_a f \;d\alpha + 
+            \int^b_a g\; d\alpha 
+        \]
+    \item \textbf{Subsets}: If $[c,d]\subset[a,b]$, then $f \in \mathscr{R}_\alpha([c,d])$.
+    \item \textbf{Splitting the Interval}: If $c \in [a,b]$, then 
+        \[ \int^b_a f d\alpha = \int^c_a f d\alpha 
+            + \int^b_c f d\alpha \]
+    \item \textbf{Monotonicity}: If $f,g,h \in 
+        \mathscr{R}_\alpha([a,b])$, $f\geq0$, and
+        $g \leq h$ on $[a,b]$, then
+            \[ \int^b_a f d\alpha \geq 0 \qquad
+                \int^b_a g \; d\alpha \leq 
+                \int^b_a h \; d\alpha  \]
+    \item \textbf{Compositions}: Suppose that $f \in 
+        \mathscr{R}_\alpha([a,b])$ and
+        $g: \mathbb{R}\rightarrow\mathbb{R}$ is 
+        continuous. Then $g \circ f\in\mathscr{R}_\alpha([a,b])$
+        \begin{proof}
+            Since $f$ is bounded, 
+            let $m:=\inf_{[a,b]}f$ and $M:=\sup_{[a,b]}f$.
+            Then since $g$ is continuous on the compact 
+            interval $[m,M]$, $g$ is uniformly continuous.
+            As a result, for all $\varepsilon>0$
+            there then exists $\delta>0$ such that 
+            \begin{equation}
+                \label{cont}
+                 |u- v| \leq 2K\delta \quad \Rightarrow
+                    \quad |g(u) - g(v)| \leq 
+                    \frac{\varepsilon}{2\left[\alpha(b)-\alpha(a)
+                    \right]}
+            \end{equation}
+            where $K$ is some positive, finite number. But what
+            is $K$ exactly? Well,
+            $g$ also happens to be bounded because it is
+            continuous on a compact interval, thus $|g(x)| \leq K$
+            for some $K$ and all $x$. So we'll go with that.
+            \\
+            \\
+            Next, since we know that $f \in 
+            \mathscr{R}_\alpha([a,b])$, 
+            there exists a partition $P$ such that
+            \begin{equation}
+                \label{forf}
+                 U_\alpha(f,P)- L_\alpha(f,P) \leq \epsilon\cdot
+                    \delta
+            \end{equation}
+            %And, considering the building blocks $M_i(f)$ and 
+            %$m_i(f)$, by the uniform continuity of $g$, we
+            %also have for any $i$, for all $\varepsilon$, there must
+            %be a $\delta$ such that
+            %\begin{equation}
+            %    \label{compcont}
+            %    M_i(f) - m_i(f) < 2K{\delta}
+            %        \quad \Rightarrow \quad 
+            %        M_i(g\circ f) - m_i(g\circ f) \leq 
+            %        \frac{\varepsilon}{2[\alpha(b)-\alpha(a)]}
+            %\end{equation}
+            Now that everything's spelled out, 
+            we're interested in showing Riemann 
+            integrability for $g\circ f$, which requires us
+            to show that the upper and lower RS-Darboux sums
+            are arbitrarily close. We will do so by breaking
+            the sums into two parts based on how
+            the original function $f$ behaves on an interval:
+            \begin{align*}
+                A = \{ i \; | \; M_i(f) - m_i(f)\leq2K\delta\}\\
+                B = \{ i \; | \; M_i(f) - m_i(f)>2K\delta\}
+            \end{align*}
+            Now let's work out the sums for $g\circ f$:
+            \begin{align}
+                U_\alpha(g\circ f,P) - L_\alpha(g\circ f,P)
+                    &= \sum^n_{i=1} \left[
+                    M_i(g\circ f) - m_i(g\circ f)\right]
+                    \Delta\alpha_i \notag\\
+                &= \sum_{i\in A} \quad + \quad
+                    \sum_{i\in B} \notag\\
+                \qquad
+                &\leq \frac{\varepsilon}{2[\alpha(b)-\alpha(a)} 
+                    \sum_{i\in A} \Delta\alpha_i+
+                    K \sum_{i\in B} \Delta\alpha_i
+                    \label{final}
+            \end{align}
+            where the result from the sum over $A$ comes from 
+            Equation \ref{cont} and the result for the sum over 
+            $B$ comes from $g$ being bounded.
+            \\
+            \\
+            Now let's consider the sum over $B$ from the last
+            line, and relate it back to Expression \ref{forf}.
+            We know that by our definition of $B$:
+            \begin{align*}
+                {2K}{\delta} \sum_{i\in B} 
+                \Delta\alpha_i &\leq    
+                \sum_{i\in B} \left[M_i(f) - m_i(f) \right]
+                \Delta\alpha_i \leq \varepsilon\cdot\delta \\
+                &\Rightarrow \qquad \sum_{i\in B} \Delta\alpha_i
+                \leq \frac{\varepsilon}{2K}
+            \end{align*}
+            Substituting this result back into Equation    
+            \ref{final}, we see that we must have
+            \begin{align*}
+                U_\alpha(g\circ f,P) - L_\alpha(g\circ f,P)
+                &\leq \frac{\varepsilon}{2[\alpha(b)-\alpha(a)]}    
+                    [\alpha(b)-\alpha(a)]
+                    + K\frac{\varepsilon}{2K} \\
+                    &\leq \frac{\varepsilon}{2} + 
+                        \frac{\varepsilon}{2} = \varepsilon
+            \end{align*}
+            Thus, we have that $g\circ 
+            f\in\mathscr{R}_\alpha([a,b])$.
+        \end{proof}
+    \item \textbf{Multiplication}: If we have 
+        $f,g\in\mathscr{R}_\alpha([a,b])$, then 
+        $fg\in\mathscr{R}_\alpha([a,b])$.
+        \begin{proof}
+            We know that $f - g$ and $f+g \in
+            \mathscr{R}_\alpha([a,b])$. We also know that 
+            $h(x) = x^2$ is continuous, so then we can say that
+            \[ fg = \frac{1}{4} \left[(f+g)^2 - (f-g)^2 \right]
+                \in\mathscr{R}_\alpha([a,b])
+                \]
+        \end{proof}
+    \item \textbf{Absolute Value Relations}: If we have
+        $f \in \mathscr{R}_\alpha([a,b])$, then both
+        \[ |f| \in \mathscr{R}_\alpha([a,b]) \qquad
+            \left\lvert\int^b_a f d\alpha \right\rvert
+            \leq \int^b_a |f| \; d\alpha \]
+        \begin{proof}
+            The first expression is clearly true because $g(x)=|x|$
+            is a continuous function, so $g\circ f = |f|$ is
+            RS integrable.
+            \\
+            \\
+            Next, let $c$ be a single constant (either 1 or 
+            $-1$) such that 
+                \[ c\int^b_a f\; d\alpha = \left\lvert 
+                \int^b_a f\;d\alpha \right\rvert \]
+            Then we have that $cf \leq |f|$ and by the monotonicity
+            property, we have that
+            \begin{align*}
+                \int^b_a |f| \; d\alpha &\geq 
+                    \int^b_a cf \; d\alpha \\
+                \Rightarrow \qquad 
+                \int^b_a |f| \; d\alpha &\geq
+                    \int^b_a cf \; d\alpha =
+                    c \int^b_a f \; d\alpha = 
+                    \left\lvert
+                    \int^b_a f \; d\alpha \right\rvert 
+            \end{align*}
+        \end{proof}
+        ($*$) This is an often-used result.
+        
+\end{itemize}
+
+\newpage
+\subsection{Mean Value Theorem}
+
+The classical Mean-Value Theorem states that if $f$ is continuous on $[a,b]$ with $\alpha$ increasing, there's some $c\in[a,b]$ such that 
+    \[ \int^b_a f\;d\alpha = f(c)[\alpha(b)-\alpha(a)] \]
+We'll prove a more general result that retains this as a special case.
+\begin{thm}
+\label{mvt}
+Suppose that $f,g\in\mathscr{R}_\alpha([a,b])$ and assume $g\geq0$. Then there exists a $\mu\in[m,M]$, i.e. in between the upper and lower bounds of $f$, such that 
+        \[ \int^b_a fg\;d\alpha = \mu \int^b_a g\;d\alpha \]
+Moreover, if $f$ is continuous, then there exists $c\in[a,b]$ such that $\mu = f(c)$.
+\end{thm}
+\begin{proof}
+Since $g\geq0$, we can conclude that 
+\begin{align*}
+    m &\leq f \leq M \\
+    mg &\leq fg \leq Mg \\
+    \Rightarrow \qquad m\int^b_a g\;d\alpha &\leq 
+        \int^b_a fg\;d\alpha \leq  M \int^b_a g\;d\alpha
+\end{align*}
+If we consider the case where $\int^b_a g\;d\alpha= 0$, then any old $\mu$ will work since we'll have that $\int^b_a fg\;d\alpha=0$. And if it's not 0, then we can set 
+\[ \mu = \frac{\int^b_a fg\;d\alpha}{\int^b_a g\;d\alpha} \]
+We know the numerator and denominator exist because both $f$ and $g$ were assumed integrable, so their product is as well.
+\end{proof}
+\begin{rmk}
+If we take $g(x)=1$, then we get the plain vanilla MVT we opened up the subsection with.  And in the case where $f$ is continuous, we know from the intermediate value theorem that there exists a $c$ such that $\mu=f(c)$. 
+\end{rmk}
+
+
+\newpage
+\subsection{Convergence of Riemann-Stieltjes Sums, $S_\alpha(f,P,T)$}
+
+Basic calculus makes us all think that we approximate a Riemann-Sieltjes integral by taking finer and finer partitions, which we use to weight the value of the function at an increasing number of evaluation points along the interval $[a,b]$.  So it would be very nice and very convenient if Riemann-Stieltjes sums converged to the value of the integral whenever we construct just that sort of limiting approximation. 
+
+\emph{However}, this will not always be the case.  That is, there will be some functions that are RS-integrable, which won't \emph{necessarily} converge if you take finer and finer partitions with more and more evaluations points. So the theorems in this section will illustrate when that will and won't apply. In certain cases, arbitrarily fine partitions might converge to different values, none of which must equal the value of the integral (if it even exists).
+
+\begin{thm}
+\label{weaker}
+Let $f$ be a bounded function on $[a,b]$. Then $f\in\mathscr{R}_\alpha([a,b])$ if and only if there exists a number $I$ such that for every $\varepsilon>0$, there exists a corresponding partition $P$ where, for all $P^* \supset P$, we have 
+    \[ |S_\alpha(f,P^*,T) - I | \leq \varepsilon \qquad \forall T\]
+And if $f\in\mathscr{R}_\alpha([a,b])$, then $I = \int^b_a f\;d\alpha$.
+\end{thm}
+\begin{rmk}
+We could have written a weaker theorem, leaving out the part about $P^*\supset P$, which is a special case of the above theorem.  But going forward, we'll want to consider the idea of taking finer and finer partitions. This will be particularly true when $\alpha$ might not be increasing.
+\end{rmk}
+\begin{proof}
+First, we prove the $\Rightarrow$ direction. Since $f\in\mathscr{R}_\alpha([a,b])$, we know that there's a partition $P$ such that
+    \[ U_\alpha(f,P) - L_\alpha(f,P)<\varepsilon \qquad 
+    \forall \varepsilon \]
+Considering $P^*\supset P$, we also have
+\begin{align*}
+    L_\alpha(f,P^*)&\leq S_\alpha(f,P^*,T) \leq U_\alpha(f,P^*)\\
+    L_\alpha(f,P^*)&\leq \int^b_a f\;d\alpha \leq U_\alpha(f,P^*)
+\end{align*}
+Thus, we can conclude that 
+\begin{align*}
+    \left\lvert S_\alpha(f,P^*,T) - \int^b_a f\;d\alpha 
+    \right\rvert \leq \varepsilon \qquad \forall T
+\end{align*}
+It's clear that $I=\int^b_a f\;d\alpha$,
+\\
+\\
+Next, we want to show the $\Leftarrow$ direction. We begin by noting that given any $P$, there exists a $T_1$ and $T_2$ such that
+\begin{align}
+    S_\alpha(f,P,T_1) &\geq U_\alpha(f,P) - \varepsilon\notag\\
+    S_\alpha(f,P,T_2) &\leq L_\alpha(f,P) + \varepsilon
+    \label{proof1.17}
+\end{align}
+This works because given any partition, we can always choose a $T_1$ and $T_2$ to satisfy by taking $T_1$ ($T_2$) as the set of all $M_i$ ($m_i$). 
+\\
+\\
+So now, let's take $P^*$ to be the partition such that the RS sum is $\varepsilon$ close to $I$ for all $T$. (Note that this $P^*$ is taken to exist in this direction of the proof.) Then we have from the inequalities in \ref{proof1.17} that
+\begin{align*}
+    U_\alpha(f,P) - L_\alpha(f,P) &\leq 
+        \left[ S_\alpha(f,P,T_1) + \varepsilon\right] -
+        \left[ S_\alpha(f,P,T_2) - \varepsilon\right] \\
+    &\leq \left[ S_\alpha(f,P,T_1) - I + \varepsilon\right] -
+        \left[ S_\alpha(f,P,T_2) - I - \varepsilon\right] \\
+    &\leq \left\lvert S_\alpha(f,P,T_1) - I \right\rvert+       
+        \left\lvert S_\alpha(f,P,T_2) - I \right\rvert
+        + \varepsilon + \varepsilon \\
+    \text{From Inequalities \ref{proof1.17}} \quad
+        &\leq 4\varepsilon
+\end{align*}
+Since the Upper and Lower sums can be made arbitrarily close, we then know that $f\in\mathscr{R}_\alpha([a,b])$.
+\end{proof}
+\begin{rmk}
+Before moving on, let's recap what the last theorem said in words---or at least what it didn't say.  It didn't say that if you keep taking smaller partitions, you will \emph{always} force your RS-Sum to converge to the value of an integral.  What it did say was twofold:
+\begin{enumerate}
+    \item First, if your function \emph{is} Riemann-Integrable, then and you can find \emph{some} partition (though it might not be true for all of them) where the RS-Sums given that partition and \emph{all finer} partitions get arbitrarily close to this integral (which exists).
+    \item Next, suppose you know an $I$ that the RS-sums get arbitrarily close to.  More specifically, that means if you're handed any $\varepsilon>0$, you can find a partition that gets the RS-Sums arbitrarily close to that $I$, no matter the $T$ tagging the partition $P$. Now we're not saying that the sums \emph{must} converge to some $I$ when you take finer partitions. Instead, we're just saying it's possible, and if $I$ \emph{does} indeed exist, then $f$ is RS integrable.
+\end{enumerate}
+Now we can move on to consider that thorny case of ever-shrinking partitions.
+\end{rmk}
+\begin{defn}
+\label{strongest}
+For a bounded function $f$ on $[a,b]$, we say 
+    \[ \lim_{||P||\rightarrow 0} S_\alpha(f,P,T) = I \]
+if for every $\varepsilon>0$, there exists a $\delta>0$ such that $||P||\leq\delta$ implies that
+    \[ |S_\alpha(f,P,T) - I | \leq \varepsilon \qquad \forall T \]
+    Now here's the big difference between this and what we've seen earlier: the sums might converge, but I never said anything about the equivalence of this statement to RS-integrability, like we had in Theorem \ref{weaker}.  In fact, we can't.
+\\
+\\
+There might be functions where this condition does \emph{not} hold (i.e. the limit does not exist), but still the function is integrable. (See the next example.) But we do have at least one direction intact, as shown in the next theorem.
+\end{defn}
+\begin{thm}
+\label{oneway}
+Suppose that $f$ is bounded on $[a,b]$. If $\lim_{||P||\rightarrow 0}$ exists, then $f\in\mathscr{R}_\alpha([a,b])$ and
+    \[ \int^b_a f\;d\alpha = \lim_{||P||\rightarrow 0} 
+    S_\alpha(f,P,T) \]
+\end{thm}
+
+\begin{ex}
+Now we give an example of why the other direction in Theorem \ref{oneway} wouldn't work.  Consider
+\[ f(x) = \begin{cases} 0 & x \in [0, 1/2) \\ 1 & x \in [1/2, 1] 
+        \end{cases}  \qquad
+    \alpha(x) = \begin{cases} 0 & x \in [0,1/2] \\ 1& x\in(1/2, 1] 
+        \end{cases} \]
+Depending on whether the point $1/2$ is included in the partition, we can construct ever-finer partitions that make the RS-Sums converge to 0 sometimes, and to 1 at other times.
+\end{ex}
+\begin{rmk}
+    Thus we have that the strongest statement is in Definition \ref{strongest} and Theorem \ref{oneway}. If we can show the limit exists as $||P||\rightarrow 0$, then we can show that $f$ is integrable. If we can't use that, we should think a little harder and try to find a $P$ as in Theorem \ref{weaker} before concluding that $f$ isn't RS-integrable. However, if we require more from our function $f$, we can can be more conclusive, as in the next theorem.
+\end{rmk}
+
+\begin{thm}
+Let $f\in\mathscr{R}_\alpha([a,b])$. If either $f$ or $\alpha$ is continuous on $[a,b]$, then 
+\begin{equation}
+    \label{limsum.toprove}
+    \int^b_a f\;d\alpha = \lim_{||P||\rightarrow 0} 
+    S_\alpha(f,P,T) 
+\end{equation}
+\end{thm}
+\begin{rmk}
+This previous theorem is important, because if we just consider \emph{Riemann} integrability, then $\alpha(x) = x$, which is continuous. Thus, Riemann-integrability and the existence of the limit of Riemann sums (as the partition intervals get smaller) are equivalent notions.
+\end{rmk}
+So our goal will be to show that, for all $\epsilon>0$,
+\begin{equation}
+    \label{contequiv.toshow}
+    \lim_{||P||\rightarrow 0}
+    \left\lvert \int^b_a f \; d\alpha - S_\alpha(f,P,T) \right\rvert
+        \leq \varepsilon
+\end{equation}
+when $f$ or $\alpha$ is continuous.
+
+\begin{proof}($f$ Continuous)
+First, suppose that $f$ is continuous. We'll use the Mean Value Theorem (taking $g=1$) to rewrite the integral in Equation \ref{contequiv.toshow} in terms of the partition $P$ that's used for the sum. This allows us to assert that for some $\mu \in [m,M]$, we have that
+    \[ \int^b_a f \; d\alpha = \mu \int^b_a d\alpha \]
+But this will also hold if we break up our interval into subintervals defined by the points in any partition, $P$:
+\begin{equation}
+    \label{contequiv}
+    \sum^n_{i=1} \int^{x_i}_{x_{i-1}} f \; d\alpha 
+        = \sum^n_{i=1} \mu_i \int^{x_i}_{x_{i-1}} d\alpha 
+        \qquad\qquad \mu_i \in [m_i, M_i] 
+\end{equation}
+Next, because $f$ is continuous, we can use the Intermediate Value Theorem to note that, for all $i$, there must be some $c_i \in [x_{i-1}, x_i]$ where $f(c_i) = \mu_i$. Substituting into Equation \ref{contequiv}, we get
+\begin{align*}
+    \sum^n_{i=1} \int^{x_i}_{x_{i-1}} f \; d\alpha 
+        &= \sum^n_{i=1} f(c_i) \int^{x_i}_{x_{i-1}} d\alpha 
+        \qquad\qquad c_i \in [x_{i-1}, x_{i}] \\
+        &= \sum^n_{i=1} f(c_i) \Delta\alpha_i
+\end{align*}
+Then, summing over $i$, we can define 
+\begin{align*}
+    \int^{b}_{a} f \; d\alpha 
+        &= \sum^n_{i=1} f(c_i) \Delta\alpha_i
+        \equiv S_\alpha(f,P,C)
+\end{align*}
+So now, we can replace the integral with this sum in the statement that we want to prove, as given in Inequality \ref{contequiv.toshow}:
+\begin{equation}
+    \label{contequiv.toshow2}
+    \lim_{||P||\rightarrow 0}
+    \left\lvert  S_\alpha(f,P,C)- S_\alpha(f,P,T) \right\rvert
+        \leq \varepsilon
+\end{equation}
+This is now our equivalent target statement to prove.
+\\
+\\
+Next, because $f$ is continuous on a compact interval, $f$ is uniformly continuous on $[a,b]$.  Thus for any $\varepsilon$, there exists a $\delta$ such that $||P||\leq\delta$ implies that $|f(x) - f(y)| \leq \varepsilon$, where $x$ and $y$ are both in the same interval.  
+\\
+\\
+So given $\epsilon>0$, let $\delta>0$ be such that 
+    \[ |x-y|\leq \delta \Rightarrow \quad |f(x)-f(y)| \leq 
+        \frac{\varepsilon}{\alpha(b)-\alpha(a)} \]
+Now if we take our partition such that $||P||\leq\delta$, we can write our sums as
+\begin{align*}
+    \left\lvert  S_\alpha(f,P,C)- S_\alpha(f,P,T) \right\rvert
+    &= \left\lvert  \sum^n_{i=1} \left[f(c_i) - f(t_i) \right]
+    \Delta\alpha_i\right\rvert  \\
+    &\leq \sum^n_{i=1} \left\lvert  f(c_i) - f(t_i) \right\rvert
+    \Delta\alpha_i  \\
+    &\leq \frac{\varepsilon}{\alpha(b)-\alpha(a)}
+        \sum^n_{i=1} \Delta\alpha_i =  \varepsilon 
+\end{align*}
+\end{proof}
+\begin{proof}($\alpha$ Continuous)
+Suppose $\varepsilon$ is given. Since $f\in\mathscr{R}_\alpha([a,b])$, we know that there exists a $P^*$ (with $\#P^*$, or $n+1$, subintervals) such that 
+\begin{equation}
+    \label{bases}
+    U_\alpha(f,P^*) < \int^b_a f\;d\alpha + \varepsilon
+        \qquad L_\alpha(f,P^*) > \int^b_a f\;d\alpha - \varepsilon
+\end{equation}
+To construct the proof from here, we'll want eventually to compare any arbitrary RS-Sum $S_\alpha(f,P,T)$ to these specific upper and lower sums (using $P^*$) that we know something about---i.e. how close they are to the target integral. Then we'll take the limit for $P$ once we've established that relationship.
+\\
+\\
+Also, assume that $f(x)>0$ over $[a,b]$. We'll resolve this simplifying assumption later on, and it will help in the meantime.
+\\
+\\
+So since that interval is compact and $\alpha$ is continuous, we know that $\alpha$ is \emph{uniformly} continuous, implying that
+    \[ \exists \delta > 0 \quad \text{s.t.} \qquad 
+    w_\alpha(\delta) < \frac{\varepsilon}{\#P^*} \]
+where $\#P^*$ is the number of sub-intervals in $P^*$. And so 
+    \[ \forall P \qquad ||P||<\delta \quad \Rightarrow 
+        \quad \alpha(x_i) - \alpha(x_{i-1}) < w_\alpha(\delta)
+        <  \frac{\varepsilon}{\#P^*} \]
+Now, considering any such set $P$, let's also define the following sets, which group the indices for the subintervals of any $P$ into two categories, based on how they interact with $P^*$:
+\begin{align*}
+    I_1 &:= \{i \; | \; [x_{i-1},x_i) \cap P^* = \emptyset \}\\
+    I_2 &:= \{i \; | \; [x_{i-1},x_i) \cap P^* \neq \emptyset \}
+\end{align*}
+And so $I_2$ contains all the indices where an subinterval of $P$ contain a point of $P^*$. $I_1$ has all the indices where an subinterval of $P$ is contained entirely within a subinterval of $P^*$.
+\\
+\\
+Having done all of groundwork from above, we can now write an expression for the upper sum relative to $P$:
+\begin{align}
+    U_\alpha(f,P) &= \sum^n_{i=1} M_i(f) \Delta\alpha_i \notag \\
+        &= \sum_{I\in I_1} M_i(f) \Delta\alpha_i 
+         + \sum_{I\in I_2} M_i(f) \Delta\alpha_i
+         \label{twosums}
+\end{align}
+But clearly, $I_2$ can only contain, at most, $\#P$ points since there are only $\#P$ intervals of $P$, so we must have that $\#I_2 \leq \#P$. Thus, the sum over $I_2$ simplifies:
+\begin{align}
+        \sum_{I\in I_2} M_i(f) \Delta\alpha_i 
+        &\leq \sum_{I\in I_2} M \frac{\varepsilon}{\#P} =    
+            M\varepsilon
+        \label{tocombine1}
+\end{align}
+where $M = \sup f(x)$ over the interval $[a,b]$.
+\\
+\\
+To deal with the sum over $I_1$, we get the result that 
+\begin{equation}
+    \label{tocombine2}
+    \sum_{I\in I_1} M_i(f) \Delta\alpha_i  \leq U_\alpha(f,P^*)
+\end{equation}
+This is true because in assuming $f(x)>0$ and restricting our sum to $I_1$, we throw out whole portions of the interval $[a,b]$ from the sum entirely. And on top of that, we threw out the very large intervals that span one or more of the points in the partition $P^*$.  So all that remains in our sum over $I_1$ are those tiny subintervals of $P$ that would fit entirely within a subinterval of $P^*$. And so we won't be able to make up for the parts we throw out by weighting parts of the interval $[a,b]$ with $M_i(f)$ from $P$ \emph{more than} we would in the case of $M_i(f)$ from $P^*$.
+\\
+\\
+Combining the representation for $U_\alpha(f,P)$ with the two sum representation of Equation \ref{twosums} and the results in Inequalities \ref{tocombine1} and \ref{tocombine2}, we get that
+\begin{equation}
+    U_\alpha(f,P) \leq U_\alpha(f,P^*) + M\varepsilon
+\end{equation}
+And because we had an expression for $U_\alpha(f,P^*)$ in Equation \ref{bases}, we can substitute in and get that
+\begin{equation}
+    \label{ass1}
+    U_\alpha(f,P) \leq \int^b_a f\;d\alpha  + (M+1)\varepsilon
+\end{equation}
+And by a similar argument, we also have that 
+\begin{equation}
+    \label{ass2}
+    L_\alpha(f,P) \geq \int^b_a f\;d\alpha  - (M+1)\varepsilon
+\end{equation}
+Now, at this point we have to dispense with the assumption that $f(x)>0$.  We do that by choosing a $k$ such that $f(x) + k >0$, where now $f$ can be any arbitrary function such that $\int^b_a f\;d\alpha$ as we assume in the theorem.  Then we're in the world we described above in choose our $P$. 
+\\
+\\
+And, since we're in that world, we get the inequality in the next line, which allows us to conclude a very useful result
+\begin{align*}
+    U(f,P) + k(\alpha(b)-\alpha(a))  
+        = U(f+k, P) &\leq \int^b_a (f+k)\; d\alpha 
+        + (M+1)\varepsilon \\
+    &\leq \int^b_a f\; d\alpha  + k(\alpha(b)-\alpha(a))
+        + (M+1)\varepsilon \\
+    \Rightarrow U(f,P) &\leq \int^b_a f\; d\alpha
+        + (M+1)\varepsilon 
+\end{align*}
+So we have our asses covered if $f(x)$ isn't always positive, and we can stick with the results in Inequalities \ref{ass1} and \ref{ass2}.
+\\
+\\
+And now we're almost done.  All that's left is to recognize that we can sandwich, for all $P$ such that $||P||\leq\delta$
+\begin{align*}
+    \int^b_a f\;d\alpha - (M+1)\varepsilon \leq
+    L_\alpha(f,P) \leq S_\alpha(f,P,T) &\leq U_\alpha(f,P) \leq
+   \int^b_a f\;d\alpha + (M+1)\varepsilon  \\
+        \Rightarrow \qquad \left\lvert S_\alpha(f,P,T) 
+        - \int^b_a f\;d\alpha\right\rvert &\leq 2(M+1)\varepsilon \end{align*}
+\end{proof}
+
+\newpage
+\subsection{Integration for Arbitrary Integrators, $\alpha$}
+
+By ``arbitrary'', we mean ``$\alpha$ not necessarily increasing'', which contrasts our operating assumption up until this point. 
+
+In order to make such a notion operational, we will need to dispense with our ``sandwiching'' approach, which uses $L_\alpha(f,P)\leq S_\alpha(f,P,T)\leq U_\alpha(f,P)$, as it no longer holds. In fact, we don't even get that if $P^*\supset P$, then $U_\alpha(f,P^*) \leq U_\alpha(f,P)$ (and the analogous case for the lower sum). With that, we give a new definition of integrability framed entirely in terms of RS-Sums:
+
+\begin{defn}
+Given any $f$ and $\alpha$ (not necessarily increasing) on $[a,b]$, we say that $f\in\mathscr{R}_\alpha([a,b])$ if and only if there exists an $I\in\mathbb{R}$ such that for all $\varepsilon>0$, there exists a $P$ where $P^*\supset P$ implies
+    \[ \left\lvert S_\alpha(f,P^*,T) - I \right\rvert \leq
+        \varepsilon \qquad \forall \; T \]
+This $I$ is denoted by $\int^b_a f\;d\alpha$. And despite this new definition, we still retain of the usual nice linearity properties discussed above in the increasing $\alpha$ case.
+\end{defn}
+The next subsection goes onto a very important topic when we consider arbitrary integrators---so important that I gave its own subsection, although it actually should fall under this current one.
+
+\subsection{Integration by Parts}
+
+\begin{thm}
+\label{thm.intbyparts}
+\emph{(Integration by Parts)} 
+Let $f$ and $\alpha$ (not necessarily increasing) be bounded on $[a,b]$. If $f\in\mathscr{R}_\alpha([a,b])$, then $\alpha\in\mathscr{R}_f([a,b])$ and 
+\begin{equation}
+    \label{intbyparts}
+    \int^b_a f\;d\alpha = f(b) \alpha(b) - f(a)\alpha(a) - 
+    \int^b_a \alpha \; df 
+\end{equation}
+This is a slightly more general case that the classic calculus version, which is a special case where $\alpha(x)=x$.
+\end{thm}
+\begin{proof}
+To start, we take $P^*$ as the partition such that 
+\begin{equation}
+    \label{ibpassump}
+    \left\lvert S_\alpha(f,P^*,T) - \int^b_a f\;d\alpha 
+    \right\rvert \leq \varepsilon 
+\end{equation}
+which we know exists, since the integrability of $f$ is assumed. 
+\\
+\\
+Now we want to show that for all $\varepsilon>0$, there exists a $P$ such that $P^*\supset P$ implies that 
+    \[ \left\lvert S_f(\alpha,P^*,T) -  f(b) \alpha(b) - 
+        f(a)\alpha(a) - \int^b_a f \; d\alpha \right\rvert \leq 
+        \varepsilon \qquad \forall \; T\]
+        So we rewrite the righthand side of Equation \ref{intbyparts}, recasting them as telescoping sums, also substituting in $S_f(\alpha,P^*,T)$ for the integral:\footnote{You might object and say ``Hey, you can't do that.  You don't know that there's an equivalent RS-Sum for the integral $\int^b_a \alpha\;df$---particularly if you use that same $P^*$ we've been using all along.'' But I actually don't care whether this sum I'm substituting in is actually equivalent (yet). I'm just taking the righthand side of Equation \ref{intbyparts} as inspiration, and using the $P^*$ we've been using to write an RS-Sum. We'll see at the very end that it's a \emph{result} that this RS-Sum approximates the integral, not an assumption.}
+\begin{align}
+    f(b) \alpha(b) - f(a)\alpha(a) - S_f(\alpha,P^*,T)
+        &= \sum^n_{i=1} f(x_i) \alpha(x_i) - f(x_{i-1})
+        \alpha(x_{i-1}) \notag\\
+    &\quad - \sum^n_{i=1} \alpha(t_i) \left[f(x_i) - f(x_{i-1})
+        \right] \notag\\
+    &= \sum^n_{i=1} f(x_i) \left[\alpha(x_i) - \alpha(t_i) \right]
+        \notag\\
+    &\qquad +\sum^n_{i=1} f(x_{i-1}) \left[\alpha(t_i) 
+    - \alpha(x_{i-1})\right]\label{righthandtwosums}
+\end{align}
+Now the righthand side kind of looks like a RS-Sum, so let's define a partition and set of tag points so it is. Define define a new partition, call it $P^{**}$, which will be the union of the old $P^*$ and the points $t_i$. So $P^{**} = P^*\cup T$, with multiplicities. Next, define a new set of tagging points,
+    \[ T^{**} = \{ x_0, x_1, x_1, x_2, x_2,\ldots, x_n \} \]
+Now we can collapse the righthand side in Equation \ref{righthandtwosums} into a proper RS-Sum:
+\begin{align*}
+    f(b) \alpha(b) - f(a)\alpha(a) - S_f(\alpha,P,T)
+    &= S_\alpha(f, P^{**}, T^{**})
+\end{align*}
+Since $P^{**}\supset P^* \supset P$, it's clear that 
+\begin{align*}
+    \left\lvert S_\alpha(f,P^{**},T^{**}) - \int^b_a f\;d\alpha
+    \right\rvert \leq &\varepsilon  \\
+    \Leftrightarrow \quad 
+        \left\lvert f(b) \alpha(b) - f(a)\alpha(a) 
+        - S_f(\alpha,P^*,T) - 
+        \int^b_a f \; d\alpha \right\rvert &\leq 
+        \varepsilon \qquad \forall \; T
+\end{align*}
+which is exactly what we wanted to prove, since we can take $P^*$ as our partition. 
+\end{proof}
+
+\begin{cor}
+The big result from integration by parts is that 
+$f\in\mathscr{R}_\alpha([a,b])$ if and only if $\alpha\in\mathscr{R}_f([a,b])$
+\end{cor}
+
+\begin{cor}
+If $f\in\mathscr{R}_{\alpha_1}([a,b]) \cap \mathscr{R}_{\alpha_2}([a,b])$, then $f\in\mathscr{R}_{\alpha_1 + \alpha_2}([a,b])$ and 
+    \[ \int^b_a f\;d(\alpha_1 + \alpha_2) = 
+    \int^b_a f\;d\alpha_1 + \int^b_a f\;d\alpha_2 \]
+\end{cor}
+
+\newpage
+\subsection{Functions of Bounded Variation}
+
+In the previous subsection, ``Integration by Parts,'' we assumed that $f$ was integrable with respect to an arbitrary integrator $\alpha$. This relaxed our earlier assumptions in the sense that $\alpha$ didn't have to be increasing anymore.  \emph{However}, we just went ahead and assumed $f\in\mathscr{R}_\alpha([a,b])$, which doesn't seem very general.
+
+So now, we'll relax our assumptions even further and consider what characteristics and conditions for the functions $f$ and $\alpha$ truly permit integrability---we won't just assume.  This returns us to earlier subsections where we were concerned about \emph{whether} $f$ would be integrable given $\alpha$.  To answer that question, we'll have to define the concept of \emph{bounded variation}.
+
+\begin{defn}
+Let $f$ be a function on $[a,b]$. Define the \emph{total variation} as
+\[ V_a^b(f) := \sup_P \sum^n_{i=1} \left\lvert f(x_i) - f(x_{i-1})
+    \right\rvert \]
+We say that $f \in BV([a,b])$, i.e. ``$f$ is of bounded variation'', if $V^b_a(f)<\infty$, i.e. the total variation is finite.
+\end{defn}
+
+\begin{thm}
+If $f$ is monotonically increasing on $[a,b]$, then $f\in BV([a,b])$.
+\end{thm}
+
+\begin{thm}
+If $f$ is continuous and differentiable on $[a,b]$ and $f'$ is bounded, then $f\in BV([a,b])$.
+\end{thm}
+\begin{proof}
+Given any partition $P$, from the Mean Value Theorem, we have that for all subintervals, 
+    \[ \exists\; c_i \in [x_{i-1}, x_i] \quad \text{s.t.}
+        \quad f(x_i) - f(x_{i-1}) = c_i \left[
+        x_i - x_{i-1}\right]    \]
+Since $f'$ is bounded, we know that $M=\sup_{x\in[a,b]} |f'(x)|$ is finite. Thus we can write, for any partition $P$,
+\begin{align*}
+    \sum^n_{i=1} \left\lvert f(x_i) - f(x_{i-1})
+        \right\rvert &= \sum^n_{i=1} \left\lvert f(c_i) 
+        \left[x_i - x_{i-1}\right] \right\rvert \\
+    &\leq \sum^n_{i=1} M \left\lvert \Delta x_i 
+        \right\rvert = M(b-a) < \infty 
+\end{align*}
+Thus, since the righthand side is independent of the partition $P$, when we take the sup over $P$'s, we still have that $V_a^b(f)$ is finite.
+\end{proof}
+
+\begin{ex}
+You might ask why we threw in the condition that $f'$ is bounded in the previous theorem.  It turns out continuous and differentiable doesn't necessarily mean that the derivative is bounded, so that was a necessarily addition.  Here's an example:
+    \[ f(x) =
+        \begin{cases} 
+            x^2 \sin(1/x^2) & x \neq 0\\
+            0               & x = 0
+        \end{cases}  \]
+It's continuous (take the limit of the top while $x\rightarrow 0$ to see this), and it's differentiable:
+    \[ f'(x) = 2x \sin(1/x^2) - \frac{2}{x} \cos(1/x^2) \]
+Clearly, that derivative isn't bounded as $x\rightarrow 0$.
+\end{ex}
+
+\begin{thm}
+$f$ continuous does not imply that $f\in BV$; $f \in BV$ does not imply $f$ continuous.
+\end{thm}
+\begin{ex}
+As you might also suspect, continuous functions aren't necessarily of bounded variation. An example given in the book defines the following function on $[0,1]$:
+    \[ f(x) = 
+        \begin{cases}
+        \frac{1}{n} & \text{$x = \frac{1}{n}$, where $n$ is an even integer}\\
+        0 & \text{$x = \frac{1}{n}$, where $n$ is an odd integer} \\
+        0 & \text{$x = 0$ or $x = 1$}
+        \end{cases}
+    \]
+and linear in between.  Another similar example take
+    \[ f(x) = 
+        \begin{cases}
+            x \sin(1/x) & x\neq 0 \\
+            0 & x=0 
+        \end{cases} \]
+Both look something like the harmonic series that sums $1/n$, which we know diverges.
+\end{ex}
+\begin{ex}
+As an example of a function of bounded variation that's not continuous, consider the function $f=\chi_{[1/2,1]}$ on $[0,1]$. Clearly there's a jump, but $V_a^b(f) = 1 < \infty$.
+\end{ex}
+
+\begin{thm}
+$f\in BV([a,b])$ implies that $f$ is bounded on $[a,b]$, as 
+    \[ \sup_{x\in[a,b]} |f(x) | \leq |f(a)| + V_a^b(f) \]
+\end{thm}
+\begin{proof}
+Suppose that the statement above were not true---that for some $x^* \in [a,b]$, we have
+\begin{align*}
+    |f(x^*)| &> |f(a)| + V_a^b(f) \\
+    \Rightarrow \qquad 
+        |f(x^*)| - |f(a)|  &> V_a^b(f) 
+\end{align*}
+But we can keep using identities about the absolute value to show that the above statement implies
+\begin{align*}
+    V_a^b(f) < |f(x^*)| - |f(a)| \leq \left\lvert \;
+        |f(x^*)| - |f(a)|\;\right\rvert
+        \leq |f(x^*) - f(a)|
+\end{align*}
+And if this were the case, we clearly chose $V_a^b(f)$ incorrectly because we could define a partition by $\{a, x^*, b\}$ to get a bigger value for the total variation than $V_a^b(f)$.
+\end{proof}
+
+\begin{thm}
+For $f, g\in BV([a,b])$, we have that
+    \[ V_a^b(f+g) \leq V_a^b(f) + V_a^b(g)
+    \qquad V_a^b(cf) = |c|V_a^b(f) \]
+This implies that $f+g$ and $cf$ are both of bounded variation as well.
+\end{thm}
+\begin{rmk}
+Given this definition and the triangle inequality, we see that Bounded Variation looks like a linear space. In fact, it's \emph{semi-norm}, meaning that it satisfies all but the 0 condition, since a non-zero (constant) function will have 0 total variation. 
+
+But we can fix that, getting a full norm by adding the sup-norm ($||f||_\infty = \sup_{[a,b]} f$) to total variation. Thus if we define our norm as
+    \[ \lVert f||_\infty + V_a^b(f) \]
+we see that we've satisfied all of the conditions for a norm on the function space:
+\begin{enumerate}
+    \item $\lVert f\rVert_\infty + V_a^b(f) = 0$ if and only if $f=0$.
+    \item $\lVert cf\rVert_\infty + V_a^b(cf) = c\lVert f\rVert_\infty + |c|V_a^b(f)
+        = c\left[\lVert f\rVert_\infty + V_a^b(f)\right]$.
+    \item $\lVert f+g\rVert_\infty + V_a^b(f+g) \leq 
+        \left[\lVert f\rVert_\infty + V_a^b(f)\right] +
+        \left[\lVert g\rVert_\infty + V_a^b(g)\right]$.
+\end{enumerate}
+\end{rmk}
+
+\begin{thm}
+If $f,g\in BV([a,b])$, then $f\cdot g \in BV([a,b])$.
+\end{thm}
+
+\begin{thm}
+If $f\in BV([a,b])$ and $c \in (a,b)$, then 
+    \[ V_a^b(f) = V_a^c(f) + V_c^b(f) \]
+\end{thm}
+\begin{cor}
+As a result of the last theorem, we have that, as a function of $x$, $V_a^x(f)$ is monotonically increasing.
+\end{cor}
+\begin{proof}
+This is because if $y>x$, then we have 
+    \[ V_a^y(f) = V_a^x(f) + V_x^y(f) \]
+So clearly, $V_a^y(f) >V_a^x(f)$.
+\end{proof}
+
+\begin{note}
+This next result is an important theorem that establishes the link between functions of bounded variation and increasing functions, allowing us to apply some old results where we had to deal with strictly increasing integrators.
+\end{note}
+
+\begin{thm}
+\label{monot}
+$f\in BV([a,b])$ if and only if $f = u-v$, where $u$ and $v$ are monotonically increasing functions on $[a,b]$. 
+\end{thm}
+\begin{proof}
+First, take the $\Leftarrow$ direction. This is pretty trivial since 
+    \[ V_a^b(f) = V_a^b(u-v) \leq V_a^b(u) + V_a^b(v) \]
+And since $u$ and $v$ are monotonically increasing, the terms $V_a^b(u)$ and $V_a^b(v)$ are finite.
+\\
+\\
+Now for the $\Rightarrow$ direction. Set $u(x) = V_a^x(f)$, and let $v(x)=V_a^x(f) - f(x)$. Clearly, $f = u-v$; we just have to prove that $v$ is monotonically increasing, since the $u$ case is fairly obvious.
+\\
+\\
+Supposing that $y>x$, we want to show that $v(y) > v(x)$. We can do so by starting with an obvious statement that 
+    \[ f(y) - f(x) \leq V_x^y(f) \]
+Then we rewrite and rearrange terms to show
+\begin{align*}
+    f(y) - f(x) &\leq V_x^y(f) = V_a^y(f) - V_a^x(f)  \\
+    \Leftrightarrow\quad V_a^x(f) - f(x) &\leq V_a^y(f) - f(y)  \\
+    \Leftrightarrow\quad v(x) &\leq v(y)  
+\end{align*}
+\end{proof}
+Now that we have the whole framework for functions of bounded variation in place, we can return to integration where either $f$ or $\alpha$ is of bounded variation (or both). 
+
+\subsection{Integration with Respect to Functions of Bounded Variation}
+
+\begin{thm}
+If $f$ is continuous on $[a,b]$ and $\alpha\in BV([a,b])$, then $f\in\mathscr{R}_\alpha([a,b])$. Also, since we can swap the integrand and integrator, if $f\in BV([a,b])$ and $\alpha$ continuous, then $f\in\mathscr{R}_\alpha([a,b])$
+\end{thm}
+\begin{proof}
+Suppose that $f$ is continuous and $\alpha\in BV([a,b])$. Then by Theorem \ref{monot}, we have that $\alpha = u -v$, both of which are increasing. Thus $f\in\mathscr{R}_u([a,b]) \;\cap \;\mathscr{R}_v([a,b])$, which entails $u, v \in \mathscr{R}_f([a,b])$ by Theorem \ref{thm.intbyparts}.  This implies that $u-v\in\mathscr{R}_f([a,b])$, which implies $f\in\mathscr{R}_{u-v}([a,b]) = \mathscr{R}_\alpha([a,b])$.
+\end{proof}
+
+\begin{thm}
+We get a number of familiar results from regular integration when $\alpha\in BV([a,b])$, $f,g\in\mathscr{R}_\alpha([a,b])$, $h$ continuous, and $c\in(a,b)$:
+\begin{itemize}
+    \item $\int^c_a f\;d\alpha + \int^b_c f\;d\alpha = \int^b_a f\;d\alpha$.
+    \item $h\circ f\in\mathscr{R}_\alpha([a,b])$.
+    \item $fg\in\mathscr{R}_\alpha([a,b])$.
+    \item $|f|\in\mathscr{R}_\alpha([a,b])$
+\end{itemize}
+\end{thm}
+
+\begin{thm}
+\label{ftcbasis}
+Suppose $\alpha$ is continuous and differentiable on $[a,b]$ with $\alpha', f\in\mathscr{R}([a,b])$. Then $f\in\mathscr{R}_\alpha([a,b])$ and
+    \[ \int^b_a f\;d\alpha = \int^b_a f \alpha'\;dx\]
+Since $\alpha$ is continuous and $\alpha'$ is bounded on $[a,b]$, $\alpha \in BV([a,b])$. 
+\end{thm}
+\begin{proof}
+Now we know by the Mean Value Theorem that, for all subintervals,
+    \[ 
+        \exists \; \xi_i \in [x_{i-1}, x_i] \quad \text{s.t.} 
+        \qquad \Delta\alpha_i = \alpha'(\xi_i) \Delta x_i 
+    \]
+Now consider the function $f\cdot\alpha'$. Since both $f,\alpha' \in\mathscr{R}([a,b])$ by assumption, we know that their product is Riemann integrable.  That means there's some partition $P$ such that $P^*\supset P$ implies that 
+    \[ \left\lvert S(f\alpha',P,T) - \int^b_a f\alpha'\;dx 
+    \right\rvert \leq \varepsilon/2 \]
+Using partition $P$ and the MVT result above, we can write the sum for the other integral:
+\begin{align*}
+        S_\alpha(f,P,T) &= \sum^n_{i=1} f(t_i) \Delta\alpha_i 
+        = \sum^n_{i=1} f(t_i)\alpha'(\xi_i) \Delta x_i
+\end{align*}
+Now, we want to show the following for any arbitrary $\varepsilon>0$:
+\begin{align}
+    \label{toexpand}
+    \left\lvert  S_\alpha(f,P,T) - \int^b_a f\alpha'\;dx 
+        \right\rvert &\leq \varepsilon
+\end{align}
+If we can prove this, then we know that the limit of the sum exists (so the corresponding integral exists) and that it is equal to the integral of $f\alpha'$. So let's expand out
+But we can expand out Inequality \ref{toexpand}:
+\begin{align*}
+    \left\lvert S_\alpha(f,P,T) - \int^b_a f\alpha'\;dx 
+        \right\rvert &\leq 
+        \left\lvert S_\alpha(f,P,T) - S(f\alpha',P,T)
+        \right\rvert \\
+    &\qquad + \left\lvert S(f\alpha',P,T)
+        - \int^b_a f\alpha'\;dx \right\rvert 
+\end{align*}
+Now the second term will be $\varepsilon/2$ small by our choice of $P$ above. As for the first term:
+\begin{align*}
+    \left\lvert S_\alpha(f,P,T) - S(f\alpha',P,T)
+        \right\rvert &\leq 
+        \left\lvert \sum^n_{i=1} f(t_i)\left[\alpha'(\xi_i) - 
+        \alpha'(t_i)\right] \Delta x_i \right\rvert\\
+    &\leq M \cdot
+        \sum^n_{i=1} \left\lvert \alpha'(\xi_i) - 
+        \alpha'(t_i)\right\rvert \Delta x_i 
+\end{align*}
+where $M =\sup_{x\in[a,b]}\left\lvert f(x)\right\rvert$. Finally, note that for each $i$,
+\[ 
+    |\alpha'(\xi_i) - \alpha'(t_i)| \leq 
+    \sup_{[x_{i-1}, x]} \alpha(x) - 
+    \inf_{[x_{i-1}, x]} \alpha(x) 
+\]
+like we might have if we consider the upper and lower sums. As a result, because $\alpha'\in\mathscr{R}_\alpha([a,b])$, we can choose a $Q$ such that 
+\[ 
+    \sum^n_{i=1} \left\lvert \alpha'(\xi_i) - 
+    \alpha'(t_i)\right\rvert \Delta x_i 
+    \leq U_\alpha(f,Q) - L_\alpha(f,Q) \leq \frac{\varepsilon}{2M}
+\]
+Taking our new partition to be $P \cup Q$, which is a superset of $P$ (where $P$ is from above), we see that our desired result is achieved.
+\end{proof}
+
+\newpage
+\subsection{Fundamental Theorem of Calculus}
+
+\begin{thm} \emph{(Part I)}
+\label{ftc1}
+If $f$ is differentiable and $f'\in\mathscr{R}([a,b])$, then 
+    \[ \int^b_a f'(x)\;dx = f(b) - f(a) \]
+\end{thm}
+\begin{proof}
+Careful with the notation here, but take the $f$ in Theorem \ref{ftcbasis} to be the constant function $f(x) =1$. Then, take the $\alpha(x)$ in Theorem \ref{ftcbasis} to be the $f$ in this theorem's statement. Then we get that
+\[ \int^b_a f'(x) \;dx = \int^b_a 1 \;df = f(b) - f(a) \]
+\end{proof}
+
+\begin{thm} \emph{(Part II)}
+\label{ftc2}
+Suppose $f\in\mathscr{R}([a,b])$, and take 
+    \[ F(x) = \int^x_a f(t)\;dt \]
+Then $F$ is Lipschitz continuous on $[a,b]$, and $F$ is differentiable at those points where $f$ is continuous with $F'(x) = f(x)$ at those points.
+\end{thm}
+\begin{proof}
+First, we deal with the continuity. Since $f$ is bounded, we know that 
+    \[ 
+        f(x) \leq C = \sup_{x\in[a,b]} f(x)
+    \]
+Thus, we can say that
+\begin{align*}
+    |F(y) - F(x)| &= \left\lvert \int^y_x f(t)\;dt \right\rvert
+        \leq \int^y_x |f(t)|\;dt \\
+    &\leq \int^y_x C\;dt = C|y-x| 
+\end{align*}
+Thus, $F$ is Lipschitz continuous.
+\\
+\\
+Next, for $x\in[a,b]$ and $h\neq 0$:
+\[ 
+    \frac{F(x+h)-F(x)}{h} = \frac{1}{h}\int^{x+h}_x f(t)\;dt
+\]
+Applying the Mean Value Theorem for integrals, we know that there is some $\mu \in [m, M]$, where $m = \inf f$ and $M = \sup f$ over the interval $[x,x+h]$, such that 
+    \[ \mu = \frac{1}{h}\int^{x+h}_x f(t)\;dt \]
+Now, if $f$ is continuous at $x$, then for all $\varepsilon>0$, there exists a $\delta>0$ such that 
+\begin{align*}
+    |h| \leq \delta \quad \Rightarrow \quad |f(x) - f(y)|
+        &\leq\varepsilon \\
+    \Rightarrow \qquad |\mu - f(x)|&\leq\varepsilon \\
+    \Rightarrow \quad \left\lvert \frac{F(x+h)-F(x)}{h}- f(x)
+        \right\rvert
+        &\leq\varepsilon 
+\end{align*}
+So $f$ is differentiable at $x$ and $F'(x)=f(x)$.
+\end{proof}
+
+\begin{thm}\emph{(Change of Variables)}
+Suppose that we have $\varphi: [a,b] \rightarrow [\varphi(a), \varphi(b)]$, a differentiable, monotonically increasing function with $\varphi'\in\mathscr{R}([a,b])$. Also suppose that $f\in\mathscr{R}([\varphi(a),\varphi(b)])$. Then $(f\circ \varphi)\cdot\varphi' \in \mathscr{R}([a,b])$ and
+\[
+    \int^b_a f\left(\varphi(x)\right) \varphi'(x)\;dx
+    = \int^{\varphi(b)}_{\varphi(a)} f(u)\;du
+\]
+\end{thm}
+\begin{proof}
+   to do 
+\end{proof}
+
+
+\newpage
+\subsection{Improper Integrals}
+
+\begin{defn}
+(Cauchy Principal Value) Sometimes we want to consider integrating a function over the real line, we take 
+\[
+    \lim_{b\rightarrow\infty}
+    \left(\lim_{a\rightarrow-\infty} \int^b_a f\;d\alpha
+    \right) \neq 
+    \left(\lim_{a\rightarrow\infty} \int^a_{-a} f\;d\alpha
+    \right)
+\]
+where the second term is the \emph{Cauchy Principle Value}. It may sometimes exist, while the integral on the left does not. 
+\end{defn}
+
+\begin{ex}
+For the simplest example, take $f(x)=x$. If evaluated in the usual sense, we get $\infty-\infty$, which makes no sense. However, if we evaluate as on the righthand side above, we get a Cauchy Principle Value of $0$.
+\end{ex}
+
+\begin{ex}
+Now we have an example of a function that is continuous, non-negative everywhere, and $f\not\rightarrow 0$, but $f\in\mathscr{R}([a,\infty))$ nonetheless.
+To construct such a function, set up
+\[
+    f(x) =
+    \begin{cases}
+        1 & x\in\mathbb{Z} \\
+        / & [x - 1/x^2, x] \\
+        \text{\textbackslash} & [x, x + 1/x^2] \\
+        0 & \text{otherwise}
+    \end{cases}
+\]
+where $/$ and \textbackslash denote increasingly linear and decreasingly linear, respectively. An example is below
+\begin{figure}[h!]
+   \centering
+   %\includegraphics[scale=0.45]{TriangleFunction.pdf}
+\end{figure}
+\end{ex}
+
+\begin{ex}
+Suppose that in addition to the conditions we had above, we also want $f$ to be unbounded. To deal with that, make the triangles higher, but shrink the base faster.
+\end{ex}
+
+
 \clearpage
 \section{Fixed Points}
 
