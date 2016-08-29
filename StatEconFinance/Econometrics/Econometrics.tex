@@ -5091,6 +5091,7 @@ $L^2$ is a Hilbert space under inner product
 \end{align*}
 \end{thm}
 
+
 \clearpage
 \section{Probability Theory with Random Variables}
 
@@ -5105,26 +5106,27 @@ Any function satisfying the necessary properties to be called a CDF
 \emph{implies} a probability measure on $(\R,\sB(\R))$. Moreover,
 that implied probability measure will be \emph{uniquely} specified.
 
-Therefore, cumulative distributions are a really handy way to introduce
-measures on $(\R,\sB(\R))$. In later sections, we'll also see the close
-relationship between CDFs and random variables.
+Therefore, CDFs are a really handy way to introduce measures on
+$(\R,\sB(\R))$. In later sections, we'll also see the close relationship
+between CDFs and random variables.
 
 \begin{defn}(Cumulative Distribution Function)
 \label{defn:cdf}
 A function $F:\R\ra\R$ is called a
 \emph{cumulative distribution function} $F$ on $\R$ if it satisfies the
 following properties:
-\begin{enumerate}
+\begin{enumerate}[label=(\roman*)]
   \item Non-decreasing
-  \item Right continuous
+  \item Right continuous\footnote{%
+      Right rather than left continuity because only the former makes
+      sense for distributions with mass points---we can interpret the
+      jump size as the probability of point $x$ occuring.
+    }
   \item $\lim_{x\ra-\infty} F(x)=0$ and $\lim_{x\ra+\infty}=1$.
 \end{enumerate}
-Right rather than left continuity because only the former makes sense
-for distributions with mass points---we can interpret the jump size as
-the probability of point $x$ occuring.
 \end{defn}
 
-\begin{prop}\emph{(Prob. Measure on $(\R,\sB(\R))$ to CDF)}
+\begin{prop}\emph{($P$ on $(\R,\sB(\R))$ to CDF)}
 Given prob. measure $P$ on $(\R,\sB(\R))$, define
 \begin{align*}
   F(x) := P\big[(-\infty,x]\big]
@@ -5140,39 +5142,31 @@ This is a cumulative distribution function.\footnote{%
 We check that it satisfies the properties in Definition~\ref{defn:cdf}
 (except 3, which is obvious):
 \begin{enumerate}
-  \item Suppose $y \geq x$. Then by monoticity of the underlying
-    probability measure $P$:
-    \begin{alignat*}{3}
-      (-\infty,x]\subseteq (-\infty,y]
-      &\quad\implies\quad
-      &P\big[(-\infty,x]\big]
+  \item If $y \geq x$, clearly $(-\infty,x]\subseteq (-\infty,y]$, so by
+    monoticity of the underlying measure $P$:
+    \begin{align*}
+      P\big[(-\infty,x]\big]
       &\leq
-      P\big[(-\infty,y]\big] \\
-      &\quad\iff\quad
-      &F(x) &\leq F(y)
-    \end{alignat*}
+      P\big[(-\infty,y]\big]
+      \quad\iff\quad
+      F(x) \leq F(y)
+    \end{align*}
 
   \item We can write $(-\infty,x]$ as the intersection of a decreasing
     sequence of sets
-    \begin{align}
+    \begin{align*}
       (-\infty,x] = \bigcap\ninf \left(-\infty, \; x+1/n\right]
-      \label{ascap}
-    \end{align}
-    Since $P$ is a probability measure, it is continuous from above,
-    so for that decreasing sequence of sets, we have
-    \begin{align*}
-      P\left[ \bigcap\ninf \left(-\infty, \; x+1/n\right]
-      \right]
-      &=\limn P\big[ \left(-\infty, \; x+1/n\big]
-      \right]
+      \quad\implies\quad
+      F(x) := P\big[(-\infty,x]\big]
+        = P\left[\bigcap\ninf \left(-\infty, \; x+1/n\right]\right]
     \end{align*}
-    So by Statement~\ref{ascap}, we have
+    Since $P$ a prob. measure, it's continuous from above, so for that
+    decreasing sequence of sets,
     \begin{align*}
-      P\big[(-\infty,x]\big]
-      &=\limn P\big[ \left(-\infty, \; x+1/n\right]\big] \\
-      \iff \quad
       F(x)
-      &=\limn F(x+1/n)
+      = P\left[ \bigcap\ninf \left(-\infty, \; x+1/n\right] \right]
+      &=\limn P\big[ (-\infty, \; x+1/n]\big]
+      = \limn F(x+1/n)
     \end{align*}
     Hence, $F$ is right continuous.
 \end{enumerate}
@@ -5187,11 +5181,11 @@ We check that it satisfies the properties in Definition~\ref{defn:cdf}
 %$P\big[(-\infty,x]\big]$. From there, apply Theorem~\ref{thm:PQunq}.
 %\end{proof}
 
-The next statement is very important. In terms of the discussion above,
-this next statement says that writing down $F$ will uniquely determine a
-probability measure on measurable space $(\R,\sB(\R))$.
+The next statement is very important as it says that writing down $F$
+will \emph{uniquely} determine a probability measure on measurable space
+$(\R,\sB(\R))$.
 
-\begin{prop}\emph{(CDF to Prob. Measure on $(\R,\sB(\R))$)}
+\begin{prop}\emph{(CDF to $P$ on $(\R,\sB(\R))$)}
 Let $F:\R\ra\R$ be a cumulative distribution function. There exists a
 \emph{unique} probability measure $P_F$ on measurable space
 $(\R,\sB(\R))$ such that
@@ -5248,6 +5242,8 @@ Let $F:\Rn\ra[0,1]$ be a function satisfying the following properties
     that the other coordinates need not be converging to $-\infty$.
 \end{enumerate}
 \end{defn}
+
+\clearpage
 \begin{rmk}
 To understand Inequality~\ref{deltas} in the first requirement, if the
 domain of $F$ is simply $\R$, the requirement reduces to
@@ -5279,15 +5275,14 @@ Therefore, the requirement states
 \end{align*}
 This is the $\R^2$ analog of the ``$F$ nondecreasing'' assumption.
 
-To visualize, consider the following figure. We want calculate the
-area of the box---the probability that something lands in the box. We
-want that guy to be positive. Rather than compute the area by taking the
-produce of the sides of the rectangle (which would build in
-independence), we compute the area by starting with the area of the
-whole box (the gray shaded box plus all cross-hatched boxes),
-subtracting off all northwest hatched areas, subtracting off all
-northeast hatched areas, then adding back in the double-hatched area
-(since we subtracted it twice).
+To visualize, consider the following figure. We want calculate the area
+of the gray box---equivalently, the probability something lands in
+the box.  Rather than compute the area by taking the product of the
+sides of the rectangle (which would build in independence), compute the
+area by starting with the area of the whole box (the gray shaded box
+plus all cross-hatched boxes), subtracting off all northwest hatched
+areas, subtracting off all northeast hatched areas, then adding back in
+the double-hatched area (since we subtracted it twice).
 \begin{figure}[htpb!]
 \centering
 \begin{tikzpicture}[yscale=1.0, xscale=1.5]
@@ -5319,7 +5314,7 @@ northeast hatched areas, then adding back in the double-hatched area
 \end{rmk}
 
 \begin{prop}
-\emph{(From CDF to Probability Measure on $(\R^n,\sB(\R)^{\otimes n})$)}
+\emph{(From CDF to $P$ on $(\R^n,\sB(\R)^{\otimes n})$)}
 Let $S$ denote the set of all hypercubes
 \begin{align*}
   S = \left\{ (a_1,b_1]\times\cdots\times(a_n,b_n]
@@ -5348,11 +5343,13 @@ above on $S$ has a unique extension to $\sB(\R)^{\otimes n}$.
 \subsection{Distributions of Random Variables}
 
 
-\begin{defn}(Prob. Distribution and Distribution Function of Random Variable $X$)
+\begin{defn}(Prob. Distribution and CDF of RV $X$)
 Consider measurable function $X:(\Omega,\sF,P)\ra (\R,\sB(\R))$.
-If $P$ is a probability measure, then the push forward
-measure $P \circ X^{-1}$ or $P_X$ is \emph{also} a probability measure
-called the \emph{probability distribution of $X$}, where
+If $P$ is a probability measure on the underlying measurable space
+$(\Omega,\sF)$, then the push forward measure $P \circ X^{-1}$ or $P_X$
+is \emph{also} a probability measure---but on space
+$(\R,\sB(\R))$---called the \emph{probability distribution of RV $X$}
+satisfying
 \begin{align*}
   \int_\Omega (g\circ X)(\omega)\; dP(d\omega)
   = \int_\R g(x) \; dP_X(dx)
@@ -5364,10 +5361,10 @@ Moreover, we call
   = P_X\big[(-\infty,x]\big]
   = P\big[X^{-1}\big((-\infty,x]\big)\big]
 \end{align*}
-the \emph{distribution function of $X$}.
+the \emph{cumulative distribution function of RV $X$}.
 \end{defn}
 
-\begin{defn}
+\begin{defn}(Classifying RVs)
 We call the random vector $X:(\Omega,\sF)\ra(\R^d,\sB(\R)^{\otimes d})$
 on probability space $(\Omega,\sF,P)$
 \begin{itemize}
@@ -5378,26 +5375,28 @@ on probability space $(\Omega,\sF,P)$
 \end{itemize}
 \end{defn}
 
-The above definitions are motivated as follows. I could write down
-$\Omega$, the set of elementary events that could happen. I could then
-specify the measurable sets $\sF$, which are events or subsets of
-$\Omega$ whose probabilities I want to compute. I could then also
-specify a measure $P$ that assigns probabilities to the measurable sets
-in $\sF$. Finally, if I define a random variable $X$ mapping $\Omega$
-into real numbers, I could (in theory) compute integrals corresponding
-to functions of my random variable like
-\begin{align*}
-  \int_\Omega g\circ X \; dP
-\end{align*}
-But the problem is that I don't really know how to integrate over
-$\Omega$. On the other hand, I might know how to integrate over $\R$,
-the range of $X$. This, in fact, is part of the reason I defined $X$ in
-the first place---so that I wouldn't have to work exclusively with the
-more abstract measure space $(\Omega,\sF,P)$. So rather than integrate
-over subsets of $\Omega$ (the domain of $X$ and $g\circ X$), I change
-variables to integrate over subsets of $\R$ (the range of $X$), using
-the preimage of $X$ to invoke implicitly the underlying probability
-measure $P$:
+The above definitions are motivated as follows.  Suppose I want to
+compute something as simple as $\E[g(X)]$ for some RV $X:\Omega\ra\R$
+and function $g$. Here's one way to go about that
+\begin{enumerate}[label=(\roman*)]
+  \item Write down $\Omega$, the set of elementary events that could
+    happen.
+  \item Then specify measurable sets included in $\sF$--- the events or
+    subsets of $\Omega$ whose probabilities I want to compute.
+  \item Then specify a measure $P$ assigning probabilities to the
+    measurable sets in $\sF$.
+  \item Compute integral $\E[g(X)]=\int_\Omega g\circ X \; dP$
+\end{enumerate}
+Theoretically possible, sure.
+But one big problem: I don't really know how to integrate over $\Omega$.
+On the other hand, I might know how to integrate over $\R$, the range of
+$X$. In fact, that's partly why I defined $X$ in the first place---so
+that I wouldn't have to work exclusively with the more abstract measure
+space $(\Omega,\sF,P)$. Rather than integrate over subsets of $\Omega$
+(the domain of $X$ and $g\circ X$), I can change variables to integrate
+over subsets of $\R$ (the range of $X$), using the preimage of $X$ to
+invoke the underlying probability space $(\Omega,\sF,P)$ only
+\emph{implicitly}:
 \begin{align}
   \int_{X^{-1}(A)} g\circ X \; dP
   =
@@ -5414,34 +5413,39 @@ $X:(\Omega,\sF)\ra\R$---all to get to $P_X$ and a general integral over
 $\R$.  That's all super abstract and not often how we work with
 probability spaces.
 
-As a result, we actually work in a different way, starting with $P_X$
-and showing that it implies all of that other formal structure that
-makes probability work---the measurable space, the probablity measure,
-the random variable, etc. That's what the rest of this section will
-concern itself with.
-
-Specifically, we usually start by defining a cumulative distribution
-function $F:\R\ra\R$, which is just a special type of function
-satisfying certain properties. By satisfying those properties, the CDF
-then implicitly represents some distribution $P_X$ that implies an
-underlying measure space $(\Omega,\sF)$ and probability measure $P$.
-This then allows us to construct the chain
-\begin{align*}
-  \int_\R g(x) \; F(dx)
-  =
-  \int_\R g(x) \; P_X(dx)
-  =
-  \int_\Omega g(X(\omega)) \; P(d\omega)
-\end{align*}
+As a result, we actually work in a different way
+to compute $\E[g(X)]$:
+\begin{enumerate}[label=(\roman*)]
+  \item Define a cumulative distribution function $F:\R\ra\R$. As
+    discussed above, this is just a special type of function satisfying
+    certain properties.
+  \item Recognize that $F$ implicitly represents some distribution $P_X$
+    that implies all of that other formal structure that makes
+    probability work---a measurable space $(\Omega,\sF)$ and a random
+    variable $X:\Omega\ra\R$ with probablity distribution $P_X$ on
+    $(\R,\sB(\R))$ corresponding to a measure $P$ on underlying
+    $(\Omega,\sF)$.
+    The beauty is that you just have to ``recognize'' this step is
+    happening. You don't actually have to do anything.
+  \item Then by (ii), we have that
+    \begin{align*}
+      \E[g(X)] =
+      \int_\R g(x) \; F(dx)
+      =
+      \int_\R g(x) \; P_X(dx)
+      =
+      \int_\Omega g(X(\omega)) \; P(d\omega)
+    \end{align*}
+\end{enumerate}
 While the second two integrals operate with measure $P_X$ and $P$---set
 functions---the first integral is a Lebesgue integral (that might
-specialize to a Riemann-Stieltjes integral) using function
-$F$ from $\R$ to $\R$.  That's huge. Moreover, that will be
-equivalent to computing the integral $\int_\Omega g \circ X \; dP$ on
-some underlying probability space by Equation~\ref{omega-Px}.
+specialize to a Riemann-Stieltjes integral) using function $F$ from $\R$
+to $\R$.  That's huge. And as shown above, that is equivalent to
+computing integral $\int_\Omega g \circ X \; dP$ on some underlying
+probability space by Equation~\ref{omega-Px}.
 
-Finally, if we write down a density function for a random variable, then
-we can also get
+Finally, we could have alternatively specified a density function
+in step (i) rather than a CDF, in which case we have
 \begin{align*}
   \int_\R g(x)f(x) \; dx
   =
@@ -5450,10 +5454,10 @@ we can also get
   F(x) &= \int_{(-\infty,x]} f(x)\; dx \\
   P_X(B) &= \int_{B} f(x)\; dx \quad B\in\sB(\R)
 \end{align*}
-where the first and last integral use the Lebesgue measure (which might
-specialize to a Riemann integral).
+Note that the integrals on the first line all use the Lebesgue measure
+(which might specialize to a Riemann or Riemann-Stieltjes integral).
 
-\begin{defn}
+\begin{defn}(Expectation, Variance, Covariance)
 Let $X:(\Omega,\sF,P)\ra (\R,\sB(\R))$ and $P$ a probability measure,
 Then define
 \begin{alignat*}{3}
@@ -5494,17 +5498,15 @@ real-valued integrable random variables. Then
   \item $Z$ and $Z'$ are independent if $\sigma(V,W)$ is independent of
     $\sigma(V',W')$
   \item If $Z$ and $Z'$ are independent and square integrable, then
-    \begin{align*}
-      \E[Z\cdot Z'] = \E[Z]\cdot\E[Z']
-    \end{align*}
+    $\E[Z\cdot Z'] = \E[Z]\cdot\E[Z']$
 \end{enumerate}
 \end{prop}
 \begin{proof}
 We prove each in turn:
 \begin{enumerate}
   \item[(iii)]
-    First, we'll want a clever way to write $\big|\E[Z]\big|$. To do so,
-    we make use of the following result:
+    First, we want a clever way to write $\big|\E[Z]\big|$. To do so,
+    make use of the following result:
     \begin{align}
       |z| = \sup_{q\in\Q} \Re(e^{iq}z)
       \qquad\forall z = v+iw\in\C
@@ -5517,18 +5519,19 @@ We prove each in turn:
       \left(\cos(q) + i\sin(q)\right)
       \cdot
       \left(v + iw\right)
-      \big) \\
-      &=\cos(q)v - \sin(q)w
+      \big)
+      =\cos(q)v - \sin(q)w
     \end{align*}
     Now we want the $q$ that maximizes this object. Since everything is
     differentiable, the first order necessary condition for an optimum
     is
     \begin{align*}
-      0 &=-\sin(q)v - \cos(q)w \\
-      -\frac{w}{v} &=
-      \frac{\sin(q)}{\cos(q)} = \tan(q) \\
-      \implies\quad
-      q &= \arctan\left(-\frac{w}{v}\right)
+      0 &=-\sin(q)v - \cos(q)w
+      \quad\implies\quad
+      -\frac{w}{v} =
+      \frac{\sin(q)}{\cos(q)} = \tan(q)
+      \quad \implies\quad
+      q = \arctan\left(-\frac{w}{v}\right)
     \end{align*}
     Using this in the expression for $\Re(e^{iq}z)$, we get
     \begin{align*}
@@ -5582,7 +5585,6 @@ We prove each in turn:
 \subsection{Characteristic Functions}
 
 
-
 \begin{defn}(Characteristic Function)
 Let $X$ be a $d$-dimensional random vector on probability space
 $(\Omega,\sF,P)$ with CDF
@@ -5595,10 +5597,10 @@ Then the \emph{characteristic function} is the function
 $\varphi_X:\R^d\ra \C$ defined
 \begin{align*}
   \varphi_X(u)
-  &= \E\left[e^{iu^TX}\right]
-  = \E\left[\cos(u^TX)\right]+i\,\E\left[\sin(u^TX)\right]\\
-  &= \int_{\R^d} e^{iu^TX} \; dF_{X}
-  \qquad\text{where}\quad u^T X = \sum_{i=1}^d u_iX_i
+  &:= \int_{\R^d} e^{iu^TX} \; dF_{X}
+  = \E\left[e^{iu^TX}\right] =
+  \E\left[\cos(u^TX)\right]+i\,\E\left[\sin(u^TX)\right]
+  \quad\text{where}\quad u^T X = \sum_{i=1}^d u_iX_i
 \end{align*}
 If $X$ is absolutely continuouse with density $f_{X}(x)$, we
 can write
@@ -5614,8 +5616,8 @@ A few facts about characteristic functions:
   \item They always exist, even for fat-tailed distributions. That's why
     we prefer them to moment generating functions
   \item Characteristic functions \emph{uniquely} determine distributions
-  \item Convergence in distribution is equivalent to pointwise
-    convergence of characteristic functions
+  \item Convergence in distribution equivalent to pointwise
+    convergence of char. functions
 \end{enumerate}
 \end{defn}
 
@@ -6346,22 +6348,22 @@ variables is one of the most important results that underlies the
 estimation and application of factor, regression, and state space
 models. It can be summarized as follows:
 \begin{align}
-  \text{Given} \qquad 
+  \text{Given} \qquad
     \begin{bmatrix} X_1 \\ X_2 \end{bmatrix}
-    &\sim 
+    &\sim
     N\left(
     \begin{bmatrix} \mu_1 \\ \mu_2 \end{bmatrix},
-    \begin{bmatrix} 
+    \begin{bmatrix}
       \Sigma_{11} & \Sigma_{12} \\
-      \Sigma_{21} & \Sigma_{22} 
-    \end{bmatrix} 
+      \Sigma_{21} & \Sigma_{22}
+    \end{bmatrix}
     \right) \notag\\
     \label{reg} \\
   X_1 | X_2 &\sim N(\hat{\mu}, \hat{\Sigma})  \notag\\
   \text{where} \quad
-  \hat{\mu} &= \mu_1 + \Sigma_{12} \Sigma^{-1}_{22} 
+  \hat{\mu} &= \mu_1 + \Sigma_{12} \Sigma^{-1}_{22}
     (X_2-\mu_2) \notag\\
-  \hat{\Sigma} &= \Sigma_{11} - \Sigma_{12} \Sigma^{-1}_{22} 
+  \hat{\Sigma} &= \Sigma_{11} - \Sigma_{12} \Sigma^{-1}_{22}
     \Sigma_{21}\notag
 \end{align}
 This will be used again and again to derive the results presented below.
@@ -6769,8 +6771,6 @@ $k$. Then $Z'MZ\sim \Chi^2_k$.
 \end{prop}
 \begin{proof}
 \end{proof}
-
-
 
 
 \clearpage
@@ -7357,7 +7357,7 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
    %\item[ii.]{Each $X_t$ is a discrete-type random variable over $n$
       %possible discrete values.}
    %\item[iii.]{The {\sl transition probabilities} are history
-      %independent when it comes to pre-$t$ states, 
+      %independent when it comes to pre-$t$ states,
       %but the transition probabilities may vary with time, $t$:
       %\[ Q_{ij}^{(t)} = P( X_{t+1}=j \; | \; X_t = i, \; X_{t-1}=k_{t-1},
 	 %\ldots,\; X_0 = k_0 ) \]
@@ -7369,23 +7369,23 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 
 %If the transition probabilities, $Q^{(t)}_{ij}$, do
 %not depend on $t$, then they are denoted by $Q_{ij}$ and we have
-%a {\sl homogeneous Markov Chain}. 
+%a {\sl homogeneous Markov Chain}.
 %\\
 %\\
-%For this type of Markov Chain, 
+%For this type of Markov Chain,
 %only state or position, \emph{not} time, factors into the distribution for the
-%next period. This differs from the definition above, in that we explicity allow $Q_{ij}^{(t_1)} \neq Q_{ij}^{(t_2)}$ for 
+%next period. This differs from the definition above, in that we explicity allow $Q_{ij}^{(t_1)} \neq Q_{ij}^{(t_2)}$ for
 %$t_1\neq t_2$.
 
 
 %\subsection{Order of a Markov Chain}
 %We can generalize a bit and allow the Markov Chain to depend upon more
-%than one previously observed state.  In particular, we define an 
-%{\sl order}-${n}$ {\sl Markov Chain} to be a Markov Chain that 
-%depends upon the previous $n$ values.  
+%than one previously observed state.  In particular, we define an
+%{\sl order}-${n}$ {\sl Markov Chain} to be a Markov Chain that
+%depends upon the previous $n$ values.
 %\\
 %\\
-%Above, we defined an order-1 Markov chain. If we want to consider 
+%Above, we defined an order-1 Markov chain. If we want to consider
 %higher-order Markov Chains, we'll have to do a bit of work when it
 %comes time to put the probabilities in the transition matrices that
 %we next define. Namely, we will have to convert them to order-1.
@@ -7397,14 +7397,14 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 %Hopefully, the notation above clearly suggested that it will be
 %convenient to place the many transition probabilities into a
 %{\sl transition matrix}, whose $i,j$ entry is the transition
-%probability for moving from state $i$ to state $j$. So if 
+%probability for moving from state $i$ to state $j$. So if
 %there are $n$ states, define
 %\[\mathbf{Q}^{(t)}=\begin{pmatrix} Q_{ij}^{(t)} \end{pmatrix}_{ij}
     %\quad \text{where $\mathbf{Q}^{(t)}$ is $n\times n$} \]
 %And just a word about the funky notation you see above: it says
 %``the matrix $\mathbf{Q}^{(t)}$ is a matrix populated
-%with the values/probabilities $Q_{ij}^{(t)}$ at the $ij$ 
-%entry.'' 
+%with the values/probabilities $Q_{ij}^{(t)}$ at the $ij$
+%entry.''
 %\\
 %\\
 
@@ -7413,17 +7413,17 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 
 %Often, we'll want to look further ahead than just the next period, which
 %is all that our current formulation allows. To do so, we'll define
-%the {\sl longer term transition probabilities} as 
+%the {\sl longer term transition probabilities} as
 %\[ Q^{(t,k)}_{ij} = P(X_{t+k} = j \;|\; X_t = i ) \]
-%where $Q^{(t,k)}_{ij}$ is the probability of 
+%where $Q^{(t,k)}_{ij}$ is the probability of
 %being in state $j$ in $k$ periods given that you are currently
 %at time $t$ and in state $i$.\footnote{It's important to note that the transition
     %probability $Q^{(t,k)}_{ij}$ does \textbf{not} care what happens in between
     %time $t$ and time $t+k$.  It's just the probability that you were in
-    %state $i$ at time $t$ and may be in state $j$ at time 
-    %$t+k$. In fact, it's even entirely possible 
+    %state $i$ at time $t$ and may be in state $j$ at time
+    %$t+k$. In fact, it's even entirely possible
     %that you were \emph{already} in state $j$ sometime between
-    %time $t$ and $t+k$! So if we're considering $Q^{(t,k)}_{ii}$, 
+    %time $t$ and $t+k$! So if we're considering $Q^{(t,k)}_{ii}$,
     %this is not the probability of staying of in state $i$
     %from time $t$ to $t+k$.  You can drift away and then come back.}
 %The above sections dealt with the special case where $k=1$.
@@ -7435,21 +7435,21 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
       %\]
 %\paragraph{Theorem} In non-homogeneous Markov Chains, the longer-term
 %probability $Q^{(t,k)}_{ij}$ can be computed as the $(i,j)$-entry of
-%the matrix 
+%the matrix
    %\[\mathbf{Q^{(t,k)}}= \mathbf{Q^{(t)}} \times \mathbf{Q^{(t+1)}} \times
-      %\cdots \times \mathbf{Q^{(t+k-1)}} 
+      %\cdots \times \mathbf{Q^{(t+k-1)}}
             %\]
-%And for a homogeneous Markov Chain, this matrix is just 
+%And for a homogeneous Markov Chain, this matrix is just
 %$\mathbf{Q^{(\cdot, k)}} = \left(\mathbf{Q}\right)^k$, dropping the
-%$t$ in the superscript since the transition probabilities do not 
+%$t$ in the superscript since the transition probabilities do not
 %change over time.
 
 %\subsection{Chapman-Kolmogorov Equations (Homogeneous Case)}
 
-%\paragraph{Theorem} If we restrict ourselves to the 
-%homogeneous case, 
-%the {\sl Chapman-Kolmogorov Equations} tell us that 
-%\[Q^{(\cdot, \; k+\ell)}_{ij} = \sum^n_{s=1} 
+%\paragraph{Theorem} If we restrict ourselves to the
+%homogeneous case,
+%the {\sl Chapman-Kolmogorov Equations} tell us that
+%\[Q^{(\cdot, \; k+\ell)}_{ij} = \sum^n_{s=1}
     %Q^{(\cdot, \; k)}_{is} Q^{(\cdot,\; \ell)}_{sj} \]
 %This equation captures the idea of ``interposing'' some
 %intermediate time and state between now (time $t$, state
@@ -7457,25 +7457,25 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 %The logic goes as follows:
 %\begin{enumerate}
     %\item Before you get to time $t+k+\ell$ and state $j$, you
-	%have to stop at time $t+k$.   
+	%have to stop at time $t+k$.
     %\item At that time $t+k$, you'll be in any one of the states,
 	%call it $s$, where $s$ could equal $1, \cdots, n$ (where
 	%$n$ is the number of states.
     %\item So if you sum over the probability
-	%of moving as follows: 
+	%of moving as follows:
 	%\[  \text{state $i$ at $t$} \quad \Rightarrow \quad
-			%\text{state $s$ at $t+k$} \quad \Rightarrow \quad 
+			%\text{state $s$ at $t+k$} \quad \Rightarrow \quad
 			%\text{state $j$ at $t+k+\ell$} \]
-	%(where $s$ ranges over all possible intermediary states), 
+	%(where $s$ ranges over all possible intermediary states),
 	%you'll get the desired probability.
 %\end{enumerate}
 %{\sl Matrix Representation:}
 %In matrix form, this result can be written more compactly as
-    %\[ \mathbf{Q}^{(\cdot,\; k+\ell)} = \mathbf{Q}^{(\cdot,\; k)} \times 
+    %\[ \mathbf{Q}^{(\cdot,\; k+\ell)} = \mathbf{Q}^{(\cdot,\; k)} \times
       %\mathbf{Q}^{(\cdot,\; \ell)}\]
 %restricting ourselves to the homogeneous case.
-%Things are a little tougher if we want to consider the 
-%non-homogeneous case, as we'll have to multiply more matrices 
+%Things are a little tougher if we want to consider the
+%non-homogeneous case, as we'll have to multiply more matrices
 %together and keep track of subscripts.
 
 
@@ -7486,31 +7486,31 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 %\begin{enumerate}
     %\item A homogeneous Markov Chain, $\{X_t\}$ with a transition matrix,
 	%$\mathbf{Q}^{(\cdot)}$
-    %\item A marginal distribution for $X_t$, denoted by row-matrix $\psi^{(t)}$ 
+    %\item A marginal distribution for $X_t$, denoted by row-matrix $\psi^{(t)}$
 	%The $i$th entry of $\psi^{(t)}$ is
 	%\[ \psi^{(t)}_i = P\left\{ X_t = i \right\} \]
 %\end{enumerate}
 %First, suppose we want to get the marginal distribution of $X_{t+1}$.
 %This we can do by using the law of total probability:
 %\begin{align*}
-     %P\{X_{t+1} = j\} &= \sum_{i=1}^n 
-	%P\{X_{t+1} = j \; | \; X_t = i \} \cdot 
+     %P\{X_{t+1} = j\} &= \sum_{i=1}^n
+	%P\{X_{t+1} = j \; | \; X_t = i \} \cdot
 	%P\{X_{t} = i\} \\
-    %&= \sum_{i=1}^n 
-	%Q^{(\cdot)}_{ij} \cdot 
+    %&= \sum_{i=1}^n
+	%Q^{(\cdot)}_{ij} \cdot
 	%\psi_i^{(t)} \\
-    %\Rightarrow \qquad 
+    %\Rightarrow \qquad
     %\psi^{(t+1)} &= \psi^{(t)} \mathbf{Q}^{(\cdot)}
 %\end{align*}
-%More generally, and still restricting to the homogeneous case, 
-%this implies that for any arbitrary $m$, 
+%More generally, and still restricting to the homogeneous case,
+%this implies that for any arbitrary $m$,
     %\[ \psi^{(t+m)} = \psi^{(t)} \mathbf{Q}^{(\cdot,\; m)} \]
 
-%\paragraph{Note}: All of this math works whether we are 
+%\paragraph{Note}: All of this math works whether we are
 %\emph{certain} of the initial distribution, $X_t$, or
-%whether we aren't quite sure.  
+%whether we aren't quite sure.
 %\begin{itemize}
-    %\item[-] If we are \emph{certain} of the initial state $i$, 
+    %\item[-] If we are \emph{certain} of the initial state $i$,
 	%$X_t$, or if we want to assume an initial state $i$,
 	%$\psi^{(t)}$ will be a vector that is all zeros
 	%\emph{except} for $i$th position, which will have a 1.
@@ -7532,14 +7532,14 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 
 %\subsection{Definition}
 
-%A distribution $\psi^*$ is called {\sl stationary} or 
+%A distribution $\psi^*$ is called {\sl stationary} or
 %{\sl invariant} if $\psi^* = \psi^* \mathbf{Q}$,
 %which implies that $\psi^* = \psi^* \left(\mathbf{Q}\right)^m$
-%for all $m$ too.\footnote{Take note that a stationary 
+%for all $m$ too.\footnote{Take note that a stationary
     %\emph{distribution} differs from a stationary \emph{process}.
     %The former is the limiting distribution of a Markov Chain,
     %or the marginal distribution of a stationary process. The
-    %latter is a stochastic process whose joint probability 
+    %latter is a stochastic process whose joint probability
     %distribution does not change when shifted through time or
     %space.  Finally, a ``stationary process'' is \emph{not} the
     %same as a ``process with a stationary distribution.''}
@@ -7561,7 +7561,7 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 
 %\subsection{Solving for Stationary Distributions}
 
-%We saw above that a stationary distribution, $\psi^*$, must solve 
+%We saw above that a stationary distribution, $\psi^*$, must solve
 %\begin{equation}
     %\label{psicond1}
     %\psi = \psi \mathbf{Q} \quad \Leftrightarrow \quad
@@ -7573,17 +7573,17 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 %\begin{align}
     %\sum_{i=1}^n \psi_i = 1 \quad &\Leftrightarrow \quad
     %\psi b = 1 \qquad \text{where $b_i \in \mathbb{R}^n$ and
-				%$b_i=1$ for $i=1,\ldots,n$.} \nonumber \\ 
-    %&\Leftrightarrow \quad \psi B = b 
+				%$b_i=1$ for $i=1,\ldots,n$.} \nonumber \\
+    %&\Leftrightarrow \quad \psi B = b
     %\qquad \text{where $B$ is an $n\times n$ matrix of 1s}
     %\label{psicond2}
 %\end{align}
 %By adding together the two conditions, Equations \ref{psicond1}
-%and \ref{psicond2}, we see that $\psi$ must satisfy 
+%and \ref{psicond2}, we see that $\psi$ must satisfy
 %\begin{align*}
     %\psi \left(I_n - \mathbf{Q} + B\right) &= b \\
     %\Leftrightarrow \qquad
-	%\left(I_n - \mathbf{Q} + B\right)^T \psi^T &= b^T 
+	%\left(I_n - \mathbf{Q} + B\right)^T \psi^T &= b^T
 %\end{align*}
 %In this way, we can solve for the stationary distribution
 %by inverting the matrix to get:
@@ -7593,7 +7593,7 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 %\end{equation}
 
 
-%\subsection{Uniform Ergodicity} 
+%\subsection{Uniform Ergodicity}
 
 %\paragraph{Definition}
 %A stochastic matrix, $\mathbf{Q}$,
@@ -7605,8 +7605,8 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 %Note that there may in fact be
 %many stationary distributions for the stochastic matrix,
 %$\mathbf{Q}$ (as in the case of the identity matrix).
-%But one sufficient condition for uniqueness is 
-%\emph{uniform ergodicity}.  
+%But one sufficient condition for uniqueness is
+%\emph{uniform ergodicity}.
 
 %\paragraph{Convergence to Steady-State}
 %If uniform ergodicity holds, we also get the result that
@@ -7615,12 +7615,12 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 %\[ \psi \mathbf{Q}^t \rightarrow \psi^* \quad \text{ as }
 	%t\rightarrow \infty \]
 %where $\psi^*$ is the unique stationary distribution. So
-%regardless of the distribution of $X_0$, the distribution 
+%regardless of the distribution of $X_0$, the distribution
 %of $X_t$ converges to $\psi^*$.
 
 %\paragraph{Time in States} To get another import interpretation
-%and result, assume $\{X_t\}$ is a Markov Chain with stochastic 
-%matrix $\mathbf{Q}$. Also assume that $\mathbf{Q}$ is 
+%and result, assume $\{X_t\}$ is a Markov Chain with stochastic
+%matrix $\mathbf{Q}$. Also assume that $\mathbf{Q}$ is
 %uniformly ergodic with stationary distribution $\psi^*$. Then
 %\begin{equation}
     %\lim_{s\rightarrow\infty}
@@ -7641,37 +7641,37 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 %\subsection{Application: Page Rank}
 
 %Suppose we have a set of web-pages, $j \in \{1, 2, \dots,n \}$.
-%We want to find the fanking $r_j$ for each page, $j$. To do 
+%We want to find the fanking $r_j$ for each page, $j$. To do
 %so, we'll set the ranking as
     %\[ r_j = \sum_{i \in L_j} \frac{r_i}{\ell_i} \]
 %where $L_j$ is the set of pages linking to page $j$, and
-%where $\ell_i$ is the total number of outbound links from 
-%page $i$. 
+%where $\ell_i$ is the total number of outbound links from
+%page $i$.
 %\\
 %\\
 %But we can think of this another way.  Specifically, imagine
 %a jabroni on some webpage $i$ who is clicking links randomly
-%and with equal probability.  So what's his probability of 
+%and with equal probability.  So what's his probability of
 %landing on page $j$?  Well clearly, we can define this whole
 %``ranking'' business in terms of Markov Chains and transition
 %probabilities:
     %\[ r_j = \sum_{\text{all $i$}} Q_{ij} r_i, \qquad
 	%\text{ where  } Q_{ij} = \frac{1\{i \rightarrow j\}}{\ell_i}
     %\]
-%where $1\{i \rightarrow j\}$ is an indicator function that 
+%where $1\{i \rightarrow j\}$ is an indicator function that
 %equals 1 if page $i$ links to page $j$, zero otherwise.
 %So $Q_{ij}$ is, as above, the transition probability for
-%moving from state--or in this case ``page''--$i$ to 
-%$j$.\footnote{We drop the superscript, since we'll assume 
+%moving from state--or in this case ``page''--$i$ to
+%$j$.\footnote{We drop the superscript, since we'll assume
 %we're in the homeogeneous case.}
 %\\
 %\\
-%Awesome, now let's write the ranking in vector and matrix 
+%Awesome, now let's write the ranking in vector and matrix
 %notation so we can describe the problem for all pages,
 %$j \in \{1, \ldots, n\}$:
     %\[ \mathbf{r} = \mathbf{r} \mathbf{Q} \]
 %where $\mathbf{r}$ is the vector of rankings and $\mathbf{Q}$
-%is the transition matrix.  Well that looks familiar.  
+%is the transition matrix.  Well that looks familiar.
 %Specifically, $r$ is the stationary distribution of the
 %stochastic matrix $\mathbf{Q}$---and we know how to solve for
 %that!
@@ -7681,14 +7681,14 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 %\subsection{Tauchen's Approximation Method}
 
 %\subsection{AR(1) Approximiation}
-%Often, we will approximate some continuous model with a 
+%Often, we will approximate some continuous model with a
 %discrete model that utilizes Markov Chains. Specifically, the
 %discrete model takes the form:
 %\begin{equation}
-    %y_{t+1} = \rho y_t + \varepsilon_{t+1} \qquad 
+    %y_{t+1} = \rho y_t + \varepsilon_{t+1} \qquad
 	%\varepsilon_{t+1} \sim \text{N}(0, \sigma_\varepsilon^2)
 %\end{equation}
-%Now the variance of the stationary probability distribution 
+%Now the variance of the stationary probability distribution
 %of the stochastic process $\{y_t\}$ (which we hope to specify
 %as a Markov Chain) can be easily shown to be
     %\[ \sigma_y^2 = \frac{\sigma^2_\varepsilon}{1-\rho^2} \]
@@ -7696,7 +7696,7 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 %\subsection{Constructing the State Space}
 %To discretize an otherwise continuous process, we choose
 %\begin{itemize}
-    %\item $n$, the number of states for the discrete 
+    %\item $n$, the number of states for the discrete
 	%approximation that $y_t$ can be in.
     %\item $m$, an integer that parameterizes the width of
 	%the space of values $y_t$ can take on.
@@ -7710,7 +7710,7 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
     %\item $x_{i+1} = x_i + s$ where
 	%\[ s = \frac{x_n - x_1}{n-1} \]
     %\item $Q_{ij}$ represents the probability of transition
-	%from state $x_i$ to state $x_j$. 
+	%from state $x_i$ to state $x_j$.
 %\end{enumerate}
 
 %\subsection{Defining the Transition Probabilities}
@@ -7719,6 +7719,301 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 %that run from $[x_i, x_{i+1}]$.  So if we say that $y_t$
 %is in state $i$, we really mean that $y_t$ is in that bucket.
 %There are, of course, $n-1$ equal width buckets.
+
+
+\clearpage
+\section{Stochastic Calculus}
+
+\subsection{Random Walk}
+
+We will start with an approximation of Brownian Motion, the
+\textbf{random walk}, denoted by $W_n$.  This random walk will be the
+driving force behind the random variable $X_t$, which is approximated by
+by $X^n_t$, to be defined below.  This second random variable is
+similar to its driver, the random walk, but it provides a little more
+flexibility on the time and value dimensions as we shall see.
+
+\subsubsection{The Random Walk, $W_n$}
+So to begin, the random walk is a stochastic process, defined and denoted
+as follows:
+   \[ \{ W_n | n \in \mathbb{N} \} \]
+   \[ W_n = \xi_1 + \xi_2 + \cdots + \xi_n \]
+   \[ W_0 =  0 \]
+where the $\xi_i$ have distribution
+   \[ P(\xi_i = 1) = p \]
+   \[ P(\xi_i = -1) = 1-p. \]
+
+\subsubsection{Generalized Process, $X_t$}
+To handle time, we will pick a $T \in (0, \infty)$, and partition our
+time interval into $n$ equal segments
+   \[ \Delta t = \frac{T}{n} \;\; \Rightarrow t_i = i \Delta t.\]
+In addition, the random variable, $X_t$, will be will approximated by
+the random variable $X^n_t$, which depends on how finely we partition
+our time interval.  Eventually, we will let $n$ tend to infinity, so
+that $X^n_t \rightarrow X_t$. But before we get there, a little more
+about $X^n_t$.
+
+We will restrict the approximation $X^n_t$ to movements of
+only $\Delta x$, a constant, between time $t_{i-1}$ to time $t_i$.
+Eventually, as our time increments become small, $\Delta x$ will
+shrink too.
+
+Therefore, at each time $t_i =  i \Delta  t $, we can define the process
+as a function of the underlying, driving random walk:
+\begin{equation}
+   \label{bm1}
+   X^n_{t_i} = \Delta x W_i = \Delta x (\xi_1 + \cdots + \xi_i),
+      \qquad i \in 0,1,\ldots,n.
+\end{equation}
+Think of the $\xi_i$ as ``up or down'' indicators that are iid.
+
+At intermediate times, $t \in [t_{i-1},t_i]$, we will also define $X^n_t$ as
+the linear interpolation between $X^n_{t_{i-1}}$ and  $X^n_{t_{i}}$:
+\[ X^n_{t_{i}} = \frac{t_i - t}{\Delta t} X^n_{t_{i-1}} +
+   \frac{t- t_{i -1}} {\Delta t} X^n_{t_{i}} \]
+allowing $X_t^n$ to be defined for all $t \in [0,T]$.
+
+\subsection{The Limiting Case}
+
+Ideally, we want to let $n$ tend to infinity, so that $\Delta t
+\rightarrow 0$ and so that $X^n_t \rightarrow X_t$.  But for this process
+$X^n$ to converge to something and be useful, we're going to need the
+first and second moments, and hence $EX^n_T$ and $Var(X^n_T)$ to be
+bounded. Otherwise, the expected value of $X^n_T$ and/or the
+typical change in $X^n$ would be infinite.
+
+From Equation \ref{bm1}, we see that
+   \[ EX^n_T  = \Delta x \cdot n \cdot E\xi_i = \Delta x \cdot n(2p-1) \]
+   \[Var(X^n_T) = (\Delta x)^2 \cdot n \cdot Var(\xi_i) =
+      (\Delta x)^2 \cdot n \cdot 4p(1-p). \]
+And using the fact that $n = \frac{T}{\Delta t}$, we can rewrite the
+expectation and the variance as
+\begin{equation}
+   \label{exp}
+   EX^n_T = T \cdot \frac{ \Delta x}{\Delta t} (2p-1)
+\end{equation}
+\begin{equation}
+   \label{var}
+   Var(X^n_T) = T \cdot \frac{(\Delta x)^2 }{\Delta t} \cdot 4p(1-p).
+\end{equation}
+Our goal is to \emph{keep these babies finite} for all fixed $t$. So let's
+force the things we have control over in the variance term.
+Specifically, to prevent the variance from being 0 (and our process
+deterministic) and to prevent the process from blowing up to infinity,
+we choose $\Delta x$ so that the relevant portion is non-zero and finite:
+\begin{equation}
+   \label{diff}
+   \frac{(\Delta x)^2}{\Delta t} = 2D > 0
+\end{equation}
+for some positive constant $D$, which we will call the \textbf{diffusion
+coefficient}. This is the only logical and feasible way to keep it
+bounded.\footnote{We say $D$ instead of specifying a constant to avoid
+making too many assumptions, and we multiply by two for convenience
+of notation only (since $D$ is arbitrary and could absorb or nullify
+the 2 anyway).}
+
+This forces our hand with the expectation, because Equation \ref{exp} will blow up to
+infinity as $\Delta x \rightarrow 0$, which we see by plugging
+\ref{diff} into equation \ref{exp}, which gives
+\begin{equation}
+    \label{exprec}
+    EX^n_T = T \cdot \frac{ 2D}{\Delta x} (2p-1)
+\end{equation}
+Now since we want the expectation bounded, we must choose the parameter $p$
+so that Equation \ref{exprec} is finite (so equal to some constant, say $cT$),
+which is equivalent to
+   \[ \Leftrightarrow \quad \frac{2p - 1}{\Delta x} = \frac{c}{2D} \]
+\begin{equation}
+   \label{p}
+   \Rightarrow \quad p = \frac{1}{2} + \frac{c}{2D}
+\end{equation}
+where $c$ is some constant, which we call the \textbf{drift coefficient}.
+
+So if we take equations \ref{exp} and \ref{p}, we find
+   \[ EX^n_T = cT \]
+while taking equations \ref{var}, \ref{diff}, and \ref{p} gives us
+   \[ Var(X^n_T)= 2DT \left( 1 - \frac{c^2}{D^2} (\Delta x)^2 \right).\]
+
+\paragraph{Final Result} So now let's take the limit of the mean and
+variance expressions, noting that $\Delta x$ goes to $0$ as
+$n\rightarrow \infty$:
+   \[ \lim_{n\rightarrow \infty} EX^n_T = cT  \]
+   \[ \lim_{n\rightarrow \infty} Var(X^n_T)= 2DT  \]
+both of which are bounded!
+
+Finally, we can apply the Central Limit Theorem to conclude that,
+   \[\lim_{n \rightarrow \infty} \frac{X^n_T -
+      EX^n_T}{\sqrt{Var(X^n_T)}} \rightarrow Z \]
+where $Z$ is the standard normal random variable.
+
+\subsection{Brownian Motion}
+
+Now we can take the limiting case to define our result. So for any fixed
+$ T \in (0,\infty)$, we can define the limit of $X^n_T$ as $X_T$, which
+is a normally distributed random variable defined by parameters
+   \[ \mu_T = cT \]
+   \[ \sigma_T = \sqrt{2DT}.\]
+If we do this for each time $T \in (0,\infty)$, we obtain a
+continuous process
+   \[ \{ X_T \; |\; T \geq 0 \}  \]
+   \[p(x,T) = \frac{1}{\sqrt{4\pi DT}} \;
+      e^{\frac{-(x - cT)^2}{4DT}}, \;\; x \in \mathbb{R}.\]
+
+\paragraph{Definition} If we set the parameters at $c = 0$ and $D = 1/2$,
+we get as the corresponding process \textbf{Brownian Motion}, also
+called the \textbf{Wiener Process}, denoted by $\{ W_t\;|\; t\geq 0\}$:
+
+\subsection{Properties of Brownian Motion}
+
+Brownian Motion, as just defined, satisfies certain properties:
+\begin{enumerate}
+   \item[i.]{$W_0 = 0$ with probability 1.}
+   \item[ii.]{$W_t$ is a continuous function of $t$ with probability 1.}
+   \item[iii.]{For all $u < s < t$, the increments $W_t - W_s$ and
+      $W_s - W_u$ are independent.}
+   \item[iv.]{For all $s <t$, $W_t - W_s$ is normally distributed with
+      mean $0$ and variance $t-s$.  The pdf is
+      \[ p(x,t-s) =  \frac{1}{\sqrt{2\pi (t-s)}} \;
+	 e^{-\frac{x^2}{2(t-s)}}.\]
+      }
+\end{enumerate}
+
+\subsubsection{Brownian Motion Starting at $y$}
+
+Let $W^y_t$ denote Brownian motion starting at $y$, rather than $0$.
+Much remains the same, but let's run through just to be clear.
+\begin{enumerate}
+   \item[i.]{$W^y_0 = y$, since it has a non-zero starting point.}
+   \item[ii.]{Doesn't change.}
+   \item[iii.]{Non-overlapping increments remain independent, and an
+      increment like $W_t - W_s$ will have
+      expectation $0$, and variance $t - s$.}
+   \item[iv.]{ $W^y_t$ is normally distributed with density function
+      \[ f(x,t|y) = \frac{1}{\sqrt{2\pi t}} e^{-\frac{(x-y)^2}{2t}}.\]
+      }
+\end{enumerate}
+
+\subsubsection{Additional Properties}
+
+Before we prove the following results, let's just state them quickly:
+\begin{enumerate}
+   \item{The process $W_t$ is \textbf{nowhere differentiable}.}
+   \item{$W_t$ is not of \textbf{bounded first order variation}.}
+   \item{The function $W_t$ has \textbf{bounded quadratic
+      variation}.}
+   \item{$(dW_t)^2 = dt$.}
+\end{enumerate}
+Now we can prove these statements. Many of the properties of the Wiener
+Process, the It\={o} Integral, and Stochastic Differential Equations
+will follow from these results. So let's get to the proofs.
+
+\subsubsection{$W_t$ is Nowhere Differentiable}
+      \begin{proof}
+	 We'll want to show that
+	    \[\lim_{h \rightarrow 0} P\left( \left\lvert
+	       \frac{W_{t+h} - W_t}{h} \right\rvert \geq n \right) =1 \]
+	 which would imply $W_t$ cannot be differentiated.
+
+	 So let's rewrite, using the properties that result from the
+	 definition of the Wiener Process:
+	    \[ P\left( \left\lvert \frac{W_{t+h} - W_t}{h}
+	       \right\rvert \geq n \right) = P(|W_h| \geq n|h|) \]
+	 \begin{equation}
+	    \label{jfk}
+	     = 1 - P(|W_h| < n|h|)
+	 \end{equation}
+	 As $h$ goes to zero, the second term in Equation \ref{jfk} also
+	 goes zero, so the probability as a whole tends to unity.  To
+	 see this, assume that $h>0$ (without loss of generality) and
+	 carry out the rest of the proof:
+	 \[ 1- P(|W_h| < nh) = 1- \frac{1}{\sqrt{2\pi h}} \int^{nh}_{-nh}
+	    e^{-\frac{x^2}{2t}} dx \]
+	 With an eye towards using the Squeeze Theorem, we can set up
+	 the inequality
+	    \[   1- \frac{1}{\sqrt{2\pi h}} \int^{nh}_{-nh}
+	       e^{-\frac{x^2}{2t}} dx \geq 1 - \frac{1}{\sqrt{2\pi h}}
+	       \int^{nh}_{-nh} 1 dx \]
+	    \[ \Rightarrow  1- \frac{1}{\sqrt{2\pi h}} \int^{nh}_{-nh}
+	       e^{-\frac{x^2}{2t}} dx \geq 1 -\frac{2hn}{ \sqrt{2\pi h}}
+	       = 1 - \sqrt{\frac{2hn}{\pi}} \]
+	 and taking the limit of both sides of the inequality,
+	 \[ \lim_{h\rightarrow 0}\left[1 - P(|W_h| \leq nh) \right] \geq
+	    \lim_{h\rightarrow 0} \left[ 1-\sqrt{\frac{2hn}{\pi}}\right]
+	    = 1 \]
+	 \[ \Rightarrow \lim_{h\rightarrow 0} 1 - P(|W_h| \leq nh)
+	    \geq 1.\]
+	 \end{proof}
+
+
+\subsubsection{$W_t$ is not of Bounded First Order Variation}
+
+      \paragraph{Definition} A function $f: [0,T] \rightarrow \mathbb{R}$
+      has \textbf{bounded variation} if
+	 \[ BV(f) = \lim_{||\Delta|| \rightarrow 0}\sum_{i=1}^n|f(t_i)-
+	    f(t_{i-1})| \]
+      exists and is finite, where
+	 \[ \Delta = (t_0, t_1, \ldots , t_n = T) \]
+      is any partition of the interval $[0,T]$ and
+	 \[ || \Delta || = \max_{i = 1, \ldots, n} |t_i - t_{i-1}|. \]
+
+      \begin{proof}
+	 To prove that the function $t \mapsto W_t$ does not have bounded
+	 variation, we can compute something related instead, given that
+	 $\Delta = (t_0, \ldots, t_n)$ is a partition of $[0,T]$:
+	    \[E\left[\sum^n_{i=1} |W_{t_i} - W_{t_{i-1}}|\right] =
+	       \sum^n_{i=1} E(|W_{t_i} - W_{t_{i-1}}|) .\]
+	 For if this is not bounded, then $BV(W_t)$ is surely not
+	 bounded. So let's compute the expectation for a single time
+	 interval
+	 \[E(|W_{t_i} - W_{t_{i-1}}|) = \int^{+\infty}_{-\infty}
+	    |x| \frac{1}{\sqrt{2\pi \Delta t}} e^{-\frac{x^2}{2\Delta t}}
+	    dx \]
+	 where $\Delta t = t_i - t_{i-1}$. Using the symmetry of the
+	 normal distribution, and then changing variables by letting
+	 $u = \frac{x^2}{2\Delta t}$ and $du=\frac{x}{\Delta t}dx$,
+	 we get
+	    \[ E(|W_{t_i} - W_{t_{i-1}}|) = 2 \int^{+\infty}_{0}
+	       x\frac{1}{\sqrt{2\pi \Delta t}} e^{-\frac{x^2}{2\Delta t}}
+	       dx \]
+	    \[ = \int^{+\infty}_{0} \sqrt{\frac{2 \Delta t}{\pi}}
+	       e^{-u} du = \left[ -\sqrt{\frac{2 \Delta t}{\pi}} e^{-u}
+	       \right]^{+\infty}_{0} \]
+	    \[ = \sqrt{\frac{2}{\pi} (t_i - t_{i-1})}
+	       = c\sqrt{t_i-t_{i-1}}  \]
+	 So for the expectation, we get
+	    \[ E\left[\sum^n_{i=1} |W_{t_i} - W_{t_{i-1}}|\right]
+	       = c \sum_{i=1}^n \sqrt{t_i - t_{i-1}}.\]
+	 Recalling that $t_i = i \cdot (\frac{T}{n})$, we can simplify
+	    \[ E\left[\sum^n_{i=1} |W_{t_i} - W_{t_{i-1}}|\right]  =
+	       c \sum_{i=1}^n \sqrt{\frac{T}{n}} =cn\sqrt{\frac{T}{n}} =
+	       c\sqrt{nT}.\]
+	 Therefore,
+	    \[ \lim_{||\Delta|| \rightarrow 0} E\left[\sum^n_{i=1}
+	       |W_{t_i}-W_{t_{i-1}}|\right]=\lim_{n\rightarrow \infty}
+	       c\sqrt{nT} = \infty \]
+	 And since
+	    \[E\left[\sum^n_{i=1}|W_{t_i}-W_{t_{i-1}}|\right] \leq
+	       \sum^n_{i=1} |W_{t_{i-1}} - W_{t_i}| \]
+	 we see that $BV(W_t)$ diverges to infinity with probability 1.
+      \end{proof}
+
+\subsubsection{$W_t$ has Bounded Quadratic Variation}
+
+      I'll omit the proof because it's rather
+      straightforward to show that the following converges to 0:
+      \[ \lim_{||\Delta || \rightarrow 0} E\left[ \left(\sum_{i=1}^n
+	 \lvert W_{t_i} - W_{t_{i-1}} \rvert^2 -T\right)^2 \right]=0.\]
+
+      \paragraph{Definition} A function $f: [0,t] \rightarrow \mathbb{R}$
+      has \textbf{bounded quadratic variation} if
+	 \[ BV^2(f) = \lim_{||\Delta|| \rightarrow 0} \sum^n_{i=1}
+	    \left\lvert f(t_i) - f(t_{i-1}) \right\rvert^2 < \infty.\]
+
+      In fact, for Brownian Motion, with probability 1:
+	 \[BV^2(W_t) = T.\]
+
+
+
 
 
 \clearpage
@@ -9532,7 +9827,7 @@ extract common factors across individuals which correspond to these
 different types of intelligence.}
 
 The data $\{x_{it}\}$ are assumed to be explained by $r$ factors,
-$\{f_j\}_{j=1}^r$, plus random error. 
+$\{f_j\}_{j=1}^r$, plus random error.
 \begin{equation}
   x_{it} = \mu_i + \lambda_{i1} f_{1t} + \cdots + \lambda_{ir} f_{rt} + e_{it}
   \qquad i=1\ldots,n
@@ -9544,17 +9839,17 @@ We can write out the model more explicitly and compactly in matrix
 notation.  To do so, we stack all ovservations for a given $t$ and write
 out the distributional assumptions as:
 \begin{align}
-  \underset{(n \times 1)}{X_t} &= \underset{(n \times 1)}{\mu} + 
+  \underset{(n \times 1)}{X_t} &= \underset{(n \times 1)}{\mu} +
     \underset{(n \times r)}{\Lambda} \underset{(r \times 1)}{F_t}
-    + \underset{(n \times 1)}{e_t} 
+    + \underset{(n \times 1)}{e_t}
     \qquad\quad \text{with } F_t \perp e_t
     \notag\\
   \begin{bmatrix} x_{1t} \\ \vdots \\ x_{nt} \end{bmatrix}
     &= \begin{bmatrix} \mu_{1t} \\ \vdots \\ \mu_{rt} \end{bmatrix}+
-        \begin{bmatrix} 
+        \begin{bmatrix}
           \lambda_{11} & \cdots & \lambda_{1r} \\
           \vdots & \ddots & \vdots \\
-          \lambda_{n1} & \cdots & \lambda_{nr} 
+          \lambda_{n1} & \cdots & \lambda_{nr}
         \end{bmatrix}
       \begin{bmatrix} f_{1t} \\ \vdots \\ f_{rt} \end{bmatrix}
       +  \begin{bmatrix} e_{1t} \\ \vdots \\ e_{nt} \end{bmatrix}
@@ -9563,7 +9858,7 @@ out the distributional assumptions as:
     \begin{bmatrix} e_t \\ F_t \end{bmatrix} &\sim
     N\left(
       \begin{bmatrix} 0 \\ 0 \end{bmatrix} ,
-      \begin{bmatrix} 
+      \begin{bmatrix}
         \Psi & 0 \\
         0 & I \\
       \end{bmatrix}
@@ -9586,18 +9881,18 @@ deriving the means, variances, and covariances:
     EX_t &= \mu \\\\
   E[(X_t-EX_t)(X_t-EX_t)'] &= EX_tX_t' - (EX_t)^2\\
   &= E[(\mu+\Lambda F_t + e_t)(\mu+\Lambda F_t + e_t)'] - \mu\mu'\\
-  &= \mu\mu' + 2\mu E[F'_t]\Lambda' + 2\mu Ee_t' 
+  &= \mu\mu' + 2\mu E[F'_t]\Lambda' + 2\mu Ee_t'
     + \Lambda E[F_tF'_t] \Lambda' + E[e_te_t'] - \mu\mu'\\
   \text{By~\ref{fm}} \quad\Rightarrow\quad
     \text{Var}(X_t)
     &= \Lambda \Lambda' + \Psi \\\\
-  E[(X_t-EX_t)(F_t-EF_t)'] &= 
-    E[X_tF_t'] - (EX_t)(EF_t)' = 
+  E[(X_t-EX_t)(F_t-EF_t)'] &=
+    E[X_tF_t'] - (EX_t)(EF_t)' =
       E[(\mu+\Lambda F_t + e_t) F_t'] - \mu\cdot 0\\
     &= \Lambda E[F_tF_t'] + Ee_t\\
   \text{By~\ref{fm}} \quad\Rightarrow\quad
     \text{Cov}(X_t, F_t)
-    &= \Lambda 
+    &= \Lambda
 \end{align*}
 Putting all of this together to rewrite Distribution~\ref{fmjoint}, we
 can write
@@ -9605,7 +9900,7 @@ can write
   \begin{bmatrix} X_t \\ F_t \end{bmatrix} \sim
   N\left(
     \begin{bmatrix} \mu \\ 0 \end{bmatrix} ,
-    \begin{bmatrix} 
+    \begin{bmatrix}
       \Lambda\Lambda' + \Psi & \Lambda \\
       \Lambda' & I \\
     \end{bmatrix}
@@ -9632,12 +9927,12 @@ all iid $e_{it}\sim N(0, \sigma^2)$ (i.e.\ spherical) and uncorrelated
 across time and observations:
 \begin{align*}
   x_{it} &= f_{t} + e_{it}\qquad \text{Var}(e_{it})=\sigma^2\\
-  X_t &= \begin{bmatrix} 1 \\ \vdots \\ 1 \end{bmatrix} F_t + 
+  X_t &= \begin{bmatrix} 1 \\ \vdots \\ 1 \end{bmatrix} F_t +
     \begin{bmatrix} e_{1t} \\ \vdots \\ e_{nt} \end{bmatrix}
     \qquad \text{Cov}(e_t) = \Psi = \sigma^2 I_n
 \end{align*}
 Again, taking $\Psi$ and $\Lambda$ as known, the factor given the data
-can be written out explicitly as 
+can be written out explicitly as
 \begin{align}
   F_t = f_t &\sim N(\mu_F, \Sigma_F)\label{ex1}\\
   \mu_F &= \frac{1}{\left(1+\frac{n}{\sigma^2}\right)}
@@ -9655,9 +9950,9 @@ let recast this whole effort within the context of Bayesian regression.
 
 Recall the equation relating the factors to the observations:
 \begin{align}
-  \underset{(n \times 1)}{X_t} &= \underset{(n \times 1)}{\mu} + 
+  \underset{(n \times 1)}{X_t} &= \underset{(n \times 1)}{\mu} +
     \underset{(n \times r)}{\Lambda} \underset{(r \times 1)}{F_t}
-    + \underset{(n \times 1)}{e_t} 
+    + \underset{(n \times 1)}{e_t}
     \label{regintuition}
 \end{align}
 While we naturally want to think of $\Lambda$ as the coefficients on the
@@ -9665,9 +9960,9 @@ righthand-side factors ($F_t$) we can also flip that logic. Since we
 always take $\Lambda$ and $X_t$ as given in the derivations above, think
 instead of the factors $F_t$ as the ``coefficients'' to estimate,
 while $\Lambda$ is like the righthand side data in a typical regression
-setup. 
+setup.
 
-Then, the distributional assumptions about the factors 
+Then, the distributional assumptions about the factors
 \[
   F_t \sim N(0, I)
 \]
@@ -9694,10 +9989,10 @@ that the errors are all independent and distributed with variances
 unique to each series---i.e. $e_{it}\sim N(0, \sigma_i^2)$:
 \begin{align*}
   x_{it} &= \lambda_i f_{t} + e_{it}\qquad \text{Var}(e_{it})=\sigma_i^2\\
-  X_t &= \begin{bmatrix} \lambda_1 \\ \vdots \\ \lambda_n \end{bmatrix} 
-    F_t + 
+  X_t &= \begin{bmatrix} \lambda_1 \\ \vdots \\ \lambda_n \end{bmatrix}
+    F_t +
     \begin{bmatrix} e_{1t} \\ \vdots \\ e_{nt} \end{bmatrix}
-    \qquad \text{Cov}(e_t) = \Psi = 
+    \qquad \text{Cov}(e_t) = \Psi =
     \begin{bmatrix}
       \sigma_1 & \cdots & 0 \\
       \vdots & \ddots & \vdots \\
@@ -9705,7 +10000,7 @@ unique to each series---i.e. $e_{it}\sim N(0, \sigma_i^2)$:
     \end{bmatrix}
 \end{align*}
 Again, taking $\Psi$ and $\Lambda$ as known, the factor given the data
-can be written out explicitly as 
+can be written out explicitly as
 \begin{align}
   F_t = f_t &\sim N(\mu_F, \Sigma_F)\label{ex2}\\
   \mu_F &=
@@ -20112,9 +20407,9 @@ have the righthand side of Identity~\ref{invid}. So just use the
 Identity~\ref{invid} to exchange for the lefthand side and write out the
 main result
 \begin{equation}
-  \Rightarrow\qquad   
-  \Lambda'(\Lambda \Lambda' +\Psi)^{-1} = 
-  (I+\Lambda'\Psi^{-1}\Lambda)^{-1} \Lambda'\Psi^{-1} 
+  \Rightarrow\qquad
+  \Lambda'(\Lambda \Lambda' +\Psi)^{-1} =
+  (I+\Lambda'\Psi^{-1}\Lambda)^{-1} \Lambda'\Psi^{-1}
 \end{equation}
 So now, we only ever invert $\Psi$ or $(I+\Lambda'\Psi^{-1}\Lambda)$,
 both of which are $r\times r$ matrices.
@@ -20123,45 +20418,324 @@ both of which are $r\times r$ matrices.
 Rewriting our conditional factor distribution, we have
 \begin{align}
   F_t|X_t &\sim N\left(\mu_F, \Sigma_F\right) \notag\\
-  \mu_F &:= 
+  \mu_F &:=
     (I+\Lambda'\Psi^{-1}\Lambda)^{-1} \Lambda'\Psi^{-1} (X_t-\mu)\notag\\
-  \Sigma_F &:= 
-    I- (I+\Lambda'\Psi^{-1}\Lambda)^{-1} \Lambda'\Psi^{-1}\Lambda 
+  \Sigma_F &:=
+    I- (I+\Lambda'\Psi^{-1}\Lambda)^{-1} \Lambda'\Psi^{-1}\Lambda
     \label{halfway}
 \end{align}
-Let's simplify the variance a little more with the following identity 
+Let's simplify the variance a little more with the following identity
 \begin{align}
-  (I+P)^{-1} 
+  (I+P)^{-1}
     &= (I+P)^{-1} ( I + P - P)\notag\\
     &= (I+P)^{-1} ( I + P) - (I+P)^{-1}P\notag\\
-  \Rightarrow (I+P)^{-1} 
+  \Rightarrow (I+P)^{-1}
   &= I - (I+P)^{-1}P\label{invid2}
 \end{align}
 Now in Expression~\ref{halfway}, let's set
 $P:=\Lambda'\Psi^{-1}\Lambda$ and exchange the righthand side of
 Identity~\ref{invid2} for the lefthand side:J
 \begin{align}
-  \Sigma_F &= 
+  \Sigma_F &=
     I- (I+\Lambda'\Psi^{-1}\Lambda)^{-1} \Lambda'\Psi^{-1}\Lambda\notag\\
   &= (I+\Lambda'\Psi^{-1}\Lambda)^{-1} \Lambda'\Psi^{-1}\Lambda
   \notag
 \end{align}
-Again, this only entails the inversion of $r\times r$ matrices. 
+Again, this only entails the inversion of $r\times r$ matrices.
 
 \paragraph{Conclusion} Writing out the full result, we have now written
 the contribution of the Factors as
 \begin{align}
   F_t|X_t &\sim N\left(\mu_F, \Sigma_F\right) \notag\\
-  \mu_F &:= 
+  \mu_F &:=
     (I+\Lambda'\Psi^{-1}\Lambda)^{-1} \Lambda'\Psi^{-1} (X_t-\mu)\notag\\
-  \Sigma_F &:= 
+  \Sigma_F &:=
     (I+\Lambda'\Psi^{-1}\Lambda)^{-1} \Lambda'\Psi^{-1}\Lambda\notag
 \end{align}
-You only have to invert $r\times r$ matrices, and you can compute 
+You only have to invert $r\times r$ matrices, and you can compute
 $(I+\Lambda'\Psi^{-1}\Lambda)^{-1} \Lambda'\Psi^{-1}$ once, then use it
 for computing both $\mu_F$ and $\Sigma_F$ with one more matrix
 multiplication each.
 
+\clearpage
+\section{Measure Theoretic Probability Course Structure}
+
+\begin{enumerate}
+  \item Meausure Theory Foundation
+  \begin{enumerate}
+    \item Definition of $\sigma$-algebra and properties
+    \item Definition of a measure $\mu$ and properties:
+      finite additivity, monotonicity, subadditivity, complete
+    \item Results for measures, continuous from above and below
+    \item Different collections than $\sigma$-algebras: Monotone class,
+      Dynkin system---both weaker $\sigma$-algebra
+    \item Intersections of collections of a certain type are also
+      collections of that type. Define ``smallest''
+    \item
+      Generally, we want to prove that a property holds for all sets in
+      a $\sigma$-algebra. To do so, show the property holds in a smaller
+      set of things. Show this smaller set of things is a monotone
+      class, then apply the monotone class theorem. Or show this smaller
+      set of things is a Dynkin system and apply the $\pi-\lambda$
+      lemma.
+
+    \item
+      Defn of Borel $\sigma$-algebra $\sB(\R)=\sigma(\sI)$
+      gen from the collection of all half-open intervals
+      \begin{align*}
+        \sI := \left\{(a,b] \cap \R \; | \; -\infty\leq a < b \leq \infty\right\}
+      \end{align*}
+      Result: CDF uniquely determines meas on $(\R,\sB(\R))$.
+      Supporting results to get this:
+      \begin{enumerate}
+        \item Lemma for MCT:
+          algebra $\sA=\sigma(\sA)$
+          if and only if $\sA=\sM(\sA)$.
+          In words, algebra $\sA$ is a $\sigma$-algebra if and only if it
+          is a monotone class
+        \item MCTI: If $\sA$ is an algebra then
+          $\sM(\sA)=\sigma(\sA)$. Use principle of appropriate sets
+        \item Corollary to MCTI: $P$ and $Q$ are prob measures on
+          $\sigma(\sA)$ that agree on algebra $\sA$, then agree on
+          $\sigma(\sA)$.
+
+          To prove this, define
+          \begin{align*}
+            \sN = \{A\in \sigma(\sA)|P[A]=Q[A]\}
+          \end{align*}
+          We have the following results
+          \begin{enumerate}
+            \item $\sN$ is a monotone class.
+              Easy to see
+            \item $\sN\supset \sA$. Also clear
+          \end{enumerate}
+          Then clearly $\sN\supset \sM(\sA)$.
+          By (b), we have that $\sM(\sA)=\sigma(\sA)$, hence
+          $\sN\supset \sigma(\sA)$. Therefore, done
+
+        \item Lemma for MCTII: Dynkin system $\sD$ closed under finite
+          intersections is a $\sigma$-algebra.
+          In other words, $\sD$ closed under finite intersections
+          implies $\sD=\sigma(\sD)$.
+        \item MCTII: If $\sE$ nonempty \& closed under finite
+          intersections, $\delta(\sE)=\sigma(\sE)$.
+        \item Corollary to MCTII: Suppose $\sE$ nonempty \& closed under
+          finite intersections.
+          If $P$ and $Q$ agree on $\sE$, then they agree on $\sigma(\sE)$.
+
+          To prove this, define
+          \begin{align*}
+            \sD = \{A\in\sigma(\sE)|P[A]=Q[A]\}
+          \end{align*}
+          We have the following results
+          \begin{enumerate}
+            \item $\sD$ is a Dynkin system.
+              Property 1: Assume $\Omega\in\sigma(\sE)$ and $P$ and $Q$
+              agree there so good.
+              Property 2: Also good.
+              Property 3: Also good.
+            \item $\sD$ contains $\sE$.  Also clear.
+            %\item $\sD$ closed under finite intersections.
+              %Consider $C=B\cap A$ where $P[A]=Q[A]$ and $P[B]=Q[B]$. Then
+              %$P[A^c] = Q[A^c]$ and $P[B^c]=Q[B^c]$.
+              %Hence
+              %\begin{align*}
+                %P[A] = P[C] + P[A\setminus C]
+                %= P[C] + P[A\cap C^c]
+              %\end{align*}
+          \end{enumerate}
+          By fact that $\sE$ nonempty and closed under finite
+          intersections, (e) says $\delta(\sE)=\sigma(\sE)$.
+          By (i) and (ii), $\sD\supseteq \delta(\sE)=\sigma(\sE)$.
+          Hence $\sD\supset \sigma(\sE)$.
+          $P[A]=Q[A]$ for all $A\in\sigma(\sE)$.
+
+        %\item Lemma:
+          %Given collection $\sE$ and measures $P,Q$ defined on
+          %$\sigma(\sE)$, define collection
+          %\begin{align*}
+            %\sD=\{A\in\sigma(\sE)|P[A]=Q[A]\}
+          %\end{align*}
+          %Results:
+          %is closed under finite intersections because
+          %\begin{align*}
+            %A,B\in\sD
+            %\implies
+            %\begin{cases}
+              %A\in \sigma(\sE), \;P[A]=Q[A] \\
+              %B\in \sigma(\sE), \;P[B]=Q[B] \\
+            %\end{cases}
+          %\end{align*}
+          %is a Dynkin system that contains $\sE$, i.e.
+          %$\sD\supset\delta(\sE)\supset\sE$.
+          %Hence $\sD\supset\delta(\sE)=\sigma(\sE)$.
+        %\item
+          %If $\sP$ is closed under finite intersections,
+          %$\sL$ is a Dynkin system, and $\sP\subseteq\sL$,
+          %then we have that $\sigma(\sP)\subseteq\sL$.
+
+          %In borel case, define $\sP$ to be $(-\infty,a]$ intervals.
+          %Then definitely closed under finite intersections
+          %and $\sB(\R)=\sigma(\sP)$.
+          %Then define $\sL=\{A\in \sB(\R)|P[A]=Q[A]\}$.
+          %$\sP\subseteq\sL$ by assumption.
+          %Just need to show $\sL$ is a Dynkin system.
+
+          %Typical: WTS some property holds for all sets in $\sF$.
+          %Know collection of all sets with that property is a dynkin
+          %system. Then find a collection of sets $\sP$ such that the
+          %property holds, and show it's closed under finite intersections
+          %and generates $\sF$.
+        %\item
+          %$\sI$ is nonempty and closed under finite intersections.
+          %By (d), $\delta(\sI)=\sigma(\sI)$.
+
+    \end{enumerate}
+    We generally show some property holds on algebra $\sA$
+    to claim that it holds on $\sigma(\sA)$, i.e. use (a)-(c).
+    Or, can show some property holds for $\sE$ that is closed under
+    finite intersections, then agree on $\sigma(\sE)$.
+
+    Now, clearly set of all intervals like $(-\infty,x]$ is closed under
+    finite intersections. Hence, if prob measures agree on those sets,
+    then they agree on all sets in $\sigma$ algebra generated by that.
+    Since those intervals generate $\sB(\R)$, we have uniqueness of
+    measure.
+
+    \item
+      For non-empty index set $I$, have
+      $\R^I=\{(\omega_i)_{i\in I}|\omega_i\in\R\}$
+      i.e. the set of all functions $f:I\ra\R$.
+      Let $q_i(f)=f(i)$ be the projection of the $i$th coordinate.
+      Define product $\sigma$-algebra
+      $\sB(\R)^{\otimes I}$ as smallest $\sigma$-algebra on $\R^I$ such
+      that every $q_i$ measurable.
+      Generated by all sets of the form $\{\omega\in\R^I|\omega_i\leq a\}$
+      for $i\in I$ and $a\in\R$.
+
+      \item
+        Caratheodory and Construction of measure
+        \begin{enumerate}
+          \item
+            Definition of semiring
+          \item Lemma:
+            Given semiring, finitely additive measure is $\sigma$-additive
+            if certain condition holds.
+          \item
+            Extension thoerem: measure on a semiring $S$ can be extended to
+            a measure on $\sigma(S)$.
+            If $\mu$ is $\sigma$-finite, the extension is unique.
+            Uniqueness from above
+          \item We do this taking $S$ to be all $(a,b]$.
+        \end{enumerate}
+
+    \item Consistent family of probability measures and Kolmogorov.
+      Then unique $P$ on $(\R^I,\sB(\R)^{\otimes I})$.
+      Prove by caratheodory
+
+
+    \item
+      Definition of measurable functions.
+      Composition of measurable functions.
+
+    \item $\sigma$-algebra generated from measurable functions
+
+    \item defn of random variable as real-valued measurable function
+      Extended RV
+
+    \item Checking measurability for real-valued functions via $\{X=x\}$
+      sets.
+
+    \item Sums and products of RVs are RVs
+
+    \item Sup of extended RVs in sequence and inf of extended RVs in
+      sequence are also RVs. Hence limits of extended RVs are RVs
+  \end{enumerate}
+
+
+
+  \item Lebesgue integration
+    \begin{enumerate}
+      \item Integral definition for simple functions.
+        Integral definition for nonnegative functions.
+        Integral definition for any measurable function
+      \item Definition of integrability
+      \item Integral of sum of simple functions is sum of integral
+      \item Can approximate any function by sequence of measurable
+        functions
+      \item Poor Man's Beppo Levi MCT: We approximate $f$ with sequence
+        of simple functions, rather than general functions.
+        Proof rests on $\sigma$-additivity
+      \item Proprties like monotonicity and additivity
+      \item Beppo levi MCT: Approximate $f$ by sequence of measurable
+        functions.
+      \item Fatou's lemma, sup and inf versions
+      \item Lebesgue's DCT
+      \item Fubini and Tonelli
+      \item $L^p$ space stuff. Holder, Minkovski
+      \item Change of variables
+      \item Borel Cantelli
+      \item Equivalent measures, Radon Nikodym
+    \end{enumerate}
+
+  \item Probability theory specific things
+    \begin{enumerate}
+      \item Definition of a CDF and the properties such a function must
+        satisfy
+
+      \item
+        Often just take $(\Omega,\sF,P)=(\R,\sB(\R),P)$ and have $X$ as id
+        mapping from $\R$ to $\R$ as RV
+
+      \item Definining CDF again on $\R^n$. Get extension and unique
+        extension from caratheodory
+      \item
+        Independence and independent events, $\sigma$-algebras, familys
+        of RVs
+
+      \item Almost sure convergence, $L^p$ convergence, convergence in
+        probability, convergence in distribution
+    \end{enumerate}
+
+  \item Uniform integrability
+    \begin{enumerate}
+      \item Uniform integrability for a family of RVs, which is somewhere
+        between bounded in $L^1$ and bounded in $L^p$ for $p>1$.
+        In fact, $L^1$ bounded implies implies ui.
+        Also, RVs ui iff supremum over abs expections finite, can choose
+        domain of integration small enough to make abs integral on that
+        domain arbitrarily small.
+        Sums of UI are UI.
+      \item Generalization of DCT to probability space. Suppose sequnce of
+        RVs $\pto X$ and the family is UI. Then $X\in L^1$, expectations
+        converge to $\E[X]$, and $\E[|X_n-X|]\ra0$.
+        Better than lebesgue bc use $\pto$ rather than $\asto$.
+        Also UI weaker than dominated RVs. We need to use fact that we have
+        a probability space for this proof to work.
+      \item de la Vallee Poussin:
+        UI iff $\exists\varphi:\R\ra\R$ growing quickly with
+        $\sup_i \E[\varphi(|X_i|)]<\infty$. Can always choose $\varphi$
+        convex and nondecreasing.
+      \item Corollary to last theorem: UI iff there is a $p>1$ where
+        $\sup_i\E[|X_i|^p]<\infty$.
+    \end{enumerate}
+
+  \item Jensen
+  \item Weak LLN
+  \item Characteristic function. Can get means from it.
+    Can recover $F$ and $f$ from it, hence uniquely determines
+    distribution. Joint CF of independent RVs is product of CFs.
+    $\dto$ same as covergence of CFs.
+  \item Central limit theorem
+
+  \item Multivariate normal. Gaussian process.
+    Brownian motion
+
+  \item Conditional expectation
+  \item Martingales, stopping times, Doob, upcrossing inequality, Strong
+    LLN
+
+\end{enumerate}
 
 \clearpage
 \section{Hayashi Reference Sheet}
