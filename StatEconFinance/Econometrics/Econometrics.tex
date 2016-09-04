@@ -403,6 +403,7 @@
 \newcommand{\Lpto}{\xrightarrow{L_p}}
 \newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
 \newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+\newcommand{\range}{\operatorname{range}}
 
 % Redefine real and imaginary from fraktur to plain text
 \renewcommand{\Re}{\operatorname{Re}}
@@ -1540,16 +1541,25 @@ Let $\sE$ be a collection of subsets of $\Omega$. Then
 \begin{prop}
 \label{prop:gensigal}
 Given function $f:\Omega\ra E$ and collection $\sE$ of subsets of $E$,
-\begin{align*}
-  \sigma\left( \left\{ f^{-1}(A) \;|\; A\in\sE \right\} \right)
+\begin{align}
+  \sigma\left( \left\{ f^{-1}(A) \subseteq\Omega\;|\; A\in\sE \right\} \right)
   =
-  \left\{ f^{-1}(A) \;|\; A\in\sigma\left( \sE \right)\right\}
-\end{align*}
+  \left\{ f^{-1}(A) \subseteq\Omega\;|\; A\in\sigma\left( \sE \right)\right\}
+  \label{eq:gensigal}
+\end{align}
 So generating the $\sigma$-algebra containing $\sE$ and taking
 preimages \emph{commutes} with taking preimages and generating the
 $\sigma$-algebra.
 \end{prop}
+%\begin{proof}
+%(LHS $\subseteq$ RHS)
+%Suppose $A\in$ LHS of Expression~\ref{eq:gensigal}.
 
+%(LHS $\supseteq$ RHS)
+%Suppose $B\in$ RHS of Expression~\ref{eq:gensigal}.
+%Then $B=f^{-1}(A)\subseteq\Omega$ for some $A\in\sigma(\sE)$, implying
+%$f(B)=A\in\sigma(\sE)$.
+%\end{proof}
 
 \clearpage
 \subsubsection{Relating Types of Collections and the Monotone Class Theorems}
@@ -2995,51 +3005,55 @@ $(\R^{\N},\sB(\R)^{\otimes \N})$ such that
 for all $n\geq 1$ and for every sequence $(j_1,\ldots,j_n)\in\{0,1\}^n$.
 \end{ex}
 
+
 \clearpage
 \section{Measurable Functions}
 
+This section studies the important topic of measurable functions on a
+general measurable space $(\Omega,\sF)$.\footnote{%
+  Note that measurable functions \emph{only} require a measur\emph{able}
+  $(\Omega,\sF)$ space to be defined. We don't actually need to specify
+  a measure $\mu$ unless we want to do integration, so I'll often leave
+  it out.
+}
+These functions both constitute the class of functions with which
+we define the Lebesgue integral and retain RVs in probability theory as
+a special case.
+
+
 \subsection{General Measurable Functions}
 
-We now define the important notion of measurable functions, the class of
-functions for which we will define the Lebesgue integral. Note that they
-\emph{only} require a measurable space to be defined. We don't need a
-measure unless we want to do integration, so I'll often leave it out in
-the definitions below to work with measurable spaces (rather than
-measure spaces).
-
-
 \begin{defn}(Measurable Function)
-A function $f:(\Omega,\sF)\ra (E,\sE)$ between two measurable space
-is called a \emph{measurable function} if and only if
+Mapping $f:(\Omega,\sF)\ra (E,\sE)$ between two measurable spaces is
+called a \emph{measurable function} if and only if
 \begin{align*}
   f^{-1}(A) \in \sF \qquad \forall A\in \sE
 \end{align*}
-In words, the preimage of a measurable set of $(E,\sE)$ is always a
-measurable set of $(\Omega,\sF)$.\footnote{%
-  It shouldn't be surprising that the definition of ``nice'' functions
-  in measure theory stems from preimages (as is the case for
-  continuity), since preimages are generally nice to work with. For
-  example, $f^{-1}\left( \cup A_n \right) = \cup f^{-1}(A_n)$ and
-  $f^{-1}(A\cap B) = f^{-1}(A)\cap f^{-1}(B)$ and $f^{-1}(A^c)=
-  [f^{-1}(A)]^c$
-}
+In words, the preimage of any measurable set in the range $(E,\sE)$
+must be a measurable set in the domain $(\Omega,\sF)$.
 Measurable functions are the structure-preserving entities in Measury
 Theory, similar to isomorphisms in linear algebra or homeomorphisms in
 Topology.
-
-Mesurable functions are important for probability, since random
-variables are defined as (extended) real-valued measurable functions on
-a probability space $(\Omega,\sF,P)$, as we'll see below.
 \end{defn}
+
+\begin{rmk}
+Preimages are generally nice to work with,\footnote{%
+  For example, $f^{-1}\left( \cup A_n \right) = \cup f^{-1}(A_n)$ and
+  $f^{-1}(A\cap B) = f^{-1}(A)\cap f^{-1}(B)$ and $f^{-1}(A^c)=
+  [f^{-1}(A)]^c$
+}
+so it shouldn't be surprising that the definition of ``nice'' functions
+in measure theory hinges on preimages (just like for continuity).
+\end{rmk}
 
 \begin{ex}
 Measurability depends crucially on the $\sigma$-algebras involved. For
-example, suppose we take for the domain the measure space
-$(\Omega,2^\Omega)$, where the $\sigma$-algebra is the power set. Then
-\emph{any} function $f:(\Omega,2^\Omega)\ra (E,\sE)$ with any range
-$\sigma$-algebra $\sE$ will be measurable. However, if we restirct the
-domain $\sigma$-algebra from $2^\Omega$ to a proper subset
-$\sF \subset 2^\Omega$, this will clearly not be true in general.
+example, suppose we take $(\Omega,2^\Omega)$ as the domain measurable
+space.
+Then \emph{any} function $f:(\Omega,2^\Omega)\ra (E,\sE)$ for \emph{any}
+$(E,\sE)$ will be measurable.  However, restricting the domain
+$\sigma$-algebra from $2^\Omega$ to a proper subset $\sF \subsetneq
+2^\Omega$ generally restricts the class of measurable functions.
 \end{ex}
 
 %Suppose we have a measurable space $(\Omega,\calF)$ and a function
@@ -3059,101 +3073,88 @@ $\sF \subset 2^\Omega$, this will clearly not be true in general.
 %on where we think about partitioning based on the range, not the domain
 %(as in the Riemann approach).
 
-\begin{prop}
+\begin{prop}\emph{(Composition of Measurable Functions)}
 \label{prop:meascomp}
-Let $f:(\Omega,\sF)\ra(E,\sE)$ and $g:(E,\sE)\ra (G,\sG)$ be two
-measurable functions. Then
-\begin{align*}
-  g\circ f: (\Omega,\sF) \ra (G,\sG)
-\end{align*}
-is a measurable function.
+If  $f:(\Omega,\sF)\ra(E,\sE)$ and $g:(E,\sE)\ra (G,\sG)$ are
+measurable, composition $g\circ f: (\Omega,\sF) \ra (G,\sG)$
+is also measurable.
 \end{prop}
 
-\begin{defn}($\sigma$-algebra Generated by $f$)
-Given $f:\Omega\ra (E,\sE)$ for $\sigma$-algebra $\sE$, define
+\begin{defn}(Generated $\sigma$-algebras)
+Given $f:\Omega\ra E$ and $\sigma$-algebras $\sF$ and $\sE$ on the
+domain and range, respectively, define collections
 \begin{align*}
-  \sigma(f):=\left\{ f^{-1}(A) \; |\; A \in\sE \right\}
+  \sigma(f)&:=\left\{ f^{-1}(A)  \subseteq\Omega\; |\; A \in\sE \right\}
+  \qquad
+  %\\
+  \hat{\sigma}(f) :=
+  \left\{ A\subseteq E \; |\; f^{-1}(A)\in\sF \right\}
 \end{align*}
-which is called the \emph{$\sigma$-algebra generated by $f$}. The next
-proposition verifies this is a valid $\sigma$-algebra.
+%The next proposition verifies that these are valid $\sigma$-algebras.
 \end{defn}
 
 \begin{prop}
-Given function $f:\Omega\ra (E,\sE)$, the collection $\sigma(f)$ is a
-valid $\sigma$-algebra, and it is the smallest $\sigma$-algebra such
-that $f:(\Omega,\sigma(f))\ra (E,\sE)$ is measurable.
+Collections $\sigma(f)$ and $\hat{\sigma}(f)$ are valid
+$\sigma$-algebras. Moreover,
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item  $\sigma(f)$ is the \emph{smallest/coarsest} possible $\sigma$-algebra
+    we can have on the domain $\Omega$ if we want $f:\Omega\ra(E,\sE)$
+    to be measurable.
+  \item $\hat{\sigma}(f)$ is the \emph{largest/finest} possible
+    $\sigma$-algebra we can have on the range $E$ if we want
+    $f:(\Omega,\sF)\ra E$ to be measurable.
+\end{enumerate}
 \end{prop}
 \begin{proof}
-Since $\sE$ is a $\sigma$-algebra, we have $\sE=\sigma(\sE)$ so that
+To prove the result for (i), simply note that
 \begin{align*}
-  \left\{ f^{-1}(A) \;|\; A\in\sigma\left( \sE \right)\right\}
-  =
-  \left\{ f^{-1}(A) \;|\; A\in \sE \right\}
+  \sigma(f):=
+  \left\{ f^{-1}(A) \subseteq\Omega\;|\; A\in \sE \right\}
+  \underset{(a)}{=}
+  \left\{ f^{-1}(A) \subseteq\Omega\;|\; A\in\sigma\left( \sE \right)\right\}
+  \underset{(b)}{=}
+  \sigma\left( \left\{ f^{-1}(A) \subseteq\Omega\;|\; A\in\sE \right\} \right)
 \end{align*}
-Then by Proposition~\ref{prop:gensigal}, we get that
-\begin{align*}
-  \left\{ f^{-1}(A) \;|\; A\in \sE \right\}
-  =
-  \sigma\left( \left\{ f^{-1}(A) \;|\; A\in\sE \right\} \right)
-\end{align*}
-Since the RHS is clearly a $\sigma$-algebra, the LHS must be one as
-well. Moreover, by the definition of the generated $\sigma$-algebra
-$\sigma(\cdot)$, it is indeed the smallest one such that $f$ is
-measurable.
+Equality (a) since $\sE=\sigma(\sE)$ because $\sE$ already a
+$\sigma$-algebra.
+Equality (b) follows by Prop.~\ref{prop:gensigal}.
+And the final collection is, by construction, the smallest
+$\sigma$-algebra such that $f$ measurable.
 \end{proof}
 
-\begin{prop}
-Given function $f:(\Omega,\sF)\ra E$, the set
-\begin{align*}
-  \hat{\sigma}(f)
-  :=
-  \left\{ A\subseteq E \; |\; f^{-1}(A)\in\sF \right\}
-\end{align*}
-is the \emph{finest} $\sigma$-algebra such that
-$f:(\Omega,\sF)\ra (E,\hat{\sigma}(f))$ is measurable.
-\end{prop}
 
 \clearpage
 \subsection{%
-  (Extended) Real-Valued Measurable Functions and Random Variables
+  Real-Valued Measurable Functions (Random Variables)
 }
 
-The previous subsection defined measurable functions and properties of
-measurable functions for functions $f:(\Omega,\sF)\ra(E,\sE)$ between
-two arbitrary measurable spaces $(\Omega,\sF)$ and $(E,\sE)$. In this
-section, we restrict our attention to real-valued
-$f:(\Omega,\sF)\ra(\R,\sR(\R))$ or extended real-valued functions
-$f:(\Omega,\sF)\ra(\bar{\R},\sB(\bar{\R}))$.
-
-All results of the previous subsection hold, but we can say even more if
-we restrict our attention to this class of functions. Moreover, this
-class of functions is especially important for probability theory,
-as we see in the next two definitions, which give a special name to
-(extended) real-valued measurable functions.
+The previous subsection covered functions
+$f:(\Omega,\sF)\ra(E,\sE)$ between arbitrary measurable spaces
+$(\Omega,\sF)$ and $(E,\sE)$. Now we restrict attention to
+(extended) \emph{real-valued} $f:(\Omega,\sF)\ra(\R,\sR(\R))$.
+Obviously previous results hold, but we can say even more for this
+class of functions especially important to probability theory.
 
 \begin{defn}(Random Variable)
-A measurable function $X:(\Omega,\sF)\ra (\R,\sB(\R))$ is called a
-\emph{random variable}.
+A real-valued measurable function $X:(\Omega,\sF)\ra (\R,\sB(\R))$
+is called a \emph{random variable}.
 \end{defn}
 
 \begin{defn}(Extended Random Variable)
-A measurable function $X:(\Omega,\sF)\ra (\bar{\R},\sB(\bar{\R}))$ is
-called an \emph{extended random variable}.
+An extended real-valued measurable function $X:(\Omega,\sF)\ra
+(\bar{\R},\sB(\bar{\R}))$ is called an \emph{extended random variable}.
 \end{defn}
 
 \begin{defn}(Random Vector)
 A \emph{random vector} on a probability space $(\Omega,\sF,P)$ is a
 vector $(X_1 \; \cdots \; X_d)$ where $X_1,\ldots,X_d$ are all random
-variables. In other words, it is a measurable mapping
+variables. In other words, it is a real-valued measurable mapping
 $X:(\Omega,\sF)\ra(\R^d,\sB(\R)^{\otimes d})$.
 \end{defn}
 
-We'll have more to say about random variables and their distributions
-later. But now, we just want to prove some general results about
-(extended) random variables, a.k.a. (extended) real-valued measurable
-functions. And before doing so, we just recall the standard shorthand
-notation that will be used extensively in this subsection and in later
-subsections dealing with random variables:
+More on RVs and their distributions later. Now, we just prove general
+results about (extended) real-valued measurable functions.
+But first, standard shorthand we'll use extensively:
 \begin{align*}
   \{f\leq x\} = \{\omega\in\Omega\;|\;f(\omega)\leq x\}
   = f^{-1}\big((-\infty,x]\big)
@@ -3162,192 +3163,255 @@ and similar constructs $\{f<x\}$, $\{f=x\}$, $\{f\geq x\}$, etc.
 
 \begin{prop}
 \label{prop:measurableiff}
-\emph{(Necessary and Sufficient Condition for Measurability)}
-The real-valued function $f:(\Omega,\sF)\ra\R$ is measurable if and only
-if
-\begin{align}
-  \{f\leq x\}
-  \in \sF
-  \qquad \forall x\in\R
-  \label{measurableiff}
-\end{align}
-The same is true is for \emph{extended} real-valued functions, except
-Statement~\ref{measurableiff} must hold for any
-$x\in\bar{\R}=\R\cup\{\pm\infty\}$.
+\emph{(Necessary and Sufficient Conditions for Measurability)}
+Real-valued function $f:(\Omega,\sF)\ra(\R,\sB(\R))$ is measurable if
+and only if $\{f\leq x\}\in\sF$ for all $x\in\R$.
+And instead of test sets $\{f\leq x\}$, could equivalently use
+$\{f\geq x\}$,
+$\{f<x\}$, or
+$\{f>x\}$.\footnote{
+  Note: measurability \emph{implies} $\{f=x\}\in\sF$ $\forall x\in\R$,
+  but we cannot use tests sets of this form to \emph{check}
+  measurability since we cannot generate $\sB(\R)$ from singleton sets
+  $\{x\}$, only intervals like $(a,b]$, $(-\infty,x]$, $(-\infty,x)$, etc.
+  And the proof hinges on that.
+  Hence we only have the $\Rightarrow$ direction for sets of this form.
+}
 \end{prop}
 \begin{rmk}
-This provides a really easy and convenient way to check measurability of
-(extended) real-valued functions. Note also that we could have used
-$\{f<x\}$, $\{f\geq x\}$, or $\{f>x\}$ in the proposition instead.
+For extended real-valued
+$f:(\Omega,\sF)\ra(\bar{\R},\sB(\bar{\R}))$,
+just change $\;\forall x \in\R$ to $\;\forall x\in\bar{\R}$.
+This proposition is the easiest way to check measurability of (extended)
+real-valued functions.
 \end{rmk}
-
-\begin{cor}\emph{(Continuous Functions are Measurable)}
-Suppose that $f:(\R,\sB(\R))\ra\R$ is a continuous function. Then $f$ is
-also measurable.
-\end{cor}
 \begin{proof}
-Since $(-\infty,x)$ is an open set, by the definition of continuity, we
-know that $\{f<x\}$ will be open hence $\{f<x\}\in\sB(\R)$. Then by
-Proposition~\ref{prop:measurableiff} and the fact that we could have
-used $\{f<x\}$ instead of $\{f\leq x\}$, the function $f$ is measurable.
+We prove only for $\{f\leq x\}=f^{-1}((-\infty,x])$.
+All other cases are analogous.
+
+($\Rightarrow$)
+We know $(-\infty,x]\in\sB(\R)$.
+Because $f$ measurable, $f^{-1}((-\infty,x])\in\sF$.
+
+($\Leftarrow$)
+First, since $f^{-1}( (-\infty,x])\in\sF$ for all $x\in\R$,
+\begin{align}
+  \big\{f^{-1}\big( (-\infty,x]\big)\big\}_{x\in\R}
+  \subseteq \sF
+  \quad\implies\quad
+  \sigma\big( \big\{f^{-1}\big( (-\infty,x] \big)\big\}_{x\in\R} \big)
+  \subseteq \sigma(\sF)=\sF
+  \label{proof:measurableiff0}
+\end{align}
+Next, according to Proposition.~\ref{prop:borelalt}, $\sB(\R)$ is
+generated by exactly sets of the form $(-\infty,x]$, the elements of
+$\sI_{(-\infty,a]}$: $\sB(\R)=\sigma(\sI_{(-\infty,a]})$.
+Use this with Proposition~\ref{prop:gensigal} to get
+\begin{align}
+  \sigma\left( \left\{ f^{-1}(A) \;|\; A\in \sI_{(-\infty,a]}\right\} \right)
+  &=
+  \left\{ f^{-1}(A) \;|\;
+  A\in\sigma(\sI_{(-\infty,a]})\right\}
+  \notag
+  \\
+  \iff\quad
+  \sigma\left( \left\{ f^{-1}\big((-\infty,x]\big) \;|\; x\in\R\right\} \right)
+  &=
+  \left\{ f^{-1}(A) \;|\;
+  A\in\sB(\R)\right\}
+  \label{proof:measurableiff}
+\end{align}
+Thus Expression~\ref{proof:measurableiff} says that for any
+$A\in\sB(\R)$, we have $f^{-1}(A)\in
+\sigma( \{f^{-1}( (-\infty,x] )\}_{x\in\R} )$.
+Together with Expression~\ref{proof:measurableiff0}, that implies
+$f^{-1}(A)\in\sF$ $\forall A\in\sB(\R)$, i.e. $f$ measurable.
+\end{proof}
+
+
+\begin{prop}\emph{(Continuous Functions are Measurable)}
+\label{prop:meascont}
+Suppose that $f:(\R,\sB(\R))\ra(\R,\sB(\R))$ is a continuous function.
+Then $f$ is also measurable.
+\end{prop}
+\begin{proof}
+Since $(-\infty,x)$ is an open set, $\{f<x\}=f^{-1}((-\infty,x))$ is
+open as well by continuity. Then since $\sB(\R)$ contains all open sets,
+$\{f<x\}\in\sB(\R)$.
+Then by Proposition~\ref{prop:measurableiff} and the fact that we could
+have used $\{f<x\}$ instead of $\{f\leq x\}$, $f$ is measurable.
 \end{proof}
 
 \begin{prop}
-Given two real-valued measurable functions $f,g:(\Omega,\sF)\ra\R$,
-the following functions are also measurable:
+\label{prop:measadd}
+Given real-valued measurable functions
+$f,g:(\Omega,\sF)\ra(\R,\sB(\R))$,
+the following are also measurable:
+$f+g$, $f-g$, $f\cdot g$, and  $f/g$, provided $g(\omega)\neq 0$ for all
+$\omega\in\Omega$.
+\end{prop}
+
+\begin{cor}
+The class of measurable real-valued functions forms a vector space.
+\end{cor}
+
+\begin{proof}(Proposition~\ref{prop:measadd})
+We prove each in turn, making heavy use of
+Proposition~\ref{prop:measurableiff}.
+
+($f+g$) We will show $\{f+g>x\}\in\sF$. To motivate the proof strategy,
+suppose you give me any $\omega\in \{f+g>x\}$. Then obviously
+\begin{align*}
+  f(\omega) + g(\omega) > x
+  \quad\implies\quad
+  f(\omega) > x  - g(\omega)
+\end{align*}
+Then by the density of $\Q$ in $\R$, there then exists a $q\in \Q$ such
+that
+\begin{align}
+  f(\omega) > q > x  - g(\omega)
+  \quad\iff\quad
+  \begin{cases}
+    f(\omega) > q \\
+    g(\omega) > x  - q
+  \end{cases}
+  \label{qexists}
+\end{align}
+This suggests that we can write
+\begin{align}
+  \{f+g> x\}
+  %&=
+  %\bigcup_{q\in \Q}
+  %\{
+    %f > q,\;
+    %g > x-q
+  %\}
+  =
+  \bigcup_{q\in \Q}
+  \big[
+  \{ f > q\}
+  \cap
+  \{ g > x-q \}
+  \big]
+  \label{asunion}
+\end{align}
+To prove this claim rigorously, we will show each side of
+Equation~\ref{asunion} is a subset of the other:
+\begin{itemize}
+  \item LHS $\subseteq$ RHS:
+    Take any $\omega\in \{f+g>x\}$.  We argued above that there's
+    going to be a $q$ such that Statement~\ref{qexists} holds for
+    that arbitrary $\omega$. So the RHS of Equation~\ref{asunion} (as
+    the union over \emph{all} $q\in\Q$) will definitely find that $q$,
+    implying LHS $\subseteq$ RHS.
+
+  \item LHS $\supseteq$ RHS:
+    Given any $\omega$ in the RHS of Equation~\ref{asunion}, there's an
+    associated $q$ s.t.
+    \begin{align*}
+      \begin{rcases}
+      f(\omega) &> q \\
+      g(\omega) &> x-q
+      \end{rcases}
+      \;\iff\;
+      f(\omega) > q > x-g(\omega)
+      \;\iff\;
+      f(\omega) + g(\omega) > q + g(\omega)> x
+    \end{align*}
+    Hence $f(\omega)+g(\omega) > x$ implying LHS $\supseteq$ RHS.
+\end{itemize}
+Finally, since both $f$ and $g$ are $\sF$-measurable, sets $\{f>q\}$ and
+$\{g>x-q\}$ are in $\sF$ for any $x,q$. Therefore, each
+intersection in the above union will be in $\sF$ for fixed $x,q$, and so
+too will the countable union of those intersections be in $\sF$ over all
+$q\in\Q$. Hence $\{f+g>x\}\in\sF$.
+
+($f\cdot g$)
+We know that $f+g$ and $f-g$ measurable.
+By Proposition~\ref{prop:meascont}, continuous function $\varphi(x)=x^2$
+is measurable.
+By Proposition~\ref{prop:meascomp}, compositions of measurable
+functions are measurable. All of this implies that $f\cdot g$ is measurable
+once we write it as
+\begin{align*}
+  f\cdot g
+  =
+  \frac{1}{2}
+  \left[
+  (f+g)^2 - f^2 - g^2
+  \right]
+\end{align*}
+\end{proof}
+
+
+\begin{prop}\emph{(Sequences of Measurable Functions)}
+Given countable sequence $\{f_n\}\ninf$ of measurable, extended
+real-valued functions $f_n:(\Omega,\sF)\ra(\bar{\R},\sB(\bar{\R}))$,
+the following extended real-valued functions derived from the sequence
+are also measurable:
 \begin{enumerate}[label=\emph{(\roman*)}]
-  \item $f+g$
-  \item $f-g$
-  \item $f\cdot g$
-  \item $f/g$, provided $g(\omega)\neq 0$ for all $\omega\in\Omega$
+  \item Pointwise\footnote{
+      i.e. $\omega$-wise.
+      Pointwise sup is a function defined for each $\omega$ as
+      $g(\omega):=\sup_nf_n(\omega)$.
+      Other cases analogous.
+    }
+    $\sup_n f_n(\omega)$ and pointwise $\inf_n f_n(\omega)$
+  \item Pointwise limsup and liminf, given below
+    \begin{alignat*}{3}
+      \limsup_n f_n(\omega)
+      &= \limn \bigg(\sup_{m\geq n} f_m(\omega) \bigg)
+      &&=
+        \inf_n\bigg(\sup_{m\geq n} f_m(\omega)\bigg) \\
+      \liminf_n f_n(\omega)
+      &= \limn \bigg(\inf_{m\geq n} f_m(\omega) \bigg)
+      &&= \sup_n\bigg(\inf_{m\geq n} f_m(\omega)\bigg)
+    \end{alignat*}
+  \item Pointwise limit (if and only if exists),
+    $f(\omega) = \limn f_n(\omega)$
 \end{enumerate}
 \end{prop}
 \begin{rmk}
-Together, (i) and (ii) imply that the class of measurable real-valued
-functions forms a vector space.
+Note that the pointwise sup, inf, limsup, liminf, and limit are all
+\emph{extended} real valued functions. So the object could equal
+$\pm\infty$ for some $\omega$'s. That's allowed.
+
+Also, Parts (ii) and (iii) are \emph{really} useful for Lebesgue
+integration with measurable functions and martingale theory, where we
+work with pointwise limits all of the time.
 \end{rmk}
 \begin{proof}
-We prove each in turn
-\begin{enumerate}[label=(\roman*)]
-  \item
-    By Proposition~\ref{prop:measurableiff}, we can prove the result by
-    showing that
-    \begin{align*}
-      \{f+g> x\} \in\sF
-    \end{align*}
-    To start, suppose you give me $\omega\in \{f+g>x\}$. Then obviously
-    \begin{align*}
-      f(\omega) + g(\omega) > x
-      \quad\implies\quad
-      f(\omega) > x  - g(\omega)
-    \end{align*}
-    By the density of $\Q$ in $\R$, there then exists a $q\in \Q$ such
-    that
-    \begin{align}
-      f(\omega) > q > x  - g(\omega)
-      \quad\iff\quad
-      \begin{cases}
-        f(\omega) > q \\
-        g(\omega) > x  - q
-      \end{cases}
-      \label{qexists}
-    \end{align}
-    This suggests that we can write
-    \begin{align}
-      \{f+g> x\}
-      &=
-      \bigcup_{q\in \Q}
-      \{
-        f > q,\;
-        g > x-q
-      \}
-      \label{asunion}
-    \end{align}
-    To prove this claim rigorously, we will show each side of
-    Equation~\ref{asunion} is a subset of the other:
-    \begin{itemize}
-      \item LHS $\subseteq$ RHS:
-        Take any $\omega\in \{f+g>x\}$.  We argued above that there's
-        going to be a $q$ such that Statement~\ref{qexists} holds for
-        that $\omega$. So the RHS of Equation~\ref{asunion} (as the
-        union over \emph{all} $q\in\Q$) will definitely pick out that
-        $\omega$, implying LHS $\subseteq$ RHS.
-
-      \item LHS $\supseteq$ RHS:
-        Choose $\omega$ in the RHS of Equation~\ref{asunion}. Then
-        there's some associated $q$ such that
-        \begin{align*}
-          \begin{rcases}
-          f(\omega) &> q \\
-          g(\omega) &> x-q
-          \end{rcases}
-          \quad\implies\quad&
-          f(\omega) > q > x-g(\omega) \\
-          \quad\iff\quad&
-          f(\omega) + g(\omega) > q + g(\omega)> x
-        \end{align*}
-        Hence $f(\omega)+g(\omega) > x$ implying LHS $\supseteq$ RHS.
-    \end{itemize}
-    Okay, now we rewrite Equation~\ref{asunion}:
-    \begin{align*}
-      \{f+g> x\}
-      &=
-      \bigcup_{q\in \Q}
-      \{
-        f > q,\;
-        g > x-q
-      \} \\
-      &=
-      \bigcup_{q\in \Q}
-      \{ f > q\}
-      \cap
-      \{ g > x-q \}
-    \end{align*}
-    But since both $f$ and $g$ are $\sF$-measurable, the sets $\{f>q\}$
-    and $\{g>x-q\}$ will be in $\sF$ for any $x,q$. Therefore, each
-    intersection in the above union will be in $\sF$ for fixed $x,q$,
-    and so too will the countable union of those intersections be in
-    $\sF$ over all $q\in\Q$.
-
-  \item Trivial
-  \item Write $f\cdot g$ as
-    \begin{align*}
-      f\cdot g
-      =
-      \frac{1}{2}
-      \left[
-      (f+g)^2 - f^2 - g^2
-      \right]
-    \end{align*}
-    Proposition~\ref{prop:meascomp}, (i), and (ii) give that
-    $\varphi\circ h$ is measurable for continuous (hence measurable)
-    $\varphi(x)=x^2$ and measurable $f+g$. Invoking (i) and (ii) again,
-    we get that $f\cdot g$ is measurable.
-\end{enumerate}
-\end{proof}
-
-\begin{prop}\emph{(Pointwise Sup and Inf)}
-Given a countable sequence $\{f_n\}\ninf$ of measurable, extended
-real-valued functions $f_n:(\Omega,\sF)\ra\bar{\R}$, both the pointwise
-sup and inf
-\begin{align*}
-  g(\omega) = \sup_n f_n(\omega)
-  \qquad
-  h(\omega) = \inf_n f_n(\omega)
-\end{align*}
-are measurable extended real-valued functions.
-\end{prop}
-\begin{proof}
+(Part (i))
 Note that we can write
 \begin{align}
-  \{g \leq x \}
+  \{\sup_n f_n \leq x \}
   &= \bigcap\ninf \{f_n\leq x\}
-  \label{gintersection} \\
-  \{h \geq x \}
-  &= \bigcap\ninf \{f_n\geq x\}
-  \notag
+  \qquad\quad
+  \{\inf_n f_n \geq x \}
+  = \bigcap\ninf \{f_n\geq x\}
+  \label{gintersection}
 \end{align}
-To show that these statements are valid, we show that each side is a
-subset of the other for $g$. (The proof for $h$ is analogous.)
+To show $\sup$ statement valid ($\inf$ analogous),
+show that each side is a subset of the other.
 \begin{itemize}
-  \item LHS $\subseteq$ RHS: Take any $\omega\in\{g\leq x\}$. Then by
-    the definition of $g$ as the sup, we know that
-    $f_n(\omega)\leq g(\omega)\leq x$ for all $n$.
+  \item LHS $\subseteq$ RHS: Take any $\omega\in\{\sup_nf_n\leq x\}$.
+    Then by the definition of $f_n$ as the sup, we know that
+    $f_n(\omega)\leq \sup_n f_n(\omega)\leq x$ for all $n$.
     Hence $\omega\in \cap\ninf \{f_n \leq x\}$.
   \item LHS $\supseteq$ RHS:
     Take any $\omega\in \cap\ninf \{f_n\leq x\}$. Suppose by
     contradiction that
     \begin{align*}
-      \omega\not\in \{g\leq x\}
+      \omega\not\in \{\sup_n f_n\leq x\}
       \quad&\iff\quad
-      \omega\in \{g\leq x\}^c
+      \omega\in \{\sup_n f_n\leq x\}^c
       \quad\iff\quad
-      \omega\in \{g > x\}
+      \omega\in \{\sup_n f_n > x\}
     \end{align*}
     But then by the definition of the sup, there would exist an integer
     $m$ such that
     \begin{align*}
-      f_m(\omega)\in(x,g(\omega)]
+      f_m(\omega)\in(x,\sup_n f_n(\omega)]
       \quad\implies\quad
       f_m(\omega)>x
       \quad\implies\quad
@@ -3355,68 +3419,33 @@ subset of the other for $g$. (The proof for $h$ is analogous.)
     \end{align*}
     which is a contradiction.
 \end{itemize}
-That shows that Statement~\ref{gintersection} and its counterpart for
-$h$ are both true. Now we just have to show that $\{g\leq x\}$ is indeed
-measurable. But that's easy.  Since all of the $f_n$ are measurable,
-each term in the RHS intersection of Statement~\ref{gintersection} will
-be in $\sF$, so that the countable intersection will in $\sF$ as well.
-Hence $\{g\leq x\}$ is in in $\sF$, and same for $h$, implying $g$ and
-$h$ are measurable by Proposition~\ref{prop:measurableiff}.
+That shows that Statement~\ref{gintersection} is true.
+Now we just have to show that $\{\sup_n f_n\leq x\}$ is indeed
+measurable. Easy.  Since all of the $f_n$ are measurable,
+each term in the RHS intersection $\{f_n\leq x\}\in\sF$
+so that the countable intersection will be in $\sF$ as well.
+Hence $\{\sup_n f_n\leq x\}$ is in $\sF$, and same for
+$\{\inf_n f_n\leq x\}$, implying both measurable by
+Proposition~\ref{prop:measurableiff}.
+
+(Part (ii)) Apply Part (i) to the final expression in each equality
+chain.
+
+(Part (iii)) For those $\omega$ where the pointwise limit exists, it
+equals both the pointwise limsup and liminf, which are measurable by
+(ii).
 \end{proof}
-
-\begin{cor}\emph{(Pointwise limsup and liminf)}
-Let $\{f_n\}\ninf$ be a sequence of measurable, extended real-valued
-functions on $(\Omega,\sF)$. Then the pointwise limsup $g$ and liminf
-$h$
-\begin{alignat*}{3}
-  g(\omega) =
-  \limsup_n f_n(\omega)
-  &= \limn \bigg(\sup_{m\geq n} f_m(\omega) \bigg)
-  &&=
-    \inf_n\bigg(\sup_{m\geq n} f_m(\omega)\bigg) \\
-  h(\omega) =
-  \liminf_n f_n(\omega)
-  &= \limn \bigg(\inf_{m\geq n} f_m(\omega) \bigg)
-  &&= \sup_n\bigg(\inf_{m\geq n} f_m(\omega)\bigg)
-\end{alignat*}
-are both measurable functions.
-\end{cor}
-
-\begin{cor}\emph{(Pointwise Limit)}
-Let $\{f_n\}\ninf$ be a sequence of measurable, extended real-valued
-functions on $(\Omega,\sF)$. Then if the pointwise limit
-\begin{align*}
-  f(\omega) = \limn f_n(\omega)
-\end{align*}
-exists as an extended real-valued function (so possibly infinite at
-points), then $f$ is measurable.
-Moreover, for those $\omega\in\Omega$ such that the limit exists, we
-have
-\begin{align*}
-  \liminf_n f_n(\omega)
-  &=
-  \limsup_n f_n(\omega)
-\end{align*}
-\end{cor}
-\begin{rmk}
-This last corollary, stating that measurability is preserved under
-pointwise limits, is realy nice. Recall that continuity wasn't preserved
-under pointwise limits (only uniform convergence). This will turn out to
-be really useful in integration of measurable functions, where we work
-with pointwise limits all of the time.
-\end{rmk}
 
 
 \clearpage
 \subsection{Simple Functions}
 
-Next, we come to the topic of simple functions. Simple functions are
-(get ready for it) the simplest class of measurable functions. They are
-extremely easy to characterize, and they will be the building block of
-the Lebesgue Integral in a later section. We first define simple
+Simple functions are (get ready for it) the simplest class of measurable
+functions. They are extremely easy to characterize and will be the
+building block of the Lebesgue Integral. We first define simple
 functions, and then show you can approximate \emph{any}
 extended-real-valued function $f$ with a sequence of simple functions
-that converges pointwise to $f$.
+converging pointwise to $f$ from below.
 
 \begin{defn}(Simple Function)
 A function $f$ on measurable space $(\Omega,\sF)$ is called a
@@ -3424,33 +3453,34 @@ A function $f$ on measurable space $(\Omega,\sF)$ is called a
 \begin{equation}
   \label{simplefn}
   f(\omega) = \sum^N_{n=1} c_n \cdot \one{A_n}(\omega)
-  %\quad
-  %\text{ where } A_i = f^{-1}(c_i)
+  \quad
+  \text{ where }
+  %A_i = f^{-1}(c_i)
+  \{A_1, \ldots, A_N\}\subseteq\sF
 \end{equation}
-for $A_1, \ldots, A_N$ measurable sets in $\sF$. Simple functions
-obviously have a finite range. Without loss of generality, it can be
-assumed that the $A_n$ are pairwise disjoint.\footnote{%
+WLOG can assume the $A_n$ are pairwise disjoint,\footnote{%
   Otherwise, since $\sF$ is a $\sigma$-algebra, you can always redefine
   the simple function on pairwise disjoint sets.
 }
-Thus, $A_1,\ldots,A_N$ forms a \emph{measurable partition} of $\Omega$
-based on the range of $f$, which takes on only a finite set of values,
-$\{c_1, \ldots, c_N\}$. The case where the $A_n$ are disjoint is called
-the \emph{standard representation}, and can also be expressed as:
+which gives the \emph{standard representation}:
 \begin{align*}
   f
   %= \sum^N_{n=1} c_n \cdot \Chi_{A_n}
   = \sum^N_{n=1} c_n \cdot \one{\left\{f=c_n \right\}}
 \end{align*}
+Note that the collection of $A_n=\{f=c_n\}$ forms a \emph{measurable
+partition} of the \emph{domain} based on the finite set of values
+$\{c_1, \ldots, c_N\}\subset \bar{\R}$ in the \emph{range} that $f$
+takes on.
 \end{defn}
-\begin{rmk} Simple functions form a vector space.
-\end{rmk}
+%\begin{rmk} Simple functions form a vector space.
+%\end{rmk}
 
 \begin{thm}\emph{(Simple Function Approximation)}
 \label{lebapprox}
-Suppose that $f: \Omega\rightarrow \bar{\R}_+$ is a nonnegative
-measurable function on measurable space $(\Omega,\sF)$. Then there
-exists a sequence $\{s_n\}\ninf$ of simple functions
+Suppose $f: (\Omega,\sF)\rightarrow \bar{\R}_+$ is nonnegative and
+measurable. Then there exists a sequence $\{s_n\}\ninf$ of simple
+functions
 \begin{align*}
     0 \leq s_1 \leq s_2 \leq \cdots \leq f
     \qquad \forall \omega\in \Omega
@@ -3458,7 +3488,7 @@ exists a sequence $\{s_n\}\ninf$ of simple functions
 such that $s_n\rightarrow f$ pointwise from below.
 \end{thm}
 \begin{proof}
-We prove by successive approximation, partitioning the range.
+%We prove by successive approximation, partitioning the range.
 %In particular, we will break up the range $\bar{\R}_+=[0,\infty]$ as
 %follows:
 %\begin{figure}[htpb!]
@@ -3469,66 +3499,81 @@ We prove by successive approximation, partitioning the range.
   %\draw[color=d4black, ->] (1,0) -- (5,0);
 %\end{tikzpicture}
 %\end{figure}
-We partition the range $[0,\infty]$ and then construct our approximating
-functions as follows:
+We partition the range $[0,\infty]$ of $f$, and construct our
+approximating $\{s_n\}$ as follows:
 \begin{align*}
-      s_1 := &\; 0\cdot \one{\{f\in [0,1)\}}
+  s_1 := &\; 0\cdot \one{\{f\in [0,1)\}}
         + 1 \cdot \one{\{f\in [1,\infty]\}} \\
       s_2 :=&\; 0\cdot \one{\{f\in [0,1/2)\}}
         + \frac{1}{2} \cdot \one{\{f\in [1/2,1)\}}
         + 1 \cdot \one{\{f\in [1,3/2)\}}
           + \frac{3}{2} \cdot \one{\{f\in [3/2,2)\}}
-        + 2 \cdot \one{\{f\in [2,\infty]\}} \\
-      \vdots \quad & \qquad \vdots
+        + 2 \cdot \one{\{f\in [2,\infty]\}}
+        %\\
+      %\vdots \quad & \qquad \vdots
 \end{align*}
-So what are we doing here? Well, in the case of $s_1$, we approximate
-$f$ at each $\omega\in\Omega$ such that $f(\omega)\in [0,1)$ by
-zero---the minimum value that $f$ takes on for those $\omega$.
-Similarly, we approximate $f$ at all $\omega\in \Omega$ such that
-$f(\omega)\in [1,\infty]$ by the value one---again, the minimum value
-$f$ takes on for those $\omega$.
-
-And so we see the basic logic here. Each $s_n$ splits the range of $f$,
-$[0,\infty]$, into two parts.
-\begin{itemize}
-  \item $[0,n]$: This part is very finely divided, where each interval
-    $[k,k+1)$ for $k=0,\ldots,n-1$ is broken up into $2^{n-1}$ parts.
-    This implies a total of $n\cdot 2^{n-1}$ subintervals for
-    $[0,n]$.
-  \item $[n,\infty]$: This part is obviously coarsly divided. We just
-    take $[n,\infty]$ as the single subinterval.
-\end{itemize}
-Therefore, $s_n$ divides $[0,\infty]$ into $n\cdot 2^{n-1}+1$ total
-subintervals. Since $f$ is measurable, all of the preimages of these
-subintervals are measurable, implying $s_n$ is a well defined simple
-function for whatever values we assign to it. What are those values?
-Again, the value of $s_n$ over any one of those subintervals is set to
-be the value of $f$ at the left endpoint of that interval.
-
-And so we work out the process we saw above, first extending the finely
-approximated part of $f$'s range by one integer span with each $n$, but
-then halving the size of those fine subdivisions. We also continue to
-approximate $f$ with the minimum value, giving us
+and so on.
+These examples illustrate the process:
+\begin{enumerate}[label=(\roman*)]
+  \item \emph{Break up $\range(f)=[0,\infty]$ into subintervals}:
+    For $n=1$, only two: $[0,1)$ and $[1,\infty]$.
+    As $n\ra\infty$, split $[0,\infty]$ into finer and finer intervals.
+    Two general groups for arbitrary $n$:
+    \begin{itemize}
+      \item $[0,n)$: This part finely divided.
+        \emph{Each} length-one interval $[k-1,k)$ for $k=1,\ldots,n$
+        broken up into $2^{n-1}$ parts.
+        Implies $n\cdot 2^{n-1}$ total subintervals for $[0,n)$.
+      \item $[n,\infty]$: This part coarsly divided. We
+        just take $[n,\infty]$ as the single subinterval.
+    \end{itemize}
+  \item
+    \emph{Approximate}: $s_n(\omega)$ approximates $f(\omega)$ by the
+    minimum of the range interval that $f(\omega)$ falls into given the
+    range partition for that $n$.
+    Hence for $s_1$ with two intervals $[0,1)$ and $[1,\infty]$,
+    approximate $f(\omega)\in[0,1)$ with $s_n(\omega)=0$ and
+    $f(\omega')\in[1,\infty]$ with $s_n(\omega')=1$
+    With finer and finer partitions of the range,
+    $s_n(\omega)\ra f(\omega)$.
+\end{enumerate}
+The above examples $s_1,s_2$ can be generalized by the described process
+to arbitrary $s_n$:
 \begin{align}
-  s_n = \left(
-  \sum^{n\cdot 2^{n-1}}_{k=0}\frac{k}{2^{n}}
+  s_n = \left[
+  \sum^{n\cdot 2^{n-1}}_{k=1}
+  \left(
+  \frac{k-1}{2^{n-1}}
+  \right)
   \one{%
     \left\{
-      f\in \left[\frac{k}{2^{n}}, \; \frac{k+1}{2^{n}}\right)
+      f\in \left[\frac{k-1}{2^{n-1}}, \; \frac{k}{2^{n-1}}\right)
     \right\}
   }
-  \right)
+  \right]
   + n \cdot \one{\{f\geq n\}}
   \qquad n=1,2,\ldots
   \label{simpleapprox}
 \end{align}
-Now it's clear that $s_n$ approaches $f$ from below, since with each
-$s_n$, we're taking the \emph{smallest possible} approximation of $f$.
-So we can never have $s_n>f$ for any $f$. It's also clear that $s_n\leq
-s_m$ for $m>n$ for the same reasons that a finer partition can only
-increase the value of of the approximation at an $\omega\in\Omega$.
+First, for arbitrary $n$, function $s_n$ takes on only a finite set of
+values. Moreover, since $f$ measurable, all of the
+preimage sets that partition the domain---$\left\{
+  f\in \left[\frac{k-1}{2^{n-1}}, \; \frac{k}{2^{n-1}}\right)
+\right\}$
+and $\{f\geq n\}$---are indeed measurable. Hence $s_n$ is a well-defined
+simple function.
 
-Finally, we just wish to show that we, in fact, do have
+Next, it's clear that $s_n$ approaches $f$ from below, since each for we
+approximate $f(\omega)$ with the left endpoint (i.e. the
+\emph{smallest possible} value) of the range subinterval that
+$f(\omega)$ falls in.
+It's also clear that
+$s_n\leq s_m$ for $m>n$ for the same reasons that a finer partition in
+this sequence can only increase the value of $s_m(\omega)$ relative to
+$s_n(\omega)$.
+
+
+Finally, we just wish to show pointwise converge
 $s_n(\omega)\rightarrow f(\omega)$ for all $\omega\in \Omega$. Let's
 take it case by case.
 \begin{enumerate}[label=(\roman*)]
@@ -3541,23 +3586,27 @@ take it case by case.
       = \lim_{n\rightarrow\infty} n = \infty = f(\omega)
     \end{align*}
   \item Next, suppose that $f(\omega) = 0$. Then
-    $\omega\in \big\{f \in [0,1/2^{n-1})\big\}$ for all $n$, so
+    $\omega\in \left\{f \in \left[0,\frac{1}{2^{n-1}}\right)\right\}$
+    for all $n$, so
     \begin{align*}
       \lim_{n\rightarrow\infty} s_n(\omega)
       = \lim_{n\rightarrow\infty}
-      \frac{0}{2^{n-1}}\cdot\one{\{f\in[0,1/2^{n-1}]\}} =
+      \frac{0}{2^{n-1}}\cdot\one{f \in \left[0,\frac{1}{2^{n-1}}\right)} =
       \lim_{n\rightarrow\infty} 0 = 0 = f(\omega)
     \end{align*}
-  \item Finally, suppose $f(\omega)\in(0,\infty)$. Then, $N>f(\omega)$
-    for some $N$. That implies
+  \item Finally, suppose $f(\omega)\in(0,\infty)$. Then, $M>f(\omega)$
+    for some $M$. That implies that $f(\omega)$ falls into one of the
+    first $n\cdot 2^{n-1}$ subintervals (not the last $[n,\infty]$
+    subinterval) for all approximations $s_n$ with $n\geq M$. So let's
+    look at approximation $s_M$. We then have
     \begin{align*}
-      f(\omega) \in \left[\frac{k}{2^{N-1}}, \frac{k+1}{2^{N-1}}\right)
+      f(\omega) \in \left[\frac{k-1}{2^{M-1}}, \frac{k}{2^{M-1}}\right)
           \qquad
-      \text{for some $k\in\{0,1,\ldots,N\cdot 2^{N-1}\}$}
+      \text{for some $k\in\{1,\ldots,M\cdot 2^{M-1}\}$}
     \end{align*}
     This, in turn, implies that
     \begin{align*}
-      f(\omega) - s_N \leq \frac{1}{2^{N-1}}
+      f(\omega) - s_M \leq \frac{1}{2^{M-1}}
       \quad \Rightarrow\quad
       \lim_{n\rightarrow\infty}  s_n  =
       f(\omega)
@@ -3573,29 +3622,30 @@ Equation~\ref{simpleapprox}, we have $s_n\ra f$ pointwise.
 \subsection{Intuition}
 
 What we did in the proof of Theorem \ref{lebapprox} is the \emph{key} to
-our general theory of integration.  And it all has to do with how we
+our general theory of integration. And it all has to do with how we
 partitioned the domain $\Omega$.
 
 Namely, we partitioned $\Omega$ in almost
-\emph{the complete opposite way} compared to what we did for Riemann
-Integrals. Instead of imposing that our partitions of $\Omega$ will be
-intervals, we partitioned $\Omega$ by what the points $\omega\in \Omega$
-\emph{get mapped to} by $f$. The sets of this partition could be
-crazy---things way more complicated that an interval
-$[\omega_{i-1}, \omega_i]$, because the $\omega\in f^{-1}([a,b))$ don't even
-have to be near each other.  And that's key.
+\emph{the complete opposite way} compared to what we do for Riemann
+Integrals. Instead of imposing \emph{interval partitions of the domain}
+$\Omega$, we break up the domain $\Omega$ based on
+\emph{preimages of sets/intervals on the range}, i.e. based on what the
+$\omega\in \Omega$ \emph{get mapped to} by $f$. The sets of this
+partition could be crazy---things way more complicated that an interval
+$[\omega_{i-1}, \omega_i]$, because the $\omega\in f^{-1}([a,b))$ don't
+even have to be near each other. And that's key.
 
 So instead of starting with a partition of $\Omega$ into intervals and
 studying how a function $f$ behaves on those intervals, we look at the
 range of values $f$ can take, then pull it back to $\Omega$.
 
 \paragraph{Metaphor}
-A wise man, Sam Kapon, in quoting Lebesgue himself, described the
-situation in the following way. Your coffee is rung up for \$1.74.
+Here's one classic way to describe the situation.
+Your coffee is rung up for \$1.74.
 Riemann starts taking successive coins out of his pocket one by one
 until he has enough to pay. He does so blindly, without any reference to
-their value (their $f(\omega)$) and to the fact that one coin could represent
-different amounts.
+their value (their $f(\omega)$) and to the fact that one coin could
+represent different amounts.
 
 On the other hand, Mr. Lebesgue first takes all of the coins out of his
 pocket and surveys their value (their $f(\omega)$) before putting down a
@@ -3635,102 +3685,91 @@ respect to $\mu$ as
 \begin{equation}
     \int_\Omega s \; d\mu
     =
-    \int_\Omega \sumnN c_n \Chi_{A_n} \; d\mu
+    \int_\Omega \sumnN c_n \one{A_n} \; d\mu
     := \sumnN c_n \; \mu(A_n)
+    %\quad\text{where}\;
+    %A_n = \{s=c_n\}
 \end{equation}
-where, as in our definition of a simple function,  $A_n = s^{-1}(c_n)$.
+%where, as in our definition of a simple function,  $A_n = s^{-1}(c_n)$.
 \end{defn}
 \begin{rmk}
-I also want to mention that this definition of the integral does,
-indeed, make a lot sense. We see that this definition prescribes that we
-average $s$ over $\Omega$.  It says simply to weight the values of the
-function by, effectively, how many points of the domain map there (i.e.
-``the measure of their preimage'').This is similar to what we did for
-the Riemann integral, only now, our $A_n$ partitioning the domain can be
-more arbitrary measurable sets, rather than more restrictive intervals.
+This definition does, indeed, make sense.
+It says to average $s$ over $\Omega$, simply weighting the values of the
+function by how many points of the domain map there (i.e.\ the ``measure
+of their preimage''). This is similar to the Riemann integral, only now,
+our $A_n$ sets partitioning the domain can be arbitrary measurable sets,
+rather than (restrictive) intervals.
 \end{rmk}
 
 \begin{defn}(Integral of Nonnegative Measurable Function)
-Consider the measure space $(\Omega,\sF,\mu)$, and let $f\geq0$ be a
-nonnegative, measurable, extended-real-valued function
-$f:\Omega\ra\bar{\R}$. Then define
+Given nonnegative $f\geq0$, measurable, extended-real-valued function
+$f:\Omega\ra\bar{\R}$ on measure space $(\Omega,\sF,\mu)$, define
 \begin{align*}
-    \int_\Omega f \; d\mu := \sup_{0\leq s\leq f} \int_\Omega s \; d\mu
+    \int_\Omega f \; d\mu :=
+    = \sup \left\{
+      \int s\; d\mu \;|\; \text{$s$ simple with $0\leq s\leq f$}
+    \right\}
 \end{align*}
-where $s$ is any such simple function between zero and $f$, and the
-rightand side integral is defined as in Definition~\ref{simpleint}. Note
-that the integral is \emph{only} defined for measurable functions.
+In words, for any simple function $s$ such that $0\leq s\leq f$, compute
+the value of its integral according to Definition~\ref{simpleint}.
+The value we assign to $\int_\Omega f\;d\mu$ is then the supremum over
+all these simple-function integral \emph{values}.
+Note that the integral is \emph{only} defined for measurable $f$.
 \end{defn}
 
-\begin{defn}(Integral of Arbitrary Measurable Function)
-Consider the measure space $(\Omega,\sF,\mu)$, and let $f$ be an
-arbitrary measurable, extended real valued function. Define
+
+\begin{defn}(Positive and Negative Parts of $f$)
+\label{lebint}
+Given arbitrary measurable, extended real-valued function $f$, define
+the positive and negative parts of the function as
 \begin{align*}
-    f_+(\omega) := \max\{f(\omega), 0\}
+    f_+(\omega)
+    := f(\omega) \vee 0
+    = \max\{f(\omega), 0\}
     \qquad
-    f_-(\omega) := -\min\{f(\omega), 0\}
+    f_-(\omega)
+    := - \big(f(\omega) \wedge 0\big)
+    = -\min\{f(\omega), 0\}
 \end{align*}
-where the max and min are both pointwise.
-Because both $f$ and $0$ are measurable, these functions that equal the
-pointwise max and min will \emph{also} be measurable. Thus $f_+$ and
-$f_-$ are measurable. Also note, by our definition,
+where the max and min are both pointwise ($\omega$-wise).
+Because both $f$ and the zero function $0$ are measurable,
+$f_+$ and $f_-$ as the pointwise max and min will \emph{also} be
+measurable. Moreover,
 \begin{itemize}
   \item $f = (f_+) - (f_-)$ and $|f| = (f_+) + (f_-)$
   \item $f_+$ and $f_-$ will be non-negative \emph{everywhere}.
 \end{itemize}
-This allows us to define the integral for arbitrary measurable function
-$f$ as
+\end{defn}
+
+\begin{defn}(Integral of Arbitrary Measurable Function)
+\label{lebintarb}
+Given measure space $(\Omega,\sF,\mu)$, let
+$f:\Omega\ra\bar{\R}$ be an arbitrary measurable, extended real valued
+function.
+Since $f_+$ and $f_-$ nonnegative, can use
+Definition~\ref{lebint} to define the integral of $f$ as
 \begin{align*}
   \int_\Omega f\; d\mu := \int_\Omega f_+ \; d\mu - \int_\Omega f_- \; d\mu
 \end{align*}
-provided that at least one of the integrals on the RHS is
-finite---otherwise the integral is undefined.
+This is defined if and only if
+$\int_\Omega f_+ \; d\mu<\infty$ or $\int_\Omega f_- \; d\mu<\infty$
+(or both).
+Note that the value of the integral can still be $\pm\infty$.
+We just don't assign a value in the undefined case of $\infty-\infty$.
 \end{defn}
-
-\begin{defn}(The Space of Integrable Functions)
-We say that measurable function $f$ is \emph{integrable}
-on $\Omega$ with respect to $\mu$, denoted
-$f\in\mathscr{L}(\Omega,\sF,\mu)$, if
-\begin{align*}
-  \int_\Omega |f| \; d\mu < \infty
-  \quad\iff\quad
-  \text{both} \;
-  \begin{cases}
-    \int_\Omega f_+ \; d\mu < \infty \\
-    \int_\Omega f_- \; d\mu < \infty
-  \end{cases}
-\end{align*}
-\end{defn}
-
-\begin{thm}
-$f\in\mathscr{L}(X,\mathscr{M},\mu)$ if and only if $|f|\in\mathscr{L}(X,\mathscr{M},\mu)$.
-\end{thm}
-\begin{note}
-This is an important theorem, since it means we that we can prove a function $f$ is in $\mathscr{L}(X,\mathscr{M},\mu)$ just by proving that $|f|$ is, which is often \emph{much}, much easier to work with since it is non-negative, allowing us to work with our integration primitive: simple functions. So we can approximate arbitrary integrals of $|f|$ with integrals of simple functions, then assert that integrability (or non-integrability) of $|f|$ holds for $f$ too.
-\end{note}
-\begin{proof}
-($\Rightarrow$ Direction) Suppose that $f\in\mathscr{L}(X,\mathscr{M},\mu)$. Then $f_-, f_+\in\mathscr{L}(X,\mathscr{M},\mu)$. Since $|f|=f_+ + f_-$, we can conlcude that $|f|\in\mathscr{L}(X,\mathscr{M},\mu)$ as well.
-\\
-\\
-($\Leftarrow$ Direction) Suppose that $|f|\in\mathscr{L}(X,\mathscr{M},\mu)$. Then we know from the fact $|f|=f_+ + f_-$ and from monotonicity that
-\[
-    f_-, f_+ \leq |f| \qquad \Rightarrow
-    \qquad
-    \int_X f_- \; d\mu \leq \int_X f \; d\mu <\infty\qquad
-    \int_X f_+ \; d\mu \leq \int_X f \; d\mu <\infty
-\]
-which implies that $f_-, f_+\in\mathscr{L}(X,\mathscr{M},\mu)$, so that $f\in\mathscr{L}(X,\mathscr{M},\mu)$.
-\end{proof}
 
 \begin{defn}(Integral over Part of the Domain)
-For measurable set $A\subseteq \Omega$, define
+Given measurable function $f$ and measurable subset $A\in\sF$, define
+the integral of $f$ over $A\subseteq\Omega $ with respect to measure
+$\mu$ as
 \begin{align*}
   \int_{A} f\; d\mu
   :=
-  \int_{\Omega} f\cdot\Chi_A\; d\mu
+  \int_{\Omega} f\cdot\one{A}\; d\mu
 \end{align*}
 \end{defn}
 
+\clearpage
 \begin{ex}
 Next, suppose that we have the measure space
 $(\mathbb{N},2^\mathbb{N}, \mu)$, where $\mu$ is the counting
@@ -3840,337 +3879,531 @@ the counting measure, then $f$ is integrable if and only if
 $\sum^\infty_{n=1}|f(n)|<\infty$, as $|f| = f_+ + f_-$.
 \end{ex}
 
+
 \clearpage
-\subsection{Properties of the Integral}
+\subsection{Space of Integrable Functions $\sL(\Omega,\sF,\mu)$ and
+Properties}
 
-\begin{thm}\emph{(Homogoneity)}
-Given measurable function $f$,
+\begin{defn}(The Space of Integrable Functions)
+\label{defn:lebintegrability}
+We say that measurable function $f$ is \emph{integrable}
+on $\Omega$ with respect to $\mu$, denoted
+$f\in\mathscr{L}(\Omega,\sF,\mu)$, if
 \begin{align*}
-  f\in\mathscr{L}(\Omega,\sF,\mu)
+  \int_\Omega f \; d\mu
+  < \infty
   \quad\iff\quad
-  cf\in\mathscr{L}(\Omega,\sF,\mu)
-  \qquad\forall c\in\mathbb{R}
+  \text{both} \;
+  \begin{cases}
+    \int_\Omega f_+ \; d\mu < \infty \\
+    \int_\Omega f_- \; d\mu < \infty
+  \end{cases}
 \end{align*}
-Moreover,
-\begin{align*}
-  \int_\Omega cf\;d\mu = c\int_\Omega f\;d\mu
-\end{align*}
+Note that by Definition~\ref{lebintarb}, $\int_\Omega f\;d\mu$ might
+equal $\pm\infty$. In that case, the value of the integral
+$\int_\Omega f\;d\mu$ exists and is well-defined. \emph{However},
+$f\not\in \sL(\Omega,\sF,\mu)$---$f$ is not integrable.
+The notion of ``integrability'' is reserved only for functions with
+\emph{finite} integral value.
+\end{defn}
+
+\begin{thm}
+\label{thm:fintiff}
+$f\in\mathscr{L}(\Omega,\sF,\mu)$ if and only if
+$|f|\in\mathscr{L}(\Omega,\sF,\mu)$.
 \end{thm}
+\begin{note}
+This is an important theorem, since it is often easier to check whether
+$|f|\in\sL(\Omega,\sF,\mu)$, rather than plain $f$, since $|f|$ is
+non-negative, allowing us to work with our integration primitive: simple
+functions. So we can approximate arbitrary integrals of $|f|$ with
+integrals of simple functions, then assert that integrability (or
+non-integrability) of $|f|$ holds for $f$ too.
+\end{note}
 \begin{proof}
-If $s$ is a simple function, then $cs$ is also a simple function. And so
-we can write that $\int_\Omega cf \; d\mu = c\int_\Omega f \; d\mu$.
+Since $|f|=f_+ + f_-$, write out the integral of $|f|$:
+\begin{align}
+  \int_\Omega |f|\; d\mu
+  = \int_\Omega (f_+ + f_-) \; d\mu
+  = \int_\Omega f_+ \; d\mu + \int_\Omega  f_- \; d\mu
+  \label{lebiff}
+\end{align}
+Note that I just used linearity of the integral to break things up.
+That's technically not allowed since we haven't proved this linearity
+property yet. But we will (in a way that does not use/reference this
+theorem), so just use it.
+
+($\Rightarrow$) Suppose $f\in\mathscr{L}(\Omega,\sF,\mu)$.
+Definition~\ref{defn:lebintegrability} then
+says both $\int_\Omega f_+ \; d\mu$ and $\int_\Omega  f_- \; d\mu$,
+are finite, hence their sum is finite,
+hence $\int_\Omega |f|\;d\mu$ is finite by Expression~\ref{lebiff}, and
+we're done.
+
+($\Leftarrow$) Suppose that $|f|\in\mathscr{L}(\Omega,\sF,\mu)$. Then by
+Expression~\ref{lebiff}, it's clear that both $\int_\Omega f_+ \; d\mu$
+and $\int_\Omega  f_- \; d\mu$ are finite, otherwise the integral of
+$|f|$ would not have been defined or finite. Hence
+$f\in\sL(\Omega,\sF,\mu)$ by Definition~\ref{defn:lebintegrability}.
+%we know from the fact $|f|=f_+ + f_-$ and from monotonicity that
+%\begin{align*}
+  %f_-, f_+ \leq |f| \qquad \Rightarrow
+  %\qquad
+  %\int_\Omega f_- \; d\mu \leq \int_\Omega f \; d\mu <\infty\qquad
+  %\int_\Omega f_+ \; d\mu \leq \int_\Omega f \; d\mu <\infty
+%\end{align*}
+%which implies that $f_-, f_+\in\mathscr{L}(X,\sF,\mu)$, so that
+%$f\in\mathscr{L}(X,\sF,\mu)$.
 \end{proof}
 
 \begin{prop}
-Given measurable function $f\in\mathscr{L}(\Omega,\sF,\mu)$
-\begin{align*}
-  \int_\Omega |f| \; d\mu = 0
-  \quad\iff\quad
-  \mu[f\neq 0] = 0
-\end{align*}
+\emph{(Finite Measure $\implies$ All Bounded, Measurable Functions
+Integrable)}
+Given finite measure $\mu(\Omega)<\infty$ on
+$(\Omega,\sF)$, $f\in \sL(\Omega,\sF,\mu)$ for any \emph{bounded}
+measurable $f$.
 \end{prop}
-%\begin{proof}
-%If $f=0$ $\mu$-a.e., then it must be that $f_-$ and $f_+$ equal 0
-%$\mu$-a.e. In that case, by monotonicity and non-negativity of $f_-$ and
-%$f_+$,
-%\begin{align*}
-    %0 \leq f_- \leq 0
-    %\quad \Rightarrow \quad
-    %0 \leq \int f_- \leq 0  \\
-    %0 \leq f_+ \leq 0
-    %\quad \Rightarrow \quad
-    %0 \leq \int f_+ \leq 0
-%\end{align*}
-%\end{proof}
-%\begin{thm}
-%Suppose $f$ is a measurable, nonnegative function. Then
-%\begin{align*}
-  %\int_\Omega f \; d\mu = 0 \quad \implies\quad
-  %f = 0 \text{ $\mu$-a.e.}
-%\end{align*}
-%\end{thm}
 \begin{proof}
-Choose a sequence of simple functions $\{s_n\}$ that converge to $f$
-from below such that
+$f$ bounded means $\exists M$ such that $|f|\leq M$.
+By monotonicity (proved in Prop.~\ref{prop:intprop})
 \begin{align*}
-  0 \leq s_n \leq f
-  \quad\Rightarrow\quad
-  0 \leq \int_\Omega s_n \leq \int_\Omega f = 0
+  0 \leq \int_\Omega |f|\;d\mu \leq \int_\Omega M \; d\mu
+  = M\mu(\Omega)<\infty
 \end{align*}
-That implies
-\begin{align*}
-  \mu\left(\{s_n > 0 \}\right) = 0
-  \qquad \forall n
-\end{align*}
-otherwise an approximation of the integral by a simple function would be
-positive, implying $\int f$ is positive. So then we can write
-\begin{align*}
-  \{f>0\} =
-  \bigcup^\infty_{n=1} \{s_n>0\}
-\end{align*}
-Then, by countable additivity
-\begin{align*}
-    \mu\left(\{f>0 \} \right)=
-    \mu\left(\bigcup^\infty_{n=1} \{ s_n>0 \}
-    \right) = 0
-\end{align*}
+Therefore, $|f|\in\sL(\Omega,\sF,\mu)$, which implies that
+$f\in\sL(\Omega,\sF,\mu)$ by Theorem~\ref{thm:fintiff}.
 \end{proof}
 
-
 \begin{prop}
-Given $f,g\in\mathscr{L}(\Omega,\mathscr{F},\mu)$
-\begin{enumerate}
-  \item $\mu[f\neq g] = 0$
-    implies
+\emph{(Trivial Measure $\mu(\Omega)=0\implies$ All Measurable Functions
+Integrable)}
+If $\mu(\Omega)=0$, \emph{any} measurable
+$f: \Omega\rightarrow\bar{\mathbb{R}}$ is integrable with
+$\int_\Omega f \; d\mu=0$, even if $f=\infty$ on $\Omega$.
+\end{prop}
+\begin{proof}
+All simple $0\leq s\leq f$ integrate to zero, so sup also zero.
+\end{proof}
+
+\clearpage
+\begin{prop}\emph{(Properties of the Integral)}
+\label{prop:intprop}
+Given measurable functions $f,g\in\sL(\Omega,\sF,\mu)$,
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item \emph{(Monotonicity)}:
+    If $f\leq g$, then $\int_\Omega f \; d\mu \leq \int_\Omega g \;d\mu$.
+    This property is used very often.
+  \item \emph{(Homogeneity)}:
+    For any $c\in\R$, $cf\in\mathscr{L}(\Omega,\sF,\mu)$, in which case
+    $\int_\Omega cf\;d\mu = c\int_\Omega f\;d\mu$
+  \item
+    $\left\lvert \int_\Omega f \; d\mu\right\rvert \leq
+    \int_\Omega \left\lvert f \right\rvert \; d\mu$
+  \item
+    $\int_\Omega |f| \; d\mu = 0$ if and only if $\mu[f\neq 0] = 0$
+  \item $\mu[f\neq g] = 0$ implies
     $\int_\Omega f \; d\mu = \int_\Omega g \; d\mu$
   \item $\mu[f > g] = 0$ implies
     $\int_\Omega f \; d\mu \leq \int_\Omega g \; d\mu$
+  \item \emph{(Chebyshev's Inequality\footnote{%
+      Proof deferred to later and given in context of random variables
+      and probability.
+    })}
+    For any $t>0$,
+    $\mu\big[|f|\geq t\big] \leq \frac{1}{t}\int_{\Omega} |f|\; d\mu$
 \end{enumerate}
 \end{prop}
 
-\begin{prop}\emph{(Monoticity)}
-Given $f,g\in\mathscr{L}(\Omega,\mathscr{F},\mu)$
-\begin{align*}
-  f \leq g
-  \quad\implies\quad
-  \int_\Omega f \; d\mu \leq \int_\Omega f \; d\mu
-\end{align*}
-\end{prop}
-\begin{proof}
-Suppose that $f,g$ nonnegative.
-Since $f\leq g$, given any simple function $s$, we have
-\begin{align*}
-  0\leq s\leq f
-  \quad\implies\quad
-  0\leq s\leq g
-\end{align*}
-Therefore, it's obvious that
-\begin{align*}
-  \int_\Omega g \; d\mu \leq
-  \int_\Omega f \; d\mu
-\end{align*}
-For general $f\leq g$, we have $f_+ \leq g_+$ and $f_- \geq g_-$ which
-implies that
-\begin{align*}
-  \int_\Omega f_+ \; d\mu \leq
-  \int_\Omega g_+ \; d\mu
-  \qquad\qquad
-  -\int_\Omega f_- \; d\mu \leq
-  -\int_\Omega g_- \; d\mu
-\end{align*}
-Taken together, the desired result follows.
-\end{proof}
-
-
-\begin{prop}
-If $f$ is measurable and bounded, and if $\mu(\Omega)<\infty$, then
-$f\in\mathscr{L}(\Omega,\mathscr{M},\mu)$.
-\end{prop}
-
-\begin{prop}
-If $\mu(\Omega)=0$, then \emph{any} measurable function $f:
-\Omega\rightarrow\bar{\mathbb{R}}$ will be integrable with $\int_\Omega
-f \; d\mu=0$, even if $f=\infty$ on $\Omega$.
-\end{prop}
-\begin{proof}
-Note that all simple functions will integrate to zero, so that the sup
-over simple functions will be zero as well.
-\end{proof}
-
-
-\begin{cor} If we have $f\in\mathscr{L}(\Omega,\sF,\mu)$, then
-\begin{align*}
-  \left\lvert \int_\Omega f \; d\mu\right\rvert \leq
-  \int_\Omega \left\lvert f \right\rvert \; d\mu
-\end{align*}
-\end{cor}
-\begin{proof}
-Since $f\in\mathscr{L}(\Omega,\sF,\mu)$, we know from the previous
-theorem that $|f|\in\mathscr{L}(\Omega,\sF,\mu)$. Then it's clear that
-\begin{align*}
-  \left\lvert \int_\Omega f \; d\mu\right\rvert
-  = c \int_\Omega f \; d\mu\qquad\text{where $c=1$ or $c=-1$}
-\end{align*}
-Then, since $cf\leq |f|$, we can say that
-\begin{align*}
-  \left\lvert \int_\Omega f \; d\mu\right\rvert
-  = c \int_\Omega f \; d\mu
-  = \int_\Omega c f \; d\mu \leq
-    \int_\Omega |f| \; d\mu
-\end{align*}
-\end{proof}
-
-\begin{thm}
-Suppose $f\in\mathscr{L}(\Omega,\sF,\mu)$. Then for any $t>0$,
-\begin{align*}
-  \mu\big[\{|f|\geq t\}\big] \leq \frac{1}{t}\int_{\Omega} |f|\; d\mu
-\end{align*}
-\end{thm}
-
 \begin{rmk}
-You may have noticed that we didn't include the usual linearity
-property. We will have this as a consequence of pillar convergence
-theorems, but it turns out to be tougher for the more general integral
-we've developed. We need to do the hard work in the next subsections to
-establish this property.
+Notice that we didn't include the usual linearity property. It turns
+out to be tougher to prove for this more general integral.
+We first need to do the hard work in the next subsections.
+Then we derive linearity as a corollary to the pillar convergence
+theorems.
 \end{rmk}
 
-\subsection{Pillar Convergence Theorems}
-
-We defined the integral of nonnegative measurable function $f$ as the
-supremum over integrals of simple functions bounded above by $f$. But
-we know that we can always approximate any measurable $f$ by a sequence
-of simple functions $s_n \uparrow f$ converging from below. One might
-then reasonably think of approximating the integral of $f$ by
-$\limn \int_\Omega s_n \;d\mu$. In other words, we might reasonably
-think you could exchange the limit so that the integral of a limit
-$\int_\Omega \limn s_n=\int_\Omega f \;d\mu$ is a limit of integrals
-$\limn \int_\Omega s_n \;d\mu$. This subsection establishes that result
-and, more generally, the conditions under which we can exchange limits
-and the integral.
-
-
-\begin{lem}
-Suppose that $f$ is a nonnegative measurable function and $s$ is a
-simple function such that $0\leq s\leq f$. If $\{f_n\}\ninf$ is a
-sequence of simple functions converging pointwise to $f$ from below,
-then
-\begin{align*}
-  \limn \int_\Omega f_n\;d\mu \geq \int_\Omega s \; d\mu
-\end{align*}
-\end{lem}
 \begin{proof}
-Since $s$ and the $f_n$ are simple functions, we will write them as
-\begin{align*}
-  s = \sumim x_{s,i} \cdot \Chi_{\left\{ s=x_{s,i}\right\}}
-  \qquad
-  f_n = \sum_{i=1}^{k_n} x_{n,i} \cdot
-  \Chi_{\left\{ f_n = x_{n,i} \right\}}
-\end{align*}
-We will split up the evaluation of the integral of $s$ into two cases.
-\\
-\\
-(\emph{Case 1})
-First, assume that
-$\mu[\left\{ s=x_{s,i}\right\}]=\infty$
-%$\mu[s=x_i]=\infty$
-for some $x_{s,i}$ in the range of $s$. Then define
-\begin{align*}
-  A_n := \left\{ s=x_{s,i} \right\}
-  \cap \left\{ f_n\geq \frac{x_{s,i}}{2} \right\}
-\end{align*}
-First, since $A_n\subseteq \Omega$ and $f_n$ nonnegative, it's obvious
-that
-\begin{align*}
-  \int_\Omega f_n \; d\mu
-  \geq
-  \int_{A_n} f_n \; d\mu
-\end{align*}
-But even more, since $f_n \geq \frac{x_{s,i}}{2}$ on $A_n$ by definition
-of $A_n$, we can replace $f_n$ with the lower bound on $A_n$ to say that
-\begin{align}
-  \int_\Omega f_n \; d\mu
-  \geq
-  \int_{A_n} \frac{x_{s,i}}{2} \; d\mu
-  =\frac{x_{s,i}}{2} \cdot \mu[A_n]
-  \label{Anbound}
-\end{align}
-But what's the behavior of $A_n$? Well, since $f_n\ra f\geq s$ from
-below, $\{A_n\}$ is an increasing sequence of sets such that
-\begin{align*}
-  \{s=x_{s,i}\} = \bigcup\ninf A_n
-  \quad\implies&\quad
-  \mu[\{s=x_{s,i}\}] = \mu\left[\bigcup\ninf A_n\right] \\
-  \text{By $\sigma$-additivity of $\mu$}
-  \quad \iff&\quad
-  \mu[\{s=x_{s,i}\}] = \limn \mu\left[A_n\right]
-\end{align*}
-But since we assumed $\mu[\{s=x_{s,i}\}]=\infty$, we
-have $\limn \mu[A_n]=\infty$ as well. Therefore, taking the limit of
-Expression~\ref{Anbound} we get
-\begin{align*}
-  \limn \int_\Omega f_n \; d\mu
-  &\geq
-  \limn
-  \frac{x_{s,i}}{2} \cdot \mu[A_n] = \infty \\
-  \Rightarrow\quad
-  \limn \int_\Omega f_n \; d\mu
-  &\geq
-  \infty
-\end{align*}
-So since the LHS is $\infty$ by implication, we clearly have
-\begin{align*}
-  \limn \int_\Omega f\;d\mu \geq \int_\Omega s\;d\mu
-\end{align*}
-(\emph{Case 2}) Now suppose that
-$\mu[\left\{ s=x_{s,i} \right\}] <\infty$ for all $i$.
-Then fix $\varepsilon \in (0,\min_i x_{s,i})$ and define for each $i$
-\begin{align*}
-  A_{i,n}
-  =
-  \{s = x_{s,i}\}
-  \cap
-  \left\{ f_n \geq x_{s,i} -\varepsilon\right\}
-\end{align*}
-Since $f_n\ra f \geq s$ from below, it's the case for all $i$ that
-\begin{align*}
-  \{s=x_{s,i}\} = \bigcup\ninf A_{i,n}
-  \quad\implies&\quad
-  \mu[\{s=x_{s,i}\}] = \mu\left[\bigcup\ninf A_{i,n}\right] \\
-  \text{By $\sigma$-additivity of $\mu$}
-  \quad \iff&\quad
-  \mu[\{s=x_{s,i}\}] = \limn \mu\left[A_{i,n}\right]
-\end{align*}
+We prove each in turn
+\begin{enumerate}[label=(\roman*)]
+  \item
+    Suppose that $f,g\geq 0$ with $f\leq g$. Then it's clear that
+    \begin{align*}
+      %\{s\;|\; 0\leq s \leq f\}
+      %\subseteq
+      %\{s\;|\; 0\leq s \leq g\}
+      %\;\implies\;
+      \left\{\int_\Omega s \;d\mu\;|\; \text{$s$ simple }, \; 0 \leq s\leq f\right\}
+      \subseteq
+      \left\{\int_\Omega s \;d\mu\;|\; \text{$s$ simple }, \; 0 \leq s\leq g\right\}
+    \end{align*}
+    Therefore, taking supremum over these sets to get integral
+    values $\int_\Omega f\;d\mu$ and $\int_\Omega g\;d\mu$,
+    it's clear that the latter must be larger, implying monotonicity.
+    Then for general $f\leq g$, we have nonnegative $f_+ \leq g_+$ and
+    $f_- \geq g_-$. Applying monotocity to these
+    \begin{align*}
+      \int_\Omega f_+ \; d\mu \leq
+      \int_\Omega g_+ \; d\mu
+      \qquad\qquad
+      -\int_\Omega f_- \; d\mu \leq
+      -\int_\Omega g_- \; d\mu
+    \end{align*}
+    Taken together, the desired result follows.
+  \item
+    This statement is clearly true for any simple function $s$:
+    \begin{align*}
+      \int_\Omega cs \; d\mu
+      = \sumnN c\cdot c_n \; \mu(A_n)
+      = c\sumnN c_n \; \mu(A_n)
+      = c \int_\Omega s \; d\mu
+    \end{align*}
+    Note that $cs$ is also a simple function.
+    Then when we take the sup over simple functions, any simple $s$ such
+    that $0\leq s \leq f$ will also satisfy $0\leq cs\leq cf$.
+    So taking the sup either way works, allowing us to generate the
+    integrals and the desired result.
+
+  \item
+    Start by noting that
+    \begin{align*}
+      \left\lvert \int_\Omega f \; d\mu\right\rvert
+      = c \int_\Omega f \; d\mu\qquad
+        \text{where $c=1$ or $c=-1$, depending on sign of integral}
+    \end{align*}
+    Next, $f\in\mathscr{L}(\Omega,\sF,\mu)$ implies
+    $|f|\in\mathscr{L}(\Omega,\sF,\mu)$ by Theorem~\ref{thm:fintiff}.
+    Also, clearly $cf\leq |f|$. Use these facts together with Properties
+    (i) and (ii):
+    \begin{align*}
+      \left\lvert \int_\Omega f \; d\mu\right\rvert
+      = c \int_\Omega f \; d\mu
+      = \int_\Omega c f \; d\mu \leq
+        \int_\Omega |f| \; d\mu
+    \end{align*}
+
+  \item
+    %If $f=0$ $\mu$-a.e., then it must be that $f_-$ and $f_+$ equal 0
+    %$\mu$-a.e. In that case, by monotonicity and non-negativity of $f_-$ and
+    %$f_+$,
+    %\begin{align*}
+        %0 \leq f_- \leq 0
+        %\quad \Rightarrow \quad
+        %0 \leq \int f_- \leq 0  \\
+        %0 \leq f_+ \leq 0
+        %\quad \Rightarrow \quad
+        %0 \leq \int f_+ \leq 0
+    %\end{align*}
+    ($\Rightarrow$)
+    Since $|f|$ measurable, can choose a sequence of nonnegative simple
+    functions $\{s_n\}$ converging to $|f|$ from below. Since
+    $0\leq s_n\leq |f|$ for all $n$, monotonicity implies $\forall n$
+    \begin{align*}
+      0 \leq \int_\Omega s_n \;d\mu\leq \int_\Omega |f|\;d\mu = 0
+      \qquad\implies\qquad
+      0 = \int_\Omega s_n\;d\mu
+      := \sum^M_{m=1} c_m \cdot \mu[s_n=c_m ]
+    \end{align*}
+    where we just used the definition of the integral of a simple
+    function.
+    This last statement shows clearly
+    $\mu[\{s_n=c_m\}]=0$ for all nonzero values $c_m$ that $s_n$
+    takes on. By finite additivity of $\mu$, that implies
+    $\mu[\{s_n\neq 0\}]=0$, which holds for arbitrary $n$.
+    Now write
+    \begin{align*}
+      \big\{|f|\neq 0\big\} =
+      \bigcup^\infty_{n=1} \{s_n\neq0\}
+      \quad\implies\quad
+      \mu\left[\,|f|\neq 0 \right]=
+      %\mu\left[\bigcup^\infty_{n=1} \{ s_n>0 \} \right]
+      %=
+      \sumninf \mu\left[s_n\neq 0\right]
+      = 0
+    \end{align*}
+    where we used countable additivity.
+    Lastly, simply note that $\{|f|\neq 0\}=\{f\neq 0\}$ to get the
+    desired result.
+
+\end{enumerate}
 \end{proof}
 
 
+\clearpage
+\subsection{Pillar Convergence Theorems}
+
+This section considers when we can freely move a limit inside and
+outside of an integral. In other words, this section considers when the
+integral of a limit equals the limit of integrals.
+
 \begin{thm}\emph{(Poor Man's Monotone Convergence or Beppo-Levi Theorem)}
-Given nonnegative measurable $f$ on measure space $(\Omega,\sF,\mu)$,
-let $\{s_n\}\ninf$ be a sequence of nonnegative simple functions
-converging pointwise to $f$ from below.
+\label{thm:mctpoor}
+Given measurable $f\geq 0$ on $(\Omega,\sF,\mu)$,
+let $\{s_n\}\ninf$ be a sequence of nonnegative \emph{simple} functions
+$0\leq s_n\leq f$ converging pointwise to $f$ from below.
 Then we can exchange limits with the integral:
 \begin{align*}
     \lim_{n\rightarrow\infty} \int_\Omega s_n \; d\mu &=
-    \int_\Omega \left(\lim_{n\rightarrow\infty} s_n\right) \; d\mu \\
-    \iff\quad
-    \lim_{n\rightarrow\infty} \int_\Omega s_n \; d\mu &=
+    \int_\Omega \left(\lim_{n\rightarrow\infty} s_n\right) \; d\mu
+    \quad\iff\quad
+    \lim_{n\rightarrow\infty} \int_\Omega s_n \; d\mu =
     \int_\Omega f \; d\mu
 \end{align*}
 This is valid whether $f$ is infinite or not.
+Theorem gets name from monotonically $\uparrow$ sequence of
+functions $\{s_n\}$.
 \end{thm}
 \begin{rmk}
-This is ``Poor Man's'' because the convergence sequence consists of
-simple functions rather than arbitrary measurable functions.
-We see the strong version as the next theorem.
+``Poor Man's'' because all functions nonnegative and converging sequence
+consists of simple functions, rather than arbitrary measurable
+functions. Generalization below.
 \end{rmk}
 \begin{proof}
-(LHS $\leq$ RHS) Since $s_n\leq f$ for all $n$, we have by monotonicity
-that
+(LHS $\leq$ RHS) Since $0\leq s_n\leq f$ for all $n$, we have by
+monotonicity that
 \begin{align*}
   \int_\Omega s_n \;d\mu
   &\leq
-  \int_\Omega f \;d\mu \\
-  \implies\quad
+  \int_\Omega f \;d\mu
+  \;\; \forall n
+  \quad \implies\quad
   \limn \int_\Omega s_n \;d\mu
-  &\leq
+  \leq
   \int_\Omega f \;d\mu
 \end{align*}
-(RHS $\leq$ LHS) This direction is tougher.
+(LHS $\geq$ RHS)
+Fix any arbitrary simple function $s$ such that $0\leq s\leq f$.
+Recall that $s$ has standard representation
+$s = \sum_{i=1}^J x_i\one{\{s=x_i\}}$.
+There are two possibilities given $s$:
+\begin{itemize}
+  \item $\mu[s=x_i]=\infty$ for some $i$:
+    Then define
+    \begin{align*}
+      A_n := \{s=x_i\}\cap \{s_n\geq x_i/2\}
+    \end{align*} First, $\{A_n\}$ is an \emph{increasing} set sequence
+    because $s_n\leq s_m$ for all $m>n$, hence the second set in the
+    intersection defining $A_n$ only grows. Moreover, since $s\leq f$
+    and $s_n\ra f$ pointwise, eventually for large enough $n$, the
+    second set in the intersection contains the first.
+    Hence $A_n\ra\{s=x_i\}$. All this implies
+    \begin{align*}
+      \{s=x_i\}
+      = \bigcup\ninf A_n
+      \quad\implies\quad
+      \mu[s=x_i]
+      = \mu\left[\bigcup\ninf A_n\right]
+      = \limn \mu[A_n]
+    \end{align*}
+    Recalling that $\mu[s=x_i]=\infty$ by assumption,
+    $\limn \mu[A_n]=\infty$.  We will apply that result to the upcoming
+    inequality chain.
+    Since $A_n\subseteq\Omega$ and $s_n$ nonnegative
+    \begin{align*}
+      %\int_\Omega f\;d\mu
+      %\geq
+      \int_\Omega s_n\;d\mu
+      \geq \int_{A_n} s_n\;d\mu
+      \geq \frac{x_i}{2}\mu[A_n]
+    \end{align*}
+    where the last inequality followed because $A_n$ includes only those
+    $\omega$'s where $s_n$ is at least $x_i/2$ by construction.
+    Now taking the limit we get
+    \begin{align*}
+      \limn \int_\Omega s_n\;d\mu
+      \geq \limn \frac{x_i}{2}\mu[A_n] = \infty
+    \end{align*}
+    Since the limit of simple integrals is $\infty$, clearly
+    $\limn \int_\omega s_n \geq \int_\Omega f\;d\mu$.
+
+  \item
+    $\mu[s=x_i]<\infty$ for all $i$:
+    Fix $\varepsilon \in (0,\min_i x_{i})$ and define for each $i$.
+    \begin{align*}
+      A_{n}^i
+      =
+      \{s = x_{i}\}
+      \cap
+      \left\{ s_n \geq x_{i} -\varepsilon\right\}
+    \end{align*}
+    First, for each $i$, $\{A_n^i\}\ninf$ is an increasing set sequence
+    because $s_n\leq s_m$ for all $m>n$.
+    Second, because $s\leq f$ and $s_n\ra f$ pointwise, eventually for
+    large enough $n$, $s_n$ will equal or exceed $s$ at all points,
+    meaning the second set in the intersection will contain the
+    first. Hence $A_n^i\ra \{s=x_i\}$ for all $i$. All this implies
+    \begin{align*}
+      \{s=x_i\}
+      = \bigcup\ninf A_n^i
+      \quad\implies\quad
+      \mu[s=x_i]
+      = \mu\left[\bigcup\ninf A_n^i\right]
+      = \limn \mu[A_n^i]
+    \end{align*}
+    Now, compute the integral of $S_n$ over $A_n^i$ only:
+    \begin{align*}
+      \int_{A_n^i} s_n\;d\mu
+      \geq \int_{A_n^i} (x_i-\varepsilon)\;d\mu
+      = (x_i-\varepsilon)\mu[A_n^i]
+    \end{align*}
+    Taking the limit use $\mu[s=x_i]=\limn \mu[A_n^i]$ that we derived
+    above:
+    \begin{align*}
+      \limn \int_{A_n^i} s_n\;d\mu
+      \geq (x_i-\varepsilon) \mu[s=x_i]
+    \end{align*}
+    Sum up over all $i$. Since $\varepsilon$ was arbitrary, we have
+    \begin{align*}
+      \limn \int_\Omega s_n \;d\mu
+      \geq
+      \sum_{i=1}^J x_i\mu[s=x_i]
+      \quad\iff\quad
+      \limn \int_\Omega s_n \;d\mu
+      \geq \int_\Omega s \; d\mu
+    \end{align*}
+    Since simple function $s\leq f$ was arbitrary
+    $\limn \int_\Omega s_n\;d\mu$ is independent of $s$, this inequality
+    holds for all $s\leq f$. Now take sup over those simple functions to
+    get
+    \begin{align*}
+      \limn \int_\Omega s_n \;d\mu
+      \geq
+      \sup_{0\leq s\leq f}\int_\Omega s \; d\mu
+      \quad\iff\quad
+      \limn \int_\Omega s_n \;d\mu
+      \geq
+      \int_\Omega f\;d\mu
+    \end{align*}
+    which is the desired result.
+\end{itemize}
 \end{proof}
 
-
 \begin{thm}\emph{(Monotone Convergence or Beppo-Levi Theorem)}
-Given arbitrary measurable $f,g$ on measure space $(\Omega,\sF,\mu)$,
-let $\{f_n\}\ninf$ be a sequence of measurable functions converging
-pointwise to $f$ a.e. from below. If $\int_\Omega|g|\;d\mu<\infty$ and
-$g \leq f_1$ a.e., then we can exchange limits with the integral:
+\label{mct:strong}
+Suppose we have
+\begin{itemize}
+  \item Arbitrary measurable function $f$
+  \item Sequence of measurable (not necessarily simple) functions
+    $\{f_n\}\ninf$ converging pointwise to $f$ from below almost
+    everywhere
+  \item Measurable function $g\leq f_1$ a.e. such that
+    $\int_\Omega|g|\;d\mu<\infty$,
+    i.e. $g\in\sL(\Omega,\sF,\mu)$.
+\end{itemize}
+Then we can exchange limits with the integral:
 \begin{align*}
     \lim_{n\rightarrow\infty} \int_\Omega f_n \; d\mu =
     \int_\Omega \left(\lim_{n\rightarrow\infty} f_n\right)
     \; d\mu
+    \quad\iff\quad
+    \lim_{n\rightarrow\infty} \int_\Omega f_n \; d\mu =
+    \int_\Omega f \; d\mu
 \end{align*}
-This is valid whether $f$ is infinite or not.
+Valid even if $f$ infinite.
+Function $g$ acts as lower bound on $f$ and $\{f_n\}\ninf$.
+Again, theorem gets name from monotonically $\uparrow$ sequence of
+functions $\{s_n\}$.
 \end{thm}
+\begin{proof}
+(LHS $\leq$ RHS)
+Again, very simple by $f_n\leq f$, which by monotocity implies
+\begin{align*}
+  \int_\Omega f_n\;d\mu
+  \leq
+  \int_\Omega f\;d\mu
+  \quad\implies\quad
+  \limn \int_\Omega f_n\;d\mu
+  \leq
+  \int_\Omega f\;d\mu
+\end{align*}
+(LHS $\geq$ RHS)
+Relative to Poor Man's Beppo-Levi Theorem~\ref{thm:mctpoor},
+we have to account for three new features:
+(1) $f$ possibly negative, (2) $f_n\ra f$ only \emph{almost} everywhere,
+and (3) the converging functions are general measurable (non-simple)
+functions.
+
+To start, handle (1) by assuming $g= 0$ (which we relax later),
+implying $f$ and $\{f_n\}\ninf$ nonnegative.
+To handle (2), collect all those $\omega$'s where indeed $f_n\ra f$
+pointwise in $A = \{\omega\in\Omega \;|\; f_n\ra f\}$.
+$A^c$ is the set of points where $f_n\not\ra f$, which is measure-zero
+by assumption of almost everywhere convergence.
+Next, use $A$ to define the following measurable functions:
+\begin{align*}
+  \tilde{f} := \one{A} \cdot f
+  \qquad \tilde{f}_n := \one{A} \cdot f_n
+  \quad\implies\quad
+  \text{$\tilde{f}_n\ra \tilde{f}$ \emph{everywhere}}
+\end{align*}
+Next, to handle (3), since $\tilde{f}$ measurable, can construct a
+sequence of nonnegative simple functions $\{s_n\}\ninf$
+converging pointwise to $\tilde{f}$ from below such that
+$s_n\leq \tilde{f}_n$ also.
+We recall our previous construction in Expression~\ref{simpleapprox} and
+modify it slightly to
+\begin{align}
+  s_n = \left[
+  \sum^{n\cdot 2^{n-1}}_{k=1}
+  \left(
+  \frac{k-1}{2^{n-1}}
+  \right)
+  \one{%
+    \left\{
+      \tilde{f}_n\in \left[\frac{k-1}{2^{n-1}}, \; \frac{k}{2^{n-1}}\right)
+    \right\}
+  }
+  \right]
+  + n \cdot \one{\{\tilde{f}_n\geq n\}}
+  \qquad n=1,2,\ldots
+  \label{simpleapprox2}
+\end{align}
+This can be shown to converge pointwise to $\tilde{f}$.
+Moreover, $s_n\leq \tilde{f}_n$ by construction, monotonicity tells us
+that for all $n$
+\begin{align*}
+  \int_\Omega \tilde{f}_n\;d\mu
+  \geq
+  \int_\Omega s_n\;d\mu
+  \quad\implies\quad
+  \limn \int_\Omega \tilde{f}_n\;d\mu
+  \geq
+  \limn \int_\Omega s_n\;d\mu
+\end{align*}
+Since nonnegative simple $s_n\ra\tilde{f}$, we have enough to apply Poor
+Man's Beppo Levi Theorem~\ref{thm:mctpoor}
+to $\limn \int_\Omega s_n\;d\mu$, exchange the limit with the integral,
+and get new inequality
+\begin{align*}
+  \limn \int_\Omega \tilde{f}_n\;d\mu
+  \geq
+  %\limn\int_\Omega s_n\;d\mu
+  %=
+  \int_\Omega \limn s_n\;d\mu
+  = \int_\Omega \tilde{f}\;d\mu
+\end{align*}
+But $\mu[\tilde{f}_n\neq f_n]=\mu[\tilde{f}\neq f]=\mu[A^c]=0$, hence by
+Proposition~\ref{prop:intprop} Part (v), we can remove tildes from
+the last line to get simply:
+\begin{align}
+  \limn \int_\Omega f_n\;d\mu
+  \geq \int_\Omega f\;d\mu
+  \label{mctalmost}
+\end{align}
+All that's left now is to relax $g=0$.
+Given arbitrary measurable $g\in\sL(\Omega,\sF,\mu)$,
+work with differences $f_n-g$ and $f-g$.
+Since $g\leq f_1$ and $f_n\uparrow f$, we have $f_1-g\geq 0$ and
+$f-g\geq 0$. Hence apply Result~\ref{mctalmost} for nonnegative
+functions
+\begin{align*}
+  \limn \int_\Omega (f_n-g)\;d\mu
+  \geq \int_\Omega (f-g)\;d\mu
+\end{align*}
+By Corollary~\ref{cor:mctpoor} (which is proved using only Poor Man's
+Beppo Levi), we can break up the integral by linearity and cancel
+$\int_\Omega g\;d\mu$ on each side to get the desired result.
+\end{proof}
+
 
 \begin{lem}\emph{(Fatou's Lemma)}
 Let $g$ and $\{f_n\}\ninf$ be measurable with $g\in\sL(\Omega,\sF,\mu)$
@@ -4179,33 +4412,298 @@ and $g \leq f_n$ a.e.\ for all $n$. Then
   \int_\Omega \left(\liminf_n f_n\right) \; d\mu
   \leq \liminf_n \int_\Omega f_n \; d\mu
 \end{align*}
-Or equivalently, if $g \geq f_n$ a.e.\ for all $n$
-\begin{align*}
-  \int_\Omega \left(\limsup_n f_n\right) \; d\mu
-  \geq \limsup_n \int_\Omega f_n \; d\mu
-\end{align*}
+Or equivalently, if $g \geq f_n$ a.e.\ for all $n$, replace $\inf$ with
+$\sup$ and reverse the inequality.
+%\begin{align*}
+  %\int_\Omega \left(\limsup_n f_n\right) \; d\mu
+  %\geq \limsup_n \int_\Omega f_n \; d\mu
+%\end{align*}
 \end{lem}
 \begin{rmk}
 Inequality might be strict.
 \end{rmk}
+\begin{proof}
+Take liminf case.
+Since all $f_n$ measurable, function $h_n := \inf_{m\geq n} f_m$
+measurable for all $n$. Moreover, definition implies $\{h_n\}\ninf$ is a
+monotonically increasing sequence of functions converging pointwise from
+below to $\liminf_n f_n$, which is also measurable.
+Since $f_n\geq g$ a.e. for all $n$, clearly $h_1\geq g$ a.e.
+Hence, we have satisfied all the conditions so that we can simply apply
+the Monotone Convergence Theorem~\ref{mct:strong}:
+\begin{align*}
+    \int_\Omega \left(\lim_{n\rightarrow\infty} h_n\right) \; d\mu
+    = \lim_{n\rightarrow\infty} \int_\Omega h_n \; d\mu
+    \quad\iff\quad
+    \int_\Omega \liminf_{n\rightarrow\infty} f_n \; d\mu
+    &= \lim_{n\rightarrow\infty} \int_\Omega \inf_{m\geq n} f_m \; d\mu
+\end{align*}
+Since the integral of the pointwise inf of functions is less than the
+inf of integrals, can weaken above equality to inequality
+\begin{align*}
+    \int_\Omega \liminf_{n\rightarrow\infty} f_n \; d\mu
+    &\leq \lim_{n\rightarrow\infty} \inf_{m\geq n} \int_\Omega f_m \; d\mu
+    \quad\iff\quad
+    \int_\Omega \liminf_{n\rightarrow\infty} f_n \; d\mu
+    &\leq \liminf_{n\rightarrow\infty}\int_\Omega f_n \; d\mu
+\end{align*}
+\end{proof}
 
 \begin{thm}\emph{(Lebesgue's Dominated Convergence Theorem)}
 Let $\{f_n\}\ninf$ be a sequence of measurable functions converging to $f$
 a.e. Suppose also that $g\in\sL(\Omega,\sF,\mu)$ is a measurable
-function with $|f_n|\leq g$ a.e. Then
-\begin{align*}
-  \int_\Omega |f| \;d\mu
-  &\leq
-  \int_\Omega |g| \;d\mu \\
-  \limn \int_\Omega f_n \; d\mu
-  &= \int_\Omega \limn f_n \; d\mu \\
-  \limn \int_\Omega |f_n-f|\;d\mu &= 0
-\end{align*}
+function with $|f_n|\leq g$ a.e for all $n$. Then
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item $\int_\Omega |f| \;d\mu \leq \int_\Omega g \;d\mu$, hence
+    $f\in\sL(\Omega,\sF,\mu)$
+  \item
+    $\limn \int_\Omega f_n \; d\mu = \int_\Omega \limn f_n \; d\mu
+    =\int_\Omega f\;d\mu$
+  \item $\limn \int_\Omega |f_n-f|\;d\mu = 0$.
+    This is called ``convergence in $L^1$''
+\end{enumerate}
 \end{thm}
 \begin{rmk}
-For bounded measurable functions on measure space with a finite measure,
-we'll be able to use the result all of the time.
+For bounded measurable functions a finite measure space, we can use the
+result (exchange limit and integral) \emph{always}.
 \end{rmk}
+\begin{proof}
+We prove each
+\begin{enumerate}[label=(\roman*)]
+  \item
+    Since $|f_n|\leq g$ for all $n$, monotonicity implies
+    \begin{align*}
+      \int_\Omega |f_n|\;d\mu
+      \leq
+      \int_\Omega g\;d\mu
+      \quad\implies\quad
+      \limn \int_\Omega |f_n|\;d\mu
+      \leq
+      \int_\Omega g\;d\mu
+    \end{align*}
+    Given (ii), can exchange limit and integral and note that
+    $\limn |f_n|=|f|$ to get desired result.
+  \item
+    Since $f_n\ra f$ a.e., the limit, liminf, and limsup are identical,
+    hence we can derive
+    \begin{align*}
+      \int_\Omega f \; d\mu
+      \underset{(a)}{\leq}
+      \liminf_n \int_\Omega f_n \; d\mu
+      \underset{(b)}{\leq}
+      \limsup_n \int_\Omega f_n \; d\mu
+      \underset{(c)}{\leq}
+      \int_\Omega f \; d\mu
+    \end{align*}
+    Inequality (a) was the inf version of Fatou. Inequality (b) is the
+    definition of inf and sup. Inequality (c) was the sup version of Fatou.
+    Together, this last line implies
+    \begin{align*}
+      \liminf_n \int_\Omega f_n \; d\mu
+      =
+      \limsup_n \int_\Omega f_n \; d\mu
+      =
+      \int_\Omega f \; d\mu
+    \end{align*}
+    Hence the limit exists and
+    $\lim_n \int_\Omega = \int_\Omega f \; d\mu$, the desired result.
+
+  \item Define $h_n:=|f_n-f|$.
+    Since $|f_n-f|\leq |f_n|-|f| \leq 2g$
+    apply (ii) to $\{h_n\}$ to get
+    \begin{align*}
+      \limn \int_\Omega h_n\;d\mu
+      = \int_\Omega \limn h_n\;d\mu
+      \quad\iff\quad
+      \limn \int_\Omega |f_n-f|\;d\mu
+      = \int_\Omega \limn |f_n-f|\;d\mu
+      = 0
+    \end{align*}
+    where the last equality followed since $f_n\ra f$ a.e.
+\end{enumerate}
+\end{proof}
+
+
+\begin{cor}\emph{(Corollaries to Poor Man's Beppo-Levi/MCT)}
+\label{cor:mctpoor}
+From Theorem~\ref{thm:mctpoor},
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item \emph{(Linearity, Nonnegative):} Given arbitrary measurable
+    $f,g\geq 0$,
+    \begin{align}
+      \int_\Omega (f+g)\;d\mu
+      = \int_\Omega f\;d\mu
+      + \int_\Omega g\;d\mu
+      \label{leblinearity}
+    \end{align}
+  \item Suppose $f,g\in\sL(\Omega,\sF,\mu)$. Then
+    $f+g\in\sL(\Omega,\sF,\mu)$
+  \item \emph{(Linearity, General):}
+    Suppose $f\in\sL(\Omega,\sF,\mu)$ and $g$ measurable with
+    $g_+$ or $g_-$ integrable. Then Expression~\ref{leblinearity} holds.
+\end{enumerate}
+\end{cor}
+\begin{proof}
+We prove each in turn
+\begin{enumerate}[label=(\roman*)]
+  \item Since $f,g$ measurable, can choose sequence of simple functions
+    $\{f_n\}\ninf$ and $\{g_n\}\ninf$
+    such that $0\leq f_n\uparrow f$ and $0\leq g_n\uparrow g$.
+    Then $\{f_n+g_n\}\ninf$ is a sequence of simple functions such that
+    $0\leq f_n+g_n\uparrow f+g$. So by Poor Man's Beppo-Levi
+    Theorem~\ref{thm:mctpoor},
+    \begin{align*}
+      \int_\Omega f+g\;d\mu
+      = \int_\Omega \limn (f_n+g_n)\;d\mu
+      = \limn \int_\Omega (f_n+g_n)\;d\mu
+    \end{align*}
+    Next, linearity holds trivially for simple functions like
+    $f_n$ and $g_n$ so can break up
+    \begin{align*}
+      \int_\Omega f+g\;d\mu
+      = \limn \int_\Omega f_n\;d\mu
+      + \limn \int_\Omega g_n\;d\mu
+    \end{align*}
+    Lastly, apply Theorem~\ref{thm:mctpoor} again to each integral to
+    get desired result:
+    \begin{align*}
+      \int_\Omega f+g\;d\mu
+      = \int_\Omega \limn f_n\;d\mu
+        + \int_\Omega \limn g_n\;d\mu
+      = \int_\Omega f\;d\mu
+        + \int_\Omega g\;d\mu
+    \end{align*}
+  \item Can use Property (i) on nonnegative $|f|$ and $|g|$ in
+    \begin{align*}
+      \int_\Omega |f+g|\;d\mu
+      \leq
+      \int_\Omega (|f|+|g|)\;d\mu
+      =
+      \int_\Omega |f|\;d\mu
+      + \int_\Omega |g|\;d\mu
+    \end{align*}
+    Since $f,g\in\sL(\Omega,\sF,\mu)$, the two integrals being summed up
+    are finite, meaning $\int_\Omega |f+g|\;d\mu$ finite hence
+    $f+g\in\sL(\Omega,\sF,\mu)$.
+
+  \item Assume $g_-$ integrable.
+    \begin{align*}
+      \int_\Omega (f+g)_-\;d\mu
+      \leq
+      \int_\Omega (f_- +g_-)\;d\mu
+      \underset{(a)}{=}
+      \int_\Omega f_- \;d\mu
+      + \int_\Omega g_-\;d\mu
+      \underset{(b)}{\leq}
+      \infty
+    \end{align*}
+    Equality (a) followed from Property (i) since $f_-$ and $g_-$
+    nonnegative. Inequality (b) followed from
+    $f,g_-\in\sL(\Omega,\sF,\mu)$.
+    Next, note that
+    \begin{align*}
+      (f+g)_+ - (f+g)_-
+      = f+g = (f_+ - f_-) + (g_+ - g_-)
+    \end{align*}
+    That lets us derive
+    \begin{align*}
+      \int_\Omega (f+g)_+\;d\mu
+      + \int_\Omega f_-\;d\mu
+      + \int_\Omega g_-\;d\mu
+      &= \int_\Omega \big[(f+g)_+ + f_- + g_-\big] \;d\mu \\
+      &= \int_\Omega \big[(f+g)_- + f_+ + g_+\big] \;d\mu \\
+      \implies\quad
+      \int_\Omega (f+g)_+\;d\mu
+      + \int_\Omega f_-\;d\mu
+      + \int_\Omega g_-\;d\mu
+      &=
+      \int_\Omega (f+g)_-\;d\mu
+      + \int_\Omega f_+\;d\mu
+      + \int_\Omega g_+\;d\mu
+    \end{align*}
+    Rearrange into
+    \begin{align*}
+      \int_\Omega (f+g)_+\;d\mu
+      - \int_\Omega (f+g)_-\;d\mu
+      &=
+      \int_\Omega f_+\;d\mu
+      - \int_\Omega f_-\;d\mu
+      + \int_\Omega g_+\;d\mu
+      - \int_\Omega g_-\;d\mu
+      \\
+      \iff\qquad
+      \int_\Omega (f+g)\;d\mu
+      &=
+      \int_\Omega f\;d\mu
+      + \int_\Omega g\;d\mu
+    \end{align*}
+\end{enumerate}
+\end{proof}
+
+
+\clearpage
+\subsection{Fubini-Tonelli}
+
+\begin{thm}\emph{(Fubini-Tonelli)}
+Let
+$(\Omega_1,\sF_1,\mu_1)$ and
+$(\Omega_2,\sF_2,\mu_2)$
+be measure spaces and let
+\begin{align*}
+  f:
+  (\Omega_1\times \Omega_2, \sF_1\otimes\sF_2)
+  \ra
+  (\R,\sB(\R))
+\end{align*}
+be a measurable function. Then
+\begin{enumerate}
+  \item \emph{Fubini}:
+    If $f$ is integrable on the product space
+    \begin{align*}
+      \int_{\Omega_1\times \Omega_2}
+      |f(\omega_1,\omega_2)| \; d(\mu_1\otimes\mu_2)
+      <\infty
+    \end{align*}
+    then you can break up and swap the order of integration:
+    \begin{align*}
+      \int_{\Omega_1\times \Omega_2}
+      f(\omega_1,\omega_2) \; d(\mu_1\otimes\mu_2)
+      &=
+      \int_{\Omega_1} \left[\int_{\Omega_2}
+      f(\omega_1,\omega_2)
+      \;\mu_2(d\omega_2) \right]\;\mu_1(d\omega_1) \\
+      &=
+      \int_{\Omega_2}\left[
+        \int_{\Omega_1}
+      f(\omega_1,\omega_2)
+      \;\mu_1(d\omega_1) \right]\;\mu_2(d\omega_2)
+    \end{align*}
+
+  \item \emph{Tonelli}:
+    Suppose that $f$ is nonnegative and $\mu_1,\mu_2$ are
+    $\sigma$-finite. Then you can swap the order of integration:
+    \begin{align*}
+      \begin{rcases}
+      f\geq 0 \\
+      \text{$\mu_1,\mu_2$ are $\sigma$-finite}
+      \end{rcases}
+      \quad\implies \quad
+      \int_{\Omega_1\times \Omega_2}
+      f \; d(\mu_1\otimes\mu_2)
+      =
+      \int_{\Omega_1}\int_{\Omega_2}
+      f(\omega_1,\omega_2)
+      \;d\mu_2(\omega_2) \;d\mu_1(\omega_1)
+    \end{align*}
+\end{enumerate}
+\end{thm}
+\begin{rmk}
+Fubini is often easy to check, since a bounded function with a finite
+measure will be integrable, so then Fubini tells you that you can swap
+the order of integration.
+\end{rmk}
+
+
 
 \clearpage
 \subsection{Push Forward Measure and Change of Variables}
@@ -4603,68 +5101,6 @@ really a probability theory result, not a measure theory result.
 A family of random variables $\{X_\alpha\}_{\alpha\in J}$ is UI if and
 only if the family is $L^p$-bounded for some $p\in(1,\infty]$.
 \end{cor}
-
-\clearpage
-\subsection{Fubini-Tonelli}
-
-\begin{thm}\emph{(Fubini-Tonelli)}
-Let
-$(\Omega_1,\sF_1,\mu_1)$ and
-$(\Omega_2,\sF_2,\mu_2)$
-be measure spaces and let
-\begin{align*}
-  f:
-  (\Omega_1\times \Omega_2, \sF_1\otimes\sF_2)
-  \ra
-  (\R,\sB(\R))
-\end{align*}
-be a measurable function. Then
-\begin{enumerate}
-  \item \emph{Fubini}:
-    If $f$ is integrable on the product space
-    \begin{align*}
-      \int_{\Omega_1\times \Omega_2}
-      |f(\omega_1,\omega_2)| \; d(\mu_1\otimes\mu_2)
-      <\infty
-    \end{align*}
-    then you can swap the order of integration:
-    \begin{align*}
-      \int_{\Omega_1\times \Omega_2}
-      f(\omega_1,\omega_2) \; d(\mu_1\otimes\mu_2)
-      &=
-      \int_{\Omega_1} \left[\int_{\Omega_2}
-      f(\omega_1,\omega_2)
-      \;\mu_2(d\omega_2) \right]\;\mu_1(d\omega_1) \\
-      &=
-      \int_{\Omega_2}\left[
-        \int_{\Omega_1}
-      f(\omega_1,\omega_2)
-      \;\mu_1(d\omega_1) \right]\;\mu_2(d\omega_2)
-    \end{align*}
-
-  \item \emph{Tonelli}:
-    Suppose that $f$ is nonnegative and $\mu_1,\mu_2$ are
-    $\sigma$-finite. Then you can swap the order of integration:
-    \begin{align*}
-      \begin{rcases}
-      f\geq 0 \\
-      \text{$\mu_1,\mu_2$ are $\sigma$-finite}
-      \end{rcases}
-      \quad\implies \quad
-      \int_{\Omega_1\times \Omega_2}
-      f \; d(\mu_1\otimes\mu_2)
-      =
-      \int_{\Omega_1}\int_{\Omega_2}
-      f(\omega_1,\omega_2)
-      \;d\mu_2(\omega_2) \;d\mu_1(\omega_1)
-    \end{align*}
-\end{enumerate}
-\end{thm}
-\begin{rmk}
-Fubini is often easy to check, since a bounded function with a finite
-measure will be integrable, so then Fubini tells you that you can swap
-the order of integration.
-\end{rmk}
 
 
 
@@ -5427,7 +5863,7 @@ We check that it satisfies the properties in Definition~\ref{defn:cdf}
 (except 3, which is obvious):
 \begin{enumerate}
   \item If $y \geq x$, clearly $(-\infty,x]\subseteq (-\infty,y]$, so by
-    monoticity of the underlying measure $P$:
+    monotonicity of the underlying measure $P$:
     \begin{align*}
       P\big[(-\infty,x]\big]
       &\leq
