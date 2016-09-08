@@ -2661,7 +2661,10 @@ will follow.
 \end{proof}
 
 \clearpage
-\subsection{Dirac, Discrete, and (Absolutely) Continuous Measure}
+\subsection{%
+  Dirac, Discrete, (Abs.) Continuous Measures \& Density
+}
+\label{sec:abscts}
 
 \begin{defn}(Dirac Measure)
 Given set $\Omega$, pick some element $\omega\in\Omega$. Then the
@@ -2679,26 +2682,32 @@ In words, the Dirac measure $\delta_\omega$ will assign a value of one
 to any $A\in2^\Omega$ that contains $\omega$, zero otherwise.
 \end{defn}
 
-\begin{defn}(Discrete, Continuous, Absolutely Continuous Meausures)
+\begin{defn}
+(Discrete, Continuous, Absolutely Continuous Meausures on $\R^d$)
 Let $\mu$ be a measure on $\Omega=\R^d$. Then we call the measure $\mu$
 \begin{itemize}
   \item \emph{Discrete}: If we can express $\mu$ as a sum of Dirac
     measures
     \begin{align*}
-      \mu[A] = \sum\ninf p_n \delta_{c_n}[A]
+      \mu[A] = \sum\ninf p_n \delta_{x_n}[A]
     \end{align*}
-    for $c_1,c_2,\ldots\in\Omega=\R^d$ and $p_1,p_2,\ldots\geq 0$
+    for $x_1,x_2,\ldots\in\Omega=\R^d$ and
+    $p_1,p_2,\ldots\geq 0$
 
-  \item \emph{Continuous}: If the following
+  \item \emph{Continuous}: If the following is a continuous function of
+    $b\in \R^d$
     \begin{align*}
       \mu\big[
         (a_1,b_1] \times\cdots\times (a_d,b_d]
       \big]
     \end{align*}
-    is a continuous function of $b\in \R^d$
 
-  \item \emph{Absolutely Continuous}: If there exists a Borel-function
-    $f:\R^d\ra\R$ called a \emph{density} such that
+  \item \emph{Absolutely Continuous}: If $\exists$ a
+    Borel-function\footnote{%
+      Recall that $f$ is a Borel function if
+      $f^{-1}(A) \in \sB(\R)^{\otimes d}$ for any open $A\subseteq\R$.
+    }
+    $f:\R^d\ra\R_+$ called a \emph{density} s.t.
     \begin{align*}
       \mu\big[
         (a_1,b_1] \times\cdots\times (a_d,b_d]
@@ -2710,10 +2719,20 @@ Let $\mu$ be a measure on $\Omega=\R^d$. Then we call the measure $\mu$
       f(x_1,\ldots,x_d)\;
       dx_1\;\cdots \;dx_d
     \end{align*}
-    Recall that $f$ is a Borel function if
-    $f^{-1}(A) \in \sB(\R)^{\otimes d}$ for any open $A\subseteq\R$.
-    This is stronger than a continuous measure; it rules out weird,
-    intractable cases.
+    The density also satisfies
+    for all $A\in\sB(\R)^{\otimes d}$
+    and Borel-measurable functions $g$
+    \begin{align*}
+      \mu[A] &= \int_A
+      f(x_1,\ldots,x_d)\;
+      dx_1\;\cdots \;dx_d
+      \\
+      \int_A
+      g \; d\mu
+      &= \int_A gf \; dx
+    \end{align*}
+    Absolute continuity is stronger than continuity;
+    it rules out weird, intractable cases.
 \end{itemize}
 \end{defn}
 
@@ -3980,12 +3999,6 @@ Given measurable functions $f,g\in\sL(\Omega,\sF,\mu)$,
     $\int_\Omega f \; d\mu = \int_\Omega g \; d\mu$
   \item $\mu[f > g] = 0$ implies
     $\int_\Omega f \; d\mu \leq \int_\Omega g \; d\mu$
-  \item \emph{(Chebyshev's Inequality\footnote{%
-      Proof deferred to later and given in context of random variables
-      and probability.
-    })}
-    For any $t>0$,
-    $\mu\big[|f|\geq t\big] \leq \frac{1}{t}\int_{\Omega} |f|\; d\mu$
 \end{enumerate}
 \end{prop}
 
@@ -4681,27 +4694,29 @@ the order of integration.
 
 \begin{defn}(Push Forward Measure)
 \label{defn:pushfwd}
-Suppose we have have a measurable $f:(\Omega,\sF)\ra (E,\sE)$ between
-two measurable spaces and a measure $\mu$ for the \emph{domain}.
+Suppose we have have a measurable function $f:(\Omega,\sF)\ra (E,\sE)$
+between two measurable spaces and a measure $\mu$ for the \emph{domain}.
 Then the push forward measure for the \emph{range} denoted $\mu \circ
 f^{-1}$ or $\mu_f$ is defined
 \begin{align*}
   \mu_f[A] := \mu[f^{-1}(A)]
   \qquad\forall A \in\sE
 \end{align*}
+Push-forward measure is so named because we don't have a measure
+defined for $(E,\sE)$, but we \emph{induce} one by pushing forward the
+measure on the domain $(\Omega,\sF)$ to the range $(E,\sE)$.
 \end{defn}
 \begin{rmk}
-The push-forward measure is so named because we don't have a measure
-defined for $(E,\sE)$, but we \emph{induce} one by pushing forward the
-measure defined for domain $(\Omega,\sF)$ to the range $(E,\sE)$.
+When $f$ is a random variable (real-valued), we call $\mu_f$ the
+``distribution of $f$.'' See Section~\ref{sec:expdist}.
 \end{rmk}
 
 \begin{prop}\emph{(Change of Variables)}
 \label{prop:changeofvars}
-Suppose we have have a measurable $f:(\Omega,\sF)\ra (E,\sE)$ between
-two measurable spaces and a measure $\mu$ for the \emph{domain}, which
-together imply push forward measure $\mu \circ f^{-1}$ or $\mu_f$. Then
-for any measurable function $g:(E,\sE)\ra(G,\sG)$, we have
+Suppose we have measurable function $f:(\Omega,\sF)\ra (E,\sE)$ between
+two measurable spaces, measure $\mu$ for the \emph{domain},
+and push-forward measure $\mu_f=\mu \circ f^{-1}$ for the range. Then
+for any measurable function $g:(E,\sE)\ra(G,\sG)$,
 \begin{align*}
   \int_{f^{-1}(A)} g\circ f \; d\mu
   =
@@ -4917,6 +4932,36 @@ get some better inuition as to why there isn't inclusion, consider
 functions like $1/x^2$ and $1/\sqrt{x}$ which behave very differently in
 their tails and at $0$.
 \end{rmk}
+
+\begin{cor}
+Suppose that $P$ is a probability measure. Then
+\begin{align*}
+  q \geq p
+  \quad\implies\quad
+  L^q(\Omega,\sF,P)
+  \subseteq
+  L^p(\Omega,\sF,P)
+\end{align*}
+\end{cor}
+\begin{proof}
+This follows either from the previous corollary, or from upcoming
+Corollary~\ref{cor:jensen} to Jensen's inequality, which says that
+$\lVert f\rVert_p\leq \lVert f\rVert_q$
+for RVs on a probability space.
+Hence
+\begin{align*}
+  f\in L^q(\Omega,\sF,P)
+  \implies
+  \lVert f\rVert_q
+  < \infty
+  \implies
+  \lVert f\rVert_p
+  < \infty
+  \implies
+  f\in L^p(\Omega,\sF,P)
+\end{align*}
+Hence $L^q(\Omega,\sF,P)\subseteq L^p(\Omega,\sF,P)$.
+\end{proof}
 
 \begin{prop}
 For all $(\Omega,\sF,\mu)$, we have for all $p\in[1,\infty]$
@@ -5364,97 +5409,146 @@ which can be simplified to the desired result.
 \subsection{Integral Inequalities}
 
 \begin{prop}{\emph{(Jensen's Inequality)}}
-Let $g$ be a function and let $X$ be some random variable. Then
+Given probability space $(\Omega,\sF,P)$, random variable
+$X:(\Omega,\sF,P)\ra(\R,\sB(\R))$ in $\sL(\Omega,\sF,P)$, and measurable
+$\varphi:(\R,\sB(\R))\ra(\R,\sB(\R))$,
 \begin{align*}
-  \text{$g$ convex} &\implies \E[g(X)] \geq g\left(\E[X]\right) \\
-  \text{$g$ concave} &\implies \E[g(X)] \leq g\left(\E[X]\right) \\
+  \text{$\varphi$ convex} &\implies
+  \int_\Omega \varphi\circ X \; dP
+  \geq
+  \varphi\left(\int_\Omega X \; dP\right)
+  \quad\iff\quad
+  \E[\varphi(X)] \geq \varphi\left(\E[X]\right) \\
+  \text{$\varphi$ concave} &\implies
+  \int_\Omega \varphi\circ X \; dP
+  \leq
+  \varphi\left(\int_\Omega X \; dP\right)
+  \quad\iff\quad
+  \E[\varphi(X)] \leq \varphi\left(\E[X]\right)
 \end{align*}
 \end{prop}
+\begin{rmk}
+This proposition only holds for \emph{probability} measures---not
+general measures.
+In Line~\ref{jensencancel}, we'll see that we really do need
+$P[\Omega]=1$ to get everything to cancel out properly.
+\end{rmk}
 \begin{proof}
-Since $g$ is a convex function, given any $x$, there is a constant $a$
-such that
+Suppose $\varphi$ convex. Then given any number $x$, there exists a constant
+$a$ such that
 \begin{align*}
-  g(y) \geq g(x) + a (y-x)
+  \varphi(y) \geq \varphi(x) + a (y-x)
 \end{align*}
-If $g$ is differentiable, then $a=g'(x)$. But if $g$ is not
-differentiable at $x$, that's still okay because the function will be
-differentiable from the left or right (a subgradient will exist) so that
-we could just set
-$a=\lim_{\delta \ra 0} \frac{g(x+\delta)-g(x)}{\delta}$ where
-$\delta\ra 0$ from above. Anyway, the point is that $a$ exists.
-
-Next, choose $x=\E[X]$. Again, there is an $a$ such that
+If $\varphi$ differentiable, then $a=\varphi'(x)$. If $\varphi$ non-differentiable at
+$x$, still okay because the function will be differentiable from the
+left or right (a subgradient will exist)
+so we can just use that.
+%we could just set $a=\lim_{\delta \ra 0}
+%\frac{\varphi(x+\delta)-\varphi(x)}{\delta}$ where
+%$\delta\ra 0$ from above.
+Anyway, point is that $a$ exists for any choice of $x$.
+So choose $x=\E[X]$. Then $\exists a$ such that
 \begin{align*}
-  g(y) &\geq g(\E[X]) + a (y-\E[X])
+  \varphi(y) &\geq \varphi(\E[X]) + a (y-\E[X])
 \end{align*}
-But this must also be true for $y=X$, so
+But this must also be true for $y=X(\omega)$, so
 \begin{align*}
-  g(X) &\geq g(\E[X]) + a (X-\E[X])
+  \varphi(X(\omega)) &\geq \varphi(\E[X]) + a (X(\omega)-\E[X])
+  \qquad \forall \omega\in\Omega
 \end{align*}
-Now take expectation
-\begin{align*}
-  \E[g(X)]
-  &\geq \E[g(\E[X]) + a (X-\E[X])] \\
-  &= \E[g(\E[X])] + a \E[(X-\E[X])] \\
-  &= g(\E[X]) + a (\E[X]-\E[X]) \\\\
-  \implies \quad
-  \E[g(X)] &\geq g(\E[X])
-\end{align*}
-Concave proof is analogous.
+Since this holds for all $\omega\in\Omega$,
+the monotonicity property from Proposition~\ref{prop:intprop} says
+\begin{align}
+  \int_\Omega \varphi(X)
+  \; dP
+  &\geq
+  \int_\Omega
+  \big[
+  \varphi(\E[X]) + a (X-\E[X])
+  \big]
+  \; dP
+  \notag
+  \\
+  \iff\quad
+  \E[\varphi(X)]
+  &\geq \varphi(\E[X])\cdot P[\Omega] + a \E[X] - a\E[X]\cdot P[\Omega]
+  = \E[\varphi(X)]
+  \label{jensencancel}
+\end{align}
+which is the desired inequality.
+Concave proof analogous.
 \end{proof}
 
 \begin{cor}
-Let $X$ be a random variable. Then $||X||_p\leq ||X||_q$ for
+\label{cor:jensen}
+Given RV $X$ on prob. space $(\Omega,\sF,P)$,
+$\lVert X\rVert_p\leq \lVert X\rVert_q$ for
 $1\leq p\leq q\leq \infty$.
 \end{cor}
-
 \begin{rmk}
-The above proposition and corollary only work because the expectation is
-computed with a probability measure. They don't work for for general
-measures.
+Since the proof relies on Jensen's Inequality, this only works for
+probability spaces.
 \end{rmk}
-
-\begin{thm}{\emph{(Markov's Inequality)}}
-\label{thm:markov}
-Given random variable $X$,
-\begin{equation}
-    \label{markov}
-    \Prb\left[
-      \left\lvert X\right\rvert
-      \geq \varepsilon\right]
-    \leq \frac{\E\left[|X|^p\right]}{|\varepsilon|^p}
-\end{equation}
-\end{thm}
-
 \begin{proof}
-Write out the expectation in the numerator, where $F$ is the cdf of $X$:
+First, for $q\geq p$, $\varphi(x)=x^{\frac{q}{p}}$ is a convex
+function. We will use to apply Jensen to
 \begin{align*}
-  \E\left[|X|^p\right]
-  &= \int^\infty_{-\infty} |X|^p \; dF \\
-  &= \int^{\varepsilon}_{-\infty} |X|^p \; dF
-    + \int^\infty_{\varepsilon} |X|^p \; dF
-\end{align*}
-Next, let's just throw out the first term in the sum above to get an
-inequality. Since $|X|^p$ and the cdf are always positive, we know that
-we're throwing out a positive portion, which gives us inequality
-\begin{align*}
-  \E\left[|X|^p\right]
-  &\geq \int^\infty_{\varepsilon} |X|^p \; dF
-\end{align*}
-Next, notice that a lower bound for $|X|^p$ over this support will be
-$|\varepsilon|^p$, so we can modify the inequality again to get
-\begin{align*}
-  \E\left[|X|^p\right]
-  &\geq  |\varepsilon|^p \int^\infty_{\varepsilon} \; dF
-  = |\varepsilon|^p \; \Prb[X\geq \varepsilon] \\
-  \implies \quad
-  \frac{\E\left[|X|^p\right]}{|\varepsilon|^p}
-  &\geq \Prb(X\geq \varepsilon)
+  \lVert X\rVert_q
+  := \E\big[|X|^q\big]^{\frac{1}{q}}
+  %= \E\big[|X|^{p \cdot \frac{q}{p}}\big]^{\frac{1}{q}}
+  = \E\big[\varphi(|X|^p)\big]^{\frac{1}{q}}
+  \geq \varphi\left(\E\big[|X|^p\big]\right)^{\frac{1}{q}}
+  %= \E\big[|X|^p\big]^{\frac{q}{p}\cdot \frac{1}{q}}
+  = \E\big[|X|^p\big]^{\frac{1}{p}}
+  =: \lVert X\rVert_p
 \end{align*}
 \end{proof}
 
+
+\clearpage
+\begin{thm}{\emph{(Markov's/Chebyshev's Inequality)}}
+\label{thm:markov}
+Given RV $f$ on measure space $(\Omega,\sF,\mu)$, suppose that
+$f\in L^p(\Omega,\sF,\mu)$. Then
+\begin{equation}
+    \label{markov}
+    \mu\big[ \left\lvert f\right\rvert \geq \varepsilon\big]
+    \leq \frac{\int_\Omega |f|^p\;d\mu}{|\varepsilon|^p}
+\end{equation}
+\end{thm}
+\begin{proof}
+Begin by breaking up the integral in the numerator of the inequality:
+\begin{align*}
+  \int_\Omega |f|^p\;d\mu
+  &= \int_{\{|f|^p\geq \varepsilon\}} |f|^p\;d\mu
+  + \int_{\{|f|^p< \varepsilon\}} |f|^p\;d\mu
+  \\
+  \implies\quad
+  \int_\Omega |f|^p\;d\mu
+  &\geq \int_{\{|f|^p\geq \varepsilon\}} |f|^p\;d\mu
+\end{align*}
+Notice that we just threw out the second integral to get the inequality
+(since $|f|^p$ nonnegative).
+Next, we can replace $|f|^p$ with it's lower bound over the domain of
+the integral and still maintain the inequality:
+\begin{align*}
+  \int_\Omega |f|^p\;d\mu
+  &\geq
+  \int_{\{|f|^p\geq \varepsilon\}} |\varepsilon|^p\;d\mu
+  = |\varepsilon|^p\int_{\{|f|^p\geq \varepsilon\}} \;d\mu \\
+  \iff\quad
+  \int_\Omega |f|^p\;d\mu
+  &\geq
+  |\varepsilon|^p \cdot \mu\big[ |f|^p \geq \varepsilon \big]
+  %\iff\quad
+  %\frac{\int_\Omega |f|^p\;d\mu}{|\varepsilon|^p}
+  %&\geq \mu\big[ |f|^p \geq \varepsilon \big]
+\end{align*}
+Rearranging, we get the desired result.
+\end{proof}
+
 \begin{cor}{\emph{(Chebyshev's Inequality)}}
-Given random variable $X$, we have
+Given random variable $X$ on probability space $(\Omega,\sF,P)$, we have
 \begin{equation}
   \label{chebyshev1}
   \Prb\left[
@@ -5472,178 +5566,315 @@ or equivalently
 \end{equation}
 \end{cor}
 \begin{proof}
-The proof of Statement~\ref{chebyshev1} follows by taking $p=2$ in
-Markov's Inequality (Theorem~\ref{markov}).
+To prove Statement~\ref{chebyshev1}, take $p=2$ in Markov's Inequality
+(Theorem~\ref{markov}).
 To prove Statement~\ref{chebyshev2}, define $Z=X-\E[X]$ and use that in
 Markov's inequality with $p=2$ on $Z$.
 \end{proof}
 
 
 \clearpage
-\subsection{Uniform Integrability}
+\subsection{Uniform Integrability on Probability Spaces}
 
 \begin{defn}(Uniform Integrability)
-A family of random variables $\{X_\alpha\}_{\alpha \in J}$ is
-\emph{uniformly integrable} if
-\begin{align*}
+A family of RVs $\{X_\alpha\}_{\alpha \in J}$ on probability space
+$(\Omega,\sF,P)$ is \emph{uniformly integrable} (UI) if
+\begin{align}
   \lim_{c\ra\infty} \sup_{\alpha\in J}\quad
   \int_{\{|X_\alpha|>c\}}
-  |X_i|\; dP = 0
-\end{align*}
-That is, you're integrating the absolute value of $X_\alpha$ over the
-tails where it has large values. Moreover, you require that the value
-of the integral goes to zero uniformly for \emph{all} $X_\alpha$ (since
-you're taking the sup over $\alpha \in J$).
+  |X_\alpha|\; dP = 0
+  \quad\iff\quad
+  \lim_{c\ra\infty} \sup_{\alpha\in J}\quad
+  \E\big[|X_\alpha|\cdot \one{\{|X_\alpha|>c\}} \big]=0
+  \label{UIcond}
+\end{align}
+So for each $\alpha\in J$,
+you're integrating the absolute value of $X_\alpha$ over the tails of
+its distribution (i.e. over those $\omega$'s where $X_\alpha$ has large
+values).
+For the family to be UI, you require the value of these integrals
+go to zero uniformly for \emph{all} $X_\alpha$ (since taking the sup
+over $\alpha \in J$).
 \end{defn}
 
 \begin{rmk}
-Given a family of random variables $\{X_\alpha\}_{\alpha \in J}$, we
-might consider two notions of boundedness for the family:
+Given family of RVs $\{X_\alpha\}_{\alpha \in J}$,
+consider these notions of boundedness for the family:
 \begin{enumerate}[label=(\roman*)]
-  \item Random Variable in $L^1$ Bounded: For some random variable
-    $X\in L^1(\Omega,\sF,P)$:
-    \begin{align*}
-      |X_\alpha|\leq |X|
-      \qquad \forall \alpha \in J
-    \end{align*}
+  \item ({Dominated by some $X\in L^1$}):
+    For some RV
+    $X\in L^1(\Omega,\sF,P)$,
+    $|X_\alpha|\leq |X|$ $\forall \alpha\in J$
 
-  \item $L^p$ Bounded for $p\in[1,\infty)$:
-    \begin{align*}
-      \sup_{\alpha\in J} \lVert X_\alpha\rVert_p<\infty
-      \qquad\text{or equivalently}\qquad
-      \sup_{\alpha\in J} \E[|X_\alpha|^p]<\infty
-    \end{align*}
+  \item ({$L^1$ Bounded}):
+    $\sup_{\alpha\in J} \lVert X_\alpha\rVert_1<\infty$
+    or, equivalenty,
+    $\sup_{\alpha\in J} \E[|X_\alpha|]<\infty$
+
+  \item ({$L^p$ Bounded for $p\in(1,\infty)$}):
+    $\sup_{\alpha\in J} \lVert X_\alpha\rVert_p<\infty$
+    or, equivalenty,
+    $\sup_{\alpha\in J} \E[|X_\alpha|^p]<\infty$
 \end{enumerate}
 In the following lemmas and propositions, we will have the following
-results:
+results, which show that UI families lay somewhere between ``$L^{p>1}$
+bounded'' and ``$L^1$ bounded'':
 \begin{itemize}
-  \item RV in $L^1$ bounded $\implies$ UI
-  \item $L^1$ bounded + tail condition $\implies$ UI
-  \item UI $\implies$ $L^1$ bounded
+  \item Dominated $\implies$ UI
+  \item $L^1$ bounded + tail condition $\iff$ UI,
   \item UI $\implies$ $L^p$ bounded for \emph{some} (but not all)
     $p \in (1,\infty]$
   \item $L^p$ bounded for any $p\in(1,\infty]$ $\implies$ UI
 \end{itemize}
-In this sense, uniformly integrable families are somewhere in between
-``bounded in $L^1$ families'' (since UI implies this) and ``bounded in
-$L^{p>1}$ families'' (since this implies UI).
 \end{rmk}
 
-
-\begin{lem}
-If $\{X_\alpha\}_{\alpha\in J}$ is a family of random variables such
-that $|X_\alpha|\leq |X|$ a.s. for some $X\in L^1(\Omega,\sF,P)$, then
-$\{X_\alpha\}_{\alpha\in J}$ is a uniformly integrable family.
+\begin{lem}\emph{(Dominated $\implies$ UI)}
+\label{lem:UI}
+If $\{X_\alpha\}_{\alpha\in J}$ is a family of RVs such that
+$|X_\alpha|\leq |X|$ a.s. for some $X\in L^1(\Omega,\sF,P)$,
+%(i.e.  dominated by some $X\in L^1$),
+then $\{X_\alpha\}_{\alpha\in J}$ is a UI family.
 \end{lem}
-%\begin{proof}
-%First, note that for any $c\in\R$ and $\alpha\in J$, we can write
-%\begin{align*}
-  %\int_{\{|X_\alpha|>c\}}
-  %|X_\alpha|\;dP
-  %&=
-  %\int_\Omega
-  %|X_\alpha|\one{\{|X_\alpha|>c\}}\;dP \\
-  %&=
-  %\E\left[|X_\alpha|\one{\{|X_\alpha|>c\}}\right] \\
-  %&\leq
-  %\E\left[|X|\one{\{|X|>c\}}\right]
-%\end{align*}
-%since $|X_\alpha|\leq |X|$ for all $\alpha\in J$ by assumption.
-%This inequality holds for all $\alpha$, so it will also hold if we take
-%the sup over $\alpha$ on the LHS:
-%\begin{align*}
-  %\sup_\alpha \int_{\{|X_\alpha|>c\}}
-  %|X_\alpha|\;dP
-  %&\leq
-  %\E\left[|X|\one{\{|X|>c\}}\right]
-%\end{align*}
-%Now take the limit as $c\ra\infty$ on both sides:
-%\begin{align*}
-  %\lim_{c\ra\infty}
-  %\sup_\alpha \int_{\{|X_\alpha|>c\}}
-  %|X_\alpha|\;dP
-  %&\leq
-  %\lim_{c\ra\infty}
-  %\E\left[|X|\one{\{|X|>c\}}\right]
-%\end{align*}
-%Finally, by the Lebesgue dominated convergence theorem since
-%$|X|\one{|X_\alpha|>c}<|X|$ a.s. for all $\alpha$, we can take the limit
-%inside on the RHS to get
-%\begin{align*}
-  %\lim_{c\ra\infty}
-  %\sup_\alpha \int_{\{|X_\alpha|>c\}}
-  %|X_\alpha|\;dP
-  %&\leq
-  %\E\left[
-  %\lim_{c\ra\infty}
-  %|X|\one{\{|X|>c\}}
-  %\right]
-  %= 0
-%\end{align*}
-%which is exactly what we needed to show.
-%\end{proof}
-
-\begin{prop}
-A family of random variables $\{X_\alpha\}_{\alpha\in J}$
-on probability space $(\Omega,\sF,P)$ is uniformly integrable if and
-only if
+\begin{proof}
+Since $|X_\alpha|\leq |X|$ for all $\alpha\in J$,
 \begin{align*}
-  \text{both}\quad
-  \begin{cases}
-    \sup_{\alpha \in J} \E[|X_\alpha|]<\infty \\
-    \forall\varepsilon>0
-    \quad\exists \delta >0
-    \quad\text{s.t.}\;
-    \E[|X_\alpha|\one{A}]\leq\varepsilon
-  \end{cases}
+  \E\left[|X_\alpha|\cdot \one{\{|X_\alpha|>c\}}\right]
+  &\leq
+  \E\left[|X|\cdot \one{\{|X|>c\}}\right]
+  \qquad \forall \alpha\in J,\;c\in\R
+  \\
+  \implies\quad
+  \sup_\alpha \; \E\left[|X_\alpha|\cdot \one{\{|X_\alpha|>c\}}\right]
+  &\leq
+  \E\left[|X|\cdot \one{\{|X|>c\}}\right]
 \end{align*}
-In words, uniform integrability implies that the family is $L^1$-bounded
-(as mentioned above in the definition of uniform integrability),
-\emph{and} we can control the tails.
+Take the limit as $c\ra\infty$ on both sides.
+And because $|X|\cdot \one{\{|X|>c\}}<|X|$ a.s.,
+can apply the Lebesgue DCT and exchange limit and expectation:
+\begin{align*}
+  \lim_{c\ra\infty}
+  \sup_\alpha \; \E\left[|X_\alpha|\cdot \one{\{|X_\alpha|>c\}}\right]
+  &\leq
+  \lim_{c\ra\infty}
+  \E\left[|X|\cdot \one{\{|X|>c\}}\right]
+  =
+  \E\left[\lim_{c\ra\infty}|X|\cdot \one{\{|X|>c\}}\right]
+  = 0
+\end{align*}
+This last statement is exactly UI Condition~\ref{UIcond}.
+\end{proof}
+
+\begin{lem}\emph{(Finite Integrable Family is UI)}
+Any finite collection of integrable RVs
+$\{X_n\}\nN\subseteq L^1(\Omega,\sF,P)$ is a UI family.
+\end{lem}
+\begin{proof}
+Since all $X_n\in L^1$,
+$\sumnN |X_n| \in L^1(\Omega,\sF,P)$.
+And clearly $|X_n|\leq \sumnN |X_n|$.
+So just apply Lemma~\ref{lem:UI}.
+\end{proof}
+
+\begin{prop}\emph{(UI $\iff$ $L^1$ Bounded + Tail Condition)}
+Given family of random variables $\{X_\alpha\}_{\alpha\in J}$
+on probability space $(\Omega,\sF,P)$, the
+family is UI if and only if both
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item
+    \emph{($L^1$ Bounded):}
+    $\sup_{\alpha \in J} \E[|X_\alpha|]<\infty$
+  \item
+    \emph{(Tail Condition):}
+    for all $\varepsilon>0$, there exists $\delta>0$ such that,
+    \begin{align*}
+      A\in \sF
+      \;\;\text{s.t.}\;\;
+      P[A]\leq \delta
+      \quad\implies\quad
+      \E[|X_\alpha|\one{A}]\leq\varepsilon
+      \quad\forall \alpha\in J
+    \end{align*}
+\end{enumerate}
+In words, UI equivalent to family being $L^1$-bounded plus well-behaved
+tails.
 \end{prop}
+\begin{proof}
+($\Rightarrow$)
+Suppose the family is UI. We prove (i) and (ii):
+\begin{enumerate}[label=(\roman*)]
+  \item
+    For any $c\in\R_{+}$ and $\alpha\in J$, we can write out
+    $\E[|X_\alpha|]$ as
+    \begin{align*}
+      \E\big[|X_\alpha|\big]
+      &=
+      \E\big[ |X_\alpha|\cdot \one{\{|X_\alpha|\leq c\}}\big]
+      + \E\big[ |X_\alpha|\cdot \one{\{|X_\alpha|> c\}}\big]
+    \end{align*}
+    Replace first expectation with an upper bound.  Upper bound comes
+    from fact that $|X_\alpha|<c$ over the domain of the integral
+    underlying this expectation, plus measure of the domain for the
+    integral is smaller than measure of entire domain,
+    $P[\Omega]=1$, hence
+    \begin{align*}
+      \E\big[|X_\alpha|\big]
+      &\leq c + \E\big[ |X_\alpha|\cdot \one{\{|X_\alpha|> c\}}\big]
+    \end{align*}
+    Lastly, by the fact that the family is UI, there exists a
+    $C$ such that $c\geq C$ implies the remaining expectation
+    is less than 1 for all $\alpha$. Hence
+    \begin{align*}
+      \E\big[|X_\alpha|\big]
+      &\leq C + 1<\infty
+      \quad\forall \alpha\in J
+    \end{align*}
+    Clearly the supremum of $\alpha\in J$ also finite.
+  \item
+    Fix $\varepsilon>0$. Since the family is UI, there exists a
+    $c\in\R_+$ such that
+    \begin{align*}
+      \sup_{\alpha\in J}\;
+      \E\big[|X_\alpha|\cdot \one{\{|X_\alpha|>c\}} \big]
+      \leq \frac{\varepsilon}{2}
+      \quad\implies\quad
+      \E\big[|X_\alpha|\cdot \one{\{|X_\alpha|>c\}} \big]
+      \leq \frac{\varepsilon}{2}
+      \forall \alpha\in J
+    \end{align*}
+    Choose $\delta =\varepsilon/(2c)$. Then
+    \begin{align*}
+      P[A]\leq \delta
+      \quad\implies\quad
+      \E\big[
+        |X_\alpha|\cdot \one{A}
+      \big]
+      &=
+      \E\big[
+        |X_\alpha|\cdot \one{A\cap \{|X_\alpha|\leq c\}}
+      \big]
+      +
+      \E\big[
+        |X_\alpha|\cdot \one{A\cap \{|X_\alpha|>c\}}
+      \big]
+      \\
+      &\leq
+      c P[A]
+      +
+      \frac{\varepsilon}{2}
+      =
+      c \frac{\varepsilon}{2c}
+      +
+      \frac{\varepsilon}{2} \\
+      \implies\quad
+      \E\big[
+        |X_\alpha|\cdot \one{A}
+      \big]
+      &\leq \varepsilon
+    \end{align*}
+\end{enumerate}
+($\Leftarrow$)
+%We will show there exists a $C$
+%such that $\E[ \,|X_\alpha|\cdot\one{\{|X_\alpha|>c\}}]\leq \varepsilon$
+%for all $\alpha$ and $c>C$.
+Let $K=\sup_{\alpha \in J}\E[ |X_\alpha|]<\infty$.
+Given $\varepsilon>0$, use assumed (ii) to get the corresponding
+$\delta>0$.
+Set $C = K/\delta$.
+Then we can use Markov's Inequality
+(Theorem~\ref{markov}) with $p=1$ to get
+\begin{align*}
+  c\geq C\quad\implies
+    P\big[ \left\lvert X_\alpha\right\rvert > c\big]
+    \leq \frac{\E[|X_\alpha|]}{c}
+    \leq \frac{\E[|X_\alpha|]}{C}
+    \leq \frac{K}{C} = \delta
+    \quad\forall \alpha
+\end{align*}
+By (ii), it is therefore the case that
+\begin{align*}
+  \E\big[
+    |X_\alpha|\cdot \one{\{\left\lvert X_\alpha\right\rvert > c\}}
+  \big]
+  \leq \varepsilon
+  \quad \forall \alpha\in J\quad\forall c\geq C
+  \quad\implies\quad
+  \lim_{c\ra\infty}\sup_\alpha\;
+  \E\big[
+    |X_\alpha|\cdot \one{\{\left\lvert X_\alpha\right\rvert > c\}}
+  \big]
+  \leq \varepsilon
+\end{align*}
+Since $\varepsilon$ we arbitrary, we conclude that this limit of
+supremums of expectations equals zero, which is the very definition of
+UI.
+\end{proof}
 
 \begin{thm}\emph{(Lebesgue DCT Generalization)}
-Let $\{X_n\}\ninf$ and $X$ be random variables on $(\Omega,\sF,P)$ such
-that
-\begin{enumerate}[label=(\roman*)]
-  \item $X_n\pto X$
-  \item $\{X_n\}\ninf$ is a UI family
-\end{enumerate}
-Then
-\begin{enumerate}[label=(\roman*)]
+Let $\{X_n\}\ninf$ be a sequence of RVs on probability space
+$(\Omega,\sF,P)$ such that $X_n\pto X$. Suppose also that $\{X_n\}\ninf$
+is a UI family. Then
+\begin{enumerate}[label=\emph{(\roman*)}]
   \item $X\in L^1(\Omega,\sF,P)$
   \item $\limn \E[X_n] = \E\left[\limn X_n\right] = \E[X]$
   \item $X_n \Lqto{1} X$, i.e. $\lim \E[|X_n-X|] = 0$.
 \end{enumerate}
 \end{thm}
 \begin{rmk}
-This is strictly weaker than Lebesgue's DCT for a few reasons. First, we
-don't need $|X_n|\leq |X|$ for all $n$ as in Lebesgue---we just need the
-family to be UI, which we saw is weaker. Moreover, we don't need
-$X_n\asto X$---we just need $X_n\pto X$, which (again) is weaker.
-This only works for a probability space where $P[\Omega]<1$, so this is
-really a probability theory result, not a measure theory result.
+This theorem provides a result similar to Lebesgue's DCT, but it's
+slightly better.
+First advantage: we don't need the sequence of RVs to be dominated
+$|X_n|\leq |X|$ for some $X\in L^1$ and all $n$ as in Lebesgue---we just
+need the family to be UI, which we saw is weaker.  Moreover, we don't
+need $X_n\asto X$---we just need $X_n\pto X$, which (again) is weaker.
+\emph{However}, this theorem only applies to probability spaces with
+$P[\Omega]<\infty$, \emph{not} general measure spaces.
+So this is really a probability theory result, not a measure theory
+result.
 \end{rmk}
 
+\begin{thm}\emph{(de la Vallee-Poissin)}
+A family of RVs $\{X_\alpha\}_{\alpha\in J}$ on probability space
+$(\Omega,\sF,P)$ is UI if and only if there exists a function
+$\varphi:\R_+\ra\R$ such that
+\begin{align*}
+  \lim_{x\ra\infty}
+  \frac{\varphi(x)}{x} = \infty
+  \quad\text{and}\quad
+  \sup_{\alpha\in J} \; \E[\varphi(|X_\alpha|)]<\infty
+\end{align*}
+Moreover, $\varphi$ can always be chosen to be convex and nondecreasing.
+\end{thm}
 
 \begin{cor}
 A family of random variables $\{X_\alpha\}_{\alpha\in J}$ is UI if and
-only if the family is $L^p$-bounded for some $p\in(1,\infty]$.
+only if the family is $L^p$-bounded for some $p\in(1,\infty]$, i.e.
+\begin{align*}
+  \sup_{\alpha\in J}
+  \lVert X_\alpha \rVert_p
+  <\infty
+  \quad\iff\quad
+  \sup_{\alpha\in J}
+  \E\big[|X_\alpha|^p\big]
+  <\infty
+\end{align*}
 \end{cor}
+\begin{proof}
+Take $\varphi(x)=x^p$ and apply de la Vallee-Poisson.
+\end{proof}
 
 
 \clearpage
 \section{Probability Theory with Random Variables}
 
-In practice, we use real-numbers and probability distributions
-(CDFs, PDFs), not abstract measure space $(\Omega,\sF,P)$. How can we
-square practice with measure-theoretic probability?
+In practice, probability works with real-numbers and probability
+distributions (CDFs, PDFs), not abstract $(\Omega,\sF,P)$.
+How do we square practice with the measure theory?
 
 The answer is, more or less, random variables.
-Recall that a random variable is simply a \emph{real-valued},
+Recall that an RV is simply a \emph{real-valued},
 \emph{measurable mapping} between some measurable spaces:
 \begin{align*}
-  X:(\Omega,\sF)\ra (\R,\sB(\R))
+  X:(\Omega,\sF,P)\ra (\R,\sB(\R))
 \end{align*}
 The domain is some abstract state space $\Omega$ of basic elementary
 \emph{outcomes} equipped with a $\sigma$-algebra $\sF$ containing
@@ -5652,18 +5883,16 @@ probability measure $P$.
 Meanwhile, the range $\R$ is typically equipped with the Borel
 $\sigma$-algebra, as shown.
 
-RVs like this will tie everything together in this section.
-First, we start simply by studying probability measures on
-$(\R,\sB(\R))$ (the range of \emph{any} RV). We define CDFs and show the
-special relationship between them and probability measures on
-$(\R,\sB(\R))$.  After that, we show how RVs like $X$ connect a
-probability measure on the \emph{domain} $(\Omega,\sF)$---some abstract
-space of elementary events and outcomes---to a probability measure on
-the \emph{range} $(\R,\sB(\R))$, thus characterizing things in terms of
-real numbers only. Thus RVs let us work with real numbers in practice,
+This section uses RVs to tie together theory and practice.
+As we will see, CDFs are tightly linked to probability measures on
+$(\R,\sB(\R))$ (the range of \emph{any} RV). Such measures on
+$(\R,\sB(\R))$ can be interpreted as the push-forward measure
+$P_X=P\circ X^{-1}$ corresponding to some RV $X$ on an abstract measure
+space $(\Omega,\sF,P)$.
+Therefore, we can write down and work with CDFs \emph{in practice}
 while taking comfort that there's also this deep measure theoretic
-structure of space $(\Omega,\sF)$ (with some probability measure)
-floating around in the background.
+structure $(\Omega,\sF,P)$, $X$, and $P_X$ floating around in the
+background.
 
 
 \subsection{Cumulative Distribution Functions}
@@ -5933,12 +6162,13 @@ $(\R^n,\sB(\R)^{\otimes n})$ such that
 
 \clearpage
 \subsection{Expectation and Distribution of a Random Variable}
+\label{sec:expdist}
 
 Having studied the connection between CDFs and probability measures on
 $(\R,\sB(\R))$ (the range of RVs), we now examine how RVs link a
-prob. measure on their abstract measure-theoretic domain $(\Omega,\sF)$
-to a prob.  measure on their range $(\R,\sB(\R))$, which we just
-studied.
+probability measure on their abstract measure-theoretic domain
+$(\Omega,\sF)$ to a probability  measure on their range $(\R,\sB(\R))$,
+the space we just studied.
 In the process, this section clarifies how to compute probabilities and
 expectations of RVs in practice with CDFs.
 
@@ -5962,8 +6192,8 @@ First, some definitions.
 \begin{defn}(Probability Distribution of RV $X$)
 \label{defn:probdist}
 Suppose we have measure space $(\Omega,\sF,P)$ and RV
-$X:(\Omega,\sF)\ra (\R,\sB(\R))$. From the probability measure on the
-domain $(\Omega,\sF)$, we can construct the push forward
+$X:(\Omega,\sF)\ra (\R,\sB(\R))$. From the probability measure $P$ on
+the domain $(\Omega,\sF)$, we can construct the push forward
 measure\footnote{%
   Definition~\ref{defn:pushfwd}
 }
@@ -5974,8 +6204,8 @@ called the \emph{probability distribution of RV $X$}:
   P\big[ X^{-1}(A) \big]
   \qquad \forall A\in\sB(\R)
 \end{align*}
-By Prop.~\ref{prop:ptocdf}, $P_X$ uniquely determines the associated
-(unique) CDF of RV $X$:
+By Prop.~\ref{prop:ptocdf}, $P_X$ implies an associated (unique) CDF for
+RV $X$:
 \begin{align*}
   F_X(x)
   = P_X\big[(-\infty,x]\big]
@@ -5984,13 +6214,16 @@ By Prop.~\ref{prop:ptocdf}, $P_X$ uniquely determines the associated
 \end{defn}
 
 \begin{defn}(Classifying RVs)
-We call the random vector $X:(\Omega,\sF)\ra(\R^d,\sB(\R)^{\otimes d})$
-on probability space $(\Omega,\sF,P)$
+We classify random vector
+$X:(\Omega,\sF,P)\ra(\R^d,\sB(\R)^{\otimes d})$
+by the Section~\ref{sec:abscts} classification of its distribution
+$P_X=P\circ X^{-1}$.
+So we call $X$
 \begin{itemize}
-  \item \emph{Discrete}: If $P\circ X^{-1}$ is a discrete measure
-  \item \emph{Continuous}: If $P\circ X^{-1}$ is a continuous measure
-  \item \emph{Absolutely Continuous}: If $P\circ X^{-1}$ is an
-    absolutely continuous measure
+  \item \emph{Discrete}: If $P_X$ is a discrete measure
+  \item \emph{Continuous}: If $P_X$ is a continuous measure
+  \item \emph{Absolutely Continuous}: If $P_X$ is an
+    abs. continuous measure (permitting a density)
 \end{itemize}
 \end{defn}
 
@@ -6007,22 +6240,24 @@ expectation
   = \int_\R g \;dP_X
   \label{expPX}
 \end{align}
-This is a change of vars to replace integral of $g\circ X$ over
+This is a change of variables that replaces integral of $g\circ X$ over
 $(\Omega,\sF,P)$ with integral of $g$ over $(\R,\sB(\R),P_X)$.
 \end{prop}
 \begin{proof}
-This follows directly from Proposition~\ref{prop:changeofvars}.
+This follows directly from Proposition~\ref{prop:changeofvars}
+about push forward measures.
 \end{proof}
 
 Expression~\ref{expPX} looks slightly better than the expression for the
 expectation in Definition~\ref{defn:exp}. In particular, we're now
 integrating over real measurable space $(\R,\sB(\R))$ rather than super
-abstract measurable $(\Omega,\sF)$. That's surely an improvement, but
-we still don't necessarily know how to integrate with respect to $P_X$
-in practice. Therefore, we would like to replace Expression~\ref{expPX}
-with a simple Riemman or Riemann-Stieltjes integral over the PDF or CDF,
-rspectively, which we would definitely know how to compute.
-The next few definitions and results work towards that goal.
+abstract measurable space $(\Omega,\sF)$. That's surely an improvement,
+but we still don't necessarily know how to integrate with respect to
+$P_X$ in practice. Therefore, we would like to replace
+Expression~\ref{expPX} with a simple Riemman or Riemann-Stieltjes
+integral over the PDF or CDF, rspectively, which we \emph{would}
+definitely know how to compute.  The next few definitions and results
+work towards that goal.
 
 \begin{defn}(Right Quantile Function)
 Given RV $X:(\Omega,\sF,P)\ra(\R,\sB(\R))$
@@ -6129,25 +6364,29 @@ distribution $P_X$, and link the integral with respect to this
 distribution $P_X$ to a Riemann-Stieltjes integral with respect to its
 CDF $F_X$.
 
-Why did we do this? How is it that we so easily and frequently compute
-expectations and probabilities from CDFs \emph{in practice} without
-\emph{ever} thinking about all this super-involved measure theory?
-The reason is that we \emph{invert} the steps described above.
+Why did we do this? And how is it that we so easily and frequently
+compute expectations and probabilities from CDFs \emph{in practice}
+without \emph{ever} thinking about all this super-involved measure
+theory?  The reason is that we \emph{invert} the steps described above.
 Rather than start with super abstract $(\Omega,\sF,P)$ and move to
-$F_X$, we typically start by writing down the CDF $F_X$ \emph{directly}.
-Then, we simply \emph{recognize} that it \emph{implies} a probability
-space $(\Omega,\sF,P)$ and RV $X$ on that space with distribution
-$P_X=P\circ X^{-1}$ (unique by Proposition~\ref{prop:cdftop}).  Of
-course, there might be \emph{many} probability spaces and associated RVs
-that imply this same CDF $F_X$.\footnote{%
-  We don't know the \emph{true} model of the world---i.e. the true set
-  of elementary outcomes $\Omega$, set of events $\sF$, or probabilities
-  $P$.
+$X$, $P_X$, and $F_X$, we typically start by writing down the CDF $F_X$
+\emph{directly}.  Then, we simply \emph{recognize} that it
+implies a measure (unique by Proposition~\ref{prop:cdftop})
+that can be \emph{interpreted} as the probability distribution
+(push-forward measure) $P_X=P\circ X^{-1}$ of some RV $X$ on some
+probability space $(\Omega,\sF,P)$.
+Of course, there might be \emph{many} probability spaces and associated
+RVs that imply this same CDF $F_X$.\footnote{%
+  For example, the exponential distribution shows shows up so often
+  precisely because there are many different real-world ``experiments''
+  (all corresponding to different states/outcomes $\Omega$ and events
+  $\sF$) which nonetheless imply exponentially distributed waiting
+  times.
 }
 But in practice, that's fine. Really, we just care to know the CDF
 itself (so we can compute expectations and probabilities) and
-\emph{that there exists} an \emph{implied} measure-theory foundation
-$(\Omega,\sF,P)$ and $X$.
+\emph{that there exists} an implicit measure-theory foundation
+$(\Omega,\sF,P)$ and $X$ underlying everything.
 But that implied measure theoretic structure is all pushed to the
 background. In practice, we don't actually worry about it or work with
 it really. But it's there for rigor's sake to justify computations
