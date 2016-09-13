@@ -2842,6 +2842,7 @@ has a unique extension to $\sB(\R)=\sigma\big(\sI_{(a,b]}\big)$.
 \end{ex}
 
 \begin{defn}(Consistent Family of Probability Measures)
+\label{defn:consistent}
 Let $J$ be a nonempty index set and assume that for every finite
 sequence of distinct elements $\alpha_1,\ldots,\alpha_n,\in J$, there
 exists a probability measure $P^{\alpha_1,\ldots,\alpha_n}$ on
@@ -2867,6 +2868,7 @@ $\alpha_1,\ldots,\alpha_n\in J$ and $A_1,\ldots,A_n\in\sB(\R)$ we have
 \end{defn}
 
 \begin{thm}\emph{(Kolmogorov's Extension Theorem)}
+\label{thm:kolmogorov}
 Let $J$ be a nonempty index set and suppose we have a consistent family
 of probability measures. Then there exists a \emph{unique} probability
 measure $P$ on $(\R^J,\sB(\R)^{\otimes J})$ such that
@@ -4628,7 +4630,7 @@ measure on the domain $(\Omega,\sF)$ to the range $(E,\sE)$.
 \end{defn}
 \begin{rmk}
 When $f$ is a random variable (real-valued), we call $\mu_f$ the
-``distribution of $f$.'' See Section~\ref{sec:expdist}.
+``distribution of $f$.'' See Section~\ref{sec:dist}.
 \end{rmk}
 
 \begin{prop}\emph{(Change of Variables)}
@@ -4835,11 +4837,13 @@ Taking $A$ to be rectangle in $\R^d$, that means
 
 
 \begin{prop}
-If $f_1,\ldots,f_d$ are densities on $\R$ then
+\label{prop:densityproduct}
+If $f_1,\ldots,f_d$ are densities on $(\R,\sB(\R))$ then
 \begin{align*}
   f(x) = f_1(x_1) \cdots f_d(x_d)
 \end{align*}
-is a density in $\R^d$ that implies a corresponding measure
+is a density on $(\R^d,\sB(\R)^{\otimes d})$ that implies a
+corresponding measure
 \begin{align*}
   \mu = \mu_1\otimes \cdots \otimes \mu_d
 \end{align*}
@@ -5924,7 +5928,96 @@ while taking comfort that there's also this deep measure theoretic
 structure $(\Omega,\sF,P)$, $X$, and $P_X$ floating around in the
 background.
 
+\subsection{Expectation, Variance, and Covariance}
+\label{sec:exp}
 
+To motivate CDFs and distributions, we first define the fundamental
+notions of expectation, variance, and covariance for RVs on a measure
+space $(\Omega,\sF,P)$. Computing these objects is, in fact, the main
+purpose of working with CDFs and distributions anyway.
+
+\begin{defn}(Expectation, Variance, Covariance)
+\label{defn:exp}
+Given measure space $(\Omega,\sF,P)$ and RV on that measure space
+$X:(\Omega,\sF)\ra (\R,\sB(\R))$, define
+\begin{alignat*}{3}
+  \E[X] &:= \int_\Omega X \; dP &&\forall X\in L^1\\
+  \Var[X] &:= \E[(X-\E[X])^2]  &&\forall X\in L^2\\
+  \Cov[X,Y] &:= \E[(X-\E[X])(Y-\E[Y])] \qquad&&\forall X\in L^2
+\end{alignat*}
+For random vector $X:(\Omega,\sF)\ra(\R^d,\sB(\R)^{\otimes d})$,
+define
+\begin{align*}
+  \E[X] &:=
+  \begin{pmatrix}
+    \E[X_1] & \ldots \E[X_d]
+  \end{pmatrix}'
+  \in\R^d
+  \\
+  \Cov(X)
+  &:=
+  \begin{pmatrix}
+    \Var(X_1) & \Cov(X_1,X_2) & \cdots & \Cov(X_1,X_d) \\
+    \Cov(X_2,X_1) & \Var(X_2) & \cdots & \Cov(X_2,X_d) \\
+    \vdots & \vdots & \ddots & \vdots \\
+    \Cov(X_d,X_1) & \Cov(X_d,X_2) & \cdots & \Var(X_d) \\
+  \end{pmatrix}
+\end{align*}
+\end{defn}
+\begin{rmk}
+The objects presented in Definition~\ref{defn:exp} are all built up from
+a single primitive:
+the expectation of a one-dimensional RV, which represents an integral
+over abstract measure space $(\Omega,\sF)$ with respect to associated
+measure $P$.  But one problem: I don't really know how to integrate over
+abstract space $(\Omega,\sF)$.  So how to compute expectations in
+practice?
+Upcoming Subsections~\ref{sec:cdf} and \ref{sec:dist} offer the answer.
+\end{rmk}
+
+\begin{prop}\emph{(Properties of Covariance Matrix)}
+Given random vector $X:(\Omega,\sF)\ra(\R^d,\sB(\R)^{\otimes d})$,
+$\Cov(X)$ satisfies the following properties:
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item $\Cov(X)$ symmetric
+  \item $\Cov(X)$ positive semi-definite always
+  \item $\Cov(X)$ positive definite iff $1,X_1,\ldots,X_d$ are linearly
+    independent functions of $\omega$\footnote{%
+      This differs from stochastic independence introduced in
+      Section~\ref{sec:independence}.
+    }
+\end{enumerate}
+\end{prop}
+\begin{proof}
+We prove each in turn:
+\begin{enumerate}[label=(\roman*)]
+  \item Obvious since $\Cov(X_i,X_j)=\Cov(X_j,X_i)$
+  \item Given any $u\in \R^d$, consider
+    \begin{align*}
+      u'\Cov(X)u
+      = \sum_{i=1}^d\sum_{j=1}^d
+        u_i\Cov(X_i,X_j)u_j
+      = \Cov\left( \sum_{i=1}^du_i X_i, \sum_{j=1}^d u_j X_j\right)
+      = \Var\left( \sum_{i=1}^du_i X_i\right)
+      \geq 0
+    \end{align*}
+    since variance is always nonnegative.
+    Hence $u'\Cov(X)u$ nonnegative for arbitrary $u$, which
+    is precisely the definition of positive semi-definite.
+  \item
+    Given any $u\neq 0$ in $\R^d$, as for Part (ii), we have
+    \begin{align*}
+      u'\Cov(X)u
+      = \Var\left( \sum_{i=1}^du_i X_i\right)
+      = \Var(u'X)
+    \end{align*}
+    This is strictly positive if and only if $u'X$ is non-constant.
+    That's true if and only if functions $1,X_1,\ldots,X_d$ are linearly
+    independent.
+\end{enumerate}
+\end{proof}
+
+\clearpage
 \subsection{Cumulative Distribution Functions}
 \label{sec:cdf}
 
@@ -6002,6 +6095,7 @@ Hence, $F$ is right continuous.
 Lastly, Property 3 is obvious.
 \end{proof}
 
+\clearpage
 The next two propositions are very important (and the culmination of all
 the confusing, abstract, annoying Monotone Class and Extension Theorem
 set theory nonsense).
@@ -6088,6 +6182,7 @@ We define an operator that will be useful in the next definition:
 \end{align*}
 \end{defn}
 
+\clearpage
 \begin{defn}(CDF on $\R^n$)
 \label{defn:F}
 A CDF on $\R^n$ is a function $F:\Rn\ra[0,1]$ satisfying
@@ -6188,11 +6283,9 @@ $(\R^n,\sB(\R)^{\otimes n})$ such that
 \end{prop}
 
 
-
-
 \clearpage
-\subsection{Expectation and Distribution of a Random Variable}
-\label{sec:expdist}
+\subsection{Distribution of a Random Variable}
+\label{sec:dist}
 
 Having studied the connection between CDFs and probability measures on
 $(\R,\sB(\R))$ (the range of RVs), we now examine how RVs link a
@@ -6202,22 +6295,6 @@ the space we just studied.
 In the process, this section clarifies how to compute probabilities and
 expectations of RVs in practice with CDFs.
 
-\begin{defn}(Expectation, Variance, Covariance)
-\label{defn:exp}
-Given measure space $(\Omega,\sF,P)$ and RV on that measure space
-$X:(\Omega,\sF)\ra (\R,\sB(\R))$, define
-\begin{alignat*}{3}
-  \E[X] &:= \int_\Omega X \; dP &&\forall X\in L^1\\
-  \Var[X] &:= \E[(X-\E[X])^2]  &&\forall X\in L^2\\
-  \Cov[X,Y] &:= \E[(X-\E[X])(Y-\E[Y])] \qquad&&\forall X\in L^2
-\end{alignat*}
-These are well-defined objects written as an integral over abstract
-measure space $(\Omega,\sF)$ with respect to associated measure $P$.
-But one problem: I don't really know how to integrate over
-abstract space $(\Omega,\sF)$.
-So how to compute expectations in practice?
-First, some definitions.
-\end{defn}
 
 \begin{defn}(Probability Distribution of RV $X$)
 \label{defn:probdist}
@@ -6279,11 +6356,11 @@ about push forward measures.
 \end{proof}
 
 Expression~\ref{expPX} looks slightly better than the expression for the
-expectation in Definition~\ref{defn:exp}. In particular, we're now
-integrating over real measurable space $(\R,\sB(\R))$ rather than super
-abstract measurable space $(\Omega,\sF)$. That's surely an improvement,
-but we still don't necessarily know how to integrate with respect to
-$P_X$ in practice. Therefore, we would like to replace
+expectation in our original Definition~\ref{defn:exp}. In particular,
+we're now integrating over real measurable space $(\R,\sB(\R))$ rather
+than super abstract measurable space $(\Omega,\sF)$. That's surely an
+improvement, but we still don't necessarily know how to integrate with
+respect to $P_X$ in practice. Therefore, we would like to replace
 Expression~\ref{expPX} with a simple Riemman or Riemann-Stieltjes
 integral over the PDF or CDF, rspectively, which we \emph{would}
 definitely know how to compute.  The next few definitions and results
@@ -6298,15 +6375,15 @@ define the \emph{right quantile function}
   \quad\text{where}\quad
   q_X(u) := \sup\{x\in\R\;|\; F_X(x)\leq u\}
 \end{align*}
-This is a real-valued measurable function, hence a RV with range
+This is a real-valued measurable function, hence an RV with range
 $(\R,\sB(\R))$.
 \end{defn}
 
 \begin{defn}(Prob. Measure of $q_X$)
 \label{defn:probdistq}
 If we use the Lebesgue measure $\lambda$ on its domain
-$([0,1],\sB([0,1]))$, then by Definition~\ref{defn:probdist}, $q_X$ has
-probability distribution on the range given by
+$([0,1],\sB([0,1]))$, then by Definition~\ref{defn:probdist},
+$q_X$ has prob. distribution on the range given by
 \begin{align*}
   P_q[A] := \lambda[q_X^{-1}(A)]
   \qquad \forall A\in\sB(\R)
@@ -6424,6 +6501,7 @@ that we carry out with the CDF $F_X$.
 
 \clearpage
 \subsection{Independence}
+\label{sec:independence}
 
 \begin{defn}(Independence)
 Let $(\Omega,\sF,P)$ be a probability space and let $J$ be a non-empty
@@ -6460,6 +6538,7 @@ indexing set. We define the following types of independence
 \end{defn}
 
 \begin{prop}\emph{(Characterizations of Independence of Random Variables)}
+\label{prop:indep}
 Let $\{X_n\}\nN$ be a sequence of RVs on probability space
 $(\Omega,\sF,P)$. Then the following are equivalent
 \begin{enumerate}
@@ -7304,40 +7383,6 @@ let $\sG\subseteq \sF$ be a sub-$\sigma$-algebra. Then
 
 
 \clearpage
-\subsection{Gaussian Processes}
-
-\begin{defn}
-(Symmetric Positive Semi-definite and Positive Definite Functions)
-Given indexing set $J$, the function $C:J^2 \ra \R$ where we define
-$c_{st}:=c(s,t)$ is
-\begin{enumerate}
-  \item \emph{Symmetric}: $c_{st}=c_{ts}$ for all $s,t \in J$.
-  \item \emph{Positive (Semi-)definite}: The matrix
-    \begin{align*}
-      (c_{t_i,t_j})^d_{i,j=1}
-      &=
-      \begin{pmatrix}
-        c_{t_1,t_1} &\cdots & c_{t_1,t_d} \\
-        \vdots &\ddots & \vdots \\
-        c_{t_d,t_1} &\cdots & c_{t_d,t_d} \\
-      \end{pmatrix}
-      \in \R^{d\times d}
-    \end{align*}
-    is positive (semi-)definite for every finite sequence
-    $\{t_1,\ldots,t_d\}$ of different elements of $J$.
-\end{enumerate}
-\end{defn}
-
-\begin{rmk}
-Any inner product in a Hilbert Space is positive semi-definite. So
-rather than take a function $C$, fix a sequence
-$\{i_1,\ldots,i_d\}\subseteq J$, and check the resulting matrix for
-positive (semi)definiteness, just see if it's an inner product in a
-Hilbert space.
-\end{rmk}
-
-
-\clearpage
 \subsection{Transformation Theory}
 
 In this section, we derive the distribution for some RV
@@ -7385,6 +7430,7 @@ monotonic segments, denoted $g_1,\ldots,g_M$. Then
 \end{thm}
 
 \begin{thm}\emph{(Invertible $g$, $N>1$)}
+\label{thm:transformmultivar}
 Given RV $X\in\R^N$ with jdf $f_{X}(x)$ and $Y=g(X)\in\R^N$
 for some invertible function $g:\Rn\ra\Rn$.\footnote{%
   The invertibility assumption is similar to the monotonicity assumption
@@ -7431,12 +7477,98 @@ out those dummy variables.
 
 
 \clearpage
-\section{Select Probability Distributions}
+\section{Select RVs and Stochastic Processes}
+
+\subsection{Point Mass}
+
+\begin{defn}(Point Mass)
+Suppose we have RV $X\in\R^d$ with $P[X=x]=1$ for some $x\in\R^d$.
+Then its characteristic function is given by
+\begin{align*}
+  \varphi_X(u)
+  = \E[e^{iu'X}] = e^{iu'x}
+\end{align*}
+\end{defn}
 
 
-\subsection{Univariate Normal/Gaussian Distribution}
+\subsection{Gamma, Exponential, Poisson}
+
+\begin{defn}(Gamma RV)
+The Gamma($\alpha,\beta$) RV is that which has density
+\begin{equation}
+   f_X(x) = \frac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha-1}
+    e^{-\beta x}, \quad x > 0
+    \quad\implies\quad
+    \text{Mean} = \frac{\alpha}{\beta}
+    \quad
+    \text{Variance} = \frac{\alpha}{\beta^2}
+\end{equation}
+\end{defn}
+
+\begin{prop}\emph{(Sums of Gamma RVs are Gamma)}
+Gamma RVs also satisfy
+\begin{align*}
+  X_n \sim \operatorname{Gamma}(\alpha_n, \;\beta)
+  \quad \Rightarrow \quad
+   \sumnN X_n \sim
+   \operatorname{Gamma}\left(\sumnN \alpha_n,\;\beta \right)
+\end{align*}
+\end{prop}
+
+\begin{defn}(Exponential RV)
+An \emph{exponential} RV is a special case of the Gamma RV:
+\begin{align*}
+  \text{Exp}(\lambda)
+  :=
+  \text{Gamma}(1,\lambda)
+  \quad\implies\quad
+  f_X(x) = \lambda\; e^{-\lambda}
+\end{align*}
+This is a \emph{memoryless} distribution particularly useful for
+waiting times.
+CDF and moments are
+\begin{align*}
+  F_X(x)
+  = 1 - e^{-\lambda x}
+  \qquad
+  \text{Mean} = \frac{1}{\lambda}
+  \qquad
+  \text{Variance} = \frac{1}{\lambda^2}
+\end{align*}
+\end{defn}
+
+\begin{prop}\emph{(Sums of Exponential are Gamma)}
+Given iid exponential RVs $\{X_n\}\nN$,
+\begin{align*}
+  X_n \sim \operatorname{Exp}(\lambda)
+  \quad\implies\quad
+  \sumnN X_n \sim \operatorname{Gamma}(N, \lambda)
+\end{align*}
+\end{prop}
+
+\begin{defn}(Poisson Process)
+We construct the continuous time \emph{Poisson process} with constant
+parameter $\lambda$, denoted $N_t$, by building up from exponentially
+distributed jump times:
+\begin{itemize}
+  \item $S_n\iid \operatorname{Exp}(\lambda)$:
+    Time between $(n-1)$th and $n$th jump
+  \item $T_N:=\sumnN S_n$ for $N\geq 0$:
+    Time until $N$th jump, with $T_0:=0$
+  \item $N_t:=\sum_{n\geq 0} \one{\{T_n\leq t\}}$
+\end{itemize}
+This implies that, for fixed $t$,
+$N_t\sim\operatorname{Poisson}(\lambda t)$.
+\end{defn}
+
+
+\clearpage
+\subsection{Normal or Gaussian}
+
+\subsubsection{Univariate Normal/Gaussian Distribution}
 
 \begin{defn}(Normal RV)
+  \label{defn:stdnormal}
 The \emph{standard normal} RV $Z\sim \calN(0,1)$ is that with density
 \begin{align*}
    f_Z(z)
@@ -7458,14 +7590,14 @@ $Y:=\mu+\sigma Z$, compute the CDF of $Z$, shift and normalize to get
 the CDF of $Y$, then differentiate.
 \end{proof}
 
-\begin{lem}\emph{(Integrals of Exponentials)}
+\begin{lem}\emph{(Integral of Exponentials)}
 \label{lem:normintegral}
 Handy integral result for working with normal RVs:
 \begin{align}
   \frac{1}{\sqrt{2\pi}}
-  \int_\R e^{xz} e^{-\frac{1}{2}z^2}\; dz
+  \int_\R e^{az} e^{-\frac{1}{2}z^2}\; dz
   =
-  e^{\frac{1}{2}x^2}
+  e^{\frac{1}{2}a^2}
   %\label{eq:normintegral}
 \end{align}
 \end{lem}
@@ -7473,17 +7605,17 @@ Handy integral result for working with normal RVs:
 To compute this integral (ignoring the constant), just complete the
 square:
 \begin{align*}
-  \int_\R e^{xz} e^{-\frac{1}{2}z^2}\; dz
+  \int_\R e^{az} e^{-\frac{1}{2}z^2}\; dz
   =
-  \int_\R e^{-\frac{1}{2}\left(z^2-2xz\right)}\; dz
+  \int_\R e^{-\frac{1}{2}\left(z^2-2az\right)}\; dz
   =
-  \int_\R e^{-\frac{1}{2}\left(z^2-2xz+x^2-x^2\right)}\; dz
+  \int_\R e^{-\frac{1}{2}\left(z^2-2az+a^2-a^2\right)}\; dz
   =
-  e^{\frac{x^2}{2}}
-  \int_\R e^{-\frac{1}{2}\left(z-x\right)^2}\; dz
+  e^{\frac{a^2}{2}}
+  \int_\R e^{-\frac{1}{2}\left(z-a\right)^2}\; dz
 \end{align*}
 But the final integral in the chain is simply the integral of the
-density of a $N(x,1)$ RV (without the multiplying constant).
+density of a $N(a,1)$ RV (without the multiplying constant).
 Therefore, it equals $\sqrt{2\pi}$, implying
 Result~\ref{lem:normintegral}.
 \end{proof}
@@ -7500,18 +7632,23 @@ Characteristic functions of $Z$ and $Y$:
   = e^{iu\mu-\frac{1}{2}(\sigma u)^2}
 \end{align*}
 \end{prop}
+\begin{rmk}
+Notice that as $\sigma\ra 0$, the characteristic function $\varphi_Y$
+converges to the characteristic function of a point mass at $\mu$, i.e.
+$Y$ converges in distribution to a point mass at $\mu$.
+\end{rmk}
 \begin{proof}
 Use the density to compute the following function of $y$:
 \begin{align*}
-  \E[e^{xZ}]
-  := \int_\R e^{xz} f_Z(z) \; dz
+  \E[e^{aZ}]
+  := \int_\R e^{az} f_Z(z) \; dz
   =
   \frac{1}{\sqrt{2\pi}}
-  \int_\R e^{xz} e^{-\frac{1}{2}z^2} \; dz
-  = e^{\frac{1}{2}x^2}
+  \int_\R e^{az} e^{-\frac{1}{2}z^2} \; dz
+  = e^{\frac{1}{2}a^2}
 \end{align*}
 where the last result came from Lemma~\ref{lem:normintegral}.
-Plug in $x=iu$ (which we can do by analytic continuity and complex
+Plug in $a=iu$ (which we can do by analytic continuity and complex
 analysis) to get $\varphi_Z$.
 Lastly, write out definition of $\varphi_Y(u)$:
 \begin{align*}
@@ -7524,182 +7661,255 @@ Lastly, write out definition of $\varphi_Y(u)$:
 \end{proof}
 
 \clearpage
-\subsection{Multivariate Normal}
+\subsubsection{Multivariate Normal}
 
 \begin{defn}(Multivariate Normal)
-We define the $d$-dimensional \emph{multivariate normal}
-or \emph{Gaussian} RV as that random vector $X\sim \calN(\mu,\Sigma)$
-with characteristic function
+\label{defn:mvn}
+$d$-dimensional random vector $X$ is called \emph{multivariate normal}
+or \emph{Gaussian} if it has characteristic function
 \begin{align*}
   \varphi_X(u)
+  = \E[e^{iu'X}]
   = e^{iu'\mu-\frac{1}{2}u'\Sigma u}
+  \quad\text{for some}\quad
+  \mu\in\R^d,\;\Sigma\in\R^{d\times d}
 \end{align*}
-given some $\mu\in\R^d$ and symmetric positive-semidefinite matrix
-$\Sigma\in\R^{d\times d}$. Moreover, we call $X$
+where $\Sigma$ symmetric positive-semidefinite.
+Denote by $X\sim\calN_d(\mu,\Sigma)$.
+Further classify $X$
 \begin{itemize}
-  \item \emph{Regular Normal} if $\Sigma$ \emph{invertible}, hence
+  \item \emph{Regular} if $\Sigma$ \emph{invertible}, hence
     positive definite
-  \item \emph{Degenerate Normal} if $\Sigma$ \emph{not invertible},
-    hence only still positive semidefinite matrix.
-    In this case random vector $X$ lives on a proper subspace of $\R^d$.
+  \item \emph{Degenerate} if $\Sigma$ \emph{not invertible},
+    so positive \emph{semi}definite only.
+    $X$ lives on subspace of $\R^d$.
 \end{itemize}
 \end{defn}
 
-In this note, the multivariate distribution will apply to a
-$d$-dimensional random vector
-\[ X = \begin{pmatrix} X^{(1)} & X^{(2)} & \ldots & X^{(d)} \end{pmatrix}^T,
-    \qquad X  \sim N_d(\mu, \Sigma) \]
-where $\mu$ is the $n$-dimensional \emph{mean vector},
-\[ \mu = \begin{pmatrix} EX^{(1)} & EX^{(2)} & \ldots & EX^{(d)} \end{pmatrix}^T,
-      \]
-and where $\Sigma$ is the $d\times d$ \emph{covariance matrix}, which
-is defined and has in its $i,j$ entry
-\[ \sigma^2 = E\left[ (X - \mu) (X-\mu)^T\right] \in
-   \mathbb{R}^{N\times N} \]
-\[ \Sigma_{ij} = Cov(X^{(i)}, X^{(j)}), \qquad i,j = 1, \ldots, d\]
-Superscripts with parentheses, like ``$X^{(i)}$,'' will denote
-$i$th element of the MVN RV ``$X$,'' while ``$X_t$'' will denote
-an MVN RV at time $t$.
-
-
-\begin{defn}(Multivariate Normal)
-A random vector $X$ has a \emph{multivariate normal}
-distribution if every linear combination of its components,
-\[ Y = a_1 X^{(1)} + \ldots + a_d X^{(d)} \]
-\[ \Leftrightarrow Y = {a} X, \qquad
-    {a} \in \mathbb{R}^{d} \]
-is \emph{univariate normally
-distributed}, with a corresponding mean and variance. This gives a
-joint density function of
-\begin{equation}
-    \label{pdf2}
-    f_{X}({x}) = \frac{1}{(2\pi)^{d/2}\lvert \Sigma \rvert^{1/2}}
-	\; e^{ -\frac{1}{2} ({x} - \mu)^T \;
-	\Sigma^{-1} ({x} - \mu) }, \qquad \lvert\Sigma\rvert =
-      \det\Sigma \qquad x \in \mathbb{R}^d
-\end{equation}
-Note, we impose the requirement that $\Sigma$ is symmetric and positive
-definite.  Symmetric because the correlation of $X$ and $Y$ equals the
-correlation of $Y$ and $X$.
-\end{defn}
-{\sl Terminology}: I'll often us MVN to refer to the case where $X$ is
-a vector with $d\geq2$; however, it should be clear that the univariate
-normal distribution is just a special case where $d=1$. Therefore,
-when speaking about an RV that could be either MVN or univariate normal
-\emph{or} properties that apply equally well to either
-type of RV, I'll often use the term \emph{Gaussian}
-both for convenience and out of reverence to long-dead German-speaking
-mathematicians. Stimmt?
-
-
-It's fairly common to consider linear transformations and functions
-of a multivariate normally distributed random variable.  For instance,
-we might have an economic or statistical model with a recurrence
-relation to describe the dynamics of some process:
-\[ X_{t+1} = A X_{t} + {V}_{t} \]
-where ${V}_t$ is some innovation or random noise vector.
-Therefore, it would be useful to be able to derive the distributions
-of \emph{functions} or \emph{linear transformation} of multivariate
-normal random variables.
-
-So let's find the probability distribution of a linear transforamtion
-of an MVN RV. Begin by assuming
-\begin{align*}
-    X &= A{Y}, \qquad {Y} \sim
-	\text{MVN}(\mu, \Sigma) \\
-    \Rightarrow \quad f(y) &= k \; \exp\left\{-\frac{1}{2} (y - \mu)^T
-	\; \Sigma^{-1} (y-\mu)\right\}
-\end{align*}
-where $k$ is a constant.\footnote{The constant will come from the
-definition of the distribution given above in Equation, but
-it's boring algebra not that interesting, so I'll suppress the details.}
-Assuming that $A$ is invertible, we substitute in, using Equation
-, to get the distribution of $X$:
+\begin{prop}\emph{(Construction of $Z=\calN_d(0,I_d)$ Density)}
+The following function gives the density of a standard multivariate
+normal random vector $Z\sim \calN_d(0,I_d)$.
 \begin{align}
-    \label{midway}
-    \Rightarrow \quad f_X(A^{-1}x) &= k' \exp\left\{-\frac{1}{2} (A^{-1}x - \mu)^T
-	\Sigma^{-1} (A^{-1}x-\mu)\right\}
+  f_Z(z_1,\ldots,z_d)
+  = f_Z(z_1)\cdots f_Z(z_d)
+  %=
+  %\frac{1}{(2\pi)^{d/2}}
+  %e^{-\frac{1}{2}\sum_{i=1}^d z_i^2}
+  =
+  \frac{1}{(2\pi)^{d/2}}
+  e^{-\frac{1}{2}z'I_dz}
+  \label{prop:mvndens}
 \end{align}
-Next, since the expectation is a linear operator, we can use the fact
-that
+\end{prop}
+\begin{proof}
+Expr.~\ref{prop:mvndens} is a product of univariate
+densities $f_Z(z)$ on $(\R,\sB(\R))$.
+Hence by Prop.~\ref{prop:densityproduct},
+Expr.~\ref{prop:mvndens} is a density
+%on $(\R,\sB(\R)^{\otimes d})$
+corresponding to some measure/distribution $P_Z$ on
+$(\R,\sB(\R)^{\otimes d})$ corresponding to a random vector $Z$ with
+independent $\calN(0,1)$ components.
+Hence, CF is
 \begin{align*}
-    EX &= E[A{Y}] = A E{Y} = A \mu \\
-    \Rightarrow \quad \mu_* &= A \mu \\
-    \Leftrightarrow \quad \mu &= A^{-1} \mu_*
+  \varphi_Z(u)
+  := \E[e^{iu'Z}]
+  \underset{(a)}{=}
+    \E[e^{iu_1Z_1}]
+    \cdots
+    \E[e^{iu_dZ_d}]
+  \underset{(b)}{=}
+  \varphi_Z(u_1)\cdots\varphi_Z(u_d)
+  \underset{(c)}{=}
+  e^{-\frac{1}{2}u'I_du}
 \end{align*}
-where $\mu'$ is the mean vector of $X$.  With that, we
-can substitute back into Equation \ref{midway} and simplify even
-further, using convenient matrix manipulations like the distributivity
-property, associativity, etc.:
-\begin{align*}
-    f_X(A^{-1}x) &= k' \exp\left\{-\frac{1}{2} (A^{-1}x - \mu)^T \;
-	\Sigma^{-1} (A^{-1}x-\mu)\right\} \\
-    &= k' \exp\left\{-\frac{1}{2} (A^{-1}x - A^{-1}\mu_*)^T \;
-	\Sigma^{-1} (A^{-1}x-A^{-1}\mu_*)\right\} \\
-    &= k' \exp\left\{-\frac{1}{2} [A^{-1}(x - \mu_*)]^T \;
-	\Sigma^{-1} [A^{-1}(x-\mu_*)]\right\} \\
-    &= k' \exp\left\{-\frac{1}{2} (x - \mu_*)^T \; [(A^{-1})^T \;
-	\Sigma^{-1} A^{-1}] (x-\mu_*)\right\} \\
-    &= k' \exp\left\{-\frac{1}{2} (x - \mu_*)^T \;
-	\Sigma_*^{-1} \; (x-\mu_*)\right\} \\
-    \Rightarrow X &\sim  \text{MVN}(\mu_*, \Sigma_*),
-    \qquad \text{where $\mu_* = A\mu$ and $\Sigma_* = A\Sigma A^T $}
-\end{align*}
-This is huge! It means \emph{linear transformations of MVN
-RV's are themselves MVN.}
+(a) by independence of the $d$ components.
+(b) since each component $\calN(0,1)$, hence each expectation is
+precisely the definition of $\varphi_Z$.
+(c) by subbing in expression for $\varphi_Z$ and simplifying.
+Lastly, the final expression is the Definition~\ref{defn:mvn}
+CF of a $\calN_d(0,I_d)$ RV.
+Therefore, Expression~\ref{prop:mvndens} is precisely the density
+associated with some $\calN_d(0,I_d)$-distributed RV $X$.
+\end{proof}
 
-
-If you're familiar with the standard univariate normal RV,
-then you can probably guess what the standard MVN RV is:
-\begin{equation}
-    {Z} \sim \text{MVN}(0, \; I_d)
-\end{equation}
-where $I_d$ is the $d\times d$ identity matrix.  This form for
-the covariance matrix also suggests that the different components
-of ${Z}$ (denoted $Z_1, Z_2, \ldots, Z_d$) are independent and
-Gaussian.
-\\
-\\
-Moreover, just like we can build from a standard univariate to
-a general univariate.  To do so, we'll use the results from the
-last section, since building from a standard MVN
-to general MVN simply involves linear transformations of the components.
-Specifically, we can express the MVN RV ${X}$ as follows
-\begin{equation}
-    {X} = \mu + A{Z}, \qquad {X}\sim
-	\text{MVN}(\mu, AA^T)
-\end{equation}
-{\sl Computation}: Suppose we know that we want ${X}$ to
-be MVN($\mu, \; \Sigma)$, and we can only generate ${Z}$.
-How do we choose $A$ such that $AA^T = \Sigma$.  Typically, we'll
-have to use something like a \emph{Cholesky Factorization}
-algorithm to find the correct $A$ in the form of a lower triangular
-matrix. And if $\Sigma$ is symmetric, positive definite, then
-$A$ is guaranteed to exist and this approach will work.
-The algorithm itself can be found in the appendix.
-
-
-So to summarize, MVN (or Gaussian) RV's are particularly nice to work with because
-of some convenient properties:
-\begin{enumerate}
-    \item Suppose that ${X}$ and ${Y}$ are \emph{univariate}
-	normally distributed and independent. This then implies that they are
-	\emph{jointly normally distributed}. In other words,
-	$\begin{pmatrix} {X} & {Y} \end{pmatrix}$ must have a multivariate
-	normal distribution.
-    \item Linear functions of Gaussians are Gaussian. So if $A$
-	is a constant matrix and ${X}$ is MVN, then $A{X}$
-	is also MVN.
-    \item Uncorrelated Gaussian random variables are independent.
-    \item Conditions Gaussian's are normal. So if $X_1$ and $X_2$
-	are two components of a MVN RV, ${X}$, then
-	$X_1 | X_2$ is normal, and vice versa.
+\begin{prop}
+Given vector $\mu\in\R^d$ and symmetric positive semi-definite
+$\Sigma\in\R^{d\times d}$.
+Define $Y:=\mu+LZ$ where $Z\sim\calN_d(0,I_d)$ and
+$\Sigma=LL'$ is the Cholesky decomposition of $\Sigma$.\footnote{%
+  Such a decomposition exists precisely because $\Sigma$ assumed
+  symmetric positive semi-definite, though only unique if $\Sigma$
+  positive definite. But regardless, such a decomposition exists, and
+  that's all that matters.
+}
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item $Y:=\mu+LZ\sim\calN_d(\mu,\Sigma)$.
+  \item All components are mutually independent if and only if
+    $\Cov(Y_i,Y_j)=0$ for all $i\neq j$
+  \item If $\Sigma$ invertible (hence $\Sigma$ positive definite), then
+    $Y$ has density
+    \begin{equation}
+      \label{pdf2}
+      f_{Y}(y) =
+      \frac{1}{(2\pi)^{d/2}\lvert \Sigma \rvert^{1/2}}
+      \; e^{%
+            -\frac{1}{2} (y-\mu)^T \; \Sigma^{-1} (y-\mu)
+      }
+      \qquad\text{where}\quad
+      \lvert\Sigma\rvert = \det\Sigma,\quad y\in\R^d
+    \end{equation}
+  \item If $\Sigma$ not invertible, $Y$ lies in a strict subspace
+    of $\R^d$ and cannot have a density on $\R^d$
+  \item
+    For every $\nu\in\R^k$ and $M\in\R^{k\times d}$
+    $X:=\nu + MY \sim \calN_d(\nu + M\mu,\; M\Sigma M^T)$
 \end{enumerate}
+\end{prop}
+\begin{proof}
+We prove each in turn
+\begin{enumerate}[label=(\roman*)]
+  \item
+    %Clearly $\E[Y]=\mu$. Now check
+    %$\Cov(Y)=\Cov(\mu+LZ)=L\Cov(Z)L'=LI_dL'=\Sigma$.
+    %That shows the moments are correct. Now let's
+    We can check that the distribution of $Y$ is correct by checking the
+    characteristic function:
+    \begin{align*}
+      \varphi_Y(u)
+      := \E[e^{iu'Y}]
+      = \E[e^{iu'(\mu+LZ)}]
+      = e^{iu'\mu}\E[e^{iv'Z}]
+      \qquad\text{where} \quad:=L'u
+    \end{align*}
+    But identify this last expectation as simply the definition of
+    $\varphi_Z(v)$. Hence
+    \begin{align*}
+      \varphi_Y(u)
+      = e^{iu'\mu}\varphi_Z(v)
+      = e^{iu'\mu}e^{-\frac{1}{2}v'I_dv}
+      = e^{iu'\mu-\frac{1}{2}u'\Sigma u}
+    \end{align*}
+    where we used the fact that $\Sigma=LL'$ is the Cholesky
+    decomposition of $\Sigma$ to simplify $v'I_dv=u'LI_dL'u=u'\Sigma u$.
+    And this last expression is precisely Definition~\ref{defn:mvn}.
 
-The conditional distribution of jointly multivariate normal random
-variables is one of the most important results that underlies the
-estimation and application of factor, regression, and state space
-models. It can be summarized as follows:
+  \item
+    ($\Rightarrow$) is true for any random vector.
+    ($\Leftarrow$) is a special result for normal RVs that is not
+    generally true.
+    To prove this direction, recall Proposition~\ref{prop:indep} which
+    says that
+    \begin{align*}
+      Y_1,\ldots,Y_d \;\; \text{independent}
+      \quad\iff\quad
+      \varphi_Y(u) = \prod_{i=1}^d\varphi_{Y_i}(u_i)
+    \end{align*}
+    Now recall the Definition~\ref{defn:mvn} expression for
+    $\varphi_Y(u)$
+    \begin{align*}
+      \varphi_Y(u)
+      &= e^{iu'\mu-\frac{1}{2}u'\Sigma u}
+      = \exp\left\{
+          i\sum_{j=1}^du_j\mu_j
+          -\frac{1}{2}\sum_{j=1}^d\sum_{k=1}^du_j\Sigma_{ij}u_k
+        \right\}
+    \end{align*}
+    We can factor this into a product of univariate normal
+    characteristic functions (implying independence), if and only if
+    $\Sigma_{ij}=0$ for all $i\neq j$.
+
+  \item
+    We can use Theorem~\ref{thm:transformmultivar} on the
+    transformation $Y=\mu+LZ$ and density $f_Z(z)$ in
+    Expression~\ref{prop:mvndens}
+    \begin{align*}
+      f_{Y}(y)
+      &= \left[
+          f_{Z}(z)\frac{1}{\lvert J\rvert}
+        \right]_{z=L^{-1}(y-\mu)}
+      \qquad\text{where}\quad
+      |J|
+      = \det\left(\partial Y/\partial Z\right)
+      = \det(L')
+      \\
+      &=
+        \frac{1}{(2\pi)^{d/2}}
+        e^{-\frac{1}{2}(y-\mu)'(L^{-1})' L^{-1}(y-\mu)}
+        \frac{1}{\det(L')}
+    \end{align*}
+    Lastly, recall $\Sigma=LL'$ is invertible, $L$ triangular.
+    Hence $0\neq\det(\Sigma)=\det(L)\det(L')=\det(L)^2$
+    and $(L^{-1})'=(L')^{-1}$. Using these results,
+    in the density expression above,
+    \begin{align*}
+      f_{Y}(y)
+      &=
+      \frac{1}{(2\pi)^{d/2}\sqrt{|\Sigma|}}
+      e^{-\frac{1}{2}(y-\mu)'\Sigma^{-1} (y-\mu)}
+    \end{align*}
+  \item
+    $\Sigma$ not invertible iff $L$ not invertible, which implies
+    $L\R^d$ is a strict subspace of $\R^d$ and $\lambda(A\R^d)=0$, where
+    $\lambda$ is the Lebesgue measure.
+  \item
+    Simply compute the characteristic function of $X=\nu+MY$.
+    \begin{align*}
+      \varphi_X(u)
+      = \E[e^{iu'X}]
+      = \E[e^{iu'(\nu+MY)}]
+      = e^{iu'\nu}\E[e^{i(M'u)'Y}]
+      = e^{iu'\nu}\varphi_Y(M'u)
+      = e^{iu'(\nu+M\mu)-\frac{1}{2}u'M\Sigma M'u}
+    \end{align*}
+\end{enumerate}
+\end{proof}
+
+\clearpage
+\begin{prop}
+$X\sim \calN_d(\mu,\Sigma)$ if and only if $v'X$ is univariate normal
+for all $v\in\R^d$.
+\end{prop}
+\begin{proof}
+($\Rightarrow$)
+Start by computing the characteristic function $\varphi_{v'X}(u)$ where
+$u$ is a scalar:
+\begin{align*}
+  \varphi_{v'X}(u)
+  = \E[e^{iu(v'X)}]
+  = \E[e^{iuv'X}]
+  = \varphi_X(uv)
+\end{align*}
+where $\varphi_X(\tilde{u})$ is the characteristic function of $X$.
+Since $X\sim\calN_d(\mu,\Sigma)$, CF $\varphi_X(\tilde{u})$ is given by
+Definition~\ref{defn:mvn}, hence
+\begin{align*}
+  \varphi_{v'X}(u)
+  = \varphi_X(uv)
+  = e^{i(uv)'\mu-\frac{1}{2}(uv)'\Sigma(uv)}
+  = e^{iu(v'\mu)-\frac{1}{2}u(v'\Sigma v)u}
+\end{align*}
+which implies precisely that $v'X$ univariate normal,
+$v'X\sim\calN(v'\mu,v'\Sigma v)$
+
+($\Leftarrow$)
+If $v'X$ is normal for all $v\in\R^d$, then vector $X$ is square
+integrable, so $\mu:=\E[X]$ and $\Sigma:=\Cov(X)$ exist and
+well-defined.
+Just need to show $X$ $\calN_d(\mu,\Sigma)$, which we do by showing that
+it has the correct characteristic function---i.e. that of
+Definition~\ref{defn:mvn}.
+\begin{align*}
+  \varphi_X(u)
+  = \E[e^{iu'X}]
+  \underset{(*)}{=} e^{i\E[u'X] - \frac{1}{2} \Cov(u'X)}
+  = e^{iu'\mu - \frac{1}{2} u'\Sigma u}
+\end{align*}
+Equality $(*)$ because $u'X$ is univariate normal, and the expectation
+of lognormal RV is equal to the RHS of equality $(*)$.
+\end{proof}
+
+\begin{prop}\emph{(Conditional Distributions of MVN RVs)}
 \begin{align}
   \text{Given} \qquad
     \begin{bmatrix} X_1 \\ X_2 \end{bmatrix}
@@ -7712,14 +7922,296 @@ models. It can be summarized as follows:
     \end{bmatrix}
     \right) \notag\\
     \label{reg} \\
-  X_1 | X_2 &\sim N(\hat{\mu}, \hat{\Sigma})  \notag\\
+  X_1 | X_2 &\sim \calN(\hat{\mu}, \hat{\Sigma})  \notag\\
   \text{where} \quad
   \hat{\mu} &= \mu_1 + \Sigma_{12} \Sigma^{-1}_{22}
     (X_2-\mu_2) \notag\\
   \hat{\Sigma} &= \Sigma_{11} - \Sigma_{12} \Sigma^{-1}_{22}
     \Sigma_{21}\notag
 \end{align}
+\end{prop}
+\begin{rmk}
+This is one of the most important results that underlies the estimation
+and application of factor, regression, and state space models.
 This will be used again and again to derive the results presented below.
+\end{rmk}
+
+\clearpage
+\subsubsection{Gaussian Processes, White Noise, Brownian Motion}
+
+\begin{defn}
+\label{defn:psd}
+(Symmetric Positive (Semi-)Definite Functions)
+Given nonempty index set $J$ and function $C:J^2 \ra \R$,
+define $c_{ij}:=C(i,j)$. We call function $C$
+\begin{enumerate}
+  \item \emph{Symmetric}: If $c_{ij}=c_{ij}$ for all $i,j \in J$.
+  \item \emph{Positive (Semi-)definite}: If,
+    for \emph{any} finite sequence
+    $\{\alpha_1,\ldots,\alpha_d\}\subseteq J$ of distinct elements,
+    \begin{align*}
+      (c_{\alpha_i,\alpha_j})^d_{i,j=1}
+      &=
+      \begin{pmatrix}
+        c_{\alpha_1,\alpha_1} &\cdots & c_{\alpha_1,\alpha_d} \\
+        \vdots &\ddots & \vdots \\
+        c_{\alpha_d,\alpha_1} &\cdots & c_{\alpha_d,\alpha_d} \\
+      \end{pmatrix}
+      \in \R^{d\times d}
+    \end{align*}
+    is a positive (semi-)definite matrix.
+\end{enumerate}
+\end{defn}
+\begin{rmk}
+Any inner product in a Hilbert Space is positive semi-definite. So to
+check PSD in practice, \emph{don't} take a function $C$, fix a sequence
+$\{\alpha_1,\ldots,\alpha_d\}\subseteq J$, and check the resulting
+matrix.
+Instead, simply show that function $C$ is an inner product for some
+Hilbert space.
+\end{rmk}
+
+\begin{defn}(Gaussian Process)
+Given nonempty index set $J$, family $\{X_\alpha\}_{\alpha\in J}$
+is a \emph{Gaussian Process} if, for any sequence $\{\alpha_1,\ldots,\alpha_d\}$
+of distinct elements in $J$,
+RV $(X_{\alpha_1},\ldots,X_{\alpha_d})$ is multivariate normal.
+In other words, \emph{all} finite dimensional distributions are normal.
+
+Also, given any Gaussian process, define functions
+$\mu^X:J\ra \R$ and $\Sigma^X:J\times J \ra \R$
+\begin{align}
+  \mu_i^X := \E[X_i]
+  \qquad
+  \Sigma_{ij}^X := \Cov(X_i,X_j)
+  \qquad i,j\in J
+  \label{gaussianfunctions}
+\end{align}
+\end{defn}
+
+\begin{thm}\emph{($\Sigma^X$ PSD and Existence of Gaussian Process)}
+\label{thm:gaussian}
+We have the following:
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item
+    Given any Gaussian process $\{X_\alpha\}_{\alpha\in J}$,
+    %as defined in Expression~\ref{gaussianfunctions}
+    $\Sigma^X$ is symmetric positive semidefinite.
+  \item
+    Given any nonempty index set $J$ and functions $\mu:J\ra\R$ and
+    $\Sigma:J\times J\ra\R$ with $\Sigma$ symmetric positive
+    semidefinite, there exists a Gaussian Process
+    $\{X_\alpha\}_{\alpha\in J}$ with implied $\mu^X$ and $\Sigma^X$
+    such that $\mu^X=\mu$ and $\Sigma^X=\Sigma$.
+\end{enumerate}
+\end{thm}
+\begin{rmk}
+Part (ii) is powerful.
+It says that we don't have to start with a measure space
+$(\Omega,\sF,P)$ and family of RVs $\{X_\alpha\}_{\alpha\in J}$ on that
+measure space. Instead, simply write down mean and covariance
+functions that you want some family $\{X_\alpha\}_{\alpha\in J}$ to
+possess. Such a process is guaranteed to exist.
+\end{rmk}
+\begin{proof}
+We prove each in turn
+\begin{enumerate}[label=(\roman*)]
+  \item Symmetric obvious.
+    Positive semidefinite because for vector $(X_{\alpha_1},\ldots,X_{\alpha_d})$
+    to be multivariate normal for any sequence
+    $\{\alpha_1,\ldots,\alpha_d\}$ of distinct elements in $d$, the associated
+    covariance matrix must be positive semidefinite by the definition of
+    a MVN RV.
+  \item
+    Given any sequence $\{\alpha_1,\ldots,\alpha_d\}$ of distinct
+    elements in $J$, construct
+    \begin{align*}
+      m:=
+      \begin{pmatrix}
+        \mu_{\alpha_1} \\ \vdots \\ \mu_{\alpha_d}
+      \end{pmatrix}
+      \in \R^d
+      \qquad
+      C:=
+      \begin{pmatrix}
+        \Sigma_{\alpha_1,\alpha_1} & \cdots & \Sigma_{\alpha_1,\alpha_d}
+        \\
+        \vdots & \ddots &\vdots \\
+        \Sigma_{\alpha_d,\alpha_1} & \cdots & \Sigma_{\alpha_d,\alpha_d}
+      \end{pmatrix}
+      \in\R^{d\times d}
+    \end{align*}
+    By assumption, function $\Sigma:J\times J\ra\R$ positive
+    semidefinite, so matrix $C$ positive semidefinite.
+    Now let $P^{\alpha_1,\ldots,\alpha_d}$ be the distribution
+    associated with a $\calN_d(m,C)$-distributed random vector on
+    $(\R,\sB(\R)^{\otimes d})$.
+    This family of all such probability measures is consistent
+    (Definition~\ref{defn:consistent}).
+    Hence, by Kolmogorov's Extension Theorem~\ref{thm:kolmogorov},
+    there exists a unique probability measure $P$ on
+    all of $(\R^J,\sB(\R)^{\otimes J})$
+    matching the family of finite dimensional distributions
+    $P^{\alpha_1,\ldots,\alpha_d}$.
+\end{enumerate}
+\end{proof}
+
+\begin{defn}(White Noise)
+For any nonempty index set $J$, there exists a Gaussian process
+$\{X_\alpha\}_{\alpha\in J}$ called \emph{white noise} such that
+\begin{align}
+  \E[X_i]=0
+  \qquad
+  \Cov(X_i,X_j)
+  =
+  \begin{cases}
+    1 & i=j \\
+    0 & i\neq j
+  \end{cases}
+  \qquad\forall i,j\in J
+  \label{whitenoisecov}
+\end{align}
+Since the covariance function defined in Expression~\ref{whitenoisecov}
+is positive semidefinite, Part (ii) of Theorem~\ref{thm:gaussian}
+ensures that this family exists and is well-defined.
+\end{defn}
+\begin{rmk}
+This is nice when $J$ discrete, but really nasty process when $J$
+continuous, in which case family $\{X_\alpha\}_{\alpha \in J}$ is a
+non-continuous and (even crazier) non-measurable function of $\alpha$.
+\end{rmk}
+
+\begin{defn}(Brownian Motion)
+\label{defn:brownian}
+Taking $J=\R_+=[0,\infty)$, \emph{Brownian Motion} is the Gaussian
+process $\{W_t\}_{t\in\R_+}$ impled by mean and covariance
+functions
+\begin{align*}
+  \E[W_t]=0
+  \qquad
+  \Cov(W_s,W_t) = s \wedge t
+  \qquad \forall s,t\in\R_+
+\end{align*}
+To ensure that this process is well-defined by Part (ii) of
+Theorem~\ref{thm:gaussian}, we must check that $s\wedge t$ is indeed a
+symmetric positive semidefinite function in the next proposition.
+\end{defn}
+
+\begin{prop}\emph{(Properties of Brownian Motion)}
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item
+    Function $C(s,t)=s\wedge t$ symmetric positive semidefinite
+    (hence Definition~\ref{defn:brownian} valid)
+  \item $W_0=0$ almost surely
+  \item For $t>s$, we have $(W_t-W_s)\sim \calN(0,t-s)$
+  \item For $t>s>v>u$, increments $W_t-W_s$ and $W_v-W_u$ independent
+\end{enumerate}
+\end{prop}
+
+\clearpage
+\begin{proof}
+We prove each in turn
+\begin{enumerate}[label=(\roman*)]
+  \item
+    Fix indices $\{t_1,\ldots,t_d\}$. Given covariance function
+    $C(s,t)=s\wedge t$, construct finite-dimensional covariance matrix
+    for these indices:
+    \begin{align*}
+      C
+      :=
+      %\begin{pmatrix}
+        %C_{t_1,t_1} & \cdots & C_{t_1,t_d} \\
+        %\vdots & \ddots &\vdots \\
+        %C_{t_d,t_1} & \cdots & C_{t_d,t_d}
+      %\end{pmatrix}
+      %=
+      \begin{pmatrix}
+        \Cov(X_{t_1},X_{t_1}) & \cdots & \Cov(X_{t_1},X_{t_d}) \\
+        \vdots & \ddots &\vdots \\
+        \Cov(X_{t_d},X_{t_1}) & \cdots & \Cov(X_{t_d},X_{t_d}
+      \end{pmatrix}
+      =
+      \begin{pmatrix}
+        (t_1 \wedge t_1) & \cdots & (t_1 \wedge t_d) \\
+        \vdots & \ddots &\vdots \\
+        (t_d \wedge t_1) & \cdots & (t_d \wedge t_d
+      \end{pmatrix}
+    \end{align*}
+    To show that $C$ psd, we must show that for any $u\in R^d$,
+    we have $u'Cu\geq 0$. So compute
+    \begin{align}
+      u'Cu
+      = \sum_{i=1}^d\sum_{j=1}^d
+        u_i (t_i\wedge t_j) u_j
+      \label{psdbrownian}
+    \end{align}
+    To show this quantity $\geq 0$,
+    we take the advice in the remark to Definition~\ref{defn:psd}.
+    Specifically, we consider Hilbert Space
+    $L^2(\R_+,\sB(\R_+),\lambda)$ equipped with inner product
+    \begin{align*}
+      \langle f,g\rangle =
+      \int^\infty_0 \; f\cdot g \; dx
+      \qquad f,g\in L^2(\R_+,\sB(\R_+),\lambda)
+    \end{align*}
+    We want to write $(s\wedge t)$ in terms of this inner product, which
+    we can do if we define
+    \begin{align*}
+      f_{t}(x) := \one{\{x\in[0,t]\}}
+      \in L^2
+      \quad\implies\quad
+      \langle f_s,f_t\rangle
+      = \int_0^\infty f_{s}\cdot f_{t}\;dx
+      %= \int_0^\infty
+        %\one{\{x\in[0,s]\}}
+        %\cdot
+        %\one{\{x\in[0,t]\}}
+          %\;dx
+      = \int_0^\infty \one{\{x\in[0,s\wedge t]\}} \;dx
+      = (s\wedge t)
+    \end{align*}
+    Thus, we can use this result to rewrite Expression~\ref{psdbrownian}
+    as
+    \begin{align*}
+      u'Cu
+      = \sum_{i=1}^d\sum_{j=1}^d
+        u_i (t_i\wedge t_j) u_j
+      = \sum_{i=1}^d\sum_{j=1}^d
+        u_i \langle f_{t_i}, f_{t_j}\rangle u_j
+      = \left\langle
+        \sum_{i=1}^d u_i f_{t_i},\;
+        \sum_{j=1}^d u_j f_{t_j}
+        \right\rangle
+      \geq 0
+    \end{align*}
+    where we used linearity of inner products and
+    the fact that inner products are nonnegative.
+    Hence matrix $C$ is PSD. Since the indices were arbitrary, function
+    $C(s,t)=s\wedge t$ is PSD.
+
+  \item By definition, $\Var(W_0)=\Cov(W_0,W_0)=0\wedge 0=0$.
+  \item Difference of Gaussians is Gaussian. Just need to check the
+    variance given $s<t$:
+    \begin{align*}
+      \Var(W_t-W_s)
+      = \E[(W_t-W_s)^2]
+      &= \E[W_t^2]+\E[W_s^2]-2\E[W_tW_s]
+      = t+s-2(s\wedge t) = t-s
+    \end{align*}
+
+  \item
+    Since $W_t-W_s$ and $W_v-W_u$ Gaussian, just need to check that
+    correlation is zero to get independence.
+    \begin{align*}
+      \Cov(W_t-W_s,\; W_v-W_u)
+      &= \E[(W_t-W_s)(W_v-W_u)] \\
+      &= \E[W_tW_v - W_tW_u - W_sW_v + W_sW_u] \\
+      &= (t\wedge v) - (t\wedge u) - (s\wedge v) + (s\wedge u) \\
+      &= v - u - v + u = 0
+    \end{align*}
+\end{enumerate}
+
+\end{proof}
 
 
 \clearpage
@@ -8065,36 +8557,7 @@ Equation \ref{int1} and makes the substitution
       t = \frac{s}{1-s} \]
 
 
-\subsection{General Gamma Function}
 
-The gamma function has many special cases, but let's consider it
-in its most general form, along with the mean and variance:
-\begin{equation}
-   f_X(x) = \frac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha-1}
-      e^{-\beta x}, \qquad x > 0
-\end{equation}
-\[ \text{Mean} = \frac{\alpha}{\beta} \qquad \text{Variance} =
-   \frac{\alpha}{\beta^2} \]
-Gamma random variables also have the nice property that
-\[ X_i \sim \text{Gamma}(\alpha_i, \;\beta) \quad \Rightarrow \quad
-   \sum^n_{i=1} X_i \sim \text{Gamma}\left(\sum^n_{i=1} \alpha_i,\;\beta
-   \right) \]
-
-\subsection{Exponential Random Variable}
-
-This family has $\alpha=1$ with $\beta$ unrestricted. Changing the way
-we denote the variables (set $\beta =\theta$), this simplifies to
-   \[ f_X(x) = \theta\; e^{-\theta} \]
-This is particularly useful for waiting times, as it is a memoryless
-distribution. In addition, as it is technically a Gamma random
-variable, sums of exponential variables will have a Gamma distribution:
-\[ X_i \sim \text{Exp}(\theta) \quad \Rightarrow \quad
-   \sum^n_{i=1} X_i \sim \text{Gamma}(n, \theta) \]
-Another attraction is the intimate connection this distribution has
-with the Poisson process.  Namely, suppose $N(t)$ is a Poisson process
-with parameter $\theta$, in which case $N(t)$ is Poisson distributed
-with parameter $\theta t$, then the interarrival times are
-exponentially distributed with parameter $\theta$.
 
 \clearpage
 \subsection{Quadratic Form Results}
