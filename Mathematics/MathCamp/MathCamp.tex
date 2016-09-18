@@ -3,6 +3,7 @@
 \author{Matthew D. Cocci}
 \title{Math Camp}
 \date{\today}
+\listfiles
 
 %% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -92,6 +93,7 @@
 
 \usepackage{tikz}
 \usepackage{tikz-3dplot}
+\usepackage{pgfplots}
 \usetikzlibrary{decorations.pathreplacing,arrows}
 \usepackage{graphicx}
 \usepackage{subfigure}
@@ -9679,10 +9681,12 @@ point of the Lagrangian.
 \clearpage
 \subsection{Lagrange Multiplier Intuition}
 
+\subsection{No Local Improvement Logic and Pictures}
+
 Consider the following simple problem (differentiable $f$, single
 equality constraint):
 \begin{align}
-  \max_{x\in\R^k} &f(x)
+  \max_{x\in\R^k} &\;f(x)
   \quad
   \text{s.t. } g(x) = 0
   \label{prob:eqconst}
@@ -9694,13 +9698,18 @@ constrained local extremum:
   \qquad \lambda \in \R
   \label{lagrange-intuition}
 \end{align}
-The key to understanding Expression~\ref{lagrange-intuition} is
-to think in terms of contour lines.\footnote{%
+The key to understanding Expr.~\ref{lagrange-intuition} is
+to think in terms of contour lines. See figure.\footnote{%
   We ignore the case where some $x^*$ satisfies $g(x^*)=0$ and
   $f'(x^*)=0$ (i.e. the usual necessary condition in
   \emph{unconstrained} maximization problems) which would implies
   $\lambda=0$.
 }
+%\begin{tikzpicture}
+  %\begin{axis}[view={0}{90}]
+    %\addplot3[contour gnuplot] {2*x};
+  %\end{axis}
+%\end{tikzpicture}
 
 In searching for local constrained extrema, we walk along
 contour/constraint line $g(x)=0$ that connects all feasible points.  For
@@ -9762,6 +9771,239 @@ This means divide each $\frac{\partial f(x^*)}{\partial x_i}$ by
 $\frac{\partial f(x^*)}{\partial x_i}$ to appropriately scale your step
 size.
 
+
+\subsection{Game Theory Intuition}
+
+Again, we consider simple maximization problem
+\begin{align}
+  \max_{x\in X} f(x)
+  \quad \text{s.t.}\;\; g(x) = c
+  \label{gametheory}
+\end{align}
+with associated Lagrangian
+\begin{align}
+  \sL(x,\lambda)
+  = f(x) - \lambda \big(g(x)-c\big)
+  \label{gametheorylagrange}
+\end{align}
+To solve, we specify two separate-but-related zero-sum games, solve for
+the optimal strategies of each, and verify that the optimal strategies
+are in fact solutions to Problem~\ref{gametheory}.  Both games involve
+two Players, $X$ and $\Lambda$, who sequentially choose elements of pair
+$(x,\lambda)$
+
+\begin{defn}(Payoffs for Both Games)
+Given pair $(x,\lambda)$, payoffs are
+\begin{align*}
+  \text{(Payoff to $X$)}
+  = f(x) - \lambda(g(x)-c)
+  \qquad
+  \text{(Payoff to $\Lambda$)}
+  = -\big[f(x) - \lambda(g(x)-c)\big]
+\end{align*}
+This is a zero-sum game. One player gets a good payoff iff the other
+gets a bad payoff. This and game play are all common knowledge.
+\end{defn}
+
+\begin{defn}(Game 1)
+Pair $(x,\lambda)$ is chosen via sequential play as follows
+\begin{enumerate}
+  \item Player $X$ chooses $x$, not knowing $\lambda$.
+  \item Player $\Lambda$ choose $\lambda$ \emph{after} observing chosen
+    $x$.
+\end{enumerate}
+\end{defn}
+
+\begin{defn}(Game 2)
+Pair $(x,\lambda)$ is chosen via sequential play as follows
+\begin{enumerate}
+  \item Player $\Lambda$ chooses chooses $\lambda$, not knowing $x$
+  \item Player $X$ chooses $x$ \emph{after} observing chosen $\lambda$.
+\end{enumerate}
+\end{defn}
+
+\begin{prop}
+\label{prop:game1}
+\emph{(Game 1 Solution)}
+In Game 1, we have
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item Player $\Lambda$'s optimal strategy is $x$-contingent policy
+    \begin{align*}
+      \lambda^*(x) = \argmin_\lambda f(x)-\lambda\big(g(x)-c\big)
+    \end{align*}
+  \item
+    Player $X$'s optimal strategy $x^*$ accounts for Player $\Lambda$'s
+    strategy, hence satisfies
+    \begin{align}
+      x^*
+      = \argmax_x f(x)-\lambda^*(x)\big(g(x)-c\big)
+      = \argmax_x \left(
+      \min_\lambda f(x)-\lambda\big(g(x)-c\big)
+      \right)
+      \label{gametheoryxopt}
+    \end{align}
+  \item Game play results in unique outcome $(x^*,\lambda^*(x^*))$
+  \item Optimal strategy $x^*$ satisfies the constraint, $g(x^*)=c$
+  \item Optimal strategy $x^*$ Solves Problem~\ref{gametheory}
+\end{enumerate}
+\end{prop}
+\clearpage
+\begin{proof}
+We prove each in turn:
+\begin{enumerate}[label=(\roman*)]
+  \item
+    Player $\Lambda$, after observing $x$, simply maximizes his payoff,
+    i.e.  solves
+    \begin{align*}
+      \max_\lambda -\big[ f(x)-\lambda\big(g(x)-c\big)\big]
+      =
+      \min_\lambda  f(x)-\lambda\big(g(x)-c\big)
+    \end{align*}
+    which implies an $x$-contingent optimal strategy $\lambda^*(x)$.
+  \item
+    Since game play and payoffs common knowledge, Player $X$
+    incorporates Player $\Lambda$'s optimal strategy $\lambda^*(x)$ and
+    hence solves Problem~\ref{gametheoryxopt} to maximize his payoff.
+  \item Optimal strategies $x^*$ and $\lambda(x^*)$, this last point is
+    clear.
+  \item
+    Clearly $x^*$ satisfies the constraint
+    since any deviation from the constraint $g(x)\neq c$ by Player $X$
+    means that Player $\Lambda$ can exploit the deviation to generate
+    arbitrarily high payoff for himself by choosing large
+    $\lambda^*(x)$.
+    In other words,
+    \begin{align*}
+      g(x)\neq c
+      \quad\implies\quad
+      \lambda^*(x)=\infty
+    \end{align*}
+    Since this would imply a $-\infty$ payoff for Player $X$ (the game
+    is zero-sum), Player $X$ will choose an $x^*$ that avoids this
+    outcome and respects the constraint.
+  \item
+    Combining Player $X$'s payoff function and with Result (ii),
+    we see that Player $X$ is choosing a point that delivers the highest
+    possible $f(x)$, subject to satisfying constraint $g(x)=c$.  But
+    that is \emph{precisely} original Problem~\ref{gametheory}.  Hence,
+    optimal strategy $x^*$ in this game solves that constrained
+    maximization problem.
+\end{enumerate}
+\end{proof}
+
+\begin{prop}
+\emph{(Game 2 Solution)}
+\label{prop:game2}
+Completely analogous to Game 1, we have for Game 2 (which simply
+reverses the order of play) that
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item Player $X$'s optimal strategy is $\lambda$-contingent policy
+    \begin{align*}
+      x^*(\lambda) = \argmax_x f(x)-\lambda\big(g(x)-c\big)
+    \end{align*}
+  \item
+    Player $\Lambda$'s optimal strategy $\lambda^*$ accounts for Player
+    $X$'s strategy, hence satisfies
+    \begin{align*}
+      \lambda^*
+      = \argmin_\lambda f(x^*(\lambda))-\lambda \big(g(x^*(\lambda))-c\big)
+      =
+      \argmin_\lambda \left(
+      \max_x f(x)-\lambda\big(g(x)-c\big)
+      \right)
+      %\label{gametheorylambdaopt}
+    \end{align*}
+  \item Game play results in unique outcome
+    $(x^*(\lambda^*),\lambda^*)$
+  \item Optimal strategy $x^*(\lambda^*)$ equals the maximizer
+    of Lagrangian~\ref{gametheorylagrange} where $\lambda=\lambda^*$.
+\end{enumerate}
+\end{prop}
+\begin{proof}
+(i), (ii), and (iii) exactly analogous to previous proposition.
+Part (iv) is simply noticing the connection between Part (i) and
+Lagrangian~\ref{gametheorylagrange}, i.e.
+$x^*(\lambda^*)$ by definition satisfies
+\begin{align*}
+  x^*(\lambda^*)
+  =
+  \argmax_x f(x) - \lambda^*\big(g(x)-c\big)
+\end{align*}
+\end{proof}
+
+\begin{thm}
+\emph{(Equivalence of Game Outcomes and Validity of Lagrangian Approach)}
+Under certain technical conditions, we can apply the minimax theorem to
+assert that
+\begin{align}
+  \max_x
+  \left(
+    \min_\lambda
+    f(x) - \lambda(g(x)-c)
+  \right)
+  &=
+  \min_\lambda
+  \left(
+    \max_x
+    f(x) - \lambda(g(x)-c)
+  \right)
+  \label{minimax}
+\end{align}
+This implies equivalent outomes
+$(x^*,\lambda^*(x^*))=(x^*(\lambda^*),\lambda^*)$ for Games 1 and 2.
+
+Hence, there exists a particular, correct choice of Lagrange multiplier
+(namely $\lambda^*$) such that the maximizer $x^*(\lambda^*)$ of
+Lagrangian~\ref{gametheorylagrange} (taking $\lambda=\lambda^*$)
+\emph{also} equals the the solution $x^*$ to original maximization
+Problem~\ref{gametheory}.
+\end{thm}
+\begin{proof}
+Notice that the LHS of Expression~\ref{minimax} is the maximization
+problem that defines solution $(x^*,\lambda^*(x^*))$ for Game 1 by Parts
+(ii) and (iii) of Proposition~\ref{prop:game1}.
+Similarly, the RHS is the maximization problem that defines solution
+$(x^*(\lambda^*),\lambda^*)$ for Game 2 by Part (ii) and (iii) of
+Proposition~\ref{prop:game2}.
+So it must be that $(x^*,\lambda^*(x^*))$ implied by LHS
+\emph{equals} $(x^*(\lambda^*),\lambda^*)$ implied by RHS:
+\begin{align*}
+  (x^*,\lambda^*(x^*))
+  = (x^*(\lambda^*),\lambda^*)
+\end{align*}
+Hence
+$x^*(\lambda^*)$ in Game 2---which is the maximizer of
+Lagrangian~\ref{gametheorylagrange} taking $\lambda=\lambda^*$ by Part
+(iv) of Proposition~\ref{prop:game2}---is \emph{equivalent} to
+optimal strategy $x^*$ in Game 1---which solves original optimization
+Problem~\ref{gametheory} by Part (v) of Proposition~\ref{prop:game1}
+\end{proof}
+
+
+
+%\subsection{Functional Garbage}
+
+%Again, suppose we are solving simple maximization problem
+%\begin{align*}
+  %\max_{x\in X} f(x)
+  %\quad \text{s.t.}\;\; g(x) = c
+%\end{align*}
+%Let function $s:C\ra X$ denote the solution operator which returns the
+%maximizer of $f(x)$ that also satisfies feasibility $g(s(c))=c$ for all
+%$c$.
+
+%We want to know how sensitive our maximized objective function $f(s(c))$
+%is to changes in parameter $c$. In other words, we want to compute
+%\begin{align*}
+  %\frac{d}{dc} f(s(c))
+  %= f'(s(c))s'(c)
+%\end{align*}
+%To compute this, we apply the implicit function theorem to feasibility:
+%\begin{align*}
+  %g(s(c)) = c
+  %\quad\implies\quad
+  %g'(s(c))s'(c) = 0
+%\end{align*}
 
 
 
