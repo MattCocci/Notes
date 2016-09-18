@@ -10197,12 +10197,12 @@ Problem~\ref{prob:sequential-short} does not automically exist.
 Formulation}
 
 \begin{thm}
-Given dynamic optimization Problem~\ref{prob:sequential-short}, suppose
-additionally that $F$ is a continuously differentiable concave function
-on a compact set, while the constraint set is convex. Then the following
-conditions are necessary and sufficient for a sequence
-$\{x_{t+1}\}\tinfz$ to be optimal if
-$x_{t+1}\in \interior(\Gamma(x_t))$,
+Given Problem~\ref{prob:sequential-short}, suppose additionally that $F$
+continuously differentiable and concave on a compact set, while the
+constraint set is convex.
+Then the following conditions are necessary and sufficient for a
+sequence $\{x_{t+1}\}\tinfz$ to be optimal if $x_{t+1}\in
+\interior(\Gamma(x_t))$,
 \begin{alignat*}{3}
   \text{\emph{(EE)}}:&&
   \qquad
@@ -10215,28 +10215,57 @@ $x_{t+1}\in \interior(\Gamma(x_t))$,
   \beta^T F_2(x_{T},x_{T+1})
   x_{T+1}
   &= 0
+  \\
+  \text{\emph{(IC)}}:&&
+  x_0 &= \hat{x}_0
 \end{alignat*}
-(EE) is the Euler Equation---a first order difference equation in state
-variable $x_{t+1}$. If $x_t$ is a vector, then $F_1$ and $F_2$ are
-column vectors and this is a system of equations.
-(TVC) is the \emph{Transversality Condition}, which plays the role of a
-boundary condition.\footnote{%
-  By substituting (EE) into (TVC), we have alternative
-  and equivalent representation for the (TVC):
-  \begin{align*}
-    \lim_{T\ra\infty}
-    \beta^{T}
-    F_1(x_{T},x_{T+1})
-    x_{T}
-    &= 0
-  \end{align*}
-}
+where
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item \emph{Initial Condition (IC):} This pins down the initial value
+    of the trajectory $\{x_t\}\tinfz$
+  \item \emph{Euler Equation (EE):}
+    A difference equation in state variable $x_{t+1}$ and local
+    condition that says ``For path $\{x_t\}\tinfz$ truly to be optimal,
+    there can't be any gain from a one-period deviation from and back to
+    it.''
+    On an optimal path, gain $F_2(x_t,x_{t+1})$ from a little more
+    $x_{t+1}$ today is offset by discounted loss $-\beta
+    F_1(x_{t+1},x_{t+2})$ from less $x_{t+1}$ tomorrow.
+    Note: if $x_t$ is a vector, $F_1$ and $F_2$ are column vectors, and
+    this is a system of equations.
+
+  \item \emph{Transversality Condition (TVC):}
+    This generalizes the \emph{terminal boundary condition} of a
+    finite-horizon problem to infinite-horizons, placing a
+    restriction on the tail of $\{x_t\}\tinfz$.
+    While (EE) rules out gains from temporary/local deviations from an
+    optimal trajectory, (TVC) rules out gains from deviating from an
+    optimal trajectory and \emph{never returning}.
+
+    Note that it has an alternate equivalent form, derived from subbing
+    (EE) into (TVC):
+      \begin{align*}
+        \lim_{T\ra\infty}
+        \beta^{T}
+        F_1(x_{T},x_{T+1})
+        x_{T}
+        &= 0
+      \end{align*}
+\end{enumerate}
 \end{thm}
 \begin{rmk}
-The assumption that $x_{t+1}\in\interior(\Gamma(x_t))$ for all $t$
+In econ, TVC mostly rules out \emph{over}accumulation of wealth.
+It shouldn't be confused with a no-Ponzi condition, which rules out
+\emph{under}accumulation of wealth (or \emph{over}accumulation of
+\emph{debt}). Though they often look similar and are used for the same
+purpose: \emph{ruling out} certain paths from being an optimal solution
+to a dynamic optimization problem.
+\end{rmk}
+\begin{rmk}
+Assumption $x_{t+1}\in\interior(\Gamma(x_t))$ for all $t$
 reminds us that this is a \emph{state-only} representation.
 General, control variables \emph{do} run up against budget or other
-constraints, so you need to have used these relationships to remove
+constraints, so you must use these relationships to remove
 all endogenous control avariables from the problem.
 
 For example, in the standard growth model, this assumption
@@ -10247,10 +10276,8 @@ $x_t=k_t$---not leaving in endogenous control $c_t$.  From there, the
 Inada conditions ensure $x_{t+1}\in \interior(\Gamma(x_t))$.
 \end{rmk}
 \begin{proof}
-Existence of a solution gauranteed by Extreme Value Theorem
-(Weierstrass): We are optimizing a continuous function over a compact
-domain, hence a maximum exists. Uniqueness is guaranteed by concave $F$
-and convex constraint set.
+Existence of solution by Extreme Value Theorem (Weierstrass). Uniqueness
+by concave $F$ and convex constraint set.
 \end{proof}
 
 \begin{defn}(Steady State)
@@ -11092,18 +11119,18 @@ guarantee the solution is globablly optimal.
 \begin{defn}{(Canonical Sequential Formulation: Control-State Rep)}
 \label{defn:sequential-altrep-cts}
 The \emph{Canonical Sequential Formulation} requires choosing
-\emph{function of time} $y_t:[0,\infty) \ra Y$ that maximizes
+\emph{function of time} $y_t:\R_+\ra Y$ that maximizes
 \begin{align}
   \label{prob:cts-dynamic}
   %\max_{y_t}\;
   %W(y_t):=
   \max_{y_t}\;
-  &\int_0^\infty e^{-\rho t} F(x_t,y_t) \; dt
+  &\int_0^\infty e^{-\rho t} f(x_t,y_t) \; dt
   \notag\\
   %\qquad
   %\begin{cases}
   \text{s.t.}\quad
-  &\text{$\dot{x}_{t} = G(x_t,y_t)$ $\;\forall t$, $x_0$ given}
+  &\text{$\dot{x}_{t} = g(x_t,y_t)$ $\;\forall t$, $x_0$ given}
   \notag\\
   &
   y_t \in Y \;\; \forall t\in[0,\infty)
@@ -11121,18 +11148,18 @@ discrete time, where
     Affects instantaneous return and influences the evolution of the
     state.
 
-  \item \emph{Instantaneous Return}, $F(x_t,y_t)$: Given state $x_t$ and
+  \item \emph{Instantaneous Return}, $f(x_t,y_t)$: Given state $x_t$ and
     choice of control $y_t$, the agent gets instantaneous return
-    $F(x_t,y_t)$ at time $t$, discounted back to the present at rate
+    $f(x_t,y_t)$ at time $t$, discounted back to the present at rate
     $\rho$.
 
-  \item \emph{Law of Motion} $G(x_t,y_t)$: Given the current state $x_t$
+  \item \emph{Law of Motion} $g(x_t,y_t)$: Given the current state $x_t$
     and the choice of control $y_t$,
     $x_t$ evolves according to differential equation
-    $\dot{x}_t=G(x_t,y_t)$.
+    $\dot{x}_t=g(x_t,y_t)$.
   \item \emph{Admissable Pair}, $(x_t,y_t)$: The pair of functions
     $(x_t,y_t)$ is called an admissable pair if they satisfy both
-    $\dot{x}_t = G(x_t,y_t)$ and $y_t\in Y$ for all $t$.
+    $\dot{x}_t = g(x_t,y_t)$ and $y_t\in Y$ for all $t$.
 \end{enumerate}
 \end{defn}
 
@@ -11143,10 +11170,11 @@ discrete time, where
 Formulation}
 
 \begin{defn}{(Current-Value Hamiltonian)}
-The \emph{Current-Value Hamiltonian} associated with
-Problem~\ref{prob:cts-dynamic} is
+The \emph{Current-Value Hamiltonian} is a real-valued functional
+(function of functions) associated with Problem~\ref{prob:cts-dynamic}
+is
 \begin{align*}
-  H(x,y,\lambda) := F(x_t,y_t) + \lambda_t G(x_t,y_t)
+  H(x,y,\lambda) := f(x_t,y_t) + \lambda_t g(x_t,y_t)
 \end{align*}
 where $\lambda_t$ is a function of time called the \emph{co-state}.
 The Hamiltonian is much like the Lagrangian of static optimization
@@ -11154,112 +11182,129 @@ problems, only for dynamic optimization.
 \end{defn}
 
 \begin{prop}\emph{(Necessary Conditions for Optimum)}
-Given Problem~\ref{prob:cts-dynamic} with $F$ and $G$ continuously
+Given Problem~\ref{prob:cts-dynamic} with $f$ and $g$ continuously
 differentiable, an interior continuous solution $y_t$ with corresponding
 state variable function $x_t$ ($x_0$ given) satisfies the following
 necessary conditions for all $t\geq 0$:
 \begin{enumerate}
   \item $H_y (x_t,y_t,\lambda_t) = 0$
   \item $\dot{\lambda}_t = \rho\lambda_t- H_x(x_t, y_t, \lambda_t)$
-  \item $\dot{x}_t = H_\lambda(x_t,y_t,\lambda_t) = G(x_t, y_t)$
+  \item $\dot{x}_t = H_\lambda(x_t,y_t,\lambda_t) = g(x_t, y_t)$
 \end{enumerate}
-with the boundary condition for costate $\lambda_t$ given by TVC
-$\limT e^{-\rho T} \lambda(T)x(T)=0$.
+Also have an initial boundary condition $(x_0$ given) and terminal
+boundary condition by TVC
+\begin{align*}
+  \limT e^{-\rho T} \lambda(T)x(T)=0
+\end{align*}
+Note that the initial value of the costate $\lambda_0$ is \emph{not}
+pinned down.
 \end{prop}
+\begin{rmk}
+Here's the general procedure for solving a problem of this form
+\begin{enumerate}[label=(\roman*)]
+  \item Construct the Hamilton and compute the above derivatives
+  \item Set $\dot{x}_t=\dot{\lambda}_t=0$ in those expressions and solve
+    for steady state $x^*$ and $y^*$
+  \item
+    If $\lambda_t$ and $x_t$ scalar, draw phase diagram in
+    $(x,\lambda)$-space or substitute out for $\lambda$ and draw phase
+    diagram in $(x,y)$ space
+\end{enumerate}
+\end{rmk}
 
-\begin{proof}{(Kinda for Finite Horizon)}
-Suppose we only go out to horizon $T$ (rather than indefinitely), and we
-have interior continuous solution $y^*_t$ with associated path for the
-state variable $x_t^*$. We want to characterize the necessary conditions
-that $y_t^*$ must satisfy to be a genuine (local) optimum.
+%\begin{proof}{(Kinda for Finite Horizon)}
+%Suppose we only go out to horizon $T$ (rather than indefinitely), and we
+%have interior continuous solution $y^*_t$ with associated path for the
+%state variable $x_t^*$. We want to characterize the necessary conditions
+%that $y_t^*$ must satisfy to be a genuine (local) optimum.
 
-Start by looking at ``variations'' on $y_t^*$. Specifically,
-fix arbitrary continuous function $\eta_t$ and add a
-scaled-by-$\varepsilon$ version of this function to our solution $y_t^*$
-to generate variation $y_t(\varepsilon)$:
-\begin{align*}
-  y_t(\varepsilon) := y_t^* + \varepsilon\eta_t
-\end{align*}
-Since $\eta_t$ is continuous, $y_t(\varepsilon)$ is continuous for any
-$\varepsilon\in\R$.
-Moreover, we think of $\varepsilon$ indexing a family variations on the
-solution $y_t^*$ (i.e. we can sweep out the family of variations on
-$y_t^*$ by varying $\varepsilon$). For $\varepsilon$ small, these
-variations $y_t(\varepsilon)$ are all close to the solution
-$y_t^*$.\footnote{%
-  To ensure feasibility of the variations, note that for fixed $\eta_t$,
-  $\eta_t$ is continuous on a compact interval, hence bounded.
-  Therefore, you can always choose an $\varepsilon_\eta$ such that
-  $|\varepsilon| < \varepsilon_\eta$
-  implies $y_t(\varepsilon) \in \text{int}(Y_t)$.
-  Since we're looking for a local optimum, this is fine.
-}
+%Start by looking at ``variations'' on $y_t^*$. Specifically,
+%fix arbitrary continuous function $\eta_t$ and add a
+%scaled-by-$\varepsilon$ version of this function to our solution $y_t^*$
+%to generate variation $y_t(\varepsilon)$:
+%\begin{align*}
+  %y_t(\varepsilon) := y_t^* + \varepsilon\eta_t
+%\end{align*}
+%Since $\eta_t$ is continuous, $y_t(\varepsilon)$ is continuous for any
+%$\varepsilon\in\R$.
+%Moreover, we think of $\varepsilon$ indexing a family variations on the
+%solution $y_t^*$ (i.e. we can sweep out the family of variations on
+%$y_t^*$ by varying $\varepsilon$). For $\varepsilon$ small, these
+%variations $y_t(\varepsilon)$ are all close to the solution
+%$y_t^*$.\footnote{%
+  %To ensure feasibility of the variations, note that for fixed $\eta_t$,
+  %$\eta_t$ is continuous on a compact interval, hence bounded.
+  %Therefore, you can always choose an $\varepsilon_\eta$ such that
+  %$|\varepsilon| < \varepsilon_\eta$
+  %implies $y_t(\varepsilon) \in \text{int}(Y_t)$.
+  %Since we're looking for a local optimum, this is fine.
+%}
 
-Given each variation of the control $y_t(\varepsilon)$, define
-corresponding $x_t(\varepsilon)$ satisfying
-\begin{align}
-  \dot{x}_t(\varepsilon)
-  = G(x_t(\varepsilon), y_t(\varepsilon))
-  \qquad x_0(\varepsilon)=x_0
-  \label{xvardef}
-\end{align}
-Given admissable pair $(x_t(\varepsilon), y_t(\varepsilon))$, let's also
-define
-\begin{align}
-  W(\varepsilon) :=
-  \int^{T}_0 F(x_t(\varepsilon), y_t(\varepsilon)) \, dt
-  &\leq W(0) \label{Weps}
-\end{align}
-where the last inequality followed because $y_t(0)=y_t^*$, which was
-optimal.
+%Given each variation of the control $y_t(\varepsilon)$, define
+%corresponding $x_t(\varepsilon)$ satisfying
+%\begin{align}
+  %\dot{x}_t(\varepsilon)
+  %= G(x_t(\varepsilon), y_t(\varepsilon))
+  %\qquad x_0(\varepsilon)=x_0
+  %\label{xvardef}
+%\end{align}
+%Given admissable pair $(x_t(\varepsilon), y_t(\varepsilon))$, let's also
+%define
+%\begin{align}
+  %W(\varepsilon) :=
+  %\int^{T}_0 F(x_t(\varepsilon), y_t(\varepsilon)) \, dt
+  %&\leq W(0) \label{Weps}
+%\end{align}
+%where the last inequality followed because $y_t(0)=y_t^*$, which was
+%optimal.
 
-Now that we have this family of variations, let's derives the necessary
-conditions we need to put on $y_t^*$ so that none of the
-$y_t(\varepsilon)$ are better.
+%Now that we have this family of variations, let's derives the necessary
+%conditions we need to put on $y_t^*$ so that none of the
+%$y_t(\varepsilon)$ are better.
 
-(Prove the Conditions)
-By definition of Equation~\ref{xvardef}
-\begin{alignat}{3}
-  0 &= G(x_t(\varepsilon), y_t(\varepsilon), t) - \dot{x}_t(\varepsilon)
-  &&\forall t\in[0,T] \notag \\
-  \Rightarrow \quad
-  0 &= \int^{T}_0
-  \lambda_t \; [
-    G(x_t(\varepsilon), y_t(\varepsilon), t) -
-    \dot{x}_t(\varepsilon)
-  ] \, dt
-  \qquad&&\forall \lambda_t:[0,T]\rightarrow \R
-  \label{lambdadef}
-\end{alignat}
-where $\lambda_t$ is any function. Assume it is continuously
-differentiable.\footnote{%
-Did I cool you down with that hand wave. I'm just going to assume that
-for now.}
-If we choose it correctly (with a few conditions on the function), it
-will be called the \emph{co-state} and will behave like a Lagrange
-multiplier.
+%(Prove the Conditions)
+%By definition of Equation~\ref{xvardef}
+%\begin{alignat}{3}
+  %0 &= G(x_t(\varepsilon), y_t(\varepsilon), t) - \dot{x}_t(\varepsilon)
+  %&&\forall t\in[0,T] \notag \\
+  %\Rightarrow \quad
+  %0 &= \int^{T}_0
+  %\lambda_t \; [
+    %G(x_t(\varepsilon), y_t(\varepsilon), t) -
+    %\dot{x}_t(\varepsilon)
+  %] \, dt
+  %\qquad&&\forall \lambda_t:[0,T]\rightarrow \R
+  %\label{lambdadef}
+%\end{alignat}
+%where $\lambda_t$ is any function. Assume it is continuously
+%differentiable.\footnote{%
+%Did I cool you down with that hand wave. I'm just going to assume that
+%for now.}
+%If we choose it correctly (with a few conditions on the function), it
+%will be called the \emph{co-state} and will behave like a Lagrange
+%multiplier.
 
-Now do the following addition
-\begin{align*}
-  W(\varepsilon) &= W(\varepsilon) + 0
-  = W(\varepsilon) +\text{(RHS of \ref{lambdadef})} \\
-  \Rightarrow \quad
-  W(\varepsilon) &=
-  \int^{t_1}_0
-  \left\{
-  F(x_t(\varepsilon), y_t(\varepsilon), t)
-  + \lambda_t [
-    G(x_t(\varepsilon), y_t(\varepsilon), t) -
-    \dot{x}_t(\varepsilon)
-  ]
-  \right\}\, dt
-\end{align*}
-Integrating the $\int \lambda_t \dot{x}_t(\varepsilon)$ by parts to turn
-the $\lambda$ into $\dot{\lambda}$ and $x$ into $\dot{x}$, you get
-\begin{align*}
-  \int^{t_1}_0 \lambda_t \dot{x}_t(\varepsilon) \, dt
-\end{align*}
-\end{proof}
+%Now do the following addition
+%\begin{align*}
+  %W(\varepsilon) &= W(\varepsilon) + 0
+  %= W(\varepsilon) +\text{(RHS of \ref{lambdadef})} \\
+  %\Rightarrow \quad
+  %W(\varepsilon) &=
+  %\int^{t_1}_0
+  %\left\{
+  %F(x_t(\varepsilon), y_t(\varepsilon), t)
+  %+ \lambda_t [
+    %G(x_t(\varepsilon), y_t(\varepsilon), t) -
+    %\dot{x}_t(\varepsilon)
+  %]
+  %\right\}\, dt
+%\end{align*}
+%Integrating the $\int \lambda_t \dot{x}_t(\varepsilon)$ by parts to turn
+%the $\lambda$ into $\dot{\lambda}$ and $x$ into $\dot{x}$, you get
+%\begin{align*}
+  %\int^{t_1}_0 \lambda_t \dot{x}_t(\varepsilon) \, dt
+%\end{align*}
+%\end{proof}
 
 
 \end{document}
