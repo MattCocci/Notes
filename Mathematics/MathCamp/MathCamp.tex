@@ -2826,59 +2826,71 @@ in proportion to the computed \emph{in-sample} eigenvalues.
 \clearpage
 \section{Differential Equations}
 
-\subsection{Solving System of Differential Equations}
+\subsection{Solving Linear System of Differential Equations}
 
 \begin{prop}
+\emph{(Solution to Linear System)}
 \label{prop:sysdiffeq}
-Suppose we have the following linear differential equation system
+Suppose we have the following system
 \begin{align*}
   \dx(t) = Ax(t)
   \qquad x(t)\in\Rn
 \end{align*}
-If $A$ permits an eigenvalue decomposition $A=V\Lambda V^{-1}$, then the
-system solution is given by
+If $A$ permits eigenvalue decomp $A=V\Lambda V^{-1}$
+for $\Lambda=\diag\{\lambda_1,\ldots,\lambda_n\}$ and
+$V=(v_1,\ldots,v_n)$,
+then the system has solution
 \begin{align*}
   x(t) = \sumin c_i e^{\lambda_i t}v_i
   \quad\text{where}\quad
-  \hat{x}=\sumin c_iv_i
+  x_0=\sumin c_iv_i
 \end{align*}
-where the $\lambda_i$ are eigenvalues of $A$, $v_i$ the corresponding
-eigenvectors, and $x(0)=\hat{x}$ the initial condition needed to pin
-down the $n$ unknown constants $c_i$.
-\end{prop}
+where $x(0)=x_0$ is an initial condition necessary to pin down unknown
+constants $c_i$.
 
-\begin{cor}
-Suppose that the first $k\leq n$ eigenvalues of $A$ have negative real
-parts, $\Re(\lambda_i)<0$ for $i=1,\ldots,k$.\footnote{%
+Suppose also that the first $k\leq n$ eigenvalues of $A$ have negative
+real parts: $\Re(\lambda_i)<0$ for $i=1,\ldots,k$.\footnote{%
   That they are the \emph{first} $k$ is wlog.
 }
-Then $\exists$ a $k$-dimensional subspace of $\Rn$ denoted by $X$ such
-that
+Then there exists a $k$-dimensional subspace of $\Rn$ denoted $X_0$
+such that
 \begin{align*}
-  x(0)\in X
-  \quad\implies\quad
-  x(t) \ra 0\in\Rn
-\end{align*}
-In words, if the initial condition specifies that solution $x(t)$ starts
-at some $x(0)\in X$, the solution will eventually converges to the zero
-vector. This space $X$ is defined as
-\begin{align*}
-  X =
+  x(0)\in X_0
+  :=
   \left\{
-    x\in\Rn \;\big|\;
-    x = \sum_{i=1}^k c_i v_i
+    x_0\in\Rn \;\big|\;
+    x_0 = \sum_{i=1}^k c_i v_i
   \right\}
+  \quad\implies\quad
+  \limt x(t) = 0\in\Rn
 \end{align*}
-In words, $x\in X$ if and only if it can be written as the sum of the
+In words, if solution $x(t)$ starts at any $x_0\in X_0$, it converges to
+zero.
+And $x_0\in X_0$ iff it can be written as the sum of the
 first $k$ eigenvectors, which have eigenvalues satisfying
 $\Re(\lambda_i)<0$ by assumption.
-So we are ruling out $x$ having any component pointing in the direction
-of eigenvector $v_j$ if $\Re(\lambda_j)\geq 0$.
-\end{cor}
+So we rule out initial conditions $x_0$ having any component pointing in
+the direction of eigenvectors $v_j$ where $\Re(\lambda_j)\geq 0$.
+Since generally $X_0\subsetneq \Rn$, this is a nontrivial
+restriction on the set of initial conditions $x_0$ compatibile with
+convergence of solution $x(t)\ra 0$.
+\end{prop}
+\begin{rmk}
+Given $k\leq n$---number of eigenvalues with $\Re(\lambda_i)<0$---let
+$m$ be the number of predetermined state variables in a model.
+Three possibilities re: convergence to steady state
+\begin{itemize}
+  \item $k=m$, \emph{Saddle Path Stable}:
+    Standard, with unique optimal trajectory to steady state where
+    negative eigenvalues determine the speed of convergence
+  \item $k< m$, \emph{Unstable}: $x(t)$ does not converge to steady state
+  \item $k>m$, \emph{Indeterminate}: Multiple optimal trajectories
+\end{itemize}
+\end{rmk}
 
 \begin{proof}
 %(Proposition~\ref{prop:sysdiffeq})
-Using eigen-decomposition $A=V\Lambda V^{-1}$, we can rewrite the
+Using eigenvalue decomposition $A=V\Lambda V^{-1}$, we can rewrite the
 system
 \begin{align*}
   V^{-1}\dx(t) = \Lambda V^{-1}x(t)
@@ -2928,24 +2940,81 @@ to go to zero and kill the oscillations. Said another way,
   z(t)
   \ra 0\in\Rn
   \quad&\iff\quad
+  \big(\quad
   \Re(\lambda_i) \geq 0
-  \quad\implies\quad c_i=0
+  \;\implies\; c_i=0
+  \quad\big)
   \label{diffeqconvcond}
   %\\
   %\quad&\iff\quad
   %c_i=0
   %\quad\forall i>k
 \end{align}
-And clearly $z(t)=V^{-1}x(t)\ra 0$ if and only $x(t)\ra 0$.
-So Statement~\ref{diffeqconvcond} holds if we replace $z(t)$ with
-$x(t)$.
-And if a solution $x(t)$ satisfies this condition, it must satisfy this
-condition at all $t$, including $t=0$.
-Hence, the construction of space $X$.
+And clearly $z(t)=V^{-1}x(t)\ra 0$ iff $x(t)\ra 0$.
+So (\ref{diffeqconvcond}) holds if we replace $z(t)$ with $x(t)$.
+And if solution $x(t)$ satisfies this $\forall t$, must also satisfy for
+$x(0)$.
+Hence, the construction of $X_0$.
 \end{proof}
 
 
+\subsection{Solving Non-Linear System of Differential Equations}
 
+Even though this subsection is about solving nonlinear systems, we solve
+them by linearizing about steady state, then applying
+Proposition~\ref{prop:sysdiffeq} to analyze the linearized system.
+
+\begin{prop}\emph{(Approximate Solution to Nonlinear System)}
+Suppose we have system
+\begin{align*}
+  \dx(t) = m(x(t))
+  \qquad\text{where} \quad
+  m:\Rn\ra\Rn
+\end{align*}
+Let $x^*$ be the steady state satisfying $0=m(x^*)$.
+Then we can write a first-order linear approximation of the system in
+terms of deviations from steady-state $\hat{x}(t):=x_t-x^*$ as
+\begin{align*}
+  \dot{\hat{x}}(t) = M\hat{x}(t)
+  \qquad\text{where}\quad
+  M:= \frac{\partial m(x^*)}{\partial x'}
+\end{align*}
+where $M$ is the Jacobian matrix of $m$, evaluated at steady state
+$x^*$.
+\end{prop}
+\begin{proof}
+Do a first-order Taylor expansion about $x^*$:
+\begin{align*}
+  \dx(t)\approx
+  m(x^*)
+  +
+  \frac{\partial \dx(t)}{\partial x(t)'}
+  (x(t)-x^*)
+  =
+  0 + M\hat{x}(t)
+\end{align*}
+where we used $m(x^*)=0$ (by definition of steady state)
+and the definition of $M$. To conclude, simply notice that
+$\dot{\hat{x}}(t)=\frac{d}{dt}[x(t)-x^*]=\dot{x}(t)$.
+\end{proof}
+
+\subsection{Cookbook Appraoch to Solving System of ODEs}
+
+Given arbitrary nonlinear system:
+\begin{enumerate}[label=(\roman*)]
+  \item Gather/stack all differential equations in the system and write
+    them in the form $\dx(t)=m(x(t))$.
+    Write out vector-valued function $m:\Rn\ra\Rn$ as explicitly as
+    possible.
+  \item Set $\dx(t)=0$ and solve $m(x^*)=0$ for steady state
+  \item Given $m$ and $x^*$, compute $M=\frac{\partial m(x^*)}{\partial
+    x'}$, the Jacobian matrix evaluated at steady state
+  \item Solve linear system $\dot{\hat{x}}(t)=M\hat{x}(t)$
+    using Proposition~\ref{prop:sysdiffeq}.
+    In the process, look at the eigenvalues of $M$ to analyze stability
+    and determine which constants $c_i$ in the solution must be set to
+    zero.
+\end{enumerate}
 
 \clearpage
 \section{Metric Spaces and Sequences}
