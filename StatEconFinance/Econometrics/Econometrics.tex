@@ -459,6 +459,7 @@
 \newcommand{\limn}{\lim_{n\rightarrow\infty}}
 \newcommand{\limk}{\lim_{k\rightarrow\infty}}
 \newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limh}{\lim_{h\rightarrow0}}
 \newcommand{\limT}{\lim_{T\rightarrow\infty}}
 \newcommand{\limhz}{\lim_{h\rightarrow 0}}
 
@@ -5582,6 +5583,7 @@ Rearranging, we get the desired result.
 \end{proof}
 
 \begin{cor}{\emph{(Chebyshev's Inequality)}}
+%\label{cor:cheby}
 Given random variable $X$ on probability space $(\Omega,\sF,P)$, we have
 \begin{equation}
   \label{chebyshev1}
@@ -7946,9 +7948,10 @@ Given nonempty index set $J$ and function $C:J^2 \ra \R$,
 define $c_{ij}:=C(i,j)$. We call function $C$
 \begin{enumerate}
   \item \emph{Symmetric}: If $c_{ij}=c_{ij}$ for all $i,j \in J$.
-  \item \emph{Positive (Semi-)definite}: If,
-    for \emph{any} finite sequence
-    $\{\alpha_1,\ldots,\alpha_d\}\subseteq J$ of distinct elements,
+  \item \emph{Positive (Semi-)definite}:
+    If, for \emph{any} finite sequence
+    $\{\alpha_1,\ldots,\alpha_d\}\subseteq J$ of distinct elements, the
+    following corresponding matrix is positive (semi-)definite:
     \begin{align*}
       (c_{\alpha_i,\alpha_j})^d_{i,j=1}
       &=
@@ -7959,7 +7962,6 @@ define $c_{ij}:=C(i,j)$. We call function $C$
       \end{pmatrix}
       \in \R^{d\times d}
     \end{align*}
-    is a positive (semi-)definite matrix.
 \end{enumerate}
 \end{defn}
 \begin{rmk}
@@ -8006,12 +8008,11 @@ We have the following:
 \end{enumerate}
 \end{thm}
 \begin{rmk}
-Part (ii) is powerful.
-It says that we don't have to start with a measure space
+Part (ii) is powerful, saying we don't have to start by defining
 $(\Omega,\sF,P)$ and family of RVs $\{X_\alpha\}_{\alpha\in J}$ on that
-measure space. Instead, simply write down mean and covariance
-functions that you want some family $\{X_\alpha\}_{\alpha\in J}$ to
-possess. Such a process is guaranteed to exist.
+measure space. Instead, just write down the mean and covariance
+functions you want the family $\{X_\alpha\}_{\alpha\in J}$ to possess,
+and such a process is guaranteed to exist.
 \end{rmk}
 \begin{proof}
 We prove each in turn
@@ -8041,16 +8042,16 @@ We prove each in turn
       \end{pmatrix}
       \in\R^{d\times d}
     \end{align*}
-    By assumption, function $\Sigma:J\times J\ra\R$ positive
-    semidefinite, so matrix $C$ positive semidefinite.
+    By assumption, $\Sigma:J\times J\ra\R$ positive semidefinite, so
+    matrix $C$ positive semidefinite.
     Now let $P^{\alpha_1,\ldots,\alpha_d}$ be the distribution
     associated with a $\calN_d(m,C)$-distributed random vector on
     $(\R,\sB(\R)^{\otimes d})$.
     This family of all such probability measures is consistent
     (Definition~\ref{defn:consistent}).
     Hence, by Kolmogorov's Extension Theorem~\ref{thm:kolmogorov},
-    there exists a unique probability measure $P$ on
-    all of $(\R^J,\sB(\R)^{\otimes J})$
+    $\exists !$ prob. measure $P$ on all of
+    $(\R^J,\sB(\R)^{\otimes J})$
     matching the family of finite dimensional distributions
     $P^{\alpha_1,\ldots,\alpha_d}$.
 \end{enumerate}
@@ -8105,6 +8106,13 @@ symmetric positive semidefinite function in the next proposition.
   \item $W_0=0$ almost surely
   \item For $t>s$, we have $(W_t-W_s)\sim \calN(0,t-s)$
   \item For $t>s>v>u$, increments $W_t-W_s$ and $W_v-W_u$ independent
+  \item $W_t$ is a continuous function of $t$ with probability 1.
+  \item $W_t$ is nowhere differentiable
+  \item $W_t$ is \emph{not} of bounded first order variation:
+    $\sup_P \sumnN |W_{t_n}-W_{t_{n-1}}|=\infty$
+  \item $W_t$ is of bounded \emph{quadratic} (second order) variation
+    $\sup_P \sumnN (W_{t_n}-W_{t_{n-1}})^2 <\infty$
+  \item $(dW_t)^2=dt$
 \end{enumerate}
 \end{prop}
 
@@ -8209,6 +8217,83 @@ We prove each in turn
       &= (t\wedge v) - (t\wedge u) - (s\wedge v) + (s\wedge u) \\
       &= v - u - v + u = 0
     \end{align*}
+  \item
+  \item
+    Fix $\varepsilon>0$ and $t\in\R_+$.
+    To show that $W_t$ nowhere differentiable, we want to show that
+    \begin{align*}
+      1=
+      \limh
+	    P\left[
+        \left\lvert
+        \frac{W_{t+h} - W_t}{h}
+        \right\rvert \geq\varepsilon
+      \right]
+    \end{align*}
+    Using Part (ii) and the fact that increment $W_{t+h}-W_t$ has the
+    same distribution as increment $W_h-W_0=W_h$, we can rewrite
+    the target probability as
+    \begin{align*}
+	    P\left[
+        \left\lvert
+        \frac{W_{t+h} - W_t}{h}
+        \right\rvert \geq\varepsilon
+      \right]
+      %=
+			%P\left[
+        %\left\lvert
+        %\frac{W_{h} - W_0}{h}
+        %\right\rvert \geq \varepsilon
+      %\right]
+      =
+	    P\big[
+        \left\lvert
+        W_{h}
+        \right\rvert \geq h\varepsilon
+      \big]
+      =
+      1-
+      P\big[
+        \left\lvert
+        W_{h}
+        \right\rvert < h\varepsilon
+      \big]
+    \end{align*}
+    By Part (iii), recall that $W_h\sim\calN(0,h)$. Hence we can compute
+    \begin{align*}
+	    P\big[
+        \left\lvert
+        W_{h}
+        \right\rvert < h\varepsilon
+      \big]
+      =
+      \frac{1}{\sqrt{2\pi h}}
+      \int_{-h\varepsilon}^{h\varepsilon}
+	    e^{-\frac{x^2}{2h}} \;dx
+      \leq
+      \frac{1}{\sqrt{2\pi h}}
+      \int_{-h\varepsilon}^{h\varepsilon}
+	    1\;dx
+      %= \frac{2h\varepsilon}{\sqrt{2\pi h}}
+      = \sqrt{\frac{2h\varepsilon}{\pi}}
+    \end{align*}
+    Hence, we have that
+    \begin{align*}
+      \limh
+	    P\left[
+        \left\lvert
+        \frac{W_{t+h} - W_t}{h}
+        \right\rvert \geq\varepsilon
+      \right]
+      =
+      \limh 1-P\big[|W_h|<h\varepsilon\big]
+      =\limh 1-\sqrt{\frac{2h\varepsilon}{\pi}}
+      = 1
+    \end{align*}
+    which is exactly what we wanted to show.
+    In words, the fraction relevant for the derivative is larger than
+    arbitrary $\varepsilon>0$ (with probability one).
+
 \end{enumerate}
 
 \end{proof}
@@ -9547,293 +9632,149 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 \clearpage
 \section{Stochastic Calculus}
 
-\subsection{Random Walk}
-
-We will start with an approximation of Brownian Motion, the
-\textbf{random walk}, denoted by $W_n$.  This random walk will be the
-driving force behind the random variable $X_t$, which is approximated by
-by $X^n_t$, to be defined below.  This second random variable is
-similar to its driver, the random walk, but it provides a little more
-flexibility on the time and value dimensions as we shall see.
-
-\subsubsection{The Random Walk, $W_n$}
-So to begin, the random walk is a stochastic process, defined and denoted
-as follows:
-   \[ \{ W_n | n \in \mathbb{N} \} \]
-   \[ W_n = \xi_1 + \xi_2 + \cdots + \xi_n \]
-   \[ W_0 =  0 \]
-where the $\xi_i$ have distribution
-   \[ P(\xi_i = 1) = p \]
-   \[ P(\xi_i = -1) = 1-p. \]
-
-\subsubsection{Generalized Process, $X_t$}
-To handle time, we will pick a $T \in (0, \infty)$, and partition our
-time interval into $n$ equal segments
-   \[ \Delta t = \frac{T}{n} \;\; \Rightarrow t_i = i \Delta t.\]
-In addition, the random variable, $X_t$, will be will approximated by
-the random variable $X^n_t$, which depends on how finely we partition
-our time interval.  Eventually, we will let $n$ tend to infinity, so
-that $X^n_t \rightarrow X_t$. But before we get there, a little more
-about $X^n_t$.
-
-We will restrict the approximation $X^n_t$ to movements of
-only $\Delta x$, a constant, between time $t_{i-1}$ to time $t_i$.
-Eventually, as our time increments become small, $\Delta x$ will
-shrink too.
-
-Therefore, at each time $t_i =  i \Delta  t $, we can define the process
-as a function of the underlying, driving random walk:
-\begin{equation}
-   \label{bm1}
-   X^n_{t_i} = \Delta x W_i = \Delta x (\xi_1 + \cdots + \xi_i),
-      \qquad i \in 0,1,\ldots,n.
-\end{equation}
-Think of the $\xi_i$ as ``up or down'' indicators that are iid.
-
-At intermediate times, $t \in [t_{i-1},t_i]$, we will also define $X^n_t$ as
-the linear interpolation between $X^n_{t_{i-1}}$ and  $X^n_{t_{i}}$:
-\[ X^n_{t_{i}} = \frac{t_i - t}{\Delta t} X^n_{t_{i-1}} +
-   \frac{t- t_{i -1}} {\Delta t} X^n_{t_{i}} \]
-allowing $X_t^n$ to be defined for all $t \in [0,T]$.
-
-\subsection{The Limiting Case}
-
-Ideally, we want to let $n$ tend to infinity, so that $\Delta t
-\rightarrow 0$ and so that $X^n_t \rightarrow X_t$.  But for this process
-$X^n$ to converge to something and be useful, we're going to need the
-first and second moments, and hence $EX^n_T$ and $Var(X^n_T)$ to be
-bounded. Otherwise, the expected value of $X^n_T$ and/or the
-typical change in $X^n$ would be infinite.
-
-From Equation \ref{bm1}, we see that
-   \[ EX^n_T  = \Delta x \cdot n \cdot E\xi_i = \Delta x \cdot n(2p-1) \]
-   \[Var(X^n_T) = (\Delta x)^2 \cdot n \cdot Var(\xi_i) =
-      (\Delta x)^2 \cdot n \cdot 4p(1-p). \]
-And using the fact that $n = \frac{T}{\Delta t}$, we can rewrite the
-expectation and the variance as
-\begin{equation}
-   \label{exp}
-   EX^n_T = T \cdot \frac{ \Delta x}{\Delta t} (2p-1)
-\end{equation}
-\begin{equation}
-   \label{var}
-   Var(X^n_T) = T \cdot \frac{(\Delta x)^2 }{\Delta t} \cdot 4p(1-p).
-\end{equation}
-Our goal is to \emph{keep these babies finite} for all fixed $t$. So let's
-force the things we have control over in the variance term.
-Specifically, to prevent the variance from being 0 (and our process
-deterministic) and to prevent the process from blowing up to infinity,
-we choose $\Delta x$ so that the relevant portion is non-zero and finite:
-\begin{equation}
-   \label{diff}
-   \frac{(\Delta x)^2}{\Delta t} = 2D > 0
-\end{equation}
-for some positive constant $D$, which we will call the \textbf{diffusion
-coefficient}. This is the only logical and feasible way to keep it
-bounded.\footnote{We say $D$ instead of specifying a constant to avoid
-making too many assumptions, and we multiply by two for convenience
-of notation only (since $D$ is arbitrary and could absorb or nullify
-the 2 anyway).}
-
-This forces our hand with the expectation, because Equation \ref{exp} will blow up to
-infinity as $\Delta x \rightarrow 0$, which we see by plugging
-\ref{diff} into equation \ref{exp}, which gives
-\begin{equation}
-    \label{exprec}
-    EX^n_T = T \cdot \frac{ 2D}{\Delta x} (2p-1)
-\end{equation}
-Now since we want the expectation bounded, we must choose the parameter $p$
-so that Equation \ref{exprec} is finite (so equal to some constant, say $cT$),
-which is equivalent to
-   \[ \Leftrightarrow \quad \frac{2p - 1}{\Delta x} = \frac{c}{2D} \]
-\begin{equation}
-   \label{p}
-   \Rightarrow \quad p = \frac{1}{2} + \frac{c}{2D}
-\end{equation}
-where $c$ is some constant, which we call the \textbf{drift coefficient}.
-
-So if we take equations \ref{exp} and \ref{p}, we find
-   \[ EX^n_T = cT \]
-while taking equations \ref{var}, \ref{diff}, and \ref{p} gives us
-   \[ Var(X^n_T)= 2DT \left( 1 - \frac{c^2}{D^2} (\Delta x)^2 \right).\]
-
-\paragraph{Final Result} So now let's take the limit of the mean and
-variance expressions, noting that $\Delta x$ goes to $0$ as
-$n\rightarrow \infty$:
-   \[ \lim_{n\rightarrow \infty} EX^n_T = cT  \]
-   \[ \lim_{n\rightarrow \infty} Var(X^n_T)= 2DT  \]
-both of which are bounded!
-
-Finally, we can apply the Central Limit Theorem to conclude that,
-   \[\lim_{n \rightarrow \infty} \frac{X^n_T -
-      EX^n_T}{\sqrt{Var(X^n_T)}} \rightarrow Z \]
-where $Z$ is the standard normal random variable.
-
-\subsection{Brownian Motion}
-
-Now we can take the limiting case to define our result. So for any fixed
-$ T \in (0,\infty)$, we can define the limit of $X^n_T$ as $X_T$, which
-is a normally distributed random variable defined by parameters
-   \[ \mu_T = cT \]
-   \[ \sigma_T = \sqrt{2DT}.\]
-If we do this for each time $T \in (0,\infty)$, we obtain a
-continuous process
-   \[ \{ X_T \; |\; T \geq 0 \}  \]
-   \[p(x,T) = \frac{1}{\sqrt{4\pi DT}} \;
-      e^{\frac{-(x - cT)^2}{4DT}}, \;\; x \in \mathbb{R}.\]
-
-\paragraph{Definition} If we set the parameters at $c = 0$ and $D = 1/2$,
-we get as the corresponding process \textbf{Brownian Motion}, also
-called the \textbf{Wiener Process}, denoted by $\{ W_t\;|\; t\geq 0\}$:
-
-\subsection{Properties of Brownian Motion}
-
-Brownian Motion, as just defined, satisfies certain properties:
-\begin{enumerate}
-   \item[i.]{$W_0 = 0$ with probability 1.}
-   \item[ii.]{$W_t$ is a continuous function of $t$ with probability 1.}
-   \item[iii.]{For all $u < s < t$, the increments $W_t - W_s$ and
-      $W_s - W_u$ are independent.}
-   \item[iv.]{For all $s <t$, $W_t - W_s$ is normally distributed with
-      mean $0$ and variance $t-s$.  The pdf is
-      \[ p(x,t-s) =  \frac{1}{\sqrt{2\pi (t-s)}} \;
-	 e^{-\frac{x^2}{2(t-s)}}.\]
-      }
-\end{enumerate}
-
-\subsubsection{Brownian Motion Starting at $y$}
-
-Let $W^y_t$ denote Brownian motion starting at $y$, rather than $0$.
-Much remains the same, but let's run through just to be clear.
-\begin{enumerate}
-   \item[i.]{$W^y_0 = y$, since it has a non-zero starting point.}
-   \item[ii.]{Doesn't change.}
-   \item[iii.]{Non-overlapping increments remain independent, and an
-      increment like $W_t - W_s$ will have
-      expectation $0$, and variance $t - s$.}
-   \item[iv.]{ $W^y_t$ is normally distributed with density function
-      \[ f(x,t|y) = \frac{1}{\sqrt{2\pi t}} e^{-\frac{(x-y)^2}{2t}}.\]
-      }
-\end{enumerate}
-
-\subsubsection{Additional Properties}
-
-Before we prove the following results, let's just state them quickly:
-\begin{enumerate}
-   \item{The process $W_t$ is \textbf{nowhere differentiable}.}
-   \item{$W_t$ is not of \textbf{bounded first order variation}.}
-   \item{The function $W_t$ has \textbf{bounded quadratic
-      variation}.}
-   \item{$(dW_t)^2 = dt$.}
-\end{enumerate}
-Now we can prove these statements. Many of the properties of the Wiener
-Process, the It\={o} Integral, and Stochastic Differential Equations
-will follow from these results. So let's get to the proofs.
-
-\subsubsection{$W_t$ is Nowhere Differentiable}
-      \begin{proof}
-	 We'll want to show that
-	    \[\lim_{h \rightarrow 0} P\left( \left\lvert
-	       \frac{W_{t+h} - W_t}{h} \right\rvert \geq n \right) =1 \]
-	 which would imply $W_t$ cannot be differentiated.
-
-	 So let's rewrite, using the properties that result from the
-	 definition of the Wiener Process:
-	    \[ P\left( \left\lvert \frac{W_{t+h} - W_t}{h}
-	       \right\rvert \geq n \right) = P(|W_h| \geq n|h|) \]
-	 \begin{equation}
-	    \label{jfk}
-	     = 1 - P(|W_h| < n|h|)
-	 \end{equation}
-	 As $h$ goes to zero, the second term in Equation \ref{jfk} also
-	 goes zero, so the probability as a whole tends to unity.  To
-	 see this, assume that $h>0$ (without loss of generality) and
-	 carry out the rest of the proof:
-	 \[ 1- P(|W_h| < nh) = 1- \frac{1}{\sqrt{2\pi h}} \int^{nh}_{-nh}
-	    e^{-\frac{x^2}{2t}} dx \]
-	 With an eye towards using the Squeeze Theorem, we can set up
-	 the inequality
-	    \[   1- \frac{1}{\sqrt{2\pi h}} \int^{nh}_{-nh}
-	       e^{-\frac{x^2}{2t}} dx \geq 1 - \frac{1}{\sqrt{2\pi h}}
-	       \int^{nh}_{-nh} 1 dx \]
-	    \[ \Rightarrow  1- \frac{1}{\sqrt{2\pi h}} \int^{nh}_{-nh}
-	       e^{-\frac{x^2}{2t}} dx \geq 1 -\frac{2hn}{ \sqrt{2\pi h}}
-	       = 1 - \sqrt{\frac{2hn}{\pi}} \]
-	 and taking the limit of both sides of the inequality,
-	 \[ \lim_{h\rightarrow 0}\left[1 - P(|W_h| \leq nh) \right] \geq
-	    \lim_{h\rightarrow 0} \left[ 1-\sqrt{\frac{2hn}{\pi}}\right]
-	    = 1 \]
-	 \[ \Rightarrow \lim_{h\rightarrow 0} 1 - P(|W_h| \leq nh)
-	    \geq 1.\]
-	 \end{proof}
 
 
-\subsubsection{$W_t$ is not of Bounded First Order Variation}
 
-      \paragraph{Definition} A function $f: [0,T] \rightarrow \mathbb{R}$
-      has \textbf{bounded variation} if
-	 \[ BV(f) = \lim_{||\Delta|| \rightarrow 0}\sum_{i=1}^n|f(t_i)-
-	    f(t_{i-1})| \]
-      exists and is finite, where
-	 \[ \Delta = (t_0, t_1, \ldots , t_n = T) \]
-      is any partition of the interval $[0,T]$ and
-	 \[ || \Delta || = \max_{i = 1, \ldots, n} |t_i - t_{i-1}|. \]
 
-      \begin{proof}
-	 To prove that the function $t \mapsto W_t$ does not have bounded
-	 variation, we can compute something related instead, given that
-	 $\Delta = (t_0, \ldots, t_n)$ is a partition of $[0,T]$:
-	    \[E\left[\sum^n_{i=1} |W_{t_i} - W_{t_{i-1}}|\right] =
-	       \sum^n_{i=1} E(|W_{t_i} - W_{t_{i-1}}|) .\]
-	 For if this is not bounded, then $BV(W_t)$ is surely not
-	 bounded. So let's compute the expectation for a single time
-	 interval
-	 \[E(|W_{t_i} - W_{t_{i-1}}|) = \int^{+\infty}_{-\infty}
-	    |x| \frac{1}{\sqrt{2\pi \Delta t}} e^{-\frac{x^2}{2\Delta t}}
-	    dx \]
-	 where $\Delta t = t_i - t_{i-1}$. Using the symmetry of the
-	 normal distribution, and then changing variables by letting
-	 $u = \frac{x^2}{2\Delta t}$ and $du=\frac{x}{\Delta t}dx$,
-	 we get
-	    \[ E(|W_{t_i} - W_{t_{i-1}}|) = 2 \int^{+\infty}_{0}
-	       x\frac{1}{\sqrt{2\pi \Delta t}} e^{-\frac{x^2}{2\Delta t}}
-	       dx \]
-	    \[ = \int^{+\infty}_{0} \sqrt{\frac{2 \Delta t}{\pi}}
-	       e^{-u} du = \left[ -\sqrt{\frac{2 \Delta t}{\pi}} e^{-u}
-	       \right]^{+\infty}_{0} \]
-	    \[ = \sqrt{\frac{2}{\pi} (t_i - t_{i-1})}
-	       = c\sqrt{t_i-t_{i-1}}  \]
-	 So for the expectation, we get
-	    \[ E\left[\sum^n_{i=1} |W_{t_i} - W_{t_{i-1}}|\right]
-	       = c \sum_{i=1}^n \sqrt{t_i - t_{i-1}}.\]
-	 Recalling that $t_i = i \cdot (\frac{T}{n})$, we can simplify
-	    \[ E\left[\sum^n_{i=1} |W_{t_i} - W_{t_{i-1}}|\right]  =
-	       c \sum_{i=1}^n \sqrt{\frac{T}{n}} =cn\sqrt{\frac{T}{n}} =
-	       c\sqrt{nT}.\]
-	 Therefore,
-	    \[ \lim_{||\Delta|| \rightarrow 0} E\left[\sum^n_{i=1}
-	       |W_{t_i}-W_{t_{i-1}}|\right]=\lim_{n\rightarrow \infty}
-	       c\sqrt{nT} = \infty \]
-	 And since
-	    \[E\left[\sum^n_{i=1}|W_{t_i}-W_{t_{i-1}}|\right] \leq
-	       \sum^n_{i=1} |W_{t_{i-1}} - W_{t_i}| \]
-	 we see that $BV(W_t)$ diverges to infinity with probability 1.
-      \end{proof}
+%\subsection{Random Walk}
 
-\subsubsection{$W_t$ has Bounded Quadratic Variation}
+%We will start with an approximation of Brownian Motion, the
+%\textbf{random walk}, denoted by $W_n$.  This random walk will be the
+%driving force behind the random variable $X_t$, which is approximated by
+%by $X^n_t$, to be defined below.  This second random variable is
+%similar to its driver, the random walk, but it provides a little more
+%flexibility on the time and value dimensions as we shall see.
 
-      I'll omit the proof because it's rather
-      straightforward to show that the following converges to 0:
-      \[ \lim_{||\Delta || \rightarrow 0} E\left[ \left(\sum_{i=1}^n
-	 \lvert W_{t_i} - W_{t_{i-1}} \rvert^2 -T\right)^2 \right]=0.\]
+%\subsubsection{The Random Walk, $W_n$}
+%So to begin, the random walk is a stochastic process, defined and denoted
+%as follows:
+   %\[ \{ W_n | n \in \mathbb{N} \} \]
+   %\[ W_n = \xi_1 + \xi_2 + \cdots + \xi_n \]
+   %\[ W_0 =  0 \]
+%where the $\xi_i$ have distribution
+   %\[ P(\xi_i = 1) = p \]
+   %\[ P(\xi_i = -1) = 1-p. \]
 
-      \paragraph{Definition} A function $f: [0,t] \rightarrow \mathbb{R}$
-      has \textbf{bounded quadratic variation} if
-	 \[ BV^2(f) = \lim_{||\Delta|| \rightarrow 0} \sum^n_{i=1}
-	    \left\lvert f(t_i) - f(t_{i-1}) \right\rvert^2 < \infty.\]
+%\subsubsection{Generalized Process, $X_t$}
+%To handle time, we will pick a $T \in (0, \infty)$, and partition our
+%time interval into $n$ equal segments
+   %\[ \Delta t = \frac{T}{n} \;\; \Rightarrow t_i = i \Delta t.\]
+%In addition, the random variable, $X_t$, will be will approximated by
+%the random variable $X^n_t$, which depends on how finely we partition
+%our time interval.  Eventually, we will let $n$ tend to infinity, so
+%that $X^n_t \rightarrow X_t$. But before we get there, a little more
+%about $X^n_t$.
 
-      In fact, for Brownian Motion, with probability 1:
-	 \[BV^2(W_t) = T.\]
+%We will restrict the approximation $X^n_t$ to movements of
+%only $\Delta x$, a constant, between time $t_{i-1}$ to time $t_i$.
+%Eventually, as our time increments become small, $\Delta x$ will
+%shrink too.
+
+%Therefore, at each time $t_i =  i \Delta  t $, we can define the process
+%as a function of the underlying, driving random walk:
+%\begin{equation}
+   %\label{bm1}
+   %X^n_{t_i} = \Delta x W_i = \Delta x (\xi_1 + \cdots + \xi_i),
+      %\qquad i \in 0,1,\ldots,n.
+%\end{equation}
+%Think of the $\xi_i$ as ``up or down'' indicators that are iid.
+
+%At intermediate times, $t \in [t_{i-1},t_i]$, we will also define $X^n_t$ as
+%the linear interpolation between $X^n_{t_{i-1}}$ and  $X^n_{t_{i}}$:
+%\[ X^n_{t_{i}} = \frac{t_i - t}{\Delta t} X^n_{t_{i-1}} +
+   %\frac{t- t_{i -1}} {\Delta t} X^n_{t_{i}} \]
+%allowing $X_t^n$ to be defined for all $t \in [0,T]$.
+
+%\subsection{The Limiting Case}
+
+%Ideally, we want to let $n$ tend to infinity, so that $\Delta t
+%\rightarrow 0$ and so that $X^n_t \rightarrow X_t$.  But for this process
+%$X^n$ to converge to something and be useful, we're going to need the
+%first and second moments, and hence $EX^n_T$ and $Var(X^n_T)$ to be
+%bounded. Otherwise, the expected value of $X^n_T$ and/or the
+%typical change in $X^n$ would be infinite.
+
+%From Equation \ref{bm1}, we see that
+   %\[ EX^n_T  = \Delta x \cdot n \cdot E\xi_i = \Delta x \cdot n(2p-1) \]
+   %\[Var(X^n_T) = (\Delta x)^2 \cdot n \cdot Var(\xi_i) =
+      %(\Delta x)^2 \cdot n \cdot 4p(1-p). \]
+%And using the fact that $n = \frac{T}{\Delta t}$, we can rewrite the
+%expectation and the variance as
+%\begin{equation}
+   %\label{exp}
+   %EX^n_T = T \cdot \frac{ \Delta x}{\Delta t} (2p-1)
+%\end{equation}
+%\begin{equation}
+   %\label{var}
+   %Var(X^n_T) = T \cdot \frac{(\Delta x)^2 }{\Delta t} \cdot 4p(1-p).
+%\end{equation}
+%Our goal is to \emph{keep these babies finite} for all fixed $t$. So let's
+%force the things we have control over in the variance term.
+%Specifically, to prevent the variance from being 0 (and our process
+%deterministic) and to prevent the process from blowing up to infinity,
+%we choose $\Delta x$ so that the relevant portion is non-zero and finite:
+%\begin{equation}
+   %\label{diff}
+   %\frac{(\Delta x)^2}{\Delta t} = 2D > 0
+%\end{equation}
+%for some positive constant $D$, which we will call the \textbf{diffusion
+%coefficient}. This is the only logical and feasible way to keep it
+%bounded.\footnote{We say $D$ instead of specifying a constant to avoid
+%making too many assumptions, and we multiply by two for convenience
+%of notation only (since $D$ is arbitrary and could absorb or nullify
+%the 2 anyway).}
+
+%This forces our hand with the expectation, because Equation \ref{exp} will blow up to
+%infinity as $\Delta x \rightarrow 0$, which we see by plugging
+%\ref{diff} into equation \ref{exp}, which gives
+%\begin{equation}
+    %\label{exprec}
+    %EX^n_T = T \cdot \frac{ 2D}{\Delta x} (2p-1)
+%\end{equation}
+%Now since we want the expectation bounded, we must choose the parameter $p$
+%so that Equation \ref{exprec} is finite (so equal to some constant, say $cT$),
+%which is equivalent to
+   %\[ \Leftrightarrow \quad \frac{2p - 1}{\Delta x} = \frac{c}{2D} \]
+%\begin{equation}
+   %\label{p}
+   %\Rightarrow \quad p = \frac{1}{2} + \frac{c}{2D}
+%\end{equation}
+%where $c$ is some constant, which we call the \textbf{drift coefficient}.
+
+%So if we take equations \ref{exp} and \ref{p}, we find
+   %\[ EX^n_T = cT \]
+%while taking equations \ref{var}, \ref{diff}, and \ref{p} gives us
+   %\[ Var(X^n_T)= 2DT \left( 1 - \frac{c^2}{D^2} (\Delta x)^2 \right).\]
+
+%\paragraph{Final Result} So now let's take the limit of the mean and
+%variance expressions, noting that $\Delta x$ goes to $0$ as
+%$n\rightarrow \infty$:
+   %\[ \lim_{n\rightarrow \infty} EX^n_T = cT  \]
+   %\[ \lim_{n\rightarrow \infty} Var(X^n_T)= 2DT  \]
+%both of which are bounded!
+
+%Finally, we can apply the Central Limit Theorem to conclude that,
+   %\[\lim_{n \rightarrow \infty} \frac{X^n_T -
+      %EX^n_T}{\sqrt{Var(X^n_T)}} \rightarrow Z \]
+%where $Z$ is the standard normal random variable.
+
+%\subsection{Brownian Motion}
+
+%Now we can take the limiting case to define our result. So for any fixed
+%$ T \in (0,\infty)$, we can define the limit of $X^n_T$ as $X_T$, which
+%is a normally distributed random variable defined by parameters
+   %\[ \mu_T = cT \]
+   %\[ \sigma_T = \sqrt{2DT}.\]
+%If we do this for each time $T \in (0,\infty)$, we obtain a
+%continuous process
+   %\[ \{ X_T \; |\; T \geq 0 \}  \]
+   %\[p(x,T) = \frac{1}{\sqrt{4\pi DT}} \;
+      %e^{\frac{-(x - cT)^2}{4DT}}, \;\; x \in \mathbb{R}.\]
+
+%\paragraph{Definition} If we set the parameters at $c = 0$ and $D = 1/2$,
+%we get as the corresponding process \textbf{Brownian Motion}, also
+%called the \textbf{Wiener Process}, denoted by $\{ W_t\;|\; t\geq 0\}$:
+
 
 
 
