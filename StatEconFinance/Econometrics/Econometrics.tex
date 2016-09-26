@@ -21206,8 +21206,853 @@ $\sigma_{m\ell}=\E[\varepsilon_{nm}\varepsilon_{n\ell}]\neq 0$ for all
 least some pair of $m\neq\ell$.
 \end{rmk}
 
+
 \clearpage
 \section{Bayesian Statistics}
+
+\subsection{Standard Normal Linear Model (SNLM) aka Regression}
+
+For the purpose of estimating means or regression coefficients, this
+section considers the standard normal linear model in a Bayesian
+context, where we have observations $\{y_n,\bsx_n\}\nN$, with $y_n$
+the dependent variable and $\bsx_n$ a $(K\times 1)$ vector of
+predetermined covariates.
+Note that this is purposefully general. Everything in this section
+is perfectly valid even if $N=1$ (since we're not doing frequentist
+asymptotics) or if $\bsx_n$ is just a constant equal to one for all $n$,
+so that the ``regression coefficient'' we are estimating is really just
+the mean of $\{y_n\}\nN$.
+
+\begin{defn}(Model Likelihood)
+We have the following conditional-on-$\bsX$ likelihood for data
+$\{y_n\}\nN$ given $(K\times 1$) parameter vector $\bsbeta$ and scalar
+parameter $\sigma^2$:
+\begin{align*}
+  p(\bsy\,|\,\bsbeta,\sigma^2,\bsX)
+  \;\sim\;\calN(\bsX\bsbeta,\;\sigma^2 \bsI_N)
+\end{align*}
+Note that this setup implies independent, equal-variance errors for each
+observation.
+\end{defn}
+
+\begin{defn}(Conjugate Prior)
+We need a joint prior on $(\bsbeta,\sigma^2)$, and we can get a
+conjugate prior if we break up the prior into two components as follows:
+\begin{align*}
+  p(\bsbeta,\sigma^2)
+  =
+  p(\bsbeta|\sigma^2)p(\sigma^2)
+  \quad\text{where}\quad
+  p(\bsbeta|\sigma^2)
+  &\sim
+  \calN\left(\bsbeta_0, \; \frac{\sigma^2\bsI_k}{\kappa_0}
+  \right)
+  \quad
+  p(\sigma^2)
+  \sim \text{InvGamma}\left(
+  \frac{\nu_0}{2},
+  \; \frac{\nu_0\sigma^2_0}{2}
+  \right)
+\end{align*}
+Note $X\sim \text{InvGamma}(\alpha,\beta)$ means that
+$X^{-1}\sim\text{Gamma}(\alpha,\beta)$.
+Also, by this construction, $\bsbeta$ and $\sigma^2$ are \emph{a priori}
+dependent. High variance $\sigma^2$ also induce a high-variance prior
+distribution for $\bsbeta$. But you need this to get conjugacy (hence a
+nice analytically tractable posterior).
+\end{defn}
+\begin{rmk}
+The above assumes simple covariance matrices for the likelihood and
+prior on $\bsbeta$: $\sigma^2\bsI_N$ and $(\sigma^2/\kappa_0)\bsI_K$.
+The former implies independent equal-variance errors; the latter implies
+independent equal-prior-variance components of $\bsbeta$.
+We could instead use arbitrary covariance matrices, but things become
+substantially more complicated and non-conjugate.
+\end{rmk}
+
+\begin{defn}(Flat Prior)
+We can impose a flat/noninformative prior by taking a special limiting
+case of the above conjugate prior.
+In particular, $\kappa_0\ra0$ puts a flat prior on $\bsbeta$, while
+$\nu_0\ra 0$ puts a flat prior on $\sigma^2$.
+\end{defn}
+
+\begin{defn}(Posterior Under Conjugate Prior)
+\label{defn:posteriornormal}
+Construct the posterior as follows:
+\begin{align*}
+   p(\bsbeta, \sigma^2 | \bsy,\bsX)
+   &\propto
+   p(\bsy|\bsbeta,\sigma^2,\bsX)\cdot p(\bsbeta|\sigma^2)\cdot p(\sigma^2)
+\end{align*}
+Sub in functional forms, ignoring all constants (that don't include
+parameters):
+\begin{align*}
+  p(\bsbeta, \sigma^2 | \bsy,\bsX)
+  &\propto
+  \big[
+  (\sigma^2)^{-\frac{N}{2}}
+  e^{-\frac{1}{2\sigma^2}(\bsy-\bsX\bsbeta)'(\bsy-\bsX\bsbeta)}
+  \big]
+  \big[
+  (\sigma^2)^{-\frac{1}{2}}
+  e^{-\frac{\kappa_0}{2\sigma^2}(\bsbeta-\bsbeta_0)'(\bsbeta-\bsbeta_0)}
+  \big]
+  \big[
+    (\sigma^2)^{-\left(\frac{\nu_0}{2}+1\right)}
+    e^{-\frac{\nu_0\sigma_0^2}{2\sigma^2}}
+  \big]
+  \\
+  &\propto
+  (\sigma^2)^{-\left(\frac{N+\nu_0+1}{2}+1\right)}
+  e^{%
+    -\frac{1}{2\sigma^2}
+    \left[
+    (\bsy-\bsX\bsbeta)'(\bsy-\bsX\bsbeta)
+    + \kappa_0(\bsbeta-\bsbeta_0)'(\bsbeta-\bsbeta_0)
+    +\nu_0\sigma^2_0
+    \right]
+  }
+\end{align*}
+\end{defn}
+
+
+
+\clearpage
+
+\begin{prop}
+\label{prop:posteriornormal}
+\emph{(Factoring the Joint Posterior)}
+The joint posterior can be factored into the following product of an MVN
+pdf for $\bsbeta$ and an inverse gamma pdf for $\sigma^2$:
+\begin{align}
+  p(\bsbeta, \sigma^2 | \bsy,\bsX)
+  &\propto
+  \calN(\bsbarbeta,\sigma^2\bsV)
+  \cdot
+  \operatorname{InvGamma}\left(a,b\right)
+  \label{posteriornormal}
+\end{align}
+\begin{alignat}{3}
+  \bsV^{-1}&=(\bsX'\bsX+\kappa_0\bsI_K)
+  \qquad
+  &&\bsbarbeta
+  = \bsV\big(\bsX'\bsy + \kappa_0\bsbeta_0\big) \notag\\
+  a&=\frac{1}{2} \big[N+\nu_0-K+1\big]
+  \qquad
+  &&b=
+  \frac{1}{2}
+  \big[
+    \bse'\bse
+    - \bsbarbeta'\bsV^{-1}\bsbarbeta
+    + \bshatbeta'\bsX'\bsX\bshatbeta
+    + \kappa_0\bsbeta_0'\bsbeta_0
+    +\nu_0\sigma^2_0
+  \big]
+  \notag
+\end{alignat}
+Like the prior, that's a conditional-on-$\sigma^2$ MVN pdf for $\bsbeta$
+times an Inverse Gamma pdf for $\sigma^2$:
+\begin{align}
+  p(\bsbeta | \sigma^2, \bsy, \bsX)
+  &\propto
+  \calN(\bsbarbeta,\sigma^2\bsV)
+  %=
+  %\calN\bigg(
+  %(\bsX'\bsX+\kappa_0\bsI_K)^{-1}
+  %\big(\bsX'\bsy + \kappa_0\bsbeta_0\big),\;
+  %\sigma^2(\bsX'\bsX+\kappa_0\bsI_K)^{-1}
+  %\bigg)
+  \notag
+  \\
+  p(\sigma^2|\bsy,\bsX)
+  &=\int p(\bsbeta, \sigma^2 | \bsy,\bsX) \; d\bsbeta
+  \;\propto\;
+  \operatorname{InvGamma}\left(a,b\right)
+  \label{sigpos}
+\end{align}
+Thus, to sample from the joint posterior, first sample $\sigma^2$ from
+an $\operatorname{InvGamma}(a,b)$ distribution,\footnote{%
+  Could equivalently sample $1/\sigma^2$ from the Gamma distribution
+  and take the reciprocal to get $\sigma^2$ draw.
+}
+then draw $\bsbeta$ from a $\calN(\bsbarbeta,\sigma^2\bsV)$
+distribution.
+\end{prop}
+
+
+\begin{cor}
+\emph{(Alternative Formula for $p(\bsbeta|\sigma^2,\bsy,\bsX)$)}
+Rather than write the conditional posterior for $\bsbeta$ as in
+Proposition~\ref{prop:posteriornormal}, we can alternatively write
+\begin{align*}
+  p(\bsbeta | \sigma^2, \bsy, \bsX)
+  \sim
+  \calN\bigg(
+  \big(
+  {\bsX^*}'
+  {\bsSigma^*}^{-1}
+  \bsX^*
+  \big)^{-1}
+  {\bsX^*}'{\bsSigma^*}^{-1} \bsy^*,\;\;
+  \big(
+  {\bsX^*}'
+  {\bsSigma^*}^{-1}
+  \bsX^*
+  \big)^{-1}
+  \bigg)
+\end{align*}
+where these objects are defined
+\begin{align*}
+  \bsy^*=
+  \begin{bmatrix}
+    \bsy \\ \bsbeta_0
+  \end{bmatrix}
+  \quad
+  \bsX^*=
+  \begin{bmatrix}
+    \bsX \\ \bsI_k
+  \end{bmatrix}
+  \quad
+  \bsSigma^*=
+  \begin{bmatrix}
+    \sigma^2\bsI_k & 0 \\
+    0 &  (\sigma^2/\kappa_0)\bsI_k
+  \end{bmatrix}
+  \quad
+  %\bsV
+  %=
+  %\big(
+  %{\bsX^*}'
+  %\bsSigma^{-1}
+  %\bsX^*
+  %\big)^{-1}
+  %=
+  %\left(
+  %\frac{\bsX'\bsX+\kappa_0\bsI_k}{\sigma^2}
+  %\right)^{-1}
+\end{align*}
+This form offers the intuition that we are appending ``dummy
+observations'' to $\bsy$ and $\bsX$ to get $\bsy^*$ and $\bsX^*$. Then
+we just run Weighted OLS (WLS) with $\Sigma^*$ as our weighting matrix
+on the actual observations plus the dummy observations.
+\end{cor}
+
+
+\begin{cor}\emph{(Flat Prior Gives OLS)}
+\label{cor:flatpriorols}
+Notice from the formulas in Prop.~\ref{prop:posteriornormal} that as
+$\kappa_0\ra 0$ so that $p(\bsbeta|\sigma^2)$ approaches a flat prior,
+we get the standard normal OLS result for the conditional posterior of
+$\bsbeta$:
+\begin{align*}
+  \lim_{\kappa_0\ra 0}
+  p(\bsbeta | \sigma^2, \bsy, \bsX)
+  &\propto
+  \calN\bigg(
+  (\bsX'\bsX)^{-1}
+  \bsX'\bsy,\;
+  \sigma^2(\bsX'\bsX)^{-1}
+  \bigg)
+\end{align*}
+Moreover, if we take both $k_0,\nu_0\ra 0$ to get a flat prior on both
+$\bsbeta$ and $\sigma^2$, the resulting marginal posterior of $\bsbeta$
+is a multivariate $t$-distribution:
+\begin{align*}
+  p(\bsbeta|\bsy,\bsX)
+  &= \int p(\bsbeta,\sigma^2| \bsy,\bsX) \; d\sigma^2
+  \propto
+  t_\nu\big(\bshatbeta,s^2(\bsX'\bsX)^{-1}\big)
+\end{align*}
+with $\nu=N-K+1$ degrees of freedom.
+\end{cor}
+\begin{rmk}
+This last corollary gives a Bayesian interepretation to frequentist
+tables of parameter estimates and t-tests: they simply contain
+information about the posterior conditional distribution of $\bsbeta$.
+\end{rmk}
+
+
+\clearpage
+\begin{proof}(Proposition~\ref{prop:posteriornormal})
+To simplify the joint posterior, recall the following normal-error OLS
+formulas/results:
+\begin{align*}
+  \bshatbeta=(\bsX'\bsX)^{-1}\bsX'\bsy
+  \qquad
+  \bsy
+  = \bsX\bsbeta + \bsvarepsilon
+  = \bsX\bshatbeta + \bse
+  \qquad
+  \bse'\bsX = \bso
+\end{align*}
+One consequence is of all of this is that
+\begin{align*}
+  (\bsy-\bsX\bsbeta)'
+  (\bsy-\bsX\bsbeta)
+  %&=
+  %\big(
+  %\bse - \bsX(\bsbeta-\bshatbeta)
+  %\big)'
+  %\big(
+  %\bse - \bsX(\bsbeta-\bshatbeta)
+  %\big)
+  %\\
+  %&=
+  %\bse'\bse
+  %- 2\bse'\bsX(\bshatbeta-\bsbeta)
+  %+ (\bsbeta-\bshatbeta)'\bsX'\bsX(\bsbeta-\bshatbeta)
+  %\\
+  &=
+  \bse'\bse
+  + (\bsbeta-\bshatbeta)'\bsX'\bsX(\bsbeta-\bshatbeta)
+\end{align*}
+We use this to rewrite the posterior under the conjugate prior as stated
+in Definition~\ref{defn:posteriornormal} as
+\begin{align*}
+  p(\bsbeta, \sigma^2 | \bsy,\bsX)
+  &\propto
+  (\sigma^2)^{-\left(\frac{N+\nu_0+1}{2}+1\right)}
+  \exp\bigg\{%
+    \frac{-1}{2\sigma^2}
+    \big[
+    \bse'\bse
+    +
+    \underbrace{
+    (\bsbeta-\bshatbeta)'\bsX'\bsX(\bsbeta-\bshatbeta)
+    + \kappa_0(\bsbeta-\bsbeta_0)'(\bsbeta-\bsbeta_0)
+    }_{(*)}
+    +\nu_0\sigma^2_0
+    \big]
+  \bigg\}
+\end{align*}
+For easier posterior analysis, we want to split this whole thing into a
+product of two pdfs: MVN for $\bsbeta$ and inverse gamma for $\sigma^2$.
+Therefore, we need a quadratic form in the exponential for $\bsbeta$,
+which we obtain by completing the square for terms in $(*)$.  Start by
+grouping/rewriting
+\begin{align*}
+  (*)
+  &=
+  \bsbeta'(\bsX'\bsX+\kappa_0\bsI_K)\bsbeta
+  - 2\bsbeta'\big(\bsX'\bsX\bshatbeta + \kappa_0\bsbeta_0\big)
+  + \bshatbeta'(\bsX'\bsX)\bshatbeta
+  + \kappa_0 \bsbeta_0'\bsbeta_0
+  \\
+  &=
+  \bsbeta'(\bsX'\bsX+\kappa_0\bsI_K)\bsbeta
+  - 2\bsbeta'\big(\bsX'\bsy + \kappa_0\bsbeta_0\big)
+  + \bshatbeta'(\bsX'\bsX)\bshatbeta
+  + \kappa_0 \bsbeta_0'\bsbeta_0
+\end{align*}
+where we used the OLS formula to get to the second line.
+To complete the square, define
+\begin{align*}
+  \bsV^{-1}=(\bsX'\bsX+\kappa_0\bsI_K)
+  \qquad\quad
+  \bsbarbeta =
+  \bsV\big(\bsX'\bsy + \kappa_0\bsbeta_0\big)
+\end{align*}
+We can then use these to continue rewriting $(*)$ and complete the
+square:
+\begin{align*}
+  (*)
+  &=
+  \bsbeta'\bsV^{-1}\bsbeta
+  - 2\bsbeta'\bsV^{-1}\bsbarbeta
+  + \bshatbeta'(\bsX'\bsX)\bshatbeta
+  + \kappa_0 \bsbeta_0'\bsbeta_0
+  \\
+  %&=
+  %\bsbeta'\bsV^{-1}\bsbeta
+  %- 2\bsbeta'\bsV^{-1}\bsbarbeta
+  %+ \bsbarbeta' \bsV^{-1}\bsbarbeta
+  %- \bsbarbeta' \bsV^{-1}\bsbarbeta
+  %+ \bshatbeta'\bsX'\bsy
+  %+ \kappa_0 \bsbeta_0'\bsbeta_0
+  %\\
+  &=
+  (\bsbeta-\bsbarbeta)'\bsV^{-1}(\bsbeta-\bsbarbeta)
+  - \bsbarbeta' \bsV^{-1}\bsbarbeta
+  + \bshatbeta'(\bsX'\bsX)\bshatbeta
+  + \kappa_0 \bsbeta_0'\bsbeta_0
+\end{align*}
+Substituting this in for $(*)$ in the posterior expression above, we
+have
+\begin{align*}
+  p(\bsbeta, \sigma^2 | \bsy,\bsX)
+  &\propto
+  (\sigma^2)^{-\left(\frac{N+\nu_0+1}{2}+1\right)}
+  e^{%
+    -\frac{1}{2\sigma^2}
+    \big[
+    (\bsbeta-\bsbarbeta)'\bsV^{-1}(\bsbeta-\bsbarbeta)
+    +
+    \bse'\bse
+    - \bsbarbeta' \bsV^{-1}\bsbarbeta
+    + \bshatbeta'(\bsX'\bsX)\bshatbeta
+    + \kappa_0 \bsbeta_0'\bsbeta_0
+    +\nu_0\sigma^2_0
+    \big]
+  }
+\end{align*}
+We can factor out $\bsbeta\sim \calN_K(\bsbarbeta,\sigma^2\bsV)$ pdf to
+make this joint posterior a product of pdfs:
+\begin{align*}
+  p(\bsbeta, \sigma^2 | \bsy,\bsX)
+  \propto
+  \bigg[
+  \frac{1}{(\sigma^2)^{\frac{K}{2}}}
+  e^{%
+    -\frac{1}{2}
+    (\bsbeta-\bsbarbeta)'(\sigma^2\bsV)^{-1}(\bsbeta-\bsbarbeta)
+  }
+  \bigg]
+  \bigg[
+  (\sigma^2)^{-\left(\frac{N+\nu_0-K+1}{2}+1\right)}
+  e^{%
+    -\frac{1}{2\sigma^2}
+    \left[
+    \bse'\bse
+    - \bsbarbeta'\bsV^{-1}\bsbarbeta
+    + \bshatbeta'\bsX'\bsX\bshatbeta
+    + \kappa_0\bsbeta_0'\bsbeta_0
+    +\nu_0\sigma^2_0
+    \right]
+  }
+  \bigg]
+\end{align*}
+Identify the first as MVN normal for $\bsbeta$, the second as an
+inverse-gamma distribution for $\sigma^2$, with parameters as stated in
+the proposition.
+\end{proof}
+
+\clearpage
+\begin{proof}(Corollary~\ref{cor:flatpriorols})
+Take $\kappa_0\ra0$ to get a flat prior on $\bsbeta$.
+Then the Proposition~\ref{prop:posteriornormal} formulas read
+\begin{alignat}{3}
+  \bsV^{-1}&=\bsX'\bsX
+  \qquad
+  &&\bsbarbeta
+  = \bsV\big(\bsX'\bsy\big) \notag\\
+  a&=\frac{1}{2} \big[N+\nu_0-K+1\big]
+  \qquad
+  &&b=
+  \frac{1}{2}
+  \big[
+    \bse'\bse
+    - \bsbarbeta'\bsV^{-1}\bsbarbeta
+    + \bshatbeta'\bsX'\bsX\bshatbeta
+    + \nu_0\sigma^2_0
+  \big]
+  \notag
+\end{alignat}
+So $\sigma^2\bsV=\sigma^2(\bsX'\bsX)^{-1}$ and $\bsbarbeta=\bshatbeta$,
+the standard OLS formula.
+
+Next, additionally take $\nu_0\ra 0$ so that the prior is flat on both
+$\bsbeta$ and $\sigma^2$. It will be easier to set $\kappa_0=\nu_0=0$ in
+the original expression for the posterior in
+Definition~\ref{defn:posteriornormal}, rather than the broken-up
+version of Proposition~\ref{prop:posteriornormal}:
+\begin{align*}
+  p(\bsbeta, \sigma^2 | \bsy,\bsX)
+  &\propto
+  (\sigma^2)^{-\left(\frac{N+1}{2}+1\right)}
+  e^{%
+    -\frac{1}{2\sigma^2}
+    \bsvarepsilon'\bsvarepsilon
+  }
+\end{align*}
+where I simply used $\bsvarepsilon=\bsy-\bsX\bsbeta$ to replace the term
+the exponent.
+We want to integrate out $\sigma^2$ to get the marginal posterior for
+$\bsbeta$:
+\begin{align*}
+  p(\bsbeta| \bsy,\bsX)
+  &=
+  \int
+  p(\bsbeta, \sigma^2 | \bsy,\bsX)
+  \;d\sigma^2
+  \propto
+  \int
+  (\sigma^2)^{-\left(\frac{N+1}{2}+1\right)}
+  e^{%
+    -\frac{1}{2\sigma^2}
+    \bsvarepsilon'\bsvarepsilon
+  }
+  \;d\sigma^2
+\end{align*}
+We will now do a change of variables.
+Define $v=(\sigma^2)^{-1}$ so that (ignoring a negative sign)
+$dv=(\sigma^2)^{-2}\,d\sigma^2$ or, equivalently,
+$d\sigma^2=\sigma^4\,dv=v^{-2}\,dv$.
+Then we can rewrite the integral as
+\begin{align*}
+  p(\bsbeta| \bsy,\bsX)
+  &\propto
+  \int
+  v^{\frac{N+1}{2}+1}
+  e^{%
+    -\frac{v}{2}
+    \bsvarepsilon'\bsvarepsilon
+  }
+  \;v^{-2}\,dv
+  =
+  \int
+  v^{\frac{N-1}{2}}
+  e^{%
+    -\frac{v}{2}
+    \bsvarepsilon'\bsvarepsilon
+  }
+  \;dv
+\end{align*}
+Do another change of variables with $v = u
+/\bsvarepsilon'\bsvarepsilon$, which implies
+$dv = du/\bsvarepsilon'\bsvarepsilon$.
+Sub in:
+\begin{align*}
+  p(\bsbeta| \bsy,\bsX)
+  =
+  \int
+  \left(
+  \frac{u}{\bsvarepsilon'\bsvarepsilon}
+  \right)^{\frac{N-1}{2}}
+  e^{%
+    -\frac{u}{2}
+  }
+  \;
+  \frac{1}{\bsvarepsilon'\bsvarepsilon}
+  du
+  =
+  \left(
+  \bsvarepsilon'\bsvarepsilon
+  \right)^{-\left(\frac{N+1}{2}\right)}
+  %\underbrace{%
+  \int
+  u^{\frac{N+1}{2}-1}
+  e^{-\frac{u}{2}}
+  \;
+  du
+  %}_{(*)}
+\end{align*}
+But notice that the very last integral is proportional to a
+Gamma$(\frac{N+1}{2},\frac{1}{2})$ pdf in $u$. Therefore, it integrates
+to a constant.\footnote{%
+  Just some constant (rather than one exactly) since we don't have the
+  leading terms multiplying this expression to normalize the pdf to
+  integrate to one.
+}
+This leaves us with
+\begin{align*}
+  p(\bsbeta| \bsy,\bsX)
+  \propto
+  \left(
+  \bsvarepsilon'\bsvarepsilon
+  \right)^{-\left(\frac{N+1}{2}\right)}
+\end{align*}
+Lastly, use the identity/result that $\bsvarepsilon'\bsvarepsilon =
+\bse'\bse + (\bsbeta-\bshatbeta)'(\bsX'\bsX)(\bsbeta-\bshatbeta)$
+to get
+\begin{align*}
+  p(\bsbeta| \bsy,\bsX)
+  &\propto
+  \left(
+  \bse'\bse +
+  (\bsbeta-\bshatbeta)'(\bsX'\bsX)(\bsbeta-\bshatbeta)
+  \right)^{-\left(\frac{N+1}{2}\right)}
+  %\\
+  \propto
+  \left(
+  1 +
+  \frac{%
+    (\bsbeta-\bshatbeta)'
+    \bsSigma^{-1}
+    (\bsbeta-\bshatbeta)
+  }{N-K+1}
+  \right)^{-\left(\frac{(N-K+1)+K}{2}\right)}
+\end{align*}
+where we defined
+\begin{align*}
+  \bsSigma
+  = s^2(\bsX'\bsX)^{-1}
+  \qquad
+  \text{where}\quad
+  s^2:=
+  \frac{\bse'\bse}{N-K+1}
+  =
+  \frac{1}{N-K+1}\sumnN (y_n-\bsx_n\bshatbeta)^2
+\end{align*}
+Notice that the last expression obtained for the marginal posterior of
+$\bsbeta$ is proportional to a multivariate $t_\nu(\bshatbeta,\bsSigma)$
+distribution with $\nu=N-K+1$ degrees of freedom.
+\end{proof}
+
+
+\clearpage
+\begin{ex}(Special Case with $\beta$ as Mean of $\bsy$)
+Consider the special case where $\bsX$ is a column vector of all ones so
+that $\beta$ is simply the mean of $\bsy$.
+Then Prop.~\ref{prop:posteriornormal} simplifies to
+\begin{align}
+  p(\beta, \sigma^2 | \bsy,\bsX)
+  &\propto
+  \calN(\bar{\beta},\sigma^2V)
+  \cdot
+  \operatorname{InvGamma}\left(a,b\right)
+\end{align}
+\begin{alignat*}{3}
+  V^{-1}&=(N+\kappa_0)
+  \qquad
+  &&\bar{\beta}
+  = \frac{1}{N+\kappa_0}\bigg(\sumnN y_n + \kappa_0\beta_0\bigg)
+  \\
+  a &= \frac{1}{2}[N+v_0]
+  \qquad&&b
+  %&=
+  %\frac{1}{2}
+  %\left[
+    %\sumnN (y_n-\bar{y})^2
+    %-
+    %\frac{1}{N+\kappa_0}\bigg(\sumnN y_n + \kappa_0\beta_0\bigg)^2
+    %+ N\bar{y}^2
+    %+ \kappa_0 \beta_0^2 + \nu_0\sigma^2_0
+  %\right]
+  %\\
+  %&=
+  %\frac{1}{2}
+  %\left[
+    %\sumnN (y_n-\bar{y})^2
+    %-
+    %\frac{1}{N+\kappa_0}\bigg(
+      %\bigg(\sumnN y_n\bigg)^2
+      %+ 2\kappa_0\beta_0 \left( \sumnN y_n \right)
+      %+ \kappa_0^2\beta_0^2
+    %\bigg)
+    %+ N\bar{y}^2
+    %+ \kappa_0 \beta_0^2 + \nu_0\sigma^2_0
+  %\right]
+  %\\
+  %&=
+  %\frac{1}{2}
+  %\left[
+    %\sumnN (y_n-\bar{y})^2
+    %-
+    %\frac{1}{N+\kappa_0}\bigg(
+      %(N^2-N(N+\kappa_0))\bar{y}^2
+      %+ 2\kappa_0\beta_0 N\bar{y}
+      %+ (\kappa_0^2- \kappa_0 (N+\kappa_0)) \beta_0^2
+    %\bigg)
+    %+ \nu_0\sigma^2_0
+  %\right]
+  %\\
+  =
+  \frac{1}{2}
+  \left[
+    \sumnN (y_n-\bar{y})^2
+    + \frac{N\kappa_0}{N+\kappa_0}
+      (\bar{y}-\beta_0)^2
+    + \nu_0\sigma^2_0
+  \right]
+\end{alignat*}
+This implies the following conditional posterior for $\beta$ and
+marginal posterior for $\sigma^2$, writing things out very explicitly:
+\begin{align*}
+  p(\beta | \sigma^2,\bsy,\bsX)
+  &\propto
+  %\calN\left(
+    %\frac{%
+      %\frac{N}{\sigma^2} \bar{y} + \frac{\kappa_0}{\sigma^2} \beta_0
+    %}{%
+      %\frac{N}{\sigma^2} + \frac{\kappa_0}{\sigma^2}
+    %}
+  %\; , \; \frac{1}{\frac{N}{\sigma^2} + \frac{\kappa_0}{\sigma^2}}
+  %\right)
+  %=
+  \calN\left(
+    \frac{N\bar{y} + \kappa_0\beta_0}{N + \kappa_0}
+  \; , \; \frac{\sigma^2}{N+\kappa_0}
+  \right)
+  \\
+  p(\sigma^2|\bsy)
+  &\propto
+  %\operatorname{InvGamma}(a,b)
+  %=
+  \operatorname{InvGamma}\left(
+    \frac{N+v_0}{2},\;
+    \frac{1}{2}
+    \left[
+      \sumnN (y_n-\bar{y})^2
+      + \frac{N\kappa_0}{N+\kappa_0}
+        (\bar{y}-\beta_0)^2
+      + \nu_0\sigma^2_0
+    \right]
+  \right)
+\end{align*}
+For $\beta$, notice that it's as if we're adding $\kappa_0$ dummy
+observations to the data/sample, all with value equal to $\beta_0$, so
+that our conditional posterior mean is the average of the actual data
+mean $\bar{y}$ and the prior dummy observations at $\beta_0$.  For
+$\sigma^2$, the second parameter of the inverse gamma distribution is a
+combination of the sum of squares, the discrepancy between the data mean
+and the prior mean, and prior $\nu_0\sigma^2$:
+
+
+Next, notice that in the flat/noninformative prior case with
+$\kappa_0\ra 0$,
+\begin{align*}
+  \lim_{\kappa_0,\nu_0\ra 0}
+  p(\beta|\sigma^2,\bsy,\bsX)
+  \;\propto\;
+  \calN\left(\bar{y},\frac{\sigma^2}{N}\right)
+  %\cdot
+  %\operatorname{InvGamma}\left(\frac{N}{2},\;\frac{1}{2}\sumnN (y_n-\bar{y})^2\right)
+\end{align*}
+Notice that we're blending the data mean $\bar{y}$ and prior
+mean $\beta_0$, and as $N\rightarrow \infty$, we get the same
+result as the Central Limit Theorem.
+\end{ex}
+
+
+
+\clearpage
+\subsubsection{Flat Prior}
+
+Next, we can ask about the \emph{posterior predictive distribution}
+which is simple enough to integrate analytically and get:
+\begin{align*}
+   p(\tilde{y} | \tilde{X}, y, X) &= \int \int p(\tilde{y} | \tilde{X},
+      \beta, \sigma^2 ) p(\beta | \sigma^2, y, X) p(\sigma^2|y, X)
+      \; d\beta \; d\sigma^2 \\
+      \Rightarrow \quad \tilde{y} | \tilde{X}, y, X &\sim
+      \text{MVT}_{n-p}(\tilde{X} \hat{\beta}, \;
+      S^2( I + \tilde{X} V_\beta \tilde{X}'))
+\end{align*}
+
+\subsubsection{Unknown Mean, Known Variance}
+
+
+To get the \emph{predictive distribution}, since we know that
+$p(\tilde{\mathbf{y}} | \mu)$ is normal, and since $p(\mu | \mathbf{y})$
+is normal, their product will be too. So we need only find the
+appropriate mean and variance to say all we need to say.
+Since the normal is conjugate to itself, we know that this
+      posterior predictive distribution \emph{will} be normal.
+
+  So we can compute the expectation
+      \begin{align*}
+	 E[\tilde{\mathbf{y}} | \mathbf{y} ] &=
+	    E[ E(\tilde{\mathbf{y}} | \mu) |  \mathbf{y} ]
+	    = E[\mu | \mathbf{y}]
+	 \\
+	 &= \frac{\frac{n}{\sigma^2} \bar{y}
+	 + \frac{1}{\tau^2} \mu_0}{\frac{n}{\sigma^2} + \frac{1}{\tau^2}}
+      \end{align*}
+Next, we can compute the variance
+      \begin{align*}
+	 Var[\tilde{\mathbf{y}} | \mathbf{y} ] &=
+	    E[ Var(\tilde{\mathbf{y}} | \mu) |  \mathbf{y} ]
+	    + Var[ E(\tilde{\mathbf{y}} | \mu) | \mathbf{y} ]
+	 \\
+	 &= E[ \sigma^2 | \mathbf{y} ] + Var( \mu | \mathbf{y})
+	 \\
+	 &= \sigma^2 + \frac{1}{\frac{n}{\sigma^2} + \frac{1}{\tau^2}}
+      \end{align*}
+
+We now have two alternatives. First, we can approximate the integral
+in Expression through simulation. Or, alternatively, we
+can use conjugacy along with the mean and variance which we just derived
+to sample straight from the normal distribution defined
+\[ \tilde{y} | y\sim N\left(\frac{\frac{n}{\sigma^2} \bar{y}
+      + \frac{1}{\tau^2} \mu_0}{\frac{n}{\sigma^2} + \frac{1}{\tau^2}},
+       \; \sigma^2 + \frac{1}{\frac{n}{\sigma^2} +
+      \frac{1}{\tau^2}}\right) \]
+
+
+\subsubsection{Non-Informative Prior}
+
+{\sl Non-Informative Prior}: To get this distribution, we can let
+$\kappa_0, \nu_0\rightarrow 0$, using the notation from the conjugate
+prior distribution described above. This gives us
+   \[ p(\mu) \propto 1, \qquad p(\sigma^2) \propto (\sigma^2)^{-1} \]
+Putting this together, you get a joint prior density of
+   \[ p(\mu, \sigma^2) \propto \frac{1}{\sigma^2}, \quad\Leftrightarrow
+      \quad p(\mu, \ln \sigma) \propto 1 \]
+where the second expression indicates the prior is flat on the
+$\mu, \ln \sigma$ scale.
+
+
+
+\newpage
+\subsubsection{Semi-Conjugate Prior}
+
+
+\newpage
+\subsubsection{Ridge Regression}
+
+In classical regression, to estimate $\hat{\beta}_{\text{MLE}}$,
+we will solve
+\[ \hat{\beta}_{\text{MLE}} = \arg \max_{\beta} p(y | \beta, X),
+   \quad \Leftrightarrow \quad \hat{\beta}_{\text{MLE}} =
+   \arg \min_{\beta} \sum^n_{i=1} (y_i - X_i \beta)^2
+   \]
+However, in Bayesian regression, the problem becomes
+\[ \hat{\beta}= \arg \max_{\beta} p(y | \beta, X)\;p(\beta),
+   \quad \Leftrightarrow \quad \hat{\beta} =
+   \arg \max_{\beta} \ln p(y | \beta, X) + \ln p(\beta)
+   \]
+\[ \Rightarrow \hat{\beta} = \arg \min_\beta \sum^n_{i=1}
+   (y_i - X_i \beta)^2 - \ln p(\beta) \]
+where the log of the prior acts as a penalty term. And there just so happen to be a number of interesting penalty.
+
+\paragraph{Example} {\sl Ridge Regression (L2 Regression)}:
+Now let's consider the case where
+   \[ \beta \sim \text{MVN}_p(\beta_0, \; \tau^2 I_p).\]
+In models with many parameters ($p$ large), it's common to set a
+prior where the coefficient vector is assumed to be the zero vector,
+so that our optimization problem becomes
+\begin{align*}
+   \ln p(\beta) &= K - \frac{1}{2\tau^2} \sum^p_{j=1} \beta_j^2\\
+   \hat{\beta} &= \arg \min_\beta \sum^n_{i=1}
+      (y_i - X_i \beta)^2 + \lambda  \sum^p_{j=1} \beta_j^2, \qquad
+      \lambda = \frac{1}{2\tau^2}
+\end{align*}
+Now it's clear to see how the $\ln p(\beta)$ acts as a penalty term.
+Large values of $\beta_j$ are penalized more in the minimization,
+leading the $\beta_j$ estimates to be shrunk back towards 0.
+\\
+\\
+But we can make the penalty even more extreme by changing the
+$\lambda$ term, which brings us to the next section.
+
+\subsubsection{Optimization for Non-Conjugate Priors}
+
+{\sl Laplace Prior and Lasso (or L2) Regression}: We set a prior
+as follows leading to a corresponding minimization problem:
+\[ p(\beta_j) \propto e^{-\lambda|\beta_j|} \]
+\[ \hat{\beta} = \arg \min_\beta \sum^n_{i=1}
+   (y_i - X_i \beta)^2 + \lambda  \sum^p_{j=1} |\beta_j| \]
+The interesting thing about the Laplace-based model is that many
+$\hat{\beta}_j$ will be set \emph{identically} to 0 because of the
+cusp that occurs in the prior density.
+\\
+\\
+{\sl More General Priors and Bridge Regression}: We can be even
+more general and set
+   \[ p(\beta) \propto \exp\{ -\lambda \mathcal{J}(\beta) \} \]
+   \[ \Rightarrow \hat{\beta} = \arg \min_\beta \sum^n_{i=1}
+      (y_i - X_i \beta)^2 + \lambda  \mathcal{J}(\beta) \]
+Often, it's very common to restrict $\mathcal{J}(\beta)$ to
+\[ \mathcal{J}(\beta) = \sum^p_{j=1} |\beta_j|^q \]
+which retains as special cases Lasso regression ($q=1$) and
+Ridge regression ($q=2$).
+
+
+
+
+\clearpage
+\section{Bayesian Statistics (OLD)}
 
 \subsection{Statistical Inference: From Classical to Bayesian}
 
@@ -21243,9 +22088,9 @@ by the \textbf{likelihood principle}, where you say that the probability
 model is based on some density, $p(Y_i | \mathbf{\theta})$. Then, after
 observing data, you compute
    \[ \text{Likelihood} = \prod^n_{i=1} p(y_i | \mathbf{\theta}) \]
-Then from there, choose parameter values that make our data as 
+Then from there, choose parameter values that make our data as
 likely as possible:
-   \[ \hat{\mathbf{\theta}}_{MLE} = \arg \max_{\mathbb{\theta}} 
+   \[ \hat{\mathbf{\theta}}_{MLE} = \arg \max_{\mathbb{\theta}}
       p( \mathbf{y} | \mathbf{\theta}) \]
 For simple models, this is often possible to compute analytically, but
 for larger models, you'll need to resort to optimizing algorithms
@@ -21258,25 +22103,25 @@ the uncertainty in our measurements.  To do so, we use the concept
 of a \textbf{sampling distribution}, which describes the distribution
 of values taken on by a parameter or statistic across \emph{all
 possible} samples.  This is the basis for hypothesis testing and
-confidence intervals.  In very large samples (which classical 
+confidence intervals.  In very large samples (which classical
 statistics is optimized for), this is a very big deal.
 \\
 \\
 However, there are some disadvantages which we will want to discuss.
 \begin{enumerate}
-   \item{Assumes parameters are \emph{fixed constants}, 
+   \item{Assumes parameters are \emph{fixed constants},
       disallowing prob. statements about $\theta$.}
    \item{The interpretation of Confidence Intervals is rather unwieldy.
       It's not a probability statement, and only says that in 95\%
       of the many samples we could take, the CIs will contain $\mu$.}
-   \item{Most of the variability results are \emph{asymptotic}, 
+   \item{Most of the variability results are \emph{asymptotic},
       implicitly requiring large samples.}
 \end{enumerate}
-   
+
 \subsubsection{From Classical to Bayesian Paradigm}
 
 The major feature of Bayesian Statistics is that unknown parameters,
-$\theta$, do \emph{not} have fixed values. Instead, they are random 
+$\theta$, do \emph{not} have fixed values. Instead, they are random
 variables with their own distribution: $p(\theta)$. This allows us
 to make direct probability statements about $\theta$, although it
 does complicate matters a bit.
@@ -21289,8 +22134,8 @@ distribution of values.
 \subsubsection{Summarizing the Bayesian Approach}
 
 The main goal of the Bayesian approach is to make probability statements
-about a parameter $\theta$ or a unobserved data $\tilde{\mathbf{y}}$ 
-\emph{conditional} on the observed value of $\mathbf{y}$.\footnote{Note 
+about a parameter $\theta$ or a unobserved data $\tilde{\mathbf{y}}$
+\emph{conditional} on the observed value of $\mathbf{y}$.\footnote{Note
 that $\mathbf{y}$ is a vector representing the observed
 data, $(y_1, \ldots, y_n)$.} Typically, we write these statements
 as $p(\theta| \mathbf{y})$ or  $p(\tilde{\mathbf{y}}| \mathbf{y})$.
@@ -21302,19 +22147,19 @@ $\mathbf{y}$. However, we typically break this up as follows:
    \[ p(\theta, \textbf{y}) = p(\theta) p(\mathbf{y} | \theta) \]
 where $p(\theta)$ is a model for the parameter called the \textbf{prior}
 distribution, and we call $p(\mathbf{y} | \theta)$ the \textbf{likelihood
-function}, which we'll describe in more detail.\footnote{The 
+function}, which we'll describe in more detail.\footnote{The
    likelihood function assumes that name when $\theta$ varies and
    $\textbf{y}$ is \emph{fixed}, so that $p(\mathbf{y} | \theta)$ is
-   a particular function of $\theta$.  As a result, we typically use 
-   this name \emph{after} we observe data.  However, 
-   when $\mathbf{y}$ is not fixed, we can also call it the 
+   a particular function of $\theta$.  As a result, we typically use
+   this name \emph{after} we observe data.  However,
+   when $\mathbf{y}$ is not fixed, we can also call it the
    \emph{sampling distribution}---for obvious reasons---as Gelman does.}
 \\
 \\
 The \emph{likelihood function}, $p(\mathbf{y} | \theta)$ is viewed
 as a function of $\theta$ for fixed $\mathbf{y}$---i.e. after you observe
 the data.  This is precisely the means through which one \emph{updates}
-an initial prior distribution. So having observed data, 
+an initial prior distribution. So having observed data,
 you then \emph{update} the model for $\theta$ using Bayes' Rule:
 \begin{equation}
    \label{bayes}
@@ -21325,23 +22170,23 @@ you then \emph{update} the model for $\theta$ using Bayes' Rule:
 Note that we show the \emph{unnormalized} posterior density after
 $\propto$ because $p(\mathbf{y})$ is simply a constant with respect
 to $\theta$, so we will often drop it from our analysis
-since we can just normalize the numerator by a constant so 
+since we can just normalize the numerator by a constant so
 that it integrates to 1.
 \\
 \\
-This value, $p(\mathbf{y})$ in the denominator, is often called 
+This value, $p(\mathbf{y})$ in the denominator, is often called
 the \emph{prior predictive distribution} or the \emph{marginal
 likelihood}.  It's called the first
-as it represents how we would predict $\mathbf{y}$ 
-before we observe any data. Specifically, before we see 
+as it represents how we would predict $\mathbf{y}$
+before we observe any data. Specifically, before we see
 $\mathbf{y}$ and update $\theta$ to arrive at a posterior,
-we would average the likelihood of observing 
+we would average the likelihood of observing
 $\mathbf{y}$ \emph{given} $\theta$ over all
 possible values of $\theta$ that we allow for in our prior.
 We can see this in the formulation of $\mathbf{y}$:
 \begin{equation}
     \label{marglik}
-    p(\mathbf{y}) = \int p(y, \theta) \; d\theta = 
+    p(\mathbf{y}) = \int p(y, \theta) \; d\theta =
 	\int p(y | \theta) p(\theta) \; d\theta
 \end{equation}
 It's second moniker,
@@ -21349,15 +22194,15 @@ the marginal likelihood, arises from this same averaging out
 of $\theta$ to get a marginal distribution.
 \\
 \\
-Finally, 
+Finally,
 we return to the updated result, $p(\theta | \mathbf{y})$,
 called the \textbf{posterior}, which we can state  even more
 intuitively:
-   \[ (\text{Posterior}) = 
-      \frac{(\text{Likelihood})(\text{Prior})}{(\text{Marginal 
+   \[ (\text{Posterior}) =
+      \frac{(\text{Likelihood})(\text{Prior})}{(\text{Marginal
       Distribution})} \]
 Note, if we have a lot of data, they will dominate the prior and
-wash out many of the effects of a potentially bad prior. (But in 
+wash out many of the effects of a potentially bad prior. (But in
 that case, why not just use classical statistics in the first place?)
 
 \subsubsection{Prediction}
@@ -21367,23 +22212,23 @@ about out of sample observations, once we have observed some data
 and updated our model.  For that reason, we look to the
 \textbf{posterior predictive distribution}:
 \begin{align}
-   p(\tilde{\mathbf{y}} | \mathbf{y}) &= \int p(\tilde{\mathbf{y}}, 
+   p(\tilde{\mathbf{y}} | \mathbf{y}) &= \int p(\tilde{\mathbf{y}},
        \theta | y) \; d\theta \label{pospred1}\\
    &= \int p(\tilde{\mathbf{y}} | \theta , y) p(\theta | \mathbf{y})
        \; d\theta \label{pospred2}\\
-   &= \int p(\tilde{\mathbf{y}} | 
-      \theta) p(\theta | \mathbf{y} ) \; d\theta 
+   &= \int p(\tilde{\mathbf{y}} |
+      \theta) p(\theta | \mathbf{y} ) \; d\theta
 	\label{pospred3}
 \end{align}
-Intuitively, Equation \ref{pospred1} says that our prediction of 
-$\tilde{\mathbf{y}}$, which depends upon $\theta$, 
-should \emph{average} over all possible 
+Intuitively, Equation \ref{pospred1} says that our prediction of
+$\tilde{\mathbf{y}}$, which depends upon $\theta$,
+should \emph{average} over all possible
 values of $\theta$.
 \\
 \\
 Equation \ref{pospred2} tells us how
-to do that: consider the likelihood of observing new 
-data $\tilde{\mathbf{y}}$ \emph{given} some assumed $\theta$, 
+to do that: consider the likelihood of observing new
+data $\tilde{\mathbf{y}}$ \emph{given} some assumed $\theta$,
 but weight
 that likelihood by the probability that $\theta$ actually does
 equal that assumed $\theta$.  What should the weight be? Well,
@@ -21392,17 +22237,17 @@ the best guess of $\theta$'s distribution given previously
 observed data.
 \\
 \\
-Finally, we can jump from Equation \ref{pospred2} to 
+Finally, we can jump from Equation \ref{pospred2} to
 \ref{pospred3} because $\mathbf{y}$
-and $\tilde{\mathbf{y}}$ are conditionally independent given 
+and $\tilde{\mathbf{y}}$ are conditionally independent given
 $\theta$.
 
 \subsubsection{Likelihood and Odds Ratios}
 
-We call the ratio of the posterior density, $p(\theta | \mathbf{y})$ 
+We call the ratio of the posterior density, $p(\theta | \mathbf{y})$
 evaluated at points $\theta_1$ and $\theta_2$ the \emph{posterior odds}
 for $\theta_1$ relative to $\theta_2$. Note that the posterior
-odds are equal to the prior odds multiplied by the likelihood 
+odds are equal to the prior odds multiplied by the likelihood
 ratio, $p( \mathbf{y} | \theta_1)/p( \mathbf{y} | \theta_2)$:
    \[ \frac{p(\theta_1 | \mathbf{y})}{p(\theta_2 | \mathbf{y})}
       = \frac{p(\theta_1) p(\mathbf{y} | \theta_1)}{p(\theta_2)
@@ -21413,11 +22258,11 @@ ratio, $p( \mathbf{y} | \theta_1)/p( \mathbf{y} | \theta_2)$:
 
 Let's start with the nice results:
 \begin{enumerate}
-   \item{Variability of $\theta$ summarized by the posterior 
+   \item{Variability of $\theta$ summarized by the posterior
       distribution.}
    \item{We can make direct probability statements about $\theta$ now.}
    \item{Hypothesis testing is less important.  For example, instead
-      of testing a hypothesis as to whether the treatment effect of a 
+      of testing a hypothesis as to whether the treatment effect of a
       drug is nonzero, we ask what is the \emph{probability} that
       the effect is greater than zero. Whole different ballgame.}
    \item{We are \emph{not} relying on asymptotic results to come
@@ -21426,7 +22271,7 @@ Let's start with the nice results:
 Now let's be fair and go over some of the disadvantages:
 \begin{enumerate}
    \item{We need to assume or create a prior distribution, leaving
-      us to specify two distributions (the likelihood and the 
+      us to specify two distributions (the likelihood and the
       prior) as opposed to just one (the likelihood).
    }
    \item{Having to specify a prior can be tough if there is really
@@ -21446,12 +22291,12 @@ hopes the topic in a general framework.
 \subsubsection{Conjugate Priors}
 
 The formal definition of conjugacy is as follows: If $\mathcal{S}$ is
-a class of sampling distributions, or likelihoods, 
-$p(\mathbf{y} | \theta)$, and $\mathcal{P}$ is a class of prior 
+a class of sampling distributions, or likelihoods,
+$p(\mathbf{y} | \theta)$, and $\mathcal{P}$ is a class of prior
 distributions, $p(\theta)$ for $\theta$, then the class
-$\mathcal{P}$ is \emph{conjugate} for $\mathcal{S}$ if 
-   \[ p(\theta | \mathbf{y}) \in \mathcal{P} 
-      \text{ for all } p(\cdot | \theta) \in 
+$\mathcal{P}$ is \emph{conjugate} for $\mathcal{S}$ if
+   \[ p(\theta | \mathbf{y}) \in \mathcal{P}
+      \text{ for all } p(\cdot | \theta) \in
       \mathcal{S} \text{ and } p(\cdot) \in \mathcal{P}.\]
 In words, a prior is conjugate if the posterior is of the same form
 as the prior. Common examples include
@@ -21473,11 +22318,11 @@ we're adding ``prior counts'' to get from the data to the posterior.
 \subsubsection{Other Classes of Priors}
 
 In addition to \emph{conjugate priors}, there are other principles or
-forms of prior distributions we might adopt. Let's discuss some 
+forms of prior distributions we might adopt. Let's discuss some
 important ones along with a few general concepts.
 
 \paragraph{Improper Prior}
-In some instances, you can even have an \emph{improper prior} that 
+In some instances, you can even have an \emph{improper prior} that
 generates a proper posterior nonetheless. Examples include the
 Beta(0,0) distribution as a prior, which doesn't integrate to 1, but
 effectively adds zero ``prior counts'' to the posterior, which will
@@ -21485,40 +22330,40 @@ integrate to 1 with one observation.
 
 \paragraph{Non-Informative Priors}
 Suppose we have virtually no idea about what the prior should look
-like. Then we might want to construct a prior that is 
+like. Then we might want to construct a prior that is
 \emph{non-informative}, in the sense that it has as little influence
 upon the posterior as possible.
 
 \paragraph{Flat Priors} One way to have a non-informative prior involves
-setting $p(\theta) \propto 1$, a constant. This is called a 
+setting $p(\theta) \propto 1$, a constant. This is called a
 \emph{flat prior} with the consequence that the posterior is proportional
 to the likelihood:
 \begin{align*}
-   p(\theta |\mathbf{y}) &\propto  p(\mathbf{y}| \theta ) \cdot 1 
+   p(\theta |\mathbf{y}) &\propto  p(\mathbf{y}| \theta ) \cdot 1
    \\
-   &\propto p(\mathbf{y}| \theta )  
+   &\propto p(\mathbf{y}| \theta )
 \end{align*}
 But this approach does lead to a few problems.
 \begin{enumerate}
    \item{Namely, if the range
-      is not bounded, then a flat prior will be an improper prior, 
-      integrating to $\infty$ (ex. Normal distribution). 
+      is not bounded, then a flat prior will be an improper prior,
+      integrating to $\infty$ (ex. Normal distribution).
       }
    \item{Also, this
-      is a highly risky, as this approach may not lead to a proper 
+      is a highly risky, as this approach may not lead to a proper
       posterior. }
    \item{Finally, ``flatness'' may not be invariant to transformation.
       Specifically, if $p(\theta) \propto 1$ so that it is flat on the
       natural scale of $\theta$, it does not necessarily follow
       that it will be flat relative to transformations of $\theta$.
-      This leads us to \emph{Jeffrey's Invariance Principle} and 
+      This leads us to \emph{Jeffrey's Invariance Principle} and
       \emph{Jeffrey's Prior}.\footnote{As an example, let's consider
 	 the transformation $\phi = \ln \left(\frac{\theta}{1-\theta}
 	 \right)$,
 	 the so-called ``log odds.'' If we make our prior flat with
 	 respect to $\phi$ flat, so that $p(\phi) \propto 1$, then
 	 \[p(\theta) = p(\phi = g^{-1}(\theta)) \left\lvert \frac{
-	    d\phi}{d\theta} \right\rvert 
+	    d\phi}{d\theta} \right\rvert
 	    = 1 \cdot \left\lvert \frac{
 	    d\phi}{d\theta} \right\rvert = \frac{1}{\theta(1-\theta)}
 	 \]
@@ -21529,16 +22374,16 @@ But this approach does lead to a few problems.
 \paragraph{Jeffrey's Prior} \emph{Jeffrey's Invariance Principle}
 states that any rule for determining a non-informative prior
 for $\theta$ should yield the same results if applied to transformations
-of theta. Luckily, there does in fact exist such a prior, and it's 
+of theta. Luckily, there does in fact exist such a prior, and it's
 called \emph{Jeffrey's Prior} and is formulated as follows
    \[ p(\theta) \propto \sqrt{J(\theta)}, \qquad
-      J(\theta) = - E_\mathbf{y} 
+      J(\theta) = - E_\mathbf{y}
       \left[ \frac{d^2(\ln p(\mathbf{y} | \theta))}{
       d\theta^2} \; \lvert \; \theta \right] \]
-where $J(\theta)$ is commonly referred to as ``Expected Fisher 
-Information.'' Note that the subscript $\mathbf{y}$ is placed on the 
-expectation to indicate explicitly that this expectation is taken 
-relative to the $\mathbf{y}$, not $\theta$.  
+where $J(\theta)$ is commonly referred to as ``Expected Fisher
+Information.'' Note that the subscript $\mathbf{y}$ is placed on the
+expectation to indicate explicitly that this expectation is taken
+relative to the $\mathbf{y}$, not $\theta$.
 \\
 \\
 Once we have $p(\theta)$ from above, it's an added bonus if we can
@@ -21548,7 +22393,7 @@ write Jeffrey's Prior as a \emph{conjugate} prior as well.
 \paragraph{Neutral Prior} The goal of a \emph{neutral prior} is to
 craft a prior so that
    \[ P(\theta > \hat{\theta}_{\text{MLE}} | \mathbf{y}) \approx 1/2 \]
-which tries to ensure that the posterior distribution is cented at the 
+which tries to ensure that the posterior distribution is cented at the
 MLE.
 
 
@@ -21566,10 +22411,10 @@ and how we can apply the Bayesian approach to such problems.
 
 \subsubsection{Likelihood}
 
-Consider the random variable $\mathbf{y}$, 
+Consider the random variable $\mathbf{y}$,
 which is the number of successes in
 $n$ trials $y_1, \ldots, y_n$, so that it is binomially distributed
-with parameters $n,\theta$. This gives the sampling model (or 
+with parameters $n,\theta$. This gives the sampling model (or
 likelihood)
    \[p(\mathbf{y} = y | \theta) = \binom{n}{y} \theta^y (1-\theta)^{n-y}
       \]
@@ -21584,7 +22429,7 @@ If we get specific and set $a=b=1$ so that our prior is the uniform
 distribution,
 we will obtain what's called the ``Wilson Estimate'' in our
 posterior which has
-many nice properites. In effect, his prior makes each point in the 
+many nice properites. In effect, his prior makes each point in the
 entire range of $\theta$, $[0,1]$, equally likely.
 \\
 \\
@@ -21595,9 +22440,9 @@ which nonetheless gives a proper posterior.
 
 As a result, we get the posterior distribution
 \begin{align*}
-    p(\theta | \mathbf{y}) &\propto  p(Y | \theta) p(\theta) 
+    p(\theta | \mathbf{y}) &\propto  p(Y | \theta) p(\theta)
     \\
-    &\propto \binom{n}{y} \theta^y (1-\theta)^{n-y}  \times 
+    &\propto \binom{n}{y} \theta^y (1-\theta)^{n-y}  \times
       \frac{\Gamma(a + b)}{\Gamma(a)\Gamma(b)}
       \theta^{a-1}(1-\theta)^{b-1}
    \\
@@ -21608,7 +22453,7 @@ As a result, the posterior has a beta distribution, $\theta | \mathbf{y}
 expectaitons and variances given the properties of the beta
 distribution. For examply,
    \[ E[\theta | \mathbf{y} ] = \frac{y+a}{n+a+b},\]
-which lends a nice intuitive interpreation. Namely, $a$ acts as prior 
+which lends a nice intuitive interpreation. Namely, $a$ acts as prior
 counts and $a+b$ acts as prior total trials. Here, it's very easy
 to see how our prior influences the analysis.
 
@@ -21618,14 +22463,14 @@ to see how our prior influences the analysis.
 Say we want to compare the parameter for two different populations, $a$
 and $b$. Assuming the two populations are independent, we can compute
 \begin{align*}
-    P(\theta_a, \theta_b | \mathbf{y}_a, \mathbf{y}_b) 
+    P(\theta_a, \theta_b | \mathbf{y}_a, \mathbf{y}_b)
       &\propto P(\mathbf{y}_a, \mathbf{y}_b | \theta_a, \theta_b)
-      P(\theta_a, \theta_b) 
+      P(\theta_a, \theta_b)
    \\
    &\propto P(\mathbf{y}_a, \mathbf{y}_b | \theta_a, \theta_b)
       P(\theta_a) P(\theta_b)
    \\
-   &\propto P(\mathbf{y}_a| \theta_a) P(\theta_a) 
+   &\propto P(\mathbf{y}_a| \theta_a) P(\theta_a)
       P(\mathbf{y}_b | \theta_b )
       P(\theta_b)
 \end{align*}
@@ -21641,7 +22486,7 @@ which is easy to do with simulation:
       of $\theta_a > \theta_b$.}
 \end{enumerate}
 And if we want to do prediction, we will need to compute
-   \[ P(\tilde{\mathbf{y}}_a | \mathbf{y}_a) = \int 
+   \[ P(\tilde{\mathbf{y}}_a | \mathbf{y}_a) = \int
       p(\tilde{\mathbf{y}}_a | \theta_a) p(\theta_a | \mathbf{y}_a)
       \; d\theta_a \]
 which is to say, we find the probability of new results
@@ -21658,16 +22503,16 @@ we can do by simulation.
 We'll model the likelihood for a vector of $n$ iid RV's as a
 Poisson Random variable,
    \[ p(\mathbf{y} | \theta) \propto \theta^{\Sigma y_i} e^{-n\theta} \]
-   
+
 \subsubsection{Conjugate Prior and Special Cases}
 
-Naturally, we would like a \emph{conjugate prior}, and the Gamma 
+Naturally, we would like a \emph{conjugate prior}, and the Gamma
 distribution
-happens to be the perfect candidate. 
+happens to be the perfect candidate.
 So $\theta \sim \text{Gamma}(\alpha,
 \beta)$ and
    \[ p(\theta) \propto \theta^{\alpha - 1} e^{-\beta \theta}.\]
-Next, we could consider \emph{Jeffrey's Prior}, 
+Next, we could consider \emph{Jeffrey's Prior},
 which---after running through
 the straightforward calculations---would give us
    \[ p(\theta) \propto \theta^{-1/2} \]
@@ -21689,18 +22534,18 @@ This will give us a posterior distribution,
       + \alpha \; , \; n + \beta ) \]
 
 
-\subsubsection{Extension: Rate, Exposure Modification} 
+\subsubsection{Extension: Rate, Exposure Modification}
 It may be convenient to extend
 the Poisson model for data points $y_1, \ldots, y_n$ to the form
    \[ y_i \sim \text{Poisson}(x_i\theta) \]
-where $\theta$ is the \emph{rate} and $x_i$ \emph{exposure} of the 
+where $\theta$ is the \emph{rate} and $x_i$ \emph{exposure} of the
 $i$th unit. Typically, the values $x_i$ are known constants, while
-$\theta$ is some unknown parameter. If we set out our model to 
+$\theta$ is some unknown parameter. If we set out our model to
 accomodate this extension, we get
 \begin{align*}
    \theta &\sim \text{Gamma}(\alpha, \beta) \\
    p(y|\theta) &\propto \theta^{\Sigma y_i} e^{-(\Sigma x_i)\theta}\\
-   \theta | y &\sim \text{Gamma}\left( \alpha + \Sigma y_i, \; 
+   \theta | y &\sim \text{Gamma}\left( \alpha + \Sigma y_i, \;
       \beta + \Sigma x_i\right)
 \end{align*}
 As an example, suppose $\theta$ is the Poisson rate of plane crashes,
@@ -21708,549 +22553,11 @@ which is scaled by the $x_i$ representing miles flown in a given year.
 
 \newpage
 
-\subsubsection{Normal Data (Known Variance)}
-
-\subsubsection{Likelihood}
-Let's assume for our likelihood that the random variables, $y_i$
-follow a normal distribution where
-\begin{align*}
-    p(y_i) = \frac{1}{\sigma \sqrt{2\pi}} e^{-\frac{1}{2\sigma^2}
-    (y_i - \mu)^2} \qquad p(\mathbf{y} | \theta) &= \left(\frac{1}{  
-       \sigma \sqrt{2\pi}}\right)^n \; \Pi \; e^{-\frac{1}{2\sigma^2}
-       \Sigma (y_i - \mu)^2}
-   \\
-   &\propto \exp\left\{ -\frac{1}{2\sigma^2}
-      \Sigma (y_i - \mu)^2 \right\}
-\end{align*}
-and $\sigma$ is known and fixed.  
-
-
-\subsubsection{Conjugate Prior and Resulting Posterior}
-Next, in choosing our prior for the parameter $\mu$, we will assume
-that $\mu \sim N(\mu_0, \tau^2)$, and, again, $\sigma$ is constant. 
-This implies a posterior distribution\footnote{
-Clearly, as $n\rightarrow \infty$, we get the same result as the Central
-Limit Theorem.}
-\begin{align*}
-   \mu \sim N(\mu_0, \tau^2) \quad \Rightarrow \quad
-   \mu | \mathbf{y} \sim N\left( \frac{\frac{n}{\sigma^2} \bar{y}
-   + \frac{1}{\tau^2} \mu_0}{\frac{n}{\sigma^2} + \frac{1}{\tau^2}}
-   \; , \; \frac{1}{\frac{n}{\sigma^2} + \frac{1}{\tau^2}} \right)
-\end{align*}
-One way to view this is as the prior mean adjusted towards
-the observed data, $\mathbf{y}$:
-\[ \mu_{\text{pos}} = \alpha + (\bar{y} - \alpha) 
-   \frac{\tau^2}{\frac{\sigma^2}{n} + \tau^2} \]
-Now, if we want a particularly \emph{uninformative prior}, we can 
-let $\tau \rightarrow \infty$, which will give us the Central Limit
-Theorem. But note, our prior will be improper.
-
-\subsubsection{Jeffrey's Prior}
-Next, if we want \emph{Jeffrey's prior}, 
-we can do the computeations and get
-   \[ p(\mu) \propto 1 \]
-or the flat prior over the entire real line, which gets us to the
-Central Limit Theorem-type posterior
-   \[ \mu | \mathbf{y} \sim N(\bar{y}, \sigma^2/n) \]
-
-
-\newpage
-\subsubsection{Posterior Predictive Distribution}
-To get the \emph{predictive distribution}, we can integrate
-\begin{equation}
-   \label{op1}
-    p(\tilde{\mathbf{y}} | \mathbf{y}) = \int^\infty_{-\infty}
-      p(\tilde{\mathbf{y}} | \mu) p( \mu | \mathbf{y}) \; d\mu 
-\end{equation}
-Now that's a bit of a tough integration, so we'll often compute
-that by simulation. But that doesn't stop us from summarizing the
-posterior predictive distribution. Since we know that 
-$p(\tilde{\mathbf{y}} | \mu)$ is normal, and since $p(\mu | \mathbf{y})$
-is normal, their product will be too. So we need only find the 
-appropriate mean and variance to say all we need to say.
-\begin{enumerate}
-   \item{Since the normal is conjugate to itself, we know that this 
-      posterior predictive distribution \emph{will} be normal.}
-   \item{So we can compute the expectation
-      \begin{align*}
-	 E[\tilde{\mathbf{y}} | \mathbf{y} ] &=  
-	    E[ E(\tilde{\mathbf{y}} | \mu) |  \mathbf{y} ]  
-	    = E[\mu | \mathbf{y}] 
-	 \\
-	 &= \frac{\frac{n}{\sigma^2} \bar{y}
-	 + \frac{1}{\tau^2} \mu_0}{\frac{n}{\sigma^2} + \frac{1}{\tau^2}}
-      \end{align*}
-	 }
-   \item{Next, we can compute the variance
-      \begin{align*}
-	 Var[\tilde{\mathbf{y}} | \mathbf{y} ] &=  
-	    E[ Var(\tilde{\mathbf{y}} | \mu) |  \mathbf{y} ]  
-	    + Var[ E(\tilde{\mathbf{y}} | \mu) | \mathbf{y} ]
-	 \\
-	 &= E[ \sigma^2 | \mathbf{y} ] + Var( \mu | \mathbf{y}) 
-	 \\
-	 &= \sigma^2 + \frac{1}{\frac{n}{\sigma^2} + \frac{1}{\tau^2}}
-      \end{align*}
-	 }
-\end{enumerate}
-We now have two alternatives. First, we can approximate the integral
-in Expression \ref{op1} through simulation. Or, alternatively, we
-can use conjugacy along with the mean and variance which we just derived
-to sample straight from the normal distribution defined
-\[ \tilde{y} | y\sim N\left(\frac{\frac{n}{\sigma^2} \bar{y}
-      + \frac{1}{\tau^2} \mu_0}{\frac{n}{\sigma^2} + \frac{1}{\tau^2}},
-       \; \sigma^2 + \frac{1}{\frac{n}{\sigma^2} + 
-      \frac{1}{\tau^2}}\right) \]
-
-
-
-
-\newpage
-\subsection{Normal Data (Known Mean, Unknown Variance)}
-
-Given a vector of length $n$, denoted $y$, of random draws from 
-a normal distribution with unknown variance and known mean $\mu$, we
-have a likelihood of
-   \[ p(y|\sigma^2) \propto \sigma^{-n} \exp\left\{ 
-      -\frac{1}{2\sigma^2} \sum^n_{i=1} (y_i - \mu)^2 \right\} \]
-The \emph{conjugate prior} is an inverse Gamma distribution,
-\[ \sigma^2 \sim \text{InvGamma}(\alpha, \beta) \quad
-   \Leftrightarrow \quad 
-   \frac{1}{\sigma^2} \sim \text{Gamma}(\alpha, \beta)
-   \]
-   \[ p(\sigma^2) = \frac{\beta}{\Gamma(\alpha)} \; 
-      (\sigma^2)^{-(\alpha+1)} 
-      e^{-\beta/\sigma^2} \]
-where the distribution function comes froNon-Informative Priorm a simple 
-transformation of variables.
 
 
 
 \newpage
 \subsection{Multiparameter Models}
-
-\subsection{Univariate Normal Model}
-
-Here we begin with one of the most useful models, full stop. We
-will extend this in many directions after the initial specification
-considered here.
-
-\subsubsection{Likelihood}
-In this model, $\theta$ is a vector of two unknown parameters,
-$\theta=(\mu,\sigma)$. The likelihood is
-\begin{align*}
-   p(\mathbf{y}|\mu,\sigma) &= 
-      \left(\frac{1}{\sigma\sqrt{2\pi}}\right)^2
-      \exp\left\{ -\frac{1}{2\sigma^2} \sum (y_i-\mu)^2 \right\}\\
-   &\propto (\sigma^2)^{-n/2} 
-      \exp\left\{ -\frac{1}{2\sigma^2} \sum (y_i-\mu)^2 \right\}
-\end{align*}
-
-\subsubsection{Conjugate Prior and Resulting Posterior} 
-
-We break the prior density up into two components:
-\begin{align*}
-   \mu|\sigma^2 &\sim N\left(\mu_0, \; \frac{\sigma^2}{\kappa_0}
-   \right), \qquad \quad
-   \sigma^2 \sim \text{InvGamma}\left(\frac{\nu_0}{2},
-   \; \frac{\nu_0\sigma^2_0}{2}\right)
-\end{align*}
-Note that $\mu$ and $\sigma^2$ are \emph{a priori} dependent. A high
-variance term, $\sigma^2$, will also induce a high-variance prior
-distribution for $\mu$. But you need this dependence for conjugacy.
-\\
-\\
-{\sl Joint Posterior Distribution}:
-Now if we use this prior with the likelihood, the resulting non-standard
-joint posterior distribution simplifies to
-\begin{align*}
-   p(\mu, \sigma^2 | \mathbf{y}) \propto (\sigma^2)^{- \left(\frac{
-   n+\nu_0+1}{2} + 1\right)} \; \exp \left\{ -\frac{1}{2\sigma^2}
-   \left( \sum (y_i-\mu)^2 + \kappa_0 (\mu - \mu_0)^2 + \nu_0\sigma_0^2
-   \right) \right\}
-\end{align*}
-{\sl Marginal Posterior Densities}:
-Often, we will be interested in the marginal densities. So let's find
-the marginal posterior density of $\sigma^2$. With a lot of algebra, 
-a nice identity,\footnote{Specifically, we'll use that $\Sigma 
-   (y_i - \mu)^2 = \Sigma  (y_i - \bar{y})^2 + n(\bar{y}-\mu)^2$.}, 
-and completing the square, we get:
-\begin{align}
-   \label{sigpos}
-   p(\sigma^2|\mathbf{y})&=\int p(\mu, \sigma^2 | \mathbf{y}) \; d\mu
-   \notag\\
-   &= (\sigma^2)^{-\left(\frac{n+\nu_0}{2}+1\right)} \;
-   \exp\left\{ -\frac{1}{2\sigma^2} \left( \left[\sum (y_i-\bar{y})^2
-   \right] +\nu_0 \sigma^2_0 + \frac{nk_0}{n + k_0} (\bar{y}-\mu_0)^2
-   \right) \right\}\notag\\
-   \sigma^2|\mathbf{y} &\sim \text{InvGamma}\left(\frac{n+\nu_0}{2},
-   \; \frac{1}{2} \left(\left[\sum (y_i-\bar{y})^2
-   \right] +\nu_0 \sigma^2_0 + \frac{nk_0}{n + k_0} (\bar{y}-\mu_0)^2
-   \right)\right) 
-\end{align}
-This has a nice clear interpretation, where the second parameter is a
-combination of the sum of squares, $\nu_0\sigma^2$, and the discrepancy
-between the data mean and the prior mean. 
-\\
-\\
-Next, if we consider the
-marginal posterior distribution for the mean, we get
-\begin{align}
-   \label{mupos}
-   p(\mu | \sigma^2,\mathbf{y}) &\propto \exp\left\{ -\frac{1}{2\sigma^2}
-   \left( \sum (y_i - \mu)^2 + \kappa_0 (\mu-\mu_0)^2\right)\right\}
-   \notag\\
-   \mu | \sigma^2,\mathbf{y} &\propto N\left( \frac{\frac{n}{\sigma^2}
-   \bar{y} + \frac{\kappa_0}{\sigma^2}\mu_0}{\frac{n}{\sigma^2} +
-   \frac{k_0}{\sigma^2}}, \; \frac{1}{\frac{n}{\sigma^2} +
-   \frac{k_0}{\sigma^2}}\right)
-\end{align}
-To obtain samples from the joint posterior distribution, first sample
-from $\sigma^2$ from the Equation \ref{sigpos} Inverse Gamma
-distribution.\footnote{Alternatively, you could use the same parameters
-from Equation \ref{sigpos} to draw from the Gamma distribution, and
-then take the reciprocal to get a value for $\sigma^2$.}
-Then, using this value for $\sigma^2$, sample from a normal distribution
-with the parameters from Equation \ref{mupos}. Then repeat this
-process many times to get samples of $\mu,\sigma|y$.
-
-\subsubsection{Non-Informative Prior}
-
-{\sl Non-Informative Prior}: To get this distribution, we can let
-$\kappa_0, \nu_0\rightarrow 0$, using the notation from the conjugate
-prior distribution described above. This gives us
-   \[ p(\mu) \propto 1, \qquad p(\sigma^2) \propto (\sigma^2)^{-1} \]
-Putting this together, you get a joint prior density of
-   \[ p(\mu, \sigma^2) \propto \frac{1}{\sigma^2}, \quad\Leftrightarrow
-      \quad p(\mu, \ln \sigma) \propto 1 \]
-where the second expression indicates the prior is flat on the 
-$\mu, \ln \sigma$ scale. 
-\\
-\\
-{\sl Posterior}: As a result, our posterior distributions
-will be\footnote{The distribution
-      for $\mu|\sigma^2,\mathbf{y}$ follows from the fact that this
-      is equivalent to the one-parameter normal case with known
-      variance}
-\begin{align*}
-   \sigma^2 | \mathbf{y} &\sim \text{InvGamma}\left(\frac{n}{2}, \;
-   \frac{1}{2} \sum (y_i - \bar{y})^2 \right)\\
-   \mu | \sigma^2, \mathbf{y} &\sim N\left(\bar{y}, \frac{\sigma^2}{n}
-      \right) \qquad \qquad  
-\end{align*}
-So we just factored our posterior density into the product of conditional
-and marginal posterior densities: $p(\mu, \sigma^2 |y) = 
-p(\mu|\sigma^2,y) p(\sigma^2|y)$.
-So, to sample, just pull from the Inverse Gamma for $\sigma^2$, 
-then use it to pull from the normal.
-\\
-\\
-We already saw the marginal posterior density for $\sigma^2$ above. 
-Now let's say we want the posterior \emph{marginal} density of $\mu$. We 
-can integrate analytically to get
-\begin{align*}
-   p(\mu|\mathbf{y}) &= \int p(\mu,\sigma^2| \mathbf{y}) \; d\sigma^2\\
-   &\propto \left[ 1 + \frac{n(\mu-\bar{y})^2}{(n-1)s^2} \right]^{-
-      \frac{n}{2} }, \qquad s^2 = \frac{1}{n-1} \sum (y_i - \bar{y})^2
-\end{align*}
-which we recognize to be the good old t-distribution:
-\[ \mu|\mathbf{y} \sim t_{n-1}\left(\bar{y}, \frac{s^2}{n}\right) \]
-
-
-
-\newpage
-\subsubsection{Semi-Conjugate Prior}
-
-{\sl Prior Distribution}:
-This particular prior allows for a priori independence between
-$\mu$ and $\sigma^2$. To do so, take
-\begin{align*}
-   \mu &\sim N(\mu_0, \tau_0^2)\\
-   \sigma^2 &\sim \text{InvGamma}\left(\frac{\nu_0}{2}, \; \frac{\nu_0
-      \sigma_0^2}{2}\right)
-\end{align*}
-{\sl Posterior}: This will give us a joint posterior distribution of 
-\begin{align*}
-   p(\mu, \sigma^2 | y) &= (\sigma^2)^{-n/2} \exp\left\{
-      -\frac{1}{2\sigma^2} \sum (y_i - \bar{y})^2 \right\}
-      \exp\left\{ -\frac{1}{2\tau_0^2} (\mu-\mu_0)^2\right\} \\
-      &\quad \times (\sigma^2)^{-\left(\frac{\nu_0}{2} +1\right)} 
-      \exp\left\{ \frac{-\nu_0\sigma_0}{2\sigma^2}\right\}
-\end{align*}
-which doesn't really simplify any further to something nice or standard.
-But, if we consider the conditional posterior density for $\mu$, we
-do get something familiar:
-   \[ \mu | \sigma^2, y \sim N\left(\frac{\frac{n}{\sigma^2} \bar{y}
-     +\frac{1}{\tau_0^2}\mu_0}{\frac{n}{\sigma^2} + \frac{1}{\tau_0^2}},
-       \; \frac{1}{\frac{n}{\sigma^2} + 
-       \frac{1}{\tau_0^2}}\right) \]
-But in order to use this, we need a value of $\sigma^2$ to condition on.
-\\
-\\
-\emph{Marginal Posterior Density for $\sigma^2$}: 
-Next, we can integrate out $\mu$ from the joint posterior. This yields
-\begin{align*}
-   p(\sigma^2 | y)&\propto \left(\frac{n}{\sigma^2} + \frac{1}{\tau_0^2}
-   \right)^{1/2}  (\sigma^2)^{-\left(\frac{n+\nu_0}{2}+1\right)}
-    \exp\left\{
-      -\frac{1}{2\sigma^2} \sum (y_i - \mu_0)^2 \right\}\\
-     &\quad \times\exp\left\{ -\frac{1}{2\tau_0^2} (\mu-\mu_0)^2\right\}
-      \exp\left\{ \frac{-\nu_0\sigma_0}{2\sigma^2}\right\}
-\end{align*}
-
-
-\newpage
-\subsection{Multivariate Normal Model}
-
-Suppose $y_i$ is a vector of length $d$ with multivariate normal
-distribution, 
-   \[ y_i | \mu, \Sigma \sim N(\mu, \Sigma) \]
-where $\mu$ is a column vector of length $d$ and $\Sigma$ is a
-$d\times d$ matrix.  Then the likelihood function is 
-   \[ p(y_i |\mu,\Sigma) \propto |\Sigma|^{-\frac{1}{2}} 
-   \exp \left( -\frac{1}{2}(y_i-\mu)^T \Sigma^{-1} (y_i-\mu)\right)\]
-Now suppose that we have $n$ such random variables. Then the joint
-likelihood is written
-   \[ p(y_1, \ldots, y_n | \mu, \Sigma) \propto 
-      |\Sigma|^{-\frac{n}{2}}
-      \exp \left( -\frac{1}{2} \sum_{i=1}^n
-      (y_i-\mu)^T \Sigma^{-1} (y_i-\mu)\right)\]
-
-
-
-
-
-
-\newpage
-\subsection{Bayesian Regression}
-
-In this section, I'll let $y$ be either a single observation or an
-$n\times1$ vector, which will be clear from the context. To help 
-establish that context, I'll let $x_i$ denote covariates for a 
-\emph{single} observation, while $X$ will denote a \emph{matrix}
-of covariates with dimension $n\times p$ for $n$ observations and
-$p$ covariates.
-
-
-\subsubsection{Likelihood for Simple and Multiple Regression}
-
-In the simplest case, we will extend the simple $N(\mu,\sigma^2)$ model
-to allow for conditional means, as in simple regression. 
-Therefore, our model for the $i$th observation will be
-\[ y_i = \beta x_i + \varepsilon_i, \qquad 
-   \varepsilon_i \sim N(0,\sigma^2) \]
-where $x_i$ is a vector of $p$ known covariates, and $\beta$ is a 
-$p$-dimensional coefficient vector. Typically, we'll want to estimate
-$\beta$ and $\sigma^2$. In our notation, we can even be a bit broader
-and write
-\begin{align*}
-    y &= X \beta  + \varepsilon, \qquad  \varepsilon \sim 
-      \text{N}(0, \sigma^2 I_n) \\  
-      y| \beta, X, \sigma^2 &\sim \text{N}(X\beta, \sigma^2 I_n) 
-\end{align*}
-where $y$ is an $n\times1$ vector of observations and
-$X$ is an $n\times p$ matrix for $n$ observations and $p$
-covariates. This setup also implies errors that are 
-independent and have equal variance. 
-
-
-\subsubsection{Flat Prior}
-
-In the case of the flat, non-informative prior, we recall the 
-multiparameter normal case and set
-   \[ p(\beta, \sigma^2) \propto (\sigma^2)^{-1}.\]
-Now, we'll just recycle and adapt everything we did above, 
-in the multiparameter normal case. This will give us a 
-joint posterior distribution of
-\begin{align}
-   p(\beta, \sigma^2 | y) &\propto 
-   p(y | \beta, \sigma^2 ) p(\beta, \sigma^2) \notag\\
-   &\propto (\sigma^2)^{-1} (\sigma^2)^{-\frac{n}{2}}
-      \exp\left\{ \frac{1}{2\sigma^2} 
-   (y - X\beta)^T (y-X\beta)\right\} \notag\\
-   &\propto (\sigma^2)^{-\left(\frac{n+2}{2}\right)} 
-      \exp\left\{ y^T y-2 y^T X\beta+\beta^T X^T X \beta\right\} \notag
-\end{align}
-Now, let's say we want to compute the conditional posterior density
-for $\beta$.  In that case, any unnecessary
-$\sigma$ or $y$ terms can be considered constants
-and wash out. This allows us to rewrite the last line, make 
-substitutions, and complete the square
-to get\footnote{The substitution $\hat{\beta} =
-(X'X)^{-1} X y$ is the standard MLE estimate for $\beta$ in 
-regression.}
-\begin{align}
-   p(\beta | \sigma^2, y) &\propto \exp\left\{ \beta^T X^T X \beta -
-      2y^T X\beta\right\} \notag\\
-   \begin{tabular}{l} $V_\beta = (X^T X)^{-1}$ \\ $\hat{\beta} =
-      (X^T X)^{-1} X^T y$ \end{tabular} \qquad\Rightarrow \qquad  
-      &\propto 
-      \exp\left\{ -\frac{1}{2\sigma^2} (\beta^T V_\beta \beta  - 
-      2\hat{\beta}^T V_\beta \beta) \right\} \notag\\
-   &\propto \exp\left\{ -\frac{1}{2\sigma^2} (\beta - \hat{\beta})
-   V_\beta^{-1} (\beta - \hat{\beta}) \right\}\notag
-\end{align}
-which happens to be the density of a multivariate normal distribution.
-This means 
-\[ \beta | \sigma^2, y, X \sim 
-   \text{MVN}_p(\hat{\beta},\;\sigma^2 V_\beta)
-   \]
-Now we have to handle the conditional posterior density of $\sigma^2$:
-\begin{align*}
-   p(\sigma^2 | y, X) &= \frac{ p(\beta, \sigma^2 | y)}{p(\beta |
-      \sigma^2, y)} \\
-   &\propto \frac{ (\sigma^2)^{-\left(\frac{n+2}{2}\right)} 
-   \exp\left\{ -\frac{1}{2\sigma^2} (y-X\beta)^T(y - X\beta)\right\}}{
-	 (\det|\sigma^2 V_\beta|)^{-\frac{1}{2}} 
-	 \exp\left\{ -\frac{1}{2\sigma^2} (\beta - \hat{\beta})^T
-	 \; V^{-1}_\beta\; (\beta - \hat{\beta})\right\}
-      }
-\end{align*}
-Since $\beta$ appears nowhere in the LHS, we can plug
-in anything, like, say, $\beta = \hat{\beta}$, and is guaranteed to
-cancel. This simplifies to
-\begin{align*}
-    p(\sigma^2 | y, X) &\propto (\sigma^2)^{-\left(\frac{n-p}{2}+ 1
-      \right)} \exp\left\{ -\frac{1}{2\sigma^2} \sum (y_i - x_i \beta)^2
-      \right\} \\
-    \Rightarrow \quad \sigma^2 | y,X &\sim \text{InvGamma}\left(
-      \frac{n-p}{2}, \; \frac{1}{2} \sum^n_{i=1} (y_i - x_i\beta)^2 
-      \right) 
-\end{align*}
-Like the multiparameter normal with the non-informative prior, the
-marginal posterior density is easy enough to get through integration
-\begin{align*}
-   p(\beta | y, X) &= \int^\infty_0 p(\beta, \sigma^2 |y, X)\; 
-      d\sigma^2 \\
-   &\propto \left[ 1+ \frac{1}{\sum (y_i - x_i\beta)} 
-      (\beta - \hat{\beta})' \; V_\beta^{-1} \;(\beta - \hat{\beta})
-      \right]^{-\frac{n}{2}}
-\end{align*}
-which is a \emph{scaled multivariate t-distribution}.
-\\
-\\
-Next, we can ask about the \emph{posterior predictive distribution}
-which is simple enough to integrate analytically and get:
-\begin{align*}
-   p(\tilde{y} | \tilde{X}, y, X) &= \int \int p(\tilde{y} | \tilde{X},
-      \beta, \sigma^2 ) p(\beta | \sigma^2, y, X) p(\sigma^2|y, X)
-      \; d\beta \; d\sigma^2 \\
-      \Rightarrow \quad \tilde{y} | \tilde{X}, y, X &\sim 
-      \text{MVT}_{n-p}(\tilde{X} \hat{\beta}, \;
-      S^2( I + \tilde{X} V_\beta \tilde{X}'))
-\end{align*}
-
-\newpage
-\subsubsection{Informative Prior with iid $\beta_j \in \beta$}
-
-Now let's say we want to build some more information into our coefficient
-vector, $\beta$. Specifically, we can model each component of the
-beta vector, $\beta_j \in \beta$, to be iid and distributed
-   \[ \beta_j \sim N(\beta_{0j}, \tau^2). \]
-As before, we'll take a flat, non-informative prior for the variance of 
-the error terms:
-   \[ p(\sigma^2) \propto (\sigma^2)^{-1} \]
-where $\beta$ and $\sigma^2$ are independent.
-\\
-\\
-This gives a posterior conditional distribution for $\beta$ of 
-\begin{align*}
-   p(\beta | y, X, \sigma^2) &\propto p(y|\beta, \sigma^2, X) 
-      p(\beta, \sigma^2) \\
-   &\propto p(y|\beta, \sigma^2, X)  p(\beta) p(\sigma^2) \\
-   &\propto \exp\left\{ -\frac{1}{2} (y^* - X^*\beta) \; \Sigma^{-1}
-      (y^* - X^*\beta) \right\} \\
-   y^* = \begin{pmatrix} Y \\ \beta_0 \end{pmatrix}, \qquad 
-   X^* &= \begin{pmatrix} X \\ I_p \end{pmatrix}, \qquad 
-   \Sigma = \begin{pmatrix} \sigma^2 I_n & 0 \\
-      0 & \tau^2 I_p \end{pmatrix}  
-\end{align*}
-This implies for the conditional posterior distribution of $\beta$
-that
-   \[ \beta|y, X, \sigma^2 \sim \text{MVN}_p(\hat{\beta}, V_\beta) \]
-   \[ \hat{\beta} = (X^{*'} \Sigma X^*)^{-1} X^{*'} \Sigma^{-1} y^*,
-      \qquad V_\beta = (X^{*'} \Sigma^{-1} X^*)^{-1} \]
-
-\subsubsection{Extensions}
-
-Above, we took a very simple approach to the error terms in the 
-likelihood, which gave us independent errors with equal variance.
-But we can generalize this a bit and allow correlation between error
-terms, and, thus, observed $y$ by specifying instead:
-   \[ y \sim \text{MVN}( X\beta,\; \sigma^2 I_n)\quad \Rightarrow \quad
-      y \sim \text{MVN}_n( X\beta, \;\Sigma_y).\]
-Similarly, we could extend our prior for $\beta$, where we assumed that
-all of the components $\beta_j \in \beta$ were iid. 
-Instead, we could assume a distribution for the entire coefficient 
-vector
-   \[ \beta_j \sim N(\beta_{0j}, \tau^2) \quad \Rightarrow \quad
-      \beta \sim \text{MVN}_p(\beta_0, \; \Sigma_\beta) \]
-In both of these cases, however, things become substantially more
-complicated because we have to pre-specify covariance matrices, 
-$\Sigma_y$ and $\Sigma_\beta$. In practice, this is pretty tough
-to do a priori, 
-unless we have a look at the data before we estimate parameters.
-
-\newpage
-\subsubsection{Ridge Regression}
-
-In classical regression, to estimate $\hat{\beta}_{\text{MLE}}$,
-we will solve
-\[ \hat{\beta}_{\text{MLE}} = \arg \max_{\beta} p(y | \beta, X), 
-   \quad \Leftrightarrow \quad \hat{\beta}_{\text{MLE}} = 
-   \arg \min_{\beta} \sum^n_{i=1} (y_i - X_i \beta)^2 
-   \]
-However, in Bayesian regression, the problem becomes
-\[ \hat{\beta}= \arg \max_{\beta} p(y | \beta, X)\;p(\beta),
-   \quad \Leftrightarrow \quad \hat{\beta} = 
-   \arg \max_{\beta} \ln p(y | \beta, X) + \ln p(\beta)
-   \]
-\[ \Rightarrow \hat{\beta} = \arg \min_\beta \sum^n_{i=1} 
-   (y_i - X_i \beta)^2 - \ln p(\beta) \]
-where the log of the prior acts as a penalty term. And there just so happen to be a number of interesting penalty.
-
-\paragraph{Example} {\sl Ridge Regression (L2 Regression)}:
-Now let's consider the case where 
-   \[ \beta \sim \text{MVN}_p(\beta_0, \; \tau^2 I_p).\]
-In models with many parameters ($p$ large), it's common to set a
-prior where the coefficient vector is assumed to be the zero vector,
-so that our optimization problem becomes
-\begin{align*}
-   \ln p(\beta) &= K - \frac{1}{2\tau^2} \sum^p_{j=1} \beta_j^2\\
-   \hat{\beta} &= \arg \min_\beta \sum^n_{i=1} 
-      (y_i - X_i \beta)^2 + \lambda  \sum^p_{j=1} \beta_j^2, \qquad
-      \lambda = \frac{1}{2\tau^2}
-\end{align*}
-Now it's clear to see how the $\ln p(\beta)$ acts as a penalty term.
-Large values of $\beta_j$ are penalized more in the minimization,
-leading the $\beta_j$ estimates to be shrunk back towards 0. 
-\\
-\\
-But we can make the penalty even more extreme by changing the 
-$\lambda$ term, which brings us to the next section.
-
-\subsubsection{Optimization for Non-Conjugate Priors}
-
-{\sl Laplace Prior and Lasso (or L2) Regression}: We set a prior
-as follows leading to a corresponding minimization problem:
-\[ p(\beta_j) \propto e^{-\lambda|\beta_j|} \]
-\[ \hat{\beta} = \arg \min_\beta \sum^n_{i=1} 
-   (y_i - X_i \beta)^2 + \lambda  \sum^p_{j=1} |\beta_j| \]
-The interesting thing about the Laplace-based model is that many
-$\hat{\beta}_j$ will be set \emph{identically} to 0 because of the
-cusp that occurs in the prior density.
-\\
-\\
-{\sl More General Priors and Bridge Regression}: We can be even
-more general and set
-   \[ p(\beta) \propto \exp\{ -\lambda \mathcal{J}(\beta) \} \]
-   \[ \Rightarrow \hat{\beta} = \arg \min_\beta \sum^n_{i=1} 
-      (y_i - X_i \beta)^2 + \lambda  \mathcal{J}(\beta) \]
-Often, it's very common to restrict $\mathcal{J}(\beta)$ to
-\[ \mathcal{J}(\beta) = \sum^p_{j=1} |\beta_j|^q \]
-which retains as special cases Lasso regression ($q=1$) and 
-Ridge regression ($q=2$).
-
 
 
 
@@ -22260,8 +22567,8 @@ Ridge regression ($q=2$).
 Let's first discuss the idea of Mixture Models. If we set up a mixture
 model, then we assume that any given observation, $y_i \in y$, can
 come from one of $k$ standard distributions. Each observation
-also has a certain probability of being pulled from any one of 
-the $k$ distributions. So to begin and nail down the intuition, 
+also has a certain probability of being pulled from any one of
+the $k$ distributions. So to begin and nail down the intuition,
 let's begin with the simple two-parameter case.
 
 \subsubsection{Likelihood as a Mixture of Two Models}
@@ -22283,7 +22590,7 @@ of the data
 	 \phi_B(y_i) \right]
 \end{align*}
 Now clearly, this is a totally non-standard distribution (most-likely).
-And on top of that, it's going to be really tough to estimate 
+And on top of that, it's going to be really tough to estimate
 parameters. So to do that, we'll typically employ the technique
 of the EM algorithm to estimate parameters.
 
@@ -22291,7 +22598,7 @@ of the EM algorithm to estimate parameters.
 
 This method employs ``missing data'' in the sense of data points
 or characteristics of the data $y$ that, \emph{if} we had it, it
-would make our parameter estimation much easier. One example, 
+would make our parameter estimation much easier. One example,
 let's say we had an indicator variable
 \[ I_i = \begin{cases} 1 & \text{if $y_i$ is in group $A$} \\
       0 & \text{if $y_i$ is in group $B$} \end{cases} \]
@@ -22301,7 +22608,7 @@ as a function of the observed data, the missing data, and the unknown
 parameters:
 \begin{align*}
     p(y, I | \theta_A, \theta_B) &= \prod^n_{i=1}
-      \left[  \phi_A(y_i)\right]^{I_i} 
+      \left[  \phi_A(y_i)\right]^{I_i}
       \left[\phi_B(y_i) \right]^{1-I_i} \alpha^{I_i}(1-\alpha)^{1-I_i}
       \\
    \ell(y,I|\theta_A, \theta_B) &= \sum^n_{i=1} (I_i) \ln \phi_A(y_i)
@@ -22309,7 +22616,7 @@ parameters:
    &\qquad +
    \sum^n_{i=1} I_i \ln \alpha +\sum^n_{i=1} (1-I_i) \ln (1-\alpha)
 \end{align*}
-{\sl Expectation Step}: 
+{\sl Expectation Step}:
 Now it would be great if we could optimize the last log-likelihood
 on the last line, bu we don't \emph{actually} have the values for
 $I$. Since we can't plug in actual values for
@@ -22318,7 +22625,7 @@ the observed data and the current values of the parameters.
 \begin{align*}
    \hat{I}_i = E[I_i | y, \theta] &= P(I_i=1 | y, \theta)\\
    &= \frac{ P(y_i | I_i = 1, \theta) P(I_i=1 | \theta)}{
-      p(y_i|I_i = 1, \theta) P(I_i=1 |\theta) + 
+      p(y_i|I_i = 1, \theta) P(I_i=1 |\theta) +
       P(y_i|I_i=0, \theta) P(I=0|\theta)}
 \end{align*}
 {\sl Maximization Step}: Next, we plug $\hat{I}_i$ into the complete
@@ -22332,21 +22639,21 @@ Having calculated the new parameter estimates, calculate the new
 $\hat{I}_i$ and iterate until convergence.
 
 
-\newpage 
+\newpage
 \subsection{Hierarchical Models}
 
 \subsubsection{General Form}
-{\sl Prior and Posterior}: 
+{\sl Prior and Posterior}:
 Hierarchical Models introduce difference
 levels of analysis.  A common example is to have some likelihood
 $p(y|\theta)$ for observing the data, but have the parameter $\theta$
-come from its own distribution, $p(\theta |\phi)$, where $\phi$.  
-Often, we'll take advantage of 
-conditional independence in such models to simplify 
+come from its own distribution, $p(\theta |\phi)$, where $\phi$.
+Often, we'll take advantage of
+conditional independence in such models to simplify
 posterior analysis. For example:
 \begin{align}
    \label{heirarch}
-   p(\theta,\phi|y) &\propto p(y| \theta, \phi)\cdot p(\theta, \phi) 
+   p(\theta,\phi|y) &\propto p(y| \theta, \phi)\cdot p(\theta, \phi)
       \notag\\
    &\propto p(y|\theta) \cdot p(\theta|\phi)\cdot p(\phi)
 \end{align}
@@ -22360,13 +22667,13 @@ in Equation \ref{heirarch} how to write the joint posterior.
 Typically, we will break this up into a marginal and conditional
 posterior:
 \[ p(\theta, \phi|y) \propto p(\theta | \phi, y)\cdot p(\phi | y) \]
-This method instructs us how to simulate from the posterior: 
-draw $\phi$ from it's marginal posterior distribution ($p(\phi|y)$), 
+This method instructs us how to simulate from the posterior:
+draw $\phi$ from it's marginal posterior distribution ($p(\phi|y)$),
 then sample $\theta$ from it's marginal conditional distribution
 ($p(\theta | \phi, y)$).
 \\
 \\
-Yet while it's often easy to get $p(\theta | \phi, y)$, we'll have to 
+Yet while it's often easy to get $p(\theta | \phi, y)$, we'll have to
 do a bit more work to get $p(\phi |y)$, whether that's brute force
 integration or algebraically:
 \[ p(\phi|y) \propto \int p(\theta, \phi | y) \; d\theta, \qquad
@@ -22380,9 +22687,9 @@ not always).
 distributions
 to the logarithm of the standard deviation (or approximate standard
 deviation) of the distribution on
-$\phi$. That is, 
+$\phi$. That is,
 \[ \text{Don't set} \quad p(\ln \sigma_\phi) \propto 1 \]
-It can lead to an improper posterior density on $\phi$---that is,  
+It can lead to an improper posterior density on $\phi$---that is,
 $p(\phi | y) \propto \infty$. Rather, set a uniform prior on the
 standard deviation parameter itself.
 
@@ -22394,9 +22701,9 @@ own mean ($\mu_j$) but shared variance, where the $\mu_j$ are drawn
 from a common distribution
 \begin{align*}
    y_{ij} &\sim N(\mu_j, \sigma^2), \qquad i = 1, \ldots, n_j \\
-   \mu_j &\sim N(\mu_0, \tau^2), \qquad j = 1, \ldots, J 
+   \mu_j &\sim N(\mu_0, \tau^2), \qquad j = 1, \ldots, J
 \end{align*}
-We can think of $\sigma^2$---which we assume to be known---as the 
+We can think of $\sigma^2$---which we assume to be known---as the
 \emph{within group} variance, while $\tau^2$ is \emph{between group},
 which controls between-group sharing of information
 and the amount of shrinkage back to $\mu_0$.
@@ -22406,48 +22713,48 @@ and the amount of shrinkage back to $\mu_0$.
 independent allows us to simplify the posterior, keeping in mind
 that $\mu$ is a vector of the individual $\mu_j$:
 \begin{align*}
-   p(\mu, \mu_0, \tau^2 | y) &\propto p(y | \mu, \mu_0, \tau^2 )\cdot 
+   p(\mu, \mu_0, \tau^2 | y) &\propto p(y | \mu, \mu_0, \tau^2 )\cdot
       p( \mu, \mu_0, \tau^2 ) \\
    &\propto p(y | \mu ) \cdot p( \mu | \mu_0, \tau^2 ) \cdot
       p( \mu_0, \tau^2 )\\
 \end{align*}
 {\sl Posterior Given Non-Informative Prior}: Suppose we choose
 $p(\mu_0) \propto 1$ and $p(\tau^2) \propto 1$. Then we get for our
-posterior 
+posterior
 \begin{align*}
-   p(\mu,\mu_0,\tau^2 | y) &\propto \prod^J_{j=1} \prod^{n_j}_{i=1}   
+   p(\mu,\mu_0,\tau^2 | y) &\propto \prod^J_{j=1} \prod^{n_j}_{i=1}
       (\sigma^2)^{-\frac{1}{2}} \exp \left\{ -\frac{1}{2\sigma^2}
       (y_{ij} - \mu_j)^2\right\}  \\ 
-      &\qquad \times \prod^J_{j=1} 
+      &\qquad \times \prod^J_{j=1}
       (\tau^2)^{-\frac{1}{2}} \exp\left\{-\frac{1}{2\tau^2}(\mu_j -
       \mu_0)^2\right\} \\
 \end{align*}
-{\sl Breaking Up the Posterior}: 
+{\sl Breaking Up the Posterior}:
 We can analyze the conditional distributions of the parameters and
 get standard distributions. In fact, simple calculations will show that
 \begin{align*}
-   \mu_j | \mu_0, \tau^2, y &\sim N\left(\frac{ 
-      \frac{n_j}{\sigma^2} \bar{y}_j 
+   \mu_j | \mu_0, \tau^2, y &\sim N\left(\frac{
+      \frac{n_j}{\sigma^2} \bar{y}_j
       + \frac{1}{\tau^2}\mu_0}{\frac{n_j}{\sigma^2} + \frac{1}{\tau^2}},
-      \; \frac{1}{ \frac{n_j}{\sigma^2} + \frac{1}{\tau^2}} \right), 
+      \; \frac{1}{ \frac{n_j}{\sigma^2} + \frac{1}{\tau^2}} \right),
       \\
-   \mu_0 | \tau^2, y &\sim N\left( \hat{\mu}, 
+   \mu_0 | \tau^2, y &\sim N\left( \hat{\mu},
       \;V_\mu\right),\\
-   \tau^2 | y &\sim V^{1/2}_\mu \prod^J_{j=1} \left( 
-   \frac{\sigma^2}{n_j} + \tau^2\right)^{1/2} 
-   \exp \left\{ -\frac{(\bar{y}_j 
+   \tau^2 | y &\sim V^{1/2}_\mu \prod^J_{j=1} \left(
+   \frac{\sigma^2}{n_j} + \tau^2\right)^{1/2}
+   \exp \left\{ -\frac{(\bar{y}_j
    -\hat{\mu})^2}{2 \left( (\sigma^2/n_j) + \tau^2\right)}
    \right\}
 \end{align*}
 where we have
-\[ \bar{y}_j = \frac{1}{n_j} \sum^{n_j}_{i=1} y_{ij}, 
+\[ \bar{y}_j = \frac{1}{n_j} \sum^{n_j}_{i=1} y_{ij},
    \qquad \hat{\mu} = \frac{ \sum^J_{j=1} \frac{1}{
       (\sigma^2/n_j)+\tau^2} \bar{y}_j}{ \sum^J_{j=1} \frac{1}{
 	 (\sigma^2/n_j) +
-	 \tau^2}}, \qquad V_\mu =  \frac{1}{\sum^J_{j=1} 
+	 \tau^2}}, \qquad V_\mu =  \frac{1}{\sum^J_{j=1}
 	 \frac{1}{(\sigma^2/n_j) + \tau^2}} \]
 The only distribution that is nonstandard is $\tau^2 | y$, which
-will require grid sampling.  
+will require grid sampling.
 \\
 \\
 \\
@@ -22460,25 +22767,25 @@ posterior predictive draws, depending on our goal:
       \begin{enumerate}
 	 \item Draw $\tau^2$ from it's posterior distribution using grid
 	    sampling.
-	 \item Draw $\mu_0$ from the conditional posterior 
-	    distribution of $\mu_0 |\tau^2, y$.  
-	 \item Sample $\mu_j$---for the group $j$ you are 
+	 \item Draw $\mu_0$ from the conditional posterior
+	    distribution of $\mu_0 |\tau^2, y$.
+	 \item Sample $\mu_j$---for the group $j$ you are
 	    considering---from $p(\mu_j | \mu_0, \tau^2, y)$ using
 	    the values of $\mu_0$ and $\tau^2$ just obtained.
-	 \item Sample from the distribution for 
+	 \item Sample from the distribution for
 	    $\tilde{y} \sim N(\mu_j, \sigma^2)$, where $\mu_j$ is
 	    the value just obtained.
 	 \item Repeat the process.
       \end{enumerate}
-   \item Samples from entirely new group $\tilde{j}$: Here, we 
-      consider what would happen if we introduce a new group 
+   \item Samples from entirely new group $\tilde{j}$: Here, we
+      consider what would happen if we introduce a new group
       entirely. This will get a very diffuse posterior predictive
       distribution.
       \begin{enumerate}
 	 \item Draw $\tau^2$ from it's posterior distribution using grid
 	    sampling.
-	 \item Draw $\mu_0$ from the conditional posterior 
-	    distribution of $\mu_0 |\tau^2, y$.  
+	 \item Draw $\mu_0$ from the conditional posterior
+	    distribution of $\mu_0 |\tau^2, y$.
 	 \item Sample $\tilde{\mu}$ from N$(\mu_0, \tau^2)$ using the
 	    $\mu_0$ just obtained.
 	 \item Sample $\tilde{y} \sim $ N$(\tilde{\mu}, \sigma^2)$.
@@ -22489,13 +22796,13 @@ posterior predictive draws, depending on our goal:
 \newpage
 \subsubsection{Normal Model with the EM Algorithm}
 
-We saw the EM Algorithm with Mixture Models; however, this technique, 
+We saw the EM Algorithm with Mixture Models; however, this technique,
 where we suppose that there is ``missing data,''
 can also useful in Hierarchical Models.  Let's return to the normal
 model with known variance:
 \begin{align*}
    y_{ij} &\sim N(\mu_j, \sigma^2) \\
-   \mu_j &\sim N(\mu_0, \tau^2) 
+   \mu_j &\sim N(\mu_0, \tau^2)
 \end{align*}
 In the last section, we considered $\mu$, $\mu_0$ and $\tau^2$ as our
 unknown parameters, but suppose we consider only $(\mu_0, \tau^2)$ as
@@ -22505,23 +22812,23 @@ would be really easy if we knew the $\mu_j$. This leads us to the
 EM algorithm:
 \begin{enumerate}
    \item Expectation Step: We want to compute the expectation of the
-      complete data log-likelihood. This differs a bit from the 
+      complete data log-likelihood. This differs a bit from the
       Expectation Step in the Mixture Model implementation, but
       it's a straightforward generalization.
-      \[ Q(y_{\text{obs}} | \theta) = E_{y_\text{mis}}\left[ 
+      \[ Q(y_{\text{obs}} | \theta) = E_{y_\text{mis}}\left[
 	 \ell(y_{\text{obs}}, y_{\text{mis}} | \theta) \right]\]
       In our normal example, this means
       \begin{align*}
-	 p(y, \mu | \mu_0, \tau^2) &\propto \prod^m_{j=1} 
-	    (\tau^2)^{-1/2} \exp\left\{-\frac{1}{2\tau^2} 
+	 p(y, \mu | \mu_0, \tau^2) &\propto \prod^m_{j=1}
+	    (\tau^2)^{-1/2} \exp\left\{-\frac{1}{2\tau^2}
 	    (\mu_j - \mu_0)^2\right\} \\
 	    &\qquad \times \prod^m_{j=1} \prod^{n_j}_{i=1}
 	    \exp\left\{ -\frac{1}{2\sigma^2}(y_{ij}-\mu_j)^2\right\} \\
 	 \Rightarrow \quad Q(y_{\text{obs}}|\theta)
-	    &= E[\ell(y,\mu|\mu_0, \tau^2)] = E[\ln 
+	    &= E[\ell(y,\mu|\mu_0, \tau^2)] = E[\ln
 	    p(y, \mu | \mu_0, \tau^2)]
       \end{align*}
-   \item Maximization Step: Next, we calculate the $\hat{\theta}$ 
+   \item Maximization Step: Next, we calculate the $\hat{\theta}$
       that maximizes $Q(y_{\text{obs}}|\theta)$
 \end{enumerate}
 
@@ -22543,21 +22850,21 @@ is a vector of $\theta_i$:
    p(\theta, \alpha, \beta | y) &\propto p(y | \theta, \alpha, \beta)
       \cdot p(\theta, \alpha, \beta) \\
    &\propto p(y | \theta)
-      \cdot p(\theta | \alpha, \beta) \cdot p( \alpha, \beta) 
+      \cdot p(\theta | \alpha, \beta) \cdot p( \alpha, \beta)
 \end{align*}
-We can substitute in for the particular distributions, leaving our 
+We can substitute in for the particular distributions, leaving our
 prior distribution on $\alpha$ and $\beta$ unspecified:
 \begin{align*}
  p(\theta, \alpha, \beta | y)
-   &\propto \left[ \prod^n_{i=1} \binom{n_i}{y_i} \theta_i^{y_i}   
+   &\propto \left[ \prod^n_{i=1} \binom{n_i}{y_i} \theta_i^{y_i}
    (1-\theta_i)^{n_i-y_i}\right] \cdot \left[ \prod^n_{i=1}
    \frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha) \Gamma(\beta)}
    \theta_i^{\alpha-1} (1-\theta_i)^{\beta-1}\right] \cdot
    p(\alpha, \beta) \\
-   &\propto p(\alpha, \beta) 
+   &\propto p(\alpha, \beta)
       \left[\frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha) \Gamma(\beta)}
 	 \right]^n \prod^n_{i=1} \theta_i^{y_i + \alpha -1}
-      (1-\theta_i)^{n_i - y_i + \beta - 1} 
+      (1-\theta_i)^{n_i - y_i + \beta - 1}
 \end{align*}
 Let's get the conditional posterior distribution of $\theta |
 \alpha, \beta, y$:
@@ -22565,12 +22872,12 @@ Let's get the conditional posterior distribution of $\theta |
    p(\theta_i | \alpha, \beta, y) &\propto \theta_i^{y_i + \alpha -1}
       (1-\theta_i)^{n_i - y_i + \beta - 1} \\
    \theta_i | \alpha, \beta, y &\sim \text{Beta}(y_i + \alpha, \;
-      n_i - y_i + \beta) 
+      n_i - y_i + \beta)
 \end{align*}
 Now for the posterior distribution of $\alpha$ and $\beta$ we'll need
 to make a choice for our prior. We'd probably like to do something
 non-informative, like $p(\alpha, \beta)\propto 1$, but that would
-lead to an improper posterior. Gelman suggests that we use 
+lead to an improper posterior. Gelman suggests that we use
 $p(\alpha, \beta) \propto (\alpha + \beta)^{-5/2}$, which is justified
 in Exercise 5.7 in the book. This leads to
 \begin{align*}
@@ -22581,11 +22888,11 @@ in Exercise 5.7 in the book. This leads to
 	 \right]^n \int \prod^n_{i=1} \theta_i^{y_i + \alpha -1}
 	 (1-\theta_i)^{n_i - y_i + \beta - 1} \; d\theta_i
 \end{align*}
-This looks like a beast of an integral, but notice that what's inside 
+This looks like a beast of an integral, but notice that what's inside
 the integral is the beta distribution, unnormalized by a constant. So
 it's value must be one divided by that normalizing constant,\footnote{
 Alternatively, we could have computed $p(\alpha, \beta |y)$
-by the other method: $p(\alpha, \beta | y) = 
+by the other method: $p(\alpha, \beta | y) =
 p(\theta, \alpha, \beta | y)/p(\theta|\alpha, \beta | y)$, which
 would have given us the same result (and is easy
 to compute).} which we can write
@@ -22593,16 +22900,16 @@ to compute).} which we can write
    \left[\frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha) \Gamma(\beta)}
       \right]^n  \prod^n_{i=1} \frac{ \Gamma(y_i + \alpha) \Gamma(
       n_i - y_i + \beta)}{\Gamma(n_i + \alpha + \beta)} \]
-To implement, we sample $\alpha$ and $\beta$ using grid sampling, 
+To implement, we sample $\alpha$ and $\beta$ using grid sampling,
 then sample each $\theta_i | \alpha, \beta$.
 
 \newpage
 \subsection{Markov Chain Monte-Carlo (MCMC) Algorithms}
 
-Markov Chain Monte-Carlo Algorithms allow us to sample from the 
-posterior distribution of non-standard distributions. We saw 
+Markov Chain Monte-Carlo Algorithms allow us to sample from the
+posterior distribution of non-standard distributions. We saw
 grid-sampling earlier as a way to do so, but also noted the limitations
-when we have posteriors with great than two parameters. 
+when we have posteriors with great than two parameters.
 \\
 \\
 We also saw Newton Raphson and the EM algorithm as ways to estimate
@@ -22613,67 +22920,67 @@ by sampling sequentially from a variety of univariate distributions.
 
 \subsubsection{Gibbs Sampler}
 
-Our goal is to obtain samples for $\theta | y$, where $\theta$ 
+Our goal is to obtain samples for $\theta | y$, where $\theta$
 is a vector of parameters, $(\theta_1, \ldots, \theta_k)$. Here's
 the procedure:
 \begin{enumerate}
-   \item Start with a set of arbitrary values for the parameter 
+   \item Start with a set of arbitrary values for the parameter
       \[ \theta^{(0)} = (\theta_1^{(0)}, \ldots,  \theta_k^{(0)}) \]
-   \item Next, we sample iteratively from conditional posterior 
+   \item Next, we sample iteratively from conditional posterior
       distributions of each parameter---given current values of
       other parameters---as follows:
       \begin{align*}
-	 \theta_1^{(t+1)} &\sim p(\theta_1 | 
+	 \theta_1^{(t+1)} &\sim p(\theta_1 |
 	    \theta_2^{(t)}, \ldots,  \theta_k^{(t)}, y)\\
-	 \theta_2^{(t+1)} &\sim p(\theta_2 | 
+	 \theta_2^{(t+1)} &\sim p(\theta_2 |
 	    \theta_1^{(t+1)},\theta_3^{(t)},\ldots,\theta_k^{(t)}, y)\\
 	 \vdots \quad & \qquad \vdots \\
-	 \theta_k^{(t+1)} &\sim p(\theta_k | 
+	 \theta_k^{(t+1)} &\sim p(\theta_k |
 	    \theta_1^{(t+1)},\ldots, \theta_{k-1}^{(t+1)}, y)\\
       \end{align*}
-      As noted above, the conditional distributions will often be 
+      As noted above, the conditional distributions will often be
       standard distributions that are relatively simple since we
       can absorb $k-1$ parameters into the $\propto$ each time
       we need to get a draw for $\theta_i$.
    \item We iterate through this, and eventually the distribution will
       converge to a range of values for each $\theta_i$. But
       the question is ``How exactly do we know when convergence
-      occurs?'' 
-      
+      occurs?''
+
       To answer this question, we typically run multiple
       Markov chains from multiple starting values, $\theta^{(0)}$.
       Once the chains multiple chains start moving together, we declare
-      convergence and remove the ``burn-in'' before the chains 
+      convergence and remove the ``burn-in'' before the chains
       converged.
    \item After we remove the burn-in, we still have the problem of
       autocorrelated samples.  Since the Gibbs Sampler generates
       a Markov chain, autocorrelation is baked into the procedure.
       So to obtain independent samples, we will need to evaluate the
       autocorrelation of our chains, ``thin'' them by only taking
-      every $m$th value or so, where $m$ is chosen so that 
+      every $m$th value or so, where $m$ is chosen so that
       there is negligible autocorrelation in the resulting sample.
 \end{enumerate}
 
 \newpage
 \subsubsection{Metropolis Algorithm}
 
-The Metropolis algorithm is an MCMC method that uses rejection 
+The Metropolis algorithm is an MCMC method that uses rejection
 sampling to draw from a posterior distribution. This is particularly
 when the conditional posterior distributions are non-standard, so
 that the Gibbs sampler has trouble. Here are the steps involved:
 \begin{enumerate}
-   \item Initialize at a starting point, $\theta^0$. 
-      Then for each $t \in \{1, 2, \ldots\}$, 
-      sample a \emph{proposal} value, which I'll denote 
+   \item Initialize at a starting point, $\theta^0$.
+      Then for each $t \in \{1, 2, \ldots\}$,
+      sample a \emph{proposal} value, which I'll denote
       $\theta^*$, from some proposal or ``jumping'' distribution,
       $g(\theta^* | \theta^{t-1})$.\footnote{The
       dependence on the previous value, $\theta^{t-1}$, makes
-      our method an Mark Chain Monte Carlo method.} 
+      our method an Mark Chain Monte Carlo method.}
       Typically, $g(\cdot | \cdot)$ will be a standard distribution.
-   \item Form the ratio of the densities 
+   \item Form the ratio of the densities
       \begin{equation}
 	 \label{metalg}
-	 r = \frac{p(\theta^* | y)}{p(\theta^{t-1} | y)} 
+	 r = \frac{p(\theta^* | y)}{p(\theta^{t-1} | y)}
       \end{equation}
    \item Then, once we have a value for $r$, we set
       \begin{equation}
@@ -22682,16 +22989,16 @@ that the Gibbs sampler has trouble. Here are the steps involved:
 	    $\min\{r,1\}$.} \\ \theta^{t-1} & \text{otherwise}
 	 \end{cases}
       \end{equation}
-      Intuitively, we accept a draw $\theta^*$ if it increases 
+      Intuitively, we accept a draw $\theta^*$ if it increases
       the posterior density. If not, we randomly accept
       it, but only with probability proportional to how good it is.
-      In this way, this method acts like a stochastic 
+      In this way, this method acts like a stochastic
       stepwise mode-finding algorithm.
 \end{enumerate}
-Note, for the Metropolis algorithm, we \emph{require} that the 
-proposal (or ``jumping'') distribution, $g(\cdot | \cdot)$, is 
+Note, for the Metropolis algorithm, we \emph{require} that the
+proposal (or ``jumping'') distribution, $g(\cdot | \cdot)$, is
 symmetric, i.e.
-\[ g(\theta^* | \theta^{t-1}) = g( \theta^{t-1} |\theta^* ), 
+\[ g(\theta^* | \theta^{t-1}) = g( \theta^{t-1} |\theta^* ),
    \qquad \forall \theta^*, \theta^{t-1}, t  \]
 The common and convenient normal distribution obeys this rather nice
 property and can be used with this algorithm.
@@ -22699,35 +23006,35 @@ property and can be used with this algorithm.
 \subsubsection{Metropolis-Hastings Algorithm}
 
 The \emph{Metropolis-Hastings Algorithm} is a direct generalization
-of the Metropolis algorithm. It relaxes the restrictive 
-requirement that $g(\cdot|\cdot)$, our proposal distribution, be 
+of the Metropolis algorithm. It relaxes the restrictive
+requirement that $g(\cdot|\cdot)$, our proposal distribution, be
 symmetric.
 \\
 \\
 Except for one step, the algorithm functions \emph{exactly} the same
-way as the Metropolis Algorithm. We only have to modify the 
+way as the Metropolis Algorithm. We only have to modify the
 ``attractiveness'' ratio, $r$, given by Equation \ref{metalg}. Here's
 the new ratio for the new Metropolis-Hastings Algorithm:
 \begin{equation}
    \label{methast}
-   r = \frac{ p(\theta^* | y) }{p(\theta^{t-1} | y)} \cdot 
-   \frac{ g(\theta^{t-1} | \theta^*)}{ g(\theta^* | \theta^{t-1})} 
+   r = \frac{ p(\theta^* | y) }{p(\theta^{t-1} | y)} \cdot
+   \frac{ g(\theta^{t-1} | \theta^*)}{ g(\theta^* | \theta^{t-1})}
 \end{equation}
 We accept or reject draws $\theta^*$ from $g(\cdot | \cdot)$
 just as before, in Expression \ref{accept}.
 
 \subsubsection{Gibbs Sampler as a Special Case of the M-H
    Algorithm}
-The Gibbs sampler can be viewed as a special case of the more general 
+The Gibbs sampler can be viewed as a special case of the more general
 Metropolis-Hastings Algorithm. To see why,
 suppose we \emph{could} draw directly from the posterior distribution,
 $p(\theta | y)$, that we are targeting with our Metropolis-Hastings
 algorithm. (Obviously unnecessary to use the M-H Algorithm in that case,
-but play along). 
+but play along).
 \\
 \\
-Then we can take the posterior as our proposal distribution, 
-$g(\theta^*| \theta^{t-1}) = p(\theta^*| y)$. In that case, the 
+Then we can take the posterior as our proposal distribution,
+$g(\theta^*| \theta^{t-1}) = p(\theta^*| y)$. In that case, the
 ratio in Equation \ref{methast} will \emph{always} be one, so that
 every proposed $\theta^*$ is accepted as in the Gibbs sampler.
 
@@ -22739,12 +23046,12 @@ a vector of parameters, $\phi$,
 despite the posterior distribution being nonstandard. Then suppose
 we introduce some ``missing data,'' denoted $\gamma$, in the hope that
 knowing $\gamma$ would make the estimation of the posterior of
-$\phi$ easier. 
+$\phi$ easier.
 \\
 \\
 More explicitly, it may be tough to find $p(\phi|y)$, but by introducing
-$\gamma$, we may be able to work with $p(\gamma|\phi,y)$ and 
-$p(\phi|\gamma,y)$. In particular, 
+$\gamma$, we may be able to work with $p(\gamma|\phi,y)$ and
+$p(\phi|\gamma,y)$. In particular,
 \begin{enumerate}
    \item Start with a guess for $\phi$ and $\gamma$.
    \item Replace the components of $\gamma$ with
@@ -22752,19 +23059,19 @@ $p(\phi|\gamma,y)$. In particular,
    \item Maximize the posterior
       likelihood given $\gamma$, which is denoted $p(\phi|\gamma,y)$,
       and replace $\phi$ with the maximized values.
-   \item Repeat Steps 1 and 2 until convergence. 
+   \item Repeat Steps 1 and 2 until convergence.
 \end{enumerate}
 
 
 \newpage
-\subsection{Finding Parameters for and 
+\subsection{Finding Parameters for and
 Drawing from Non-Standard Distributions}
 
-Noting that some of the resulting posterior distributions won't 
+Noting that some of the resulting posterior distributions won't
 necessarily be standard, it's important to know how to find parameters
 and get probabilities
 from these so-called \emph{non-standard distributions}. The simplest
-is the grid method, and while easy to do from a computational 
+is the grid method, and while easy to do from a computational
 standpoint,
 it can be difficult when it comes to selecting a proper grid
 initially.
@@ -22772,8 +23079,8 @@ initially.
 \subsubsection{Grid Method in One Dimension}
 
 Suppose we want to get samples from a non-standard distribution. Then
-we follow this process to generates probabilities and then samples for 
-$\theta$. 
+we follow this process to generates probabilities and then samples for
+$\theta$.
 \begin{enumerate}
    \item Pick a grid of possible values for $\theta$. A fair amount
       of trial and error will be involved here.\footnote{You choose
@@ -22782,26 +23089,26 @@ $\theta$.
    \item Calculate $m(\theta) = \frac{p(\theta, y)}{\sum p(\theta, y)}$,
       where the sum is the sum over the grid. This generates rough
       approximations of the true probabilities.
-   \item Sample one grid value with probabilities proportional to 
+   \item Sample one grid value with probabilities proportional to
       $m(\theta)$.
    \item Repeat the previous step many times to generate a large sample.
 \end{enumerate}
 
-\subsubsection{Grid Method in Two Dimensions} 
+\subsubsection{Grid Method in Two Dimensions}
 
 Here, suppose there are two parameters which define a non-standard
 distribution. We decompose the grid method into two parts:
 \begin{enumerate}
-   \item Pick a grid of values for $\alpha$ and $\beta$, our two 
-      parameters. Again, this will probably take some trial and 
+   \item Pick a grid of values for $\alpha$ and $\beta$, our two
+      parameters. Again, this will probably take some trial and
       error.
-   \item Calculate the probabilities $m(\alpha, \beta) = \frac{ 
+   \item Calculate the probabilities $m(\alpha, \beta) = \frac{
       p(\alpha, \beta |y)}{\sum p(\alpha, \beta | y)}$.
    \item Calculate marginal and conditional posterior probabilities:
-      \[ m(\alpha) = \sum_\beta m(\alpha, \beta), \qquad 
+      \[ m(\alpha) = \sum_\beta m(\alpha, \beta), \qquad
 	 m(\beta|\alpha) = \frac{m(\alpha, \beta)}{m(\alpha)}\]
    \item Sample a grid value $\alpha_i$ with probability proportional
-      to $m(\alpha)$. 
+      to $m(\alpha)$.
    \item Based on our sampled value of $\alpha_i$, sample grid value
       $\beta_i$ with probability proportional to $p(\beta | \alpha_i)$.
    \item Repeat the last couple steps many times to get distributions.
@@ -22815,44 +23122,44 @@ distribution. We decompose the grid method into two parts:
 In this method, which is in the realm of classical rather than Bayesian
 statistics, you have some data $\mathbf{y}$, which you use to estimate
 a parameter $\theta$ using Maximum Likelihood Estimation. Using
-this $\theta_{\text{MLE}}$, you then simulate a new random sample of 
+this $\theta_{\text{MLE}}$, you then simulate a new random sample of
 data using the likelihood,
 \[ p(\mathbf{y} | \theta_{\text{MLE}}) \]
 
 \subsection{Jacobian Transformation}
 
 This method is useful for determining the probability distribution
-of some variable $\phi = h(\theta)$,\footnote{Note that $\phi$ must be a 
+of some variable $\phi = h(\theta)$,\footnote{Note that $\phi$ must be a
 function of $\theta$ and $\theta$ only.} especially
-when we know the probability distribution 
+when we know the probability distribution
 of $\theta$, $p(\theta)$.  Then we apply
-   \[ f(\phi) = f(\theta) \left\lvert 
+   \[ f(\phi) = f(\theta) \left\lvert
       \frac{d\theta}{d\phi} \right\rvert \]
-where $f$ is the pdf and the term following $f(\theta)$ is known as 
+where $f$ is the pdf and the term following $f(\theta)$ is known as
 the \emph{Jacobian}.
 
-\begin{proof} 
+\begin{proof}
    Just to sketch the proof, let's start with what we know:
    $f(\theta)$ and $\phi = h(\theta)$. We want to find
       \[ f(\phi) = \frac{d}{d\phi} \left[ F(\phi) \right] \]
    where $F$ is the cdf. We can nicely rewrite and rearrange this as
    \begin{align*}
-      f_\Phi(\phi) &= \frac{d}{d\phi} 
-      \left[ F_\Phi(\phi) \right] = 
+      f_\Phi(\phi) &= \frac{d}{d\phi}
+      \left[ F_\Phi(\phi) \right] =
       \frac{d}{d\phi} \left[ P(\Phi < \phi ) \right]
       \\
       &= \frac{d}{d\phi} \left[ P( h(\theta) < \phi ) \right]
 	 = \frac{d}{d\phi} \left[ P( \theta < h^{-1}(\phi) )  \right]
       \\ 
-      &= \frac{d}{d\phi} \int^{h^{-1}(\phi)}_{-\infty} 
+      &= \frac{d}{d\phi} \int^{h^{-1}(\phi)}_{-\infty}
 	 f_\Theta(\theta)\; d\theta
       \\
-      &= f_\Theta\left( h^{-1}(\phi) \right) \left\lvert 
+      &= f_\Theta\left( h^{-1}(\phi) \right) \left\lvert
 	 \frac{d}{d\phi} \left[ h^{-1}(\phi) \right] \right\rvert
    \end{align*}
 And if we use the fact that $\theta = h^{-1}(\phi)$ and drop some of the
 pedantic subscripting, we can write a more compact version:
-   \[ f(\phi) = f(\theta) \left\lvert 
+   \[ f(\phi) = f(\theta) \left\lvert
       \frac{d\theta}{d\phi} \right\rvert\]
 
 \end{proof}
