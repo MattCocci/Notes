@@ -1918,26 +1918,113 @@ Second from changes in exp future discount rates.
 Third from covariance between these two sources.
 
 
+\clearpage
+\section{Recursive Utility}
+
+Recursive or Epstein-Zin utility
+\begin{align*}
+  U_t
+  &=
+  \left(
+  (1-\beta)c_t^{1-\rho}
+  + \beta
+  \E_t\left[U_{t+1}^{1-\gamma}\right]^{\frac{1-\rho}{1-\gamma}}
+  \right)^{\frac{1}{1-\rho}}
+\end{align*}
+It has the following features
+\begin{itemize}
+  \item Non-separable across states of nature, i.e. marginal utility in
+    one state of nature affects marginal utility in another state of
+    nature.
+  \item Today's utility and tomorrows expected utility that goes through
+    a nonlinear CES aggregator
+\end{itemize}
+It satisfies
+\begin{align*}
+  U_t'
+  &=
+  \left(
+  (1-\beta)c_t^{1-\rho}
+  + \beta
+  \E_t\left[U_{t+1}^{1-\gamma}\right]^{\frac{1-\rho}{1-\gamma}}
+  \right)^{\frac{1}{1-\rho}}
+  \\
+  &=
+  (1-\beta)
+  c_t^{-\rho}
+  U_t^{\rho}
+\end{align*}
+From that
+\begin{align*}
+  U_t^{1-\rho}
+  &=
+  (1-\beta)c_t^{1-\rho}
+  + \beta
+  \E_t\left[U_{t+1}^{1-\gamma}\right]^{\frac{1-\rho}{1-\gamma}}
+\end{align*}
+Hence
+\begin{align*}
+  U_{t+1}'
+  =
+  (1-\beta)
+  c_{t+1}^{-\rho}
+  U_{t+1}^{\rho}
+\end{align*}
+Hence
+\begin{align*}
+  m_{t+1}
+  &= \beta \frac{U'_{t+1}}{U'_t}
+  =
+  \beta
+  \frac{c_{t+1}^{-\rho}}{c_t^{-\rho}}
+  \frac{U_{t+1}^{\rho}}{U_{t}^{\rho}}
+  =
+  \beta
+  \frac{c_t^{\rho}}{c_{t+1}^{\rho}}
+  \frac{U_{t+1}^{\rho}}{U_{t}^{\rho}}
+\end{align*}
+
+
+
+\begin{align*}
+  U'_t
+  &=
+  (1-\beta)
+  \left[
+  \frac{U_t}{c_t}
+  \right]^\rho
+  \\
+  U''_t
+  &=
+  \rho
+  (1-\beta)
+  \left[
+  \frac{U_t}{c_t}
+  \right]^{\rho-1}
+  \frac{U'_tc_t - U_t}{c_t^2}
+  \\
+  &=
+  \rho
+  (1-\beta)
+  \left[
+  \frac{U_t}{c_t}
+  \right]^{\rho}
+  \frac{U'_tc_t - U_t}{U_tc_t}
+  \\
+  &=
+  \rho
+  U'_t
+  \frac{U'_tc_t - U_t}{U_tc_t}
+\end{align*}
+It has risk aversion
+\begin{align*}
+  -\frac{U_t''(c_t)c_t}{u_t'(c_t}
+  =
+\end{align*}
+
 
 
 \end{multicols*}
-
-\section{Price-Dividend and Return Linearizations}
-
-We'll derive an approximation to an identity that says the following:
-there are three potential reasons the price-dividend ratio might be
-high:
-\begin{enumerate}
-    \item Investors expect dividends to rise.
-    \item Investors expect low future returns, so future cashflows
-	are discounted at a lower than usual rate. This leads
-	to higher prices.
-    \item Investors expect prices to rise forever, giving an
-	adequate return even if there are no dividends.
-\end{enumerate}
-Now, we asserted above that Option 2 is the correct observation.
-But how can we test that?  We'll, let's derive the identity that
-lays out the theory behind Options 1-3.
 
 
 
@@ -2805,6 +2892,824 @@ shot, rather than first running the time series regression, and then
 running the cross-sectional regression.
 
 
+\section{The Fundamental Theorem of Asset Pricing}
+
+\subsection{Introduction}
+
+Derivatives require special pricing techniques aside from the traditional
+discounted cash flow (DCF) approach, as DCF requires an estimate of the
+appropriate risk-adjusted rate of return.  However, the risk of a 
+derivative varies over time, which makes it difficult to estimate the
+derivative's risk-adjusted return.
+
+As a result, derivatives pricing turns to the no-arbitrage approach (NA),
+which eliminates the need to build risk into the model.  
+
+\subsection{Trading Strategy and Derivative Pricing Definitions}
+
+A \textbf{trading strategy} is a dynamically-rebalanced portfolio.
+\\
+\\
+A trading strategy is \textbf{self-financing} if it generates no 
+intermediate cash inflows and requires no intermediate outflows between
+the time the portfolio is initiated and the time it is liquidated.  This
+implies that
+   \begin{itemize}
+      \item[i.]{All dividends are reinvestd.}
+      \item[ii.]{Value of the assets sold at a rebalance time must 
+	 equal the value of the assets bought.}
+   \end{itemize}
+A trading strategy is \textbf{strictly positive} if the value of the 
+traded portfolio can never become zero or negative.
+\\
+\\ 
+Let $N$ be the value of a \emph{strictly positive}, \emph{self-financing}
+trading strategy.  Then $N$ is a \textbf{numeraire process} or, simply,
+a \textbf{numeraire}. Here are a few examples:
+\begin{itemize}
+   \item[-]{Price of Dividend paying asset: 
+	 NO, as there are intermediate 
+	 cash outflows, violating self-financing condition.}
+   \item[-]{The price of a forward contract: NO, as it can go negative,
+      violating the strictly positive condition.}
+   \item[-]{Price of a Foreign Currency: 
+      NO, as it is equivalent to a dividend
+      paying asset because you think of it as an investment in an
+      interest-bearing account.}
+   \item[-]{Price of a non-defaultable zero-coupon bond: YES.}
+   \item[-]{Value of a money market account earning the risk free rate,
+      where there are no interim deposits or withdrawals: YES.}
+\end{itemize}
+
+\subsection{Martingales and Change of Measure}
+
+A \textbf{martingale} is a stochastic process
+$X$ with the property 
+   \[ E_t[X(T) - X(t)] = 0 \; \Leftrightarrow \; E_t[X(T)] = X(t), \qquad
+      T > t. \]
+A \textbf{probability measure} is a specification
+of the probabilities of all the possible states of the words, mapping
+states to real numbers.
+\\
+\\
+Suppose that $\xi$ is a nonnegative random variable on $(\Omega,
+\mathcal{F}, P)$ with $E_P[\xi] = 1$. (The subscript $P$ highlights that
+the last expectation is with respect to measure $P$.) 
+Then define a new measure
+   \[ Q: \mathcal{F} \rightarrow [0,1] \]
+\begin{equation}
+   \label{rnt}
+   Q(A) = E\left[1_A \xi\right]=\int_A\xi(\omega) dP(\omega), \qquad
+      A\in \mathcal{F} 
+\end{equation}
+Clearly, $Q$ is a probability measure on $(\Omega, \mathcal{F})$ and
+it is absolutely continuous with respect to $P$---i.e. we have
+   \[Q(A) > 0 \Rightarrow P(A) > 0.\] 
+Note that it is common to write the random variable $\xi$ as
+   \[ \xi = \frac{dQ}{dP},\]
+and we often refer to $\xi$ as the \emph{Radon-Nikodym derivative}
+or the \emph{likelihood ratio} of $Q$ with respect to $P$.
+
+\paragraph{Radon-Nikodym Theorem} If $P$ and $Q$ are two probability
+measures on $(\Omega, \mathcal{F})$, then there \emph{will exist}
+such a random variable $\xi$ so that Expression \ref{rnt} holds.
+
+
+\newpage
+\subsection{Fundamental Theorem of Asset Pricing (No Dividends)}
+
+\subsubsection{Statement of Theorem}
+
+Suppose we have $n$ non-dividend-paying assets with
+price processes $S_1, S_2, \ldots, S_n$.  Let $N$ be some numeraire
+process.  Then, barring market imperfection, there are no arbitrage
+opportunities among these assets if and only if there exists a strictly
+positive probability measure $Q_N$ (so it's dependent upon the numeraire,
+$N$) under which each of the processes $S_i / N$ is a martingale.
+\begin{itemize}
+   \item[-]{Note that $S_i/N$ is the price of asset $i$ in units of the
+      numeraire $N$.  Therefore, we call $S_i/N$ the \textbf{normalized
+      price process}.}
+   \item[-]{The probability measure $Q_N$ will, in general depend on
+	 the numeraire.  Therefore, we call $Q_N$ the 
+	 \textbf{martingale measure} or \textbf{pricing measure} 
+	 associated with the numeraire $N$.} 
+   \item[-]{We can paraphrase FTAP by saying that, if the is no arbitrage
+	 or market imperfections, then given \emph{any} numeraire 
+	 process $N$, there must exist a corresponding martingale
+	 measure $Q_N$ under which the normalized price of any 
+	 non-dividend paying asset is a martingale:
+	    \[ \frac{S_i(t)}{N(t)} = E_t^{Q_N}\left[ \frac{S_i(T)}{N(T)}
+	       \right], \qquad T > t. \]
+	 From this, we see that changing $N$ will generally change 
+	 $Q_N$ as well.
+      }
+\end{itemize}
+
+\subsubsection{Consequences for Derivative Pricing}
+
+Let $V$ denote the price of a derivative with payoff $V(T)$ at time $T$.
+Then we can apply FTAP to get
+   \[ V(t) = N(t) E_t^{Q_N} \left[ \frac{S_i(T)}{N(T)}
+	       \right], \qquad T > t. \]
+Note, the price we get for a deriative is \emph{invariant} to the choice
+of the numeraire.
+
+\subsubsection{Special Numeraires and Martingale Measures}
+
+\paragraph{T-forward measure} Let $P(t,T)$ be the price of a
+non-defaultable zero-coupon bond with unit face value.  Then
+   \[ N(t) = P(t,T) \]
+is our numeraire.  The associated martingale measure, denoted 
+$Q_T$, is called the \emph{T-forward martingale measure}. This yields
+a derivative price of 
+   \[ V(t) = E_t^{Q_B} \left[ e^{-\int_t^T r(s) ds} V(T)\right] \]
+
+\paragraph{Risk Neutral Measure} Let's consider the value of a money
+market account with unit initial value as our numeraire.  Then
+   \[ N(t) = B(t) = e^{\int_0^t r(s) ds} \]
+where $r$ is the instantaneous risk-free rate.  The associated 
+martingale measure, denoted by $Q_B$, is called the 
+\emph{risk-neutral martingale measure}. This yields a derivative price
+of 
+   \[ V(t) = P(t,T) \; E_t^{Q_T}\left[V(T)\right] \; = \;
+      e^{-r(t,T) (T-t)} E_t^{Q_T}\left[V(T)\right] \]
+   \[ r(t,T) = -\ln{P(t,T)}/(T-t) \]
+If interest rates are stochastic (and they probably are), then this
+measure isn't as convenient a tthe $T$-forward measure.
+
+\subsection{FTAP for Dividend-Paying Assets}
+
+Consider an asset with price process $S$ and let $D(t)$ denote the
+cumulative dividend paid by the asset from time 0 up to time $t$.
+We can consider the undiscounted cash flows from holding an asset
+from $t$ to $T$:
+   \[ S(T) - S(t) + D(T) - D(t) = GP(T) - GP(t) \]
+where $GP(t) = S(t) + D(t)$ is the asset's gain process.
+\\
+\\
+Given a numeraire $N$, the asset's \emph{normalized gain process},
+denoted NGP, measures the gains from holding the assets in units of $N$:
+\[ NGP(t) = \frac{S(t)}{N(t)} + \int^t_0 \frac{dD(s)}{N(s)}\]
+where $dD(s)$ is the dividend paid by the asset at time $s$.
+
+\paragraph{Theorem} Now, let's restate the fundamental theorem of asset
+pricing allowing for dividend paying assets.  So again, consider
+assets with price processes $S_1, \ldots, S_n$ and cumulative dividend
+processes $D_1,\ldots,D_n$, letting $N$ be any numeraire process.
+Then there are no arbitrage opportunities across these assets if and
+only if there exists a strictly positive probability measure $Q_N$ 
+under which each
+   \[ \frac{S_i(t)}{N(t)} + \int^t_0 \frac{dD_i(s)}{N(s)} \]
+is a martingale. This implies
+\[ \frac{S_i(t)}{N(t)}  = E_t^{Q_N}\left[ \frac{S_i(T)}{N(T)} +
+   \int^T_t \frac{dD_i(s)}{N(s)}\right] \]
+And so the normalized price of any asset is equalt to the conditional
+expectation under the martingale measure of the assets normalized payoffs
+(including future dividends).
+
+
+
+\newpage
+
+
+\section{The Black-Scholes Model}
+
+\subsection{Deriving the Governing Process Under $Q_B$}
+
+Let's put to use everything we've developed so far and derive the 
+Black-Scholes Model.
+\\
+\\
+First, we start by specifying the assumptions of the model:
+\begin{enumerate}
+   \item{The price of the underlying asset, the stock, follows
+      an Ito process with volatility proportional to the price
+      level:
+      \begin{equation}
+	 \label{sde}
+	 dS(t) = S(t)\mu(t) \; dt + S(t) \sigma \; dW(t).
+      \end{equation}
+      This is the movement under the real-world probibility measure $P$.
+      }
+   \item{It pays dividends continuously at a constant rate $\delta$,
+      implying that the cumulative dividend at time $t$ is
+	 \[ D(t) = \int^t_0 S(s) \delta \; ds .\]
+      }
+   \item{The instantaneous risk-free rate is \emph{constant} and 
+      equal to $r$.}
+   \item{There are no arbitrage opportunties or market imperfections.}
+\end{enumerate}
+Now, we can apply FTAP to say that the value of a Path-Independent
+Option (PID) with payoff $V(T) = \varphi(S(T))$ at time $T$ can be 
+expressed as
+   \[ V(t) = e^{-r(T-t)}E_t^{Q_B}\left[\varphi(S(T))\right].\]
+To compute the expression on the RHS, we will need to determine
+the distribution of $S(T)$ under the risk-neutral measure $Q_B$, or
+we will need to simulate $S(T)$ under $Q_B$.  In that case, 
+we will employ Girsanov's Theorem to our SDE from Equation \ref{sde}
+to rewrite the evolution of the process now under the risk neutral
+measure
+\begin{equation}
+   \label{girs}
+   dS(t) = S(t)\hat{\mu}(t) \; dt + S(t) \sigma \; d\hat{W}(t) 
+\end{equation}
+where $\hat{W}$ is Brownian motion under $Q_B$. We know everything
+written here \emph{except} $\hat{\mu}$, whose computation will
+now be our main concern.
+\\
+\\
+So in order to determine $\hat{\mu}$, we will need to compute
+the dynamics of the normalized stock gain process:
+\begin{equation}
+   \label{ngp}
+   NGP(t) = \frac{S(t)}{B(t)} + \int^t_0 \frac{dD(s)}{B(s)} =
+   \frac{S(t)}{B(t)} + \int^t_0 \frac{S(s)\delta \; ds }{B(s)}.
+\end{equation}
+Now it follows from Equation \ref{ngp} that
+\begin{equation}
+   \label{ngp2}
+   dNGP(t) = d\left(\frac{S(t)}{B(t)}\right) + \frac{S(t)}{B(t)}
+      \delta \; dt. 
+\end{equation}
+Next, since we assume $r$ to be constant, by the way we defined 
+$B(t)$, it follows that 
+   \[ B(t) = e^{\int^t_0 r(s) ds} \;\; \Rightarrow 
+      \;\; dB(t) = B(t)r \;dt\]
+Now if we apply Multi-dimensional Ito's Lemma for the ratio of the
+two processes (a special case we discussed above), we get
+\begin{equation}
+   \label{ratio}
+   d\left(\frac{S(t)}{B(t)}\right) = \frac{S(t)}{B(t)} 
+      \left(\hat{\mu}(t) - r\right) \; dt + \frac{S(t)}{B(t)}\sigma(t)
+      \; d\hat{W}(t).
+\end{equation}
+Substituting Equation \ref{ratio} into Equation \ref{ngp2}, we finally
+get that
+\begin{equation}
+   \label{ngp3}
+   dNGP(t) = \frac{S(t)}{B(t)}\left(\hat{\mu}(t) + \delta - r\right)
+   \; dt + \frac{S(t)}{B(t)} \sigma(t) \; d\hat{W}(t).
+\end{equation}
+Now since FTAP tells us that the normalized gain process must be 
+a martingale, we know that the the drift term in Equation \ref{ngp3}
+will need to be 0, forcing
+   \[ \hat{\mu}(t)= r - \delta.\]
+So substituting this result back into Equation \ref{girs}, which
+we got through Girsanov's theorem, we obtain
+   \[ dS(t) = S(t)(r - \delta) \; dt + S(t)\sigma \; d\hat{W}(t)\]
+which, you'll note, forces the stock price to follow a geometric
+Brownian Motion under $Q_B$. GBM leads to the following expression
+for $S(T)$:
+   \[ S(T) = S(t) e^{\left(r - \delta -\frac{1}{2}\sigma^2\right)
+      (T-t) + \sigma(\hat{W}(T) - \hat{W}(t))} \]
+As a consequence, $\ln S(T)$ is normally distributed with mean
+   \[ \ln S(t) + \left(r - \delta - \frac{1}{2}\sigma^2\right) (T-t) \]
+and standard deviation $\sigma\sqrt{T-t}$, \emph{under the measure 
+$Q_B$}.  From there, we can
+easily simulate samples from the distribution of $S(T)$ for 
+Monte Carlo simulation, which will be covered in later sections.
+
+
+\newpage
+
+\subsection{Arriving at a Closed-Form Solution}
+
+With a little bit of statistics, we can work out explicit formulas
+for digital and vanilla options under the Black-Scholes model and 
+assumptions, so let's build up to that.
+\\
+\\
+Consider $X$, where $\ln X$ is normally distributed with mean $\mu_X$
+and standard deviation $\sigma_X$.  Then if $1_{\{X\geq K\}}$ is the
+indicator function for $X \geq K$, then we have that
+\begin{equation}
+   \label{ind}
+   E\left[1_{\{X\geq K\}}\right] = P(X\geq K) = \Phi \left(
+      \frac{\mu_X - \ln K }{\sigma_X}\right) 
+\end{equation}
+\begin{equation}
+   \label{bitch}
+    E\left[X \cdot 1_{\{X\geq K\}}\right] = 
+      e^{\mu_X + \frac{1}{2}\sigma_X^2} \; \Phi\left(\frac{\mu_x + 
+      \sigma_X^2 - \ln K}{\sigma_X} \right) 
+\end{equation}
+Coming back to the Black-Scholes model, instead of $X$, we'll take
+$S(T)$, where we recall that $\ln S(T)$ is normally distributed under 
+$Q_B$ with mean
+$\ln S(t) + ( r - \delta - (1/2)\sigma^2) (T-t)$
+and standard deviation $\sigma \sqrt{T-t}$. From there, we apply
+Result \ref{ind} to say that
+   \[ E_t^{Q_B}\left[ 1_{\{S(T)\geq K\}}\right] = 
+      \Phi\left( \frac{\ln S(t) + \left(r-\delta - \frac{1}{2} \sigma^2
+      \right)(T-t) - \ln K }{\sigma \sqrt{T-t}}\right) \]
+We can use this result to price a \emph{cash-or-nothing} (CON) call
+which pays $\varphi(S(T)) = 1_{\{S(T)\geq K\}}$ at $T$:
+\begin{align}
+   \label{con}
+   c^{\text{CON}}(t) &= e^{-r(T-t)} 
+      E_t^{Q_B}\left[ 1_{\{S(T)\geq K\}}\right]
+   \notag\\
+   &=  e^{-r(T-t)} 
+      \Phi\left( \frac{\ln S(t) + \left(r-\delta - \frac{1}{2} \sigma^2
+      \right)(T-t) - \ln K }{\sigma \sqrt{T-t}}\right) 
+\end{align}
+Now let's adapt Result \ref{bitch} to the Black Scholes model and use
+it to price another type of derivative---the so-called 
+\emph{all-or-nothing} (AON) call, which has payoff $\varphi(S(T)) = 
+S(T) 1_{\{S(T) \geq K\}}$ at time $T$. The price of this option at
+$T$ is 
+\begin{align}
+   \label{aon}
+      c^{\text{AON}}(t) &= e^{-r(T-t)} 
+      E_t^{Q_B}\left[ 1_{\{S(T)\geq K\}}\right]
+      \notag\\
+      &= e^{-r(T-t)}  \; S(t) \; e^{(r-\delta)(T-t)} \;
+      \Phi\left(\frac{\ln S(t) + \left(r-\delta + \frac{1}{2}\sigma^2
+      \right)(T-t) - \ln K}{\sigma \sqrt{T-t}}\right)
+      \notag\\
+      &= S(t) e^{-\delta (T-t)} \Phi\left(\frac{\ln S(t) + 
+	 \left(r-\delta + \frac{1}{2}\sigma^2
+	 \right)(T-t) - \ln K}{\sigma \sqrt{T-t}}\right)
+\end{align}
+From there, we price a \emph{vanilla call} by expressing it as a
+portfolio of cash-or-nothing and all-or-nothing calls:
+   \[ c(t) = c^{\text{AON}}(t) - K  c^{\text{CON}}(t) \]
+We then get the value by using Formulas \ref{con} and \ref{aon}.
+
+\newpage
+
+
+\subsection{General Logic}
+
+So let's just recap the general steps and intuition that we employed
+at arriving at the final solution of a PID, being a bit more general
+than the specific Black-Scholes case:
+\begin{enumerate}
+   \item{First, we posit some governing process for the stock price
+      under the real-world probability measure, $P$.}
+   \item{Next, use Girsanov's Theorem to assert the existence of a
+      governing process under the probability measure $Q$.  As per 
+      Girsanov's Theorem, this new process
+      will have the same variance as the
+      original process, but \emph{not} the same drift (note that
+      the drift under $P$ is largely irrelevant in how we price
+      derivatives.)}
+   \item{Then, figure out how to express the normalized gain process
+      for the underlying. According to FTAP, 
+      this must be a Martingale under $Q$, implying a drift of 0.}
+   \item{Using the fact that the drift of $dNGP$ must be 0, solve
+      out for $\hat{\mu}$, and plug that value into the governing SDE
+      under $Q$.}
+   \item{Finally, solve out the SDE under $Q$, and simulate many 
+      sample paths from the solution, computing the value of 
+      the derivative at time $T$ under each. Take the average of all of 
+      these values to get the approximate expectation under $Q$.}
+\end{enumerate}
+
+\subsection{Relaxing Some Assumptions}
+
+Recall that the Black-Scholes model assumes that $r$, $\delta$, and
+$\sigma$ are all \emph{constants}. However, we can easily adapt in the
+case that each one is a \emph{non-random} function of 
+time.\footnote{So no stochastic factors can influence any of those 
+parameters}. Specifically, we replace $\theta (T-t)$\footnote{$\theta$
+is any one of the three parameters.} with $\bar{\theta}(T-t)$:
+   \[ \bar{r} = \frac{1}{T-t} \int^T_t r(s) ds, \qquad
+      \bar{\delta} = \frac{1}{T-t} \int^T_t \delta(s) ds, \qquad
+      \bar{\sigma^2} = \frac{1}{T-t} \int^T_t \sigma(s)^2 ds \]
+
+
+
+
+\newpage
+
+\section{Monte Carlo Pricing of PIDs}
+
+Let's consider a path-independent derivative (PID) that provides the
+payoff $\varphi(S(T))$ at expiration date $T$. FTAP tells us that
+\begin{equation}
+   \label{vee}
+   V(0) = e^{-r T} E^{Q_B}\left[\varphi(S(T))\right],
+\end{equation}
+where $E^{Q_B}$ is the expectation under the risk-neutral probability.
+\\
+\\
+Next, if we believe the assumptions of the Black-Scholes model, then
+\begin{equation}
+   \label{st}
+   S(T)=S(0)\; e^{\left(r - \delta - \frac{1}{2}\sigma^2\right) T +
+      \sigma \hat{W}(T)} 
+\end{equation}
+If we wish to compute the price $V(0)$ numerically (as opposed to 
+analytically), then we use Monte Carlo simulation:
+\begin{enumerate}
+   \item{Draw a random value from a 
+	 $N(0, (\sqrt{T})^2)$ 
+      distribution.}
+   \item{Plug that value into Expression \ref{st} to get a random
+      draw from the distribution of $S(T)$ under $Q_B$.}
+   \item{Compute the payoff, $\varphi(S(T))$.}
+   \item{Repeat those steps to get many draws of $\varphi(S(T))$ under 
+	 $Q_B$, then average them to get an unbiased estimate of 
+	 $E^{Q_B}\left[\varphi(S(T))\right]$.}
+   \item{Multiply that average by the discount factor $e^{-rT}$ to
+      get an estimate of the PID price.}
+\end{enumerate}
+Now that we've figured out a way to compute a numeric approximation, 
+it's naturual to ask how accurate this is.  To do so, we use the
+Central Limit Theorem to assert
+\[ EX - \bar{X} \sim N\left(0,\; \frac{\sigma_X}{\sqrt{N}}\right) \] 
+as the number of draws gets very large, and where $EX$ is the true
+mean, and $\bar{X}$ is the sample mean from the Monte Carlo simulation.
+Getting even more specific,
+   \[ \hat{V}_0 \sim N\left(V_0, \; e^{-r T} 
+      \frac{\sigma_\varphi}{\sqrt{N}}\right) \]
+where $\sigma_\varphi$ is the standard deviation of the payoff 
+$\varphi(S(T))$, $V_0$ is the true price, and $\hat{V}_0$ is the Monte
+Carlo estimate.
+   
+\newpage
+
+\section{Monte Carlo Pricing of PDDs}
+
+Next, consider a generic \emph{discretely-sampled} European 
+path-dependent derivative with the payoff dependent upon the price of 
+the underlying at a set of dates $\{t_1, \ldots, t_n\}$ where 
+$t_i \in [t, T]$, i.e.
+   \[ V(T) = \varphi(S(t_1), \ldots, S(t_n)).\]
+Recalling FTAP and the path of stock prices under the Black-Scholes 
+assumption, 
+   \[ V(t) = e^{-r(T-t)} E_t^{Q_B} \left[\varphi(S(t_1), \ldots, S(t_n))
+      \right] \]
+   \[ S(t_i) = S(t_{i-1}) e^{\left(r-\delta - \frac{1}{2}\sigma^2\right)
+      (t_i - t_{i-1}) + \sigma \left(\hat{W}(t_i) - \hat{W}(t_{i-1})
+      \right)} \]
+It's easy to see that reapplying the $S(t_i)$ formula again and again
+allows us to simulate sample paths under $Q_B$.
+
+\paragraph{Note} While path independent derivatives likely allow
+analytical solutions, computing solutions to PDDs analytically would
+be computationally slow because of the dependence upon the value of the
+underlying at several maturity dates.  Therefore, Monte Carlo
+simulation is a much better alternative.
+
+\newpage
+
+\section{Forwards and Futures Prices}
+
+Since forward and futures prices are \emph{not} assets prices, 
+we cannot immediately apply FTAP and its resulting properties to them.
+Instead, let's examine more closely how they are priced in a sufficiently
+general setitng with few restrictions.
+
+\subsection{Forward Prices}
+
+We start by examining \emph{forward prices}, which are effectively
+fixed delivery prices agreed upon at initiation of a forward contract. 
+They differ from the \emph{value} of
+a forward contract, which is the resale price or value of an 
+already-initiated contract. While the forward price is 
+somewhere in the ballpark of the current spot price, $S(t)$, the 
+value of a forward contract will begin at 0 and fluctuate with changes
+in the value of $S$ over time.
+
+\subsubsection{No Dividend Case}
+
+We will start with forward prices, denoed by $G(t,T)$.  We start with
+the fact that the payoff at the delivery date $T$ of a forward contract
+with delivery price $K$ will be
+\begin{equation}
+   \label{veetee}
+    V(T) = S(T) - K.
+\end{equation}
+Next, it follows from FTAP that the \emph{value} of the forward 
+contract---note, I'm not yet talking about the forward \emph{price} or
+\emph{rate}---at
+any time $t<T$ will be, under the $T$-forward measure,
+\begin{equation}
+   \label{fwd}
+   V(t)  = P(t,T) \left( E_t^{Q_T}[S(T)] - K  \right) = P(t,T)
+      E_t^{Q_T}[V(T)]
+\end{equation}
+This follows because the payoff $V(T)$ in Equation \ref{veetee} 
+is a payoff at time $T$ that we can price exactly like a PID.
+\\
+\\
+Next, since we want $V(t) = 0$, when we initiate a forward contract, 
+this forces
+   \[ G(t,T) = E_t^{Q_T}[S(T)] = K \]
+where $G(t,T)$ is the delivery price set at time $t$ such for delivery
+at time $T$. But, by the fact that $G(T,T) = S(T)$ for forward contracts
+we have that
+   \[ G(t,T) = E_t^{Q_T}[S(T)] = E_t^{Q_T}[G(T,T)] \]
+   \[ \Rightarrow \quad E_t^{Q_T}[G(T,T)-G(t,T)] = 0 \]
+In other words, the forward price for delivery at time $T$ is a 
+\emph{martingale} under the $T$-forward measure $Q_T$. We can use
+this result along with a few others,\footnote{Namely, that the
+   discounted process for $S(t)$ must be a martingale and that
+   $S(T) = G(T,T)$.} 
+   to get the current forward price
+   \[ G(t,T) = E_t^{Q_T}[G(T,T)] = E_t^{Q_T}[S(T)] 
+      = E_t^{Q_T}\left[\frac{S(T)}{P(T,T)} \right] 
+      = \frac{S(t)}{P(t,T)} \]
+which agrees with the simple formula for forward pricing.
+\\
+\\
+From Equation \ref{fwd} we also get that the value of a 
+\emph{already-initiated} forward contract at time $t$ with 
+delivery price $K$ equals
+   \[ P(t,T)(G(t,T) - K).\]
+
+\subsubsection{Incorporating Dividends}
+
+Now let's consider an asset paying dividends \emph{continuously}
+and at \emph{non-random} rate, $\delta$.
+\\
+\\
+Let $V(t) = S(t) e^{\int^t_0 \delta(s) \; ds}$ be the value of a
+portfolio that begins with one share of the underlying and
+reinvests all dividends.  Also, let $G_V(t,T)$ denote the forward
+price at time $t$ for the delivery of this just-defined portfolio
+$V$ at time $T$. Since $V$ itself pays no dividends (they are all
+reinvested), we set the forward price on this portfolio using the 
+results from the last section:
+\[ G_V(t,T) = \frac{V(t)}{P(t,T)} = 
+   \frac{S(t) e^{\int^t_0 \delta(s)\; ds} }{P(t,T)} \]
+Since $V(T) = S(T) e^{\int^T_0 \delta(s)\; ds}$, it's clear that the 
+forward price for delivery of $S$ only at time $T$ must equal
+\begin{equation}
+   \label{gcocarry}
+    G(t,T) = \frac{G_V(t,T)}{ e^{\int^T_0 \delta(s)\; ds}} =
+      \frac{S(t)e^{\int^t_0 \delta(s)\; ds}}{P(t,T) 
+      e^{\int^T_0 \delta(s)\; ds}}
+      = \frac{S(t)e^{-\int^T_t \delta(s)\; ds}}{P(t,T)}
+\end{equation}
+And under the Black-Scholes assumptions of constant interest rates and
+dividends, we get that
+   \[ G(t,T) = S(t) e^{(r-\delta)(T-t)} \]
+which we know as the cost \emph{cost-of-carry} formula.  Note that
+we call Equation \ref{gcocarry} the \emph{generalized cost-of-carry}
+formula.
+
+\newpage
+
+\section{Black Model}
+
+We cause the martingale property of forward prices to obtain an 
+option-pricing model that is far more general in its assumptions than
+the Black-Scholes model. We call this new model the \emph{Black 
+Model}. It links forward prices, $G$, to spot prices, $S$, by using
+the fact that $G(t,T)$ will converge to $S(T)$ as $t\rightarrow T$.
+
+\subsection{Assumptions}
+
+First, we assume that the \emph{forward price} of the underlying
+asset follows an Ito process 
+\begin{equation}
+   \label{blacksde}
+    dG(t,T) = G(t,T) \mu(t) \; dt + G(t,T) \sigma \; dW(t).
+\end{equation}
+We also assume that there are no arbitrage opportunities or market
+imperfections. 
+
+\paragraph{Note} We make no restrictive assumptions about dividends
+or interest rates.  That gives us much more general results. We do,
+however, retain the constant proportional volatility specification.
+BUT, the volatility term, $\sigma$, is the volatility of the 
+\emph{forward price}, not the spot price volatility.
+
+
+\subsection{Pricing PID's Under the Black Model}
+
+Let's price the arbitrary PID's under the Black Model using 
+Monte Carlo simulation, where the PID's have payoff
+$V(T) = \varphi(S(T))$ at time $T$:\footnote{We use the $T$-forward 
+measure, $Q_T$, as it is much easier to compute given stochastic
+interest rates. This is in keeping with the more general framework
+of the Black Model.}
+\begin{equation}
+   \label{blackvee}
+   V(t) = P(t,T) E_t^{Q_T}[\varphi(S(T))] = 
+   P(t,T) E_t^{Q_T}[\varphi(G(T,T))]
+\end{equation}
+In order to compute this expectation, we'll need to identify the 
+stochastic process followed by the forward price under $Q_T$.
+\\
+\\
+So apply Girsanov's Theorem to Equation \ref{blacksde}, we get a new
+SDE under $Q_T$:
+\begin{equation}
+   \label{girsanovblack}
+   dG(t,T) = G(t,T) \hat{\mu}(t) \; dt + G(t,T) \sigma \; d\hat{W}(t).
+\end{equation}
+And since we showed in the section about forwards that $G$ must be
+a martingale under $Q_T$, it follows that in Equation 
+\ref{girsanovblack} that $\hat{\mu}$ must equal 0. As a result, $G$ 
+follows Geometric Brownian Motion without drift. More generally, 
+we get
+\begin{equation}
+   \label{blackgbm}
+   S(T) = G(t,T) e^{-\frac{1}{2} \sigma^2 (T-t) 
+      + \sigma (\hat{W}(T) - \hat{W}(t)) }
+\end{equation}
+which we can easily simulate and plug into Equation \ref{blackvee}.
+
+\subsection{Results and Computational Notes}
+
+Given the form of $S(T)$ described in Equation \ref{blackgbm}, we 
+have a few immediate results:
+\begin{enumerate}
+   \item{Conditional on the information at time $t$, 
+      \[ \ln S(T) \sim N\left( \ln G(t,T) - \frac{1}{2} \sigma^2 (T-t), 
+	 \;\; (\sigma \sqrt{T-t})^2 \right) \]
+      under the measure $Q_T$. 
+   }
+   \item{We can compute the price of a generic PID from Equation 
+      \ref{blackvee} after we simulate values of $S(T)$ using 
+      Equation \ref{blackgbm}. 
+   }
+   \item{We can price options analytically under the Black Model
+      by using the closed-form solution Black-Scholes model and
+      making the following substitutions:
+      \[ G(t,T) \rightarrow S(t), \qquad r(t,T) \rightarrow r,
+	 \qquad r(t,T) \rightarrow \delta, \qquad \sigma_{spot}
+	 \rightarrow \sigma_{fwd}\]
+      }
+\end{enumerate}
+So we can price options with the following explicit formulas, where
+   \[ y = \frac{ \ln\left(\frac{G(t,T)}{K}\right) - \frac{1}{2}
+      \sigma^2 (T-t)}{\sigma \sqrt{T-t}} \]
+and where $\sigma$ is the volatility of the forward price:
+\begin{itemize}
+   \item[-]{\emph{Cash-or-Nothing}: 
+      \[c^{\text{CON}}  = P(t,T) \Phi(y)\]
+      }
+   \item[-]{\emph{All-or-Nothing}:
+      \[c^{\text{AON}}  = P(t,T) G(t,T) \; \Phi(y + \sigma\sqrt{T-t})\]
+      }
+   \item[-]{\emph{Vanilla Call}:
+      \[c(t)  = P(t,T) \left[ G(t,T) \; \Phi(y + \sigma\sqrt{T-t})
+	 - K \Phi(y) \right] 
+	 \]
+      }
+   \item[-]{\emph{Vanilla Put}:
+      \[c(t)  = P(t,T) \left[ K \Phi(-y) - 
+	 G(t,T) \; \Phi(-y - \sigma\sqrt{T-t}) \right] 
+	 \]
+      }  
+\end{itemize}
+The above formulas are called the \emph{Black Formulas}. They retain
+the Black-Scholes Formulas as a special case under the additional
+assumptions that the instantaneous interest rate is constant and that
+the stock pays dividends continuously at a constant rate $\delta$.
+But the Black Formulas are far more general and allow for stochastic
+interest rates and stochastic or discrete dividends.\footnote{We can
+   extend this framework to price PDD's as well, which is covered
+in Notes 3.}
+
+\newpage
+\subsection{Pricing PIDs in the Black Model}
+
+Pricing path-independent options is a bit less straightforward than
+pricing PIDs in the Black model. This arises because the 
+Black model simulates \emph{forward rates}, $G(t,T)$. Now, we know
+that we can simulate forward rates easily by using
+   \[ G(t_i, T) = G(t_{i-1}, T) e^{-\frac{1}{2}\sigma^2 (t_i - t_{i-1})
+      +\sigma (\hat{w}(t_j) - \hat{w}(t_{j-1}))} \]
+and iterating over the sampling times, $\{ t = t_0, t_1, \ldots,
+t_n=T\}$.
+\\
+\\
+The complication arises, however, if the derivative's payoff is a 
+function of the \emph{stock price}, not the forward rate. Then,
+you have two options.
+
+\paragraph{Option 1} Simulate multiple forward prices with delivery
+dates corresponding to each sampling date, which 
+requires lots of calibrations for volatilities and correlation
+coefficients, but requires no assumptions about interest
+rates and dividends.
+
+\paragraph{Option 2} Things simplify a bit, however, if you assume
+continuous dividends along with deterministic evolution of 
+the dividend and instantaneous interest rate. In that case, we can
+invert the cost of carry formula to recover the stock price:
+   \[ G(t,T) = S(t) e^{\int^T_t (r(s) - \delta(s))\; ds} \qquad
+      \Leftrightarrow \qquad
+      S(t)= G(t,T) e^{\int^T_t ( \delta(s)- r(s) )\; ds} \]
+Note that assuming non-random interest rates means assuming
+future interest rates equal current forward rates.
+
+
+
+\newpage
+
+\section{Put-Call Parity}
+
+Now let's consider \emph{Put-Call Parity} in it's most general case,
+namely where we don't restrict ourselves to constant interest or
+dividend rates.
+\\
+\\
+To start, we know that long a call and short a put---with identical
+strike, $K$, and maturity, $T$---will put you
+in a situation where you own the asset and owe the strike at time
+$T$. Mathematically, at expiry time $T$, we will have a payoff of
+\begin{equation}
+   \label{startpcp}
+   c(T)-p(T) = S(T) - K
+\end{equation}
+But, the RHS of Equation \ref{startpcp} is simply the payoff of a
+forward contract, $G$.  So if we consider that same portfolio today 
+at time $t$,
+we know that the portfolio must be worth the same as the
+the corresponding forward on the underlying. So we get
+\begin{equation}
+   \label{pcp}
+   c(t) - p(t) = P(t,T) \left(G(t,T) - K\right).
+\end{equation}
+This is the most general form of Put-Call Parity, and it only 
+requires the assumption of perfect markets.
+
+
+\newpage
+
+\section{Volatility Surfaces}
+
+In the Black formulas, everything you need to value a simple or vanilla
+option is likely to be observable---save the estimated volatility
+parameter, $\sigma$.  The current forward price ($G$), the discount
+factor ($P$), the strike ($K$), and the time to maturity ($T-t$) are
+all there for you to use.  
+
+As a result, there is a one-to-one
+mapping between the only disputable parameter, $\sigma$, and the
+option price. Consequently, by simply inferring the volatility from the
+market prices of options, we can get at an options \emph{implied 
+volatility} (IV), which we'll now discuss.
+\\
+\\
+If we let $c^M$ and $p^M$ denote the market value of the call and
+put, and if we let $c^B(\sigma)$ and $p^B(\sigma)$ denote the
+call and put prices obtained from the Black formula, then the
+\emph{implied volatility} of the call
+price and the put price, respectively, is that 
+$\sigma$ that solves
+   \[ c^B(\sigma) = c^M, \qquad p^B(\sigma) = p^M  \]
+First, we show that the IV for the put equals the IV for the
+call:
+   \[ c^B(\sigma) - p^B(\sigma) = P(t,T)(G(t,T) - K) \]
+   \[ c^M(\sigma) - p^M(\sigma) = P(t,T)(G(t,T) - K) \]
+where the first line follows from put-call parity, 
+and the second line follows
+if we assume no arbitrage.  So equating and rearranging, we get that
+   \[ c^B(\sigma) - c^M = p^B(\sigma) - p^M,\]
+which proves that IV of the call must equal that of the put to preclude 
+arbitrage. 
+\\
+\\
+Because of the one-to-one correspondence between IV and option 
+prices, it's common for OTC dealers to quote the IV rather than the
+price.  The IV can then be plugged into the Black Formula to get
+the prices.\footnote{Note: That doesn't mean dealers are using the 
+Black Model to price the options. In fact, they're probably using 
+somethining more sophisticated. But this is a simple way to quote
+options, and the convention is used nonetheless.}
+
+\paragraph{Results} We see that while the market quotes Black-implied
+volatilities, it does not \emph{price} according to the Black model.
+This leads to non-constant volatilities across different strikes
+and over time, with the most notable features being
+\begin{itemize}
+   \item[-] {\sl Volatility Smile}: Short term options give rise to
+      a convex pattern across strikes.
+   \item[-] {\sl Volatility Skew}: The smile gradually flattens
+      out for longer term options, although low strike IVs are
+      higher in general.
+\end{itemize}
+
+\newpage
+\section{Local Volatility Models}
+
+Local volatility models are one class of models which attempts to 
+generate prices in line with
+the market, which is equivalent to a model
+whose prices have Black-implied volatilities that match the observed
+volatility smile and skew.  To do so, this model relaxes that 
+assumption that the volatility of the spot (or forward) price
+is a constant that's proportional to the price level of the asset.
+\\
+\\
+Ideally, we'd also like to incorporate some stylistic facts into
+our model about regarding the behavior of volatility. For example,
+we know that there is a strong negative correlation between
+changes in the VIX and changes in the S\&P.  In practice, this means
+generalizing the BS and Black models to allow the volatility
+of the underlying asset to vary and be negatively correlated with price.
+
+
+
 %%%% APPPENDIX %%%%%%%%%%%
 
 \newpage
@@ -2884,6 +3789,218 @@ with this approximation, giving
   \big]
 \end{align*}
 Cancelling and regrouping, we get the desired expression above.
+
+
+\section{Antithetic Variates: A Variance Reduction Technique}
+
+The technique of \emph{antithetic variates} reduces the sample
+size needed to achieve a given precision (in the form of standard error)
+in Monte Carlo simulations. Let's go through the steps:
+\begin{enumerate}
+   \item{Suppose that we want to estimate $EY$ using MC simulation. 
+      Instead of simulating a single sample of size $N$, we simulate
+      $N/2$ pairs, $(Y_1, Y_2)_i$, where each pair is i.i.d. for
+      all pairs $i=1,\ldots,N/2$.}
+   \item{We can get an unbiased estimator of $EY$ by first
+      computing the average value $\bar{Y}_i = 
+      \frac{1}{2}(Y_{i1}+ Y_{i2})$
+      then averaging across the $\bar{Y}_i$.} 
+   \item{If we simulate the $N/2$ pairs independently, then 
+      \begin{align*}
+	 Var(\bar{Y}_i) &= Var\left(\frac{1}{2}(Y_{i1}+ Y_{i2})\right) =
+	 \frac{1}{4}\left[Var(Y_{i1})+Var(Y_{i2})+2 Cov(Y_{i1}, Y_{i2})
+	 \right]
+	 \\
+	 &=  \frac{(1+\rho)}{2} Var(Y), \quad \text{$\rho$ is the 
+	    correlation between $Y_{i1}$, $Y_{i2}$}
+      \end{align*}
+      So then if we want the total variance of $Y$ over our entire 
+      simulation, then we get 
+	 \[ Var(\bar{Y}) = \frac{(1+\rho) Var(Y)}{ 2 (N/2)}
+	    = \frac{(1+\rho) Var(Y)}{N} \]
+      }
+   \item{Clearly, by making the correlation negative between the 
+      terms $Y_1$ and $Y_2$ in each given pair, we can lower the variance
+      of our estimator for $EY$ as a whole.  (Note that the pairs
+      themselves are still independent from pair to pair.)}
+\end{enumerate}
+Note that some of the negative correlation will wash out and we
+won't get perfect -1 correlation when we jump from random draws to
+prices, as typically the prices are some convoluted \emph{function}
+of the random draws.
+\\
+\\
+Also, the gain---while significant---for path \emph{dependent} 
+derivatives is not quite as large due to the dependence of the payoffs
+upon the entire path.
+
+\newpage
+\section{Extras from the Textbook}
+
+
+This entire section aims to be a little more rigorous and specific
+about the approaches to asset pricing.  Especially in the second
+section, I hope to be a little more specific about what's going in
+the background of the Fundamental Theorem of Asset Pricing.
+
+\subsection{Replication Approach}
+
+One way to price a derivative involves a replicating portfolios.
+Suppose you know that one must exist (because, say, the market is 
+complete), and you know the value of the derivative, $V(S(t),t)$, is a
+relatively nicely function from the standpoint of Ito's Lemma.
+\\
+\\
+First, you use the condition that the portfolio must be
+self-financing:
+\begin{equation}
+   \label{selffi}
+   \theta(t)^TS(t) - \theta(0)^TS(0) = \int^t_0 \theta(u)^T \; dS(u),
+\end{equation}
+which essentially says that a portfolio process, 
+$\theta \in \mathbb{R}^d$, should be structured such that the total
+incremental gains from trading over the time $(0,T)$ (the right-hand
+side) should be equal to the total gains (the left-hand side). Note
+that $S(t)$ without the subscript is also a vector for the value of the
+$d$ assets.
+\\
+\\
+Next, we suppose that the value of the derivative over time, $V(S(t),t)$,
+is relatively well-behaved in the sense that we can apply Ito's Lemma
+to it. So let's do that to get
+\begin{align}
+   \label{itopde}
+   V(S(t),t) &= V(S(0),0) + 
+   \sum^d_{i=1} \int^t_0 \frac{\partial V(S(u),u)}{\partial S_i} dS_i(u)
+   \notag\\
+   &+ \int_0^t \left[ \frac{\partial V(S(u),u)}{\partial u} 
+   + \frac{1}{2} \sum^d_{i,j =1} S_i(u)S_j(u) \Sigma_{ij}(S(u),u)
+   \frac{\partial^2 V(S(u),u)}{\partial S_i \partial S_j} \right] du
+\end{align}
+where $d$ is the number of assets and $\sigma_{ij}$ is the covariance
+between instantaneous returns on assets $i$ and $j$.
+\\
+\\
+So now let's adapt our self-financing consraint to the derivative.
+We'll assume that the market is complete so a replicating a portfolio
+does exist, allowing us to swap out some elements in Equation 
+\ref{selffi}, rearrange, and get
+\begin{equation}
+   \label{newsf} 
+   V(S(t),t) = V(S(0),0) + \sum_{i=1}^d \int_0^t \theta_i(u) \; dS_i(u)
+\end{equation}
+So now that we have two equations in terms of $V(S(t),t)$, we'll 
+eventually want to equate them.  But let's just take note now that
+in order for them to be equal, we'll need everything on the second
+line of Equation \ref{itopde} to equal 0:
+\begin{equation}
+   \label{heat}
+   \Rightarrow \frac{\partial V(S(u),u)}{\partial u} 
+   + \frac{1}{2} \sum^d_{i,j =1} S_i(u)S_j(u) \Sigma_{ij}(S(u),u)
+   \frac{\partial^2 V(S(u),u)}{\partial S_i \partial S_j} = 0 
+\end{equation}
+Next, we'll also need 
+\begin{equation}
+   \label{theta}
+   \theta_i(u) = \frac{\partial V(S(u),u)}{\partial S_i},
+      \qquad i = 1,\ldots, d
+\end{equation}
+But given the fact that $\theta(t)^T S(t)$ is the value of the 
+replicating portfolio at time $t$
+(and, as a consequence, the derivative as well), we can write
+\begin{equation}
+   \label{delta}
+   V(S,t) = \sum^d_{i=1} \frac{\partial V(S,t)}{\partial S_i} S_i 
+\end{equation}
+Finally, note that we also have the boundary condition 
+\begin{equation}
+   \label{bound}
+   V(S(T),T) = f(S(T)) 
+\end{equation}
+where $f$ is the payoff function for the derivative.
+\\
+\\
+\textbf{Note}, 
+that the drifts, $\mu_i(t)$ of the assets, $S_i(t)$, do not
+appear anywhere in our foundational Equations \ref{delta} and 
+\ref{bound}. They are already implicit in the stock prices, $S_i(t)$, but
+they don't show up explicitly because our argument had \emph{nothing}
+to say about risk preferences. We merely described a self-financing
+portfolio that replicates the derivative, and $V(S(0),0)$ is simply
+the cost to initiate that strategy---regardless of the investor's risk
+preferences. 
+
+\paragraph{Solving the PDE} Let's just clarify how everything relates
+when trying to implement this approach:
+\begin{enumerate}
+   \item{Equation \ref{heat} is the PDE that we have to solve
+      out, subject to the boundary condition.}
+   \item{Equation \ref{bound} is that boundary condition.}
+   \item{Equation \ref{delta} actually gives us the value of the
+      derivative security.}
+\end{enumerate}
+
+\subsection{Risk-Neutral and Expectation-Type Pricing}
+
+It may be that the price dynamics are very complex or that the 
+derivative is path-dependent.  In such cases, a PDE may not be feasible
+or even apply.  In such cases, Monte Carlo methods provide a valuable
+and manageable alternative.
+\\
+\\
+Suppose we have a risk free asset governed by
+   \[ \frac{dN(t)}{N(t)} = r \; dt\qquad \Rightarrow\qquad
+      N(t) = N(0)e^{rt} \]
+Next, suppose that the market is arbitrage free, so it admits a 
+stochastic discount factor, $Z(t)$.  Then since $N(t)$ is 
+attainable, the process $N(t)/Z(t)$ will be a martingale. Note
+that $N(t)$ clearly corresponds to the numeraire, $N$, that we 
+defined earlier in FTAP. Moreover, the stochastic discount factor
+$Z(t)$ was sort of swept under the table in the above definition
+of FTAP, where I said ``there will be a measure.'' Here $Z(t)$ 
+is integral to the converting between measures and translating
+expectations under $P$ to expectations under $Q$ or $Q_N$.
+\\
+\\
+Now, if we fix $N(0)$ at 1, and if we normalize the stochastic
+discount factor so that $Z(0)=1$, then we see that $N(0)/Z(0)=1$.
+Since we already said this is a Martingale, it has expectation
+\[ E_P[N(0)/Z(0)]=1, \qquad \text{where $P$ is the real-world
+   probability measure.} \]
+Then this fact allows us to perform a change of measure to, say, $Q$.
+Specifically, this gives us 
+   \[ \left(\frac{dQ}{dP}\right)_t = \frac{N(t)}{Z(t)} \]
+   \[\Rightarrow \;\; 
+      Q(A) = E_P\left[1_A \cdot \left(\frac{dQ}{dP}\right)_t \right]
+      = E_0 \left[1_A\frac{N(t)}{Z(t)} \right] \]
+So now if we want to take an expectation under the new measure, as 
+opposed to the real world one, we compute
+   \[ E_Q[Y] = E_P\left[Y\frac{N(t)}{Z(t)}\right] \]
+where $Q$ is called the \emph{risk-neutral measure}---a particular 
+choice of \emph{equivalent martingale measure}. So now let's go 
+back to the fact that with a arbitrage-free marget, there's
+a stochastic discount factor---i.e. a positive process $Z(t)$ such
+that every attainable price process is a martingale, which states
+mathematically and implies
+   \[ \frac{V(t)}{Z(t)} = E_P\left[\frac{V(T)}{Z(T)}\right] 
+      \Rightarrow \;\; V(t) = E_P\left[V(T)\frac{Z(t)}{Z(T)}\right] \]
+   \[ \Rightarrow \;\; V(0) = E_P\left[\frac{V(T)}{Z(T)}\right].\]
+If we want to rewrite in terms of the new probability measure, $Q$,
+we can say that
+   \[V(t) = \beta(t) E_Q\left[\frac{V(T)}{N(T)}\right] \] 
+and this should look precisely analogous to the statement of FTAP 
+above, just allow $N$ to be a little more general then I treated
+it in this section. So now it's clear that we're discounting
+the terminal value under under the \emph{risk-free rate}, rather
+than under that funky stochastic discount factor (which is likely
+to be a bitch to work with and think about). 
+\\
+\\
+Next, since we know that the normalized asset price processes, 
+$S_i(t)/N(t)$ will be martingales under $Q$, 
+we will have to specify the dynamics that make it so.
+This will mean that we will need to find governing processes such that
+the drift term is 0.
 
 
 
