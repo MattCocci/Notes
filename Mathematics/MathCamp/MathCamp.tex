@@ -11164,21 +11164,21 @@ equivalent and more compact Problem~\ref{prob:sequential-short}.
 
 In continuous time, we use the more natural state-control representation
 to set up the sequential problem, so that our task involves choosing an
-optimal \emph{function} (over time) $y_t$ that then influences the
-evolution of the state $x_t$ through some law of motion.
+optimal \emph{function} (over time) $y(t)$ that then influences the
+evolution of the state $x(t)$ through some law of motion.
 To find the optimal path for the control, we use the
 \emph{variational principle} of the calculus of variations.
 Specifically, we derive necessary conditions of an optimal solution
-$y_t^*$ by perturbing a supposedly-optimal solution by small amounts
-$y^*_t+\varepsilon$ to generate new candidate solutions.
+$y(t)^*$ by perturbing a supposedly-optimal solution by small amounts
+$y^*(t)+\varepsilon$ to generate new candidate solutions.
 We then see what necessary conditions we need to place on the original
-supposedly-optimal solution $y^*_t$ so that none of the new candidate
-solutions $y^*_t+\varepsilon$ are any better.
+supposedly-optimal solution $y^*(t)$ so that none of the new candidate
+solutions $y^*(t)+\varepsilon$ are any better.
 
 Given that description, it's maybe not surprising that the necessary
 conditions are for a \emph{local} optimum rather than a global optimum.
-We're simply specifying necessary conditions on some solution $y_t^*$
-that will rule out better solutions in the neighborhood of $y_t^*$. We
+We're simply specifying necessary conditions on some solution $y(t)^*$
+that will rule out better solutions in the neighborhood of $y(t)^*$. We
 saw a similar result in the KKT section. But also as in the KKT
 conditions, a few extra conditions having to do with convexity can
 guarantee the solution is globablly optimal.
@@ -11188,47 +11188,49 @@ guarantee the solution is globablly optimal.
 \begin{defn}{(Canonical Sequential Formulation: Control-State Rep)}
 \label{defn:sequential-altrep-cts}
 The \emph{Canonical Sequential Formulation} requires choosing
-\emph{function of time} $y_t:\R_+\ra Y$ that maximizes
+\emph{function of time} $y(t):\R_+\ra Y$ that maximizes
 \begin{align}
   \label{prob:cts-dynamic}
-  %\max_{y_t}\;
-  %W(y_t):=
-  \max_{y_t}\;
-  &\int_0^\infty e^{-\rho t} f(x_t,y_t) \; dt
+  %\max_{y(t)}\;
+  %W(y(t)):=
+  v(x_0)
+  =
+  \max_{y(t)}\;
+  &\int_0^\infty e^{-\rho t} f(x(t),y(t)) \; dt
   \notag\\
   %\qquad
   %\begin{cases}
   \text{s.t.}\quad
-  &\text{$\dot{x}_{t} = g(x_t,y_t)$ $\;\forall t$, $x_0$ given}
+  &\text{$\dot{x}_{t} = g(x(t),y(t))$ $\;\forall t$, $x_0$ given}
   \notag\\
   &
-  y_t \in Y \;\; \forall t\in[0,\infty)
+  y(t) \in Y \;\; \forall t\in[0,\infty)
   %\end{cases}
 \end{align}
 This is an obvious generalization of the control-state formulation in
 discrete time, where
 \begin{enumerate}
-  \item \emph{State}, $x_t$:
+  \item \emph{State}, $x(t)$:
     like a ``sufficient statistic'' for the problem, encoding all
     relevant information about the state of the world and about feasible
-    options for $y_t$
+    options for $y(t)$
 
-  \item \emph{Control}, $y_{t}$: Chosen by the agent given state $x_t$.
+  \item \emph{Control}, $y_{t}$: Chosen by the agent given state $x(t)$.
     Affects instantaneous return and influences the evolution of the
     state.
 
-  \item \emph{Instantaneous Return}, $f(x_t,y_t)$: Given state $x_t$ and
-    choice of control $y_t$, the agent gets instantaneous return
-    $f(x_t,y_t)$ at time $t$, discounted back to the present at rate
+  \item \emph{Instantaneous Return}, $f(x(t),y(t))$: Given state $x(t)$ and
+    choice of control $y(t)$, agent gets instantaneous return
+    $f(x(t),y(t))$ at time $t$, discounted to the present at rate
     $\rho$.
 
-  \item \emph{Law of Motion} $g(x_t,y_t)$: Given the current state $x_t$
-    and the choice of control $y_t$,
-    $x_t$ evolves according to differential equation
-    $\dot{x}_t=g(x_t,y_t)$.
-  \item \emph{Admissable Pair}, $(x_t,y_t)$: The pair of functions
-    $(x_t,y_t)$ is called an admissable pair if they satisfy both
-    $\dot{x}_t = g(x_t,y_t)$ and $y_t\in Y$ for all $t$.
+  \item \emph{Law of Motion} $g(x(t),y(t))$: Given the current state $x(t)$
+    and the choice of control $y(t)$,
+    $x(t)$ evolves according to differential equation
+    $\dot{x}(t)=g(x(t),y(t))$.
+  \item \emph{Admissable Pair}, $(x(t),y(t))$: The pair of functions
+    $(x(t),y(t))$ is called an admissable pair if they satisfy both
+    $\dot{x}(t) = g(x(t),y(t))$ and $y(t)\in Y$ for all $t$.
 \end{enumerate}
 \end{defn}
 
@@ -11243,22 +11245,22 @@ The \emph{Current-Value Hamiltonian} is a real-valued functional
 (function of functions) associated with Problem~\ref{prob:cts-dynamic}
 is
 \begin{align*}
-  H(x,y,\lambda) := f(x_t,y_t) + \lambda_t g(x_t,y_t)
+  H(x,y,\lambda) := f(x(t),y(t)) + \lambda(t) g(x(t),y(t))
 \end{align*}
-where $\lambda_t$ is a function of time called the \emph{co-state}.
+where $\lambda(t)$ is a function of time called the \emph{co-state}.
 The Hamiltonian is much like the Lagrangian of static optimization
 problems, only for dynamic optimization.
 \end{defn}
 
 \begin{prop}\emph{(Necessary Conditions for Optimum)}
 Given Problem~\ref{prob:cts-dynamic} with $f$ and $g$ continuously
-differentiable, an interior continuous solution $y_t$ with corresponding
-state variable function $x_t$ ($x_0$ given) satisfies the following
+differentiable, an interior continuous solution $y(t)$ with corresponding
+state variable function $x(t)$ ($x_0$ given) satisfies the following
 necessary conditions for all $t\geq 0$:
 \begin{enumerate}
-  \item $H_y (x_t,y_t,\lambda_t) = 0$
-  \item $\dot{\lambda}_t = \rho\lambda_t- H_x(x_t, y_t, \lambda_t)$
-  \item $\dot{x}_t = H_\lambda(x_t,y_t,\lambda_t) = g(x_t, y_t)$
+  \item $H_y (x(t),y(t),\lambda(t)) = 0$
+  \item $\dot{\lambda}(t) = \rho\lambda(t)- H_x(x(t), y(t), \lambda(t))$
+  \item $\dot{x}(t) = H_\lambda(x(t),y(t),\lambda(t)) = g(x(t), y(t))$
 \end{enumerate}
 Also have an initial boundary condition $(x_0$ given) and terminal
 boundary condition by TVC
@@ -11272,10 +11274,10 @@ pinned down.
 Here's the general procedure for solving a problem of this form
 \begin{enumerate}[label=(\roman*)]
   \item Construct the Hamilton and compute the above derivatives
-  \item Set $\dot{x}_t=\dot{\lambda}_t=0$ in those expressions and solve
+  \item Set $\dot{x}(t)=\dot{\lambda}(t)=0$ in those expressions and solve
     for steady state $x^*$ and $y^*$
   \item
-    If $\lambda_t$ and $x_t$ scalar, draw phase diagram in
+    If $\lambda(t)$ and $x(t)$ scalar, draw phase diagram in
     $(x,\lambda)$-space or substitute out for $\lambda$ and draw phase
     diagram in $(x,y)$ space
 \end{enumerate}
@@ -11283,69 +11285,69 @@ Here's the general procedure for solving a problem of this form
 
 %\begin{proof}{(Kinda for Finite Horizon)}
 %Suppose we only go out to horizon $T$ (rather than indefinitely), and we
-%have interior continuous solution $y^*_t$ with associated path for the
-%state variable $x_t^*$. We want to characterize the necessary conditions
-%that $y_t^*$ must satisfy to be a genuine (local) optimum.
+%have interior continuous solution $y^*(t)$ with associated path for the
+%state variable $x(t)^*$. We want to characterize the necessary conditions
+%that $y(t)^*$ must satisfy to be a genuine (local) optimum.
 
-%Start by looking at ``variations'' on $y_t^*$. Specifically,
-%fix arbitrary continuous function $\eta_t$ and add a
-%scaled-by-$\varepsilon$ version of this function to our solution $y_t^*$
-%to generate variation $y_t(\varepsilon)$:
+%Start by looking at ``variations'' on $y(t)^*$. Specifically,
+%fix arbitrary continuous function $\eta(t)$ and add a
+%scaled-by-$\varepsilon$ version of this function to our solution $y(t)^*$
+%to generate variation $y(t)(\varepsilon)$:
 %\begin{align*}
-  %y_t(\varepsilon) := y_t^* + \varepsilon\eta_t
+  %y(t)(\varepsilon) := y(t)^* + \varepsilon\eta(t)
 %\end{align*}
-%Since $\eta_t$ is continuous, $y_t(\varepsilon)$ is continuous for any
+%Since $\eta(t)$ is continuous, $y(t)(\varepsilon)$ is continuous for any
 %$\varepsilon\in\R$.
 %Moreover, we think of $\varepsilon$ indexing a family variations on the
-%solution $y_t^*$ (i.e. we can sweep out the family of variations on
-%$y_t^*$ by varying $\varepsilon$). For $\varepsilon$ small, these
-%variations $y_t(\varepsilon)$ are all close to the solution
-%$y_t^*$.\footnote{%
-  %To ensure feasibility of the variations, note that for fixed $\eta_t$,
-  %$\eta_t$ is continuous on a compact interval, hence bounded.
+%solution $y(t)^*$ (i.e. we can sweep out the family of variations on
+%$y(t)^*$ by varying $\varepsilon$). For $\varepsilon$ small, these
+%variations $y(t)(\varepsilon)$ are all close to the solution
+%$y(t)^*$.\footnote{%
+  %To ensure feasibility of the variations, note that for fixed $\eta(t)$,
+  %$\eta(t)$ is continuous on a compact interval, hence bounded.
   %Therefore, you can always choose an $\varepsilon_\eta$ such that
   %$|\varepsilon| < \varepsilon_\eta$
-  %implies $y_t(\varepsilon) \in \text{int}(Y_t)$.
+  %implies $y(t)(\varepsilon) \in \text{int}(Y(t))$.
   %Since we're looking for a local optimum, this is fine.
 %}
 
-%Given each variation of the control $y_t(\varepsilon)$, define
-%corresponding $x_t(\varepsilon)$ satisfying
+%Given each variation of the control $y(t)(\varepsilon)$, define
+%corresponding $x(t)(\varepsilon)$ satisfying
 %\begin{align}
-  %\dot{x}_t(\varepsilon)
-  %= G(x_t(\varepsilon), y_t(\varepsilon))
+  %\dot{x}(t)(\varepsilon)
+  %= G(x(t)(\varepsilon), y(t)(\varepsilon))
   %\qquad x_0(\varepsilon)=x_0
   %\label{xvardef}
 %\end{align}
-%Given admissable pair $(x_t(\varepsilon), y_t(\varepsilon))$, let's also
+%Given admissable pair $(x(t)(\varepsilon), y(t)(\varepsilon))$, let's also
 %define
 %\begin{align}
   %W(\varepsilon) :=
-  %\int^{T}_0 F(x_t(\varepsilon), y_t(\varepsilon)) \, dt
+  %\int^{T}_0 F(x(t)(\varepsilon), y(t)(\varepsilon)) \, dt
   %&\leq W(0) \label{Weps}
 %\end{align}
-%where the last inequality followed because $y_t(0)=y_t^*$, which was
+%where the last inequality followed because $y(t)(0)=y(t)^*$, which was
 %optimal.
 
 %Now that we have this family of variations, let's derives the necessary
-%conditions we need to put on $y_t^*$ so that none of the
-%$y_t(\varepsilon)$ are better.
+%conditions we need to put on $y(t)^*$ so that none of the
+%$y(t)(\varepsilon)$ are better.
 
 %(Prove the Conditions)
 %By definition of Equation~\ref{xvardef}
 %\begin{alignat}{3}
-  %0 &= G(x_t(\varepsilon), y_t(\varepsilon), t) - \dot{x}_t(\varepsilon)
+  %0 &= G(x(t)(\varepsilon), y(t)(\varepsilon), t) - \dot{x}(t)(\varepsilon)
   %&&\forall t\in[0,T] \notag \\
   %\Rightarrow \quad
   %0 &= \int^{T}_0
-  %\lambda_t \; [
-    %G(x_t(\varepsilon), y_t(\varepsilon), t) -
-    %\dot{x}_t(\varepsilon)
+  %\lambda(t) \; [
+    %G(x(t)(\varepsilon), y(t)(\varepsilon), t) -
+    %\dot{x}(t)(\varepsilon)
   %] \, dt
-  %\qquad&&\forall \lambda_t:[0,T]\rightarrow \R
+  %\qquad&&\forall \lambda(t):[0,T]\rightarrow \R
   %\label{lambdadef}
 %\end{alignat}
-%where $\lambda_t$ is any function. Assume it is continuously
+%where $\lambda(t)$ is any function. Assume it is continuously
 %differentiable.\footnote{%
 %Did I cool you down with that hand wave. I'm just going to assume that
 %for now.}
@@ -11361,19 +11363,144 @@ Here's the general procedure for solving a problem of this form
   %W(\varepsilon) &=
   %\int^{t_1}_0
   %\left\{
-  %F(x_t(\varepsilon), y_t(\varepsilon), t)
-  %+ \lambda_t [
-    %G(x_t(\varepsilon), y_t(\varepsilon), t) -
-    %\dot{x}_t(\varepsilon)
+  %F(x(t)(\varepsilon), y(t)(\varepsilon), t)
+  %+ \lambda(t) [
+    %G(x(t)(\varepsilon), y(t)(\varepsilon), t) -
+    %\dot{x}(t)(\varepsilon)
   %]
   %\right\}\, dt
 %\end{align*}
-%Integrating the $\int \lambda_t \dot{x}_t(\varepsilon)$ by parts to turn
+%Integrating the $\int \lambda(t) \dot{x}(t)(\varepsilon)$ by parts to turn
 %the $\lambda$ into $\dot{\lambda}$ and $x$ into $\dot{x}$, you get
 %\begin{align*}
-  %\int^{t_1}_0 \lambda_t \dot{x}_t(\varepsilon) \, dt
+  %\int^{t_1}_0 \lambda(t) \dot{x}(t)(\varepsilon) \, dt
 %\end{align*}
 %\end{proof}
+
+
+\clearpage
+\subsubsection{Canonical Hamilton-Jacobi-Bellman Recursive
+Representation}
+
+\begin{prop}
+Given Sequential Formulation~\ref{defn:sequential-altrep-cts},
+we develop a recursive rep.
+Specifically, the value function satisfies the
+\emph{Hamilton-Jacobi-Bellman Equation} $\forall t$:
+\begin{align}
+  \rho v(x)
+  &= \max_{y\in Y} f(x,y) + \frac{\partial v(x)}{\partial x^T} g(x,y)
+  \qquad\forall t
+  \label{HJB}
+\end{align}
+The first order condition that the control $y$ must satisfy (for all
+$t$) is:
+\begin{align*}
+  0 =
+  \frac{\partial f(x,y)}{\partial y}
+  +
+  \frac{\partial g(x,y)^T}{\partial y}
+  \frac{\partial v(x)}{\partial x}
+\end{align*}
+Given optimal $y$ satisfying this condition (i.e. an optimal policy
+function), we can plug into Equation~\ref{HJB} and solve for value
+function $v(x)$.
+Generally (since $x$ is a vector with multiple state variables), solving
+Equation~\ref{HJB} for $v(x)$ means solving a PDE.
+\end{prop}
+\begin{rmk}
+We converted a problem in the \emph{time}-domain to one in the
+\emph{state}-domain. Notice that this holds for \emph{all} $t$, and says
+that the control $y$ \emph{at every period} should be chosen to
+optimally trade off instantaneous flow utility today $f(x,y)$ against
+the additional value $v'(x)g(x,y)$ that you can capture by influencing
+the evolution of the state variable.
+\end{rmk}
+\begin{proof}
+This proof has three steps: (1) Approximate the continuous problem with
+a discrete problem, (2) linearize discrete-problem discount factor,
+and (3) send the time step to zero.
+
+First, write the continuous-time problem as a recursive discrete time
+problem between periods $t$ and $t+\Delta$, for constant length $\Delta$
+between discrete time periods. (We eventually send this to zero).
+Note that $f(x_t,y_t)$ is a utility/return \emph{flow} per unit time
+(i.e.  between $t$ and $t+1$), so we must multiply by $\Delta$
+to get the utility/return flow $\Delta f(x_t,y_t)$ between $t$ and
+$t+\Delta$.
+Same for flow $g(x_t,y_t)$ into the next-period state, giving
+\begin{align*}
+  v(x_t) = \max_{y_t}\;
+  &\Delta f(x_t,y_t\big)
+  + \beta(\Delta)\;v(x_{t+\Delta})
+  \qquad
+  \text{s.t.}\quad
+  x_{t+\Delta}-x_t = \Delta g(x_t,y_t)
+\end{align*}
+Second, $\beta(\Delta):=e^{-\rho \Delta}$ is the discount factor between
+$t$ and $t+\Delta$. Since we will take limits as $\Delta\ra 0$, it will
+be more useful to work with its first-order Taylor Expansion (about
+$\Delta=0$)
+\begin{align*}
+  \beta(\Delta)
+  = e^{-\rho \cdot 0}
+  &=
+  e^{-\rho\Delta}
+  -\rho e^{-\rho \cdot 0}
+  (\Delta-0)
+  + o(\Delta^2)
+  =
+  1-\rho\Delta + o(\Delta^2)
+\end{align*}
+Sub this expansion for $\beta(\Delta)$ in the discrete Bellman Equation
+above, then rearrange to get
+%\begin{align*}
+  %v(x_t) = \max_{y_t}\;
+  %&\Delta f(x_t,y_t\big)
+  %+ (1-\rho\Delta) \;v(x_{t+\Delta})
+  %+ o(\Delta^2)
+%\end{align*}
+%Rearrange:
+\begin{align*}
+  \rho\Delta v(x_{t+\Delta})
+  = \max_{y_t}\;
+  &\Delta f(x_t,y_t\big)
+  +
+  \big[
+  v(x_{t+\Delta}) - v(x_t)
+  \big]
+  + o(\Delta^2)
+\end{align*}
+Divide through this last equation and the law of motion by $\Delta$ to
+end up with system
+\begin{align*}
+  \rho v(x_{t+\Delta})
+  = \max_{y_t}\;
+  & f(x_t,y_t\big)
+  +
+  \frac{v(x_{t+\Delta}) - v(x_t)}{\Delta}
+  + \frac{o(\Delta^2)}{\Delta}
+  \qquad
+  \text{s.t.}\quad
+   \frac{x_{t+\Delta}-x_t}{\Delta} = g(x_t,y_t)
+\end{align*}
+Now just take $\Delta\ra 0$.
+First, the LHS of the law of motion $\ra \dot{x}_t$.
+Second, $o(\Delta^2)/\Delta \ra 0$.
+Lastly, (assuming scalar $x$ for simplicity, though the result is the
+same for a vector $x$):
+\begin{align*}
+  \lim_{\Delta\ra 0}
+  \frac{v(x_{t+\Delta}) - v(x_t)}{\Delta}
+  =
+  \lim_{\Delta\ra 0}
+  \frac{v(x_{t+\Delta}) - v(x_t)}{x_{t+\Delta}-x_t}
+  \frac{x_{t+\Delta}-x_t}{\Delta}
+  = \frac{\partial v(x_t)}{\partial x_t^T}\dot{x}_t
+\end{align*}
+Together, all of these imply the Hamilton-Jacobi-Bellman equation above.
+\end{proof}
+
 
 
 \end{document}
@@ -11776,5 +11903,7 @@ Here's the general procedure for solving a problem of this form
             \end{figure}
 
         % Side by Side figures: Use the tabular environment
+
+
 
 
