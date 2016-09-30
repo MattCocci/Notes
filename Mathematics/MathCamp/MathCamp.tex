@@ -531,9 +531,9 @@ that you can create from linear combinations of columns of $A$:
 \end{align*}
 \end{defn}
 
-\begin{defn}(Nullspace)
-The \emph{nullspace} of a matrix $A$ ($m\times n$), denoted
-$\nul(A)$, is defined
+\begin{defn}(Nullspace or Kernel)
+The \emph{nullspace} (sometimes called the \emph{kernel}) of a matrix
+$A$ ($m\times n$), denoted $\nul(A)$, is defined
 \begin{align*}
   \nul(A)
   = \{x\in\Rn\;|\; Ax = 0\}
@@ -11500,6 +11500,486 @@ same for a vector $x$):
 \end{align*}
 Together, all of these imply the Hamilton-Jacobi-Bellman equation above.
 \end{proof}
+
+
+\clearpage
+\section{Numerical Optimization}
+
+
+Numerical optimization is necessary when we cannot analytically solve
+for the minimizing $x^*$, and still convenient when
+we solving analytically is possible but very difficult.
+Therefore, this section covers how to compute numerically the argmin
+$x^*$ of generic optimization problem
+\begin{align}
+  \label{statement}
+  x^* = \argmin_{x\in\Rn} f(x)
+\end{align}
+Note that we ignore feasibility constraints. That is, we assume the set
+of feasible points for $x^*\in\Rn$ is the entire space $\Rn$.  This is
+typically not a problem.  If we need to implement constraints, we just
+transform the original function $f$ to $\tilde{f}$ with unbounded
+support, find optimal $\tilde{x}^*$ for $\tilde{f}$, and then transform
+back to optimal $x^*$ for $f$.
+
+All methods in this section for numerically computing $x^*$ follow the
+same basic approach:
+\begin{enumerate}
+  \item Fix an initial guess for the minimizer $x_0$
+  \item Given a guess $x_n$, use a sensible update rule to get a better
+    guess, $x_{n+1}$
+  \item If we didn't improve much $\lVert x_{n+1}-x_n\lVert<\varepsilon$
+    according to some chosen norm $\lVert\,\cdot\,\rVert$ and some
+    chosen convergence threshold $\varepsilon>0$, you're done; take
+    $x_{n+1}\approx x^*$.
+
+    On the other hand, if $\lVert x_{n+1}-x_n\lVert\geq \varepsilon$,
+    return to Step 2, taking $x_{n+1}$ as your guess and repeat
+    until convergence.
+\end{enumerate}
+This section is all about Step 2: Choosing a sensible update rule
+such that $f(x_{n+1}) < f(x_n)$ (i.e.\ we get some improvement) and so
+that we converge \emph{quickly} to the minumum $x^*$.
+
+All methods implicitly assume that $f$ is differentiable and convex. The
+former because we construct update rules from the derivatives of $f$.
+Convexity because updating with derivatives of $f$ is only guaranteed to
+find \emph{local} minima of $f$ unless the function is convex.
+
+
+\clearpage
+\subsection{Gradient Descent}
+
+Here's the basic logic of gradient descent: The negative of the gradient
+$\nabla f(x_n)$ points in the direction of steepest descent. So to
+update from $x_n$, compute the gradient at $x_n$, take a step in that
+direction, and call the point where you land $x_{n+1}$.
+
+\begin{defn}(Gradient Descent)
+Suppose that $f:\Rn\ra\R$ is differentiable, and that we have some
+initial guess $x_n$. Then the update step is given by
+\begin{align*}
+  \label{eq:multigradesc}
+  x_{n+1} = x_n - \alpha [\nabla f(x_n)]
+\end{align*}
+where $\nabla f(x)$ denotes the gradient of $f$ at $x$, and
+$\alpha\in\R$ is some scale parameter that controls how aggressively we
+update.
+Notice that at each iteration, we update all the components of initial
+guess vector $x_n$ \emph{simultaneously}---not one-at-a-time.
+\end{defn}
+
+\begin{rmk}(Scale Parameter $\alpha$)
+Because scale parameter $\alpha$ is common for \emph{all} components of
+vector $x$, we should normalize to make sure the entries entries of $x$
+lie on a roughly common support.
+For example, if the first element of $x^*$ is likely to lie in range
+$[-1,1]$ and the second in $[-1000,1000]$, we should transform the
+function $f$, optimize the transformed function, then convert the result
+back to the original support.  Alternatively, we can apply a weighting
+vector $w$ to scale $\alpha$ differently for each element:
+\begin{align}
+  x_{n+1} = x_n - \alpha w^T [\nabla f(x_n)]
+\end{align}
+where $w_i$ small when the $i$th element of $x$ has an especially large
+support of plausible values.
+
+Lastly, we might also worry about the fact that scale parameter $\alpha$
+is constant across \emph{iterations} $n$.
+But this is much less of an issue.
+Notice how this update procedure self-adjusts in the magnitude of the
+update: as you get close to the minimum $x^*$, derivatives approach
+zero, and the step size self-adjusts.  And if some coordinates of $x_n$
+are closer to the minimum than others, you take smaller steps in those
+coordinates to get to $x_{n+1}$.  All of this reduces the chance that
+you'll blow past the minimum on an update.
+\end{rmk}
+
+We don't take account of any curvature in the objective function (though
+Newton's method, detailed below, does).
+
+
+\clearpage
+\subsection{Newton's Method}
+
+Here's the basic logic of Newton's method: Don't minimize the true
+(generally nonlinear) objective function $f$; instead, minimize a
+sequence of second-order Taylor expansions of $f$, with each
+minimization getting you closer and closer to the true minimum.
+Said another way, you're simply solving a sequence of \emph{easier}
+optimization problems whose solutions get successively closer to the
+minimum of the original/true objective function.
+
+\begin{defn}(Newton's Method for Optimization)
+\label{defn:newton}
+Suppose we have differentiable objective function $f:\Rn\ra\R$ and
+starting guess $x_n$.  To update, first define the step-$n$
+approximation $f_n$ as a second-order Taylor expansion of true objective
+function $f$ about the point $x_n$ (ignoring third and higher order
+terms):
+\begin{align}
+  f_n(x)
+  :=
+  f(x_n)
+  + g_n^T (x-x_n)
+  + \frac{1}{2}(x-x_n)^T H_n(x-x_n)
+  \label{eq:newtonapprox}
+\end{align}
+where $g_n:=\nabla f(x_n)$ is the gradient and $H_n:=\nabla^2 f(x_n)$
+the Hessian matrix, both at point $x_n$.
+We then define our next period guess $x_{n+1}$ as the minimum of the
+\emph{approximation} $f_n$, i.e. as that point $x_{n+1}$ which satisfies
+$\nabla f_n(x_{n+1})=0$. Based on the above expression,
+\begin{align}
+  0 &= \nabla f_n(x_{n+1})
+  = g_n + H_n(x_{n+1}-x_n)
+  \quad\implies\quad
+  x_{n+1}
+  =
+  x_n-H_n^{-1}g_n
+  \label{eq:newtonupdate1}
+\end{align}
+More generally, we can introduce general scale parameter $\alpha$ to get
+update scheme
+\begin{align}
+  x_{n+1} &= x_n - \alpha H_n^{-1} g_n \label{eq:newtonupdate2}
+\end{align}
+Intuitively, we use the direction implied by the Hessian and
+gradient, but scale that direction by $\alpha$.
+And note that $\alpha$ need not be constant throughout our entire
+optimization procedure.
+For example, we might start at $\alpha=1$ for each update step $n$, and
+then try out other values by slowly increasing $\alpha$ until we reach
+an acceptable improvement.
+\end{defn}
+
+\begin{rmk}
+Sometimes, rather than finding a minimum of some objective function,
+Newton's method is instead introduced as a way to find zeros of some
+scalar function $f$---i.e.\ to find $x$ such that $f(x)=0$.
+But Newton's root-finding method is very closely related to Newton's
+optimization scheme, as we see in the next definition.
+\end{rmk}
+
+\begin{defn}(Newton's Method for Finding Roots)
+Suppose we want to find a root/zero of scalar function $f:\R\ra\R$ given
+initial guess $x_n$.
+To update, first define the step-$n$ approximation $f_n$ as a
+\emph{first}-order Taylor expansion of $f$ about guess $x_n$ (ignoring
+second and higher order terms):
+\begin{align*}
+  f_n(x) := f(x_n) + f'(x_n)(x-x_n)
+\end{align*}
+Define the next-period guess $x_{n+1}$ as the root of this simpler
+\emph{linear approximation} $f_n$, i.e. the point satisfying
+$f_n(x_{n+1})=0$:
+\begin{align}
+  0 &= f_n(x_{n+1})
+  = f(x_n) + f'(x_n)(x_{n+1}-x_n)
+  \quad\implies\quad
+  x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}
+\end{align}
+The approach is in the same spirit as Definition~\ref{defn:newton}.
+And if $f$ is a scalar function, using Definition~\ref{defn:newton} to
+find the minimum of $f$ even delivers \emph{exactly} the same result as
+using this procedure to find a root of $f'$.
+\end{defn}
+
+
+\clearpage
+\subsection{Quasi-Newton Methods}
+
+Newton's method is all well and good with a few parameters, but it's a
+pain in many dimensions, which requires computing and storing a large
+inverse Hessian matrix $H_n$ every time we update. What's more, we don't
+even really care about the Hessian matrix \emph{itself} when we update.
+Just look at Equation~\ref{eq:newtonupdate2}. We only care about the
+\emph{product} of the Hessian and gradient $H_n^{-1} g_n$. That's a
+sufficient statistic for the update.
+
+This line of thinking brings us to Quasi-Newton methods, which try to
+find a smart, efficient way to \emph{recursively update} the Hessian
+matrix, rather than \emph{recompute} at each step.
+
+\subsubsection{Secant Conditions}
+
+In this section, we derive conditions useful for implementing
+quasi-Newton update schemes.
+
+\begin{defn}(Secant Conditions for an Approximate Hessian)
+Suppose we want to update from $x_n$ to $x_{n+1}$.
+Modify Taylor Expansion~\ref{eq:newtonapprox} (which served as our
+previous starting point) in order to form the following new
+\emph{quasi-Taylor Expansion} for $f$ that replaces true Hessian $H_n$
+with \emph{approximate} Hessian $B_n$:
+\begin{align}
+  b_n(x) := f(x_n) + (x-x_n)^Tg_n + \frac{1}{2}(x-x_n)^T B_n (x-x_n)
+  \label{eq:quasinewtonapprox}
+\end{align}
+A sensible choice of approximate Hessian $B_n$ is one that satisfies the
+\emph{secant conditions}:
+\begin{align}
+  \underbrace{(x_{n}-x_{n-1})}_{=:s_n}
+  &=
+  B_n^{-1}\underbrace{(g_{n}-g_{n-1})}_{=:y_n} \label{eq:secant_compact}
+\end{align}
+Why is this a sensible condition for $B_n$ to satisfy? The next
+proposition answers this question.
+\end{defn}
+
+\begin{prop}
+Approximate Hessian $B_n$ satisfies Secant
+Conditions~\ref{eq:secant_compact} if and only if the gradient of
+corresponding approximation function $b_n$ (constructed with approximate
+Hessian $B_n$) \emph{matches} the gradient of the \emph{true} objective
+function $f$ at points $x_n$ and $x_{n-1}$, i.e.
+\begin{align}
+  \nabla b_n(x_n) &= \nabla f(x_n) = g_n
+  \qquad\quad
+  \nabla b_n(x_{n-1}) = \nabla f(x_{n-1}) = g_{n-1}
+  \label{eq:secant}
+\end{align}
+And this seems like an uncontroversial and sensible restriction to
+impose.
+\end{prop}
+\begin{proof}
+The gradient of approximating function $b_n$ defined in
+Equation~\ref{eq:quasinewtonapprox} is given by
+\begin{align*}
+  \nabla b_n(x) &= g_n + B_n(x-x_n)
+\end{align*}
+Combine this with the assumption that the secant conditions (as written
+in Equations~\ref{eq:secant}) hold to write
+\begin{align*}
+  g_n - g_{n-1}
+  &= \nabla b_n(x_n) - \nabla b_n(x_{n-1}) \\
+  &= (g_n + B_n(x_n-x_n)) - (g_n + B_n(x_{n-1}-x_n)) \\
+  \implies\quad
+  g_n - g_{n-1}
+  &= B_n(x_{n}-x_{n-1})
+\end{align*}
+This last line is exactly the expression for the secant conditions in
+Equation~\ref{eq:secant_compact}.
+\end{proof}
+
+
+
+\subsubsection{BFGS Recursive Update}
+
+Suppose that we have a starting, symmetric Hessian approximation $B^{-1}_n$,
+that satisfies the secant conditions above in
+Equation~\ref{eq:secant_compact}. How can we update to get $B^{-1}_{n+1}$
+such that
+\begin{enumerate}
+  \item $B^{-1}_{n+1}$ also satisfies the secant conditions,
+    $s_{n+1} = B^{-1}y_{n+1}$
+  \item $B^{-1}_{n+1}$ is symmetric.
+  \item $B^{-1}_{n+1}$ is as close to $B^{-1}_n$ as possible, where
+    ``closeness'' is defined using the weighted Frobenius norm.
+    \begin{align*}
+      \min_{B^{-1}} &\quad \lVert B^{-1} - B^{-1}_n\rVert^2_W
+    \end{align*}
+\end{enumerate}
+The next definition answers this question.
+
+\begin{defn}(BFGS Recursive Update of Approximate Hessian)
+Given approximate Hessin $B-n$, the Broyden, Fletcher, Goldfarb, Shanno
+(BFGS) is given by
+\begin{align}
+  B_{n+1}^{-1} = B^{-1}_n
+  + \frac{(y_n^T s_n + y_n^T B^{-1}_n y_n)(s_n s_n^T)}{(y_n^T s_n)^2}
+  - \frac{s_n (B^{-1}_n y_n)^T + B^{-1}_n y_n s_n^T}{y_n^T s_n}
+  %H = H0 + (1+(dg'*Hdg)/dgdx)*(dx*dx')/dgdx - (dx*Hdg'+Hdg*dx')/dgdx;
+  \label{eq:bfgs}
+\end{align}
+Some math can show that this update scheme satisfies desired Properties
+1-3 above, and that $B^{-1}_{n+1}$ is positive semi-definite whenever
+$B^{-1}_n$ is. So it's not a condition we need to impose a priori, since
+it follows from this updating procedure.
+To choose the initial approximate Hessian $B_0$, we have a few options:
+\begin{enumerate}
+  \item Compute the true Hessian $H_0$, and then just apply this
+    updating scheme from there.
+  \item Use a diagonal approximation to the true Hessian.
+  \item Use a scalar multiple of the identity matrix.
+\end{enumerate}
+\end{defn}
+
+Given this, we don't have to compute the true Hessians $H_n$ every time.
+Instead, we have reasonable (i.e.\ satisfying the secant conditions)
+approximations $B_n$ that are updated via recurrence relation.
+
+
+
+%\section{Linear Programming}
+
+%\subsection{Introduction to Linear Optimization}
+
+%\subsubsection{Definition of a Linear Program}
+
+%Linear optimization, also known as \emph{linear programming},
+%consists of a linear \emph{objective function} and \emph{linear
+%inequalities}:
+%\begin{align*}
+   %\max \; \;& c_1 x_1 + \cdots + c_n x_n \\
+   %\text{s.t.} \; \;&a_{11} x_1 + \cdots + a_{1n} x_n \leq b_n \\
+   %& \qquad\qquad \vdots \\
+   %&a_{m1} x_1 + \cdots + a_{mn} x_n \leq b_m
+%\end{align*}
+%So we want to find the values of the \emph{variables}
+%$x_1, \ldots, x_n \in \mathbb{R}$ such that
+%the objective function is maximized while still satisfying the
+%linear inequalities. Using more convenient matrix notation,
+%our linear program above can be rewritten more compactly as
+%\begin{equation}
+   %\label{lp}
+   %\max \{ c^T x \; : \; x \in \mathbb{R}^n , \; Ax \leq b \}
+%\end{equation}
+%If we want to find the minimum instead of the max, we can easily
+%use the fact that the minimum of some set $S$ ($\min S$) is equivalent
+%to $-\max S$.
+
+%\subsubsection{Feasability, Optimality, Boundedness}
+
+%We call a solution $x \in \mathbb{R}^n$ \emph{feasible} if $x$
+%satisfies all the linear inequalities.  We call a linear program
+%feasible if it has a feasible solution.
+%\\
+%\\
+%A feasible solution $s \in \mathbb{R}^n$ is an \emph{optimal} solution
+%of a linear program if $c^T x \geq c^T y $ for all $y\in \mathbb{R}^n$.
+%\\
+%\\
+%A linear program is \emph{bounded} if there exists a constant $M\in
+%\mathbb{R}$ such that $c^T x \leq \mathbb{R}$ for all feasible
+%$x \in \mathbb{R}^n$.
+
+%\subsubsection{Linear Algebra Defintions}
+
+%Recall that for $A \in \mathbb{R}^{m\times n}$, the \emph{kernel}
+%of $A$, the \emph{image} of $A$, and the \emph{rowspace}
+%of $A$ are defined
+%\begin{align*}
+   %\text{ker}(A) &= \{ x \in \mathbb{R}^n \; | \; Ax =0 \} \subset
+      %\mathbb{R}^n\\
+   %\text{im}(A) &= \{ A x \; | \; x\in \mathbb{R}^n \} \subset
+      %\mathbb{R}^m\\
+   %\text{rowspace}(A) &= \{ y \in \mathbb{R}^n \; | \; \exists \lambda
+   %\in \mathbb{R}^m \text{ s.t. } A^T \lambda = y \}
+%\end{align*}
+%Note, the rowspace is just the set of all linear combinations of the
+%rows of $A$.
+%\\
+%\\
+%{\sl Result:}
+%With these definitions in hand, we can show that a solution to the
+%linear program in Equation \ref{lp} is feasible and unbounded if
+%$b \in \text{im}(A)$ and if $c \in \text{ker} A \setminus \{ 0 \}$.
+%\begin{proof}
+   %First, $b \in \text{im}(A)$ proves feasibility. It also implies that
+   %$\exists\; x^* \in \mathbb{R}^n$ such that $A x^* = b$. This
+   %and the fact that $c \in \text{ker}(A)\setminus \{0\}$
+   %allows us to write
+   %\begin{align*}
+      %A(x^* + \lambda c) &= Ax^* + \lambda A c \\
+      %&= b + 0 = b
+   %\end{align*}
+   %which proves $x^* + \lambda c$ is a feasible solution, satisfying
+   %all of the linear inequalities.
+   %\\\\
+   %So to finish up the unboundedness proof, we suppose the opposite:
+   %that the linear program is bounded:
+      %\[ c^T y \leq M \qquad \forall y \in \mathbb{R}^n \]
+   %Since $x^* + \lambda c$ is feasible, then it should also be bounded:
+   %\begin{align*}
+      %\Rightarrow \quad c^T (x^* + \lambda c ) &\leq M\\
+      %c^T x^* + \lambda c^T c \leq M
+   %\end{align*}
+   %Now since $c \neq 0$, we know that $c^T c$ will be greater than
+   %0. Now let's rearrange and choose
+      %\[ \lambda \geq \frac{M - c^T x^*}{c^T c} \]
+   %in which case $c^T ( x^* + \lambda c) > M$.
+%\end{proof}
+
+
+
+%\newpage
+%\subsection{The Geometry of Linear Programming}
+
+%\subsubsection{General Definitions}
+
+%{\sl Polyhedron:}
+%A set $P$ of vectors in $\mathbb{R}^n$ is a polyhedron
+%if $P=\{ x\in \mathbb{R}^n \; | \; Ax \leq b \}$ for some matrix $A$
+%and some vector $b$.  By our definition of a linear program in
+%Equation \ref{lp}, we see that the set of feasible solutions is
+%a polyhedron.\footnote{Just one quick note for generality: The empty
+%set, $\emptyset$, is also a polyhedron as $\emptyset = \{ x \in
+%\mathbb{R}^n \; |\; \mathbf{0}^T x \leq -1 \}$,
+%satisfying the definition of a polyhedron.}
+%\\
+%\\
+%{\sl Half space:} This is defined as $\{ x \in \mathbb{R}^n
+   %\; | \; a^T x \leq \beta \}$, where $a \in \mathbb{R}^n \setminus
+   %\mathbf{0}$.
+%\\\\
+%{\sl Hyperplane:} This is defined as $\{ x \in \mathbb{R}^n
+   %\; | \; a^T x = \beta \}$, where $a \in \mathbb{R}^n \setminus
+   %\mathbf{0}$.
+%\\\\
+%{\sl Valid:} An inequality $a^T x \leq \beta$ is valid for a
+   %polyhedron, $P$, if each $x^* \in P$ satisfies $a^T x^* \leq
+   %\beta$.
+%\\\\
+%{\sl Active:} An inequality $a^T x \leq \beta$ is active
+   %at $x^* \in \mathbb{R}^n$ if $a^T x^* = \beta$.
+
+
+%\subsubsection{Vertices}
+
+%We'll offer three equivalent definitions, each of which offers some
+%different intuition or an additional operational advantage:
+%\begin{enumerate}
+   %\item A point $x^* \in P$ is a \emph{vertex} of $P$ if
+      %there exists an inequality $a^T x \leq \beta$ such that
+      %\begin{enumerate}
+	 %\item $a^T x \leq \beta$ is valid for $P$.
+	 %\item $a^T x \leq \beta$ is active at $x^*$ and not active
+			%at any other point in $P$.
+      %\end{enumerate}
+   %\item There's also an equivalent definition which says $x^* \in P$
+      %is a vertex if and only if there exists a vector $c \in
+      %\mathbb{R}^n$ such that $x^*$ is the unique optimal solution of
+      %the linear program $\max \{ c^T x \; | \; x \in P \}$.
+   %\item Suppose we have $x^* \in P = \{ x \in \mathbb{R}^n \; | \;
+      %Ax \leq b \}$ as a vertex of $P$.
+      %Then this vertex satisfies a smaller number of active contraints
+      %(relative to all of the constraints that define the linear
+      %program and $P$). Therefore, we express those active constraints
+      %that we want to enforce with $\bar{A}x \leq \bar{b}$.
+
+      %Now since $x^*$ is a vertex satisfying those
+      %certain active constraints, that means $x^*$ is the unique
+      %solution of $\bar{A} x = \bar{b}$. That's equivalent to the
+      %statement that $\text{rank}(\bar{A}) = n$, which is equivalent
+      %to the columns of $\bar{A}$ being linearly independent.
+
+      %So if we suspect that $x^*$ is a vertex of our linear program,
+      %then we examine the subsystem, $\bar{A} x \leq \bar{b}$,
+      %of our LP that $x^*$ satisfies with equality, and we look
+      %at the rank of $\bar{A}$. If $x^*$ really is a vertex of $P$,
+      %the the rank of $\bar{A}$ equals $n$ and the columns will
+      %be linearly independent.
+
+%\end{enumerate}
+
+
+
+
+
+
+
+
 
 
 
