@@ -285,6 +285,7 @@
 \newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
 \newcommand{\bsalpha}{\boldsymbol{\alpha}}
 \newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsPi}{\boldsymbol{\Pi}}
 \newcommand{\bsgamma}{\boldsymbol{\gamma}}
 \newcommand{\bsGamma}{\boldsymbol{\Gamma}}
 \newcommand{\bslambda}{\boldsymbol{\lambda}}
@@ -296,6 +297,7 @@
 \newcommand{\bsPsi}{\boldsymbol{\Psi}}
 \newcommand{\bspsi}{\boldsymbol{\psi}}
 \newcommand{\bsPhi}{\boldsymbol{\Phi}}
+\newcommand{\bsphi}{\boldsymbol{\phi}}
 
 % Special cases like \bshatb for \boldsymbol{\hat{b}}
 \generate[\hat]{bshat}{\boldsymbol}{a,b,y,x,X,V,S,W,A,B,P}
@@ -434,6 +436,7 @@
 \newcommand{\sumtTz}{\sum^T_{t=0}}
 \newcommand{\sumninfz}{\sum^\infty_{n=0}}
 \newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+\newcommand{\sumsinfz}{\sum^\infty_{s=0}}
 
 \newcommand{\prodnN}{\prod^N_{n=1}}
 \newcommand{\prodin}{\prod^n_{i=1}}
@@ -1138,6 +1141,41 @@ $m^*$. To pin down length, simply normalize so it prices all returns
 $1=\E[m^*R]$.
 \end{proof}
 
+\clearpage
+\subsection{Representative Agent}
+
+A representative agent is endowed with a marketable \emph{wealth portfolio}
+that can be used to purchase consumption.
+Into this wealth portfolio is capitalized \emph{everything} the agent
+has that generates purchasing power: financial assets providing
+dividends/returns, human capital generating labor income, etc.  This
+wealth portfolio has current market value $W_t$ (in units of current
+consumption $C_t$), i.e. one unit of the wealth portfolio can be traded
+for one unit of consumption, and $W_t$ is max feasible
+current consumption.
+
+After consumption purchases, all remaining wealth $W_t-C_t$ is
+reinvested to provide for future consumption, earning random
+\emph{return on wealth} $R^W_{t+1}$ (which includes returns to financial
+assets, returns to human capital aka labor income, etc.) that
+generates additional purchasing power for the next period.
+Hence, next period wealth $W_{t+1}$ satisfies intertemporal
+budget constraint
+\begin{align*}
+  W_{t+1} = R_{t+1}^W(W_t-C_t)
+\end{align*}
+Defining $\tilde{W}_t:=W_t-C_t$, rearrange to get
+\begin{align}
+  R_{t+1}^W
+  = \frac{W_{t+1}}{W_t-C_t}
+  = \frac{\tilde{W}_{t+1}+C_{t+1}}{\tilde{W}_t}
+  \label{retwealth0}
+\end{align}
+As the above discussion and Eq.~\ref{retwealth0} make clear, we can think
+of the wealth portfolio simply as \emph{some asset} paying dividend
+$C_{t+1}$ and with ex-dividend/ex-consumption price $\tilde{W}_{t}$ (in
+units of $C_t$), cum-consumption price $W_t$, and \emph{return}
+$R_{t+1}^W$.
 
 \clearpage
 \subsection{Exp. Return $\beta$ Rep}
@@ -1495,7 +1533,7 @@ $G/R\approx 1+g-r$.
 
 
 \columnbreak
-\subsubsection{Shiller PV Identity}
+\subsubsection{Shiller-Campbell PV Ident.}
 
 We now derive an alternative PV identity that's both log-\emph{linear}
 and written in terms of generally stationary variables.
@@ -1575,41 +1613,58 @@ Expressions~\ref{pdidentity}-\ref{pdidentityinf} are ex post identities,
 but we can always always take $\E_t$ of both sides to get an ex ante
 statement.
 
+
 \columnbreak
+In fact, it is often useful to look at the \emph{surprise} or
+\emph{innovation} in a variable, so define the expectation-difference
+operator
+\begin{align*}
+  \Delta \E_{t+1}[z_s]
+  := (\E_{t+1} - \E_{t})[z_s]
+  = \E_{t+1}[z_s] - \E_{t}[z_s]
+\end{align*}
+We use this operator to look at the the difference between realization
+and expectation:
+$\Delta \E_{t+1}[z_{t+1}]=z_{t+1}-\E_{t}z_{t+1}$.
+
+
+With this, rewrite Expr.~\ref{pdidentityinf} by applying $\Delta
+\E_{t+1}$ to both sides, and rearrange to get
+\begin{align}
+  \Delta\E_{t+1}r_{t+1}
+  &=
+  \Delta \E_{t+1} \sum_{s=0}^\infty \rho^{s}\Delta d_{t+1+s}
+  \notag
+  \\
+  &\quad
+  -\Delta \E_{t+1} \sum_{s=1}^\infty \rho^{s}r_{t+1+s}
+  \label{rsurprise}
+\end{align}
+%or, equivalently, the formula
+%\begin{align}
+  %\Delta\E_{t+1}r_{t+1}
+  %&=
+  %\Delta \E_{t+1}\Delta d_{t+1}
+  %- \Delta \E_t \sum_{s=1}^\infty \rho^{s}r_{t+1+s}
+  %\notag
+  %\\
+  %&
+  %+ \Delta \E_{t+1} \sum_{s=1}^\infty \rho^{s}\Delta d_{t+1+s}
+  %\label{rsurprise}
+%\end{align}
+
+
 \subsubsection{Campbell-Mankiw Identity}
 
-Consider an agent endowed with a marketable \emph{wealth portfolio},
-which can be used to purchase consumption.
-Into this wealth portfolio is capitalized \emph{everything} the agent
-has that generates purchasing power: financial assets providing
-dividends/returns, human capital generating labor income, etc.  This
-wealth portfolio has current market value $W_t$ (in units of current
-consumption $C_t$), i.e. one unit of the wealth portfolio can be traded
-for one unit of consumption, and $W_t$ is max feasible
-current consumption.
-
-After consumption purchases, all remaining wealth $W_t-C_t$ is
-reinvested to provide for future consumption, earning random
-\emph{return on wealth} $R^W_{t+1}$ (which includes returns to financial
-assets, returns to human capital aka labor income, etc.) that
-generates additional purchasing power for the next period.
-Hence, next period wealth $W_{t+1}$ satisfies intertemporal
-budget constraint
-\begin{align*}
-  W_{t+1} = R_{t+1}^W(W_t-C_t)
-\end{align*}
-Defining $\tilde{W}_t:=W_t-C_t$, rearrange to get
-\begin{align}
-  R_{t+1}^W
-  = \frac{W_{t+1}}{W_t-C_t}
-  = \frac{\tilde{W}_{t+1}+C_{t+1}}{\tilde{W}_t}
-  \label{retwealth}
-\end{align}
-As the above discussion and Eq.~\ref{retwealth} make clear, we can think
-of the wealth portfolio simply as \emph{some asset} paying dividend
-$C_{t+1}$ and with ex-dividend/ex-consumption price $\tilde{W}_{t}$ (in
-units of $C_t$), cum-consumption price $W_t$, and \emph{return}
-$R_{t+1}^W$.  Therefore, we can just as well derive a Campbell-Shiller
+%Recall that the representative agent's cum-consumption wealth
+%$W_t=\tilde{W}_t+C_t$ satisfies the intertemporal budget constraint
+%\begin{align}
+  %R_{t+1}^W
+  %= \frac{W_{t+1}}{W_t-C_t}
+  %\label{retwealth}
+%\end{align}
+Thinking of wealth as an asset with cum-consumption/cum-dividend price
+$W_t$ and dividends $C_t$, we can just as well derive a Campbell-Shiller
 PV identity for this asset, as for any other asset:
 \begin{align}
   \boxed{%
@@ -1618,6 +1673,39 @@ PV identity for this asset, as for any other asset:
   }
   \label{wcidentityinf}
 \end{align}
+We can also apply $\Delta\E_{t+1}$ to both sides of the above and
+rearrange to decompose the ``surprise'' in consumption at $c_{t+1}$ into
+changes in expected future return on the wealth portfolio and changes in
+expected future consumption growth:
+\begin{align}
+  \Delta \E_{t+1}\Delta c_{t+1}
+  &=
+  \Delta \E_{t+1}\sum_{s=1}^\infty \rho^s r^w_{t+s}
+  \notag
+  \\
+  &- \Delta \E_{t+1}\sum_{s=2}^\infty \rho^s \Delta c_{t+s}
+  \label{csurprise}
+\end{align}
+%Notice also $\Delta c_{t+1}-\E_t\Delta
+%c_{t+1}=c_{t+1}-\E_tc_{t+1}$. And we can also pop off the first term of
+%the first sum to reexpress the above as
+%\begin{align}
+  %\Delta c_{t+1}-\E_t\Delta c_{t+1}
+  %&=
+  %r^w_{t+1}-\E_tr_{t+1}^w
+  %\notag
+  %\\
+  %&
+  %+
+  %\big(\E_{t+1}-\E_t\big)\sum_{s=2}^\infty \rho^s r^w_{t+s}
+  %\notag
+  %\\
+  %&- \big(\E_{t+1}-\E_t\big)\sum_{s=2}^\infty \rho^s \Delta c_{t+s}
+  %\label{wcidentitE2}
+%\end{align}
+%Again, the surprise in consumption due to realized surprise in returns,
+%expected future returns, and exp future consumption growth.
+
 
 
 \columnbreak
@@ -1664,12 +1752,9 @@ And this is really neat because
     discount rates, respectively.
 
   \item
-    These regressions are \emph{the same} as those we ran
-    in Section~\ref{sec:predictability}.\footnote{%
-      More or less.
-      They just instead used a finite-time, equally weighted
-      approximation of the LHS here.
-    }
+    These regressions are more or less \emph{the same} as those we ran
+    in Section~\ref{sec:predictability} (they just used a finite-time,
+    equally weighted approximation of the LHS here).
     And we already know $\beta_{1}\approx 0$, $\beta_2\approx -1$.
     Hence, volatility in $pd_t$ is \emph{entirely} driven by changes in
     exp. future discount rates.
@@ -1686,33 +1771,22 @@ dividends.
 \subsubsection{Decomposing Surprise, $\Var(\Delta \E_t r_t)$}
 \label{sec:decompsur}
 
-Next, define expectation-difference operator
+Take Eq~\ref{rsurprise} at $t$ (rather than $t+1$), and pop off the
+first term in the first sum to get equivalent decomposition
 \begin{align*}
-  \Delta \E_t[z_s]
-  := (\E_t - \E_{t-1})[z_s]
-  = \E_t[z_s] - \E_{t-1}[z_s]
-\end{align*}
-$\Delta\E_t[z_s]$ computes change in exp of $z_s$ between $t-1$ and $t$,
-and $\Delta \E_t[z_t]=z_t-\E_{t-1}z_t$ computes
-``surprise''/``innovation'' in realization $z_t$ relative to its
-expectation at $t-1$.
-
-Now rewrite Expr.~\ref{pdidentityinf} for $pd_{t-1}$, apply $\Delta
-\E_t$ to both sides, and rearrange to get
-\begin{align}
-  \Delta\E_tr_{t}
-  =
-  \Delta \E_t\Delta d_{t}
-  &+ \Delta \E_t \sum_{s=1}^\infty \rho^{s}\Delta d_{t+s}
-  \label{rsurprise}
-  \\
-  &- \Delta \E_t \sum_{s=1}^\infty \rho^{s}r_{t+s}
+  \Delta\E_{t}r_{t}
+  &=
+  \Delta\E_t\Delta d_t
+  + \Delta \E_{t} \sum_{s=1}^\infty \rho^{s}\Delta d_{t+s}
   \notag
-\end{align}
-Given this, we can again decompose the variance of the surprise in
-realized $r_t$ today into contributions from surprise in dividends
-today, changes in expectations of future dividend growth, changes in
-expectations of future interest rates, and final cov term:
+  \\
+  &\quad
+  -\Delta \E_t \sum_{s=1}^\infty \rho^{s}r_{t+s}
+\end{align*}
+Thuse we can decompose the variance of the surprise in realized $r_t$
+today into contributions from surprise in dividends today, changes in
+exp.  of future dividend  growth, and changes in expectations of future
+interest rates (plus a final cov term):
 \begin{align}
   &\Var(\Delta\E_tr_t)
   =
@@ -1779,7 +1853,7 @@ We find $\tilde{\beta}_1\approx 0.5$, $\tilde{\beta}_2\approx 0$, and
 $\tilde{\beta}_3\approx 0.5$.
 
 
-\clearpage
+\columnbreak
 \subsection{VAR Estimation}
 
 To estimate regression coefficients associated with the variance
@@ -1998,112 +2072,1014 @@ Third from covariance between these two sources.
 
 
 \clearpage
-\section{Recursive Utility}
+\section{Consumption-Based Asset Pricing}
 
-Recursive or Epstein-Zin utility
+\subsection{Portfolio Choice FOCs}
+
+Takeing returns $R^n_{t+1}$ as given,
+the rep agent chooses portfolio weights $B_t^n$ to maximize recursive
+Epstein-Zin utility with EIS $\sigma$ and risk-aversion parameter
+$\gamma$, subject to an intertemporal budget constraint,
 \begin{align*}
   U_t
   &=
   \left(
-  (1-\beta)c_t^{1-\rho}
+  (1-\beta)c_t^{1-\frac{1}{\sigma}}
   + \beta
-  \E_t\left[U_{t+1}^{1-\gamma}\right]^{\frac{1-\rho}{1-\gamma}}
-  \right)^{\frac{1}{1-\rho}}
-\end{align*}
-It has the following features
-\begin{itemize}
-  \item Non-separable across states of nature, i.e. marginal utility in
-    one state of nature affects marginal utility in another state of
-    nature.
-  \item Today's utility and tomorrows expected utility that goes through
-    a nonlinear CES aggregator
-\end{itemize}
-It satisfies
-\begin{align*}
-  U_t'
-  &=
-  \left(
-  (1-\beta)c_t^{1-\rho}
-  + \beta
-  \E_t\left[U_{t+1}^{1-\gamma}\right]^{\frac{1-\rho}{1-\gamma}}
-  \right)^{\frac{1}{1-\rho}}
+  \E_t\left[U_{t+1}^{1-\gamma}\right]^{\frac{1-\frac{1}{\sigma}}{1-\gamma}}
+  \right)^{\frac{1}{1-\frac{1}{\sigma}}}
   \\
-  &=
-  (1-\beta)
-  c_t^{-\rho}
-  U_t^{\rho}
-\end{align*}
-From that
-\begin{align*}
-  U_t^{1-\rho}
-  &=
-  (1-\beta)c_t^{1-\rho}
-  + \beta
-  \E_t\left[U_{t+1}^{1-\gamma}\right]^{\frac{1-\rho}{1-\gamma}}
-\end{align*}
-Hence
-\begin{align*}
-  U_{t+1}'
+  \text{s.t.}\quad&
+  W_{t+1}
   =
-  (1-\beta)
-  c_{t+1}^{-\rho}
-  U_{t+1}^{\rho}
+  \sum_{n=0}^N B_t^n R_{t+1}^n
+  =
+  R^W_{t+1}(W_t-C_t)
 \end{align*}
-Hence
-\begin{align*}
+where $\kappa := \frac{1-\gamma}{1-1/\sigma}$.
+This has FOCs:
+\begin{align}
+  1 &= \E_t[M_{t+1}R_{t+1}^n]
+  \quad \forall n
+  \label{ccapmfoc}
+  \\
+  \text{where}\quad
+  M_{t+1}
+  &=
+  \left[
+  \beta \left(
+  \frac{C_{t+1}}{C_t}
+  \right)^{-\frac{1}{\sigma}}
+  (R^W_{t+1})^{1-\frac{1}{\kappa}}
+  \right]^\kappa
+  \notag
+\end{align}
+Supposing $\beta=e^{-\delta}$, the log SDF is
+\begin{align}
   m_{t+1}
-  &= \beta \frac{U'_{t+1}}{U'_t}
+  &=
+  -\kappa
+  \delta
+  -
+  \frac{\kappa}{\sigma}
+  \Delta c_{t+1}
+  +
+  \left(
+  \kappa-1
+  \right)
+  r^w_{t+1}
+  %\notag
+  \label{logsdf}
+\end{align}
+We now derive two useful approximations given any joint dist for
+$(M_{t+1},R_{t+1}^n)$.
+First, a first order log-linear approx of Eq.~\ref{ccapmfoc} gives:
+\begin{align}
+  1
+  &=
+  \E[e^{m_{t+1}+r_{t+1}^n}]
+  \approx e^{\E_tm_{t+1}+\E_tr^n_{t+1}}
+  \notag
+  %\\
+  %\iff\quad
+  %0&\approx \E_tm_{t+1}+\E_tr^n_{t+1}
+\end{align}
+Taking logs, setting $r_{t+1}^n=r_{t+1}^w$, and using
+Expression~\ref{logsdf}, this implies:
+\begin{align}
+  \boxed{
+  \frac{1}{\sigma}\E_t\Delta c_{t+1}
   =
-  \beta
-  \frac{c_{t+1}^{-\rho}}{c_t^{-\rho}}
-  \frac{U_{t+1}^{\rho}}{U_{t}^{\rho}}
-  =
-  \beta
-  \frac{c_t^{\rho}}{c_{t+1}^{\rho}}
-  \frac{U_{t+1}^{\rho}}{U_{t}^{\rho}}
-\end{align*}
-
-
-
+  - \delta + \E_tr_{t+1}^w
+  }
+  \label{ezeuler}
+\end{align}
+Second, we can also use Eq.~\ref{ccapmfoc} to derive
 \begin{align*}
-  U'_t
-  &=
-  (1-\beta)
-  \left[
-  \frac{U_t}{c_t}
-  \right]^\rho
+  &\E[R_{t+1}^n-R_{t+1}^f]
   \\
-  U''_t
-  &=
-  \rho
-  (1-\beta)
-  \left[
-  \frac{U_t}{c_t}
-  \right]^{\rho-1}
-  \frac{U'_tc_t - U_t}{c_t^2}
-  \\
-  &=
-  \rho
-  (1-\beta)
-  \left[
-  \frac{U_t}{c_t}
-  \right]^{\rho}
-  \frac{U'_tc_t - U_t}{U_tc_t}
-  \\
-  &=
-  \rho
-  U'_t
-  \frac{U'_tc_t - U_t}{U_tc_t}
-\end{align*}
-It has risk aversion
-\begin{align*}
-  -\frac{U_t''(c_t)c_t}{u_t'(c_t}
+  &\quad
   =
+  \Cov_t\left(
+  -\frac{M_{t+1}}{\E_t[M_{t+1}]},
+  \;R_{t+1}^n-R_{t+1}^f
+  \right)
+  %\\
+  %&\quad
+  %\approx
+  %\Cov_t\left(
+  %-m_{t+1},
+  %\;R_{t+1}^n-R_{t+1}^f
+  %\right)
 \end{align*}
+Sub in approx $m_{t+1}\approx M_{t+1}/\E_t[M_{t+1}]$, use
+Eq.~\ref{logsdf}, and simplify to get an expression for the
+risk-premium:
+\begin{align*}
+  \E[R_{t+1}^n-R_{t+1}^f]
+  &\approx
+  \frac{\kappa}{\sigma}\Cov_t\left(
+  \Delta c_{t+1},\;
+  \;R_{t+1}^n-R_{t+1}^f
+  \right)
+  \\
+  &
+  +(1-\kappa)
+  \Cov_t\left(
+  r_{t+1}^w,
+  \;R_{t+1}^n-R_{t+1}^f
+  \right)
+\end{align*}
+Notice Epstein-Zin utility lies in between the consumption CAPM
+($\kappa=1$, all weight on cov with consumption) and the usual
+CAPM ($\kappa=0$, all weight on cov with the market/wealth portfolio).
+
+
+
+\subsection{Assuming Lognormality}
+
+Assuming joint lognormality of $(m_{t+1},r_{t+1}^n)$, we get even nicer
+\emph{exact} formulas.  Specifically, FOC~\ref{ccapmfoc} becomes
+\begin{align}
+  0 &=
+  \E_t\big[m_{t+1}+r_{t+1}^n\big]
+  +
+  \frac{1}{2}\Var_t\big(
+  m_{t+1}+r_{t+1}^n\big)
+  \notag
+  %\label{foclognormal}
+\end{align}
+Use Eq.~\ref{logsdf} to evaluate this when $r^n_{t+1}=r^f_{t+1}$ and
+$r^w_{t+1}$, then solve for $r^f_{t+1}$ to get
+\begin{align*}
+  r_{t+1}^f
+  =
+  \delta
+  +\frac{1}{\sigma}\E_t\Delta c_{t+1}
+  &-
+  \frac{\kappa}{2\sigma^2}
+  \Var_t(\Delta c_{t+1})
+  \\
+  &
+  +
+  \frac{\kappa-1}{2}
+  \Var_t(r_{t+1}^w)
+\end{align*}
+Then again use the lognormal FOC with Eq~\ref{logsdf} to derive the
+\emph{exact} risk premium for any return $r_{t+1}^n$:
+\begin{align*}
+  &\E_t[r_{t+1}^n - r^f_{t+1}]
+  +\frac{1}{2}
+  \Var_t\big(r_{t+1}^i\big)
+  \\
+  &
+  \qquad\quad
+  =
+  \frac{\kappa}{\sigma}
+  \Cov_t\left(\Delta c_{t+1},\; r_{t+1}^i\right)
+  \\
+  &
+  \qquad\quad\quad
+  +(1-\kappa)\Cov_t\left( r_{t+1}^w,\; r_{t+1}^i\right)
+\end{align*}
+Notice from these formulas: $r^f_{t+1}$ depends \emph{only} on IES
+$\sigma$, \emph{not} risk aversion parameter $\gamma$, which does show
+up in the expression for the risk premium. Therefore, we can choose
+$\sigma$ to nail the behavior of $r^f_{t+1}$ and, at the same time, dial
+up $\gamma$ to match the risk premium.
+
+
+
+\subsection{Intertemporal CAPM}
+
+Want consumption out of the model. To start, recall
+Identity~\ref{csurprise}:
+\begin{align*}
+  \Delta \E_{t+1}\Delta c_{t+1}
+  &=
+  \Delta \E_{t+1}\sum_{s=1}^\infty \rho^s r^w_{t+s}
+  \notag
+  \\
+  &- \Delta \E_{t+1}\sum_{s=2}^\infty \rho^s \Delta c_{t+s}
+\end{align*}
+Use approximate Euler Eq.~\ref{ezeuler} to substitute out
+$\Delta c_{t+s}$ on the RHS, then regroup to get
+\begin{align*}
+  \Delta \E_{t+1}\Delta c_{t+1}
+  &=
+  \Delta \E_{t+1}r_{t+1}^w
+  \\
+  &\quad
+  + (1-\sigma)\Delta\E_{t+1}\sum_{s=2}^\infty \rho^s r^w_{t+s}
+  \notag
+\end{align*}
+Notice that surprises in current wealth return affect consumption
+one-for-one, while the additional term captures changes in expected
+future wealth returns.
+Only if $\sigma=1$ do income and substitution effects ofset.
+
+Sub this last formula in on the RHS for $\Delta c_{t+1}$ in the
+approximate expression for the risk-premium\footnote{%
+  This is valid because
+  $\Cov_t(c_{t+1},\cdot)=\Cov_t(c_{t+1}-\E_tc_{t+1},\cdot)
+  =\Cov_t(\Delta
+  \E_{t+1}c_{t+1},\cdot)$
+}
+and simplify (recalling $\kappa=(1-\gamma)/(1-1/\sigma)$) and dropping
+constant $R^f_{t+1}$ form the covariance:
+\begin{align*}
+  &\E_t[R_{t+1}^n-R_{t+1}^f]
+  \approx
+  \gamma
+  \Cov_t\left(
+  r^w_{t+1},
+  R_{t+1}^n
+  \right)
+  \\
+  &\;
+  +
+  (\gamma-1)
+  \Cov_t\left(
+  \Delta \E_{t+1}\sum_{s=2}^\infty \rho^s r^w_{t+s},
+  R_{t+1}^n
+  \right)
+\end{align*}
+This is the intertemporal CAPM. The first term is the usual CAPM
+component. The second term captures covariance changing investment
+opportuntities, i.e. changes in expected future wealth returns.
+
+Lastly, Identity \ref{rsurprise} to sub in for $r^w_{t+1}$ in the first
+covariance term and regroup
+\begin{align*}
+  &\E_t[R_{t+1}^n-R_{t+1}^f]
+  \approx
+  \\
+  &\;
+  \Cov_t\left(
+  -\Delta\E_{t+1}\sum_{s=2}^\infty \rho^s r^w_{t+s},
+  R_{t+1}^n
+  \right)
+  \\
+  &\;
+  +\gamma
+  \Cov_t\left(
+  \Delta \E_{t+1} \sum_{s=0}^\infty \rho^{s}\Delta d_{t+1+s}^w
+  ,\;
+  R_{t+1}^n
+  \right)
+\end{align*}
+This decomposes expected excess returns into cash flow and discount rate
+effects.
+
+\clearpage
+\section{Production}
+
+Firms have operating profits $\Pi_t = Y_t - W_tL_t$. They pay out
+dividends equal to profits less the cost of investments
+\begin{align*}
+  D_t = \Pi_t - \Phi_t
+\end{align*}
+where $\Phi_t$ is some adjustment cost based on initial capital $K_t$
+and investment $I_t$.
+The firm maximizes profits
+\begin{align*}
+  V_t = \max \E_t\sumsinfz M_{t,t+s} D_{t+s}
+\end{align*}
+The firm therefore solves
+\begin{align*}
+  V_t = \max D_t + \E_t M_{t+1} V_{t+1}
+\end{align*}
+subject to the rule for dividends and adjustment costs.
+
+
+
+
+
+\clearpage
+\section{Heterogeneous Agents}
+
+\subsection{Constantinides and Duffie}
+
+Let $Y_t$ be aggregate income, and assume that agents receive
+a share $c_t(i)$ of idiosyncratic income, with time-varying
+heteroskedasticity:
+\begin{align*}
+  C_t(i) &= c_t(i) Y_t \\
+  \text{where}\quad
+  \Delta \ln c_{t+1}(i)
+  &= \eta_{t+1}(i) z_{t+1} - \frac{z^2_{t+1}}{2}
+\end{align*}
+where $\eta_{t+1}(i)\sim \calN(0,1)$ and $z_t$ is the amount of
+idiosyncratic risk in the economy, which is independent of aggregate
+$Y_t$ and returns $R_{t+1}$.
+If agents have power utility, the first order condition
+for agent $i$ satisfies
+\begin{align*}
+  1
+  &=
+  \E_t\left[
+    \beta \left(
+    \frac{C_{t+1}(i)}{C_t(i)}
+    \right)^{-\gamma}
+    R_{t+1}
+  \right]
+  \\
+  &=
+  \E_t\left[
+    \beta
+    \left(
+    \frac{Y_{t+1}}{Y_t}
+    \right)^{-\gamma}
+    \left(
+    \frac{c_{t+1}(i)}{c_t(i)}
+    \right)^{-\gamma}
+    R_{t+1}
+  \right]
+  \\
+  &=
+  \E_t\left[
+    \beta
+    \left(
+    \frac{Y_{t+1}}{Y_t}
+    \right)^{-\gamma}
+    e^{-\gamma \Delta \ln c_{t+1}(i)}
+    R_{t+1}
+  \right]
+\end{align*}
+By assumed independence, we can iterate expectations
+\begin{align*}
+  1
+  &=
+  \E_t\left[
+    \beta
+    \left(
+    \frac{Y_{t+1}}{Y_t}
+    \right)^{-\gamma}
+    \E_t[
+    e^{-\gamma \Delta \ln c_{t+1}(i)}|z_{t+1}
+    ]
+    R_{t+1}
+  \right]
+\end{align*}
+Compute that expectation using lognormality
+\begin{align*}
+  &\E_t[
+  e^{-\gamma \Delta \ln c_{t+1}(i)}|z_{t+1}
+  ]
+  \\
+  &=
+  e^{%
+    -\gamma
+    \E_t[\Delta\ln c_{t+1}(i)|z_t]
+    + \frac{\gamma^2}{2}\Var_t(\Delta \ln c_{t+1}(i)|z_t)
+  }
+  \\
+  &=
+  e^{%
+    \frac{\gamma(\gamma+1)}{2}
+    z_{t+1}^2
+  }
+\end{align*}
+Therefore, we have that
+\begin{align*}
+  1
+  &=
+  \E_t\left[
+    \beta
+    \left(
+    \frac{Y_{t+1}}{Y_t}
+    \right)^{-\gamma}
+    e^{%
+      \frac{\gamma(\gamma+1)}{2}
+      z_{t+1}^2
+    }
+    R_{t+1}
+  \right]
+\end{align*}
+
+
+
+\clearpage
+\section{Asset Demand}
+
+
+\subsection{Investor Problem}
+
+$I$ agents each allocate initial wealth $W_0(i)$ among $N$ assets at the
+start of the period. After investment, assets pay a dividend (resolving
+uncertainty) and everyone goes home.  Agents differ in beliefs about the
+distribution of dividends, risk aversion $\alpha_i$, and initial wealth,
+but all solve
+\begin{align*}
+  &\max_{\bsQ_i(\bsP)}
+  \E_i\left[
+    \frac{e^{-\alpha_i W_1(i)}}{\alpha_i}
+  \right]
+  \\
+  %\text{s.t.}\quad
+  &
+  W_1(i) = W_0(i) + \big(\bsD-\bsP(\bsQ_i(\bsP))\big)'\bsQ_i(\bsP)
+\end{align*}
+$\bsQ_i(\bsP)$ is a demand schedule given price vector $\bsP$.  As
+suggested by $\bsP(\bsQ_i(\bsP))$, we do \emph{not} assume price-taking.
+Instead, each agent anticipates price impact \& includes that in
+the problem.
+Note: From now on, I supress the arguments of both $\bsQ_i,\bsP$ for
+simplicity.
+
+To proceed, we make the simplifying assumption that all agents $i$
+believe
+\begin{align}
+  \bsD \sim \calN(\bsmu_i,\bsSigma)
+  \label{divdist}
+\end{align}
+implying $W_1(i)$ normal with
+\begin{align*}
+  \E_iW_1(i)
+  &= W_0(i) + (\bsmu_i-\bsP)'\bsQ_i
+  \\
+  \Var_i(W_1(i))
+  &= \bsQ_i'\bsSigma\bsQ_i
+\end{align*}
+Normality of $W_1(i)$ also implies lognormality of expected utility,
+implying the objective function can be rewritten
+\begin{align*}
+  \max_{\bsQ_i(\bsP)}
+  \;&
+  \frac{1}{\alpha_i}
+  e^{-\alpha_i \E_iW_1(i) + \frac{\alpha_i^2}{2}\Var_i(W_1(i))}
+  \\
+  \iff\;
+  \max_{\bsQ_i(\bsP)}
+  \;&
+  \frac{1}{\alpha_i}
+  e^{
+    -\alpha_i\big[W_0(i) +
+    (\bsmu_i-\bsP)'\bsQ_i\big]
+    + \frac{\alpha_i^2}{2}\bsQ_i'\bsSigma\bsQ_i
+  }
+\end{align*}
+Differentiate w.r.t. $\bsQ_i$ and simplify to obtain FOC
+\begin{align*}
+  \bso &=
+  (\bsmu_i-\bsP)
+  -
+  \frac{\partial \bsP'}{\partial \bsQ_i}
+  \bsQ_i
+  - \alpha_i \bsSigma\bsQ_i
+\end{align*}
+Solve for optimal $\bsQ_i$:
+\begin{align}
+  \bsQ_i
+  &=
+  \bigg(
+  \frac{\partial \bsP'}{\partial \bsQ_i}
+  + \alpha_i \bsSigma\bigg)^{-1}
+  (\bsmu_i-\bsP)
+  \label{Qdemand}
+\end{align}
+With competitive price taking, the first term in parentheses (price
+impact) is zero. But with non-atomistic investors, this is positive and
+induces strategic quantity shaving, i.e. agents pretending to be more
+risk averse.
+
+\subsection{Equilibrium}
+
+In addition to the $I$ investors, assume an exogenous source of totally
+inelastic/fixed nonstrategic demand $\bsS$.
+This is like demand from index funds that must buy and sell
+non-strategically to hold the market portfolio on behalf of investors.
+Then market clearing is
+\begin{align}
+  \bsS
+  = \sum_{j=1}^I \bsQ_j
+  \;\iff\;
+  \bsS
+  = \bsQ_i + \sum_{j\neq i}^I \bsQ_j
+  \label{mc}
+\end{align}
+One consequence of this, which investors know and anticipate in choosing
+their strategies, is the following relationship between price impacts,
+which we derive by differentiating market clearing with respect to
+$\bsQ_i$, then rearranging:
+\begin{align}
+  \bso
+  &=
+  \bsI
+  +
+  \sum_{j\neq i}
+  \frac{\partial \bsQ_j}{\partial \bsP'}
+  \frac{\partial \bsP'}{\partial \bsQ_i}
+  \notag
+  \\
+  \implies\quad
+  \frac{\partial \bsP'}{\partial \bsQ_i}
+  &=
+  -
+  \left(
+  \sum_{j\neq i}
+  \frac{\partial \bsQ_j}{\partial \bsP'}
+  \right)^{-1}
+  \label{priceimpact}
+\end{align}
+Equilibrium in this model is therefore defined as
+a price vector $\bsP$ and a set of linear demand schedules
+$\{\bsQ_i\}_{i=1}^I$ such that
+\begin{itemize}
+  \item Market Clears: Eq.~\ref{mc} satisfied at $\bsP$
+  \item Agent optimization:
+    Each agent $i$ taking $\bsS$ and the other $\{\bsQ_j\}_{j\neq i}$ as
+    given chooses strategy $\bsQ_i$ satisfying FOC~\ref{Qdemand}
+\end{itemize}
+
+
+\subsection{Linear Equilibrium}
+
+We now restrict to an equilibrium where each $\bsQ_i$ is \emph{linear}
+in expected profits $\bsmu_i-\bsP$.  Then Eq.~\ref{Qdemand} reduces to
+the functional form\footnote{%
+  wlog in the set of linear demand schedules
+}
+\begin{align}
+  \bsQ_i
+  &=
+  \frac{\bsSigma^{-1}(\bsmu_i-\bsP)}{c_i\alpha_i}
+  \label{Qlinear}
+  %\\
+  %\implies\quad
+  %\frac{\partial \bsQ_i}{\partial \bsP'}
+  %&=
+  %-\frac{\bsSigma^{-1}}{c_i\alpha_i}
+  %\label{partialQ}
+\end{align}
+To be an eq'm, agent $i$---taking as given that all other agents
+submit demand as in Eq.~\ref{Qlinear}---must \emph{also} have an optimal
+demand schedule of that form.  To verify, note that if all other
+$j\neq i$ submit Eq.~\ref{Qlinear}, its derivatives simplify
+eq'm condition (\ref{priceimpact}) to
+\begin{align}
+  \frac{\partial \bsP'}{\partial \bsQ_i}
+  &=
+  \bsSigma\left(
+  \sum_{j\neq i}
+  \frac{1}{c_i\alpha_i}
+  \right)^{-1}
+  %\label{priceimpact}
+\end{align}
+Agent $i$, taking this as given, then subs that into his optimal demand
+Eq.~\ref{Qdemand} to get
+\begin{align*}
+  \bsQ_i
+  &=
+  \bigg[
+  \bigg(
+  \sum_{j\neq i}
+  \frac{1}{c_i\alpha_i}
+  \bigg)^{-1}
+  + \alpha_i
+  \bigg]^{-1}
+  \bsSigma^{-1}(\bsmu_i-\bsP)
+  \\
+  &=
+  \frac{\bsSigma^{-1}(\bsmu_i-\bsP)}{%
+  \alpha_i
+  \left[
+  1
+  +
+  \left(
+  \sum_{j\neq i}
+  \frac{\alpha_i}{c_i\alpha_i}
+  \right)^{-1}
+  \right]
+  }
+\end{align*}
+This optimal demand is exactly as in Eq.~\ref{Qlinear}, with $c_i$ the
+object in square brackets. Since $c_i>1$, agents act as if more risk
+averse.
+
+
+\subsubsection{Estimating Linear Demand}
+
+We can estimate demand if we make more assumptions about beliefs for the
+distribution of dividends. So assume each agent observes the same $K$
+characteristics $\bsX$ for all $N$ assets and then forms beliefs
+\begin{align*}
+  \text{Agent $i$ assumes}\quad
+  \bsD &\sim
+  \calN\left(
+  \bsmu_i,\bsSigma
+  \right)
+  \\
+  \text{where}\quad
+  \bsmu_i
+  &= \bsX\bsPhi_i + \bsphi_i \\
+  \bsSigma
+  &= \bsGamma\bsGamma'+\gamma\bsI \\
+  \bsGamma
+  &= \bsX\bsPsi
+\end{align*}
+$\bsphi_i$ is idiosyncratic and unobserved by the econometrician, and
+the covariance structure of returns is \emph{common} to all investors
+and has the above factor structure.
+
+Substituting in for $\bsSigma$, the linear demand schedule simplifies to
+\footnote{%
+  Apply Woodbury matrix identity
+  $(\bsA +
+  \bsU\bsC\bsV)^{-1}=\bsA^{-1}-\bsA^{-1}\bsU(\bsC^{-1}+\bsV\bsA^{-1}\bsU)^{-1}\bsV\bsA^{-1}$
+  to $(\gamma\bsI+\bsGamma\bsI\bsGamma')$.
+}
+\begin{align*}
+  \bsQ_i
+  &=
+  (\bsGamma\bsGamma'+\gamma\bsI)^{-1}\frac{\bsmu_i-\bsP}{c_i\alpha_i}
+  \\
+  &=
+  \left(\bsI-\bsGamma(\bsI+\bsGamma'\bsGamma)^{-1}\bsGamma'\right)
+  \frac{\bsmu_i-\bsP}{\gamma c_i\alpha_i}
+  \\
+  &=
+  \frac{(\bsmu_i-\bsP)-\bsGamma(\bsI+\bsGamma'\bsGamma)^{-1}\bsGamma(\bsmu_i-\bsP)}{\gamma c_i\alpha_i}
+\end{align*}
+%Distribute then sub in for the first $\bsmu_i$ and $\bsGamma$
+%\begin{align*}
+  %\bsQ_i
+  %\\
+  %&=
+  %\frac{(\bsX\bsPhi_i+\bsphi_i)-\bsP-\bsX\bsPsi(\bsI+\bsGamma'\bsGamma)^{-1}\bsGamma(\bsmu_i-\bsP)}{\gamma c_i\alpha_i}
+%\end{align*}
+Sub in for the first $\bsmu_i$ and $\bsGamma$, then group terms to
+rewrite linear demand schedule as
+\begin{align*}
+  \bsQ_i
+  &=
+  \bsP\beta_i
+  +
+  \bsX\bsPi_i
+  +
+  \bsvarepsilon_i
+\end{align*}
+where the newly defined objects are
+\begin{align*}
+  \beta_i &=
+  -\frac{1}{\gamma c_i\alpha_i}
+  \\
+  \bsPi_i
+  &=
+  \frac{\big[\bsPhi_i-\bsPsi(\bsI+\bsGamma'\bsGamma)^{-1}\bsGamma(\bsmu_i-\bsP)\big]}{\gamma c_i\alpha_i}
+  \\
+  \bsvarepsilon_i
+  &=
+  \frac{\bsphi_i}{\gamma c_i\alpha_i}
+\end{align*}
+So demand is heterogeneous across agents $i$, written as a function of
+price \& price-elasticity $\bsbeta_i$, characteristics $\bsX$ \&
+responsiveness $\bsPi_i$ (favoring high returns $\bsPhi_i$ \& low risk
+$\bsPsi$), and noise.
+
+Since this holds for every agent, we can substitute into market clearing
+to derive price vector
+\begin{align*}
+  \bsS &= \sum_{i=1}^I
+  \bsQ_i
+  =
+  \sum_{i=1}^I
+  \big[
+  \bsP\beta_i
+  +
+  \bsX\bsPi_i
+  +
+  \bsvarepsilon_i
+  \big]
+  \\
+  \bsP
+  &=
+  \frac{
+  \sum_{i=1}^I
+  (
+  \bsX\bsPi_i
+  +
+  \bsvarepsilon_i
+  )
+  -
+  \bsS
+  }{%
+  -
+  \sum_{i=1}^I\beta_i
+  }
+\end{align*}
+where we solved market clearing for $\bsP$.
+
+
+\clearpage
+\section{Institutional Investors}
+
 
 
 
 \end{multicols*}
+
+\clearpage
+Investor $i$ faces portfolio allocation problem of splitting initial
+wealth $A_0(i)$ among a risk free asset returning $R^f$ and $N$ risky
+assets returning (stochastic, unknown) $\bsR$, i.e. $i$ solves
+\begin{align*}
+  \max_{\bsw_i}
+  &\;\E_i\left[
+      \frac{A_1(i)^{1-\gamma_i}}{1-\gamma_i}
+      \right]
+  %=
+  %\max_{\bsw_i}
+  %\;\E_i\left[
+      %\frac{e^{(1-\gamma_i)a_1(i)}}{1-\gamma_i}
+      %\right]
+      \\
+  \text{s.t.}\quad
+  & A_1(i) = A_0(i)\big(R^f + \bsw_i'(\bsR-R^f\mathbf{1})\big)
+\end{align*}
+Log-linear approximation of utility
+\begin{align*}
+  u_i(a)
+  = \frac{a^{1-\gamma_i}}{1-\gamma_i}
+  &\approx
+  u(\hat{a})
+  + u'(\hat{a})(a-\hat{a})
+  + \frac{1}{2}u''(\hat{a})(a-\hat{a})^2
+  \\
+  &=
+  u(\hat{a})
+  + a^{-\gamma_i}(a-\hat{a})
+  - \gamma_i a^{-\gamma_i-1}(a-\hat{a})^2
+\end{align*}
+Use this to rewrite the objective function, choosing expansion point
+$\hat{a}=\E_i[A_1(i)]$
+\begin{align*}
+  \max_{\bsw_i}
+  &\;\E_i\left[
+      \frac{A_1(i)^{1-\gamma_i}}{1-\gamma_i}
+      \right]
+  \approx
+  \max_{\bsw_i}
+  \;\E_i\left[
+      u(\hat{a})
+      + A_1(i)^{-\gamma_i}(A_1(i)-\hat{a})
+      - \gamma_i A_1(i)^{-\gamma_i-1}(A(1)-\hat{a})^2
+      \right]
+\end{align*}
+
+
+
+Differentiate to get the FOC
+\begin{align*}
+  \bso
+  &=
+  \frac{\partial}{\partial \bsw_i}
+  \E_i\left[
+      \frac{\left(A_0(i)\big(R^f + \bsw_i'(\bsR-R^f\mathbf{1})\big)\right)^{1-\gamma_i}}{1-\gamma_i}
+      \right]
+  \\
+  &=
+  \E_i\left[
+    \left(A_0(i)\big(R^f + \bsw_i'(\bsR-R^f\mathbf{1})\big)\right)^{-\gamma_i}
+    A_0(i)
+    (\bsR-R^f\mathbf{1})
+    \right]
+  \\
+  \bso
+  &=
+  \E_i\left[
+    \left(\frac{A_1(i)}{A_0(i)}\right)^{-\gamma_i}
+    (\bsR-R^f\mathbf{1})
+    \right]
+\end{align*}
+Let $x=\ln X$. Then we can rewrite
+\begin{align*}
+  \bso
+  &=
+  \E_i\left[
+    \exp\big\{
+    -\gamma_i \ln\big(R^f+\bsw_i'(\bsR-R^f\mathbf{1})\big)
+    +
+    (\bsR-R^f\mathbf{1})
+    \right]
+  \\
+  &=
+  \E_i\left[
+    \exp\big\{
+    -\gamma_i\big(
+      a_0(i) + \ln(R^f+\bsw_i(\bsR-R^f\mathbf{1}))
+    \big)
+    + \ln (\bsR-R^f\mathbf{1})
+    \big\}
+    \right]
+\end{align*}
+
+
+
+rewrite this problem in terms of logs
+Log linear approximation of $f(x) = e^{(1-\gamma_i)x}$---which satisfies
+$f^{(n)}(x)=(1-\gamma_i)^n f(x)$---about $\E_ia_1(i)$:
+\begin{align*}
+  f(a) \approx
+  f(\E_ia_1(i))
+  + (1-\gamma_i)f(\E_ia_1(i)) (a_1(i)-\E_ia_1(i))
+  + (1-\gamma_i)^2f(\E_ia_1(i)) (a_i-\E_ia_1(i))^2
+\end{align*}
+Then
+\begin{align*}
+  \frac{1}{1-\gamma_i}
+  \E_i\left[
+    e^{(1-\gamma_i) a_1(i)}
+    \right]
+  &\approx
+  \E_i
+  \bigg[
+  \frac{1}{1-\gamma_i}
+  f(\E_ia_1(i))
+  + f(\E_ia_1(i)) (a_1(i)-\E_ia_1(i))
+  \\
+  &\qquad\quad
+  + (1-\gamma_i)f(\E_ia_1(i)) (a_1(i)-\E_ia_1(i))^2
+  \bigg]
+\end{align*}
+Let $\mu_i=\E_ia_1(i)$ and $\Sigma_i = \Var_i(a_1(i))=\E_i[(a_1(i)-\E_ia_1(i))^2]$.
+Substitute this into the above expression, ignoring the first term,
+which is constant and not influenced by
+\begin{align*}
+  \max_{\bsw_i}
+  \E_i
+  \bigg[
+  (a_1(i)-\E_ia_1(i))
+  + (1-\gamma_i)(a_1(i)-\E_ia_1(i))^2
+  \bigg]
+\end{align*}
+
+
+\clearpage
+We have that
+\begin{align*}
+  m_{t+1} &=
+  -\kappa\delta - \frac{\kappa}{\sigma}\Delta c_{t+1}
+  + (\kappa-1)r_{t+1}^w
+  \\
+  0 &=
+  \E_t[m_{t+1}+r^f_{t+1}]
+  + \frac{1}{2}
+  \Var_t(m_{t+1})
+  %\\
+  %0 &=
+  %\E_t[m_{t+1}+r^i_{t+1}]
+  %+ \frac{1}{2}
+  %\Var_t(m_{t+1}+r_{t+1}^i)
+  \\
+  0 &=
+  \E_t[m_{t+1}+r^w_{t+1}]
+  + \frac{1}{2}
+  \Var_t(m_{t+1}+r_{t+1}^w)
+\end{align*}
+Start by substituting into the expression for $r_{t+1}^f$, and rearrange:
+\begin{align*}
+  -r_{t+1}^f &=
+  -\kappa\delta -\frac{\kappa}{\sigma}\E_t[\Delta c_{t+1}]
+  + (\kappa-1)\E_tr_{t+1}^w
+  \\
+  &\qquad
+  + \frac{1}{2}
+  \left[
+    \left(
+    \frac{\kappa}{\sigma}
+    \right)^2
+    \Var_t(\Delta c_{t+1})
+    + (\kappa-1)^2 \Var_t(r_{t+1}^w)
+    - \frac{\kappa(\kappa-1)}{\sigma}
+    \Cov(\Delta c_{t+1},r_{t+1}^w)
+  \right]
+\end{align*}
+Do the same for $r_{t+1}^w$:
+\begin{align*}
+  0
+  &=
+  -\kappa\delta
+  -\frac{\kappa}{\sigma}\E_t\Delta c_{t+1}
+  + \kappa \E_tr_{t+1}^w
+  + \frac{1}{2}
+  \left[
+    \left(
+    \frac{\kappa}{\sigma}
+    \right)^2
+    \Var_t(\Delta c_{t+1})
+    + \kappa^2 \Var_t(r_{t+1}^w)
+    - \frac{\kappa^2}{\sigma}
+    \Cov(\Delta c_{t+1},r_{t+1}^w)
+  \right]
+  \\
+  0
+  &=
+  -\delta
+  -\frac{1}{\sigma}\E_t\Delta c_{t+1}
+  + \E_tr_{t+1}^w
+  + \frac{1}{2}
+  \left[
+    \frac{\kappa}{\sigma^2}
+    \Var_t(\Delta c_{t+1})
+    + \kappa \Var_t(r_{t+1}^w)
+    - \frac{\kappa}{\sigma}
+    \Cov(\Delta c_{t+1},r_{t+1}^w)
+  \right]
+  %\\
+  %- \E_tr_{t+1}^w
+  %&=
+  %-\delta
+  %-\frac{1}{\sigma}\E_t\Delta c_{t+1}
+  %+ \frac{1}{2}
+  %\left[
+    %\frac{\kappa}{\sigma^2}
+    %\Var_t(\Delta c_{t+1})
+    %+ \kappa \Var_t(r_{t+1}^w)
+    %- \frac{\kappa}{\sigma}
+    %\Cov(\Delta c_{t+1},r_{t+1}^w)
+  %\right]
+  %\\
+\end{align*}
+Multiply through by $(1-\kappa)$ to get
+\begin{align*}
+  (\kappa-1) \E_tr_{t+1}^w
+  &=
+  \delta(\kappa-1)
+  +\frac{\kappa-1}{\sigma}\E_t\Delta c_{t+1}
+  - \frac{\kappa-1}{2}
+  \left[
+    \frac{\kappa}{\sigma^2}
+    \Var_t(\Delta c_{t+1})
+    + \kappa \Var_t(r_{t+1}^w)
+    - \frac{\kappa}{\sigma}
+    \Cov(\Delta c_{t+1},r_{t+1}^w)
+  \right]
+\end{align*}
+Substitute this into the expression for $r_{t+1}^f$,
+cancelling/regrouping terms in the process:
+\begin{align*}
+  r_{t+1}^f &=
+  \delta
+  +\frac{1}{\sigma}\E_t\Delta c_{t+1}
+  -
+  \frac{\kappa}{2\sigma^2}
+  \Var_t(\Delta c_{t+1})
+  +
+  \frac{\kappa-1}{2}
+  \Var_t(r_{t+1}^w)
+\end{align*}
+Also, we can get an expression for the risk premium, noting that
+$r_{t+1}^f$ is known at $t$ (hence contributes nothing to the variance)
+\begin{align*}
+  0 &=
+  \E_t\big[m_{t+1}+r_{t+1}^i\big]
+  +
+  \frac{1}{2}\Var_t\big(
+  m_{t+1}+r_{t+1}^i\big)
+  -
+  \E_t\big[m_{t+1}+r_{t+1}^f\big]
+  +
+  \frac{1}{2}\Var_t\big(
+  m_{t+1}+r_{t+1}^f\big)
+  \\
+  0 &=
+  \E_t\big[r_{t+1}^i\big]
+  - r_{t+1}
+  +
+  \frac{1}{2}
+  \left(
+  \Var_t\big(
+  m_{t+1}+r_{t+1}^i\big)
+  -
+  \Var_t\big( m_{t+1}\big)
+  \right)
+\end{align*}
+which gives
+\begin{align*}
+  \E_t\big[r_{t+1}^i\big]
+  - r_{t+1}
+  +\frac{1}{2}
+  \Var_t\big(r_{t+1}^i\big)
+  &=
+  -\Cov_t(m_{t+1},r_{t+1}^i)
+  \\
+  &=
+  -\Cov_t\left(
+  -\frac{\kappa}{\sigma}\Delta c_{t+1}
+  + (\kappa-1)r_{t+1}^w,\;
+  r_{t+1}^i\right)
+  \\
+  &=
+  \frac{\kappa}{\sigma}
+  \Cov_t\left(\Delta c_{t+1},\; r_{t+1}^i\right)
+  +(1-\kappa)\Cov_t\left( r_{t+1}^w,\; r_{t+1}^i\right)
+\end{align*}
+
+
+
+
+
 
 
 

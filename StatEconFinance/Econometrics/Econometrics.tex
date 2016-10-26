@@ -279,6 +279,7 @@
 \newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
 \newcommand{\bsalpha}{\boldsymbol{\alpha}}
 \newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bskappa}{\boldsymbol{\kappa}}
 \newcommand{\bsgamma}{\boldsymbol{\gamma}}
 \newcommand{\bsGamma}{\boldsymbol{\Gamma}}
 \newcommand{\bslambda}{\boldsymbol{\lambda}}
@@ -404,6 +405,8 @@
 \newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
 \newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
 \newcommand{\range}{\operatorname{range}}
+\newcommand{\mesh}{\operatorname{mesh}}
+\newcommand{\proj}{\operatorname{proj}}
 
 % Redefine real and imaginary from fraktur to plain text
 \renewcommand{\Re}{\operatorname{Re}}
@@ -428,6 +431,7 @@
 \newcommand{\sumtTz}{\sum^T_{t=0}}
 \newcommand{\sumninfz}{\sum^\infty_{n=0}}
 \newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+\newcommand{\sumtinfinf}{\sum^\infty_{t=-\infty}}
 
 \newcommand{\prodnN}{\prod^N_{n=1}}
 \newcommand{\prodin}{\prod^n_{i=1}}
@@ -452,6 +456,7 @@
 \newcommand{\ninfz}{_{n=0}^\infty}
 \newcommand{\minfz}{_{m=0}^\infty}
 \newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\tinfinf}{_{t=-\infty}^\infty}
 \newcommand{\tTz}{_{t=0}^T}
 
 % Limits
@@ -4880,22 +4885,23 @@ $\sL^0$ (using $\mu$-a.e. equality as the equivalence relation).
 Note that this collection $\sL^0(\Omega,\sF,\mu)$ of real-valued
 Borel-measurable functions is \emph{distinct} from the space of
 \emph{integrable} functions $\sL(\Omega,\sF,\mu)$.
-Though the notational distinction is quite subtle, notice that it's
-there in the superscript. More on this later.
+Hence the notation distinction in the superscript.
+More on this later.
 \end{rmk}
 
 \begin{defn}($L^p$ Norm)
 Given the collection $\sL^0(\Omega,\sF,\mu)$ of measurable functions,
-define the $L^p$ norm of $f$ as
+define the $L^p$ norm of any function $f\in\sL^0(\Omega,\sF,\mu)$ as
 \begin{align*}
   \lVert f\rVert_p := \left(\int_\Omega |f|^p\;d\mu\right)^{\frac{1}{p}}
   \qquad p \in [1,\infty)
 \end{align*}
 For $p=\infty$, define
 \begin{align*}
-  \lVert f\rVert_\infty := \inf\big\{\lambda \in\R_+ \;|\; \mu[\,|f|>\lambda\,]=0\big\}
+  \lVert f\rVert_\infty := \inf\big\{\lambda \in\R_+ \;|\;
+  \mu\big[\,|f|>\lambda\,\big]=0\big\}
 \end{align*}
-i.e. the a.e. bound of $f$.
+i.e. the norm equals the almost-everywhere bound of $f$.
 \\
 \\
 The $L^p$ norm generalizs the Euclidean norm.
@@ -4903,14 +4909,15 @@ We require $p\geq 1$ because otherwise we lose convexity and this
 wouldn't be a norm.
 \end{defn}
 \begin{rmk}
-We see from this definition why we distinguish $\sL^0$ from $L^0$.
+We see from this definition why we distinguish $\sL^0$ from $L^0$:
 There are functions in $\sL^0$ such that $\lVert f\rVert_p = 0$, though
-not everywhere zero.
-Though this would qualify as a semi-norm, this would violate the
-definition of a norm, which must return zero iff passed the zero
-element.
+not \emph{everywhere} zero.
+That means $\lVert \,\cdot\,\rVert_p$ is only a \emph{semi-norm} on
+$\sL^0$, since a true norm returns zero \emph{if and only if}
+it is given the zero element.
 However, if we identify all zero a.e.\ functions as a single identical
-element---as in $L^0$---we avoid this issue.
+element as in $L^0$, we avoid this issue, implying that
+$\lVert \,\cdot\,\rVert_p$ is a norm on $L^0$.
 \end{rmk}
 
 \begin{defn}($L^p$ Space)
@@ -4923,12 +4930,14 @@ Next, we then define $L^p$ space, for $p\in[1,\infty]$ as
     \big\{ \, [f] \; \big| \; f \in\sL^p\big\}
     = \sL^p(\Omega,\sF,\mu)/a.e.
 \end{align*}
-Note that this does no conflict with our earlier definition, where we
-used $\sL(\Omega,\sF,\mu)$ or $\sL^1(\Omega,\sF,\mu)$ to denote the set
-of all integrable functions on measure space $(\Omega,\sF,\mu)$ since
-$f\in \sL^1(\Omega,\sF,\mu)$ implies that
-$\int_\Omega |f| \; d\mu <\infty$, i.e. that $f$ is integrable.
+Notice that our earlier of definition of the space of all integrable
+function $\sL(\Omega,\sF,\mu)$ matches the definition here of
+$\sL^1(\Omega,\sF,\mu)$ since $f\in\sL(\Omega,\sF,\mu)$ if and only if
+$f$ integrable, which is equivalent to
+$\int_\Omega |f| \; d\mu <\infty$, which is equivalent to
+$f\in\sL^1(\Omega,\sF,\mu)$
 \end{defn}
+
 
 \subsubsection{Inclusion Relationships among $L^p$ and $L^q$ Spaces}
 
@@ -4966,6 +4975,7 @@ their tails and at $0$.
 \end{rmk}
 
 \begin{cor}
+\label{cor:Lpinclusion}
 Suppose that $P$ is a probability measure. Then
 \begin{align*}
   q \geq p
@@ -5032,13 +5042,14 @@ We check the properties that a normed vector space must have
 
 \begin{defn}($L^2$ Inner Product)
 \label{defn:L2}
-Given $L^p(\Omega,\sF,\mu)$ function space, define inner product
+Define an inner product on function space $L^2(\Omega,\sF,\mu)$
 \begin{align*}
   \langle f,g \rangle
   := \int_\Omega f\cdot g \; d\mu
 \end{align*}
-Writing out the induced norm $\sqrt{\langle f,f\rangle}$, we see that it
-completely agrees with $\lVert f\rVert_2$.
+Notice that if we write out the induced norm
+$\sqrt{\langle f,f\rangle}$, it exactly matches $L^2$ norm
+$\lVert \,\cdot\,\rVert_2$.
 \end{defn}
 \begin{proof}
 We must check that this definition satisfies all properties of an inner
@@ -5058,8 +5069,9 @@ product.
 \end{proof}
 
 \begin{thm}\emph{($L^2$ is Hilbert Space)}
-The collection of $L^2$ functions together with the inner product of
-Definition~\ref{defn:L2} constitute a Hilbert space.
+\label{thm:L2}
+The function space $L^2(\Omega,\sF,\mu)$ together with the
+inner product of Definition~\ref{defn:L2} constitute a Hilbert space.
 \end{thm}
 
 \begin{lem}
@@ -5112,27 +5124,31 @@ Equality if $|f|=\lambda |g|^{\frac{q}{p}}$ or
 $|g|=\lambda |f|^{\frac{p}{q}}$.
 \end{thm}
 \begin{rmk}(Cauchy-Schwarz and Theorem~\ref{thm:holder} on $L^2$)
-This looks like Cauchy-Schwarz; what's the relationship?
-First, if we restrict ourselves to functions in $L^2$ (i.e.\ only
-those functions with finite $L^2$ norm), we saw that $L^2$ is an inner
-product space with inner product given by Definition~\ref{defn:L2}. As
-with \emph{any} inner product space, Cauchy-Schwarz must hold:
+This looks like Cauchy-Schwarz; what's the relationship and is it saying
+anything new?
+Short answer: Yes, as we now develop.
+
+First, what does Cauchy-Schwarz (which holds for \emph{any} inner
+product space) say for $L^2(\Omega,\sF,\mu)$, which is an inner product
+space by Theorem~\ref{thm:L2}? It says
 \begin{align}
   \forall f,g\in L^2(\Omega,\sF,\mu),\quad
   |\langle f,g\rangle|
   \leq \lVert f\rVert_2\cdot \lVert g\rVert_2
-  \quad\iff\quad
+  \quad\implies\quad
   \left|
   \int_\Omega f\cdot g\;d\mu
   \right|
   &\leq \lVert f\rVert_2\cdot \lVert g\rVert_2
   \label{L2cauchy}
 \end{align}
-But our definition of $L^2$ and the $L^2$-norm implies $f,g\in L^2$
-iff $|f|,|g|\in L^2$.
-Thus we can restate Result~\ref{L2cauchy}
+But our definition of $L^2(\Omega,\sF,\mu)$ implies that $f,g\in L^2$
+if and only if $|f|,|g|\in L^2$.
+Together with Result~\ref{L2cauchy}, we can then derive
 \begin{align}
-  \forall f,g\in L^2(\Omega,\sF,\mu),\qquad
+  \forall f,g\in L^2,\quad
+  |f|,|g|\in L^2
+  \quad\underset{\text{By (\ref{L2cauchy})}}{\implies}\quad
   \left| \int_\Omega |f|\cdot |g|\;d\mu \right|
   = \int_\Omega |fg|\;d\mu
   \leq \lVert f\rVert_2\cdot \lVert g\rVert_2
@@ -5147,7 +5163,7 @@ of more general $L^p$ and $L^q$ and norms.
 Second, and less obvious, Result~\ref{L2cauchyrestate} holds \emph{only}
 for those $f,g\in L^2$ (functions with \emph{finite} $L^2$ norm).
 Theorem~\ref{thm:holder} holds for \emph{any, arbitrary} measurable
-functions $f,g$.
+functions $f,g\in\sL^0(\Omega,\sF,\mu)$.
 \end{rmk}
 
 \begin{proof}
@@ -8065,10 +8081,7 @@ $\{X_\alpha\}_{\alpha\in J}$ called \emph{white noise} such that
   \qquad
   \Cov(X_i,X_j)
   =
-  \begin{cases}
-    1 & i=j \\
-    0 & i\neq j
-  \end{cases}
+  \mathbf{1}\{i=j\}
   \qquad\forall i,j\in J
   \label{whitenoisecov}
 \end{align}
@@ -8082,10 +8095,10 @@ continuous, in which case family $\{X_\alpha\}_{\alpha \in J}$ is a
 non-continuous and (even crazier) non-measurable function of $\alpha$.
 \end{rmk}
 
-\begin{defn}(Brownian Motion)
-\label{defn:brownian}
-Taking $J=\R_+=[0,\infty)$, \emph{Brownian Motion} is the Gaussian
-process $\{W_t\}_{t\in\R_+}$ impled by mean and covariance
+\begin{defn}(Standard Brownian Motion)
+\label{defn:stdbrownian}
+Taking $J=\R_+=[0,\infty)$, \emph{Standard Brownian Motion} is the
+Gaussian process $\{W_t\}_{t\in\R_+}$ impled by mean and covariance
 functions
 \begin{align*}
   \E[W_t]=0
@@ -8098,25 +8111,45 @@ Theorem~\ref{thm:gaussian}, we must check that $s\wedge t$ is indeed a
 symmetric positive semidefinite function in the next proposition.
 \end{defn}
 
+\begin{defn}(Generalized Brownian Motion)
+Given Standard Brownian Motion $\{W_t\}_{t\in\R_+}$,
+\emph{Generalized Brownian Motion} (GBM) with drift, volatility, and
+initial value $(\mu,\sigma,X_0)$ is the stochastic process
+$\{X_t\}_{t\in\R_+}$ defined $X_t := X_0+\mu t + \sigma W_t$.
+Standard Brownian Motion is a special case with
+$(\mu,\sigma,X_0)=(0,1,0)$.
+\end{defn}
+
+
 \begin{prop}\emph{(Properties of Brownian Motion)}
+Let $X_t$ denote Generalized Brownian Motion with drift, volatility, and
+initial value $(\mu,\sigma,X_0)$.\footnote{%
+  Note that we could just have $(\mu,\sigma,X_0)=(0,1,0)$ so $X_t$ is
+  the special case of standard Brownian motion.
+}
+Then
 \begin{enumerate}[label=\emph{(\roman*)}]
   \item
     Function $C(s,t)=s\wedge t$ symmetric positive semidefinite
-    (hence Definition~\ref{defn:brownian} valid)
-  \item $W_0=0$ almost surely
-  \item For $t>s$, we have $(W_t-W_s)\sim \calN(0,t-s)$
-  \item For $t>s>v>u$, increments $W_t-W_s$ and $W_v-W_u$ independent
-  \item $W_t$ is a continuous function of $t$ with probability 1.
-  \item $W_t$ is nowhere differentiable
-  \item $W_t$ is \emph{not} of bounded first order variation:
-    $\sup_P \sumnN |W_{t_n}-W_{t_{n-1}}|=\infty$
-  \item $W_t$ is of bounded \emph{quadratic} (second order) variation
-    $\sup_P \sumnN (W_{t_n}-W_{t_{n-1}})^2 <\infty$
-  \item $(dW_t)^2=dt$
+    (hence Definition~\ref{defn:stdbrownian} valid)
+  \item $X_0=0$ almost surely.
+  \item $\forall t>s$, we have $(X_t-X_s)\sim
+    \calN\big(\mu t,\;\sigma^2(t-s)\big)$
+   \item $X_t\sim \calN(X_0+\mu t,\; \sigma^2 t)$
+  \item For $t>s>v>u$, increments $X_t-X_s$ and $X_v-X_u$ independent.
+    Same for $X_t$.
+  \item $X_t$ is a continuous function of $t$ with probability 1.
+    So no jumps.
+  \item $X_t$ is nowhere differentiable
+  \item $X_t$ is \emph{not} of bounded first order variation:
+    $\sup_P \sumnN |X_{t_n}-X_{t_{n-1}}|=\infty$
+  \item $X_t$ is of bounded \emph{quadratic} (second order)
+    variation $\sup_P \sumnN (X_{t_n}-X_{t_{n-1}})^2 <\infty$
+  \item GBMs are the only continuous time stochastic processes with
+    continuous sample paths and stationary increments
 \end{enumerate}
 \end{prop}
 
-\clearpage
 \begin{proof}
 We prove each in turn
 \begin{enumerate}[label=(\roman*)]
@@ -8295,8 +8328,10 @@ We prove each in turn
     arbitrary $\varepsilon>0$ (with probability one).
 
 \end{enumerate}
-
 \end{proof}
+
+
+
 
 
 \clearpage
@@ -8769,6 +8804,7 @@ defines a uniformly integrable martingale.
 
 
 \begin{defn}(Martingale Sum/Integral)
+\label{defn:martingalesum}
 Consider two stochastic processes $\{X_t\}\tinfz$ and $\{V_t\}\tinfz$ on
 probability space $(\Omega,\sF,P)$. The define the discrete time
 \emph{martingale sum} or \emph{martingale integral} as
@@ -9632,6 +9668,542 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 \clearpage
 \section{Stochastic Calculus}
 
+%In this section, we work heavily with standard Brownian motion
+%$\{W_t\}_{t\geq 0}$ from Definition~\ref{defn:stdbrownian}.
+%This stochastic process is a martingale with respect to its generated
+%filtration $\{\sF_t^W\}_{t\geq 0}$ where
+%\begin{align*}
+  %\sF_t^W:=\sigma\big(\{W_s\}_{s\in [0,t]}\big)
+%\end{align*}
+
+
+\subsection{Ito Integral}
+
+Suppose $f$ is Riemann-Stieltjes integrable with respect to weighting
+function $\alpha$. Then
+\begin{align}
+  %\int f \; d\alpha
+  %=
+  \int_0^T f(t) \; d\alpha(t)
+  = \lim_{\lVert P\rVert \ra 0} \sumnN
+  f(s_n)[\alpha(t_n)-\alpha(t_{n-1})]
+  \qquad s_n\in [t_{n-1},t_n]\quad\forall n
+  \label{riemannstieltjes}
+\end{align}
+where $\lVert P\rVert:=\mesh P := \max_n |t_n-t_{n-1}|\ra0$ for some
+partition $P = \{t_0, t_1,\ldots,t_N\}$.
+
+Ito integration is a generalization that replaces determistic weighting
+function $\alpha(t)$ with \emph{stochastic} weighting function
+$W(t)=W_t$, standard Brownian motion. Note that this implies the
+computed value of the integral is \emph{stochastic} since the weights
+assigned to time increments ($W_{t_n}-W_{t_{n-1}}$ for $[t_{n-1},t_n]$)
+vary across states of nature.  We construct the Ito Integral just like
+the Riemann integral: start with an approximating sum and then take
+limits.
+
+
+\begin{defn}(Adapted to $X_t$)
+Stochastic process $\{V_t\}_{t\geq 0}$ is \emph{adapted} to stochastic
+process $\{X_t\}_{t\geq 0}$ if $V_{t_0}$ and $X_{t_1}-X_{t_0}$ are independent
+RVs for \emph{all} $t_0,t_1$ such that $t_0<t_1$.
+
+Below, we define the Ito integral only for processes \emph{adapted} to
+standard Brownian motion integrator $W_t$ (similar to how the Lebesgue
+integral is defined only for \emph{measurable} functions).
+\end{defn}
+
+\begin{rmk}
+In words, this definition requires that $V_t$ does not ``look ahead''
+and incorporate information about $X_{t'}-X_t$.
+Though $V_t$ can still depend on \emph{past} $X_s$ for $s\leq t$ in any
+arbitrary way, this definition says that $V_t$ cannot depend on
+\emph{future} values of stochastic process $X_t$.
+
+This is useful because, for example, $\{X_t\}_{t\geq 0}$ might describe
+the evolution of some stock's price, and $\{V_t\}_{t\geq0}$ might
+describe our holdings of the stock at time $t$ (i.e. $V_t$ represents a
+trading strategy). Then it's only natural that $V_t$ does not use
+information about \emph{future} $X_s$ (for any $s>t$) to inform our
+trading strategy and asset holdings at time $t$.
+\end{rmk}
+
+
+\begin{defn}(Square Integrable)
+Stochastic process, $X_t$ is \emph{square-integrable} if
+\begin{align*}
+   \E\left[ \int^T_0 |X_t|^2 \; dt \right] < \infty
+   \qquad\forall T>0
+\end{align*}
+This is equivalent to checking that the first and second moments are
+finite.\footnote{%
+  As a side note, you can often take the expectation operater inside the
+  integral because $|X_t|^2$ is a positive random variable.
+}
+\end{defn}
+
+\clearpage
+\begin{defn}(Ito Sum)
+Given stochastic process $\{V_t\}_{t\geq 0}$ adapted to standard
+Brownian motion $\{W_t\}_{t\geq 0}$ and partition $P = \{t_0,
+t_1,\ldots,t_N\}$ of time inteval $[0,T]$, define
+\emph{Ito Sum}
+\begin{align*}
+  IS(V_t,P):=\sumnN V_{t_{n-1}} (W_{t_n}-W_{t_{n-1}})
+\end{align*}
+Note that we always use the \emph{left endpoint} $V_{t_{n-1}}$ of our
+time intervals $[t_{n-1},t_n]$. In Riemann-Stieltjes integration, that
+didn't matter; we could take any $s_n\in[t_{n-1},t_n]$ as our function
+evaluation point, as we see in Expression~\ref{riemannstieltjes}. But in
+Ito integration, we really do need to use \emph{only} the left endpoint.
+Then since $\{V_t\}_{t\geq 0}$ is adapted to $\{W_t\}_{t\geq 0}$, we
+know that $V_{t_{n-1}}$ will be \emph{independent} of increment
+$W_{t_n}-W_{t_{n-1}}$ and we won't pick up any unwanted correlation.
+\end{defn}
+
+\begin{rmk}
+In some sense, the Ito Sum also generalizes to continuous time
+Definition~\ref{defn:martingalesum} of a Martingale Sum, which was for a
+stochastic process $\{X_t\}\tinfz$ sampled at discrete times.
+\end{rmk}
+
+
+\begin{thm}\emph{(Ito Integral)}
+Given square-integrable stochastic process $\{V_t\}_{t\geq 0}$ adapted
+to standard Brownian motion $\{W_t\}_{t\geq 0}$, there exists a random
+variable $X$ such that
+\begin{align*}
+  \lim_{\lVert P\rVert \rightarrow 0}
+  \E
+  \bigg[
+  \big\lvert
+  IS(V_t,P)
+  - X
+  \big\rvert^2
+  \bigg]
+  = 0
+  \quad\iff\quad
+  \lim_{\lVert P\rVert \rightarrow 0}
+  IS(V_t,P)
+  \Lqto{2}
+  X
+\end{align*}
+The RV $X$ is called ``the Ito Integral of $V_t$ against $W_t$'', which
+we denote by $\int_0^T V_t \;dW_t$.
+\end{thm}
+
+\begin{rmk}
+In words, given square-integrable and adapted $V_t$, the Ito Sums
+(taking finer and finer partitions) converge in $L^2$ (aka in
+mean-square) to some RV that we call ``The Ito Integral'' and denote by
+symbol $\int_0^T V_t \;dW_t$.  Again, since our integrator
+$\{W_t\}_{t\geq 0}$ is a stochastic process, the value of the integral
+is a random variable that depends on its realization (even if $V_t$ is
+deterministic), which we see clearly in the above Theorem and
+Definition.
+\end{rmk}
+
+
+\begin{prop}\emph{(Properties of Ito Integral)}
+\label{prop:itoprop}
+Given square-integrable stochastic processes $\{V_t\}_{t\geq 0}$ and
+$\{Y_t\}_{t\geq 0}$ adapted to standard Brownian motion
+$\{W_t\}_{t\geq 0}$,
+\begin{enumerate}
+  \item $\int_{t_0}^{t_1} dW_s = W_{t_1} - W_{t_0}$
+  \item
+   $\int_a^t V_s \; (dW_s)^2 = \int_a^t V_s \; ds$
+   and also, for all $p>2$,
+   $\int_a^t V_s \; (dW_s)^p = 0$
+  \item
+    $\int_{t_0}^{t_1} (V_s + Y_s)\; dW_s = \int_{t_0}^{t_1} V_s \; dW_s +
+    \int_{t_0}^{t_1} Y_s \; dW_s$.
+  \item $\E\left[\int_{t_0}^{t_1} V_s \;dW_s \right] = 0$
+  \item \emph{(Ito Isometry Formula)}:
+    $\E\left[\left(\int_{t_0}^{t_1} V_s \;dW_s\right)^2 \right] =
+    \E\left[\int_{t_0}^{t_1} V^2_s \;dt \right]=
+    \int_{t_0}^{t_1} \E\left[V^2_s \right] \;dt$
+
+\end{enumerate}
+\end{prop}
+
+\begin{cor}\emph{(Slogan of Ito Calculus)}
+\label{cor:slogan}
+Simply stated, $(dW_t)^2 = dt$
+\end{cor}
+\begin{proof}
+Take $V_s=1$ for all $s$, and apply Part 2 of
+Proposition~\ref{prop:itoprop} to get
+$\int_a^t \;(dW_s)^2 = \int_a^t \; ds$.
+\end{proof}
+\begin{rmk}
+Corollary \ref{cor:slogan} is pretty remarkable:
+The square of a random process becomes \emph{deterministic}.
+We're not just talking about $dW^2_t$ being $dt$ in expectation---it
+actually \emph{is} $dt$.
+\end{rmk}
+
+
+%\begin{enumerate}
+   %\item{In the derivation of the following result,
+      %one uses the property of
+      %convergence in mean square to obtain:
+      %\[ \int_0^T W_t \; dW_t = \frac{1}{2} W_T^2 - \frac{1}{2} T \]}
+%\end{enumerate}
+
+
+
+\clearpage
+\subsection{Stochastic Differential Equations and Diffusion Processes}
+
+\begin{defn}(Ito Diffusion Process)
+Stochastic process $\{X_t\}_{t\geq 0}$ is an
+\emph{Ito Diffusion Process} (or just \emph{diffusion})
+if it can be written
+\begin{align}
+  X_T = X_0
+  + \int_0^T \mu(X_t,t)\; dt
+  + \int_0^T \sigma(X_t,t)\; dW_t
+  \qquad\forall T\geq 0
+  \label{itodiffusion}
+\end{align}
+where $\mu(X_t,t)$ and $\sigma(X_t,t)$ are the state- and time-dependent
+drift and diffusion coefficients. Generalized and Standard Brownian
+Motion are special cases with constant drift and diffusion.
+\end{defn}
+
+\begin{defn}(Stochastic Differential Equation)
+If $\{X_t\}_{t\geq 0}$ is a diffusion satisfying
+Eq.~\ref{itodiffusion}, then we say that $X_t$ satisfies the
+associated \emph{stochastic differential equation} (SDE):
+\begin{align}
+  dX_t =
+  \mu(X_t,t)\; dt
+  + \sigma(X_t,t)\; dW_t
+  \label{itosde}
+\end{align}
+Writing down an SDE like Equation~\ref{itosde} is really just shorthand
+to say that ``Solution $\{X_t\}_{t\geq 0}$ is an Ito Diffusion Process
+satisfying Equation~\ref{itodiffusion}.''
+\end{defn}
+
+\begin{defn}(Solutions to SDEs)
+Given any SDE of the form in Equation~\ref{itosde}, the solution is
+(trivially, by definition of the SDE) Equation~\ref{itodiffusion}.
+So what's with all the subsequent sections and math to come? Aren't we
+done? Why is solving SDEs such a big deal?
+
+Well sure, we can easily and directly right down an SDE like
+Equation~\ref{itosde} or the implied/associated Ito Diffusion Process in
+Equation~\ref{itodiffusion}.\footnote{%
+  Either is equivalent. They both encode the same information and
+  Eq.~\ref{itosde} is just shorthand for
+  Eq.~\ref{itodiffusion}.
+}
+\emph{However}, notice that $X_t$ is on both the LHS and the RHS.  To
+truly have a solution for $X_t$, we must write $X_t$ as a function of
+primitives $(t,W_t)$, and that requires computing the integrals on the
+RHS of Equation~\ref{itodiffusion}.
+\emph{But} the integrals on the RHS of Equation~\ref{itodiffusion} are
+generally tough to compute, if not, totally intractable.
+So there are two alternative ways to proceed:
+\begin{enumerate}
+  \item \emph{Analytically}:
+    Use Ito's Lemma (see next section) to change variables.
+    In particular, define some new diffusion process $Y_t:=f(X_t,t)$,
+    use Ito's Lemma to derive its SDE, and hope that the associated
+    Eq.~\ref{itodiffusion} for $Y_t$ has nice integrals on the RHS
+    that we can solve analytically to isolate $Y_t$ in terms of
+    primitives $(W_t,t)$. Then just invert transformation function $f$
+    to change variables back to $X_t$.
+  \item \emph{Numerical}:
+    Sometimes this is the only approach.
+    It means \emph{not} trying to compute the integrals on the RHS of
+    Equation~\ref{itodiffusion} and isolate $X_t$.
+    Instead, work directly with SDE~\ref{itosde} by discretizing the
+    equation and numerically simulating the evolution of $X_t$.
+\end{enumerate}
+\end{defn}
+
+
+\clearpage
+\subsection{Ito's Lemma}
+
+
+\begin{lem}\emph{(Ito's Lemma)}
+Let $X_t$ be an Ito Diffusion process with associated SDE
+\begin{align}
+   dX_t = \mu(X_t,t)\; dt + \sigma(X_t,t)\; dW_t
+   \label{itoslemmadiffusion}
+\end{align}
+Suppose we change variables $Y_t=f(X_t,t)$ where
+$f: \R\times [0,\infty) \rightarrow \R$ is some function twice
+differentiable in $X$, once differentiable in $t$.
+Then $Y_t=f(X_t,t)$ is a also an Ito diffusion satisfying
+\begin{equation}
+   dY_t
+   = df(X_t,t)
+   =
+   \frac{\partial f}{\partial x} \; dX_t
+   + \frac{\partial f}{\partial t} \; dt
+   + \frac{1}{2}
+    \frac{\partial^2 f}{\partial x^2} \; \sigma^2(X_t,t) \; dX_t^2
+\end{equation}
+Notice that this looks like the standard total derivative of $f$, just
+with an extra second order term, which normally disappears in a
+nonstochastic world but must here be retained because argument $X_t$ is
+in fact stochastic.
+
+Note that this can be rewritten into the standard representation of
+Ito's Lemma by using $dX_t^2=dt$, substituting in
+Expression~\ref{itoslemmadiffusion} for $dX_t$, and then collecting
+terms to get
+\begin{align}
+   \label{itoslemma}
+   dY_t
+   = df(X_t,t)
+   =
+   \left[
+    \mu(X_t,t)\frac{\partial f}{\partial x}
+   + \frac{\partial f}{\partial t}
+   + \frac{1}{2}
+     \sigma^2(X_t,t)\frac{\partial^2 f}{\partial x^2}
+   \right]
+   \; dt
+    +
+   \sigma(X_t,t)\frac{\partial f}{\partial x} \; dW_t
+\end{align}
+where all derivatives are evaluated at $(X_t,t)$.
+\end{lem}
+
+
+%\begin{lem}\emph{(Multi-Dimensional Ito's Lemma)}
+%Let $\bsX_t$ be a $N$-dimensional vector Ito diffusion process with
+%associated SDE
+%\begin{align*}
+  %d\bsX_t
+  %= \underbrace{\bsmu(\bsX_t,t)}_{(N\times 1)}\;dt
+  %+ \underbrace{\bssigma(\bsX_t,t)}_{(N\times N)}\;d\bsW_t
+%\end{align*}
+%Suppose we change variables $Y_t=(\bsX_t,t)$ where
+%$\bsf: \R^N\times [0,\infty) \rightarrow \R$ is some function twice
+%differentiable in $\bsx$, once differentiable in $t$.
+%Then $Y_t=f(\bsX_t,t)$ is a also an Ito diffusion satisfying the
+%following SDE\footnote{%
+  %Given in three different, equivalent representations since the result
+  %is often presented in any of the following ways.
+%}
+%\begin{align}
+   %dY_t
+   %= df(\bsX_t,t)
+   %&=
+   %\frac{\partial f}{\partial \bsx'} \; d\bsX_t
+   %+ \frac{\partial f}{\partial t} \; dt
+   %+ \frac{1}{2}
+    %\frac{\partial^2 f}{\partial\bsx\partial\bsx'} \; \sigma^2(\bsX_t,t)
+    %\;dt
+%\end{align}
+%\begin{align}
+  %dY_t
+  %= df(\bsX_t,t)
+  %&=
+  %\left[
+  %\bsmu(\bsX_t,t)'\,
+  %\frac{\partial f}{\partial \bsx}
+  %+
+  %\frac{\partial f}{\partial t}
+  %+
+  %\frac{1}{2}
+  %\bssigma(\bsX_t,t)\bssigma(\bsX_t,t)'
+  %\frac{\partial^2 f}{\partial \bsx\partial\bsx'}
+  %\right]
+  %\;dt
+  %+
+  %\bssigma(\bsX_t,t)'
+  %\frac{\partial f}{\partial \bsx}
+  %\;d\bsW_t
+  %\\
+  %dY_t
+  %= df(\bsX_t,t)
+  %&=
+  %\left[
+  %\bsmu(\bsX_t,t)
+  %\cdot
+  %\nabla_x
+  %+
+  %\nabla_t
+  %+
+  %\frac{1}{2}
+  %\bssigma(\bsX_t,t)\bssigma(\bsX_t,t)'
+  %\nabla_x^2
+  %\right]
+  %f(\bsX_t,t)
+  %\;dt
+  %+
+  %\bssigma(\bsX_t,t)\cdot
+  %\nabla_x
+  %f(\bsX_t,t)
+  %\;d\bsW_t
+%\end{align}
+%where all derivatives are evaluated at $(X_t,t)$.
+
+%For the sake of completeness, let's generalize Ito's Lemma to consider
+%the case of a finite number of Ito processes, $X_1, X_2, \ldots, X_n$,
+   %\[ dX_i(t) = \mu_i(t)\; dt + \sigma_i(t) \; dW_i(t).\]
+%Next, define $Y(t) = f(X_1(t), \ldots, X_n(t), t)$ for some
+%differentiable function $f$.  Then multi-dimensional Ito's Lemma says
+%\begin{align*}
+    %dY(t) &= \sum^n_{i=1} f_{X_i}(X_1(t), \ldots, X_n(t), t) \;
+      %dX_i(t) \\
+    %&+ f_{t}(X_1(t), \ldots, X_n(t), t) \; dt \\
+    %&+ \frac{1}{2} \sum^n_{i=1}\sum^n_{j=1}
+      %f_{X_i,X_j}(X_1(t), \ldots, X_n(t), t) \; \rho_{ij}\sigma_i(t)
+      %\sigma_j(t) \; dt
+%\end{align*}
+%where $\rho_{ij}$ is the correlation coefficient between $dW_i$ and
+%$dW_j$. Note that you'll have to plug back in for the $dX_i$ in the
+%first sum.
+%\\
+%\\
+%We'll mostly consider with the two-dimensional case for the
+%two specific instances below:
+%\begin{itemize}
+   %\item[i.]{$Y(t) = X_1(t)X_2(t)$, which gives us
+      %\[ dY(t) = X_2(t) \; dX_1(t) + X_1(t) \; dX_2(t) +
+	 %\rho_{12}\sigma_1(t)\sigma_2(t) \; dt \]
+      %Note that you'll have to plug back in for $dX_1$ and $dX_2$.
+      %This is a type of integration-by-parts formula because (after
+      %rearranging terms) it relates $X_1\; dX_2$ to $X_2\; dX_1$.
+   %}
+
+   %\item[ii.]{$Y(t) = X_1(t)/X_2(t)$, which gives us
+      %\begin{align*}
+	 %dY(t) = \frac{1}{X_2(t)} dX_1(t) - \frac{X_1(t)}{X_2(t)^2}
+	 %dX_2(t) +  \frac{X_1(t)}{X_2(t)^3} \sigma_2(t)^2 \;dt -
+	 %\frac{1}{X_2(t)^2} \; \rho_{12}\sigma_1(t)\sigma_2(t) \; dt.
+      %\end{align*}
+      %Note that you'll have to plug back in for $dX_1$ and $dX_2$.
+      %This is a type of integration-by-parts formula because (after
+      %rearranging terms) it relates $X_1\; dX_2$ to $X_2\; dX_1$.
+      %}
+%\end{itemize}
+
+%\end{lem}
+
+
+
+
+
+
+
+\clearpage
+
+\paragraph{Example 1} We hope to solve $\int^t_a W_s dW_s$. I will
+solve this problem in steps mirroring the numbered steps listed above.
+\begin{enumerate}
+   \item{Since our integral looks somewhat like $\int f(x) dx$, an
+      educated guess would be the equation $f(x) = \frac{1}{2} x^2$,
+      which is the integral of the traditional calculus problem.
+      }
+   \item{Next, we realize that $\phi_t = W_t$ in our problem, and
+      so set up the corresponding, implicit SDE:
+      \[ dW_t = a(W_t, t) dt + b(W_t, t) dW_t.\]
+      The only values for $a$ and $b$ that make this hold are $a=0$
+      and $b=1$.
+      }
+   \item{Next, we apply It\={o}'s Lemma, which simplifies to
+	 \[d(f(W_t)) = \frac{1}{2}\; dt + W_t \; dW_t. \]
+      From there, we can shift around to get our original problem
+	 \[W_t \; dW_t= d(f(W_t)) -\frac{1}{2}\; dt \]
+      and integrate to solve the SDE:
+	 \[ \int^t_a W_t \; dW_t =\int^t_a d(f(W_t))-\frac{1}{2}\;dt\]
+	 \[ \int^t_a W_t \; dW_t=\;\frac{1}{2}\;W^2_t-\frac{1}{2}\;W^2_a
+	    - \frac{1}{2}\;(t-a).\]
+      }
+\end{enumerate}
+
+\paragraph{Example 2} We hope to solve $\int^t_a W^2_s\;dW_s$. I will
+solve this problem in steps mirroring the numbered steps listed above.
+\begin{enumerate}
+   \item{Since our integral looks somewhat like $\int f^2 dx$, an
+      educated guess would be the equation $f(x) = \frac{1}{3} x^3$,
+      which is the integral of the traditional calculus problem.
+      }
+   \item{Need help with this.}
+
+\end{enumerate}
+
+\subsubsection{Solving SDE's with Integrals}
+
+The general method involves finding a suitable function to use in
+applying It{o}'s Lemma. Then solve this easier problem.
+
+
+\subsection{Geometric Brownian Motion}
+
+The basic stochastic differential equation representation is
+   \[ dX_t = \mu X_t \; dt + \sigma X_t \;dW_t \]
+We start by considering a function we can use in order to apply
+It\={o}'s Lemma:
+   \[ f(x) = \ln(x) \]
+   \[ f_t = 0, \;\; f_x = \frac{1}{x}, \;\; f_{xx} = -\frac{1}{x^2} \]
+Using the Lemma, we ccan write
+   \[ d(\ln(X_t)) = \left[ 0 + \mu X_t \cdot \frac{1}{X_t} -
+      \frac{1}{2} \; \sigma^2 X_t^2 \cdot \frac{1}{X_t^2} \right]\; dt
+      + \sigma \frac{1}{X_t} X_t\; dW_t \]
+   \[ d(\ln(X_t)) = \left( \mu - \frac{1}{2}\sigma^2 \right) dt
+      + \sigma dW_t \]
+We can now solve this easily for $X_t$ since all terms on the righthand
+side are known, and independentof $X_t$:
+   \[ \int^t_0 d(\ln(X_s)) \; ds =  \int^t_0 \left( \mu -
+      \frac{1}{2}\sigma^2 \right) ds + \sigma dW_s \]
+   \[ \ln(X_t) - ln(X_0) = \left( \mu -
+      \frac{1}{2}\sigma^2 \right) t - 0 + \sigma W_t - \sigma W_0 \]
+   \[ \ln(X_t) = ln(X_0) + \left( \mu -
+      \frac{1}{2}\sigma^2 \right) t +  \sigma W_t \]
+   \[X_t = X_0 \; e^{\left( \mu -
+      \frac{1}{2}\sigma^2 \right) t +  \sigma W_t} \]
+
+\subsection{Ornstein-Uhlenbeck Process}
+
+This process is defined by the SDE
+   \[ dX_t = \mu X_t \; dt + \sigma \;dW_t \]
+This case differs from geometric Brownian motion in that there is no
+$X_t$ in front of $dW_t$.
+
+For this case, choose $f(x,t) = xe^{-\mu t}$.  Applying It\={o}'s Lemma
+gives us
+   \[d(X_t e^{-\mu t})=\left(-X_t\;\mu e^{-\mu t} + X_t \mu e^{-\mu t}
+      \right) + \sigma e^{-\mu t} dW_t \]
+   \[ d(X_t e^{-\mu t})= \sigma e^{-\mu t} dW_t \]
+Integrating this expression yields
+   \[ \int^t_0 d(X_s e^{-\mu s}) = \int^t_0 \sigma e^{-\mu t} dW_t \]
+   \[ X_t e^{-\mu t} - X_0 e^{-\mu 0} = \int^t_0 \sigma e^{-\mu t} dW_t
+      \]
+   \[ X_t = X_0 e^{\mu t} + \int^t_0 \sigma e^{-\mu (t-s)} dW_t
+      \]
+
+\subsection{Cox-Ingersoll-Ross Model}
+
+This model, which exhhibits mean reversion and volatility that grows
+with $r_t$ is defined
+   \[ dr_t = a(b-r_t) \; dt + \sigma \sqrt{r_t} \; dW_t.\]
+
+\subsection{Vasicek Model}
+
+This interest rate model has mean reversion, where $b$ is the mean. It's
+defined by the following SDE:
+   \[ dr_t = a(b-r_t) \; dt + \sigma \; dW_t.\]
+
+\subsection{Continuous Time Stochastic Processes}
+
+Here, we develop the necessary machinery in continuous time stochastic
+processes to model asset price evolution properly and with sufficient
+richness and generality. In particular, we discuss a heirarchy of model
+classes that includes Brownian Motion $\subset$ Generalized Brownian
+Motion $\subset$ Diffusions $\subset$ Ito Processes.
+
+
 \subsection{Forward and Backward Equations}
 
 In the sections above, we considered SDEs of the form
@@ -9884,490 +10456,10 @@ probability must be counterbalanced by $\nabla \cdot
 
 
 \clearpage
-\subsection{Slogan of It\={o} Calculus}
 
-Finally, that last property says that
-\begin{equation}
-    \label{slogan}
-     (dW_t)^2 = dt
-\end{equation}
-This follows from Equation, which was a condition for
-the construction of Brownian Motion, and the fact that $D=1/2$
-for Brownian Motion. We can also show that $(dW_t)^p = 0$ for all $p>2$.
-In it's precise form, the above facts mean
-\begin{align*}
-    \int^t_a \phi_s (dW_s)^2 &=  \int^t_a \phi_s ds \\
-    \int^t_a \phi_s (dW_s)^n &= 0 \qquad n>2
-\end{align*}
-both of which will make more sense below.
-\\
-\\
-%{\sl Elaboration}: Equation \ref{slogan} is a pretty remarkable fact.
-It says that the square of a random process becomes \emph{deterministic}.
-We're not just talking about $dW^2_t$ being $dt$ in expectation---it
-actually \emph{is} $dt$.
 
 
 
-
-\subsection{The It\={o} Integral}
-
-The ultimate representation that we want for the \textbf{It\={o}
-Integral},
-   \[ \int_0^T \phi_t \;dW_t, \]
-is the result of the limit of specific sums, which must first be defined.
-
-\subsubsection{It\={o} Sums}
-
-So let us define \textbf{It\={o}'s Sums}, for stochastic processes
-$\phi_t$ and $W_t$ as
-   \[ IS(\phi,\Delta)=\sum^n_{i=1} \phi_{t_{i-1}}(W_{t_i}-W_{t_{i-1}}).\]
-where $\Delta = (t_0, t_1,\ldots,t_n)$ is some partition of the time
-inteval, $[0,T]$. Note, the It\={o} Integral
-is a bit more general in that we
-could substitute any stochastic process, $X_t$, in for $W_t$.  But
-the Wiener Process has some nice properties, so we'll stick to it.
-
-\paragraph{Note} Very important is the subscript on $\phi$.  Notice that
-we evaluate at the \emph{left} endpoint of our chopped-up time
-intervals: $t_{i-1}$.  This turns out to make a difference, because it
-means that the process, $\phi$, doesn't overlap the difference in the
-Brownian Motion terms, allowing us to assert independence.
-
-Moreover, when we do this, if $W_t$ (or $X_t$ more generally) is a
-Martingale, then the resulting It\={o} Sum will be as well. There's
-even an added benefit in that the choice of the left endpoint
-imposes what looks like a ``previsibility condition''---which will
-be very useful for stock prices and portfolio determination.
-
-\subsection{It\={o}'s Integral}
-
-We define the \textbf{It\={o} Integral} as the limit of of It\={o}
-Sums:
-   \[ \lim_{||\Delta|| \rightarrow 0}IS(\phi,\Delta) =
-      \lim_{||\Delta|| \rightarrow 0} \sum^n_{i=1} \phi_{t_{i-1}}(W_{t_i}
-      -W_{t_{i-1}})= \int_0^T \phi_t \;dW_t \]
-
-\paragraph{Theorem 4.3.7} If $\phi_s$ is adapted to $W_s$ (definition
-below), then
-   \[ \int_a^t \phi_s \; (dW_s)^2 = \int_a^t \phi_s \; ds.\]
-In addition, for $n>2$,
-   \[ \int_a^t \phi_s \; (dW_s)^2 = 0. \]
-
-
-\subsection{Properties of the It\={o} Integral}
-
-Given processes $\phi_s$ and $\psi_s$ which are adapted (either to
-$X_s$ or $W_s$), we obtain the following results:
-\begin{enumerate}
-   \item{$\int_a^t dX_s = X_t - X_a$.}
-   \item{$\int_a^t (\phi_s + \psi_s)\; dX_s = \int_a^t \phi_s \; dX_s +
-      \int_a^t \psi_s \; dX_s$.}
-   \item{$E\left[\int_a^t \phi_s \;dW_s \right] = 0$.}
-   \item{$E\left[\left(\int_a^t \phi_s \;dW_s\right)^2 \right] =
-      E\left[\int_a^t \phi^2_s \;dW_s \right]$.}
-\end{enumerate}
-
-
-
-
-\subsection{Existence Conditions}
-
-For the limit to exist---and, therefore, the It\={o} Integral---we must
-satisfy certain conditions.
-\begin{enumerate}[]
-   \item[(i)]{$\phi_t$ is \emph{adapted} to $W_t$.}
-   \item[(ii)]{$\phi_t$ is \emph{square-integrable}.}
-\end{enumerate}
-
-\paragraph{Definition} We say that a process, $\phi_t$ is
-\textbf{adapted} to $W_t$ if, for any $s > t$, $\phi_t$ is independent
-of $W_s - W_t$.
-
-\paragraph{Definition} We say that a random variable process, $\phi_t$ is
-\textbf{square-integrable} if, for any $T>0$,
-   \[E \left[ \int^T_0 |\phi_t|^2 \; dt \right] < \infty.\]
-This is equivalent to checking that the first and second moments are
-finite.
-And as a side note, you can take the expectation operater inside the
-integral because $|\phi_t|^2$ is a positive random variable.
-
-\subsection{Mode of Convergence}
-
-If $\phi_t$ satisfies the two conditions above, then the sequence of
-sums $IS(\phi, \Delta)$ will converge as $||\Delta||\rightarrow 0$ to a
-random variable, denoted by the It\={o} integral of $\phi_t$ against
-$W_t$. What's more, it so happens that the It\={o} Sums converge to
-the It\={o} Integral in mean square.
-
-\paragraph{Definition} We say that a sequence of random variables,
-$\{ X_n | n \in \mathbb{N} \}$ converges to a random variable $X$ in
-\textbf{mean-square} if
-   \[\lim_{n \rightarrow \infty} E\left[ |X_n - X|^2 \right] = 0, \]
-which, as can be seen upon expanding, checks that $EX_n \rightarrow
-EX$ and $Var(X_n) \rightarrow Var(X)$---i.e. that the the two random
-variables are the same.
-In the case of the It\={o} Integral, this means that
-   \[\lim_{||\Delta||\rightarrow 0} E \left[ \left\lvert IS(\phi, \Delta)
-      - \int_0^T \phi_t dW_t \right\rvert^2 \right] = 0.\]
-
-\subsection{Useful Examples}
-
-\begin{enumerate}
-   \item{In the derivation of the following result,
-      one uses the property of
-      convergence in mean square to obtain:
-      \[ \int_0^T W_t \; dW_t = \frac{1}{2} W_T^2 - \frac{1}{2} T \]}
-   \item{Follows because it's a telescoping sum:
-      \[ \int_a^b dX_t = X_b - X_a  \]
-      \[ \int_0^T dW_t = W_T - W_0 = W_T \]}
-   \item{This next result follows from the fact that $M_t = \int_0^T
-      \phi_s dW_s$ is a martingale:
-      \[ E\left[\int_0^T \phi_t \; dW_t\right] = 0 \]}
-   \item{The second order variation comes into play here:
-      \[ E\left[\left(\int_0^T \phi_t \; dW_t\right)^2\right] =
-      E\left[\int_0^T \phi^2_t \; dW_t\right] \]}
-\end{enumerate}
-
-
-
-
-\subsection{Stochastic Differential Equations}
-
-Our models for stock prices will be solutions to \textbf{stochastic
-differential equations}, which are expressions of the form
-\begin{equation}
-   \label{sde}
-   dX_t = a(X_t,t)\;dt + b(X_t,t)\;dW_t.
-\end{equation}
-A stochastic process $X_t$ that solves this SDE will be of the form
-   \[ X_t - X_a = \int_a^t dX_s = \int_a^t a(X_s,s)\;ds + b(X_s,s)\;W_s
-      \]
-Now as a word of caution, such equations don't always have solutions, and
-if they do, there's no guarantee that the solution is unique, unless
-we put some assumptions on the coefficients.  Respectively, the
-coefficients $a(x,s)$ and $b(x,s)$ are functions for the \emph{drift}
-coefficient and the \emph{diffusion} coefficient.
-
-\subsection{It\={o}'s Lemma}
-
-\paragraph{Lemma} Let $f: \mathbb{R}\times [0,\infty) \rightarrow
-\mathbb{R}$ be a function that is twice differentiable in $x$, and
-once differentiable in $t$. Also, let $X_t$ be a soltuion to the equation
-   \[ dX_t = a(X_t,t)\; dt + b(X_t,t)\; dW_t.\]
-Then $f(X_t,t)$ is a stochastic precess that satisfies the SDE
-   \[ df(X_t,t) = \left[f_t(X_t,t) + a(X_t,t) \cdot f_x(X_t,t)
-      + \frac{1}{2}\; b^2(X_t,t)\cdot f_{xx}(X_t,t)\right]\;dt \]
-   \[ \qquad + b(X_t,t)\cdot f_x(X_t,t)\;dW_t. \]
-
-\subsection{Solving SDE Problems}
-
-Stochastic diffeernital equations offer two possibilities:
-   \begin{enumerate}
-      \item{Solving stochastic differential equations that are given
-	 by finding a function for the variable $X_t$ of interest.}
-      \item{Solving stochastic integrals by transforming the problem
-	 into an SDE and solving an easier expression}
-   \end{enumerate}
-We'll consider both of those now---albeit in the reverse order from
-how they were stated.
-
-\subsubsection{Solving Stochastic Integrals with SDE's}
-
-Suppose that you're given a stochastic integral, $\int \phi_t dW_t$,
-to compute. How can you simplify?
-\begin{enumerate}
-   \item{The ultimate goal is to find a function $f(x)$ such that
-      \[\phi_t dW_t = d(f(\phi_t)).\]
-      If we have that function $f$, we can use the properties of the
-      It\={o} Integral to compute easily
-      \[ \int^b_a \phi_t\; dW_t =  \int^b_a d(f(\phi_t)) =
-	 f(\phi_b) - f(\phi_a).\]
-	 }
-   \item{But first, we have to find the SDE that this corresponds to.
-      Since we're applying It\={o}'s Lemma by finding $d(f(\phi_t))$, we
-      should really find the parameters such that
-      \begin{equation}
-	 \label{implicit}
-	 d\phi_t = a(\phi_t, t)\;dt + b(\phi_t, t) \; dW_t.
-      \end{equation}
-      Since we know $\phi$ and we $dt$ and $dW_t$ are already in there,
-      this amounts to finding the values $a(\phi_t, t)$ and $b(\phi_t,t)$
-      that make Equation \ref{implicit} hold.
-	 }
-   \item{Once we have $a(\phi_t, t)$, $b(\phi_t, t)$, and a suitable
-      guess for $f(x)$, we can apply It\={o}'s Lemma.  Hopefully,
-      the original integral, $\int \phi_t dW_t$, is in the derived
-      equation, and everything else is simple enough for us to solve.}
-\end{enumerate}
-
-
-\paragraph{Example 1} We hope to solve $\int^t_a W_s dW_s$. I will
-solve this problem in steps mirroring the numbered steps listed above.
-\begin{enumerate}
-   \item{Since our integral looks somewhat like $\int f(x) dx$, an
-      educated guess would be the equation $f(x) = \frac{1}{2} x^2$,
-      which is the integral of the traditional calculus problem.
-      }
-   \item{Next, we realize that $\phi_t = W_t$ in our problem, and
-      so set up the corresponding, implicit SDE:
-      \[ dW_t = a(W_t, t) dt + b(W_t, t) dW_t.\]
-      The only values for $a$ and $b$ that make this hold are $a=0$
-      and $b=1$.
-      }
-   \item{Next, we apply It\={o}'s Lemma, which simplifies to
-	 \[d(f(W_t)) = \frac{1}{2}\; dt + W_t \; dW_t. \]
-      From there, we can shift around to get our original problem
-	 \[W_t \; dW_t= d(f(W_t)) -\frac{1}{2}\; dt \]
-      and integrate to solve the SDE:
-	 \[ \int^t_a W_t \; dW_t =\int^t_a d(f(W_t))-\frac{1}{2}\;dt\]
-	 \[ \int^t_a W_t \; dW_t=\;\frac{1}{2}\;W^2_t-\frac{1}{2}\;W^2_a
-	    - \frac{1}{2}\;(t-a).\]
-      }
-\end{enumerate}
-
-\paragraph{Example 2} We hope to solve $\int^t_a W^2_s\;dW_s$. I will
-solve this problem in steps mirroring the numbered steps listed above.
-\begin{enumerate}
-   \item{Since our integral looks somewhat like $\int f^2 dx$, an
-      educated guess would be the equation $f(x) = \frac{1}{3} x^3$,
-      which is the integral of the traditional calculus problem.
-      }
-   \item{Need help with this.}
-
-\end{enumerate}
-
-\subsubsection{Solving SDE's with Integrals}
-
-The general method involves finding a suitable function to use in
-applying It{o}'s Lemma. Then solve this easier problem.
-
-
-\subsection{Geometric Brownian Motion}
-
-The basic stochastic differential equation representation is
-   \[ dX_t = \mu X_t \; dt + \sigma X_t \;dW_t \]
-We start by considering a function we can use in order to apply
-It\={o}'s Lemma:
-   \[ f(x) = \ln(x) \]
-   \[ f_t = 0, \;\; f_x = \frac{1}{x}, \;\; f_{xx} = -\frac{1}{x^2} \]
-Using the Lemma, we ccan write
-   \[ d(\ln(X_t)) = \left[ 0 + \mu X_t \cdot \frac{1}{X_t} -
-      \frac{1}{2} \; \sigma^2 X_t^2 \cdot \frac{1}{X_t^2} \right]\; dt
-      + \sigma \frac{1}{X_t} X_t\; dW_t \]
-   \[ d(\ln(X_t)) = \left( \mu - \frac{1}{2}\sigma^2 \right) dt
-      + \sigma dW_t \]
-We can now solve this easily for $X_t$ since all terms on the righthand
-side are known, and independentof $X_t$:
-   \[ \int^t_0 d(\ln(X_s)) \; ds =  \int^t_0 \left( \mu -
-      \frac{1}{2}\sigma^2 \right) ds + \sigma dW_s \]
-   \[ \ln(X_t) - ln(X_0) = \left( \mu -
-      \frac{1}{2}\sigma^2 \right) t - 0 + \sigma W_t - \sigma W_0 \]
-   \[ \ln(X_t) = ln(X_0) + \left( \mu -
-      \frac{1}{2}\sigma^2 \right) t +  \sigma W_t \]
-   \[X_t = X_0 \; e^{\left( \mu -
-      \frac{1}{2}\sigma^2 \right) t +  \sigma W_t} \]
-
-\subsection{Ornstein-Uhlenbeck Process}
-
-This process is defined by the SDE
-   \[ dX_t = \mu X_t \; dt + \sigma \;dW_t \]
-This case differs from geometric Brownian motion in that there is no
-$X_t$ in front of $dW_t$.
-
-For this case, choose $f(x,t) = xe^{-\mu t}$.  Applying It\={o}'s Lemma
-gives us
-   \[d(X_t e^{-\mu t})=\left(-X_t\;\mu e^{-\mu t} + X_t \mu e^{-\mu t}
-      \right) + \sigma e^{-\mu t} dW_t \]
-   \[ d(X_t e^{-\mu t})= \sigma e^{-\mu t} dW_t \]
-Integrating this expression yields
-   \[ \int^t_0 d(X_s e^{-\mu s}) = \int^t_0 \sigma e^{-\mu t} dW_t \]
-   \[ X_t e^{-\mu t} - X_0 e^{-\mu 0} = \int^t_0 \sigma e^{-\mu t} dW_t
-      \]
-   \[ X_t = X_0 e^{\mu t} + \int^t_0 \sigma e^{-\mu (t-s)} dW_t
-      \]
-
-\subsection{Cox-Ingersoll-Ross Model}
-
-This model, which exhhibits mean reversion and volatility that grows
-with $r_t$ is defined
-   \[ dr_t = a(b-r_t) \; dt + \sigma \sqrt{r_t} \; dW_t.\]
-
-\subsection{Vasicek Model}
-
-This interest rate model has mean reversion, where $b$ is the mean. It's
-defined by the following SDE:
-   \[ dr_t = a(b-r_t) \; dt + \sigma \; dW_t.\]
-
-\subsection{Continuous Time Stochastic Processes}
-
-Here, we develop the necessary machinery in continuous time stochastic
-processes to model asset price evolution properly and with sufficient
-richness and generality. In particular, we discuss a heirarchy of model
-classes that includes Brownian Motion $\subset$ Generalized Brownian
-Motion $\subset$ Diffusions $\subset$ Ito Processes.
-
-\subsection{Introduction}
-
-A \emph{stochastic process} $X$ is a collection of random variables
-indexed by time: $X = \{ X_t: t \in \mathcal{T} \}$.
-\begin{itemize}
-   \item[-]{\emph{Discrete Time}: $\mathcal{T}$ countable, and process
-      changes only at discrete time intervals.}
-   \item[-]{\emph{Continuous Time}: $\mathcal{T}$ uncountable.}
-\end{itemize}
-\paragraph{Definition} A process $X$ has stationary increments if
-$X_T - X_t$ has the same distribution as $X_{T'} - X_{t'}$ provided
-that $T-t= T'-t'$.
-
-\subsection{Brownian Motion}
-
-\paragraph{Definition} The most basic continuous-time process is
-\emph{Brownian Motion} (or the \emph{Wiener Process}).  It has three
-defining properties:
-\begin{enumerate}
-   \item[i.]{$W(0) = O$.}
-   \item[ii.]{$W(t)$ is continuous, so no jumps.}
-   \item[iii.]{Given any two times, $T>t$, the increment $W(T) - W(t)$ is
-      independent of all previous history and normally distributed
-      with mean $0$ and variance $T-t$.}
-\end{enumerate}
-A few consequences of the definition of $W(t)$:
-\begin{itemize}
-   \item[-]{Brownian motion has independent stationary increments.}
-   \item[-]{$W(t)$ is normally distributed with $\mu =0$, $\sigma^2 = t$.
-      }
-\end{itemize}
-
-\subsection{Generalized Brownian Motion}
-
-\paragraph{Definition} A \emph{generalized Brownian motion} is a
-continuous-time process $X$ with the following property:
-   \[ X(t) = X(0)+\mu t + \sigma W(t) \]
-where $\mu$ is the \emph{drift}, $\sigma$ is the \emph{volatility},
-and $W$ is simple Brownian motion. The differential equation
-equivalent is written:
-   \[ dX(t) = \mu \; dt + \sigma \; dW(t).\]
-It follows immediately from the definition that
-\begin{itemize}
-   \item[-]{$X(t)$ is continuous, so no jumps.}
-   \item[-]{$X(t)$ is normally distributed with mean $X(0)+\mu t$,
-      variance $\sigma^2 t$.
-      }
-   \item[-]{Given any two times, $T>t$, the increment $X(T) - X(t)$ is
-      independent of all previous history and normally distributed
-      with mean $\mu(T-t)$ and variance $\sigma^2(T-t)$.}
-   \item[-]{$X$ is a martingale if and only if $\mu = 0$.}
-\end{itemize}
-\paragraph{Theorem} It also happens that Generalized Brownian motions
-are the only continuous time processes with continuous sample
-paths and stationary increments.
-
-\subsection{Ito Processes}
-
-Even more general than Brownian Motion (which is retained as a special
-case), an \emph{Ito Process} is
-a stochastic process $X$ defined by one of two equivalent formulations:
-   \[ dX(t) = \mu(t) \; dt + \sigma(t) \; dW(t) \]
-   \[ X_t = X_0 + \int^t_0 \mu(s) \; ds + \int^t_0 \sigma(s) \; dW(s)
-      \]
-for any arbitrary stochastic processes $\mu$ (the drift) and $\sigma$
-(the volatility) along with some Brownian Motion $W(t)$.  Here are
-some properties
-\begin{itemize}
-   \item[-]{Has continuous sample paths and is a martingale if and only
-      if $\mu(t) = 0$. }
-   \item[-]{Increments are not necessarily stationary, as $\mu$ and
-	 $\sigma$ can change \emph{randomly} with time.}
-\end{itemize}
-
-\paragraph{Definition} If the drift and volatility of an Ito process
-depend only upon the current value of the process and time, then
-$X$ is a \emph{diffusion}.  Mathematically, $X$ is a \emph{diffusion}
-if
-   \[ dX(t) = \mu(X(t),t)\; dt+ \sigma(X(t),t)\; dW(t) \]
-for some functions $\mu$ and $\sigma$.
-
-\subsection{Ito's Lemma}
-
-Suppose that $X$ is an Ito process defined by
-\begin{equation}
-   \label{ito}
-   dX(t) = \mu(t) \; dt + \sigma(t) \; dW(t)
-\end{equation}
-and we define a new process $Y(t) = f(X(t),t)$ where $f$ is some
-function that's twice differentiable in $X$ and once in $t$.  Then
-we have that
-\begin{equation}
-   \label{lemma}
-   dY(t) = f_X(X(t),t) \; dX(t) + f_t(X(t),t) \; dt + \frac{1}{2}
-   f_{XX}(X(t),t)\sigma(t)^2 \; dt.
-\end{equation}
-where subscripts on $f$ denote the partial derivatives.\footnote{Note
-that Equation \ref{lemma} almost looks like the chain rule from
-traditional calculus, except for that extra term with $f_{XX}$ partial
-derivative. That arises from the additional variability due to the
-inclusion of stochastic factors like $W(t)$ in the original Ito
-Process.} Subbing Equation \ref{ito} into Equation \ref{lemma},
-we get that
-   \[ dY(t) =\left(f_X(X(t),t)\mu(t) + f_t(X(t),t)  + \frac{1}{2}
-      f_{XX}(X(t),t)\sigma(t)^2 \right) \; dt +
-      f_X(X(t),t)\sigma(t) \; dW(t)
-   \]
-Thus, it is clear that $Y$ is also an Ito Process by the statement
-above with the drift and volatility given by the coefficients on
-$dt$ and $dW(t)$ as always.
-
-\paragraph{Using Ito's Lemma} In practice, we use Ito's Lemma
-whenever we have a (typically complicated) Ito Process that we want
-to solve.  Given the process $X$ and its corresponding Ito Process,
-we posit a function $f$ that could could help. Then we write a
-new Ito Process using Ito's lemma with $dY(t) = df(X(t),t)$ on the LHS.
-From there, hopefully we can integrate $dY(t)$ easily on the left and
-solve out for $X(t)$.
-
-\subsection{Multi-dimensional Ito's Lemma}
-
-For the sake of completeness, let's generalize Ito's Lemma to consider
-the case of a finite number of Ito processes, $X_1, X_2, \ldots, X_n$,
-   \[ dX_i(t) = \mu_i(t)\; dt + \sigma_i(t) \; dW_i(t).\]
-Next, define $Y(t) = f(X_1(t), \ldots, X_n(t), t)$ for some
-differentiable function $f$.  Then multi-dimensional Ito's Lemma says
-\begin{align*}
-    dY(t) &= \sum^n_{i=1} f_{X_i}(X_1(t), \ldots, X_n(t), t) \;
-      dX_i(t) \\
-    &+ f_{t}(X_1(t), \ldots, X_n(t), t) \; dt \\
-    &+ \frac{1}{2} \sum^n_{i=1}\sum^n_{j=1}
-      f_{X_i,X_j}(X_1(t), \ldots, X_n(t), t) \; \rho_{ij}\sigma_i(t)
-      \sigma_j(t) \; dt
-\end{align*}
-where $\rho_{ij}$ is the correlation coefficient between $dW_i$ and
-$dW_j$. Note that you'll have to plug back in for the $dX_i$ in the
-first sum.
-\\
-\\
-We'll mostly consider with the two-dimensional case for the
-two specific instances below:
-\begin{itemize}
-   \item[i.]{$Y(t) = X_1(t)X_2(t)$, which gives us
-      \[ dY(t) = X_2(t) \; dX_1(t) + X_1(t) \; dX_2(t) +
-	 \rho_{12}\sigma_1(t)\sigma_2(t) \; dt \]
-      Note that you'll have to plug back in for $dX_1$ and $dX_2$.
-      This is a type of integration-by-parts formula because (after
-      rearranging terms) it relates $X_1\; dX_2$ to $X_2\; dX_1$.
-   }
-
-   \item[ii.]{$Y(t) = X_1(t)/X_2(t)$, which gives us
-      \begin{align*}
-	 dY(t) = \frac{1}{X_2(t)} dX_1(t) - \frac{X_1(t)}{X_2(t)^2}
-	 dX_2(t) +  \frac{X_1(t)}{X_2(t)^3} \sigma_2(t)^2 \;dt -
-	 \frac{1}{X_2(t)^2} \; \rho_{12}\sigma_1(t)\sigma_2(t) \; dt.
-      \end{align*}
-      Note that you'll have to plug back in for $dX_1$ and $dX_2$.
-      This is a type of integration-by-parts formula because (after
-      rearranging terms) it relates $X_1\; dX_2$ to $X_2\; dX_1$.
-      }
-\end{itemize}
 
 
 \subsection{Geometric Brownian Motion}
@@ -11121,57 +11213,266 @@ representation
 \clearpage
 \subsection{Wold's Theorem}
 
-\begin{thm}
-Suppose $\{y_t\}_{t=-\infty}^\infty$ is a covariance stationary process.
-Then it can be representated as
+This theorem justifies the entire field of \emph{linear} time series
+analysis. In effect, it says that if you give me \emph{any}---repeat,
+\emph{any}---covariance stationary process, we can
+\emph{without loss of generality} write the process as an MA($\infty$)
+process with white noise errors.
+Though it might be more convenient to work with and
+manipulate \emph{other} representations (MA(q), AR(p), AR($\infty$),
+ARMA(p,q), etc.) in practice, we lose nothing by working with the
+MA($\infty$) representation when stating and proving results. And
+indeed, we will make use of this result extensively in later subsections
+by mostly working with the MA($\infty$) representation of processes.
+
+
+\begin{thm}\emph{(Wold's Theorem)}
+Suppose $\{\bsy_t\}_{t=-\infty}^\infty$ is a covariance stationary process.
+Then it can always be representated as
 \begin{align*}
-  y_t = \kappa_t + \sum_{s=0}^\infty c_s \varepsilon_{t-s}
-  \qquad \varepsilon_t\sim(0,\sigma^2)
+  \bsy_t = \bskappa_t + \sum_{k=0}^\infty \bsC_k \bsw_{t-k}
+  \qquad \bsw_t\sim(\bso,\bsSigma)
 \end{align*}
-where
-\begin{enumerate}[label=(\roman*)]
-  \item $\{\varepsilon_t\}$ are uncorrelated white noise (not
-    necessarily independent)
-  \item $\sum_{s=0}^\infty c_s^2<\infty$
-  \item $\kappa_t$ is uncorrelated with $\varepsilon_{s}$ for any $s$
-    and is perfectly linearly predictable from past $y_t$.
+where the components have the following names and satisfy the following
+properties:
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item \emph{(Wold Innovations $\bsw_T$):}
+    Innovations $\{\bsw_t\}$ are uncorrelated white noise, but
+    \emph{not} necessarily independent.\footnote{%
+      As always, only for Gaussian RVs is uncorrelated $\iff$
+      independent.
+    }
+  \item
+    \emph{(Linearly Deterministic Component $\bskappa_t$)}:
+    Term $\bskappa_t$ is uncorrelated with $\bsw_{s}$ for any $s$ (past
+    or future) and is perfectly linearly predictable from past
+    $\{y_s\}_{s=-\infty}^{t-1}$.
+  \item \emph{(Linearly Regular Component):} This is name for the second
+    term on the RHS
+  \item $\sum_{k=0}^\infty \bsC_k\bsC_k'$ finite
 \end{enumerate}
 \end{thm}
-Therefore, treating any arbitrary covariance stationary processes as an
-MA($\infty$) (with white noise errors) is without loss of generality.
-Though it might be more convenient to work with and manipulate
-\emph{other} representations (MA(q), AR(p), AR($\infty$), ARMA(p,q),
-etc.) in practice, we lose nothing by working with the MA($\infty$)
-representation when stating and proving results. And indeed, we will
-make use of this result extensively in later subsections by mostly
-working with the MA($\infty$) representation of processes.
 
-To be especially pedantic, note how strong this theorem is. This theorem
-doesn't just say ``we can find sequences $\{c_s\}$ and $\{\kappa_t\}$
-along with white noise process $\{\varepsilon_t\}$ so that the resulting
-MA($\infty$)
-\begin{align}
-  \kappa_t + \sum_{s=0}^\infty c_s \varepsilon_{t-s}
-  \label{wold}
-\end{align}
-has the same mean and covariance function''---which
-is a weaker statement about moments. No, the theorem is stronger and
-says says that we can find $\{c_s\}$ and $\{\kappa_t\}$
-along with white noise process $\{\varepsilon_t\}$ so that the resulting
-MA($\infty$) as in Expression~\ref{wold} has the exact same
-\emph{joint distribution} as $y_t$:
+\begin{rmk}
+The power of this result deserves further emphasis.
+In particular, note that we're \emph{not} saying ``For any covariance
+stationary process $\{\bsy_t\}\tinfinf$, there's a corresponding
+MA($\infty$) process with the same mean and covariance function.''
+That's a more limited statement about \emph{moments}, i.e. averages
+across outcomes $\omega$'s in the sample space $\Omega$.
+
+While true, we're saying something even stronger: ``For any covariance
+stationary process $\{\bsy_t\}\tinfinf$, there's an MA($\infty$) process
+constructed from white noise shocks such that
+the \emph{joint distributions} (not just moments/averages)
+are \emph{identitcal}'', i.e.
 \begin{align*}
   \begin{pmatrix}
-    y_t \\ \vdots \\ y_{t+k}
+    \bsy_t \\ \vdots \\ \bsy_{t+s}
   \end{pmatrix}
   \overset{d}{=}
   \begin{pmatrix}
-    \kappa_t + \sum_{s=0}^\infty c_s \varepsilon_{t-s}
+    \kappa_t + \sum_{k=0}^\infty \bsC_k \bsw_{t-k}
     \\ \vdots \\
-    \kappa_{t+k} + \sum_{s=0}^\infty c_s \varepsilon_{t+k-s}
+    \kappa_{t+s} + \sum_{k=0}^\infty \bsC_k \bsw_{t+s-k}
   \end{pmatrix}
-  \qquad \forall t,k
+  \qquad \forall t,s
 \end{align*}
+\end{rmk}
+
+\clearpage
+\begin{proof}
+The proof relies on the projection theorem within Hilbert spaces.  So
+before constructing the Wold innovations, we first embed the process
+$\{\bsy_t\}\tinfinf$ within a proper Hilbert space.
+
+To start, vector-valued random process $\{\bsy_t\}\tinfinf$ necessarily
+lives on some probability space $(\Omega,\sF,P)$ which has associated
+$L^p(\Omega,\sF,P)$ collections of RVs. And because the process is
+covariance stationary, it has finite first and second moments, i.e.
+$\{\bsy_t\}\tinfinf$ is a subset of \emph{both} $L^1(\Omega,\sF,P)$ and
+$L^2(\Omega,\sF,P)$.
+And by Theorem~\ref{thm:L2}, $L^2(\Omega,\sF,P)$ joined with the
+following inner product is a Hilbert space
+\begin{align*}
+  \langle \bsX,\bsY\rangle
+  = \int_\Omega \bsX \bsY' \;dP
+  = \E[\bsX\bsY']
+  \qquad
+  \bsX,\bsY \in L^2(\Omega,\sF,P)
+\end{align*}
+But rather than work with this inner product, it will be more convenient
+to work with
+\begin{align}
+  \Cov(\bsX,\bsY)
+  := \big\langle \bsX-\E[\bsX],\;\bsY-\E[\bsY]\big\rangle
+  %= \int_\Omega (\bsX-\E[\bsY])(\bsX-\E[\bsY])' \;dP
+  = \E\big[(\bsX-\E[\bsY])(\bsX-\E[\bsY])'\big]
+  \label{woldinner}
+\end{align}
+It can easily be shown that $\Cov(\bsX,\bsY)$ is \emph{also} an inner
+product on $L^2(\Omega,\sF,P)$, with an induced norm under which
+$L^2(\Omega,\sF,P)$ a complete metric space, given by
+\begin{align}
+  \lVert \bsX\rVert
+  =
+  \Cov(\bsX,\bsX)
+  = \Var(\bsX)
+  \label{woldnorm}
+\end{align}
+So to sum up, $L^2(\Omega,\sF,P)$ together with inner product
+(\ref{woldinner}) is a Hilbert space, i.e. an inner product
+space complete under induced norm (\ref{woldnorm}). We work in this
+space.
+
+Now, return to our process
+$\{\bsy_t\}\tinfinf\subseteq L^2(\Omega,\sF,P)$.
+Given any $T$, let $\tilde{H}_T$ denote the set of all linear
+combinations of elements/RVs $\{\bsy_t\}_{t=-\infty}^T$:
+\begin{align*}
+  \tilde{H}_T :=
+  \big\{ \bsA_0 \bsy_T + \bsA_1\bsy_{T-1} + \cdots
+        \;|\; \text{For some matrices $\bsA_i$,}
+  \big\}
+\end{align*}
+It's not hard to see that any linear combination of RVs in
+$L^2(\Omega,\sF,P)$ will also be an RV in $L^2$, hence
+$\tilde{H}_T\subseteq L^2(\Omega,\sF,P)$.
+To finish up, just define $H_T\subseteq L^2(\Omega,\sF,P)$ as the
+completion of space $\tilde{H}_T$. That is, $H_T$ is just $\tilde{H}_T$
+plus any extra RVs in $L^2$ that we must include in order to make sure
+that $H_T$ is complete under norm (\ref{woldnorm}), i.e. that all Cauchy
+sequences of RVs in $H_T$ converge to some limit in $H_T$ .
+
+Now to construct the Wold innovations $\{\bsw_t\}\tinfinf$. By
+construction, each $H_T$ is a closed subspace of the Hilbert Space
+consisting of $L^2(\Omega,\sF,P)$ plus inner product (\ref{woldinner})
+with induced norm (\ref{woldnorm}). Therefore, apply the Projection
+Theorem to get the projection and innovation.
+\begin{enumerate}[label=(\roman*)]
+  \item
+    \emph{Projection}:
+    By the Projection Theorem, there \emph{exists a unique} point in
+    $H_{T-1}$ defined
+    \begin{align*}
+      \proj(\bsy_T|H_{T-1})
+      := \argmin_{\bsx\in H_{T-1}} \lVert \bsy_t-\bsx\rVert
+    \end{align*}
+    where again, $\lVert \,\cdot\,\rVert$ is induced norm (\ref{woldnorm}).
+    Since $\proj(\bsy_t|H_{T-1})\in H_{T-1}$, it is by definition of
+    $H_{T-1}$ the best forecast of realized $\bsy_T$ among \emph{all linear
+    combinations} of elements $\{\bsy_t\}_{t=-\infty}^{T-1}$, i.e. it the
+    best \emph{linear} predictor of $\bsy_T$ given observations up to time
+    $T-1$.\footnote{%
+      Note that this does \emph{not} mean that $\proj(\bsy_t|H_{T-1})$ is
+      the conditional expectation, since the conditional expectation can
+      generally be a nonlinear function of past observations.  Only if
+      $\{\bsy_t\}\tinfinf$ is a \emph{Gaussian} process do the best linear
+      predictor and conditional expectation coincide.
+    }
+
+  \item
+    \emph{Wold Innovation}:
+    Given $\proj(\bsy_T|H_{T-1})$, we can define the Wold innovation
+    \begin{align*}
+      \bsw_T := \bsy_T - \proj(\bsy_T|H_{T-1})
+    \end{align*}
+    By the Projection Theorem, it is guaranteed to be orthogonal to
+    \emph{any} $\bsx\in H_{T-1}$, i.e.
+    \begin{align*}
+      \bsw_T\perp \bsx \qquad \forall \bsx\in H_{T-1}
+      \quad\implies\quad
+      \Cov(\bsw_T,\bsx)=\bso
+      \qquad
+      \forall \bsx\in H_{T-1}
+    \end{align*}
+    That includes the particular point
+    $\proj(\bsy_T|H_{T-1})\in H_{T-1}$,
+    Therefore, we can write
+    \begin{align}
+      \bsy_T
+      &= \bsw_T + \proj(\bsy_T|H_{T-1})
+      \qquad
+      \Cov(\bsw_T,\proj(\bsy_T|H_{T-1}))=0
+      \label{woldbreak}
+    \end{align}
+    Lastly, note that for any $T$, space $H_{T}$ is spanned by subspace
+    $H_{T-1}\subseteq H_T$ and Wold innovation $\bsw_{T}$ that is
+    orthogonal to $H_{T-1}$.\footnote{%
+      To see this, think geometrically.
+      To get to some point $\bsx\in H_T$, we move around in subspace
+      $H_{T-1}\subseteq H_T$ until we're right under $\bsx\in H_T$.
+      Then use $\bsw_T$ that is orthogonal to $H_{T-1}$ to jump off
+      subspace $H_{T-1}$ in the direction of $H_T$ to the point
+      $\bsw_T$. The orthogonality of $\bsw_T$ ensures that this works.
+    }
+    Therefore, any RV $\bsx\in H_{T}$ can be written as a linear
+    combination of some element in $H_{T-1}\subseteq H_{T}$ and RV
+    $\bsw_T \perp H_{T-1}$.
+    This then implies that we can separately project onto the orthogonal
+    components
+    \begin{align}
+      \proj(\bsx|H_T)
+      = \proj(\bsx|\bsw_T) + \proj(\bsx|H_{T-1})
+      = \bsC\bsw_T + \proj(\bsx|H_{T-1})
+      \label{woldproj}
+    \end{align}
+    The second equality came from the fact that ``projection onto
+    $\bsw_T$'' means ``projection onto the set of all linear functions
+    of $\bsw_T$.'' We use $\bsC\bsw_T$ to denote the result.
+\end{enumerate}
+Now we can finish the Wold Decomposition.
+Start with Result~\ref{woldbreak}
+\begin{align*}
+    \bsy_T
+    &= \bsw_T + \proj(\bsy_T|H_{T-1})
+\end{align*}
+Then apply Result~\ref{woldproj} recursively to $\proj(\bsy_T|H_{T-k})$
+to get
+\begin{align*}
+  \bsy_T
+  &=
+  \bsw_T + \bsC_1\bsw_{T-1}
+  + \proj(\bsy_T|H_{T-2})
+  \\
+  &=
+  \bsw_T + \bsC_1\bsw_{T-1}
+  + \bsC_2\bsw_{T-2}
+  + \proj(\bsy_T|H_{T-3})
+  =\cdots
+  \\
+  %&\qquad\vdots \\
+  \implies\quad
+  \bsy_T
+  &=
+  \sum_{k=0}^{K-1} \bsC_{T-k}\bsw_{T-k}
+  + \proj(\bsy_T|H_{T-K})
+\end{align*}
+Take variances on both sides, and use the fact that everything on the
+RHS is orthogonal:
+\begin{align*}
+  \Var(\bsy_T)
+  &=
+  \sum_{k=0}^{K-1} \bsC_{T-k}\Var(\bsw_{T-k})\bsC_{T-k}'
+  + \Var(\proj(\bsy_T|H_{T-K}))
+\end{align*}
+The LHS is finite by assumed covariance stationarity. The first term on
+the RHS is therefore bounded above by $\Var(\bsy_T)<\infty$ and
+obviously monotonically increasing in $K$. Hence it is a Cauchy
+sequence, implying (by completeness since we're in a Hilbert space) that
+a well-defined limit exists, denoted
+$\sum_{k=0}^\infty \bsC_{T-k}\bsw_{T-k}$.
+
+The second term on the RHS has variance that's decreasing in $K$ but
+bounded below by zero (since variances are nonnegative).
+Hence the sequence is also Cauchy, implying a well-defined limit by
+completeness.
+Now by construction, the limit of this second term is in $H_{T-K}$ for
+every $K$, implying that the limit can be forecast arbitrarily well from
+past observations, no matter how far back in time we are.
+That's why it's called linearly deterministic: This component is
+perfectly linearly forecastable at all times.
+\end{proof}
 
 
 
