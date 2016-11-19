@@ -19089,219 +19089,491 @@ bad assumption.
 \end{defn}
 
 
-
-
-
-
-
-
-
-
 \clearpage
-\section{Classical Hypothesis Testing}
+\section{Classical/Frequentist Hypothesis Testing}
 
 There are two main approaches to \emph{hypothesis testing}: the
-\emph{Classical Approach} and the \emph{Bayesian Approach}.  This
-section focuses exclusively on the classical approach.
+\emph{classical} or \emph{frequentist} approach (covered in this
+section) and the \emph{Bayesian} approach (covered in
+Section~\ref{sec:bayesian}).
 
-\subsection{Five Basic Steps}
-
-Loosely, hypthesis testing seeks learn and conduct inference about
-parameter values.
-In the classical approach, there are five main steps. Note that four
-happen \emph{ex ante}, before we touch the data.
+Generically, we have data $\bsy:=\{\bsy_n\}\nN$ generated from some
+model/likelihood $p(\bsy|\bstildetheta)$ given some true and fixed
+parameter vector $\bstheta$. As always, we assume that we know the
+functional form $p(\bsy|\bstildetheta)$ for the model/likelihood but
+\emph{not} the true parameter values $\bstheta$.
+Therefore, we would like to use the data/sample $\bsy$ to conduct
+inference about $\bstheta$.
+In practice, that means testing \emph{hypotheses} about possible values
+for the true $\bstheta$.
+In brief, there are five main steps:
 \begin{enumerate}
   \item
     Set up \emph{explicit} null and alternative hypotheses about
-    parameter values, denoted $H_0$ and $H_a$ respectively.
-    There are two forms a hypothesis (either null or alternative) can
-    take:
-    \begin{itemize}
-      \item[-] {\sl Simple}: All parameters are specified
-          numerically. For example
-          \[ H_0: \beta = 0, \qquad H_a:\theta = 0.6\]
-      \item[-] {\sl Composite}: Not all parameters are specified
-          numerically. Examples include:
-          \begin{align*}
-            \text{One-Sided: } \;
-            \theta > 0.5 \;\text{or} \; \theta < 0.5
-            \qquad
-            \text{Two-Sided: } \; \theta \neq 0.5
-          \end{align*}
-    \end{itemize}
+    parameter values, denoted $H_0$ and $H_a$ (or $H_1$), resp.
+    On the basis of the sample realization $\bsy$, we will either reject
+    $H_0$ or \emph{fail to reject} $H_0$.
 
-  \item Choose a \emph{test-statistic} (mapping sample data to a number)
-    that we will compute in order to decide whether to accept or
-    reject $H_0$ depending upon the computed numerical value.
-    Since data realizations are inherently random, the test statistic
-    and accept/reject decision are inherently random too.\footnote{%
-      If the accept/reject decision were \emph{not} random, then we're
-      either rejecting or accepting $H_0$ \emph{regardless} of the data
-      we collect, which obviously defeats the purpose.
-    }
-    Below, we discuss optimal test statistics that essentially ensure
-    that our accept/reject decisions are sensible in light of the data.
+    Note: rejecting $H_0$ does \emph{not} mean we ``accept'' $H_a$, for
+    reasons of Type I error.
 
-  \item Adopt a tolerable Type I error rate on the basis of observed
-    data, denoted by $\alpha$:
-    \begin{align*}
-      \alpha = P(\text{Type I error})
-      = P(\text{Reject $H_0$ | $H_0$ True})
-    \end{align*}
-    This value is chosen at the discretion of the econometrician.
+  \item Choose a \emph{test-statistic} $T(\bsy)$ (mapping from sample
+    data $\bsy$ to a number/vector) that can be used to decide whether
+    to reject $H_0$ depending upon the sample realization and computed
+    numerical value of the test stat.
 
-  \item Given $\alpha$, establish the \emph{critical region}, so that if
-    the test-statistic falls within the region, we reject $H_0$ in favor
-    of $H_a$. The size of the critical region is chosen so that the Type
-    I error rate equals $\alpha$---i.e. if $H_0$ is true, the computed
-    value of the statistic will fall inside the critical region (leading
-    us to reject $H_0$) only $\alpha\%$ of the time in repeated
-    sampling.
+  \item Choose a tolerable Type I error rate on the basis of observed
+    data, denoted by $\alpha$.
+    This value is totally at the econometrician's discretion.
 
-  \item Finally, collect data, calculate the test statistic, and accept
-    or reject the null based on whether the test stat falls falls within
-    the critical region.
+  \item Establish the \emph{critical region}, which is defined as the
+    subset $C\subseteq \range(T(\bsy))$ such that we reject $H_0$ if
+    test statistic realization $T(\bsy)\in C$, subject to the constraint
+    of rejecting $H_0$ only $\alpha$\% of the time when $H_0$ is
+    actually true.
+
+  \item
+    Finally, collect sample data $\bsy$ and calculate the test statistic
+    $T(\bsy)$. Reject the null if $T(\bsy)\in C$. Fail to reject the
+    null if $T(\bsy)\in C$.
+
 \end{enumerate}
 Alternatively, we could also work with \emph{p-values}, replacing Steps
 4 and 5 with
 \begin{itemize}
   \item[4.*]
-    Collect data; compute the test stat and \emph{p-value}---the
-    probability of observing the computed value of the test stat (or a
-    more extereme value) given that $H_0$ is true.
+    Collect data, then compute the test statstic and \emph{p-value},
+    defined as the probability of observing the computed value of the
+    test stat (or a more extereme value) under the assumption that $H_0$
+    is true.
   \item[5.*] Reject $H_0$ if p-value $<\alpha$.
 \end{itemize}
+Notice that in the first five-step approach, four of the steps happen
+\emph{ex ante}, before we even touch the data.
+Frequentist hypothesis testing forces us to be explicit about what
+exactly we're testing and how to implement the test.
+
+Now let's unpack these steps and their components a little more in
+formal definitions.
+
 
 \clearpage
-\subsection{Type I \& II Error, Power, and the Fundamental Tradeoff}
+\subsection{Key Definitions}
 
-We now introduce the following table that will guide discussion:
-\begin{center}
-   \begin{tabular}{r c}
-      $\quad\qquad$ & $\qquad$ {\sl Decision}\\
-   \end{tabular}
-   \\
-   \begin{tabular}{l | c c}
-      {\sl True Situation} & Accept $H_0$ & Reject $H_0$\\\hline
-      $H_0$ True & \checkmark & \textbf{Type I Error}\\
-      $H_0$ False & \textbf{Type II Error} & \checkmark
-   \end{tabular}
-\end{center}
-The table above frames the inherent tradeoff in hypothesis testing.
-To starkly illustrate that tradeoff, notice that
+\begin{defn}(Hypothesis)
+Given model/likelihood $p(\bsy|\bstildetheta)$, a \emph{hypothesis}
+$H: \theta \in A\subseteq\bsTheta$
+is a statement/guess that region $A\subseteq\bsTheta$ of the pararameter
+space contains the (fixed) true parameter vector $\bstheta$ that
+generated data $\bsy\sim p(\bsy|\bstheta)$.
+
+Clearly, any hypothesis $H$ is either true or false: Either
+$\bstheta\in A\subseteq\bsTheta$ or not.
+We use sample data to try to infer that.
+Depending on $A\subseteq\bsTheta$, we classify a hypothesis $H$ as
+either
 \begin{itemize}
-  \item We can eliminate Type I error \emph{entirely} if we \emph{never}
-    reject $H_0$. But that's obviously ridiculous since sometimes $H_0$
-    is false, and we do want to reject.
-  \item Similarly, we can eliminate the risk of Type II error
-    \emph{entirely} if we \emph{always} reject $H_0$.
-    But that is also obviously ridiculous.
+  \item[-] \emph{Simple}:
+    $A$ is a single point in parameter space $\bsTheta$, so all
+    parameters fully specified, for example
+    $H: \bstheta = \bstheta_0$ or $H:\theta = 0.6$
+
+  \item[-] {\sl Composite}:
+    $A$ is \emph{not} a single point in the parameter space $\bsTheta$,
+    so there are at least some parameters \emph{not} specified.
+    Examples include $H:\bstheta\in A\subseteq\bsTheta$
+    or, in the case of scalar $\theta$, \emph{one-sided} tests like
+    $H:\theta>0.5$ or $H:\theta<0.5$ and \emph{two-sided} tests like
+    $H:\theta\neq 0$.
 \end{itemize}
-These examples illustrate two extremes of the inherent tradeoff:
-Reducing the chance of committing a Type I error often increases the
-chance of committing a Type II error, and vice versa.
-
-Now notice what we did in the previous subsection to handle this
-tradeoff. We \emph{fixed} the Type I error rate at $\alpha$.  We said
-``We're willing to live with an \emph{ex ante} probability of (at most)
-$\alpha$ for committing a Type I error.'' This resolves the tradeoff.
-It's then just a matter of choosing an accept/reject strategy that
-keeps $P(\text{Type I error})\leq\alpha$.
-And to discuss \emph{optimal} accept/reject strategies, we need to
-introduce the following definition.
-
-\begin{defn}(Power)
-The \emph{power} of any given strategy for accepting/reject $H_0$ is
-defined
-\begin{align*}
-   \text{Power} &= P(\text{Reject $H_0$} | H_0 \text{ False})
-   =1 - P(\text{Type II Error})
-\end{align*}
-In the case where $H_a$ is \emph{simple}, power is simply a number, but
-if $H_a$ is \emph{composite}, there is no unique value for the power.
-Rather, we have a \emph{power curve} or \emph{power surface}.
+For inference, we set up a baseline simple \emph{null hypothesis} $H_0$
+and a competing simple or composite \emph{alternative} hypothesis $H_a$
+(or $H_1$).\footnote{
+  A common alternative $H_a$ is simply ``not $H_0$'', i.e.
+  $H_0:\theta=\theta_0$ and $H_a:\theta\neq\theta_0$.
+}
+We use a statistical test to evaluate them.
 \end{defn}
 
-This suggests how to look for optimal accept/reject strategies for
-hypothesis testing.
-Specifically, we will seek tests that \emph{maximize power} (i.e.
-minimize the probability of Type II error), subject to keeping
-$P(\text{Type I error})\leq\alpha$.
+
+\begin{defn}(Statistical Test of Null and Alternative Hypotheses)
+A \emph{statistical test} of simple hypothesis $H_0$ versus simple or
+composite $H_a$ is a decision rule that says whether to reject the null
+$H_0$ after observing a particular data sample $\bsy$.  More precisely,
+a statistical test is a measurable function $\varphi(\bsy)\mapsto [0,1]$
+of the sample data $\bsy:=\{\bsy_n\}\nN$ such that
+\begin{align}
+  \varphi(\bsy)
+  =
+  \begin{cases}
+    1 & \implies \text{Reject $H_0$} \\
+    q\in(0,1) & \implies \text{Reject $H_0$ with prob. $q$} \\
+    0 & \implies \text{Fail to Reject $H_0$}
+  \end{cases}
+  \label{stattest}
+\end{align}
+A few important things to note in all of this
+\begin{itemize}
+  \item The language ``Fail to reject $H_0$'' is chosen precisely to
+    highlight the fact that ``not rejecting'' does not mean
+    ``accepting.'' Even if we fail to reject $H_0$, the hypothesis still
+    might be wrong because of sampling error, i.e. Type I error (see
+    below)
+  \item
+    More natural than $\varphi(\bsy)\mapsto[0,1]$ is
+    $\varphi(\bsy)\mapsto \{0,1\}$, i.e. a test/decision rule that
+    always specifies simply ``reject'' or ``don't reject.''
+    The middle case of Expression~\ref{stattest} weirdly implies that
+    for some sample draws $\bsy$, you decide whether to reject by
+    flipping a coin with probability $q$.
+    But this case is there purely for technical reasons in case we deal
+    with discrete-valued $\bsy_n$, which might require such
+    randomization to hit an exact $\alpha$-level.
+
+  \item Given that a test is just a decision rule for (or answer to) the
+    question ``Should I reject the null $H_0$?'', the alternative $H_a$
+    seems superfluous.
+    But that's not true.  Specifically, to decide how compelling
+    the null $H_0$ is, we really need to say ``Compared to what?'' Sure
+    the null $H_0$ might not seem super likely given the data, but to
+    say that $H_0$ is \emph{so unlikely} that it's probably incorrect,
+    we really need to know what the alternatives are.
+\end{itemize}
+Note that because the data $\bsy$ is \emph{random}, the test
+result $\varphi(\bsy)$ is \emph{also} a random variable on the
+underlying probability space.
+\end{defn}
+
+\clearpage
+Once we have a test, we might reasonably ask ``How good is it?'' or,
+more precisely, ``How often does the test/decision rule do the right or
+wrong thing?''
+This brings us to a discussion of different types of errors a test might
+make, as summarized in the table below:
+\begin{center}
+  \footnotesize
+  \begin{tabular}{l | c c}
+    & \multicolumn{2}{c}{Decision} \\\cline{2-3}
+    Reality & Fail to Reject $H_0$ & Reject $H_0$\\\hline
+    $H_0$ True & \checkmark & \textbf{Type I Error}\\
+    $H_0$ False & \textbf{Type II Error} & \checkmark
+  \end{tabular}
+\end{center}
+Now obviously, we'd like our test $\varphi(\bsy)$ to commit
+\emph{neither} Type I nor Type II errors, but that's actually not so
+easy because of the fundamental tradeoff in hypothesis testing.
+In particular, reducing the probability of Type I error mechanically
+increases the probability of Type II error, and vice versa.
+This is most obvious in the extreme.
+Specifically, we can eliminate Type I error \emph{entirely} if we
+\emph{never} reject $H_0$. But that's obviously ridiculous since
+sometimes $H_0$ is actually false, and we do want to reject.
+Alternatively, we can eliminate the risk of Type II error
+\emph{entirely} if we \emph{always} reject $H_0$. But that is also
+obviously ridiculous.
+So we have to balance the two and handle the tradeoff sensibly.
+How to proceed?
+
+The standard resolution to this tradeoff is first to fix an acceptable
+probability of Type I error (the $\alpha$ level) and then minimize the
+probability of Type II (or, equivalently, maximize power) subject to
+this constraint. We now make all of this precise with some definitions.
+
+
+\begin{defn}($\alpha$-Level)
+Define \emph{$\alpha$-level} or \emph{Type I error rate} of test
+$\varphi(\bsy)$ for simple null $H_0$ and simple or composite
+alternative $H_a$ as the probability of Type I error:
+\begin{align*}
+  \alpha
+  :=
+  \E_0[\varphi(\bsy)]
+  = P_0[\text{Reject $H_0$}]
+\end{align*}
+where $\E_0$ is the expectation under $P_0$, the probability
+measure \emph{assuming null $H_0$ is true}.
+\end{defn}
+
+\begin{defn}(Power)
+Given a statistical test $\varphi(\bsy)$ for simple null $H_0$ and
+\emph{simple} alternative $H_a$, we define the \emph{power} of test
+$\varphi$ as one minus the probability of Type II error:
+\begin{align}
+  \text{Power}
+  &:=
+  \E_a[\varphi(\bsy)]
+  = P_a[\text{Fail to Reject $H_0$}]
+  \label{power}
+\end{align}
+where $\E_a$ is the exp. under $P_a$, the prob. measure
+\emph{assuming simple alternative $H_a$ is true}.
+
+Note the restriction above to a \emph{simple} alternative $H_a$.  If
+$H_a$ were \emph{composite}, there would instead be a \emph{range} of
+probability measures corresponding to different values of $\bstheta$
+allowed under the alternative, giving a \emph{power curve/surface}
+(rather than just a number as in Expression~\ref{power}).
+Then we might think of averaging power across alternative $\bstheta$, as
+in the next definition.
+\end{defn}
+
+\begin{defn}(Weighted Average Power)
+Given statistical test $\varphi(\bsy)$ for simple null $H_0$ and
+\emph{composite} alternative $H_a:\theta \in A\subseteq\bsTheta$, let
+$w:A \ra \R$ denote a weighting function over parameter values allowed under
+the alternative $H_a$, let $P_{a,\bstheta}$ denote the probability
+measure under the alternative that supposes $\bstheta\in A$ is the true
+parameter value, and let $\E_{a,\bstheta}$ denote the expectation under
+that measure.
+We can then define the \emph{weighted average power} as
+\begin{align*}
+  \text{Weighted Ave. Power}
+  &:=
+  \E_w\big[
+  \E_{a,\bstheta}[\varphi(\bsy)]
+  \big]
+  =
+  \int_A
+  \left[
+  \int_{\bsY}
+  \varphi(\bsy)\; dP_{a,\bstheta}
+  \right]
+  w(\bstheta)
+  \; d\bstheta
+\end{align*}
+i.e. compute power $\int_{\bsY}\varphi(\bsy)\;dP_{a,\bstheta}$ for all
+alternative $\bstheta\in A$, then average with weights $w(\bstheta)$.
+\end{defn}
+
+\clearpage
+\subsection{Test Statistics and Confidence Intervals}
+
+The above definition of a test was \emph{very} abstract, treating a
+statistical test simply as a measurable function $\varphi(\bsy)$ of the
+data. This level of generality was convenient for defining concepts like
+the $\alpha$-level and power, but it's not immediately clear where
+$\varphi(\bsy)$ comes from or how to work with these concepts in
+practice. This sections helps a bit with that.
+
+In practice, most hypothesis testing is done in terms of test-statistics
+and confidence intervals. In this approach, we specify functions of the
+data $T(\bsy)$ and $\bshattheta(\bsy)$, and then construct a statistical
+test as some function of these underlying objects, i.e.
+$\varphi(\bsy)=g(T(\bsy))$ or $\varphi(\bsy)=g(\bshattheta(\bsy))$.
+This section therefore defines these objects, while the next section on
+Neyman-Pearson will say more about how to choose/construct
+\emph{optimal} test statistics and confidence intervals.
+
+
+\begin{defn}(Test-Statistic and Corresponding Critical Region)
+Suppose we have some arbtrary mapping $T(\bsy)$ from sample data $\bsy$
+to a number.
+We can use this function to define a statistical test, in which case
+$T(\bsy)$ is called a \emph{test-statistic}, where the
+corresponding/induced test $\varphi(\bsy)$ is defined
+\begin{align*}
+  \varphi(\bsy)
+  = \mathbf{1}\{T(\bsy)\in C\}
+\end{align*}
+for some subset $C\subseteq\range(T(\bsy))$ of the range of the test
+statistic called the \emph{critical region}, defined implicitly by the
+equation
+\begin{align}
+  \alpha
+  = \E_0[\varphi(\bsy)]
+  = P_0[T(\bsy)\in C]
+\end{align}
+where $\alpha$ is the desired $\alpha$-level for the test, $P_0$ is the
+probability measure assuming the null is true, and $\E_0$ is the
+expecation under that probability measure.
+\end{defn}
+
+\begin{defn}(Confidence Interval or Region)
+A $(1-\alpha)\%$ \emph{confidence interval/region} is a measurable
+mapping $\bshattheta(\bsy)\mapsto \bsTheta$ from the data/sample $\bsy$
+to the parameter space $\bsTheta$ such that
+\begin{align*}
+  1-\alpha = P_0\big[\bstheta \in \bshattheta(\bsy)\big]
+\end{align*}
+where $P_0$ is the probability measure for the data $\bsy$ assuming the
+null hypothesis is correct.
+In words, $\bshattheta(\bsy)$ maps to a region of the parameter space
+that, under the null, contains the true parameter value $\bstheta$ value
+$(1-\alpha)\%$ of the time.
+
+Given such a confidence interval/region $\bshattheta(\bsy)$, we can then
+construct a test for null hypothesis $H_0:\bstheta=\bstheta_0$ as
+follows:
+\begin{align*}
+  \varphi(\bsy)
+  = \mathbf{1}\big\{\theta_0\not\in\bshattheta(\bsy)\big\}
+\end{align*}
+i.e. reject null $H_0:\bstheta=\bstheta_0$ if null parameter vector
+$\bstheta_0$ is not in the confidence interval/region.
+\end{defn}
+
+Again, this section was also pretty abstract, leaving open a lot of
+indeterminacy. In particular, there's typically many possible test
+statistics, and even given a single test statistic $T(\bsy)$, there are
+multiple ways to define the critical region $C$.
+Similarly, there are many possible ways to construct a confidence
+region $\bshattheta(\bsy)$. So we really would like more guidance on how
+to construct tests, and \emph{optimal} tests in particular.
 
 
 \clearpage
 \subsection{Neyman-Pearson Lemma}
+\label{sec:neymanpearson}
 
-{\sl Simple $H_0$, Simple $H_1$}: We first consider the case where
-both the null and alternative are simple, and we denote the jdfs
-implied by $H_0$ and $H_1$ as $f_0$ and $f_1$, respectively. We
-then form the \emph{likelihood ratio}:
-\[ \text{LR} = \frac{f_0(y_1, \ldots, y_n)}{f_1(y_1, \ldots, y_n)}=
-   \frac{P(\text{data under $H_0$})}{P(\text{data under $H_1$})}
-   \]
-The Neyman-Pearson Lemma states that the uniformly most powerful
-test of $H_0$ versus $H_1$ rejects $H_0$ whenever LR $\leq K$,
-where $K$ is ``sufficiently small'' given the chosen value of $\alpha$.
-And by ``uniformly most powerful,'' we mean that this test
-maximizes the power (i.e. is \emph{optimal})
-after controlling for the Type I error---i.e.
-after setting the Type I error rate to $\alpha$.
-\\
-\\
-{\sl Connection to Sufficient Statistics}: If a sufficient statistic,
-$W$, exists for the parameter, $\theta$, that's being tested, then
-$W$ \emph{will} be the test statistic in the hypothesis test. This
-follows from the fact that we can factorize the jdf into two
-components: a function of the data only and a function of the sufficient
-statistic and $\theta$.
+With all the machinery in place for characterizing hypothesis tests,
+this section derives an \emph{optimal test}.
+Specifically, the Neyman-Pearson lemma specifies a test-statistic (the
+likelihood ratio) and a corresponding statistical test constructed from
+this statistic which is the \emph{uniformly most powerful test}, i.e.
+maximizes power subject to the specified $\alpha$-level.
+%optimal test $\varphi^*(\bsy)$
+%rejects whenever any other
+%$\varphi(\bsy)$ (at the same $\alpha$-level) rejects, hence maximizing
+%power subject to the specified $\alpha$ level.
 
-\subsection{Lambda Ratio Test}
+\begin{lem}\emph{(Neyman-Pearson)}
+Suppose data $\bsy:=\{\bsy_n\}\nN$ is generated from some
+model/likelihood $p(\bsy|\bstheta)$ with unknown $\bstheta$.\footnote{%
+  Observations can be discrete or continuous so that $p(\bsy|\bstheta)$
+  is either a mass or density function, resp.
+}
+To test simple null and alternative hypotheses,
+\begin{align*}
+  H_0: \bstheta=\bstheta_0
+  \qquad\qquad
+  H_1: \bstheta=\bstheta_1
+\end{align*}
+the uniformly most powerful level-$\alpha$ test $\varphi^*(\bsy)$ uses
+the \emph{likelihood ratio} as a test statistic:
+\begin{align}
+  \varphi^*(\bsy)
+  =
+  \begin{cases}
+    1 & LR(\bsy) > \lambda \\
+    q & LR(\bsy) = \lambda \\
+    0 & LR(\bsy) < \lambda
+  \end{cases}
+  \qquad \text{where}\quad
+  LR(\bsy) := \frac{p(\bsy|\bstheta_1)}{p(\bsy|\bstheta_0)}
+  \label{neymantest}
+\end{align}
+where $\lambda$ and $q$ are constants chosen so that we hit the
+$\alpha$ level, i.e. defined implicitly by
+\begin{align}
+  \alpha
+  = \E_0[\varphi^*(\bsy)]
+  = \int \varphi^*(\bsy) p(\bsy|\bstheta_0)\; d\bsy
+  \label{neymanalpha}
+\end{align}
+\end{lem}
+\begin{rmk}
+This test is also intuitive:
+Simply reject the null when the likelihood ratio strongly favors the
+alternative.
+Also, if a sufficient statistic exists for the parameter $\bstheta$
+that's being tested, then that sufficient statistic will be the test
+statistic in the hypothesis test.
+\end{rmk}
+\begin{proof}
+Let $\varphi(\bsy)$ be \emph{any} arbitrary $\alpha$-level test, and
+let $\varphi^*(\bsy)$ denote the specific test described by
+Expression~\ref{neymantest} with corresponding $\lambda$ and $q$.
+Note that we can always construct/implement such a test (i.e. there's no
+existence problem). We just need to prove that such a test is in fact
+optimal.
+So first note, based on the assumed form of the test in
+Expression~\ref{neymantest},
+\begin{align}
+  %\varphi^*(\bsy) \geq\varphi(\bsy)
+  %\quad\implies\quad
+  \big(
+    LR(\bsy)-\lambda
+  \big)
+  \big(\varphi^*(\bsy)-\varphi(\bsy)\big)
+  \geq 0
+  \label{neymanproof}
+\end{align}
+We can show this product is always nonnegative by considering the cases:
+\begin{itemize}
+  \item $\varphi^*(\bsy)-\varphi(\bsy)=1$: Test $\varphi^*$ rejects,
+    implying $LR(\bsy)-\lambda>0$
+  \item $\varphi^*(\bsy)-\varphi(\bsy)=0$: Trivial
+  \item $\varphi^*(\bsy)-\varphi(\bsy)=-1$:
+    Test $\varphi^*$ does not reject, implying $LR(\bsy)-\lambda<0$
+  \item $\varphi^*(\bsy)-\varphi(\bsy)\in (0,1)\cup (-1,0)$:
+    Also works out, just slighty tedious to check
+\end{itemize}
+So given that Expression~\ref{neymanproof} is true, substitute in the
+definition of $LR(\bsy)$, multiply through by $p(\bsy|\bstheta_0)$,
+rearrange, and integrate over $\bsy$ to get
+\begin{align*}
+  \int
+  p(\bsy|\bstheta_1)
+  \big(\varphi^*(\bsy)-\varphi(\bsy)\big)
+  \; d\bsy
+  - \lambda
+  \int
+  p(\bsy|\bstheta_0)
+  \big(\varphi^*(\bsy)-\varphi(\bsy)\big)
+  \; d\bsy
+  &\geq 0
+  \\
+  \iff\qquad
+  \E_1\big[ \varphi^*(\bsy)-\varphi(\bsy)\big]
+  - \lambda
+  \E_0\big[ \varphi^*(\bsy)-\varphi(\bsy)\big]
+  &\geq 0
+\end{align*}
+The second integral/expectation equals zero since both are
+$\alpha$-level tests, hence
+$\E_0[\varphi^*(\bsy)]=\E_0[\varphi(\bsy)]=\alpha$.
+This leaves
+\begin{align*}
+  \E_1\big[ \varphi^*(\bsy)-\varphi(\bsy)\big]
+  \geq 0
+  \quad\implies\quad
+  \E_1[\varphi^*(\bsy)]
+  \geq
+  \E_1[\varphi(\bsy)]
+\end{align*}
+which says precisely (by the definition of power) that test
+$\varphi^*$ has higher power than $\varphi$.
+\end{proof}
 
-\subsubsection{Justification and Intuition}
+\begin{cor}\emph{(Generalization to Composite Hypotheses)}
+Suppose we instead want to test \emph{composite} hypotheses
+\begin{align*}
+  H_0: \bstheta\in A_0\subseteq\bsTheta
+  \qquad\qquad
+  H_1: \bstheta\in A_1\subseteq\bsTheta
+\end{align*}
+Then we can construct a test as follows:
+\begin{align*}
+  \varphi^*(\bsy)
+  =
+  \begin{cases}
+    1 & LR > \lambda \\
+    q & LR = \lambda \\
+    0 & LR < \lambda
+  \end{cases}
+  \qquad \text{where}\quad
+  LR :=
+  \frac{%
+    \max_{\bstildetheta \in A_1}p(\bsy|\bstildetheta)
+  }{%
+    \max_{\bstildetheta \in A_0}p(\bsy|\bstildetheta)
+  }
+\end{align*}
+where, again, where $\lambda$ and $q$ are constants chosen so that
+we hit the $\alpha$ level, i.e. defined implicitly by
+Expression~\ref{neymanalpha}.
+\end{cor}
 
-Recall that the Neyman-Pearson lemma stated that the method gave
-the uniformly most powerful tests. However, recall that power\footnote{
-Unlimited power!} is defined as
-   \[ \text{Power} = P(\text{Reject $H_0$} | \text{$H_1$ true}) \]
-Moreover the likelihood Ratio procedure required a specification
-of the probability of the data under the alternative, $H_1$. BUT,
-and here's the rub, is you're working with a \emph{composite}
-alternative, where not all parameters are specified
-\begin{enumerate}
-   \item Power is not a single number, but a range of values
-      depending upon the values in $H_1$, which can vary.
-   \item The probability of the data under the alternative \emph{also}
-      takes on a range of values.
-\end{enumerate}
-How to cope?
-\\
-\\
-Well, if you wanted to know who had the best Hockey players---the US
-or Canada---it's not very efficient to have all teams consisting of
-all hockey players compete against each other. So you take the
-all-stars, and have the best of the US play against the best Canadian
-players.  We'll essentially do the same here.
-
-\subsubsection{Procedure}
-
-So suppose the null and alternative hypothesis are composite.
-We now form the Lambda Ratio by taking
-\[ \lambda =
-   \frac{\max P(\text{data under $H_0$})}{
-      \max P(\text{data under $H_1$})}
-   \]
-To find the maximum probabilities under $H_0$ and $H_1$, we
-will have to differentiate the likelihood---or equivalently, the
-log-likelihoods---with respect to any unspecified parameters, set
-the first order conditions equal to zero, and solve.
-\\
-\\
-After we have the solutions, we plug back into the $\lambda$ formula
-and use the same criterion:
-reject $H_0$ whenever $\lambda\leq K$,
-where $K$ is ``sufficiently small'' given the chosen value of $\alpha$.
-This maximizes the power after controlling for the Type I error---i.e.
-after setting the value of the Type I error equal to $\alpha$.
 
 
 
@@ -23055,6 +23327,7 @@ least some pair of $m\neq\ell$.
 
 \clearpage
 \section{Bayesian Statistics}
+\label{sec:bayesian}
 
 \subsection{Bayesian Framework for Statistical Inference}
 
