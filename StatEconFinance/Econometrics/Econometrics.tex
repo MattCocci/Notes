@@ -305,6 +305,7 @@
 \newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
 \newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
 \newcommand{\bstildePsi}{\boldsymbol{\tilde{\Psi}}}
+\newcommand{\bstildePhi}{\boldsymbol{\tilde{\Phi}}}
 \newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
 \newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
 \newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
@@ -419,6 +420,7 @@
 % - sumXY  is equivalent to \sum^Y_{X=1}
 % - sumXYz is equivalent to \sum^Y_{X=0}
 \newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\summM}{\sum^M_{m=1}}
 \newcommand{\sumin}{\sum^n_{i=1}}
 \newcommand{\sumjn}{\sum^n_{j=1}}
 \newcommand{\sumim}{\sum^m_{i=1}}
@@ -10664,7 +10666,19 @@ the martingale probability measure $Q_N$.
 
 
 \clearpage
-\section{Univariate Time Series}
+\section{Time Series}
+
+This section generally covers multivariate time series, i.e.
+vector-valued discrete-time stochastic processes $\{\bsy_t\}$.
+However, some results will be presented only for univariate time series,
+either because of ease of exposition or analytical tractability that's
+only available in the univariate case. To help distinguish, bold denotes
+multivariate objects (lowercase letters like $\bsy_t$ for vectors and
+uppercase like $\bsA$ for matrices) while non-bold indicates univariate
+objects. Finally, note that for brevity, I generally just write $\{\bsy_t\}$ rather
+than $\{\bsy_t\}\tinfz$ or $\{\bsy_t\}_{t=-\infty}^{\infty}$,
+since no results hinge on whether it's the former or the latter.
+
 
 %\subsection{Linear Difference Equations}
 
@@ -10675,26 +10689,31 @@ the martingale probability measure $Q_N$.
 %\end{defn}
 
 %\clearpage
-\subsection{Stationarity, Ergodicity, and the Lag Operator}
+\subsection{Fundamentals: Stationarity, White Noise, and Ergodicity}
 
 \begin{defn}(Strict Stationarity)
-A discrete stochastic process $\{y_t\}$ is \emph{strictly stationary} if
-the distribution of $(y_t,\ldots,y_{t+k})$ is the same as the
-distribution for $(y_s,\ldots,y_{s+k})$ for all $t$, $s$, and $k$. That
-is, shifting time indices does not change the joint distribution of the
-stochastic process.
+Discrete stochastic process $\{\bsy_t\}$ is \emph{strictly stationary} if
+the distribution of $(\bsy_t,\ldots,\bsy_{t+k})$ is the same as the
+distribution for $(\bsy_s,\ldots,\bsy_{s+k})$ for all $t$, $s$, $k$.
+In other words, shifting time indices does not change the joint
+distribution of the stochastic process.
 \end{defn}
 
 \begin{defn}(Covariance or Weak Stationarity)
-A stochastic process $\{y_t\}$ is \emph{covariance stationary},
+A stochastic process $\{\bsy_t\}$ is \emph{covariance stationary},
 \emph{weakly stationary}, or just \emph{stationary} if the mean and the
-autocovariance function does not depend upon time, i.e. for all $t$:
+autocovariance function do not depend upon time, a.k.a. are
+\emph{time homogeneous}.
+In other words, we have for all $t$
 \begin{align*}
-  \E[y_t] &= \mu \\
-  \Cov(y_t,y_{t+k}) &= \gamma(k)
+  \E[\bsy_t] &= \bsmu \\
+  \Cov(\bsy_t,\bsy_{t+k}) &=
+  \E[(\bsy_t-\bsmu)(\bsy_t-\bsmu)']
+  = \bsGamma(k)
 \end{align*}
-where $\mu$ is a constant and $\gamma(k)$ is an autocovariance function
-that does not depend upon time, just the lag length $k$.
+where $\bsmu$ is a constant vector and $\bsGamma(k)$ is an
+autocovariance function (mapping scalar $k$ into autocovariance
+matrices) that does not depend upon time, just the lag length $k$.
 \end{defn}
 \begin{rmk}
 ``Stationary'' will generally refer to covariance or weak stationarity
@@ -10704,39 +10723,46 @@ stationary.''
 \end{rmk}
 
 \begin{defn}(Trend Stationary)
-A stochastic process $\{y_t\}$ is \emph{trend stationary} if
+Univariate stochastic process $\{y_t\}$ is \emph{trend stationary} if
 $\{y_t-f(t)\}$ is stationary for some nonstochastic function $f(t)$ that
 traces out a trend.
 \end{defn}
 
 
 \begin{defn}(White Noise)
-A stochasic process $\{y_t\}$ is called \emph{white noise} if it
-satisfies for all $t$
+Stochastic process $\{\bsy_t\}$ is a \emph{vector white noise process}
+if $\forall t$
 \begin{align*}
-  \E[y_t] &= 0
+  \E[\bsy_t] &= \bso
   \\
-  \E[y_t^2] &= \sigma^2
+  \E[\bsy_t\bsy_t'] &= \bsSigma
+  \quad\text{symmetric positive definite}
   \\
-  \E[y_ty_{t-k}] &= 0 \qquad \forall k\neq 0
+  \E[\bsy_t\bsy_{t-k}']
+  &= \bso \qquad \forall k\neq 0
 \end{align*}
-This process is clearly covariance stationary, and it's one of the
+Note that by requiring only symmetric positive definiteness for
+$\bsSigma$, we allow for contemporaneous correlation between elements of
+the vector $\bsy_t$, i.e. we can have $\E[\bsy_{t,i}\bsy_{t,j}]\neq 0$.
+
+Also, this process is clearly covariance stationary, and it's one of the
 simplest examples of a covariance stationary process.
 \end{defn}
 
 \begin{defn}(Random Walk)
-A stochastic process $\{y_t\}$ is a \emph{random walk} if the process
-$\{\Delta y_t\}$ is white noise, where $\Delta y_t = y_t-y_{t-1}$.
+Univariate stochastic process $\{y_t\}$ is a \emph{random walk} if the
+process $\{\Delta y_t\}$ is white noise, where
+$\Delta y_t := y_t-y_{t-1}$.
 \end{defn}
 
 \begin{defn}(Ergodicity and a Sufficient Condition for Ergodicity)
-Intuitively, \emph{ergodicity} means that there is \textbf{no} common
-component present in all elements of the time series $\{y_t\}$ that
-does not average out over time.
+Intuitively, \emph{ergodicity} means that there \emph{does not exist} a
+common component present in all elements of the time series $\{\bsy_t\}$
+that \emph{does not average out} over time.
 
-A sufficient condition for ergodicity of stationary series $\{y_t\}$ is
-that, for any two bounded functions $f:\R^k\ra \R$ and $g:\R^\ell\ra\R$,
-we have
+A sufficient condition for ergodicity of univariate stationary series
+$\{y_t\}$ is that, for any two bounded functions $f:\R^k\ra \R$ and
+$g:\R^\ell\ra\R$, we have
 \begin{align*}
   \lim_{T\ra\infty}
   \big|
@@ -10757,23 +10783,28 @@ we have
   g(y_{s+T},\ldots,y_{s+T+\ell})]
   \big|
 \end{align*}
-Strict stationary does \emph{not} imply ergodicity.
-\end{defn}
-
-\begin{defn}(Ergodic for the Mean)
-We say that $\{y_t\}$ is \emph{ergodic for the mean} if
-\begin{align*}
-  \frac{1}{T}\sum^T_{t=1}y_t \ra \E[y_t]
-\end{align*}
-In words, the time average equals the ensemble average. More explicitly,
-for stochastic process $\{y_t(\omega)\}$ living in state space
-$(\Omega,\sF_t,P)$, the average over time indices $t$ for any
-realization $\omega^*$, $\frac{1}{T}\sumtT y_t(\omega^*)$, equals the
-average across $\omega$, fixing the time $t$.
+This of course has a multivariate generalization.
 \end{defn}
 \begin{rmk}
-Later on, we'll see the Ergodic Theorem, which states that a stationary
-ergodic process is ergodic for the mean.
+Strict stationary does \emph{not} imply ergodicity.
+\end{rmk}
+
+\begin{defn}(Ergodic for the Mean)
+We say that $\{\bsy_t\}$ is \emph{ergodic for the mean} if
+\begin{align*}
+  \frac{1}{T}\sum^T_{t=1}\bsy_t \ra \E[\bsy_t]
+  =\int_\Omega \bsy_t \; dP(\omega)
+\end{align*}
+In words, the \emph{time average} equals the \emph{ensemble average}.
+More explicitly, for stochastic process $\{\bsy_t(\omega)\}$ living in
+state space $(\Omega,\sF,P)$, the average $\frac{1}{T}\sumtT
+\bsy_t(\omega^*)$ over \emph{time indices} (fixing state realization
+$\omega^*$) equals the average $\E[\bsy_t]$ over \emph{state
+realizations} (fixing time index $t$).
+\end{defn}
+\begin{rmk}
+Later on, Theorem~\ref{thm:ergodic} presents the Ergodic Theorem, which
+states that a stationary ergodic process is ergodic for the mean.
 \end{rmk}
 
 \begin{ex}(Non-Ergodic Series)
@@ -10789,97 +10820,172 @@ stationary, again reinforcing that strict stationarity
 \subsection{Filters, the Lag Operator, and Lag Polynomials}
 
 \begin{defn}(Filter)
-Let $\{h_j\}_{j=0}^\infty$ be sequence of numbers.
-We define the associated \emph{filter} as the following function:
+Given sequence of (possibly non-square) $(N\times K)$ matrices
+$\{\bsH_j\}_{j=-\infty}^\infty$, the associated
+\emph{two-sided filter} is a function $\bsH:\C\ra\R^{N\times K}$ defined
+as
 \begin{align*}
-  h(z) :=&\; \sum_{j=0}^\infty h_j z^j
-  = h_0 + h_1 z + h_2 z^2 + \cdots
-  \qquad z\in\C
+  \bsH(z)
+  := \sum_{j=-\infty}^\infty \bsH_j z^j
+  = \cdots + \bsH_{-2}\;z^{-2} + \bsH_{-1}\;z^{-1} +
+    \bsH_0 + \bsH_1 z + \bsH_2z^2 + \cdots
+  %\qquad z\in\C
 \end{align*}
+If $\bsH_{j}=\bso$ for either all $j<0$ or $j>0$ (i.e. only
+non-negative/positive powers of $z$ resp.), we use the term
+\emph{one-sided filter}.
+In the univariate case, scalars $\{h_j\}$ replace matrices $\{\bsH_j\}$.
+\end{defn}
+\begin{rmk}
+References below to simply ``filter'' apply to either one- or two-sided.
+Filters are hugely important because most processes are written as just
+filtered white noise (see Ex.~\ref{ex:armafiltered}).  Moreover, by
+Wold's Theorem, \emph{any} arbitrary stationary process has such a
+representation.
+\end{rmk}
+
+\begin{defn}(Factored Filter)
+\label{defn:factoredfilter}
+As we'll see, it's often useful to factor one-sided filters of finite
+order $p$, i.e. to write
+\begin{align*}
+  \bsH(z)
+  := \bsH_0 + \bsH_1 z+ \ldots + \bsH_pz^p
+  = \bsH_0(\bsI+\bsC_1 z)\cdots(\bsI+\bsC_pz)
+\end{align*}
+for some matrices $\bsC_1,\ldots,\bsC_p$.
+Note that even if adhering to the above (somewhat canonical)
+representation, there are often several different ways to factor
+multivariate/matrix filters.
 \end{defn}
 
+\begin{defn}(Square- and Absolutely-Summability)
+Scalar sequence $\{h_j\}$ or the corresponding filter $h(z)$ are called
+\begin{itemize}
+  \item \emph{Square-Summable}: If $\sum_{j=-\infty}^\infty h_j^2<\infty$
+  \item \emph{Absolutely-Summable}: If $\sum_{j=-\infty}^\infty |h_j|<\infty$
+\end{itemize}
+$\{\bsH_j\}$ and associated filter is square- or
+absolutely-summable if square- or absolutely-summable in
+\emph{each element} of the matrix.
+
+\emph{Many} results in time series require either square- or
+absolute-summability.
+In particular, processes built up from infinitely many lags or
+innovations (like an AR($\infty$) or MA($\infty$)) are only well-defined
+if the weights on elements in the infinite past ``decay quick enough,''
+and absolute- and square-summability are effectively just conditions
+guaranteeing that.
+\end{defn}
+
+\begin{prop}\emph{(Absolute Summability $\implies$ Square Summability)}
+Suppose that filter $\{\bsH_j\}$ is absolutely summable. Then it is also
+square-summable.
+\end{prop}
+
 \begin{defn}(Lag Operator)
-The \emph{lag operator} $L$ is an operator that maps sequences
-into sequences such that $\{y_{t-1}\}=L\left(\{y_t\}\right)$. We often
-simply write, as shorthand, $y_{t-1}=Ly_t$. We use powers of the lag
-operator to express lags of more than one time unit:
+\emph{Lag operator} $L$ is a (linear) operator mapping sequences into
+sequences such that $\{\bsy_{t-1}\}=L\left(\{\bsy_t\}\right)$. We often
+simply write, as shorthand, $\bsy_{t-1}=L\bsy_t$.
+
+For lags/leads of more than one time unit, use positive/negative
+\emph{powers} of $L$ (respectively):
 \begin{align*}
-  y_{t-k} = L^k y_t
+  \bsy_{t-k} = L^k \bsy_t
+  \qquad k\in\Z
 \end{align*}
-$L$ is a \emph{linear} operator.
 \end{defn}
 
 \begin{defn}(Lag Polynomial)
-A \emph{lag polynomial} is a filter with the lag operator as its
-argument. For example, every filter $h(z)=h_0+h_1z + h_2z^2+\cdots$ has
-an associated lag polynomial
+A \emph{lag polynomial} is a filter with lag operator $L$ as its
+argument, making it a polynomial in $L$. Hence every filter $\bsH(z)$
+has associated lag polynomial
 \begin{align*}
-  h(L) = \sum_{j=0}^\infty h_j L^j = h_0 + h_1L + h_2 L^2 + \cdots
+  \bsH(L) = \sum_{j=-\infty}^\infty \bsH_j L^j
+  = \cdots + \bsH_{-2}\;L^{-2} + \bsH_{-1}\;L^{-1} +
+    \bsH_0 + \bsH_1 L + \bsH_2L^2 + \cdots
 \end{align*}
 and vice versa.
+As with filters, we distinguish between one- and two-sided lag
+polynomials, and we can also factor one-sided finite-order lag
+polynomials (this time, as polynomials of $L$ rather than $z$, as in
+Definition~\ref{defn:factoredfilter}).
+\end{defn}
+
+\begin{defn}(Annihilation Operator)
+Define the \emph{annihilation operator} $[\,\cdot\,]_+$ as an operator
+on lag polynomials so that $[\bsH(L)]_+$ returns a lag polynomial that
+is the same as $\bsH(L)$, but retaining \emph{only} positive powers of
+$L$ while \emph{ignoring/dropping} negative powers of $L$.
 \end{defn}
 
 \begin{defn}(Filtered Series)
-Let $\{x_t\}$ be a covariance-stationary process and let
-$\{h_j\}_{j=0}^\infty$ be an absolutely summable sequence,
-$\sum_{j=0}^\infty |h_j|<\infty$.
-Then we can create a new \emph{filtered series} $\{y_t\}$ by applying
-filter $h(L)$ to the original series $\{x_t\}$:
+Given stationary $\{\bsx_t\}$ and absolutely summable filter
+$\{\bsH_j\}$,
+we can create a new \emph{filtered series} $\{\bsy_t\}$ by applying
+filter $\bsH(L)$ to original series $\{\bsx_t\}$:
 \begin{align*}
-  y_t =&\; h(L)x_t
-  = h_0 x_t + h_1x_{t-1} + h_2x_{t-2} + \cdots
+  \bsy_t =&\; \bsH(L)\bsx_t
+  %= \bsH_0 \bsx_t + \bsH_1\bsx_{t-1} + \bsH_2\bsx_{t-2} + \cdots
+  = \cdots + \bsH_{-2}\;\bsx_{t+2} + \bsH_{-1}\;\bsx_{t+1} +
+  \bsH_0\bsx_t + \bsH_1 \bsx_{t-1} + \bsH_2\bsx_{t-2} + \cdots
 \end{align*}
-Moreover, if the autocovariances of $\{x_t\}$ are absolutely summable,
-then so are the autocovariances of $\{y_t\}$; therefore, filters map the
-space of covariance-stationary processes into itself.
+Also, since the filter is absolutely summable,
+if the sequence $\{\bsGamma_x(k)\}_{k=0}^\infty$ of
+autocovariances of $\{\bsx_t\}$ are absolutely
+summable, then so are the autocovariances
+$\{\bsGamma_y(k)\}_{k=0}^\infty$ of $\{\bsy_t\}$.
+Therefore, absolutely summable filters map the space of
+covariance-stationary processes into itself.
 \end{defn}
 
 \begin{ex}(ARMA Processes)
-Virtually all processes below can be thought of as filtered processes.
-For example, the MA($\infty$) process
-\begin{align*}
-  y_t = \psi(L)\varepsilon_t
-  = \psi_0\varepsilon_t
-  + \psi_1\varepsilon_{t-1}
-  + \psi_2\varepsilon_{t-2}
-  + \cdots
-  \qquad
-  \varepsilon_t \sim WN(0,\sigma^2)
-\end{align*}
-simply takes white noise process $\{\varepsilon_t\}$ and filters it
-with $\{\psi_j\}$. Similarly, consider stationary ARMA($p$,$q$) process
-\begin{align*}
-  y_t
-  &= \phi_1 y_{t-1}
-  +\cdots
-  + \phi_p y_{t-p}
-  + \varepsilon_t
-  + \theta_1\varepsilon_{t-1}
-  + \cdots
-  + \theta_q\varepsilon_{t-q}
-\end{align*}
-This can be rewritten in lag polynomial notation as
+\label{ex:armafiltered}
+As mentioned above, virtually all processes below can be thought of as
+filtered processes.
+%For example, the univariate MA($\infty$) process
+%\begin{align*}
+  %y_t = \psi(L)\varepsilon_t
+  %= \psi_0\varepsilon_t
+  %+ \psi_1\varepsilon_{t-1}
+  %+ \psi_2\varepsilon_{t-2}
+  %+ \cdots
+  %\qquad
+  %\varepsilon_t \sim WN(0,\sigma^2)
+%\end{align*}
+%simply takes filters white noise process $\{\varepsilon_t\}$ with
+%$\{\psi_j\}$.
+%Now
+For example, consider univariate ARMA($p$,$q$), written in lag
+polynomial notation
+%\begin{align*}
+  %y_t
+  %&= \phi_1 y_{t-1}
+  %+\cdots
+  %+ \phi_p y_{t-p}
+  %+ \varepsilon_t
+  %+ \theta_1\varepsilon_{t-1}
+  %+ \cdots
+  %+ \theta_q\varepsilon_{t-q}
+%\end{align*}
+%This can be rewritten in lag polynomial notation as
 \begin{align}
-  \iff\qquad
-  (1 - \phi_1 L - \cdots - \phi_pL^p)y_t
-  &=
-  (1+ \theta_1 L + \cdots +\theta_qL^q )\varepsilon_t
-  \notag
-  \\
+  %\iff\qquad
+  %(1 - \phi_1 L - \cdots - \phi_pL^p)y_t
+  %&=
+  %(1+ \theta_1 L + \cdots +\theta_qL^q )\varepsilon_t
+  %\notag
+  %\\
   \phi(L)y_t
   &=
   \theta(L)\varepsilon_t
-  \label{lagarma}
-  \\
+  \qquad
   \text{where}\quad
-  \phi(z) &:=
-  1 - \phi_1 z - \cdots - \phi_pz^p
-  \notag
-  \\
-  \theta(z)
-  &:=
-  1+ \theta_1 z + \cdots +\theta_qz^q
-  \notag
+  \begin{cases}
+  \phi(z) := 1 - \phi_1 z - \cdots - \phi_pz^p \\
+  \theta(z) := 1+ \theta_1 z + \cdots +\theta_qz^q
+  \end{cases}
+  \label{lagarma}
 \end{align}
 Equation~\ref{lagarma} says ``process $\{y_t\}$ filtered by
 $\phi(\,\cdot\,)$ equals white noise $\{\varepsilon_t\}$ filtered by
@@ -10887,333 +10993,103 @@ $\theta(\,\cdot\,)$.''
 \end{ex}
 
 
-\begin{defn}(Lag Polynomial Inverses)
-Consider the following function: $\Psi(z)=(1-z)$. If we want to compute
-its inverse for $|z|<1$, we could appeal to the geometric sum to write
+\clearpage
+\subsection{Inverting Lag Polynomials}
+
+In time series models, it will often be useful to \emph{invert}
+one-sided finite-order lag polynomials. For example, suppose we have a
+filtered series
+\begin{align}
+  \bsy_t = \bsH(L) \bsx_t
+  \label{laginvy}
+\end{align}
+In words, current $\bsy_t$ is a linear combination of $\{\bsx_t\}$. By
+\emph{inverting} the lag polynomial,
+\begin{align}
+  \bsx_t = \bsH(L)^{-1} \bsy_t
+  \label{laginvx}
+\end{align}
+we can write current $\bsx_t$ as a linear combination of $\{\bsy_t\}$,
+provided $\bsH(L)^{-1}$ is a well-defined object.
+So computing lag polynomial inverses enables us construct
+$\bsx_t$ from $\{\bsy_t\}$ and $\bsy_t$ from $\{\bsx_t\}$ just as well.
+But of course, now we need to precisely define lag polynomial inverses.
+
+
+\begin{defn}(Lag Polynomial Inverse)
+Let $\bsH(L)$ be a lag polynomial  with square-matrix elements. Define
+the lag polynomial inverse as the filter $\bsH(L)^{-1}$ such that
+\begin{align}
+  \bsH(L)^{-1}\bsH(L) =
+  \bsH(L)\bsH(L)^{-1} = \bsI
+  \label{laginvH}
+\end{align}
+If $\bsH(L)$ is a one-sided finite-order lag polynomial, we can take the
+\emph{factored} lag polynomial and invert element by element,\footnote{%
+  $(\bsI+\bsC_pL)^{-1}$ is defined by Expr.~\ref{laginvH}, i.e.
+  as the filter s.t.
+  $\bsI=(\bsI+\bsC_iL)^{-1}(\bsI+\bsC_iL)=(\bsI+\bsC_iL)(\bsI+\bsC_iL)^{-1}$.
+}
 \begin{align*}
-  \Psi(z)^{-1} = \frac{1}{1-z}
+  \bsH(L)
+  &= \big(\bsH_0(\bsI+\bsC_1 L)\cdots(\bsI+\bsC_pL)\big)^{-1}
+  = (\bsI+\bsC_pL)^{-1}\cdots(\bsI+\bsC_1 L)^{-1}\bsH_0^{-1}
+\end{align*}
+But of course, we should ask ``Can we \emph{always} construct an inverse
+$\bsH(L)^{-1}$? Is that always well-defined?'' The next proposition
+answers that question.
+\end{defn}
+
+\begin{prop}\emph{(Invertibility Condition)}
+Let $\bsH(L)$ be a lag-polynomial in \emph{non-negative} powers of $L$
+only.
+One-sided
+lag polynomial $\bsH(L)$ is invertible (i.e. $\bsH(L)^{-1}$ is
+well-defined) if and only if \emph{no roots} of the equation
+$\det(\bsH(z))=0$ lie on the complex unit circle.
+Moreover,
+\begin{itemize}
+  \item $\bsH(L)^{-1}$ has only positive roots
+\end{itemize}
+%The MA process with lag polynomial $\bsPsi(L)$ is invertible if and only
+%if all roots of $\text{\emph{det}}(\bsPsi(z))=0$ are outside the complex
+%unit circle.
+\end{prop}
+
+\begin{defn}(Univariate Lag Polynomial Inverses)
+Consider function $f(z)=(1-z)$. If we want to compute its inverse for
+$|z|<1$, we could appeal to the geometric sum to write
+\begin{align*}
+  f(z)^{-1} = \frac{1}{1-z}
   = \sumninfz z^n
   = 1+z+z^2 + z^3 + \cdots
 \end{align*}
-Now if instead, $\Psi$ defined a \emph{lag polynomial} $\Psi(L) =
-(1-\psi L)$ where $|\psi|<1$, this logic still works, and we should
-define the inverse of the simple lag polynomial as
+Now suppose we want to compute inverse $(1-\psi L)^{-1}$, given
+$|\psi|<1$.\footnote{%
+  We can think of the lag operator $L$ as having modulus less than one
+  so that $|\psi|<1$ implies $|\psi L|<1$ also.
+}
+Since we can write $(1-\psi L)=f(\psi L)$, the above suggests
 \begin{align}
-  \Psi(z)^{-1}
-  = 1+\psi L+\psi L^2 + \psi L^3 + \cdots
+  f(\psi L)^{-1}
+  = (1-\psi L)^{-1}
+  = 1+\psi L+(\psi L)^2 + (\psi L)^3 + \cdots
   \label{laginv}
 \end{align}
-where, again, we need $|\psi|<1$ for this to make sense.\footnote{%
-  The lag operator $L$ can usefully be thought of as having modulus of
-  one so that $|\psi|<1$ is sufficient to ensure that $|\psi L|<1$,
-  whatever that means.
-}
-We can invert more general lag polynomials by first factoring them as we
-would any other polynomial:
-\begin{align*}
-  \Psi(L)
-  &= 1 - \psi_1 L - \cdots \psi_pL^p \\
-  &= (1-\lambda_1L)(1-\lambda_2L)\cdots(1-\lambda_pL)
-\end{align*}
-Then to invert $\Psi(L)$, we can just invert the individual
-$(1-\lambda_iL)$ one at a time
+More generally, to invert $p$th order lag polynomials, first factor them
+(just like any other polynomial) and invert the individual factors one
+at a time according to Expression~\ref{laginv}:
 \begin{align*}
   \Psi(L)^{-1}
+  &= \big[1 - \psi_1 L - \cdots - \psi_pL^p\big]^{-1} \\
+  &= \big[(1-\lambda_1L)(1-\lambda_2L)\cdots(1-\lambda_pL)\big]^{-1}
+  \\
   &= (1-\lambda_1L)^{-1}(1-\lambda_2L)^{-1}\cdots(1-\lambda_pL)^{-1}
 \end{align*}
-using the geometric sum Expression~\ref{laginv} above for each.
 Of course, this makes clear that we need all roots $|\lambda_i|<1$ to do
 this.
 \end{defn}
 
-
-\clearpage
-\subsection{MA(q), AR(p), and ARMA(p,q) Models}
-
-\begin{defn}(MA(q) Models)
-We define an MA(q) process $\{y_t\}$ given white noise innovations
-$\{\varepsilon_t\}$ as
-\begin{align*}
-  y_t &= \mu + \theta_0\varepsilon_t + \theta_1y_{t-1} + \cdots \theta_qy_{t-q}
-  \qquad\qquad \varepsilon_t\sim(0,\sigma^2)
-  \\
-  \iff\quad
-  y_t - \mu
-  &= \theta(L) \varepsilon_t
-  \\
-  \text{where}\quad
-  \theta(z) &= \theta_0 + \theta_1z + \cdots + \theta_qz^q
-\end{align*}
-It is easy to work out the mean and covariance function of the process
-\begin{align*}
-  \E[y_t] = \mu
-  \qquad
-  \gamma(k) = \E[y_ty_{t-k}] &=
-    \sigma^2 \sum_{j=0}^{q-k} \theta_j \theta_{j+k}
-\end{align*}
-Since neither depends upon $t$, we conclude that \emph{any} MA(q)
-process is covariance stationary. And since the autocovariance function
-includes on finitely many terms, it will be absolutely summable
-$\sum_{j=0}^\infty |\gamma(j)|<\infty$, which ensures that $y_t$ will be
-ergodic for the mean.
-\end{defn}
-\begin{rmk}
-Note that in practice we often take the innovations in an MA(q) process
-to be mean-zero and \emph{iid}, which of course implies that the
-innovations are white noise and satisfy this definition. \emph{However},
-that's also slightly stronger than the definition we've given here since
-we want to be able to define the MA(q) process given only white noise
-(potentially non-iid) innovations.  Though white noise implies that the
-$\{\varepsilon_t\}$ are uncorrelated, that will not necessarily imply
-they are \emph{independent} (unless we assume they are Gaussian). This
-whole remark will turn out to be important when we encounter the Wold
-Representation.
-\end{rmk}
-
-\begin{defn}(MA($\infty$) Process)
-Suppose we let $q\ra\infty$, we get the MA($\infty$) process
-\begin{align*}
-  y_t &= \mu + \sum_{i=0}^\infty \psi_i \varepsilon_{t-i}
-  = \mu + \psi(L)\varepsilon_t
-  \qquad \varepsilon_t\sim (0,\sigma^2)
-  \\
-  \text{where}\quad
-  \psi(z) &= \psi_0 + \psi_1z + \psi_2z^2 + \cdots
-\end{align*}
-Given square summability of the coefficients, the mean and covariance
-are given by
-\begin{align*}
-  \E[y_t] &= \mu\\
-  \gamma(k) = \E[y_ty_{t-k}] &=
-  \sigma^2
-  \sum_{j=0}^{\infty}
-  \psi_j \psi_{j+k}
-  %\begin{cases}
-    %\sigma^2\sum_{i=0}^\infty \psi_i^2 & k=0\\
-    %\sigma^2
-      %\sum_{j=0}^{\infty}
-      %\psi_j \psi_{j+k}
-    %& k\neq 0
-  %\end{cases}
-\end{align*}
-Note that this object is only well-defined if the coefficients are
-\emph{square-summable}: $\sum_{i=0}^\infty \psi_i^2<\infty$. Square
-summability is implied by another stronger assumption we might
-reasonably impose on the coefficients, \emph{absolute summability}:
-$\sum_{i=0}^\infty |\psi_i|<\infty$.
-Given either of these conditions, we can be assured that sum defining
-$y_t$ will converge in mean-square to a random variable (making
-$y_t$ a well-defined object) and that the variance of $y_t$ is finite,
-which is necessary for the process to be covariance stationary.
-Moreover, if we do impose absolute summability of the coefficients, we
-also get that the covariance function is absolutely summable
-$\sum_j |\gamma(j)|<\infty$ so that $y_t$ is ergodic for the mean.
-\end{defn}
-
-\begin{defn}(AR(p) Process)
-Given white noise innovations $\{\varepsilon_t\}$, define the AR(p)
-model
-\begin{align*}
-  y_t
-  &= \phi_1 y_{t-1} + \cdots + \phi_p y_{t-p} + \varepsilon_t
-  \qquad \varepsilon_t\sim(0,\sigma^2) \\
-  \phi(L)y_t &= \varepsilon_t \\
-  \text{where}\quad
-  \phi(z)
-  &= 1-\phi_1z - \cdots \phi_pz^p
-\end{align*}
-This can also be written in \emph{companion form}, expressing the scalar
-valued AR(p) as a vector-valued AR(1):
-\begin{align*}
-  \begin{pmatrix}
-    y_t \\ y_{t-1}\\\vdots \\ y_{t-p+2}\\y_{t-p+1}
-  \end{pmatrix}
-  &=
-  \begin{pmatrix}
-    \phi_1 & \phi_2 & \cdots& \phi_{p-1} & \phi_p \\
-    1 & 0 & \cdots & 0 & 0\\
-    0 & 1 & \cdots & 0 & 0\\
-    \vdots & \vdots & \ddots & \vdots & \vdots \\
-    0 & 0 & \cdots & 1 & 0\\
-  \end{pmatrix}
-  \begin{pmatrix}
-    y_{t-1} \\ y_{t-2}\\\vdots \\ y_{t-p+1} \\y_{t-p}
-  \end{pmatrix}
-  +
-  \begin{pmatrix}
-     \varepsilon_t\\ 0\\\vdots \\ 0 \\0
-  \end{pmatrix}
-   \\
-  \iff \qquad
-  Y_t &= \Phi Y_{t-1} + e_t
-\end{align*}
-Though MA(q) processes are \emph{always} covariance-stationary, this is
-decidedly \emph{not} the case for AR(p) processes. This motivates the
-following proposition.
-\end{defn}
-
-\begin{prop}\emph{(Stationarity of AR(p) Processes)}
-\label{prop:stationaryar}
-Suppose that $\{y_t\}$ follows AR(p) with lag polynomial $\phi(z)$.  The
-process is stationary if and only if any of the following equivalent
-statements hold:
-\begin{enumerate}[label=\emph{(\roman*)}]
-  \item All roots of the lag polynomial $\phi(z)$ have modulus $>1$
-  \item The lag polynomial has a well-defined inverse $\phi(z)^{-1}$
-  \item All of the eigenvalues of $\Phi$ have modulus $<1$
-\end{enumerate}
-\end{prop}
-
-\begin{prop}
-\emph{(Yule-Walker and the Autocovariance Function of Stationary AR(p))}
-If we multiply through the $p$th order difference equation by $y_{t-k}$
-for $k=0,1,\ldots,p$ and take expectation, it follows that the
-autocovariances satisfy the same difference equation as $y_t$:
-\begin{align*}
-  \gamma(k)
-  &=
-  \begin{cases}
-    \sigma^2 + \sum_{j=1}^p \phi_j\gamma(j)
-    & k = 0 \\
-    \sum_{j=1}^p \phi_j\gamma(k-j)
-    & k = 1,2,\ldots \\
-  \end{cases}
-\end{align*}
-This is a system of $p+1$ equations in $p+1$ unknowns,
-$\gamma(0),\ldots,\gamma(p)$.
-
-We could have also derived this from the vector representation. So
-define the unconditional variance $\Sigma=\Var(Y_t)$, which holds for
-all $t$ (since $Y_t$ is stationary) and solve
-\begin{align*}
-  \Sigma = \Var(Y_t)
-  &= \Var(\Phi Y_{t-1} + e_t)
-  = \Phi \Sigma\Phi' + D_e \\
-  \Sigma
-  &= \Phi \Sigma\Phi' + D_e
-\end{align*}
-where $D_e=\diag(\sigma^2,0,\ldots,0)$. We can solve this system by
-computing
-\begin{align*}
-  \vc(\Sigma) &= (\Phi\otimes\Phi)\vc(\Sigma) + \vc(D_e) \\
-  \implies\quad
-  \vc(\Sigma) &= \big(I_{p^2}-(\Phi\otimes\Phi)\big)^{-1}\vc(D_e)
-\end{align*}
-
-\end{prop}
-
-\begin{ex}(Stationary AR(1) Model)
-Consider the simple AR(1) model where
-\begin{align*}
-  y_t = \rho y_{t-1} + \varepsilon_t
-  \qquad \varepsilon_t\sim(0,\sigma^2)
-\end{align*}
-Suppose that $|\rho|<1$. Then we we can solve for $y_t$ in terms of past
-$\varepsilon_t$'s by backward recursive substitution:
-\begin{align*}
-  y_t
-  &= \rho y_{t-1} + \varepsilon_t
-  = \rho\big(\rho y_{t-2} + \varepsilon_{t-1}\big) + \varepsilon_t
-  = \cdots \\
-  \implies\quad
-  y_t
-  &=
-  \sum_{j=0}^\infty \rho^j\varepsilon_{t-j}
-\end{align*}
-We have thus expressed the AR(1) as an MA($\infty$) model (more on that
-in Proposition~\ref{prop:artoma}), and we see here why exactly we need
-$|\rho|<1$ or, equivalently, the roots of $\phi(z) = 1-\rho z$ to be
-$>1$ in modulus. Only this will ensure that the variance of $y_t$ is
-finite and that the process is stationary.  From there, we can then
-solve the Yule-Walker equations to compute the autocovariance function
-\begin{align*}
-  \gamma(k) = \E[y_ty_{t-k}] = \sigma^2 \frac{\rho^{|k|}}{1-\rho^2}
-\end{align*}
-\end{ex}
-
-\begin{ex}(Explosive AR(1) Model)
-Now consider the AR(1) model where $|\rho|>1$. We solve by forward
-subsitution to get $y_t$ in terms of \emph{future} $\varepsilon_t$'s:
-\begin{align*}
-  y_t
-  &= \rho^{-1}(y_{t+1} - \varepsilon_{t+1})
-  = \rho^{-1}\big(
-      \rho^{-1}(y_{t+2} - \varepsilon_{t+2}) - \varepsilon_{t+1}\big)
-  = \cdots \\
-  \implies\quad
-  y_t
-  &=
-  -\sum_{j=1}^\infty \rho^{-j}\varepsilon_{t+j}
-\end{align*}
-\end{ex}
-
-\begin{prop}\emph{(Stationary AR(p) to MA($\infty$))}
-\label{prop:artoma}
-Extending the simple AR(1) example above, if $y_t$ is a stationary AR(p)
-model, then we know by Proposition~\ref{prop:stationaryar} that the
-associated lag polynomial $\phi(z)$ is invertible. Therefore, we can
-express $y_t$ as an MA($\infty$):
-\begin{align*}
-  \phi(L)y_t = \varepsilon_t
-  \quad\iff\quad
-  y_t = \phi(L)^{-1}\varepsilon_t
-\end{align*}
-\end{prop}
-
-\begin{prop}\emph{(Invertible MA(q) to AR($\infty$))}
-\label{prop:matoar}
-Suppose that $y_t$ follows an MA(q) representation.  If the roots of the
-associated MA lag polynomial $\theta(z)$ are all $>1$ in modulus, then
-we call the MA(q) model \emph{invertible} and can express $y_t$ as an
-AR($\infty$):
-\begin{align*}
-  y_t = \theta(L)\varepsilon_t
-  \quad\iff\quad
-  \theta(L)^{-1}y_t = \varepsilon_t
-\end{align*}
-The fact that all roots are $>1$ in modulus ensures that the
-coefficients $\phi_i$ of the AR($\infty$) are absolutely summable
-$\sum_{i=0}^\infty |\phi_i|<\infty$ so that the AR($\infty$)
-representation converges in mean square to a random variable and is,
-therefore, well-defined.
-\end{prop}
-
-\begin{rmk}
-Note that while we could \emph{always} invert a \emph{stationary} AR(p),
-we cannot always invert MA(q) models. There are such things as
-non-invertible MA(q) models. So we really do need all roots of
-$\theta(z)$ to lie outside the unit circle because only then will
-$\theta(L)^{-1}$ be a well-defined object.
-\end{rmk}
-
-\begin{prop}\emph{(Observationally Equivalent MA Representations)}
-Suppose that $y_t$ follows an invertible MA(q) process. Then there is an
-associated non-invertible MA(q) process that is
-\emph{observationally equivalent}, i.e.\ with the same first- and
-second-order properities (mean and autocovariance function). The
-opposite also holds true: For every non-invertible MA(q), there is an
-associated invertible representation.
-\end{prop}
-
-\begin{defn}(ARMA(p,q) Model)
-We define an ARMA(p,q) process $\{y_t\}$ given white noise innovations
-$\{\varepsilon_t\}$ as
-\begin{align*}
-  \phi(L)y_t = \theta(L)\varepsilon_t
-\end{align*}
-If the roots of $\phi(z)$ are all $>1$ in modulus, then $\phi(L)$ has a
-well defined inverse, the process $y_t$ is stationary, and $y_t$ has an
-MA($\infty$) representation
-\begin{align*}
-  y_t = \frac{\theta(L)}{\phi(L)}\varepsilon_t
-\end{align*}
-If the roots of the $\theta(z)$ are all $>1$ in modulus, then
-$\theta(L)$ has a well-defined inverse and $y_t$ has an AR($\infty$)
-representation
-\begin{align*}
-  \frac{\phi(L)}{\theta(L)}y_t = \varepsilon_t
-\end{align*}
-\end{defn}
 
 \clearpage
 \subsection{Wold's Theorem}
@@ -11222,18 +11098,17 @@ This theorem justifies the entire field of \emph{linear} time series
 analysis. In effect, it says that if you give me \emph{any}---repeat,
 \emph{any}---covariance stationary process, we can
 \emph{without loss of generality} write the process as an MA($\infty$)
-process with white noise errors.
-Though it might be more convenient to work with and
-manipulate \emph{other} representations (MA(q), AR(p), AR($\infty$),
-ARMA(p,q), etc.) in practice, we lose nothing by working with the
-MA($\infty$) representation when stating and proving results. And
-indeed, we will make use of this result extensively in later subsections
-by mostly working with the MA($\infty$) representation of processes.
-
+process with white noise innovations, i.e. write the process as simply
+filtered white noise.
+That's hugely important and convenient, providing a firm theoretical
+justification for the entire field of linear time series analysis.
+Moreover, it means that we can prove results for the broad class of
+\emph{all} covariance stationary processes by proving results with the
+MA($\infty$) Wold representation.
 
 \begin{thm}\emph{(Wold's Theorem)}
 Suppose $\{\bsy_t\}_{t=-\infty}^\infty$ is a covariance stationary process.
-Then it can always be representated as
+Then it can be represented as
 \begin{align*}
   \bsy_t = \bskappa_t + \sum_{k=0}^\infty \bsC_k \bsw_{t-k}
   \qquad \bsw_t\sim(\bso,\bsSigma)
@@ -11241,45 +11116,60 @@ Then it can always be representated as
 where the components have the following names and satisfy the following
 properties:
 \begin{enumerate}[label=\emph{(\roman*)}]
-  \item \emph{(Wold Innovations $\bsw_T$):}
+  \item \emph{(Wold Innovations $\bsw_t$):}
     Innovations $\{\bsw_t\}$ are uncorrelated white noise, but
     \emph{not} necessarily independent.\footnote{%
-      As always, only for Gaussian RVs is uncorrelated $\iff$
+      As always, only for Gaussian RVs do we have uncorrelated $\iff$
       independent.
     }
   \item
     \emph{(Linearly Deterministic Component $\bskappa_t$)}:
-    Term $\bskappa_t$ is uncorrelated with $\bsw_{s}$ for any $s$ (past
-    or future) and is perfectly linearly predictable from past
-    $\{y_s\}_{s=-\infty}^{t-1}$.
-  \item \emph{(Linearly Regular Component):} This is name for the second
-    term on the RHS
-  \item $\sum_{k=0}^\infty \bsC_k\bsC_k'$ finite
+    $\forall s$ (past or future), $\E[\bskappa_t\bsw_s']=\bso$.
+    Moreover, $\bskappa_t$ is perfectly linearly predictable from
+    past observations $\{\bsy_s\}_{s=-\infty}^{t-1}$, i.e. satisfies
+    \begin{align*}
+      \bskappa_t =
+      \bsA_{t,0}
+      + \bsA_{t,1}\bsy_{t-1}
+      + \bsA_{t,2}\bsy_{t-2}
+      + \cdots
+    \end{align*}
+    for some constant/non-stochastic coefficients
+    $\{\bsA_{t,n}\}\ninfz$ (specific to time $t$).
+    Generally, this represents seasonality.
+  \item \emph{(Linearly Regular Component $\sum_{k=0}^\infty \bsC_k \bsw_{t-k}$):}
+    This is the stochastic part left over after stripping out
+    everything that's perfectly linearly predictable (i.e. $\bskappa_t$)
+    from $\{\bsy_t\}$.
+  \item
+    Matrices $\{\bsC_k\}$ of the filter applied to Wold innovations
+    $\{\bsw_t\}$ satisfy $\sum_{k=0}^\infty \bsC_k\bsC_k'<\infty$
 \end{enumerate}
 \end{thm}
 
 \begin{rmk}
 The power of this result deserves further emphasis.
 In particular, note that we're \emph{not} saying ``For any covariance
-stationary process $\{\bsy_t\}\tinfinf$, there's a corresponding
-MA($\infty$) process with the same mean and covariance function.''
-That's a more limited statement about \emph{moments}, i.e. averages
-across outcomes $\omega$'s in the sample space $\Omega$.
+stationary process $\{\bsy_t\}\tinfinf$, there's an observationally
+equivalent (up to second moments) MA($\infty$) process with the same
+mean and covariance function.'' That's a more limited statement about
+\emph{moments}, i.e. averages across outcomes $\omega$'s in the sample
+space $\Omega$.
 
-While true, we're saying something even stronger: ``For any covariance
-stationary process $\{\bsy_t\}\tinfinf$, there's an MA($\infty$) process
-constructed from white noise shocks such that
-the \emph{joint distributions} (not just moments/averages)
-are \emph{identitcal}'', i.e.
+That's of course true, but because we're saying something
+\emph{even stronger}: ``For any covariance stationary process
+$\{\bsy_t\}\tinfinf$, there's an MA($\infty$) process constructed from
+white noise shocks such that the \emph{joint distributions} (not just
+moments/averages) are \emph{identitcal}'', i.e.
 \begin{align*}
   \begin{pmatrix}
     \bsy_t \\ \vdots \\ \bsy_{t+s}
   \end{pmatrix}
   \overset{d}{=}
   \begin{pmatrix}
-    \kappa_t + \sum_{k=0}^\infty \bsC_k \bsw_{t-k}
+    \bskappa_t + \sum_{k=0}^\infty \bsC_k \bsw_{t-k}
     \\ \vdots \\
-    \kappa_{t+s} + \sum_{k=0}^\infty \bsC_k \bsw_{t+s-k}
+    \bskappa_{t+s} + \sum_{k=0}^\infty \bsC_k \bsw_{t+s-k}
   \end{pmatrix}
   \qquad \forall t,s
 \end{align*}
@@ -11481,6 +11371,532 @@ perfectly linearly forecastable at all times.
 
 
 
+
+\clearpage
+\subsection{MA(q), AR(p), and ARMA(p,q) Models}
+
+So Wold's Theorem tells us that any covariance stationary process can
+\emph{always} be written as an MA($\infty$) of filtered white noise.
+Does that mean we \emph{always} have to work with MA($\infty$)
+representation and the infinite sequence $\{\bsw_t\}$ of (unobserved)
+Wold innovations if we want to do linear time series analysis?
+Well no, for two possible reasons.
+
+First, maybe the process $\{\bsy_t\}$ has has \emph{special structure}
+that greatly simplifies its Wold representation.
+Consider two examples where this might happen:
+\begin{enumerate}
+  \item $\{\bsy_t\}$ follows exactly an MA($q$):
+    Maybe you don't need an \emph{infinite} number of past innovations
+    to construct the current $\bsy_t$---maybe just a finite number $q$.
+    Said another way, maybe the Wold representation of $\{\bsy_t\}$ has
+    $\bsC_k=0$ for all $k>q$.
+  \item $\{\bsy_t\}$ follows exactly an AR($p$):
+    Recall that Wold innovation $\bsw_t$ is the forecast error implied
+    by the \emph{optimal linear forecast} constructed from a linear
+    combination of \emph{infinitely many} past observations
+    $\bsy_{t-1},\bsy_{t-2},\ldots$.
+    But suppose the optimal linear forecast only uses
+    \emph{finitely many} past $p$ observations
+    $\bsy_{t-1},\ldots,\bsy_{t-p}$, i.e. $\{\bsy_t\}$ follows an AR($p$)
+\end{enumerate}
+Either case implies a vastly simpler Wold representation, relative to the
+rather unwieldy MA($\infty$) representation Wold's Theorem offers.
+But how realistic is it that we should be so lucky that an arbitrary
+stochastic process $\{\bsy_t\}$ has such special structure?  Probably
+not too realistic.
+And in fact, there are literally \emph{countless} stochastic processes
+$\{\bsy_t\}$ that \emph{won't} have this special structure, which leads
+us to option two.
+
+Even if covariance stationary $\{\bsy_t\}$ does \emph{not} have special
+structure implying a simpler Wold representation, we don't need to work
+work with the Wold MA($\infty$) if we think of MA, AR, and ARMA models
+as \emph{approximations}.
+And that's totally justifiable because the MA, AR, and ARMA classes of
+models are \emph{dense} in the space of linearly regular covariance
+stationary processes. In other words, given \emph{any} covariance
+stationary process $\{\bsy_t\}$ that is linearly regular (i.e. with the
+deterministic $\bskappa_t$ part from Wold's Theorem stripped out),
+we can \emph{approximate} its dynamics \emph{arbitrarily well} with an
+MA, AR, ARMA model that has high enough order.
+So even though the Wold representation is the only \emph{exactly
+correct} linear representation of arbitrary covariance stationary
+process $\{\bsy_t\}$, we can justify working with MA, AR, and
+ARMA models by viewing them simply as concise approximations.
+
+Therefore, this section can be viewed in one of two ways:
+\begin{enumerate}[label=(\roman*)]
+  \item An examination of \emph{special classes} of covariance
+    stationary processes that are, in fact, linear processes with
+    \emph{exactly} MA, AR, or ARMA structure
+  \item An examination of MA, AR, and ARMA \emph{approximations} to the
+    exactly correct Wold representation for an \emph{arbitrary}
+    covariance stationary process
+\end{enumerate}
+However, in case (ii), we have no guarantee the model innovations
+are, in fact, the Wold innovations $\{\bsw_t\}$, which are very
+precisely and narrowly defined in the Wold's Theorem proof as the
+forecast errors implied by the optimal forecast among linear
+combinations of \emph{all} past observations.  Therefore, I will use
+$\{\bsvarepsilon_t\}$ to denote MA, AR, and ARMA model innovations in
+this section to highlight this subtle but crucial distinction.
+Only in the special case of interpretation (i) do Wold innovations
+$\{\bsw_t\}$ and model innovations $\{\bsvarepsilon_t\}$ coincide
+exactly.
+
+\clearpage
+\begin{defn}(MA($q$) Models)
+Given white noise process $\{\bsvarepsilon_t\}$ and mean $\bsmu$ we
+define the MA($\infty$) process as
+\begin{align*}
+  \bsy_t &=
+  \bsmu
+  + \bsTheta_0\bsvarepsilon_t
+  + \bsTheta_1\bsvarepsilon_{t-1}
+  + \cdots
+  + \bsTheta_q\bsvarepsilon_{t-q}
+  \qquad \bsvarepsilon_t \sim WN(\bso,\bsSigma)
+  \\
+  \iff\qquad
+  (\bsy_t - \bsmu) &= \bsTheta(L)\bsvarepsilon_t
+  \\
+  \text{where}\quad
+  \bsTheta(z)
+  &= \bsTheta_0 + \bsTheta_1z + \cdots + \bsTheta_qz^q
+\end{align*}
+It is easy to work out the mean and covariance function of the process
+\begin{align*}
+  \E[\bsy_t]
+  =\bsmu
+  \qquad
+  \quad
+  \bsGamma(k)
+  =
+  \E[(\bsy_{t+k}-\bsmu)(\bsy_t-\bsmu)']
+  %=
+  %\E[
+  %\left(
+  %\bsTheta_0\bsvarepsilon_{t+k}
+  %+ \bsTheta_1\bsvarepsilon_{t+k-1}
+  %+ \cdots
+  %+ \bsTheta_q\bsvarepsilon_{t+k-q}
+  %\right)
+  %\left(
+  %\bsTheta_0\bsvarepsilon_{t}
+  %+ \bsTheta_1\bsvarepsilon_{t-1}
+  %+ \cdots
+  %+ \bsTheta_q\bsvarepsilon_{t-q}
+  %\right)
+  %]
+  %=
+  &= \sum_{j=0}^{q-k} \bsTheta_{j+k}\bsSigma\bsTheta_j'
+\end{align*}
+Since neither depends upon $t$, we conclude that \emph{any} MA($q$)
+process is covariance stationary. And since the autocovariance function
+includes only finitely many terms, the autocovariances are absolutely
+summable, which ensures that $\bsy_t$ will be ergodic for the mean.
+\end{defn}
+
+\begin{rmk}
+Note that we only require the innovations are uncorrelated white noise,
+\emph{not} iid (which is generally stronger and equivalent if and only
+the innovations are Gaussian).
+This is also in keeping with the Wold representation, which only
+guarantees an MA($\infty$) with \emph{white noise} innovations---not
+iid.
+\end{rmk}
+
+\begin{defn}(MA($\infty$) Process)
+Take $q\ra \infty$. If the lag polynomial coefficients
+$\{\bsPsi\}_{j=0}^\infty$ are \emph{square-summable}, then the following
+process is well-defined and called an MA($\infty$):
+\begin{align*}
+  (\bsy_t - \bsmu) &= \bsPsi(L)\bsvarepsilon_t
+  \qquad
+  \text{where}\quad
+  \begin{cases}
+    \bsvarepsilon_t \sim WN(\bso,\bsSigma) \\
+    \bsPsi(z) = \bsPsi_0 + \bsPsi_1z + \bsPsi_2z^2 + \cdots
+  \end{cases}
+\end{align*}
+It is easy to work out the mean and covariance function of the process
+\begin{align*}
+  \E[\bsy_t]
+  =\bsmu
+  \qquad
+  \quad
+  \bsGamma(k)
+  =
+  \E[(\bsy_{t+k}-\bsmu)(\bsy_t-\bsmu)']
+  &= \sum_{j=0}^{\infty} \bsPsi_{j+k}\bsSigma\bsPsi_j'
+\end{align*}
+Note that square summability of the lag polynomial coefficients was a
+necessary condition for this object to be well-defined.
+This ensures that the sum defining $\bsy_t$ will converge in mean-square
+to a random variable (making $\bsy_t$ a well-defined object) and that
+the variance of $\bsy_t$ is finite, which is necessary for the process
+to be covariance stationary.
+
+If we further assume \emph{absolute} summability of the coefficients,
+then the covariance function is \emph{also} absolutely summable so that
+$\bsy_t$ is ergodic for the mean.
+\end{defn}
+
+\begin{prop}\emph{(Invertibility of MA Process)}
+The MA process with lag polynomial $\bsPsi(L)$ is invertible if and only
+if all roots of $\text{\emph{det}}(\bsPsi(z))=0$ are outside the complex
+unit circle.
+\end{prop}
+
+\begin{prop}\emph{(Observationally Equivalent MA Representations)}
+Suppose that $y_t$ follows an invertible MA(q) process. Then there is an
+associated non-invertible MA(q) process that is
+\emph{observationally equivalent}, i.e.\ with the same first- and
+second-order properities (mean and autocovariance function). The
+opposite also holds true: For every non-invertible MA(q), there is an
+associated invertible representation.
+\end{prop}
+
+
+
+\clearpage
+\begin{defn}(VAR($p$) Process)
+$\{\bsy_t\}$ is a VAR($p$) process if it can be written
+\begin{align*}
+  \bsPhi(L)(\bsy_t-\bsmu) &= \bsvarepsilon_t
+  \qquad\text{where}\quad
+  \begin{cases}
+    \bsvarepsilon_t\sim WN(0,\bsSigma) \\
+    \bsPhi(L) = \bsI - \bsPhi_1 L - \cdots - \bsPhi_pL^p
+  \end{cases}
+\end{align*}
+This can also be written in \emph{companion form}, reexpressing the
+AR(p) as an AR(1):
+\begin{align*}
+  \begin{pmatrix}
+    \bsy_t \\ \bsy_{t-1}\\\vdots \\ \bsy_{t-p+2}\\\bsy_{t-p+1}
+  \end{pmatrix}
+  &=
+  \begin{pmatrix}
+    \bsPhi_1 & \bsPhi_2 & \cdots& \bsPhi_{p-1} & \bsPhi_p \\
+    \bsI & \bso & \cdots & \bso & \bso\\
+    \bso & \bsI & \cdots & \bso & \bso\\
+    \vdots & \vdots & \ddots & \vdots & \vdots \\
+    \bso & \bso & \cdots & \bsI & \bso\\
+  \end{pmatrix}
+  \begin{pmatrix}
+    \bsy_{t-1} \\ \bsy_{t-2}\\\vdots \\ \bsy_{t-p+1} \\\bsy_{t-p}
+  \end{pmatrix}
+  +
+  \begin{pmatrix}
+     \bsvarepsilon_t\\ \bso\\\vdots \\ \bso \\\bso
+  \end{pmatrix}
+   \\
+  \iff \qquad
+  \bstildey_t
+  &= \bstildePhi \bstildey_{t-1} + \bstildevarepsilon_t
+\end{align*}
+Though MA(q) processes are \emph{always} covariance-stationary, this is
+decidedly \emph{not} the case for AR(p) processes. This motivates the
+following proposition.
+\end{defn}
+
+\begin{prop}\emph{(Stability Condition)}
+\label{prop:stationaryar}
+An AR($p$) process with lag polynomial $\bsPhi(L)$ is covariance
+stationary if and only if the following statements are true (they are
+equivalent):
+\begin{itemize}
+  \item
+    All roots of the equation $\det(\bsPhi(z)) = 0$ have modulus $>1$.
+  \item
+    All roots of the following equation have modulus $<1$:
+    \begin{align*}
+      \det\big(
+        \bsI z^p - \bsPhi_1z^{p-1}
+        - \cdots - \bsPhi_p z^0
+      \big)
+      =0
+    \end{align*}
+\end{itemize}
+For univariate time series (hence scalar-valued $\Psi(z)$), checking
+these conditions is easy since $\det|c|=c$ for any scalar $c$.
+\end{prop}
+
+
+\begin{prop}
+\emph{(Univariate Yule-Walker and the Autocov Function of Stationary AR(p))}
+If we multiply through the $p$th order difference equation by $y_{t-k}$
+for $k=0,1,\ldots,p$ and take expectation, it follows that the
+autocovariances satisfy the same difference equation as $y_t$:
+\begin{align*}
+  \gamma(k)
+  &=
+  \begin{cases}
+    \sigma^2 + \sum_{j=1}^p \phi_j\gamma(j)
+    & k = 0 \\
+    \sum_{j=1}^p \phi_j\gamma(k-j)
+    & k = 1,2,\ldots \\
+  \end{cases}
+\end{align*}
+This is a system of $p+1$ equations in $p+1$ unknowns,
+$\gamma(0),\ldots,\gamma(p)$.
+
+We could have also derived this from the companion representation. So
+define the unconditional variance $\Sigma=\Var(\tilde{y}_t)$, which
+holds for all $t$ (since $\tilde{y}_t$ is stationary) and solve
+\begin{align*}
+  \Sigma = \Var(\tilde{y}_t)
+  &= \Var(\Phi \tilde{y}_{t-1} + e_t)
+  = \tilde{\Phi} \Sigma\tilde{\Phi}' + D_e \\
+  \Sigma
+  &= \tilde{\Phi} \Sigma\tilde{\Phi}' + D_e
+\end{align*}
+where $D_e=\diag(\sigma^2,0,\ldots,0)$. We can solve this system by
+computing
+\begin{align*}
+  \vc(\Sigma) &= (\tilde{\Phi}\otimes\tilde{\Phi})\vc(\Sigma) + \vc(D_e) \\
+  \implies\quad
+  \vc(\Sigma) &= \big(I_{p^2}-(\tilde{\Phi}\otimes\tilde{\Phi})\big)^{-1}\vc(D_e)
+\end{align*}
+
+\end{prop}
+
+\begin{ex}(Stationary AR(1) Model)
+Consider the simple univariate AR(1) model
+\begin{align*}
+  y_t = \rho y_{t-1} + \varepsilon_t
+  \qquad \varepsilon_t\sim(0,\sigma^2)
+\end{align*}
+Suppose $|\rho|<1$. Then we can solve for $y_t$ in terms of past
+$\varepsilon_t$'s by backward recursive substitution:
+\begin{align*}
+  y_t
+  &= \rho y_{t-1} + \varepsilon_t
+  = \rho\big(\rho y_{t-2} + \varepsilon_{t-1}\big) + \varepsilon_t
+  = \cdots \\
+  \implies\quad
+  y_t
+  &=
+  \sum_{j=0}^\infty \rho^j\varepsilon_{t-j}
+\end{align*}
+We have thus expressed the AR(1) as an MA($\infty$) model (more on that
+in Proposition~\ref{prop:artoma}), and we see here why exactly we need
+$|\rho|<1$ or, equivalently, the roots of $\phi(z) = 1-\rho z$ to be
+$>1$ in modulus. Only this will ensure that the variance of $y_t$ is
+finite and that the process is stationary.  From there, we can then
+solve the Yule-Walker equations to compute the autocovariance function
+\begin{align*}
+  \gamma(k) = \E[y_ty_{t-k}] = \sigma^2 \frac{\rho^{|k|}}{1-\rho^2}
+\end{align*}
+\end{ex}
+
+\begin{ex}(Explosive AR(1) Model)
+Now consider the AR(1) model where $|\rho|>1$. We solve by forward
+subsitution to get $y_t$ in terms of \emph{future} $\varepsilon_t$'s:
+\begin{align*}
+  y_t
+  &= \rho^{-1}(y_{t+1} - \varepsilon_{t+1})
+  = \rho^{-1}\big(
+      \rho^{-1}(y_{t+2} - \varepsilon_{t+2}) - \varepsilon_{t+1}\big)
+  = \cdots \\
+  \implies\quad
+  y_t
+  &=
+  -\sum_{j=1}^\infty \rho^{-j}\varepsilon_{t+j}
+\end{align*}
+\end{ex}
+
+\begin{prop}\emph{(Stationary AR(p) to MA($\infty$))}
+\label{prop:artoma}
+Extending the simple AR(1) example above, if $y_t$ is a stationary AR(p)
+model, then we know by Proposition~\ref{prop:stationaryar} that the
+associated lag polynomial $\phi(z)$ is invertible. Therefore, we can
+express $y_t$ as an MA($\infty$):
+\begin{align*}
+  \phi(L)y_t = \varepsilon_t
+  \quad\iff\quad
+  y_t = \phi(L)^{-1}\varepsilon_t
+\end{align*}
+\end{prop}
+
+\begin{prop}\emph{(Invertible MA(q) to AR($\infty$))}
+\label{prop:matoar}
+Suppose that $y_t$ follows an MA(q) representation.  If the roots of the
+associated MA lag polynomial $\theta(z)$ are all $>1$ in modulus, then
+we call the MA(q) model \emph{invertible} and can express $y_t$ as an
+AR($\infty$):
+\begin{align*}
+  y_t = \theta(L)\varepsilon_t
+  \quad\iff\quad
+  \theta(L)^{-1}y_t = \varepsilon_t
+\end{align*}
+The fact that all roots are $>1$ in modulus ensures that the
+coefficients $\phi_i$ of the AR($\infty$) are absolutely summable
+$\sum_{i=0}^\infty |\phi_i|<\infty$ so that the AR($\infty$)
+representation converges in mean square to a random variable and is,
+therefore, well-defined.
+\end{prop}
+
+\begin{rmk}
+Note that while we could \emph{always} invert a \emph{stationary} AR(p),
+we cannot always invert MA(q) models. There are such things as
+non-invertible MA(q) models. So we really do need all roots of
+$\theta(z)$ to lie outside the unit circle because only then will
+$\theta(L)^{-1}$ be a well-defined object.
+\end{rmk}
+
+
+\begin{defn}(VARMA($p,q$) Process)
+$\{\bsy_t\}$ is a VARMA($p,q$) process if it can be written
+\begin{align*}
+  \bsPhi(L)(\bsy_t-\bsmu) &= \bsTheta(L)\bsvarepsilon_t
+  \qquad\qquad\qquad\qquad\qquad \bsvarepsilon_t\sim WN(0,\bsSigma)
+  \\
+  \bsPhi(L) &= \bsI - \bsPhi_1 L - \cdots - \bsPhi_pL^p
+  \\
+  \bsTheta(L) &= \bsTheta_0 + \bsTheta_1 L + \cdots + \bsTheta_qL^q
+\end{align*}
+\end{defn}
+
+\begin{defn}(ARMA(p,q) Model)
+We define an ARMA(p,q) process $\{y_t\}$ given white noise innovations
+$\{\varepsilon_t\}$ as
+\begin{align*}
+  \phi(L)y_t = \theta(L)\varepsilon_t
+\end{align*}
+If the roots of $\phi(z)$ are all $>1$ in modulus, then $\phi(L)$ has a
+well defined inverse, the process $y_t$ is stationary, and $y_t$ has an
+MA($\infty$) representation
+\begin{align*}
+  y_t = \frac{\theta(L)}{\phi(L)}\varepsilon_t
+\end{align*}
+If the roots of the $\theta(z)$ are all $>1$ in modulus, then
+$\theta(L)$ has a well-defined inverse and $y_t$ has an AR($\infty$)
+representation
+\begin{align*}
+  \frac{\phi(L)}{\theta(L)}y_t = \varepsilon_t
+\end{align*}
+\end{defn}
+
+\clearpage
+\subsection{Impulse Response Function and Variance Decomposition}
+
+In this section, we suppose that we have a model with MA
+representation\footnote{%
+  Note that the IRF is well-defined even for non-fundamental MAs.
+}
+\begin{align*}
+  \bsy_t = \bsPsi(L)\bsvarepsilon_t
+  \qquad
+  \bsvarepsilon_t \wn(\bso,\bsSigma)
+  \qquad\bsy_t,\bsvarepsilon_t\in \R^M
+\end{align*}
+where $\bsPsi(L)$ is a lag polynomial in \emph{postive} powers of $L$
+only (hence only lags of $\bsvarepsilon_t$ on the RHS).
+The zero-mean assumption for $\bsy_t$ is without loss of generality.
+
+\begin{defn}(Impulse Response Function)
+The \emph{impulse respose function} of variable $i$ to shock $j$ after
+$k$ periods is defined as the following function of $k$:
+\begin{align*}
+  IRF_{ij}(k)
+  &:=
+  \frac{\partial \bsy_{t,i}}{\partial \bsvarepsilon_{t-k,j}}
+  =
+  \frac{\partial \bsy_{t+k,i}}{\partial \bsvarepsilon_{t,j}}
+  = \bsPsi_{k,ij}
+\end{align*}
+\end{defn}
+
+\begin{defn}(Variance Decomposition)
+Assume that $\bsSigma$ is a diagonal matrix. As we will see below, this
+is typical for structural models.
+To obtain a (forecast error) \emph{variance decomposition}, we let
+$R^2_{ij}(h)$ denote the fraction of $h$-period-ahead forecast error
+variance for $i$th observable $\bsy_{t,i}$ that comes from the $j$th
+exogenous shock. It is given by
+\begin{align}
+  R^2_{ij}(h)
+  %= \frac{\text{Contribution of $\varepsilon_{t,j}$}}{%
+          %\text{Total for $y_{t,i}$}}
+  %=
+  %\frac{ }{%
+    %\left[
+    %\sum_{k=0}^{h-1} \bsPsi_k\bsSigma \bsPsi_k'
+    %\right]_{ii}
+  %}
+  =
+  \frac{%
+    \sum_{k=0}^{h-1}
+    \bsSigma_{jj} \bsPsi_{k,ij}^2
+  }{%
+    \sum_{k=0}^{h-1} \sum_{m=1}^{M_\varepsilon}
+    \bsSigma_{mm} \bsPsi_{k,im}^2
+  }
+  \label{vardecomp}
+\end{align}
+To see where this comes from, note that the best linear forecast of
+$\bsy_{t+h}$ given $\bsvarepsilon_t,\bsvarepsilon_{t-1},\ldots$ is given
+by the conditional expectation
+\begin{align*}
+  \E_t[\bsy_{t+h}]
+  =
+  \E_t\big[
+    \bsPsi_0\bsvarepsilon_{t+h}
+    + \bsPsi_1\bsvarepsilon_{t+h-1}
+    + \cdots
+  \big]
+  = [\bsPsi(L)L^{-h}]_+\;\bsvarepsilon_t
+  = [\bsPsi(L)L^{-h}]_+\;L^h\bsvarepsilon_{t+h}
+\end{align*}
+where $[\;\cdot\;]_+$ denotes ``take only those terms where the lag term
+is nonnegative,'' i.e.\ those $L^k$ where $k\geq 0$.
+This implies that the forecast error is given by
+\begin{align*}
+  \bsy_{t+h} - \E_t[\bsy_{t+h}]
+  &=
+  \bsPsi(L)\varepsilon_{t+h}
+  - [\bsPsi(L)L^{-h}]_+\;L^h\bsvarepsilon_{t+h}
+  =
+  \sum_{k=0}^{h-1}
+  \bsPsi_k \varepsilon_{t+h-k}
+\end{align*}
+The total variance matrix for the forecast error is therefore given by
+\begin{align}
+  \Var\big(
+  \bsy_{t+h} - \E_t[\bsy_{t+h}]
+  \big)
+  &=
+  \Var\left(
+  \sum_{k=0}^{h-1}
+  \bsPsi_k \varepsilon_{t+h-k}
+  \right)
+  =
+  \sum_{k=0}^{h-1} \bsPsi_k \Var\left(
+  \varepsilon_{t+h-k}
+  \right)\bsPsi_k'
+  =
+  \sum_{k=0}^{h-1}
+  \bsPsi_k\bsSigma \bsPsi_k'
+  \label{totalvar}
+\end{align}
+where we made use of the fact that the shocks $\bsvarepsilon_t$ are
+white noise with zero autocorrelation.
+
+To get to Expression~\ref{vardecomp}, first note that the $ii$ element
+of the matrix in Expression~\ref{totalvar} represents the total amount
+variance of the forecast error for the $i$th element of $\bsy_t$.
+Naturally, we then ask ``What fraction of the forecast error variance
+for observable $i$ in $\bsy_t$ is driven by shock $j$ in
+$\bsvarepsilon_t$?'' Since $\bsSigma$ is a diagonal matrix, the formulas
+simplify nicely to Expression~\ref{vardecomp} after writing everything
+out.
+\end{defn}
+
+
+
 \clearpage
 \subsection{Optimal Forecasting}
 
@@ -11505,8 +11921,6 @@ which can be written as
   &= \mu + \left[\frac{\psi(L)}{L^s}\right]_+\varepsilon_t
   \label{optforeeps}
 \end{align}
-where $[\,\cdot\,]_+$ is called the \emph{annihilation operator} and
-says ``Ignore negative powers of $L$ in the expression $\psi(L)/L^s$.''
 \end{prop}
 \begin{rmk}
 In practice, we obviously don't observe the infinite sequence
@@ -11548,14 +11962,16 @@ $\{y_t\}$ only, rather than past $\{\varepsilon_t\}$.
 \subsection{Autocovariance Generating Function}
 
 \begin{defn}(Autocovariance Generating Function)
-Let $\gamma(k)$ be the autocovariance function of some process $y_t$
-Then the \emph{autocovariance function} for $y_t$ is defined
+Let $\bsGamma(k)$ be the autocovariance function of some process
+$\bsy_t$ Then the \emph{autocovariance generating function} for $\bsy_t$
+is defined
 \begin{align*}
-  g_y(z) = \sum_{k=-\infty}^\infty \gamma(k)z^k
+  \bsg_{\bsy}(z)
+  = \sum_{k=-\infty}^\infty \bsGamma(k)z^k
   \qquad z\in\C
 \end{align*}
-For this to be well-defined, we require the $\gamma(k)$ to be absolutely
-summable.
+For this to be well-defined, we require the autocovariances
+$\{\bsGamma(k)\}$ to be absolutely summable.
 \end{defn}
 
 \begin{prop}\emph{(AGF of MA($\infty$))}
@@ -11895,15 +12311,15 @@ where the $\sin$ part of $e^{i\lambda k}$ drops out of the integral
 because it is even. Alternatively, the spectral density is the
 discrete-time Fourier transform of the autocovariance function:
 \begin{align}
-  f(\lambda)
+  \bsf(\lambda)
   &= \frac{1}{2\pi} \sum_{k=-\infty}^\infty
-  \gamma(k) e^{-i\lambda k}
+  \bsGamma(k) e^{-i\lambda k}
   \label{fourier}
   \\
   \iff\qquad
   &= \frac{1}{2\pi}
   \left[
-    \gamma(0) + 2\sum_{k=1}^\infty \gamma(k)\cos(k\lambda)
+    \bsGamma(0) + 2\sum_{k=1}^\infty \bsGamma(k)\cos(k\lambda)
   \right]
   \notag
 \end{align}
@@ -11911,6 +12327,24 @@ Therefore, there is a one-to-one mapping between the spectral density
 $f(\lambda)$ and the autocovariance function $\gamma(k)$.
 All of this assumes absolute summability of $\gamma(k)$.
 \end{prop}
+\begin{defn}(Spectral Density)
+Vector process $\{\bsy_t\}$ has spectral density function
+\begin{align*}
+  \bsf_{\bsy}(\lambda) = \frac{1}{2\pi} \bsg_{\bsy}(e^{-i\lambda})
+\end{align*}
+\end{defn}
+
+\begin{prop}
+Let $\{\bsx_t\}$ be a vector process and $\bsH(z)$ a conformable
+multivariate filter. Then filtered series
+$\bsy_t = \bsH(L)\bsx_t$
+has autocovariance generating function
+\begin{align*}
+  \bsg_{\bsy}(z) = \bsH(z)\bsg_{\bsx}(z)\bsH(z^{-1})'
+\end{align*}
+\end{prop}
+
+
 \begin{proof}
 First, the inverse Fourier transform:
 \begin{align*}
@@ -12139,277 +12573,377 @@ long-run variance formula:
 \end{cor}
 
 \clearpage
-\section{Multivariate Time Series}
+\subsection{Beveridge-Nelson}
 
-\subsection{Generalizing the Univariate Concepts and Formulas}
 
-\begin{defn}(Covariance Stationary Process)
-A vector stochastic process $\{\bsy_t\}$ is
-\emph{covariance stationary} if the mean and the autocovariance function
-does not depend upon time. Now though, the mean is a vector and the
-autocovariance function that maps into matrices:
+\begin{thm}\emph{(Beveridge-Nelson Decomposition)}
+\label{thm:beveridgenelson}
+Given stationary linear process
 \begin{align*}
-  \E[\bsy_t] &= \bsmu
-  \qquad
-  \Cov(\bsy_t,\bsy_{t+k})
-  = \E[(\bsy_t-\bsmu)(\bsy_t-\bsmu)']
-  = \bsGamma(k)
+  y_t = \mu+ \psi(L)\varepsilon_t
+  \qquad \varepsilon_t \iid(0,\sigma^2)
 \end{align*}
-Again, $\bsGamma(k)$ is an autocovariance function that doesn't depend
-upon time, just lag length $k$.
-\end{defn}
-
-\begin{defn}(Vector White Noise Process)
-$\{\bsy_t\}$ a \emph{vector white noise process} if $\forall t$
+Suppose that we sum $T$ observations of the process to form the
+following $I(1)$ process:
 \begin{align*}
-  \E[\bsy_t] &= \bso
-  \\
-  \E[\bsy_t\bsy_t'] &= \bsSigma
-  \quad\text{symmetric positive definite}
-  \\
-  \E[\bsy_t\bsy_{t-k}']
-  &= \bso \qquad \forall k\neq 0
-\end{align*}
-We here place no other restriction on $\bsSigma$ except for symmetric
-positive-definiteness. Therefore, we allow for contemporaneous
-correlation between elements of $\bsy_t$.
-\end{defn}
-
-\begin{defn}(Multivariate Filter)
-Given sequence of (possibly non-square) matrices
-$\{\bsH_j\}_{j=0}^\infty$, the associated
-\emph{multivariate filter}
-is defined as
-\begin{align*}
-  \bsH(z)
-  = \sum_{j=1}^\infty \bsH_j z^j
-  = \bsH_0 + \bsH_1 z + \bsH_2z^2 + \cdots
-\end{align*}
-\end{defn}
-
-\begin{defn}(Lag Polynomial Inverse)
-Let $\bsH(L)$ be a lag polynomial formed from filter $\bsH(z)$ with
-square-matrix elements. Define the lag polynomial inverse as the filter
-$\bsH(L)^{-1}$ such that
-\begin{align*}
-  \bsH(L)^{-1}\bsH(L) =
-  \bsH(L)\bsH(L)^{-1} = \bsI
-\end{align*}
-\end{defn}
-
-\begin{defn}(Autocovariance Generating Function)
-For vector process $\{\bsy_t\}$, we define the autocovariance generating
-function
-\begin{align*}
-  \bsg_{\bsy}(z) = \sum_{j=-\infty}^\infty \bsGamma(j)z^j
-\end{align*}
-\end{defn}
-
-\begin{defn}(Spectral Density)
-Vector process $\{\bsy_t\}$ has spectral density function
-\begin{align*}
-  \bsf_{\bsy}(\lambda) = \frac{1}{2\pi} \bsg_{\bsy}(e^{-i\lambda})
-\end{align*}
-\end{defn}
-
-\begin{prop}
-Let $\{\bsx_t\}$ be a vector process and $\bsH(z)$ a conformable
-multivariate filter. Then filtered series
-$\bsy_t = \bsH(L)\bsx_t$
-has autocovariance generating function
-\begin{align*}
-  \bsg_{\bsy}(z) = \bsH(z)\bsg_{\bsx}(z)\bsH(z^{-1})'
-\end{align*}
-\end{prop}
-
-\clearpage
-\subsection{VMA, VAR, and VARMA Models}
-
-\begin{defn}(VMA Process)
-Given vector white noise process $\{\bsvarepsilon_t\}$, mean $\bsmu$,
-and multivariate lag polynomial $\bsPsi(L)$, we define the vector
-MA($\infty$) process as
-\begin{align*}
-  (\bsy_t - \bsmu) = \bsPsi(L)\bsvarepsilon_t
-  \qquad \bsvarepsilon_t \sim WN(\bso,\bsSigma)
-\end{align*}
-It has autocovariance function
-\begin{align*}
-  \bsGamma(j)
-  &= \sum_{k=0}^\infty \bsPsi_{j+k}\bsSigma\bsPsi_k'
-\end{align*}
-\end{defn}
-
-\begin{prop}\emph{(Invertibility of VMA Process)}
-The VMA process with lag polynomial $\bsPsi(L)$ is invertible if and
-only if all roots of $\text{\emph{det}}(\bsPsi(z))=0$ are outside the
-complex unit circle.
-\end{prop}
-
-\begin{defn}(VAR($p$) Process)
-$\{\bsy_t\}$ is a VAR($p$) process if it can be written
-\begin{align*}
-  \bsPhi(L)(\bsy_t-\bsmu) &= \bsvarepsilon_t
-  \qquad\qquad\qquad\qquad\qquad \bsvarepsilon_t\sim WN(0,\bsSigma)
-  \\
-  \bsPhi(L) &= \bsI - \bsPhi_1 L - \cdots - \bsPhi_pL^p
-\end{align*}
-\end{defn}
-
-\begin{prop}\emph{(Stability Condition)}
-Suppose we have VAR($p$) process
-\begin{align*}
-  \bsPhi(L)\bsy_t &= \bsvarepsilon_t
-  \qquad \bsvarepsilon_t \sim WN(0,\bsSigma)
-  \\
-  \text{\emph{where}}\quad
-  \bsPhi(L) &= \bsI - \bsPhi_1 L - \cdots - \bsPhi_pL^p
-\end{align*}
-The process is covariance stationary if the following statements are
-true (they are equivalent):
-\begin{itemize}
-  \item
-    All roots of the following equation have modulus $>1$:
-    $\det(\bsPhi(z)) = 0$
-  \item
-    All roots of the following equation have modulus $<1$:
-    \begin{align*}
-      \det\big(
-        \bsI z^p - \bsPhi_1z^{p-1}
-        - \cdots - \bsPhi_p z^0
-      \big)
-      =0
-    \end{align*}
-\end{itemize}
-\end{prop}
-
-\begin{defn}(VARMA($p,q$) Process)
-$\{\bsy_t\}$ is a VARMA($p,q$) process if it can be written
-\begin{align*}
-  \bsPhi(L)(\bsy_t-\bsmu) &= \bsTheta(L)\bsvarepsilon_t
-  \qquad\qquad\qquad\qquad\qquad \bsvarepsilon_t\sim WN(0,\bsSigma)
-  \\
-  \bsPhi(L) &= \bsI - \bsPhi_1 L - \cdots - \bsPhi_pL^p
-  \\
-  \bsTheta(L) &= \bsTheta_0 + \bsTheta_1 L + \cdots + \bsTheta_qL^q
-\end{align*}
-\end{defn}
-
-\clearpage
-\subsection{Impulse Response Function and Variance Decomposition}
-
-In this section, we suppose that we have a model with VMA representation
-\begin{align*}
-  \bsy_t = \bsPsi(L)\bsvarepsilon_t
-  \qquad
-  \bsvarepsilon_t \wn(\bso,\bsSigma)
-  \qquad\bsy_t,\bsvarepsilon_t\in \R^M
-\end{align*}
-The zero-mean assumption for $\bsy_t$ is without loss of generality.
-
-\begin{defn}(Impulse Response Function)
-The \emph{impulse respose function} of variable $i$ to shock $j$ after
-$k$ periods is given by
-\begin{align*}
-  IRF_{ij}(k)
-  &=
-  \frac{\partial y_{t,i}}{\partial \varepsilon_{t-k,j}}
+  x_T:=
+  \sumtT y_t
   =
-  \frac{\partial y_{t+k,i}}{\partial \varepsilon_{t,j}}
-  = \Psi_{k,ij}
+  T\mu
+  +
+  \sumtT
+  \psi(L)\varepsilon_t
+  &=
+  T\mu
+  +
+  \sumtT
+  \sum_{j=0}^{\infty}
+  \psi_j \varepsilon_{t-j}
 \end{align*}
-We think of this as a function of $k$.
-\end{defn}
-
-\begin{defn}(Variance Decomposition)
-Assume that $\bsSigma$ is a diagonal matrix. As we will see below, this
-is typical for structural models.
-To obtain a (forecast error) \emph{variance decomposition}, we let
-$R^2_{ij}(h)$ denote the fraction of $h$-period-ahead forecast error
-variance for $i$th observable $y_{t,i}$ that comes from the $j$th
-exogenous shock. It is given by
-\begin{align}
-  R^2_{ij}(h)
-  %= \frac{\text{Contribution of $\varepsilon_{t,j}$}}{%
-          %\text{Total for $y_{t,i}$}}
+Then the I(1) process $\{x_T\}_{T=1}^\infty$ can be rewritten as
+\begin{align*}
+  x_T
   %=
-  %\frac{ }{%
-    %\left[
-    %\sum_{k=0}^{h-1} \bsPsi_k\bsSigma \bsPsi_k'
-    %\right]_{ii}
-  %}
-  =
-  \frac{%
-    \sum_{k=0}^{h-1}
-    \Sigma_{jj} \Psi_{k,ij}^2
-  }{%
-    \sum_{k=0}^{h-1} \sum_{m=1}^{M_\varepsilon}
-    \Sigma_{mm} \Psi_{k,im}^2
-  }
-  \label{vardecomp}
-\end{align}
-To see where this comes from, note that the best linear forecast of
-$\bsy_{t+h}$ given $\bsvarepsilon_t,\bsvarepsilon_{t-1},\ldots$ is given
-by the conditional expectation
-\begin{align*}
-  \E_t[\bsy_{t+h}]
-  =
-  \E_t\big[
-    \bsPsi_0\bsvarepsilon_{t+h}
-    + \bsPsi_1\bsvarepsilon_{t+h-1}
-    + \cdots
-  \big]
-  = [\bsPsi(L)L^{-h}]_+\;\bsvarepsilon_t
-  = [\bsPsi(L)L^{-h}]_+\;L^h\bsvarepsilon_{t+h}
-\end{align*}
-where $[\;\cdot\;]_+$ denotes ``take only those terms where the lag term
-is nonnegative,'' i.e.\ those $L^k$ where $k\geq 0$.
-This implies that the forecast error is given by
-\begin{align*}
-  \bsy_{t+h} - \E_t[\bsy_{t+h}]
+  %T\mu
+  %+
+  %\sumtT y_t
   &=
-  \bsPsi(L)\varepsilon_{t+h}
-  - [\bsPsi(L)L^{-h}]_+\;L^h\bsvarepsilon_{t+h}
-  =
-  \sum_{k=0}^{h-1}
-  \bsPsi_k \varepsilon_{t+h-k}
-\end{align*}
-The total variance matrix for the forecast error is therefore given by
-\begin{align}
-  \Var\big(
-  \bsy_{t+h} - \E_t[\bsy_{t+h}]
-  \big)
-  &=
-  \Var\left(
-  \sum_{k=0}^{h-1}
-  \bsPsi_k \varepsilon_{t+h-k}
+  T\mu
+  +
+  \psi(1)
+  \sumtT \varepsilon_t
+  -
+  \eta_T
+  +
+  \eta_0
+  \qquad \text{where}\quad
+  \eta_t
+  :=
+  \left(
+  \sum_{s=0}^\infty
+  \sum_{j=s+1}^\infty \psi_j\varepsilon_{t-s}
   \right)
+\end{align*}
+i.e. the sum of a linear deterministic trend, a (scaled) random walk
+$\psi(1)\sumtT \varepsilon_t$, a stationary noise component $\eta_T$,
+and an initial condition $\eta_0$ common to all $x_T\in
+\{x_T\}_{T=1}^\infty$.
+\end{thm}
+\begin{proof}
+For simplicity, suppose $\mu=0$.
+Then start by writing out the sums explicitly:
+\begin{align*}
+  \sumtT y_t
   =
-  \sum_{k=0}^{h-1} \bsPsi_k \Var\left(
-  \varepsilon_{t+h-k}
-  \right)\bsPsi_k'
-  =
-  \sum_{k=0}^{h-1}
-  \bsPsi_k\bsSigma \bsPsi_k'
-  \label{totalvar}
-\end{align}
-where we made use of the fact that the shocks $\bsvarepsilon_t$ are
-white noise with zero autocorrelation.
+  \sumtT
+  \sum_{j=0}^{\infty}
+  \psi_j \varepsilon_{t-j}
+  &=
+  \sumtT
+  \big(
+  \psi_0 \varepsilon_t
+  + \psi_1 \varepsilon_{t-1}
+  + \psi_2 \varepsilon_{t-2}
+  + \cdots
+  \big)
+  \\
+  &=
+  \quad
+  \big(
+  \psi_0 \varepsilon_1
+  + \psi_1 \varepsilon_{0}
+  + \psi_2 \varepsilon_{-1}
+  + \cdots
+  \big)
+  \\
+  &\quad
+  +
+  \big(
+  \psi_0 \varepsilon_2
+  + \psi_1 \varepsilon_{1}
+  + \psi_2 \varepsilon_{0}
+  + \cdots
+  \big)
+  \\
+  &\quad
+  + \quad \cdots
+  \\
+  &\quad
+  +
+  \big(
+  \psi_0 \varepsilon_{T-1}
+  + \psi_1 \varepsilon_{T-2}
+  + \psi_2 \varepsilon_{T-3}
+  + \cdots
+  \big)
+  \\
+  &\quad
+  +
+  \big(
+  \psi_0 \varepsilon_T
+  + \psi_1 \varepsilon_{T-1}
+  + \psi_2 \varepsilon_{T-2}
+  + \cdots
+  \big)
+\end{align*}
+Group terms to write the sum of $\sumtT y_t$ explicitly as an
+MA($\infty$) with innovations $\{\varepsilon_t\}_{t=-\infty}^\infty$:
+\begin{align*}
+  \sumtT y_t
+  &=
+  \varepsilon_T
+  \sum_{j=0}^{0}
+  \psi_j
+  +
+  \varepsilon_{T-1}
+  \sum_{j=0}^{1}
+  \psi_j
+  +
+  \cdots
+  +
+  \varepsilon_1
+  \sum_{j=0}^{T-1}
+  \psi_j
+  +
+  \varepsilon_0
+  \sum_{j=1}^{T}
+  \psi_j
+  +
+  \varepsilon_{-1}
+  \sum_{j=2}^{T+1}
+  \psi_j
+  +
+  \varepsilon_{-2}
+  \sum_{j=3}^{T+2}
+  \psi_j
+  + \cdots
+\end{align*}
+Now we can rewrite the coefficients on the innovations as
+\begin{align*}
+  \sumtT y_t
+  &=
+  \varepsilon_T
+  \left(
+  \sum_{j=0}^{\infty}
+  \psi_j
+  -
+  \sum_{j=1}^{\infty}
+  \psi_j
+  \right)
+  +
+  \varepsilon_{T-1}
+  \left(
+  \sum_{j=0}^{\infty}
+  \psi_j
+  -
+  \sum_{j=2}^\infty
+  \psi_j
+  \right)
+  +
+  \cdots
+  +
+  \varepsilon_1
+  \left(
+  \sum_{j=0}^{\infty}
+  \psi_j
+  -
+  \sum_{j=T}^{\infty}
+  \psi_j
+  \right)
+  \\
+  &
+  \quad
+  +
+  \varepsilon_0
+  \left(
+  \sum_{j=1}^{\infty}
+  \psi_j
+  -
+  \sum_{j=T+1}^{\infty}
+  \psi_j
+  \right)
+  +
+  \varepsilon_{-1}
+  \left(
+  \sum_{j=2}^\infty
+  \psi_j
+  -
+  \sum_{j=T+2}^\infty
+  \psi_j
+  \right)
+  +
+  \varepsilon_{-2}
+  \left(
+  \sum_{j=3}^\infty
+  \psi_j
+  -
+  \sum_{j=T+3}^{\infty}
+  \psi_j
+  \right)
+  + \cdots
+\end{align*}
+First, recall that $\psi(1)=\sum_{j=0}^\infty \psi_j$ and use that to
+regroup things on the first line, giving:
+\begin{align*}
+  \sumtT y_t
+  &=
+  \psi(1)
+  \sumtT \varepsilon_t
+  -
+  \left(
+  \varepsilon_T
+  \sum_{j=1}^{\infty}
+  \psi_j
+  +
+  \varepsilon_{T-1}
+  \sum_{j=2}^\infty
+  \psi_j
+  +
+  \cdots
+  +
+  \varepsilon_1
+  \sum_{j=T}^{\infty}
+  \psi_j
+  \right)
+  \\
+  &\quad
+  +
+  \varepsilon_0
+  \left(
+  \sum_{j=1}^{\infty}
+  \psi_j
+  -
+  \sum_{j=T+1}^{\infty}
+  \psi_j
+  \right)
+  +
+  \varepsilon_{-1}
+  \left(
+  \sum_{j=2}^\infty
+  \psi_j
+  -
+  \sum_{j=T+2}^\infty
+  \psi_j
+  \right)
+  +
+  \varepsilon_{-2}
+  \left(
+  \sum_{j=3}^\infty
+  \psi_j
+  -
+  \sum_{j=T+3}^{\infty}
+  \psi_j
+  \right)
+  + \cdots
+\end{align*}
+Next, group the sums in parentheses being subtracted on the second line
+with the sums in parentheses on the first line to rewrite
+\begin{align*}
+  \sumtT y_t
+  &=
+  \psi(1)
+  \sumtT \varepsilon_t
+  \\
+  &
+  \quad
+  -
+  \left(
+  \varepsilon_T
+  \sum_{j=1}^{\infty}
+  \psi_j
+  +
+  \varepsilon_{T-1}
+  \sum_{j=2}^\infty
+  \psi_j
+  + \cdots
+  +
+  \varepsilon_1
+  \sum_{j=T}^\infty
+  \psi_j
+  +
+  \varepsilon_0
+  \sum_{j=T+1}^{\infty}
+  \psi_j
+  +
+  \varepsilon_{-1}
+  \sum_{j=T+2}^\infty
+  \psi_j
+  +
+  \varepsilon_{-2}
+  \sum_{j=T+3}^{\infty}
+  \psi_j
+  + \cdots
+  \right)
+  \\
+  &
+  \quad
+  +
+  \varepsilon_0
+  \sum_{j=1}^{\infty}
+  \psi_j
+  +
+  \varepsilon_{-1}
+  \sum_{j=2}^\infty
+  \psi_j
+  +
+  \varepsilon_{-2}
+  \sum_{j=3}^\infty
+  \psi_j
+  + \cdots
+\end{align*}
+If we take care to define the indices correctly, the second and third
+lines can be collapsed into double sums, giving a final expression
+\begin{align*}
+  \sumtT y_t
+  &=
+  \psi(1)
+  \sumtT \varepsilon_t
+  -
+  \left(
+  \sum_{s=0}^\infty
+  \left[
+  \varepsilon_{T-s}
+  \sum_{j=s+1}^\infty
+  \psi_j
+  \right]
+  \right)
+  +
+  \left(
+  \sum_{s=0}^\infty
+  \left[
+  \varepsilon_{-s}
+  \sum_{j=s+1}^\infty
+  \psi_j
+  \right]
+  \right)
+  \\
+  &=
+  \psi(1)
+  \sumtT \varepsilon_t
+  -
+  \left(
+  \sum_{s=0}^\infty
+  \sum_{j=s+1}^\infty \psi_j\varepsilon_{T-s}
+  \right)
+  +
+  \left(
+  \sum_{s=0}^\infty\sum_{j=s+1}^\infty
+    \psi_j\varepsilon_{-s}
+  \right)
+\end{align*}
+It's then easy enough to recognize the second and third terms as
+$\eta_T$ and $\eta_0$ respectively.
+\end{proof}
 
-To get to Expression~\ref{vardecomp}, first note that the $ii$ element
-of the matrix in Expression~\ref{totalvar} represents the total amount
-variance of the forecast error for the $i$th element of $\bsy_t$.
-Naturally, we then ask ``What fraction of the forecast error variance
-for observable $i$ in $\bsy_t$ is driven by shock $j$ in
-$\bsvarepsilon_t$?'' Since $\bsSigma$ is a diagonal matrix, the formulas
-simplify nicely to Expression~\ref{vardecomp} after writing everything
-out.
-\end{defn}
+
+
 
 
 
 \clearpage
-\subsection{Identification of Structural VMA($q$)}
+\subsection{Structural Models}
+
+\subsubsection{Identification of Structural VMA($q$)}
 
 
 Suppose that the data $\{\bsy_t\}$ follows MA($q$) process where
@@ -12575,7 +13109,7 @@ for resolving the underidentification problem.
 
 
 \clearpage
-\subsection{Structural VARs}
+\subsubsection{Structural VARs}
 
 \begin{defn}(SVAR Representation)
 Assume that the lag polynomial of the VMA representation, $\bsPsi(L)$,
@@ -14279,15 +14813,15 @@ Hence, we have
 
 \subsection{Modes of Convergence}
 
-Recall the usual Analysis definition of convergence of a sequence: A
-sequence $\{x_n\}$ converges to limit $x$ if for all $\varepsilon> 0$,
-there exists a finite $N$ such that
+Recall the usual Analysis definition of convergence of a numerical
+sequence: A sequence $\{x_n\}$ converges to limit $x$ if for all
+$\varepsilon> 0$, there exists a finite $N$ such that
 \begin{align*}
   n > N \implies |x_n - x| < \varepsilon
 \end{align*}
 But this, of course, is for a sequence of numbers $\{x_n\}$ in some
 metric space. There's no randomness there. So what about a sequence of
-random variables---something non-deterministic?
+random variables---something stochastic?
 
 There are a few options when talking about convergence of random
 variables, but all involve getting rid of the randomness somehow and
@@ -14295,85 +14829,115 @@ checking convergence of a sequence of \emph{functions} (random
 variables) or a sequence of \emph{numbers} (where that number represents
 a probability or expectation). And checking convergence of functions or
 numerical sequences are both well within the domain of the usual
-analysis machinery. More specifically, these alternatives give rise to
+analysis machinery.  More specifically, these alternatives give rise to
 the following three different types of convergence:
 \begin{enumerate}
-  \item \emph{Almost Sure Convergence}: Check that the set of points
-    $\omega\in\Omega$ where the sequence $X_n(\omega)\not\ra
-    X(\omega)$ has probability zero.
+  \item \emph{Almost Sure Convergence}: Check that
+    $X_n(\omega)\ra X(\omega)$ almost everywhere, i.e. for almost all
+    $\omega\in\Omega$.
   \item \emph{Convergence in Probability}: The sequence of probabilities
     that $X_n(\omega)$ is far from $X(\omega)$ over all $\omega$ goes to
     zero.
   \item \emph{Converge in $p$-Norm}: The sequence of expected distances
     $\E[|X_n-X|^p]$ goes to zero.
 \end{enumerate}
-In all of these cases, we've framed convergence of random variables in
-terms of convergence of functions or numerical sequences. We can then
-easily work with the usual analysis definitions. Now onto the formal
-definitions.
+In all cases, we've framed convergence of RVs in terms of convergence of
+functions or numerical sequences so that we can then easily work with
+the usual analysis definitions.
+
+\begin{defn}(Random Element and Metric)
+This section considers convergence of \emph{random elements}
+$X_n:\Omega\ra S$ on probability space $(\Omega,\sF,P)$
+where the range $S$ dictates what type of object random element $X_n$ is
+exactly:
+\begin{itemize}
+  \item $S=\R$, in which case $X_n$ is a \emph{scalar random variable}
+  \item $S=\R^d$ in which case $X_n$ is a \emph{random vector}
+  \item $S$ is a space of functions, in which case
+    $X_n$ is a random \emph{function}.
+    For example, suppose $S=\calC([0,1])$ the space of real-valued
+    continuous functions on the unit-interval, $f:[0,1]\ra\R$.
+    Then $X_n(\omega)$ is a particular \emph{function} like
+    $f:[0,1]\ra\R$ in $\calC$ that is specific to state
+    $\omega\in\Omega$.
+\end{itemize}
+Of course, to define notions of \emph{convergence} of random elements,
+we need a metric on the range $S$ of $X_n$. To keep things simple, I
+will generically use $\lVert\,\cdot\,\rVert$ in this section to refer to
+some (any) norm on $S$, from which we can construct a metric
+$d(x,y)=\lVert x-y\rVert$ for any two elements $x,y\in S$.
+\end{defn}
+
 
 \begin{defn}{(Almost Sure, Almost Everywhere, or Strong Convergence)}
-Given a sequence of random variables $\{X_n\}$ and a random variable
-$X$ on probability space $(\Omega,\sF,P)$, we say that ``$X_n$
-\emph{converges almost surely} to $X$'' written
+Given a sequence of random elements $\{X_n\}$ and a random element $X$
+all on the same probability space $(\Omega,\sF,P)$, we can define
+\emph{almost sure} convergence as follows:
 \begin{align*}
   X_n\asto X
   \quad \iff \quad
-  \Prb\left[\limn X_n = X\right]
-  = \Prb\left[\,\omega \,\big|\,\limn X_n(\omega) = X(\omega)\right]
+  \Prb\left[\limn \lVert X_n(\omega) - X(\omega)\rVert = 0\right]
+  %= \Prb\left[\,\omega
+      %\,\big|\,\limn \big\lVert X_n(\omega) - X(\omega)\big\rVert = 0\right]
   = 1
 \end{align*}
-This checks that the measure of the set of $\omega$'s where
-$\limn X_n(\omega)\neq X(\omega)$ is zero, i.e.\ that $X_n$ matches $X$
-almost everywhere on $\Omega$.
-Note the function can differ arbitrarily on sets that have measure zero,
-or zero probability of occurring. But on those events that will occur
-with some nonzero probability, $X_n$ matches $X$.  If $X_n$ and $X$ are
-vectors, we need almost surely convergence element-by-element.
+The intuition is clearest when we take random element $X_n$ to be a
+scalar random variable.
+Then this definition equivalently checks that the measure of the set of
+$\omega$'s where $\limn X_n(\omega)\neq X(\omega)$ is zero, i.e.\ that
+$X_n$ matches $X$ almost everywhere on $\Omega$.
+Note the limit of functions $X_n$ can differ arbitrarily from the
+limiting function $X$ on sets that have measure zero,
+(zero probability of occurring). But on those events that will occur
+with some nonzero probability, the limit of $X_n$'s matches $X$.
 
-This notion is called ``strong convergence'' because it it computes the
-probability of the limit of a sequence of random variables, rather than
-the limit of a sequence of probabilities. We're effectively asking that
-the functions $X_n:\Omega\ra\R$ (the random variables in the sequence)
-\emph{converge pointwise} to $X:\Omega\ra\R$ (the limiting random
-variable) almost everywhere on the sample space $\Omega$.
+This notion of convergence is called ``strong convergence'' because it
+it computes the probability of the limit of a sequence of random
+variables, rather than the limit of a sequence of probabilities. We're
+effectively asking that the random elements $X_n$ \emph{themselves}
+(loosely) converge \emph{pointwise} to some limiting random element $X$
+almost everywhere.
 \end{defn}
 
 
 \begin{defn}{(Convergence in Probability)}
-We say that a sequence of random variables $\{ X_n \}$ on measure space
-$(\Omega,\sF,\Prb)$ \emph{converges in probability} to $X$ if
+Given a sequence of random elements $\{X_n\}$ and a random element $X$,
+all on some measure space $(\Omega,\sF,P)$, we can define
+\emph{convergence in probability} as follows:
 \begin{equation}
   \label{plim}
   X_n\pto X
   \quad\iff\quad
   \limn p_n(\varepsilon) :=
   \limn
-  \Prb(\left\lvert X_n - X \right\rvert > \varepsilon) = 0
+  \Prb\left(\lVert X_n - X \rVert > \varepsilon\right) = 0
   \qquad \forall  \varepsilon> 0
 \end{equation}
 This is sometimes written as $\plim X_n = X$.
-If $X_n$ and $X$ are vectors, we need convergence in probability
-element-by-element.
+%If $X_n$ and $X$ are vectors, we need convergence in probability
+%element-by-element.
 
 Convergence in probability is also known as \emph{weak convergence}
-because it doesn't ask the random variables (functions) $X_n$ to
-converge to the random variable (function) $X$, i.e.\ that
+because it \emph{doesn't} ask the random element $X_n$ to converge to
+the random element $X$, i.e.\ that (loosely)
 $\limn X_n(\omega)=X(\omega)$ identically for almost all
 $\omega\in\Omega$.
-Instead, we just stipulate that the probability of $X_n$ being far from
-$X$ over all $\Omega$ is small as $n\rightarrow\infty$.
+That's strong convergence.
+Instead, we just stipulate that the numerical sequence of probabilities
+$\{p_n(\varepsilon)\}\ninf$ of $X_n$ being $\varepsilon$-far from $X$
+over all $\Omega$ goes to zero as $n\rightarrow\infty$.
 \end{defn}
 
+
 \begin{defn}{(Mean Square and $p$-norm or $L^p$ Convergence)}
-We say that a sequence of random variables $\{ X_n \}$
-\emph{converges in $p$-norm} or \emph{in $L^p$} to $X$, written
+Given a sequence of scalar random variables $\{ X_n \}$, we can define
+\emph{convergence in $p$-norm} or \emph{in $L^p$} to $X$ as follows:
 \begin{align*}
   X_n \Lpto X
   \quad\iff\quad
-  \limn \E\left[|X_n-X|^p\right] &= 0 \\
+  \limn \E\big[|X_n-X|^p\big] &= 0 \\
   \iff\quad\;\;\;
-  \limn ||X_n-X||_p &= 0
+  \limn \lVert X_n-X\rVert_p &= 0
 \end{align*}
 The special case where $p=2$ is called \emph{mean square convergence} or
 \emph{convergence in quadratic mean}, and is often written $X_n\msto X$.
@@ -14382,85 +14946,148 @@ element-by-element.
 \end{defn}
 
 
-\begin{defn}{(Convergence in Distribution or Weak Convergence)}
+\clearpage
+\begin{defn}
 \label{defn:convergeInDistribution}
-We say that a sequence of random variables $\{X_n\}$
-\emph{converges in distribution} to random variable $X$, written
+(Convergence in Distribution, Convergence in Law, or Weak Convergence)
+Given a sequence of random variables/vectors $\{X_n\}$ with
+CDFs $\{F_{X_n}\}$, we can define \emph{convergence in distribution} (or
+in law) to random variable/vector $X$ with CDF $F_X$ as follows:
 \begin{align*}
   X_n\dto X
   \quad\iff\quad
   \limn F_{X_n}(x) = F_X(x)
 \end{align*}
-for all values of $x$ where $F_x$ is continuous,
-where $F_{X_n}$ and $F_X$ are the cdfs of $X_n$ and $X$, respectively.
-
-One of the reasons this called weak convergence (aside from being
-implied by all other kinds of convergence, as we'll see) is that each
-$X_n$ can even be on a different probability space. We're just looking
-at convergence of cdfs $F_{X_n}$ and $F_X$---functions from $\R$ to
-$\R$.  We never compare $X_n$ and $X$ or $X_n$ and $X_m$ under a common
-probability measure or integrate them together (as we did in all other
-types of convergence). Therefore, the underlying probability spaces for
-each can differ.
-
-If $X_n$ and $X$ are vectors, then we can characterize convergence
-in distribution as either
-\begin{itemize}
-  \item The joint cdf of $X_n$ converges to the joint CDF of $X$.
-  \item Cramer-Wold Device: $a'X_n \dto a'X$ for any non-stochastic
-    vector $a$.
-\end{itemize}
+$\forall x$ where $F_X$ is continuous.
+See Ex.~\ref{ex:dto} for why restricting to continuity points is
+important.
 \end{defn}
-\begin{ex}
-To see why we need to restrict convergence to points of continuity on
-$F_X(x)$, consider the following example:
-\begin{align*}
-  F_{X_n}(x) &= \one{\left\{x\geq \frac{1}{n}\right\}}\\
-  F_{X}(x) &= \one{\left\{x\geq 0\right\}}
-\end{align*} In other words, random variable $X_n$ takes on value
-$\frac{1}{n}$ with probability one, while $X$ takes on value zero with
-probability one.  So if we check convergence of the CDFs at $x=0$, we
-have a sequence $\{F_{X_n}(0)\}_{n=1}^\infty=\{0\}_{n=1}^\infty$, which
-clearly does not converge to $F_X(0)=1$.
-
-However, it is the case that $F_{X_n}$ is well-approximated by $F_X$ at
-all other points, so we'd like to be able to say $X_n\dto X$. And we
-can, if we simply restrict ourselves to points where $F_X$ is
-continuous.
-\end{ex}
 
 \begin{prop}
-If $X_n\dto X$ and $F_X$ is continuous, then
+If $X_n\dto X$ and $F_X$ is continuous everywhere, then
 \begin{align*}
   \limn \sup_x |F_{X_n}(x)-F_X(x)| = 0
 \end{align*}
 \end{prop}
 
+
 \begin{prop}
-Sequence of random variables $\{X_n\} \dto X$ if and only if
-\begin{align*}
-  \E[g(X_n)] = \E[g(X)]
-\end{align*}
-for any continuous bounded function $g$.
+\label{prop:altdto}
+\emph{(Alternative Characterizations of Convergence in Dist.)}
+Random variables/vectors $X_n \dto X$ iff any of the three following
+(equivalent) conditions are satisfied:
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item
+    \emph{(via Characteristic Functions):}
+    $\varphi_{X_n}(u)\ra \varphi_X(u)$ pointwise.\footnote{%
+      where $\varphi_Z(u)$ is the characteristic function of RV $Z$.
+    }
+
+  \item \emph{(Cramer-Wold Device):}
+    Scalar RV $a'X_n \dto a'X$ for \emph{any} non-stochastic vector $a$
+
+  \item
+    $\E[g(X_n)]\ra\E[g(X)]$ for \emph{any} continuous bounded function
+    $g$.
+\end{enumerate}
 \end{prop}
 \begin{rmk}
-This is another useful way to characterize to characterize convergence
-in distribution aside from Definiton~\ref{defn:convergeInDistribution}.
-It's extremely handy for a lot of results.
+In both Definition~\ref{defn:convergeInDistribution} and Alternative
+(ii) of Proposition~\ref{prop:altdto}, we see one of the reasons why
+convergence in distribution is also called ``weak convergence'' (aside
+from being implied by all other kinds of convergence, as we'll in the
+next proposition). In particular, unlike convergence in probability and
+almost sure convergence, each $X_n$ and $X$ could actually be on
+\emph{different} probability spaces altogether, rather than a common
+probability space.
 
-Moreover, it again highlights the fact that the $X_n$ and $X$ can all be
-on different probability spaces. Each expectation in the sequence
-$\{\E[g(X_n)]\}\ninf$ is computed on that $X_n$'s own probability space,
-and we just get back a number. Convergence in distribution checks the
-convergence of these numbers---we never compare the $X_n$ and $X$ under
-a common probability measure or integral. It's all separate.
+For example in Definition~\ref{defn:convergeInDistribution}, we're just
+looking at convergence of cdfs $F_{X_n}$ to $F_X$---both just functions
+from $\R$ to $\R$.  We never compare RVs $X_n,X$ under a common
+probability measure or integrate them together (as we did in all other
+types of convergence). Therefore, the underlying probability spaces for
+each can differ.
+
+Similarly, in Alternative (ii) of Proposition~\ref{prop:altdto}, each
+expectation in the sequence $\{\E[g(X_n)]\}\ninf$ is computed on that
+$X_n$'s own probability space, and we're just checking convergence of
+the sequence of \emph{numbers} $\E[g(X_n)]$ to the number $\E[g(X)]$.
+So again, we never compare the $X_n$ and $X$ under a common probability
+measure or integral.
 \end{rmk}
 
-\begin{prop}
-Sequence of random variables $\{X_n\} \dto X$ if and only if
-$\varphi_{X_n}(x) \ra \varphi_X(x)$ pointwise where $\varphi_Z(z)$ is
-the characteristic function of random variable $Z$.
-\end{prop}
+
+\begin{ex}
+\label{ex:dto}
+To see why Definition~\ref{defn:convergeInDistribution} considers only
+points of continuity of $F_X(x)$, consider the following example:
+\begin{alignat*}{3}
+  X_n &= \frac{1}{n}
+  &\qquad\implies\qquad
+  F_{X_n}(x) &= \mathbf{1}\left\{x\geq \frac{1}{n}\right\}
+  \\
+  X &= 0
+  &\quad
+  F_{X}(x) &= \mathbf{1}\left\{x\geq 0\right\}
+\end{alignat*}
+Now if we check convergence of the CDFs at $x=0$, we have a sequence
+$\{F_{X_n}(0)\}_{n=1}^\infty=\{0\}_{n=1}^\infty$, which clearly does not
+converge to $F_X(0)=1$.
+
+However, it's clear the case that $X_n\ra 0=X$, so we'd like to be able
+to say $X_n\dto X$. And we can, if we simply restrict ourselves to
+points where $F_X$ is continuous, as in
+Definition~\ref{defn:convergeInDistribution}.
+\end{ex}
+
+\clearpage
+
+Note that Definition~\ref{defn:convergeInDistribution} was only
+well-defined given a CDF, i.e. only for scalar RVs and random vectors.
+For general random elements $X_n,X$ (which might have a function space
+as their range), there's no such thing as a CDF. Therefore, we need to
+generalize the definition.
+
+
+\begin{defn}
+(Generalization of Convergence in Distribution to Random Elements)
+Suppose we have random elements $\{X_n\},X:(\Omega,\sF,P)\ra (S,\sB(S))$
+where $\sB(S)$ is the Borel $\sigma$-algebra generated from all open
+subsets of $S$, where the open sets are defined by some metric
+$d(\,\cdot\,,\,\cdot)$ over elements of $S$.
+Then
+\begin{align*}
+  X_n \dto X
+  \quad\iff\quad
+  P[X_n\in A] \ra P[X\in A]
+  \qquad \forall A \in \sB(S)
+  \quad \text{s.t.}
+  \quad P[X\in \partial A] = 0
+\end{align*}
+where $\partial A$ is the set of boundary points of $A$.\footnote{%
+  i.e. those points $x\in S$ (the range) such that \emph{any} open ball
+  about $x$ will intersect both $A$ and $A^c$.
+}
+
+This is simply a generalization of
+Definition~\ref{defn:convergeInDistribution}.  Rather than look at
+convergence of CDFs \emph{encoding} information about the measure, we
+look \emph{directly} at the convergence of measures of sets $P[X_n\in
+A]\ra P[X\in A]$.
+And just like we only checked convergence at points of continuity of
+$F_X$, we here only check convergence for measurable sets $A$ where the
+measure of $\{\omega\;|\;X(\omega)\in \partial A\}$ (i.e. of ``boundary
+outcomes'') is negligible.
+In other words, we only check convergence on measurable sets $A$ where
+including or removing all boundary points \emph{would not change} the
+probability mass of the set.
+\end{defn}
+
+
+
+
+\clearpage
+\subsection{Relationship between Modes of Convergence}
 
 \begin{prop}
 Given a sequence of random variables $\{X_n\}$ and random variable $X$,
@@ -14649,42 +15276,46 @@ We also have the following implications and rules of operations:
 \clearpage
 \subsection{The Continuous Mapping Theorem and Slutsky's Theorem}
 
+\begin{thm}\emph{(Continuous Mapping Theorem)}
+\label{thm:cmt}
+Given random elements $\{X_n\},X$, let $g:S\ra U$ be a function whose
+set of discontinuity points $D_g$ satisfies $P[X\in D_g]=0$.
+Then
+\begin{enumerate}
+  \item $X_n\asto X \implies g(X_n) \asto g(X)$
+  \item $X_n\pto X \implies g(X_n) \pto g(X)$
+  \item $X_n\dto X \implies g(X_n) \dto g(X)$.
+  \item $X_n - Y_n\pto 0$ and $Y_n \dto Y$
+    $\implies g(X_n) - g(Y_n)\pto 0$
+
+\end{enumerate}
+Each type of convergence of random element $X_n$ to random element
+$X$ is defined with some metric $d_S$ on the domain of $g$ (range of
+$\{X_n\},X$), and the convergence of random element $g(X_n)$
+to random element $g(X)$ is defined using some metric $d_U$ on the range
+of $g$.
+\end{thm}
+\begin{rmk}
+Note that in Result 4, we needed the additional requirement that at
+least one of the variables (WLOG, I chose $Y_n$) converges in
+distribution to something.  This might have seemed superfluous, but it
+usefully ensures that $Y_n$ is bounded in probability and doesn't race
+off to infinity, which would have prevented us from concluding
+$g(X_n)-g(Y_n) \pto 0$.
+\end{rmk}
+
+
 \begin{lem}
 \label{lem:joint}
+\emph{(Lemma for Slutsky)}
 Suppose $X_n\dto X$ and $Y_n\pto c$, for constant vector $c$.
 Then $(X_n,Y_n)\dto (X,c)$ jointly.
 \end{lem}
 
-\begin{thm}\emph{(Continuous Mapping Theorem)}
-\label{thm:cmt}
-Let $g(\,\cdot\,)$ be a function that is continuous on the support of
-$X$.  Then
-\begin{enumerate}
-  \item $X_n\asto X \implies g(X_n) \asto g(X)$
-  \item $X_n\pto X \implies g(X_n) \pto g(X)$
-  \item $X_n\dto X \implies g(X_n) \dto g(X)$
-  \item $X_n - Y_n\pto 0$ and $Y_n \dto Y$
-    $\implies g(X_n) - g(Y_n)\pto 0$
-\end{enumerate}
-\end{thm}
-\begin{rmk}
-A word about the third requirement. We'd like to say that just
-$X_n - Y_n\pto 0$ implies $g(X_n) - g(Y_n)\pto 0$, but we need to put
-the extra requirement on at least one of the variables (WLOG, I chose
-$Y_n$) converges in distribution to some $Y$. In a sense, this is a
-requirement that $Y_n$ is bounded in probability and doesn't race off to
-infinity, which would prevent us from having $g(X_n)-g(Y_n) \pto 0$ as
-we want to conclude.
-\end{rmk}
 
 \begin{cor}{\emph{(Slutsky's Theorem)}}
 Suppose that we have sequences of random variables $\{X_n\}$ and
-$\{Y_n\}$ such that
-\begin{align*}
-  X_n &\dto X
-  \qquad
-  Y_n \pto c
-\end{align*}
+$\{Y_n\}$ such that $X_n \dto X$ and $Y_n \pto c$.
 Then we have
 \begin{enumerate}
   \item $X_n+Y_n\dto X+c$
@@ -14711,25 +15342,11 @@ Define $Z_n := X_n - Y_n$. We're told that $Z_n\pto 0$. We also know
 that $Y_n\dto Y$. Then by Slutsky's Theorem, we know
 \begin{align*}
   Z_n + Y_n &\dto 0 + Y \\
-  \Leftrightarrow\quad (X_n-Y_n) + Y_n &\dto 0 + Y \\
-  \Leftrightarrow\quad X_n &\dto Y
+  \iff\quad (X_n-Y_n) + Y_n &\dto 0 + Y \\
+  \iff\quad X_n &\dto Y
 \end{align*}
 \end{proof}
 
-\begin{prop}(CMT for General Metric Spaces)
-Let $h:S\ra U$ be a mapping between general metric spaces (not just $\R$
-to $\R$) and let $D_h$ denote the set of discontinuity points of $h$.
-Then
-\begin{align*}
-  \begin{rcases}
-  X_n \dto X \\
-  P[X\in D_h] = 0
-  \end{rcases}
-  \quad\implies\quad
-  h(X_n) \dto h(X)
-\end{align*}
-
-\end{prop}
 
 
 \clearpage
@@ -14778,6 +15395,7 @@ $\E[X_n]=\mu<\infty$.
 \end{thm}
 
 \begin{thm}\emph{(Ergodic Theorem)}
+\label{thm:ergodic}
 Suppose that $y_t$ is a stationary and ergodic (vector) process with
 $\E[y_t]=\mu$. Then the process is ergodic for the mean, i.e.
 \begin{align*}
@@ -14792,58 +15410,194 @@ converge to the cross-sectional average.
 \clearpage
 \subsection{Central Limit Theorems}
 
+This section details several different Central Limit Theorems.
+Though all similar in result, they differ in the conditions put on
+the underlying objects being averaged (e.g. iid, mds, linear process,
+etc.) that ensure convergence in distribution.
+
+
 \begin{thm}\emph{(Lindberg-Levy)}
-Let $\{X_n\}_{n=1}1^N$ be a sequence of iid random variables with
-$\E[X_n] = \mu$ and $\Var(X_n)=\sigma^2$. Then
+\label{thm:cltlindberglevy}
+Let $\{X_n\}\nN$ be a sequence of iid random vectors with
+$\E[X_n] = \mu$ and $\Var(X_n)=\Sigma$. Then
 \begin{align*}
-  \frac{\sqrt{N}}{\sigma}
-  \left(\bar{X}_N - \mu\right) \dto N(0,1)
+  \sqrt{N}
+  \left(\bar{X}_N - \mu\right) \dto \calN(0,\Sigma)
   \qquad
-  \bar{X}_N := \frac{1}{N}\sumin X_n
+  \bar{X}_N := \frac{1}{N}\sumnN X_n
 \end{align*}
 \end{thm}
 
 \begin{thm}\emph{(CLT for Martingale Difference Sequence)}
 Suppose that $\{u_t\}\ninf$ is a stationary and ergodic martingale
-difference sequence with respect to the filtration $\{\sF_t\}\tinfz$,
-i.e. $\E[u_t|\sF_{t-1}]=0$. Also suppose that $\E[u_tu_t']=\Sigma$. Then
+difference sequence with respect to the filtration
+$\{\sF_t\}\tinfz$, i.e. $\E[u_t|\sF_{t-1}]=0$ for all $t$.
+Also suppose that $\E[u_tu_t']=\Sigma$. Then
 \begin{align*}
-  \frac{1}{\sqrt{T}}\sumtT u_t \dto N(0,\Sigma)
+  \frac{1}{\sqrt{T}}\sumtT u_t \dto \calN(0,\Sigma)
 \end{align*}
 \end{thm}
 
-\begin{thm}\emph{(CLT for Linear Processes)}
-Suppose that we have linear process $y_t=\mu+\sum_{j=0}^\infty \psi_j
-\varepsilon_{t-j}$ where $\varepsilon_t\iid (0,\sigma^2)$ and
-$\sum_{j=0}^\infty j^2\psi_j^2<\infty$. Then
+\begin{thm}
+\label{thm:cltlinear}
+\emph{(CLT for Linear Processes)}
+Suppose that we have linear process
+\begin{align*}
+  y_t=\mu+\sum_{j=0}^\infty \psi_j \varepsilon_{t-j}
+  \qquad\text{where}\quad
+  \varepsilon_t\iid (0,\sigma^2)
+  \qquad
+  \sum_{j=0}^\infty j^2\psi_j^2<\infty
+\end{align*}
+Then letting $\bar{y}_T$ denote the sample average and
+$S=\sigma^2\psi(1)^2$ the LR variance of $\{y_t\}$,
 \begin{align*}
   \sqrt{T}\left(
   \bar{y}_T
   - \mu
   \right)
-  \dto N\left(0,S\right)
-  \qquad
-  \text{where}\quad
-  \bar{y}_T =
-  \frac{1}{T}
-  \sumtT y_t
+  \dto \calN\left(0,S\right)
+  %\qquad
+  %\text{where}\quad
+  %\bar{y}_T :=
+  %\frac{1}{T}
+  %\sumtT y_t
 \end{align*}
-where $S$ is the long-run variance of $\{y_t\}$.
+%$S=\sigma^2\left(\sum_{j=1}^\infty\psi_j\right)^2$
 \end{thm}
+\begin{proof}
+By the Beveridge-Nelson decomposition of
+Theorem~\ref{thm:beveridgenelson}, we can write
+\begin{align*}
+  \bar{y}_T-\mu
+  =
+  \frac{1}{T}\sumtT (y_t-\mu)
+  &=
+  \frac{1}{T}
+  \left(
+  \psi(1)
+  \sumtT \varepsilon_t
+  -
+  \eta_T
+  +
+  \eta_0
+  \right)
+  \qquad \text{where}\quad
+  \eta_t
+  :=
+  \left(
+  \sum_{s=0}^\infty
+  \sum_{j=s+1}^\infty \psi_j\varepsilon_{t-s}
+  \right)
+\end{align*}
+Multiply through by $\sqrt{T}$, and then send $T\ra\infty$:
+\begin{align*}
+  \sqrt{T}(\bar{y}_T-\mu)
+  &=
+  \underbrace{%
+    \frac{\psi(1)}{\sqrt{T}}
+    \sumtT \varepsilon_t
+  }_{\dto \calN(0,\sigma^2\psi(1)^2)}
+  -
+  \underbrace{%
+    \frac{\eta_T}{\sqrt{T}}
+    \vphantom{%
+      \frac{\psi(1)}{\sqrt{T}}
+      \sumtT \varepsilon_t
+    }
+  }_{\pto 0}
+  +
+  \underbrace{%
+    \frac{\eta_0}{\sqrt{T}}
+    \vphantom{%
+      \frac{\psi(1)}{\sqrt{T}}
+      \sumtT \varepsilon_t
+    }
+  }_{\pto 0}
+  \quad
+  \dto
+  \quad
+  \calN(0,\sigma^2\psi(1)^2)
+\end{align*}
+For the first term in the sum, the convergence in distribution follows
+from the usual Lindberg-Levy CLT of Theorem~\ref{thm:cltlindberglevy}
+since the innovations are iid white noise with variance $\sigma^2$.
+The convergence in probability of the second and third terms follow from
+the fact that $\eta_T$ is a stationary process (as mentioned in the
+Beveridge-Nelson theorem) hence finite with probability one, while
+$\eta_0$ is a random initial condition that is finite with probability
+one.
+The final convergence of the sum of these objects follows by the
+continuous mapping theorem.
+\end{proof}
 
+
+\clearpage
 \begin{thm}\emph{(Functional CLT)}
-Suppose that $y_t$ is stationary and ergodic with mean $\mu$. Then
+\label{thm:fclt}
+Suppose that $y_t$ is stationary and ergodic with mean $\mu$.
+Define the following random element in the space of functions on the
+unit interval $[0,1]$:
 \begin{align*}
   W_T(s) :=
   \frac{1}{\sqrt{T}}
   \sum_{t=1}^{\lfloor s T\rfloor}
-  (y_t-\mu) \dto \sqrt{S}\cdot W(s)
+  (y_t-\mu)
   \qquad
   s\in [0,1]
 \end{align*}
-where $S$ is the long-run variance of $\{y_t\}$ and $W(s)$ is Brownian
-motion.
+In words, statistic $W_T(s)$ is a step function that (roughly) sums and
+scales the first $s\times 100\%$ of the sample.\footnote{%
+  Alternatively, think of $W_T(s)$ as \emph{averaging} the first
+  $s\times 100\%$ of the sample, then multiplying by $\sqrt{T}$ so we
+  can get a CLT result.
+}
+But since discontinuous, even more useful is to define random element
+$W_T^*\in \calC([0,1])$ (i.e. in space of real-valued continuous
+functions on $[0,1]$) as a linear interpolation of $W_T$ between
+$\lfloor sT\rfloor$ values:
+\begin{align*}
+  W_T^*(s) :=
+  W_T(s)
+  +
+  \frac{1}{\sqrt{T}}
+  \big(sT -\lfloor sT\rfloor\big)
+  \big(y_{\lfloor sT\rfloor+1}-\mu\big)
+  = W_T(s) + o_p(1)
+  %=
+  %\frac{1}{\sqrt{T}}
+  %\sum_{t=1}^{\lfloor s T\rfloor}
+  %(y_t-\mu)
+  %+
+  %\frac{1}{\sqrt{T}}
+  %\big(sT -\lfloor sT\rfloor\big)
+  %\big(y_{\lfloor sT\rfloor+1}-\mu\big)
+\end{align*}
+where $y_{T+1}-\mu:=0$.
+Then we have that
+\begin{align*}
+  W_T^*(s)
+  \dto \sqrt{S}\cdot W(s)
+  \qquad
+  s\in [0,1]
+\end{align*}
+where $S$ is the long-run variance of $\{y_t\}$, $W(s)$ is standard
+Brownian motion, and convergence in distribution of the random elements
+in $\calC([0,1])$ is under the sup-norm.
 \end{thm}
+\begin{rmk}
+This is useful because often many objects of interest can be written as
+continuous functions of $W_T(s)$. Together with the continuous mapping
+theorem, this offers a chance to answer many questions.
+
+Note that for fixed $s$, this result can be derived as a corollary to
+Theorem~\ref{thm:cltlinear}. But Theorem~\ref{thm:fclt} is more
+generally useful because in many cases, we'd like to answer questions
+where we don't know which $s$ to choose, i.e. how much of the sample to
+sum (as in structural breaks). Then we need a convergence result that
+works even if we don't know $s$.
+\end{rmk}
+
 
 
 \clearpage
