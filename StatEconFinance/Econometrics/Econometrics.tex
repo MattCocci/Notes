@@ -310,6 +310,7 @@
 \newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
 \newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
 \newcommand{\bstildey}{\boldsymbol{\tilde{y}}}
+\newcommand{\bstildex}{\boldsymbol{\tilde{x}}}
 \newcommand{\bstildeX}{\boldsymbol{\tilde{X}}}
 \newcommand{\bstildevarepsilon}{\boldsymbol{\tilde{\varepsilon}}}
 \newcommand{\bstildes}{\boldsymbol{\tilde{s}}}
@@ -349,6 +350,7 @@
 \newcommand{\Rl}{\mathbb{R}^\ell}
 \newcommand{\Rm}{\mathbb{R}^m}
 \newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmm}{\mathbb{R}^{m\times m}}
 \newcommand{\Rmn}{\mathbb{R}^{m\times n}}
 \newcommand{\Rnm}{\mathbb{R}^{n\times m}}
 \newcommand{\Rkn}{\mathbb{R}^{k\times n}}
@@ -19097,62 +19099,65 @@ There are two main approaches to \emph{hypothesis testing}: the
 section) and the \emph{Bayesian} approach (covered in
 Section~\ref{sec:bayesian}).
 
-Generically, we have data $\bsy:=\{\bsy_n\}\nN$ generated from some
-model/likelihood $p(\bsy|\bstildetheta)$ given some true and fixed
-parameter vector $\bstheta$. As always, we assume that we know the
-functional form $p(\bsy|\bstildetheta)$ for the model/likelihood but
-\emph{not} the true parameter values $\bstheta$.
-Therefore, we would like to use the data/sample $\bsy$ to conduct
-inference about $\bstheta$.
-In practice, that means testing \emph{hypotheses} about possible values
-for the true $\bstheta$.
+Generically this section consider how to use data $y$ to test
+hypotheses and conduct inference about its \emph{unknown}
+density/distribution $p(y)$.\footnote{%
+  Throughout this section, I will use the general term ``density''
+  though it should be understood that the dominating measure for $p(y)$
+  could be the counting or Lebesgue measure, so that $y$ can be
+  \emph{either} a discrete or continuous RV.
+}
+The data $y$ might be a single scalar or vector oervation, or it
+might represent a sample $y=\{y_n\}\nN$ so that $p(y)$ is the
+\emph{joint} distribution of that sample.
+Moreover, we will often assume that $p(y)$ has a known parametric
+form $p(y)=p(y|\theta)$, with only parameter $\theta$ unknown.
+In that case, inference about $p(y)=p(y|\theta)$ is equivalent
+to inference about parameter $\theta$.
+
+In practice, conducting inference about $p(y)$ means testing
+\emph{hypotheses} about the density function.
 In brief, there are five main steps:
 \begin{enumerate}
   \item
     Set up \emph{explicit} null and alternative hypotheses about
-    parameter values, denoted $H_0$ and $H_a$ (or $H_1$), resp.
-    On the basis of the sample realization $\bsy$, we will either reject
-    $H_0$ or \emph{fail to reject} $H_0$.
+    $p(y)$, denoted $H_0$ and $H_1$, resp.
+    On the basis of the sample realization $y$, we will either reject
+    $H_0$ or \emph{fail to reject} $H_0$.\footnote{%
+      Note: rejecting $H_0$ does \emph{not} mean we ``accept'' $H_1$,
+      for reasons of Type I error.
+    }
 
-    Note: rejecting $H_0$ does \emph{not} mean we ``accept'' $H_a$, for
-    reasons of Type I error.
+  \item Choose an acceptable $\alpha$-level (Type I error rate) for the
+    test.
 
-  \item Choose a \emph{test-statistic} $T(\bsy)$ (mapping from sample
-    data $\bsy$ to a number/vector) that can be used to decide whether
-    to reject $H_0$ depending upon the sample realization and computed
-    numerical value of the test stat.
+  \item Choose a \emph{test-statistic} $T(y)$ (mapping from sample
+    data $y$ to a number/vector) that can be used to decide whether
+    to reject $H_0$ depending upon the sample realization and
+    the corresponding value of the test statistic.
 
-  \item Choose a tolerable Type I error rate on the basis of observed
-    data, denoted by $\alpha$.
-    This value is totally at the econometrician's discretion.
-
-  \item Establish the \emph{critical region}, which is defined as the
-    subset $C\subseteq \range(T(\bsy))$ such that we reject $H_0$ if
-    test statistic realization $T(\bsy)\in C$, subject to the constraint
-    of rejecting $H_0$ only $\alpha$\% of the time when $H_0$ is
-    actually true.
 
   \item
-    Finally, collect sample data $\bsy$ and calculate the test statistic
-    $T(\bsy)$. Reject the null if $T(\bsy)\in C$. Fail to reject the
-    null if $T(\bsy)\in C$.
+    Subject to the chosen $\alpha$-level constraint, establish the
+    \emph{critical region}, which is defined as the subset
+    $C\subseteq \range(T(y))$ such that we reject $H_0$ if
+    $T(y)\in C$.
+
+  \item
+    Finally, collect sample data $y$ and calculate the test statistic
+    $T(y)$. Reject the null if $T(y)\in C$. Fail to reject the
+    null if $T(y)\in C$.
 
 \end{enumerate}
-Alternatively, we could also work with \emph{p-values}, replacing Steps
-4 and 5 with
-\begin{itemize}
-  \item[4.*]
-    Collect data, then compute the test statstic and \emph{p-value},
-    defined as the probability of observing the computed value of the
-    test stat (or a more extereme value) under the assumption that $H_0$
-    is true.
-  \item[5.*] Reject $H_0$ if p-value $<\alpha$.
-\end{itemize}
-Notice that in the first five-step approach, four of the steps happen
+We could also equivalently work with \emph{p-values}, replacing Steps 4
+and 5 with
+``Collect data, then compute the test statstic and corresponding
+\emph{p-value}.  Reject $H_0$ if p-value $<\alpha$.''
+
+Notice that in the above five-step approach, four of the steps happen
 \emph{ex ante}, before we even touch the data.
 Frequentist hypothesis testing forces us to be explicit about what
 exactly we're testing and how to implement the test.
-
 Now let's unpack these steps and their components a little more in
 formal definitions.
 
@@ -19161,419 +19166,1149 @@ formal definitions.
 \subsection{Key Definitions}
 
 \begin{defn}(Hypothesis)
-Given model/likelihood $p(\bsy|\bstildetheta)$, a \emph{hypothesis}
-$H: \theta \in A\subseteq\bsTheta$
-is a statement/guess that region $A\subseteq\bsTheta$ of the pararameter
-space contains the (fixed) true parameter vector $\bstheta$ that
-generated data $\bsy\sim p(\bsy|\bstheta)$.
-
-Clearly, any hypothesis $H$ is either true or false: Either
-$\bstheta\in A\subseteq\bsTheta$ or not.
-We use sample data to try to infer that.
-Depending on $A\subseteq\bsTheta$, we classify a hypothesis $H$ as
-either
+Most generally, a \emph{hypothesis} is a statement/guess about the
+unknown distribution $p(y)$ of the data $y$:
+\begin{align*}
+  H:p \in \{p_\theta\}_{\theta \in \Theta}
+  \qquad \text{or equivalently}\qquad
+  H: \theta \in \Theta
+\end{align*}
+where $\{p_\theta\}_{\theta \in \Theta}$ is an arbitrary collection of
+possible data densities indexed by $\theta\in \Theta$.
+Note $\theta$ could just be an arbitrary labeling/index, or represent an
+actual parameter vector if we're willing to assume the data density has
+known parametric form $p(y)=p(y|\theta)$ for some unknown
+$\theta\in\Theta$.
+We can classify any hypothesis $H$ as either
 \begin{itemize}
   \item[-] \emph{Simple}:
-    $A$ is a single point in parameter space $\bsTheta$, so all
-    parameters fully specified, for example
-    $H: \bstheta = \bstheta_0$ or $H:\theta = 0.6$
+    Collection $\{p_\theta\}_{\theta\in \Theta}$ (hence $\Theta$ itself)
+    contains a single element so that the density under $H$ is fully
+    specified, e.g.  $H:p\sim \calN(0,1)$ or $H: \theta = \theta_0$.
 
   \item[-] {\sl Composite}:
-    $A$ is \emph{not} a single point in the parameter space $\bsTheta$,
-    so there are at least some parameters \emph{not} specified.
-    Examples include $H:\bstheta\in A\subseteq\bsTheta$
-    or, in the case of scalar $\theta$, \emph{one-sided} tests like
-    $H:\theta>0.5$ or $H:\theta<0.5$ and \emph{two-sided} tests like
-    $H:\theta\neq 0$.
+    $\Theta$ has more than one element so that the density is not fully
+    specified, e.g. $H:p\sim \calN(0,\sigma^2)$ ($\sigma^2$ not
+    specified) or $H:\theta\neq\theta_0$.
+
+    For scalar $\theta$, we also distinguish between \emph{one-sided}
+    composite tests like $H:\theta>0.5$ and
+    \emph{two-sided} composite tests like $H:\theta\neq 0$.
 \end{itemize}
-For inference, we set up a baseline simple \emph{null hypothesis} $H_0$
-and a competing simple or composite \emph{alternative} hypothesis $H_a$
-(or $H_1$).\footnote{
-  A common alternative $H_a$ is simply ``not $H_0$'', i.e.
-  $H_0:\theta=\theta_0$ and $H_a:\theta\neq\theta_0$.
+Clearly, any hypothesis is either true or false. There's no
+in-between.\footnote{%
+  The Bayesian framework does, however, permit and formalize statements
+  like ``$H$ is \emph{probably} true.''
 }
-We use a statistical test to evaluate them.
 \end{defn}
 
 
-\begin{defn}(Statistical Test of Null and Alternative Hypotheses)
-A \emph{statistical test} of simple hypothesis $H_0$ versus simple or
-composite $H_a$ is a decision rule that says whether to reject the null
-$H_0$ after observing a particular data sample $\bsy$.  More precisely,
-a statistical test is a measurable function $\varphi(\bsy)\mapsto [0,1]$
-of the sample data $\bsy:=\{\bsy_n\}\nN$ such that
+\begin{defn}(Statistical Test of a Hypotheses)
+\label{defn:stattest}
+A \emph{statistical test} of hypothesis $H$ is a decision rule that says
+whether to reject $H$ after observing a particular data draw $y$.
+More precisely, a test is a measurable function
+$\varphi(y)\mapsto [0,1]$ of data draw $y$ s.t.\footnote{%
+  The middle outcome perhaps seems strange, since it implies ``For some
+  $y$ draws, flip a coin with prob. $q$ to decide whether to reject.''
+  More natural than $\varphi(y)\mapsto[0,1]$ is perhaps
+  $\varphi(y)\mapsto \{0,1\}$, i.e. a test that always specifies simply
+  ``reject'' or ``don't reject.''
+  However, the middle case is there purely for technical reasons in case
+  $y$ is discrete, which might require such randomization to hit an exact
+  $\alpha$-level.
+}
 \begin{align}
-  \varphi(\bsy)
+  \varphi(y)
   =
   \begin{cases}
-    1 & \implies \text{Reject $H_0$} \\
-    q\in(0,1) & \implies \text{Reject $H_0$ with prob. $q$} \\
-    0 & \implies \text{Fail to Reject $H_0$}
+    1 & \implies \text{Reject $H$} \\
+    q\in(0,1) & \implies \text{Reject $H$ with prob. $q$} \\
+    0 & \implies \text{Fail to Reject $H$}
   \end{cases}
   \label{stattest}
 \end{align}
-A few important things to note in all of this
+Important things to note:
 \begin{itemize}
-  \item The language ``Fail to reject $H_0$'' is chosen precisely to
-    highlight the fact that ``not rejecting'' does not mean
-    ``accepting.'' Even if we fail to reject $H_0$, the hypothesis still
-    might be wrong because of sampling error, i.e. Type I error (see
-    below)
   \item
-    More natural than $\varphi(\bsy)\mapsto[0,1]$ is
-    $\varphi(\bsy)\mapsto \{0,1\}$, i.e. a test/decision rule that
-    always specifies simply ``reject'' or ``don't reject.''
-    The middle case of Expression~\ref{stattest} weirdly implies that
-    for some sample draws $\bsy$, you decide whether to reject by
-    flipping a coin with probability $q$.
-    But this case is there purely for technical reasons in case we deal
-    with discrete-valued $\bsy_n$, which might require such
-    randomization to hit an exact $\alpha$-level.
-
-  \item Given that a test is just a decision rule for (or answer to) the
-    question ``Should I reject the null $H_0$?'', the alternative $H_a$
-    seems superfluous.
-    But that's not true.  Specifically, to decide how compelling
-    the null $H_0$ is, we really need to say ``Compared to what?'' Sure
-    the null $H_0$ might not seem super likely given the data, but to
-    say that $H_0$ is \emph{so unlikely} that it's probably incorrect,
-    we really need to know what the alternatives are.
+    Because data $y$ is \emph{random}, test $\varphi(y)$ is \emph{also}
+    a RV on the underlying probability space. Hence we can compute its
+    mean, which satisfies $\E[\varphi(y)]=P[\text{Reject $H$}]$ for any
+    arbitrary measure $P$ representing the assumed distribution of $y$.
+  \item
+    ``Fail to reject $H$'' does not mean ``Accept $H$'', since
+    hypothesis $H$ might still be wrong because of Type I error (see
+    below).
 \end{itemize}
-Note that because the data $\bsy$ is \emph{random}, the test
-result $\varphi(\bsy)$ is \emph{also} a random variable on the
-underlying probability space.
 \end{defn}
 
+\begin{rmk}
+It's clear from Definition~\ref{defn:stattest} that we technically
+can define a test $\varphi(y)$ of given baseline hypothesis $H$
+\emph{without} reference to any competing alternative hypothesis.
+But as we'll see, to determine whether $\varphi(y)$ is
+\emph{optimal}, we need to know the distribution of $y$ when $H$ is
+wrong, which requires specifying a competing alternative hypothesis.
+This justifies the ubiquitous ``null vs.  alternative'' framework within
+frequentist hypothesis testing.
+\end{rmk}
+
 \clearpage
-Once we have a test, we might reasonably ask ``How good is it?'' or,
-more precisely, ``How often does the test/decision rule do the right or
-wrong thing?''
+
+
+\begin{defn}(Null \& Alternative Testing Framework)
+The null and alternative framework requires specification of a baseline
+\emph{null} $H_0$ and competing \emph{alternative hypothesis}
+$H_1$:\footnote{
+  If $H_0$ is simple, a common alternative $H_1$ is simply ``not
+  $H_0$'', e.g.  $H_0:\theta=\theta_0$ and $H_1:\theta\neq\theta_0$.
+}
+\begin{align}
+  H_0: p\in\{p_{\theta}\}_{\theta\in\Theta_0}
+  \qquad \text{vs.}\qquad
+  H_1: p\in\{p_{\theta}\}_{\theta\in\Theta_1}
+  \label{nullalt}
+\end{align}
+We assume one (and only one) of those hypotheses is true,\footnote{%
+  This requires that any distribution allowed under $H_0$ is not allowed
+  under $H_1$, and vice versa.
+}
+and a statistical test within this framework is then a test $\varphi(y)$
+of $H_0$ (as in Definition~\ref{defn:stattest}).
+
+Within this framework, we might then reasonably ask ``How good is test
+$\varphi(y)$?''
+Or more precisely, ``How often does the test/decision rule make a
+mistake?''
 This brings us to a discussion of different types of errors a test might
 make, as summarized in the table below:
 \begin{center}
-  \footnotesize
-  \begin{tabular}{l | c c}
+  \scriptsize
+  \begin{tabular}{c | c c}
     & \multicolumn{2}{c}{Decision} \\\cline{2-3}
     Reality & Fail to Reject $H_0$ & Reject $H_0$\\\hline
-    $H_0$ True & \checkmark & \textbf{Type I Error}\\
-    $H_0$ False & \textbf{Type II Error} & \checkmark
+    $H_0$ True, $H_1$ False & \checkmark & \textbf{Type I Error}\\
+    $H_0$ False, $H_1$ True & \textbf{Type II Error} & \checkmark
   \end{tabular}
 \end{center}
-Now obviously, we'd like our test $\varphi(\bsy)$ to commit
-\emph{neither} Type I nor Type II errors, but that's actually not so
-easy because of the fundamental tradeoff in hypothesis testing.
-In particular, reducing the probability of Type I error mechanically
-increases the probability of Type II error, and vice versa.
+Obviously, we'd like our test $\varphi(y)$ to commit
+\emph{neither} Type I nor Type II errors, but that's not feasible
+because of the fundamental tradeoff in hypothesis testing:
+Reducing the probability of Type I error mechanically increases the
+probability of Type II error, and vice versa.
 This is most obvious in the extreme.
-Specifically, we can eliminate Type I error \emph{entirely} if we
+Specifically, we can eliminate Type I errors \emph{entirely} if we
 \emph{never} reject $H_0$. But that's obviously ridiculous since
-sometimes $H_0$ is actually false, and we do want to reject.
-Alternatively, we can eliminate the risk of Type II error
-\emph{entirely} if we \emph{always} reject $H_0$. But that is also
-obviously ridiculous.
-So we have to balance the two and handle the tradeoff sensibly.
+sometimes $H_0$ actually is false, and we do want to reject.
+Alternatively, we can eliminate Type II errors \emph{entirely} if we
+\emph{always} reject $H_0$. But that is also ridiculous.
+So we have to balance this tradeoff sensibly.
 How to proceed?
 
 The standard resolution to this tradeoff is first to fix an acceptable
-probability of Type I error (the $\alpha$ level) and then minimize the
-probability of Type II (or, equivalently, maximize power) subject to
-this constraint. We now make all of this precise with some definitions.
+Type I error rate (the $\alpha$ level) and then minimize the Type II
+error rate (or, equivalently, maximize power) subject to this
+constraint. We now make all of this precise with some definitions.
+\end{defn}
 
 
 \begin{defn}($\alpha$-Level)
-Define \emph{$\alpha$-level} or \emph{Type I error rate} of test
-$\varphi(\bsy)$ for simple null $H_0$ and simple or composite
-alternative $H_a$ as the probability of Type I error:
+The \emph{$\alpha$-level} or \emph{Type I error rate} for test
+$\varphi(y)$ of Hypotheses~\ref{nullalt} is the maximum probability of
+Type I error over all possible null distributions:
 \begin{align*}
   \alpha
   :=
-  \E_0[\varphi(\bsy)]
-  = P_0[\text{Reject $H_0$}]
+  \sup_{\theta\in\Theta_0}
+  \E_\theta[\varphi(y)]
+  =
+  \sup_{\theta\in\Theta_0}
+  P_\theta[\text{Reject $H_0$}]
 \end{align*}
-where $\E_0$ is the expectation under $P_0$, the probability
-measure \emph{assuming null $H_0$ is true}.
+where $\E_\theta$ is the expectation under $P_\theta$, the probability
+measure assuming the truth is $p=p_\theta$.
 \end{defn}
 
 \begin{defn}(Power)
-Given a statistical test $\varphi(\bsy)$ for simple null $H_0$ and
-\emph{simple} alternative $H_a$, we define the \emph{power} of test
-$\varphi$ as one minus the probability of Type II error:
+\label{defn:power}
+Given a test $\varphi(y)$ of Hypotheses~\ref{nullalt}, define
+\emph{power under $\theta\in\Theta_1$} as the probability of rejecting
+when the truth is $p=p_\theta$:
 \begin{align}
-  \text{Power}
+  \text{Power}(\theta)
   &:=
-  \E_a[\varphi(\bsy)]
-  = P_a[\text{Fail to Reject $H_0$}]
+  \E_\theta[\varphi(y)]
+  = P_\theta[\text{Reject $H_0$}]
   \label{power}
+  \qquad \text{for}\quad
+  \theta\in\Theta_1
 \end{align}
-where $\E_a$ is the exp. under $P_a$, the prob. measure
-\emph{assuming simple alternative $H_a$ is true}.
-
-Note the restriction above to a \emph{simple} alternative $H_a$.  If
-$H_a$ were \emph{composite}, there would instead be a \emph{range} of
-probability measures corresponding to different values of $\bstheta$
-allowed under the alternative, giving a \emph{power curve/surface}
-(rather than just a number as in Expression~\ref{power}).
-Then we might think of averaging power across alternative $\bstheta$, as
-in the next definition.
+Note that power generally differs across alternative
+$\theta\in\Theta_1$, implying a power \emph{curve} or \emph{surface}.
+Power is generally only a single number if $\Theta_1$ contains a single
+element.
+Note also that power equals one minus the probability of Type II error
+under $p=p_\theta$.
 \end{defn}
 
-\begin{defn}(Weighted Average Power)
-Given statistical test $\varphi(\bsy)$ for simple null $H_0$ and
-\emph{composite} alternative $H_a:\theta \in A\subseteq\bsTheta$, let
-$w:A \ra \R$ denote a weighting function over parameter values allowed under
-the alternative $H_a$, let $P_{a,\bstheta}$ denote the probability
-measure under the alternative that supposes $\bstheta\in A$ is the true
-parameter value, and let $\E_{a,\bstheta}$ denote the expectation under
-that measure.
-We can then define the \emph{weighted average power} as
+\begin{defn}(Uniformly Most Powerful Test)
+A test $\varphi(y)$ is the \emph{uniformly most powerful} test if any
+\emph{other} $\alpha$-level test has weakly less power under any
+alternative $\theta\in\Theta_1$.
+More compactly in notation, this is equivalent to saying
+$\varphi(y)$ is UMP if and only if
 \begin{align*}
-  \text{Weighted Ave. Power}
-  &:=
-  \E_w\big[
-  \E_{a,\bstheta}[\varphi(\bsy)]
-  \big]
-  =
-  \int_A
-  \left[
-  \int_{\bsY}
-  \varphi(\bsy)\; dP_{a,\bstheta}
-  \right]
-  w(\bstheta)
-  \; d\bstheta
+  \tilde{\varphi}(y)
+  \quad\text{s.t.}\quad
+  \sup_{\theta\in\Theta_0}
+  \E_\theta[\tilde{\varphi}(y)]
+  \leq \alpha
+  \quad\implies\quad
+  \E_\theta[\tilde{\varphi}(y)]
+  \leq
+  \E_\theta[\varphi(y)]
+  \quad
+  \forall
+  \theta\in\Theta_1
 \end{align*}
-i.e. compute power $\int_{\bsY}\varphi(\bsy)\;dP_{a,\bstheta}$ for all
-alternative $\bstheta\in A$, then average with weights $w(\bstheta)$.
 \end{defn}
-
 \clearpage
-\subsection{Test Statistics and Confidence Intervals}
 
 The above definition of a test was \emph{very} abstract, treating a
-statistical test simply as a measurable function $\varphi(\bsy)$ of the
+statistical test simply as a measurable function $\varphi(y)$ of the
 data. This level of generality was convenient for defining concepts like
 the $\alpha$-level and power, but it's not immediately clear where
-$\varphi(\bsy)$ comes from or how to work with these concepts in
+$\varphi(y)$ comes from or how to work with these concepts in
 practice. This sections helps a bit with that.
 
-In practice, most hypothesis testing is done in terms of test-statistics
-and confidence intervals. In this approach, we specify functions of the
-data $T(\bsy)$ and $\bshattheta(\bsy)$, and then construct a statistical
-test as some function of these underlying objects, i.e.
-$\varphi(\bsy)=g(T(\bsy))$ or $\varphi(\bsy)=g(\bshattheta(\bsy))$.
+In practice, most hypothesis testing is done with test-statistics and
+confidence intervals. In this approach, we specify functions of the data
+$T(y)$ and $\hat{\theta}(y)$, and then construct a statistical test as
+some function of these underlying objects, i.e.  $\varphi(y)=g(T(y))$ or
+$\varphi(y)=h(\hat{\theta}(y))$.
 This section therefore defines these objects, while the next section on
 Neyman-Pearson will say more about how to choose/construct
 \emph{optimal} test statistics and confidence intervals.
 
 
 \begin{defn}(Test-Statistic and Corresponding Critical Region)
-Suppose we have some arbtrary mapping $T(\bsy)$ from sample data $\bsy$
+Suppose we have some arbtrary mapping $T(y)$ from sample data $y$
 to a number.
-We can use this function to define a statistical test, in which case
-$T(\bsy)$ is called a \emph{test-statistic}, where the
-corresponding/induced test $\varphi(\bsy)$ is defined
+We can use this mapping to define the following statistical test:
 \begin{align*}
-  \varphi(\bsy)
-  = \mathbf{1}\{T(\bsy)\in C\}
+  \varphi(y)
+  = \mathbf{1}\{T(y)\in C\}
 \end{align*}
-for some subset $C\subseteq\range(T(\bsy))$ of the range of the test
-statistic called the \emph{critical region}, defined implicitly by the
-equation
+for some subset $C\subseteq\range(T(y))$ called the
+\emph{critical region}. Critial region $C$ is defined implicitly by the
+the equation that enforces the $\alpha$-level:
 \begin{align}
   \alpha
-  = \E_0[\varphi(\bsy)]
-  = P_0[T(\bsy)\in C]
+  = \sup_{\theta\in\Theta_0}\E_\theta[\varphi(y)]
+  = \sup_{\theta\in\Theta_0}
+    P_\theta[T(y)\in C]
 \end{align}
-where $\alpha$ is the desired $\alpha$-level for the test, $P_0$ is the
-probability measure assuming the null is true, and $\E_0$ is the
-expecation under that probability measure.
+where $\alpha$ is the desired $\alpha$-level for the test.
 \end{defn}
 
-\begin{defn}(Confidence Interval or Region)
-A $(1-\alpha)\%$ \emph{confidence interval/region} is a measurable
-mapping $\bshattheta(\bsy)\mapsto \bsTheta$ from the data/sample $\bsy$
-to the parameter space $\bsTheta$ such that
-\begin{align*}
-  1-\alpha = P_0\big[\bstheta \in \bshattheta(\bsy)\big]
-\end{align*}
-where $P_0$ is the probability measure for the data $\bsy$ assuming the
-null hypothesis is correct.
-In words, $\bshattheta(\bsy)$ maps to a region of the parameter space
-that, under the null, contains the true parameter value $\bstheta$ value
-$(1-\alpha)\%$ of the time.
 
-Given such a confidence interval/region $\bshattheta(\bsy)$, we can then
-construct a test for null hypothesis $H_0:\bstheta=\bstheta_0$ as
-follows:
+\begin{defn}(Confidence Interval or Region)
+Suppose the true data density has parametric form $p(y)=p(y|\theta)$ for
+some unknown $\theta$, and we want to test simple hypothesis
+$H_0:\theta=\theta_0$. Then a $(1-\alpha)\%$
+\emph{confidence interval/region} is a measurable mapping
+$A(y)\subseteq\Theta$ into the parameter space $\Theta$ such that
 \begin{align*}
-  \varphi(\bsy)
-  = \mathbf{1}\big\{\theta_0\not\in\bshattheta(\bsy)\big\}
+  P_{\theta_0}\big[\theta_0 \in A(y)\big]
+  =
+  1-\alpha
 \end{align*}
-i.e. reject null $H_0:\bstheta=\bstheta_0$ if null parameter vector
-$\bstheta_0$ is not in the confidence interval/region.
+where $P_{\theta_0}$ is the probability measure for the data $y$ under
+the null.
+In words, under the null $p(y)=p(y|\theta_0)$, $A(y)$ contains
+$\theta_0$ for $(1-\alpha)\%$ of $y$ draws.
+
+Given such a confidence interval/region $A(y)$, we can then
+construct a test for null hypothesis $H_0$ as follows:
+\begin{align*}
+  \varphi(y)
+  = \mathbf{1}\big\{\theta_0\not\in A(y)\big\}
+\end{align*}
+i.e. reject null $H_0:\theta=\theta_0$ if null parameter vector
+$\theta_0$ is not in the confidence interval/region.
 \end{defn}
 
 Again, this section was also pretty abstract, leaving open a lot of
 indeterminacy. In particular, there's typically many possible test
-statistics, and even given a single test statistic $T(\bsy)$, there are
+statistics, and even given a single test statistic $T(y)$, there are
 multiple ways to define the critical region $C$.
-Similarly, there are many possible ways to construct a confidence
-region $\bshattheta(\bsy)$. So we really would like more guidance on how
-to construct tests, and \emph{optimal} tests in particular.
+Similarly, there are many possible ways to construct a confidence region
+$A(y)$. So we really would like more guidance on how to construct tests,
+and \emph{optimal} tests in particular.
 
 
 \clearpage
 \subsection{Neyman-Pearson Lemma}
 \label{sec:neymanpearson}
 
-With all the machinery in place for characterizing hypothesis tests,
-this section derives an \emph{optimal test}.
-Specifically, the Neyman-Pearson lemma specifies a test-statistic (the
-likelihood ratio) and a corresponding statistical test constructed from
-this statistic which is the \emph{uniformly most powerful test}, i.e.
-maximizes power subject to the specified $\alpha$-level.
-%optimal test $\varphi^*(\bsy)$
-%rejects whenever any other
-%$\varphi(\bsy)$ (at the same $\alpha$-level) rejects, hence maximizing
-%power subject to the specified $\alpha$ level.
+Now with the machinery in place to characterize hypothesis tests, this
+section derives an \emph{optimal test} for any \emph{simple} null and
+alternative hypotheses.
+Namely, Neyman-Pearson specifies a test-stat (the likelihood ratio) and
+a corresponding test constructed from this statistic which is the
+\emph{uniformly most powerful test}.
+
+And while Neyman-Pearson optimality result is technically limited to
+\emph{simple} hypotheses $H_0$ and $H_1$, this is not as restrictive as
+it seems. In later subsections, we will see that it's often possible to
+transform a composite hypothesis problem slightly into one where we can
+apply the Neyman-Pearson lemma.
+Therefore, it's certainly the most important result for hypothesis
+testing generally.
+
 
 \begin{lem}\emph{(Neyman-Pearson)}
-Suppose data $\bsy:=\{\bsy_n\}\nN$ is generated from some
-model/likelihood $p(\bsy|\bstheta)$ with unknown $\bstheta$.\footnote{%
-  Observations can be discrete or continuous so that $p(\bsy|\bstheta)$
-  is either a mass or density function, resp.
+Suppose we want to test the following simple null and alternative
+hypotheses about the unknown model/likelihood $p(y)$ that generates
+data $y$,\footnote{%
+  Data $y$ might be a single obs. (scalar or vector) or
+  sample $y=\{y_n\}\nN$ so that $p(y)$ is a \emph{joint}
+  distribution. Moreover, obs. can also be discrete or
+  continuous so that $p(y)$ denotes either a mass or density
+  function, resp.
 }
-To test simple null and alternative hypotheses,
 \begin{align*}
-  H_0: \bstheta=\bstheta_0
+  H_0: p=p_0
   \qquad\qquad
-  H_1: \bstheta=\bstheta_1
+  H_1: p=p_1
 \end{align*}
-the uniformly most powerful level-$\alpha$ test $\varphi^*(\bsy)$ uses
-the \emph{likelihood ratio} as a test statistic:
+Then the uniformly most powerful level-$\alpha$ test $\varphi^*(y)$
+uses the likelihood ratio as a test statistic:
 \begin{align}
-  \varphi^*(\bsy)
+  \varphi^*(y)
   =
   \begin{cases}
-    1 & LR(\bsy) > \lambda \\
-    q & LR(\bsy) = \lambda \\
-    0 & LR(\bsy) < \lambda
+    1 & LR(y) > \lambda \\
+    q & LR(y) = \lambda \\
+    0 & LR(y) < \lambda
   \end{cases}
   \qquad \text{where}\quad
-  LR(\bsy) := \frac{p(\bsy|\bstheta_1)}{p(\bsy|\bstheta_0)}
+  LR(y) := \frac{p_1(y)}{p_0(y)}
   \label{neymantest}
 \end{align}
-where $\lambda$ and $q$ are constants chosen so that we hit the
-$\alpha$ level, i.e. defined implicitly by
+where $\lambda,q$ are constants chosen to hit the $\alpha$-level, i.e.
+defined implicitly by $\alpha$-level constraint
 \begin{align}
   \alpha
-  = \E_0[\varphi^*(\bsy)]
-  = \int \varphi^*(\bsy) p(\bsy|\bstheta_0)\; d\bsy
+  = \E_0[\varphi^*(y)]
+  = \int \varphi^*(y) p_0(y)\; dy
   \label{neymanalpha}
 \end{align}
 \end{lem}
 \begin{rmk}
 This test is also intuitive:
-Simply reject the null when the likelihood ratio strongly favors the
-alternative.
-Also, if a sufficient statistic exists for the parameter $\bstheta$
-that's being tested, then that sufficient statistic will be the test
-statistic in the hypothesis test.
+Reject the null when the LR strongly favors the alternative.  And if the
+densities are parametric $p_i(y)=p(y|\theta_i)$, the hypotheses
+can, equivalently, just be rewritten as hypotheses about parameter
+values. Moreover, in this case, if a sufficient statistic exists for the
+parameters being tested, we can just use that sufficient statistic as
+the test statistic (since the LR will be large/small entirely according
+to the sufficient statistic).
 \end{rmk}
+
 \begin{proof}
-Let $\varphi(\bsy)$ be \emph{any} arbitrary $\alpha$-level test, and
-let $\varphi^*(\bsy)$ denote the specific test described by
+Let $\varphi(y)$ be \emph{any} arbitrary $\alpha$-level test, and
+let $\varphi^*(y)$ denote the specific test described by
 Expression~\ref{neymantest} with corresponding $\lambda$ and $q$.
-Note that we can always construct/implement such a test (i.e. there's no
-existence problem). We just need to prove that such a test is in fact
-optimal.
+Note that we can always construct/implement such a test (i.e.
+there's no existence problem). We just need to prove that such a test is
+in fact \emph{optimal}.
 So first note, based on the assumed form of the test in
 Expression~\ref{neymantest},
 \begin{align}
-  %\varphi^*(\bsy) \geq\varphi(\bsy)
+  %\varphi^*(y) \geq\varphi(y)
   %\quad\implies\quad
   \big(
-    LR(\bsy)-\lambda
+    LR(y)-\lambda
   \big)
-  \big(\varphi^*(\bsy)-\varphi(\bsy)\big)
+  \big(\varphi^*(y)-\varphi(y)\big)
   \geq 0
   \label{neymanproof}
 \end{align}
-We can show this product is always nonnegative by considering the cases:
+We can show this inequality is true by considering the cases
+individually:
 \begin{itemize}
-  \item $\varphi^*(\bsy)-\varphi(\bsy)=1$: Test $\varphi^*$ rejects,
-    implying $LR(\bsy)-\lambda>0$
-  \item $\varphi^*(\bsy)-\varphi(\bsy)=0$: Trivial
-  \item $\varphi^*(\bsy)-\varphi(\bsy)=-1$:
-    Test $\varphi^*$ does not reject, implying $LR(\bsy)-\lambda<0$
-  \item $\varphi^*(\bsy)-\varphi(\bsy)\in (0,1)\cup (-1,0)$:
+  \item $\varphi^*(y)-\varphi(y)=1$: Test $\varphi^*$ rejects,
+    implying $LR(y)-\lambda>0$
+  \item $\varphi^*(y)-\varphi(y)=0$: Trivial
+  \item $\varphi^*(y)-\varphi(y)=-1$:
+    Test $\varphi^*$ does not reject, implying $LR(y)-\lambda<0$
+  \item $\varphi^*(y)-\varphi(y)\in (0,1)\cup (-1,0)$:
     Also works out, just slighty tedious to check
 \end{itemize}
 So given that Expression~\ref{neymanproof} is true, substitute in the
-definition of $LR(\bsy)$, multiply through by $p(\bsy|\bstheta_0)$,
-rearrange, and integrate over $\bsy$ to get
+definition of $LR(y)$, multiply through by $p_0(y)$,
+rearrange, and integrate over $y$ to get
 \begin{align*}
   \int
-  p(\bsy|\bstheta_1)
-  \big(\varphi^*(\bsy)-\varphi(\bsy)\big)
-  \; d\bsy
+  p_1(y)
+  \big(\varphi^*(y)-\varphi(y)\big)
+  \; dy
   - \lambda
   \int
-  p(\bsy|\bstheta_0)
-  \big(\varphi^*(\bsy)-\varphi(\bsy)\big)
-  \; d\bsy
+  p_0(y)
+  \big(\varphi^*(y)-\varphi(y)\big)
+  \; dy
   &\geq 0
   \\
   \iff\qquad
-  \E_1\big[ \varphi^*(\bsy)-\varphi(\bsy)\big]
+  \E_1\big[ \varphi^*(y)-\varphi(y)\big]
   - \lambda
-  \E_0\big[ \varphi^*(\bsy)-\varphi(\bsy)\big]
+  \E_0\big[ \varphi^*(y)-\varphi(y)\big]
   &\geq 0
 \end{align*}
 The second integral/expectation equals zero since both are
 $\alpha$-level tests, hence
-$\E_0[\varphi^*(\bsy)]=\E_0[\varphi(\bsy)]=\alpha$.
+$\E_0[\varphi^*(y)]=\E_0[\varphi(y)]=\alpha$.
 This leaves
 \begin{align*}
-  \E_1\big[ \varphi^*(\bsy)-\varphi(\bsy)\big]
+  \E_1\big[ \varphi^*(y)-\varphi(y)\big]
   \geq 0
   \quad\implies\quad
-  \E_1[\varphi^*(\bsy)]
+  \E_1[\varphi^*(y)]
   \geq
-  \E_1[\varphi(\bsy)]
+  \E_1[\varphi(y)]
 \end{align*}
 which says precisely (by the definition of power) that test
 $\varphi^*$ has higher power than $\varphi$.
 \end{proof}
 
-\begin{cor}\emph{(Generalization to Composite Hypotheses)}
-Suppose we instead want to test \emph{composite} hypotheses
+\clearpage
+\subsection{Unbiasedness}
+
+\begin{defn}(Unbiased Test)
+Test $\varphi$ of of potentially composite hypotheses
 \begin{align*}
-  H_0: \bstheta\in A_0\subseteq\bsTheta
+  H_0:\theta\in\Theta_0
   \qquad\qquad
-  H_1: \bstheta\in A_1\subseteq\bsTheta
+  H_1:\theta\in\Theta_1
 \end{align*}
-Then we can construct a test as follows:
+is said to be \emph{unbiased} at level $\alpha$ if its power under any
+alternative always exceeds its $\alpha$-level, i.e.
+\begin{align}
+  \E_{\theta}[\varphi(X)]
+  \geq \alpha
+  \qquad\forall \theta\in\Theta_1
+  \label{unbiased}
+\end{align}
+This ensures that you're always more likely to reject a \emph{false}
+null hypothesis than accidentally/incorrectly reject a \emph{true} null
+hypothesis.
+\end{defn}
+
+\begin{prop}
+Given simple null $H_0:\theta=\theta_0$ and composite alternative
+$H_1:\theta\in\Theta_1$, any unbiased test $\varphi(y)$
+satisfies
 \begin{align*}
-  \varphi^*(\bsy)
+  \theta_0
+  =
+  \argmin_{\theta\in\Theta}
+  \E_\theta[\varphi(y)]
+  \qquad \text{where}\quad
+  \Theta=\{\theta_0\}\cup\Theta_1
+\end{align*}
+If the rejection probability $\E_\theta[\varphi(y)]$ is a differentiable
+function of $\theta$, this means
+\begin{align*}
+  0
+  &=
+  \frac{d}{d\theta}
+  \bigg[
+  \E_{\theta_0}[\varphi(X)]
+  \bigg]
+\end{align*}
+\end{prop}
+\begin{rmk}
+In words, in the special case of a simple null, the definition
+unbiasedness as stated in Expression~\ref{unbiased} implies that the
+rejection probability $\E_\theta[\varphi(y)]$ is \emph{minimized} at
+null value $\theta_0$.
+\end{rmk}
+
+
+\clearpage
+\subsection{Weighted Average Power}
+
+Unlike the conditions in Neyman-Pearson, suppose we have a
+\emph{composite} alternative
+\begin{align}
+  H_1:p\in\{p_\theta\}_{\theta\in\Theta_1}
+  \qquad \text{or equivalently}\qquad
+  H_1: \theta\in\Theta_1
+  \label{wapalt}
+\end{align}
+where $\Theta_1$ has more than one element.
+Then we can't just naively apply Neyman-Pearson (which requires simple
+$H_0,H_1$) to derive an optimal (i.e. power-maximizing) test.
+The issue: with composite $H_1$, we have a power function/surface that
+depends on $\theta\in\Theta_1$ as stated in Definition~\ref{defn:power}.
+Power is not a single number we can maximize.
+
+We can, however, make a lot of progress by \emph{averaging} the power
+function, and looking for a test that maximizes
+\emph{weighted average power}.
+That gets us to a point where we can invoke Neyman-Pearson to find an
+optimal test, in a weighted average power sense.
+
+\begin{defn}(Weighted Average Power)
+\label{defn:wap}
+Given statistical test $\varphi(y)$ and composite alternative
+Hypothesis~\ref{wapalt}, let $w:\Theta_1 \ra \R$ denote a weighting
+function over alternative parameter values under $H_1$.\footnote{%
+  i.e.  $w$ is nonnegative and integrates to one
+}
+Then \emph{weighted average power} (WAP) under $w$ is defined
+\begin{align*}
+  \text{WAP}_w
+  &:=
+  \int_{\Theta_1}
+  \text{Power}(\theta_1)
+  w(\theta_1)\;d\theta_1
+\end{align*}
+Substituting in for $\text{Power}(\theta)$ from
+Definition~\ref{defn:power}, this is equivalent to
+\begin{align*}
+  \text{WAP}_w
+  &=
+  \int_{\Theta_1}
+  \left[
+    \int
+    \varphi(y)
+    p(y|\theta_1)
+    \;dy
+  \right]
+  w(\theta_1)\;d\theta_1
+  =
+  \E_w\big[
+    \E_{\theta_1}[\varphi(y)]
+  \big]
+\end{align*}
+The subscripting by $w$ makes clear that WAP depends on the weighting
+function.
+\end{defn}
+
+\begin{cor}
+\emph{(WAP${}_w$-Maximizing Test of Simple $H_0$ against Composite $H_1$)}
+Given a simple null and composite alternative
+\begin{align*}
+  H_0:p=p_0
+  \qquad\quad
+  H_1:p\in\{p_\theta\}_{\theta\in\Theta_1}
+\end{align*}
+and given weighting function $w:\Theta_1\ra\R$, the following is the
+WAP${}_w$-maximizing $\alpha$-level test:
+\begin{align*}
+  \varphi^*(y)
   =
   \begin{cases}
-    1 & LR > \lambda \\
-    q & LR = \lambda \\
-    0 & LR < \lambda
+    1 & LR_w(y) > \lambda \\
+    q & LR_w(y) = \lambda \\
+    0 & LR_w(y) < \lambda
   \end{cases}
   \qquad \text{where}\quad
-  LR :=
+  LR_w(y) :=
   \frac{%
-    \max_{\bstildetheta \in A_1}p(\bsy|\bstildetheta)
-  }{%
-    \max_{\bstildetheta \in A_0}p(\bsy|\bstildetheta)
-  }
+    \int p(y|\theta_1)w(\theta_1)\; d\theta_1
+  }{p_0(y)}
+  =
+  \int
+  \frac{p(y|\theta_1)}{p_0(y)}
+  w(\theta_1)\; d\theta_1
 \end{align*}
-where, again, where $\lambda$ and $q$ are constants chosen so that
-we hit the $\alpha$ level, i.e. defined implicitly by
-Expression~\ref{neymanalpha}.
+where $\lambda,q$ are constants defined implicitly by $\alpha$-level
+constraint
+\begin{align}
+  \alpha
+  = \E_0[\varphi^*(y)]
+  = \int \varphi^*(y) p_0(y)\; dy
+\end{align}
 \end{cor}
+\begin{rmk}
+Notice that the test statistic $LR_w(y)$ is a weighted average
+likelihood ratio, averaging likelihood ratios of simple null, simple
+alternative likelihood ratios according to $w(\theta_1)$.
+It's also sometimes possible to choose $w(\theta_1)$ so that it's
+conjugate (in some sense) to the likelihood ratios, providing a nice
+intuitive or tractable formula for $LR_w$.
+\end{rmk}
 
+\clearpage
+\begin{proof}
+Start with the expression for weighted average power, which we want to
+maximize:
+\begin{align*}
+  \text{WAP}_w
+  =
+  \int
+  \left[
+  \int
+  \varphi(y)p(y|\theta_1)\;dy
+  \right]
+  w(\theta_1)
+  \, d\theta_1
+  =
+  \int
+  \varphi(y)
+  \underbrace{%
+  \left[
+  \int
+    p(y|\theta_1)
+    w(\theta_1)
+    \, d\theta_1
+  \right]
+  }_{=:p_1(y)}
+  dy
+\end{align*}
+We could reverse the order of integration by Fubini's Theorem since all
+objects in the integrand are nonnegative.
+Since both $p(y|\theta_1)$ and $w(\theta_1)$ are densities
+(assumed continuous, nonnegative everywhere, integrate to one), $p_1(y)$
+is \emph{also} a density, inheriting nonnegativity and satisfying
+\begin{align*}
+  \int p_1(y)\; dy
+  =
+  \int
+  \left[
+  \int
+    p(y|\theta_1)
+    w(\theta_1)
+    \, d\theta_1
+  \right]
+  dy
+  =
+  \int
+  w(\theta_1)
+  \left[
+  \int
+    p(y|\theta_1)
+  \; dy
+  \right]
+  d\theta_1
+  =
+  \int
+  w(\theta_1)
+  \cdot 1
+  \, d\theta_1
+  = 1
+\end{align*}
+So finding a test to maximize weighted average power
+\begin{align*}
+  \text{WAP}_w
+  =
+  \int \varphi(y) p_1(y) \; dy
+\end{align*}
+subject to some $\alpha$-level constraint is here entirely equivalent to
+maximizing power (subject to that $\alpha$-level constraint) in a test
+of the following simple null and simple alternative:
+\begin{align*}
+  H_0: p = p_0
+  \qquad
+  H_1: p = p_1 :=
+  \int p(y|\theta_1) w(\theta_1) \, d\theta_1
+\end{align*}
+Therefore we can use the Neyman-Pearson lemma says that the optimal
+power-maximizing test is based on the likelihood ratio
+\begin{align*}
+  LR_w(y)
+  = \frac{p_1(y)}{p_0(y)}
+  = \frac{\int p(y|\theta_1) w(\theta_1) \,
+  d\theta_1}{p_0(y)}
+\end{align*}
+\end{proof}
+
+
+\clearpage
+\subsection{Least Favorable Distributions}
+
+We want an optimal test of the following composite null and simple
+alternative\footnote{%
+  Note that $H_1$ might be simple because we averaged over parameters in
+  the alternative to convert an originally composite alternative into
+  this simple alternative, just as with WAP.
+}
+\begin{align}
+  H_0:
+  p(y) \in \big\{p(y|\theta)\big\}_{\theta\in\Theta_0}
+  \qquad\quad
+  H_1: p(y) = p_1(y)
+  \label{lfd}
+\end{align}
+With $H_0$ composite, we cannot naively apply Neyman-Pearson.
+However, we might still be able to use its insights if we can construct
+an optimal level-$\alpha$ test for a \emph{related} problem.
+Under certain conditions, an optimal test for that problem will also be
+optimal for Hypotheses~\ref{lfd}.
+
+\begin{thm}
+Suppose we want to test Hypotheses~\ref{lfd}.
+For some probablity distribution $\Lambda$ over $\Theta_0$, consider
+testing instead the following simple null and simple alternative
+hypotheses:
+\begin{align}
+  H_\Lambda:
+  p(y) = p_\Lambda(y) := \int_{\Theta_0} p(y|\theta)\;d\Lambda(\theta)
+  \qquad\quad
+  H_1: p(y) = p_1(y)
+  \label{lfd2}
+\end{align}
+Suppose $\varphi_\Lambda(y)$ denotes the best level-$\alpha$ test of
+Hypotheses~\ref{lfd2}.\footnote{%
+  This can be derived from Neyman-Pearson
+}
+Then
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item
+    $\varphi_\Lambda$ is at least as powerful as any level-$\alpha$ test
+    $\varphi$ of Hypotheses~\ref{lfd}, i.e.
+    \begin{align*}
+      \varphi(y)
+      \quad \text{s.t.}\quad
+      \sup_{\theta\in\Theta_0}
+      \E_\theta[\varphi(y)]\leq\alpha
+      \quad\implies\quad
+      \E_1[\varphi(y)]\leq\E_1[\varphi_\Lambda(y)]
+    \end{align*}
+
+  \item
+    Suppose $\Lambda$ is such that $\varphi_\Lambda(y)$ is
+    level-$\alpha$ under $H_0$ in Expression~\ref{lfd}. Then by Part
+    (i), $\varphi_\Lambda$ is the \emph{best} level-$\alpha$ test of
+    Hypotheses~\ref{lfd}.
+    Moreover, $\Lambda$ is then called the least favorable distribution,
+    since it induces the lowest possible power among all possible
+    distributions over $\Theta_0$.
+    %Expressed in more compact notation:
+    %\begin{align*}
+      %\sup_{\theta\in\Theta_0}
+      %\E_\theta[\varphi_\Lambda(y)]
+      %\leq\alpha
+      %\quad\implies\quad
+      %\E_1[\varphi(y)]
+      %\leq
+      %\E_1[\varphi_\Lambda(y)]
+      %\quad
+      %\forall
+      %\varphi(y)
+      %\;\; \text{s.t.}\;\;
+      %\sup_{\theta\in\Theta_0}
+      %\E[\varphi(y)]
+      %\leq \alpha
+    %\end{align*}
+\end{enumerate}
+\end{thm}
+\begin{rmk}
+This suggests a strategy for finding optimal tests for composite null
+and simple alternative hypotheses:
+Guess and verify that some $\Lambda$ is the least favorable
+distribution, i.e. the distribution such that the implied optimal
+level-$\alpha$ test $\varphi_\Lambda$ of~\ref{lfd2} is, in fact, also
+level-$\alpha$ for~\ref{lfd}.
+In many cases, $\Lambda$ puts all weight on a single point in
+$\Theta_0$.
+This theorem then guarantees $\varphi_\Lambda$ is optimal for
+Hypotheses~\ref{lfd}.
+\end{rmk}
+\begin{proof}
+(Part (i))
+First, any level-$\alpha$ test $\varphi(y)$ of
+Hypotheses~\ref{lfd} is \emph{also} level-$\alpha$ against \ref{lfd2}.
+To show this, compute it's $\alpha$-level, $\E_\Lambda[\varphi(y)]$:
+\begin{align*}
+  \E_\Lambda[\varphi(y)]
+  =
+  \int \varphi(y)p_\Lambda(y)\;dy
+  &=
+  \int \int_{\Theta_0} \varphi(y)p(y|\theta) \;d\Lambda(\theta)\;dy
+  \leq
+  \sup_{\theta\in\Theta_0}
+  \E_\theta[\varphi(y)]
+  =
+  \alpha
+\end{align*}
+The final equality followed because $\varphi(y)$ is level-$\alpha$ for
+Hypotheses~\ref{lfd}.
+Therefore, the above chain implies $\varphi(y)$ is level-$\alpha$
+for Hypotheses~\ref{lfd2}. And by assumption, $\varphi_\Lambda$
+was the \emph{most powerful} test of Hypotheses~\ref{lfd2}, which means
+$\E_1[\varphi(y)]\leq\E_1[\varphi_\Lambda(y)]$. That's exactly
+Part (i).
+
+That's the math.
+More intuitively, (i) holds because a level-$\alpha$ test
+$\varphi$ of Hypotheses~\ref{lfd} is constructed so that the
+$\alpha$-level restriction holds for all $\theta\in\Theta_0$
+\emph{individually}.  So then certainly that $\alpha$-level
+restriction will hold \emph{on average}, for any weights
+$\Lambda(\theta)$.
+
+(Part (ii))
+If additionally $\varphi_\Lambda$ is a level-$\alpha$ test of
+Hypotheses~\ref{lfd}, then Part (i) immediately implies that
+$\varphi_\Lambda$ is the most powerful test.
+\end{proof}
+
+
+\clearpage
+\subsection{Invariance}
+
+In many cases where we want to construct a test based on some data $y$,
+we might also think about constructing a test based on some
+\emph{transformation} of the data $g(y)$. If we require that a test
+based on transformed data $g(y)$ delivers the same answer as a test
+based on the original data $y$, i.e. $\varphi(y)=\varphi(g(y))$, we are
+requiring the test to be \emph{invariant} to that transformation.
+In many cases, such invariance is extremely sensible and has an added
+benefit of shrinking the class of possible tests to something smaller
+and more manageable, where it might be easier to find/construct an
+\emph{optimal} test.
+
+\begin{defn}(Group)
+Let $\calG$ be a collection of elements, and let $\bullet$ be an
+operation that we can apply to any elements $a,b\in\calG$ to get a new
+element $a\bullet b$.\footnote{%
+  Note that $a\bullet b$ need not be in $\calG$, unless
+  $(\calG,\bullet)$ is a group.
+}
+A \emph{group} is then a pair $(\calG,\bullet)$ satisfying the four
+group axioms:
+\begin{enumerate}[label=(\roman*)]
+  \item \emph{Closure}: For all $a,b\in\calG$, $a\bullet b\in\calG$.
+  \item \emph{Associativity}:
+    For all $a,b,c\in\calG$,
+    we have $(a\bullet b)\bullet c= a\bullet (b\bullet c)$.
+  \item \emph{Identity Element}:
+    There exists an element $e\in\calG$ such that $\forall a\in\calG$,
+    $e\bullet a=a\bullet e= a$.
+  \item \emph{Inverse Element}:
+    For each $a\in\calG$, there exists another element $a^{-1}\in\calG$
+    such that $a\bullet a^{-1}=a^{-1}\bullet a=e$, the identity element.
+\end{enumerate}
+\end{defn}
+
+\begin{defn}(Group of Transformations)
+Suppose $\calG=\{g_a:\R^n\ra\R^n\}_{a\in J}$ is a collection
+of \emph{functions} that transform $y\in\Rn$ into some other element
+$g_a(y)\in\Rn$.\footnote{%
+  Note that $a$ is just some index in arbitrary index set $J$.
+}
+Suppose also that we consider the operation
+of \emph{function composition}, denoted by $g_{a_1}\circ
+g_{a_2}$.
+Then the pair $(\calG,\circ)$ is a group if it satisfies the four group
+axioms. Given our particular $(\calG,\circ)$ here, they specialize to
+the following four conditions:
+\begin{enumerate}[label=(\roman*)]
+  \item \emph{Closure}:
+    %For all $g_{a_1},g_{a_2}\in\calG$,
+    %the function $g_{a_1}\circ g_{a_2}\in\calG$.
+    If we transform $y\in\Rn$ twice by $g_{a_1}(g_{a_2}(y))$
+    for any two $g_{a_1},g_{a_2}\in\calG$, then there's a
+    function $g\in\calG$ that does it in one step, i.e. such that
+    $g_{a_1}\circ g_{a_2}=g$ or, equivalently,
+    $g_{a_1}(g_{a_2}(y))=g(y)$.
+
+  \item \emph{Associativity}:
+    In practice, we don't even have to check whether this condition
+    holds in $\calG$ since it \emph{always} holds for \emph{any}
+    collection of functions, including $\calG$, i.e.
+    for any three functions,
+    $g_{a_1},g_{a_2},g_{a_3}$
+    we have $(g_{a_1}\circ g_{a_2})\circ g_{a_3} =
+    g_{a_1} \circ (g_{a_2}\circ g_{a_3})$.
+
+  \item \emph{Identity Element}:
+    There exists a function $g_i\in\calG$ that is an
+    \emph{identity map}, i.e. $g_i(y)=y$ leaving $y$ unchanged.
+    %Given that $\calG$ is a collection of transformations,
+    %this is the only way to satisfy the more general requirement
+    %that $g_i\circ g_a = g_a \circ g_i=g_a$ for all
+    %$g_a\in\calG$ in our original general definition of a group
+
+  \item \emph{Inverse Element}:
+    For each $g_a\in\calG$, there exists another element
+    $g_{a}^{-1}\in\calG$ that undoes the transformation,
+    %$g_a \circ g_a^{-1}=g_{a}^{-1}\circ g_{a} =
+    %g_i$ or, equivalently,
+    $g^{-1}_a(g_{a}(y))=y$.
+\end{enumerate}
+If pair $(\calG,\circ)$ satisfies these properties, then we call the
+pair a \emph{group of transformations}, which we often denote more
+simply by $\calG$ (with the operation $\circ$ implicitly understood).
+\end{defn}
+\begin{rmk}
+These conditions may look slightly different from the more general
+conditions in the previous definition.
+However, it's easy to see that they are equivalent in this special case
+where $\calG=\{g_a\}_{a\in J}$ is a collection of transformations
+and are a natural consequence of working with this particular colleciton
+$\calG$
+\end{rmk}
+
+\begin{defn}($\calG$-Invariant Test)
+A statistical test $\varphi(y)$ is \emph{invariant} with respect to
+group of transformations $\calG$ or, more succinctly,
+\emph{$\calG$-invariant} if
+\begin{align*}
+  \varphi(g(y))
+  = \varphi(y)
+  \qquad\forall g\in\calG
+\end{align*}
+In words, the test $\varphi$ gives the same answer whether you pass in
+the original data $y$ or transformed data $g(y)$, where $g$ is
+\emph{any} possible transformation in $\calG$.
+Of course, the test $\varphi$ is generally \emph{not} invariant to
+transformations that are not in group $\calG$.
+\end{defn}
+
+
+\begin{defn}(Maximal Invariant)
+A function $h:\Rn\ra\Rm$ is a \emph{maximal invariant} with respect to
+group of transformations $\calG$ if
+\begin{enumerate}[label=(\roman*)]
+  \item \emph{Invariance}: $h(g(y))=h(y)$ for all $g\in\calG$.
+
+    In words, the function $h$ returns the same value whether you pass
+    in the original data $y$ or transformed data $g(y)$, where $g$ is
+    \emph{any} possible transformation in $\calG$.
+  \item \emph{Maximality}:
+    $h(y)=h(y')$ implies that there exists a $g\in\calG$
+    such that $y'=g(y)$.
+
+    In words, if $y$ and $y'$ are mapped to the same value under $h$,
+    then there must be a way to transform $y$ into $y'$ (and vice versa,
+    by the fact that $\calG$ is a group).
+\end{enumerate}
+First, note that maximal invariants are \emph{not} generally unique.
+Second, note that $h$ maps $y\in\Rn$ into $h(y)\in\Rm$, so
+$h$ \emph{could} (and generally does) reduce the dimension of the data.
+Third, note tha the trick part is that $h$ must be totally agnostic
+about which $g$ is applied---it can \emph{only} depend on the data it's
+passed in, nothing else.
+\end{defn}
+
+\begin{thm}
+Suppose $\calG$ has maximal invariant $h$.
+Then test $\varphi$ is $\calG$-invariant if and only if there exists a
+function $\vartheta$ such that
+\begin{align*}
+  \varphi(y) = \vartheta(h(y))
+  \qquad\forall y
+\end{align*}
+In other words, test $\varphi$ is $\calG$-invariant iff it depends
+on the data $y$ through $\calG$'s maximal invariant $h(y)$.
+Hence, treat $h(y)$ as the effective observation and derive a
+test based on that effective observation.
+\end{thm}
+\begin{rmk}
+Given a group of transformations $\calG$,
+this theorem prescribes the following practical approach for
+constructing a $\calG$-invariant test of some hypothesis:
+\begin{enumerate}
+  \item Guess and verify that some $h(y)$ is the maximal invariant of
+    $\calG$
+  \item Derive the distribution of $h(y)$ under the null, since that is
+    the effective observation by the above theorem
+  \item Construct a test based on effective observation $h(y)$ using its
+    null distribution
+\end{enumerate}
+\end{rmk}
+
+\clearpage
+\begin{proof}
+($\Leftarrow$)
+Suppose $\varphi(y)=\vartheta(h(y))$, where $h$ is a maximal invariant
+for $\calG$ satisfying $h(g(y))=h(y)$ for all $g\in\calG$. Then
+\begin{align*}
+  \varphi(g(y))
+  = \vartheta(h(g(y)))
+  = \vartheta(h(y))
+  = \varphi(y)
+\end{align*}
+which implies that $\varphi$ is $\calG$-invariant.
+
+($\Rightarrow$)
+To get a contradiction, suppose that $\varphi$ is $\calG$-invariant, but
+also that we can't write $\varphi(y)=\vartheta(h(y))$.
+Then it must be the case that, for some $y,y'$,
+\begin{align*}
+  h(y)=h(y')
+  \quad\text{and yet}\quad
+  \varphi(y)\neq\varphi(y')
+\end{align*}
+In other words, the test $\varphi$ uses information not contained in
+just the maximal invariant.
+But then, by $h(y)=h(y')$ and the definition of the maximal invariant
+$h$, there's a transformation $g\in\calG$ such that
+$y=g(y')$. And because $\varphi$ is $\calG$-invariant by assumption,
+\begin{align*}
+  \varphi(y) = \varphi(g(y')) = \varphi(y')
+\end{align*}
+which is a contradiction.
+\end{proof}
+
+
+
+%\clearpage
+%\begin{defn}
+%{(Generalized Likelihood Ratio Test for Composite Hypotheses)}
+%Suppose we want to test the following simple null and alternative
+%hypotheses about the unknown parameter $\bstheta$ in the parametric
+%model/likelihood $p(\bsy|\bstheta)$ that generates data $\bsy$:
+%\begin{align*}
+  %H_0: \bstheta\in A_0\subseteq\bsTheta
+  %\qquad\qquad
+  %H_1: \bstheta\in A_1\subseteq\bsTheta
+%\end{align*}
+%Then we can construct the following
+%\emph{generalized likelihood ratio test}:
+%\begin{align*}
+  %\varphi^*(\bsy)
+  %=
+  %\begin{cases}
+    %1 & LR > \lambda \\
+    %q & LR = \lambda \\
+    %0 & LR < \lambda
+  %\end{cases}
+  %\qquad \text{where}\quad
+  %LR :=
+  %\frac{%
+    %\max_{\bstildetheta \in A_1}p(\bsy|\bstildetheta)
+  %}{%
+    %\max_{\bstildetheta \in A_0}p(\bsy|\bstildetheta)
+  %}
+%\end{align*}
+%where, again, $\lambda,q$ are constants chosen to satisfy the
+%$\alpha$-level constraint:
+%\begin{align}
+  %\alpha
+  %= \int \varphi^*(\bsy) p(\bsy|\bstheta_0)\; d\bsy
+  %\qquad\text{where}\quad
+  %\bstheta_0:=
+  %\argmax_{\bstildetheta \in A_0}p(\bsy|\bstildetheta)
+%\end{align}
+%\end{defn}
+
+\clearpage
+\subsection{Similarity, and Completeness}
+
+\begin{defn}(Similar)
+Let $\varphi(y)$ be any level-$\alpha$ test of composite null and simple
+alternative
+\begin{align}
+  H_0: p\in \{p_\theta\}_{\theta\in\Theta_0}
+  \qquad
+  \qquad
+  H_1: p=p_1
+  \label{similar}
+\end{align}
+Test $\varphi(y)$ is \emph{similar} if the rejection probability equals
+exactly $\alpha$ for \emph{all} null parameter values:
+\begin{align*}
+  \forall \theta\in\Theta_0
+  \qquad
+  \E_{\theta}[\varphi(Y)]
+  = \alpha
+\end{align*}
+This is nontrivial since the $\alpha$-level restriction only requires an
+inequality $\E_{\theta}[\varphi(Y)] \leq \alpha$ for all
+$\theta\in\Theta_0$, and that inequality is generally strict for at
+least some null parameter values.
+\end{defn}
+
+\begin{defn}(Neyman Structure)
+Suppose $Y\sim p(y|\theta)$ and $S(Y)$ is a sufficient statistic for
+$\theta$. This implies the conditional distribution (and hence the
+expectation) of $\varphi(Y)|S(Y)$ depends only on $S(Y)$ and not
+$\theta$,  which lets us write
+\begin{align*}
+  m(S(Y))
+  =
+  \E_{\theta}\big[\varphi(Y)|S(Y)\big]
+  \qquad
+  \forall \theta\in\Theta_0
+\end{align*}
+where $m(s)$ is a function that depends only on the realization of the
+sufficient statistic, not $\theta$.
+We further say that a test $\varphi$ has \emph{Neyman structure} if
+\begin{align*}
+  m(S(Y))=\alpha
+  \qquad
+  \forall S(Y)
+  \;\;\text{realizations}
+\end{align*}
+\end{defn}
+
+\begin{prop}\emph{(Neyman Structure $\Rightarrow$ Similar)}
+Any test with Neyman structure is similar.
+\end{prop}
+\begin{proof}
+Given $\alpha$-level test $\varphi(y)$ with Neyman structure, similarity
+follows from the law of iterated expectations:
+\begin{align*}
+  \forall\theta\in\Theta_0
+  \qquad
+  \E_{\theta}[\varphi(Y)]
+  =
+  \E_{\theta}\big[
+    \E_{\theta}[
+    \varphi(Y)|S(Y)
+    ]
+  \big]
+  =
+  \E_{\theta}\big[
+    m(S(Y))
+  \big]
+  =
+  \E_{\theta}[\alpha]
+  =\alpha
+\end{align*}
+Hence tests with the Neyman Structure are \emph{similar}.
+\end{proof}
+
+
+\begin{prop}\emph{(Optimal Tests given Neyman Structure)}
+Suppose $Y\sim p(y|\theta)$ with sufficient statistic $S(Y)$.
+Let $\varphi(y)$ be an level-$\alpha$ test of Hypotheses~\ref{similar}
+with Neyman structure.
+Then by the previous proposition, the test is similar and we can recast
+our test of Hypotheses~\ref{similar} as a test of simple conditional
+hypotheses
+\begin{align*}
+  H_0: p(y|s) = p_{0|s}(y)
+  \qquad \qquad
+  H_1: p(y|s)= p_{1|s}(y)
+\end{align*}
+Invoking Neyman-Pearson gives an optimal test.
+\end{prop}
+
+\begin{defn}(Complete)
+Family of distributions $\{P_\theta\}_{\theta\in\Theta}$ for some RV
+$S$ is \emph{complete} if
+\begin{align*}
+  \E_\theta[g(S)]=0
+  \quad\forall \theta\in\Theta
+  \qquad \implies\qquad
+  P_\theta[g(S)=0]=1
+\end{align*}
+\end{defn}
+
+\begin{thm}
+Suppose that under the null, $Y\sim p(y|\theta)$ for
+$\theta\in\Theta_0$, and $S(Y)$ is a sufficient statistic for $\theta$.
+If the family of distributions $\{P_\theta\}_{\theta\in\Theta_0}$ for
+$S$ is complete, then all similar tests have Neyman-Structure.
+\end{thm}
 
 
 
