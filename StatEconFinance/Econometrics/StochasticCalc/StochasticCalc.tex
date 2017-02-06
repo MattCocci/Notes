@@ -1,0 +1,1017 @@
+\documentclass[12pt]{article}
+
+\author{Matthew D. Cocci}
+\title{Stochastic Calculus}
+\date{\today}
+
+%% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % most detailed page formatting control
+\usepackage{fullpage} % Simpler than using the geometry package; std effect
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+%% Formatting %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[margin=1in]{geometry}
+    %   Adjust the margins with geometry package
+%\usepackage{pdflscape}
+    %   Allows landscape pages
+%\usepackage{layout}
+    %   Allows plotting of picture of formatting
+
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt}
+    %   Make the header bigger to avoid overlap
+
+%\fancyhf{}
+    %   Erase header settings
+
+%\renewcommand{\headrulewidth}{0.3pt}
+    %   Width of the line
+
+%\setlength{\headsep}{0.2in}
+    %   Distance from line to text
+
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rmk}{Remark}
+\newtheorem*{note}{Note}
+
+% Below supports left-right alignment in matrices so the negative
+% signs don't look bad
+\makeatletter
+\renewcommand*\env@matrix[1][c]{\hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols #1}}
+\makeatother
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+\usepackage{courier}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref}
+\hypersetup{%
+    colorlinks,
+        %   This colors the links themselves, not boxes
+    citecolor=black,
+        %   Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Colors %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{color}
+\definecolor{codegreen}{RGB}{28,172,0}
+\definecolor{codelilas}{RGB}{170,55,241}
+
+% David4 color scheme
+\definecolor{d4blue}{RGB}{100,191,255}
+\definecolor{d4gray}{RGB}{175,175,175}
+\definecolor{d4black}{RGB}{85,85,85}
+\definecolor{d4orange}{RGB}{255,150,100}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{verbatim}
+    %   For including verbatim code from files, no colors
+\usepackage{listings}
+    %   For including code snippets written directly in this doc
+
+\lstdefinestyle{bash}{%
+  language=bash,%
+  basicstyle=\footnotesize\ttfamily,%
+  showstringspaces=false,%
+  commentstyle=\color{gray},%
+  keywordstyle=\color{blue},%
+  xleftmargin=0.25in,%
+  xrightmargin=0.25in
+}
+\lstdefinestyle{log}{%
+  basicstyle=\scriptsize\ttfamily,%
+  showstringspaces=false,%
+  xleftmargin=0.25in,%
+  xrightmargin=0.25in
+}
+
+
+\lstdefinestyle{matlab}{%
+  language=Matlab,%
+  basicstyle=\footnotesize\ttfamily,%
+  breaklines=true,%
+  morekeywords={matlab2tikz},%
+  keywordstyle=\color{blue},%
+  morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+  identifierstyle=\color{black},%
+  stringstyle=\color{codelilas},%
+  commentstyle=\color{codegreen},%
+  showstringspaces=false,%
+    %   Without this there will be a symbol in
+    %   the places where there is a space
+  %numbers=left,%
+  %numberstyle={\tiny \color{black}},%
+    %   Size of the numbers
+  numbersep=9pt,%
+    %   Defines how far the numbers are from the text
+  emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{blue},%
+    %   Some words to emphasise
+}
+
+\newcommand{\matlabcode}[1]{%
+    \lstset{style=matlab}%
+    \lstinputlisting{#1}
+}
+    %   For including Matlab code from .m file with colors,
+    %   line numbering, etc.
+
+\lstdefinelanguage{Julia}%
+  {morekeywords={abstract,break,case,catch,const,continue,do,else,elseif,%
+      end,export,false,for,function,immutable,import,importall,if,in,%
+      macro,module,otherwise,quote,return,switch,true,try,type,typealias,%
+      using,while},%
+   sensitive=true,%
+   %alsoother={$},%
+   morecomment=[l]\#,%
+   morecomment=[n]{\#=}{=\#},%
+   morestring=[s]{"}{"},%
+   morestring=[m]{'}{'},%
+}[keywords,comments,strings]
+
+\lstdefinestyle{julia}{%
+    language         = Julia,
+    basicstyle       = \scriptsize\ttfamily,
+    keywordstyle     = \bfseries\color{blue},
+    stringstyle      = \color{codegreen},
+    commentstyle     = \color{codegreen},
+    showstringspaces = false,
+    literate         = %
+      {ρ}{{$\rho$}}1
+      {ℓ}{{$\ell$}}1
+      {∑}{{$\Sigma$}}1
+      {Σ}{{$\Sigma$}}1
+      {√}{{$\sqrt{}$}}1
+      {θ}{{$\theta$}}1
+      {ω}{{$\omega$}}1
+      {ν}{{$\nu$}}1
+      {ω²}{{$\omega^2$}}1
+      {ɛ}{{$\varepsilon$}}1
+      {φ}{{$\varphi$}}1
+      {σ²}{{$\sigma^2$}}1
+      {Φ}{{$\Phi$}}1
+      {ϕ}{{$\phi$}}1
+      {Dₑ}{{$D_e$}}1
+      {Σ}{{$\Sigma$}}1
+      {γ}{{$\gamma$}}1
+      {δ}{{$\delta$}}1
+      {τ}{{$\tau$}}1
+      {μ}{{$\mu$}}1
+      {û}{{$\hat{u}$}}1
+      {μ̂}{{$\hat{\mu}$}}1
+      {x̂}{{$\hat{x}$}}1
+      {ω̂}{{$\hat{\omega}$}}1
+      {ω̂²}{{$\hat{\omega}^2$}}1
+      {β}{{$\beta$}}1
+      {Λ}{{$\Lambda$}}1
+      {λ}{{$\lambda$}}1
+      {r̃}{{$\tilde{\text{r}}$}}1
+      {α}{{$\alpha$}}1
+      {σ}{{$\sigma$}}1
+      {σ²}{{$\sigma^2$}}1
+      {π}{{$\pi$}}1
+      {∈}{{$\in$}}1
+      {∞}{{$\infty$}}1
+}
+
+
+%% Bibliographies %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{natbib}
+    %---For bibliographies
+%\setlength{\bibsep}{3pt} % Set how far apart bibentries are
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{enumitem}
+    %   Has to do with enumeration
+\usepackage{appendix}
+%\usepackage{natbib}
+    %   For bibliographies
+\usepackage{pdfpages}
+    %   For including whole pdf pages as a page in doc
+\usepackage{pgffor}
+    %   For easier looping
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bstildevarepsilon}{\boldsymbol{\tilde{\varepsilon}}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildey}{\boldsymbol{\tilde{y}}}
+\newcommand{\bstildeX}{\boldsymbol{\tilde{X}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\summM}{\sum^M_{m=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+\maketitle
+
+\section{Ito's Lemma}
+
+\begin{lem}\emph{(Ito's Lemma)}
+Let $X_t$ be an Ito process with associated SDE
+\begin{align}
+   dx_t = \mu(x_t,t)\; dt + \sigma(x_t,t)\; dw_t
+   \label{itoslemmadiffusion}
+\end{align}
+Suppose we change variables $y_t=f(x_t,t)$.
+Then $y_t=f(x_t,t)$ also an Ito process with SDE
+\begin{align}
+  dY_t
+  =
+  \partial_t f \,dt
+  +
+  \partial_x f \,dx_t
+  +
+  \frac{1}{2}
+  +
+  \partial_{xx} f \,(dx_t)^2
+  \\
+   dY_t
+   = df(X_t,t)
+   =
+   \frac{\partial f}{\partial x} \; dX_t
+   + \frac{\partial f}{\partial t} \; dt
+   + \frac{1}{2}
+    \frac{\partial^2 f}{\partial x^2} \; \sigma^2(X_t,t) \; dX_t^2
+   \label{itoslemma0}
+\end{align}
+Note that this can be rewritten into the standard representation of
+Ito's Lemma by using $dX_t^2=dt$, substituting in
+Expression~\ref{itoslemmadiffusion} for $dX_t$, and then collecting
+terms to get
+\begin{align}
+  \label{itoslemma}
+  dY_t
+  = df(X_t,t)
+  &=
+  \left[
+  \mu(X_t,t)
+  \; \partial_x f(X_t,t)
+  +
+  \partial_t f(X_t,t)
+  + \frac{1}{2}
+    \sigma^2(X_t,t)
+    \;\partial_{xx}
+    f(X_t,t)
+  \right]
+  \; dt
+  \\
+  &\qquad
+  +
+  \sigma(X_t,t)
+  \;
+  \partial_x f(X_t,t)\; dW_t
+\end{align}
+\end{lem}
+\begin{rmk}
+Notice that Expression~\ref{itoslemma0} looks like the standard total
+derivative of $f$, just with an extra second order term, which normally
+disappears in a nonstochastic world but must here be retained because
+argument $X_t$ is in fact stochastic.
+\end{rmk}
+
+
+%\begin{lem}\emph{(Multi-Dimensional Ito's Lemma)}
+%Let $\bsX_t$ be a $N$-dimensional Ito process with associated SDE
+%\begin{align*}
+  %d\bsX_t
+  %= \underbrace{\bsmu(\bsX_t,t)}_{(N\times 1)}\;dt
+  %+ \underbrace{\bssigma(\bsX_t,t)}_{(N\times N)}\;d\bsW_t
+%\end{align*}
+%Suppose we change variables $Y_t=(\bsX_t,t)$ where
+%$\bsf: \R^N\times [0,\infty) \rightarrow \R$ is some function twice
+%differentiable in $\bsx$, once differentiable in $t$.
+%Then $Y_t=f(\bsX_t,t)$ is a also an Ito diffusion satisfying the
+%following SDE\footnote{%
+  %Given in three different, equivalent representations since the result
+  %is often presented in any of the following ways.
+%}
+%\begin{align}
+   %dY_t
+   %= df(\bsX_t,t)
+   %&=
+   %\frac{\partial f}{\partial \bsx'} \; d\bsX_t
+   %+ \frac{\partial f}{\partial t} \; dt
+   %+ \frac{1}{2}
+    %\frac{\partial^2 f}{\partial\bsx\partial\bsx'} \; \sigma^2(\bsX_t,t)
+    %\;dt
+%\end{align}
+%\begin{align}
+  %dY_t
+  %= df(\bsX_t,t)
+  %&=
+  %\left[
+  %\bsmu(\bsX_t,t)'\,
+  %\frac{\partial f}{\partial \bsx}
+  %+
+  %\frac{\partial f}{\partial t}
+  %+
+  %\frac{1}{2}
+  %\bssigma(\bsX_t,t)\bssigma(\bsX_t,t)'
+  %\frac{\partial^2 f}{\partial \bsx\partial\bsx'}
+  %\right]
+  %\;dt
+  %+
+  %\bssigma(\bsX_t,t)'
+  %\frac{\partial f}{\partial \bsx}
+  %\;d\bsW_t
+  %\\
+  %dY_t
+  %= df(\bsX_t,t)
+  %&=
+  %\left[
+  %\bsmu(\bsX_t,t)
+  %\cdot
+  %\nabla_x
+  %+
+  %\nabla_t
+  %+
+  %\frac{1}{2}
+  %\bssigma(\bsX_t,t)\bssigma(\bsX_t,t)'
+  %\nabla_x^2
+  %\right]
+  %f(\bsX_t,t)
+  %\;dt
+  %+
+  %\bssigma(\bsX_t,t)\cdot
+  %\nabla_x
+  %f(\bsX_t,t)
+  %\;d\bsW_t
+%\end{align}
+%where all derivatives are evaluated at $(X_t,t)$.
+
+%For the sake of completeness, let's generalize Ito's Lemma to consider
+%the case of a finite number of Ito processes, $X_1, X_2, \ldots, X_n$,
+   %\[ dX_i(t) = \mu_i(t)\; dt + \sigma_i(t) \; dW_i(t).\]
+%Next, define $Y(t) = f(X_1(t), \ldots, X_n(t), t)$ for some
+%differentiable function $f$.  Then multi-dimensional Ito's Lemma says
+%\begin{align*}
+    %dY(t) &= \sum^n_{i=1} f_{X_i}(X_1(t), \ldots, X_n(t), t) \;
+      %dX_i(t) \\
+    %&+ f_{t}(X_1(t), \ldots, X_n(t), t) \; dt \\
+    %&+ \frac{1}{2} \sum^n_{i=1}\sum^n_{j=1}
+      %f_{X_i,X_j}(X_1(t), \ldots, X_n(t), t) \; \rho_{ij}\sigma_i(t)
+      %\sigma_j(t) \; dt
+%\end{align*}
+%where $\rho_{ij}$ is the correlation coefficient between $dW_i$ and
+%$dW_j$. Note that you'll have to plug back in for the $dX_i$ in the
+%first sum.
+%\\
+%\\
+%We'll mostly consider with the two-dimensional case for the
+%two specific instances below:
+%\begin{itemize}
+   %\item[i.]{$Y(t) = X_1(t)X_2(t)$, which gives us
+      %\[ dY(t) = X_2(t) \; dX_1(t) + X_1(t) \; dX_2(t) +
+   %\rho_{12}\sigma_1(t)\sigma_2(t) \; dt \]
+      %Note that you'll have to plug back in for $dX_1$ and $dX_2$.
+      %This is a type of integration-by-parts formula because (after
+      %rearranging terms) it relates $X_1\; dX_2$ to $X_2\; dX_1$.
+   %}
+
+   %\item[ii.]{$Y(t) = X_1(t)/X_2(t)$, which gives us
+      %\begin{align*}
+   %dY(t) = \frac{1}{X_2(t)} dX_1(t) - \frac{X_1(t)}{X_2(t)^2}
+   %dX_2(t) +  \frac{X_1(t)}{X_2(t)^3} \sigma_2(t)^2 \;dt -
+   %\frac{1}{X_2(t)^2} \; \rho_{12}\sigma_1(t)\sigma_2(t) \; dt.
+      %\end{align*}
+      %Note that you'll have to plug back in for $dX_1$ and $dX_2$.
+      %This is a type of integration-by-parts formula because (after
+      %rearranging terms) it relates $X_1\; dX_2$ to $X_2\; dX_1$.
+      %}
+%\end{itemize}
+
+%\end{lem}
+
+
+\clearpage
+\subsection{Forward and Backward Equations}
+
+In the sections above, we considered time-homogeneous SDEs of the form
+\begin{align}
+  dX_t = b(X_t) dt + \sigma(X_t) dW_t
+  \label{kolmogorovsde}
+\end{align}
+which we tried to solve for the process $X_t$, writing $X_t$ as a
+function of primitives $(t,W_t)$.
+This section pursues another approach, instead using the SDE to
+characterize the evolution
+\begin{enumerate}
+  \item The probability distribution of $X_t$ via the
+    \emph{Forward Equation}
+  \item Functions or moments of $X_t$ via the \emph{Backard Equation}
+\end{enumerate}
+And instead of solving SDE~\ref{kolmogorovsde}, we solve PDEs.
+%Since $X_t$ is Markov (by the fact that it solves
+%the above SDE with particular smoothness and growth conditions on $b$
+%and $\sigma$), we will often deal with the transition density:
+%\begin{align*}
+  %p(x,t|y,s) := P(X_t\in [x,x+dx) \; | \; X_s=y)
+%\end{align*}
+
+\begin{defn}(Generator of a Process)
+Given a continuous function $f$ and a time-homogeneous process
+(multi-dimensional) stochastic process $X_t$, define the
+\emph{generator} of $X_t$
+\begin{align}
+  (\mathscr{A}f)(x)
+  :=
+  \lim_{t\rightarrow0} \frac{E[f(X_t)|X_0=x]-f(x)}{t}
+  \label{genA}
+\end{align}
+In words, the generator of a time-homogeneous process is the
+expected infinitesimal change of some function of that process.
+\end{defn}
+
+\begin{thm}\emph{(Functional Form of Generator)}
+Given a time homogeneous process $X_t\in\R^N$ satisfying
+SDE~\ref{kolmogorovsde}, the generator $\mathscr{A}$ of $X_t$ satisfies
+$\mathscr{L}$
+\begin{align}
+  \mathscr{A}f
+  &= b \cdot \nabla f
+  + \frac{1}{2}
+  \trace\left(\sigma \sigma^T\nabla^2 f\right)
+  \label{genL} \\
+  \iff \qquad
+  &= \sumnN b_n \frac{\partial f}{\partial x_n}
+  + \frac{1}{2} \sumnN \summM
+    \left(\sigma \sigma^T\right)
+    \frac{\partial^2 f}{\partial x_n \partial x_m}\notag
+\end{align}
+where $\nabla^2 f$ is the Hessian matrix of $f$.
+\end{thm}
+\begin{rmk}
+Though $\mathscr{A}f = \mathscr{L}f$, we use separate notation to
+distinguish that $\mathscr{A}$ and $\mathscr{L}$ come from different
+%places: a limit as in (\ref{genA}) versus a simple lifting of
+coefficients from an SDE as in (\ref{genL}), respectively.
+\end{rmk}
+\begin{proof}
+The result follows directly from Ito's Lemma. Therefore apply
+multi-dimensional Ito's Lemma to $f(X_t)$ for homogeneous process $X_t$:
+\begin{align*}
+  df(X_t) &=
+  \left(b\cdot \nabla f + \frac{1}{2}\sigma\sigma^T : \nabla^2 f\right)
+  dt
+  + \nabla f\cdot \sigma \;dW_t\\
+  f(X_t) - f(X_s) &=
+  \int^t_s
+  \left(b\cdot \nabla f + \frac{1}{2}\sigma\sigma^T : \nabla^2 f\right)
+  d\tau
+  +
+  \int^t_s
+  \nabla f\cdot \sigma \;dW_\tau
+\end{align*}
+Now take conditional expectation $E[\;\cdot\;|X_s=x]$ and use the fact
+that the Ito Integral has expectation of zero:
+\begin{align}
+  E[f(X_t)|f(X_s)=x] - f(x) &=
+  E\left[
+  \int^t_s
+  \left(b\cdot \nabla f + \frac{1}{2}\sigma\sigma^T : \nabla^2 f\right)
+  d\tau
+  \; \big|\; f(X_s)=x\right]\notag\\
+  &\qquad
+  +
+  E\left[
+  \int^t_s
+  \nabla f\cdot \sigma \;dW_\tau
+  \; \big|\;f(X_s)=x\right]
+  \notag\\
+  &=
+  E\left[ \int^t_s (\mathscr{L} f)(X_\tau) d\tau
+    \;\big|\:f(X_s)=x\right] + 0
+  \label{genL.proof}
+\end{align}
+From there, form the limit that defines the generator:
+\begin{align*}
+  (\mathscr{A}f)(x)
+  &=\lim_{t\rightarrow0} \frac{E[f(X_t)\;|\;f(X_s)=x] - f(x)}{t}\\
+  \text{Sub in (\ref{genL.proof})} \Rightarrow\qquad
+  &=\lim_{t\rightarrow0} \frac{1}{t}
+  E\left[ \int^t_s (\mathscr{L} f)(X_\tau) d\tau \; \big|\:f(X_s)=x\right]\\
+  &=(\mathscr{L}f)(x)
+\end{align*}
+where the last step follows from the Dominated Convergence Theorem since
+$f$ and all of its derivatives are bounded (K\&S p 323).
+\end{proof}
+
+\begin{thm}{(Forward Kolmogorov Equation and Fokker-Planck Equation)}
+There are two formulations, both of which make use of $\mathscr{L}^*$,
+defined as
+\begin{align*}
+  \mathscr{L}^*f_x = -\nabla_x \cdot (b f)
+  +\frac{1}{2}\nabla^2_x : (a f)
+\end{align*}
+The two formulations are as follows:
+\begin{enumerate}
+  \item The transition probability density $p(x,t|y,s)$ solves
+    \begin{align*}
+      \frac{\partial p}{\partial t} = \mathscr{L}^*_x p
+      \qquad p(x,s|y,s) = \delta(x-y)
+    \end{align*}
+
+  \item If $\rho_0(x)$ is the initial probability desnity and
+    $\rho(x,t)$ is the density at time $t$, then $\rho(x,t)$ solves
+    \begin{align}
+      \frac{\partial \rho}{\partial t} = \mathscr{L}^* \rho
+      \qquad \text{where } \; \rho(x,0) = \rho_0(x)
+      \label{fpeqn}
+    \end{align}
+\end{enumerate}
+\begin{rmk}
+$\mathscr{L}^*$ is the adjoint of $\mathscr{L}$ meaning that
+on the Hilbert Space with inner product
+$\langle\cdot,\cdot\rangle_{L^2}$,\footnote{%
+  The inner product $\langle\cdot,\cdot\rangle_{L^2}$ is defined as
+  \begin{align*}
+    \langle f,g\rangle_{L^2}
+    &= \int_X fg\;d\mu
+  \end{align*}
+}
+we have that $\langle\mathscr{L}f,g\rangle_{L^2} =\langle
+f,\mathscr{L}^*g\rangle_{L^2}$
+\end{rmk}
+\end{thm}
+\begin{proof}
+We take each case separately:
+\begin{enumerate}
+  \item By Ito's Lemma and results we saw above, we can write:
+    \begin{align*}
+      E[f(X_t) \;|\; X_s=y] -f(y)
+      &= E\left[\int^t_s (\mathscr{L}f(X_\tau) d\tau \;\big|\;
+          f(X_s)=y\right]
+    \end{align*}
+    Writing the expectation out explicitly,
+    \begin{align*}
+      \int_{\mathbb{R}^d} f(x)p(x,t|y,s)\;dx  -f(y)
+      &= \int_{\mathbb{R}^d} \int^t_s
+        (\mathscr{L}f)(x) \cdot p(x,\tau|y,s)\; d\tau dx
+    \end{align*}
+    Differentiating both sides with respect to $t$,
+    \begin{align*}
+      \int_{\mathbb{R}^d} f(x) \frac{\partial p}{\partial t}\;dx
+      &= \int_{\mathbb{R}^d}
+        (\mathscr{L}f)(x) \cdot p\; dx
+    \end{align*}
+    And this holds for all test functions $f$, so $p$ is a weak
+    solution.
+\end{enumerate}
+\end{proof}
+
+\begin{thm}{\emph{(Backward Komogorov Equation)}}
+There are 3 formulations. For each, let $p(x,t|y,s)$ denote the
+transition probability of $X_t$, and for a function $f\in
+C^2(\mathbb{R}^d)$, Then it is the case that
+\begin{enumerate}
+  \item Define $u_t^{(x)} := \mathbb{E}[f(X_t)|X_0=x]$ for a
+    time-homogeneous process $X_t$. Then given boundary condition
+    $u^{(x)}_0=f(x)$,
+    \begin{align*}
+      \frac{\partial u^{(x)}_t}{\partial t} = \mathscr{L} u^{(x)}_t
+      \qquad t>0
+    \end{align*}
+  \item For a possibly time-inhomogeneous SDE with solution $X_t$,
+    define $v^{(y)}_t:=E[f(X_T)|X_t~=~y]$. Then given boundary
+    condition $v^{(y)}_T=f(y)$, we have
+    \begin{align*}
+      \frac{\partial v^{(y)}_t}{\partial t}
+      + \mathscr{L} v^{(y)}_t = 0
+      \qquad t < T
+    \end{align*}
+  \item For a Markov process solving a time-inhomogeneous SDE
+    and for boundary condition $p(y,t|x,s) = \delta(x-y)$,
+    \begin{align*}
+      \frac{\partial p}{\partial s} + \mathscr{L}_y p = 0
+      \qquad s<t
+    \end{align*}
+    where $\mathscr{L}_y$ denotes that the derivatives in $\mathscr{L}$
+    are with respect to variable $y$.
+\end{enumerate}
+\end{thm}
+\begin{rmk}
+The second and third formulations should be solved \emph{backward} in
+time, which gives the theorem its name.
+\end{rmk}
+\begin{proof}
+We prove each in turn:
+  \begin{enumerate}
+    \item Recall from Ito's Lemma that for some stochastic process $X_t$
+      and some twice-differentiable function $g: \mathbb{R}^d \times
+      [0,\infty) \rightarrow \mathbb{R}^d$ (a function of both $X_t$ and
+      $t$), we have
+      \begin{align*}
+        d\left(g(X_t,t)\right)
+        &=
+        \left(
+        \frac{\partial g}{\partial t}
+        + b \cdot \nabla_x g
+        + \frac{1}{2} \sigma \sigma^T : \nabla_x^2 g
+        \right)dt
+        +
+        \frac{\partial g}{\partial x} \sigma dW_t
+      \end{align*}
+    \item Relabel time as $t' = t-s$ and consider the function
+      $u(x,t')$.
+  \end{enumerate}
+\end{proof}
+
+
+
+
+
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% SAMPLE CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    %% VIEW LAYOUT %%
+
+        \layout
+
+    %% LANDSCAPE PAGE %%
+
+        \begin{landscape}
+        \end{landscape}
+
+    %% BIBLIOGRAPHIES %%
+
+        \cite{LabelInSourcesFile}  %Use in text; cites
+        \citep{LabelInSourcesFile} %Use in text; cites in parens
+
+        \nocite{LabelInSourceFile} % Includes in refs w/o specific citation
+        \bibliographystyle{apalike}  % Or some other style
+
+        % To ditch the ``References'' header
+        \begingroup
+        \renewcommand{\section}[2]{}
+        \endgroup
+
+        \bibliography{sources} % where sources.bib has all the citation info
+
+    %% SPACING %%
+
+        \vspace{1in}
+        \hspace{1in}
+
+    %% URLS, EMAIL, AND LOCAL FILES %%
+
+      \url{url}
+      \href{url}{name}
+      \href{mailto:mcocci@raidenlovessusie.com}{name}
+      \href{run:/path/to/file.pdf}{name}
+
+
+    %% INCLUDING PDF PAGE %%
+
+        \includepdf{file.pdf}
+
+
+    %% INCLUDING CODE %%
+
+        %\verbatiminput{file.ext}
+            %   Includes verbatim text from the file
+
+        \texttt{text}
+            %   Renders text in courier, or code-like, font
+
+        \matlabcode{file.m}
+            %   Includes Matlab code with colors and line numbers
+
+        \lstset{style=bash}
+        \begin{lstlisting}
+        \end{lstlisting}
+            % Inline code rendering
+
+
+    %% INCLUDING FIGURES %%
+
+        % Basic Figure with size scaling
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[scale=1]{file.pdf}
+            \end{figure}
+
+        % Basic Figure with specific height
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[height=5in, width=5in]{file.pdf}
+            \end{figure}
+
+        % Figure with cropping, where the order for trimming is  L, B, R, T
+            \begin{figure}
+               \centering
+               \includegraphics[trim={1cm, 1cm, 1cm, 1cm}, clip]{file.pdf}
+            \end{figure}
+
+        % Side by Side figures: Use the tabular environment
+
+

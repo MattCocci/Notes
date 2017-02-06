@@ -4675,31 +4675,36 @@ Expressing these integrals in more verbose, explicit notation
 
 \clearpage
 \subsection{%
-  Abs. Continuous Measures, Radon-Nikodym, Density,
-  Classifying Measures
+  Abs. Continuity, Radon-Nikodym, Density, Likelihood Ratio,
+  Importance Sampling
 }
 \label{sec:abscts}
 
 \begin{defn}(Absolutely Continuous Measures)
-Given measures $\mu_1$ and $\mu_2$ on $(\Omega,\sF)$,
-$\mu_2$ is \emph{absolutely continuous with respect to $\mu_1$}, denoted
-$\mu_2<<\mu_1$, iff
+Given $\mu_1,\mu_2$ on common space $(\Omega,\sF)$, $\mu_2$ is
+\emph{absolutely continuous with respect to $\mu_1$}
+or ``$\mu_1$ \emph{dominates} $\mu_2$,'' denoted $\mu_2<<\mu_1$, iff
 \begin{align*}
-  %\mu_2<<\mu_1
-  %\quad\iff\quad
-  A\in\sF\;\;\text{such that}\;\;
+  \forall A\in\sF
+  \quad
+  %\begin{rcases}
+  %A\in\sF \\
   \mu_1(A) = 0
+  %\end{rcases}
   \quad\implies\quad
   \mu_2(A) = 0
 \end{align*}
-In words, $\mu_2$ does not assign positive weight/probability to events
-$\mu_1$ does not.
+In words, $\mu_2$ also assigns no weight/probability to events $\mu_1$
+does not.
 \end{defn}
 
 \begin{defn}(Equivalent Measures)
 Measures $\mu_1$ and $\mu_2$ on $(\Omega,\sF)$
 are \emph{equivalent} $\mu_1\sim\mu_2$
 iff both $\mu_1<<\mu_2$ and $\mu_2<<\mu_1$.
+``Equivalence'' ensures $\mu_1,\mu_2$ agree about
+which sets have zero measure. They could still assign
+different values to sets of nonzero measure.
 \end{defn}
 
 
@@ -4756,8 +4761,8 @@ iff both $\mu_1<<\mu_2$ and $\mu_2<<\mu_1$.
 
 \begin{thm}
 \label{thm:radon}
-\emph{(Relating Measures on Common Measurable Space and Radon-Nikodym)}
-Suppose we have measurable space $(\Omega,\sF)$.
+\emph{(Creating Measures and Radon-Nikodym)}
+Given measurable space $(\Omega,\sF)$.
 \begin{enumerate}[label=\emph{(\roman*)}]
   \item
     Given measure $\mu_1$ and nonnegative measurable
@@ -4771,23 +4776,203 @@ Suppose we have measurable space $(\Omega,\sF)$.
     $\mu_1$, i.e. $\mu_2 << \mu_1$.
     Moreover, if $f\in\sL(\Omega,\sF,\mu_1)$, then $\mu_2$ is a finite
     measure.
+
   \item \emph{(Radon-Nikodym)}:
-    If we have measures $\mu_1$ and $\mu_2$ such that
-    $\mu_2<<\mu_1$ and $\mu_1$ $\sigma$-finite,
-    then $\exists$ a measurable $f:\Omega\ra \overline{\R}_+$
+    If $\mu_2<<\mu_1$ and $\mu_1$ $\sigma$-finite, then $\exists$ a
+    measurable $f:\Omega\ra \overline{\R}_+$
     (unique up to $\mu_1$-a.e. equality)
     satisfying Expression~\ref{radon}.
-    Function $f$ is called the \emph{Radon-Nikodym derivative} and
-    often denoted $f=\frac{d\mu_2}{d\mu_1}$.
-    %\begin{align*}
-      %\mu_2(A) = \int_A f \; d\mu_1
-    %\end{align*}
+    Function $f$ (which depends crucially on $\mu_1$) is called the
+    \emph{Radon-Nikodym derivative}, hence is often denoted
+    $f=\frac{d\mu_2}{d\mu_1}$.
 \end{enumerate}
 \end{thm}
 \begin{rmk}
-(ii) is partial converse to (i).
-Only partial because we require $\mu_1$ $\sigma$-finite only in (ii).
+(ii) is only a partial converse to (i) since we require $\mu_1$
+$\sigma$-finite only in (ii).
+But if we restrict attention to only finite or probability measures
+$\mu_1,\mu_2$, then (ii) is a full converse to (i) since any finite or
+probability measure is trivially $\sigma$-finite.
 \end{rmk}
+
+\begin{defn}(Alternate Names for Radon-Nikodym Derivative)
+The \emph{Radon-Nikodym derivative} $\frac{d\mu_2}{d\mu_1}$ from Part
+has many other names depending on the context:
+\begin{itemize}
+  \item \emph{Density} of $\mu_2$ with respect to the dominating measure
+    $\mu_1$:
+    This generalizes
+    %(that also makes explicit mention of the measures in question)
+    the way we most often use ``density''
+    in probability and statistics as shorthand for a Borel function with
+    $\mu_1$ the Lebesgue measure and $\mu_2$ the distribution of a RV.
+    See Definition~\ref{defn:density}.
+
+  \item
+    \emph{Likelihood Ratio}:
+    This name is common in statistics, especially when, in addition
+    to $\mu_2<<\mu_1$, we also have $\mu_1,\mu_2<<\mu$---a third measure
+    like the Lebesgue or counting (for continuous and discrete
+    RVs, resp.). Then as developed in Corollary~\ref{cor:lr},
+    RN derivative $\frac{d\mu_2}{d\mu_1}$ can be written as the ratio of
+    densities/likelihoods $\frac{d\mu_2/d\mu}{d\mu_1/d\mu}$.
+
+  \item
+    \emph{State Price Density}:
+    In finance, we often want to price a payoff as a simple expectation
+    (ignoring discounting) $\E_{\mu_2}[X]$, where $\mu_2$ is the
+    ``risk-neutral'' measure. As we'll see in
+    Corollary~\ref{cor:importance}, we can compute that expectation by
+    instead computing $\E_{\mu_1}[\frac{d\mu_2}{d\mu_1}X]$ under the
+    historical measure $\mu_1$ that reflects real-world probabilities.
+    This formula suggests that  we can think of
+    $\frac{d\mu_2}{d\mu_1}$ as giving the ``price'' of one unit of
+    probability in the $\mu_1$ measure, in units of probability in the
+    $\mu_2$ measure.
+\end{itemize}
+\end{defn}
+
+\begin{defn}
+\label{defn:density}
+(Density and Probability Mass Function)
+Consider a special case of Theorem~\ref{thm:radon} with $\mu<<\lambda$
+where $\lambda$ is the Lebesgue measure on $(\R^d,\sB(\R)^{\otimes d})$.
+Since $\lambda$ is $\sigma$-finite, can apply Part (ii) of
+Theorem~\ref{thm:radon} to conclude that there exists Borel
+measurable function $f:(\R,\sB(\R)^{\otimes d})\ra(\R,\sB(\R))$
+representing the Radon-Nikodym derivative $\frac{d\mu}{d\lambda}$, which
+we simply call the \emph{density}, satisfying Expression~\ref{radon}
+with $A\in \sB(\R)^{\otimes d}$, $\mu_2=\mu$, and $\mu_1=\lambda$.  If
+we take $A$ to be rectangle in $\R^d$, note that this implies
+\begin{align*}
+  \mu\big[
+    (a_1,b_1] \times\cdots\times (a_d,b_d]
+  \big]
+  =
+  \int_{a_1}^{b_1}
+  \cdots
+  \int_{a_d}^{b_d}
+  f(x_1,\ldots,x_d)\;
+  dx_1\;\cdots \;dx_d
+\end{align*}
+This is how we get to work with density functions in so much of
+probability and statistics. When we compute things (like the RHS of the
+above expression) with the density function $f$, we are \emph{really}
+computing more abstract and general integrals (like the LHS) through
+Radon-Nikodym. The same goes for computing expectations with the
+density.
+
+Finally, if we instead replace $\lambda$ with the counting measure and
+$\mu$ is absolutely continuous with respect to \emph{that} measure, then
+$\mu$ represents a discrete random variable, and Radon-Nikodym furnishes
+a probability \emph{mass} function (rather than density) in just the
+same way.
+\end{defn}
+
+\begin{prop}
+\label{prop:densityproduct}
+If $f_1,\ldots,f_d$ are densities on $(\R,\sB(\R))$ then
+\begin{align*}
+  f(x) = f_1(x_1) \cdots f_d(x_d)
+\end{align*}
+is a density on $(\R^d,\sB(\R)^{\otimes d})$ that implies a
+corresponding measure
+\begin{align*}
+  \mu = \mu_1\otimes \cdots \otimes \mu_d
+\end{align*}
+\end{prop}
+
+
+\begin{cor}\emph{(Likelihood Ratio)}
+\label{cor:lr}
+Suppose $\mu_1,\mu_2<<\mu$ with Radon-Nikodym
+derivatives $\frac{d\mu_1}{d\mu}$ and $\frac{d\mu_2}{d\mu}$.
+Suppose also $\mu_2 << \mu_1$ so that RN derivative
+$\frac{d\mu_2}{d\mu_1}$ exists.
+Then
+\begin{align}
+  \frac{d\mu_2}{d\mu_1}
+  = \frac{d\mu_2/d\mu}{d\mu_1/d\mu}
+  \label{rnfrac}
+\end{align}
+\end{cor}
+\begin{rmk}
+In the special case where both $\mu_1,\mu_2<<\lambda$ the Lebesgue
+measure, then we know from the previous definition that each
+$\frac{d\mu_i}{d\lambda}=f_i$ is a density function (i.e. Borel
+measurable function) like we're so used to working with in probability
+and statistics. So then the Radon-Nikodym derivative
+$\frac{d\mu_2/d\lambda}{d\mu_1/d\lambda}$ is represented by just the
+ratio of densities/likelihoods. This is the theoretical justification
+for we so often form the likelihood ratio in practice: Radon-Nikodym
+says that's precisely how you bridge the gap between two measures (i.e.
+distributions) $\mu_1,\mu_2$.
+\end{rmk}
+\begin{proof}
+Equality (i) from Radon-Nikodym and definition of
+$\frac{d\mu_2}{d\mu}$, assumed to exist.
+Equality (ii) since $\frac{d\mu_1}{d\mu}$ assumed to exist.
+Equality (iii) from Radon-Nikodym and the definition of
+$\frac{d\mu_1}{d\mu}$.
+\begin{align*}
+  \mu_2(A)
+  \underset{(i)}{=}
+  \int_A \frac{d\mu_2}{d\mu} \; d\mu
+  \underset{(ii)}{=}
+  \int_A
+  \frac{d\mu_2/d\mu}{d\mu_1/d\mu}
+  \;
+  \frac{d\mu_1}{d\mu}
+  \; d\mu
+  \underset{(iii)}{=}
+  \int_A
+  \frac{d\mu_2/d\mu}{d\mu_1/d\mu}
+  \;d\mu_1
+\end{align*}
+From this, we can deduce Result~\ref{rnfrac}.
+\end{proof}
+
+\begin{cor}\emph{(Importance Sampling)}
+\label{cor:importance}
+If $\frac{d\mu_2}{d\mu_1}$ is a RN derivative for $\mu_2<<\mu_1$ and $X$
+is $\mu_2$ measurable, then we compute the expectation of $X$ under
+$\mu_2$, equivalently, as
+\begin{align*}
+  \E_{\mu_2}[X]
+  =
+  \E_{\mu_1}\left[\frac{d\mu_2}{d\mu_1}X\right]
+\end{align*}
+And since $X=1$ (constant) is measurable, this implies
+\begin{align*}
+  \E_{\mu_1}\left[\frac{d\mu_2}{d\mu_1}\right]
+  =
+  \E_{\mu_2}[1]
+  = 1
+\end{align*}
+\end{cor}
+\begin{rmk}
+This is a very useful \emph{practical} result for computing expectations
+via simulation. In particular, suppose we want to compute
+$\E_{\mu_2}[X]$. In theory, we could just draw $X$ according to the
+distribution implied by $\mu_2$ and average. But suppose $\mu_2$ is
+nonstandard and tough to sample from. This corollary then says that we
+can instead draw from \emph{any} other $\mu_1$ (such that
+$\mu_2<<\mu_1$), including nice tractable distributions. So then just
+draw $X$ according to $\mu_1$, multiply by $\frac{d\mu_2}{d\mu_1}$,
+and average. In other words, do the same thing, but sipmly adjust by
+$\frac{d\mu_2}{d\mu_1}$. And in the case where $\mu_1,\mu_2<<\lambda$,
+Corollary~\ref{cor:lr} says that this RN derivative is just the ratio of
+probability density functions.
+\end{rmk}
+\begin{proof}
+Follows directly from Part (ii) of Theorem~\ref{thm:radon}.
+\end{proof}
+
+
+
+
+\clearpage
+\subsection{Classifying Measures}
 
 \begin{defn}
 (Classifying Meausures on $(\R^d,\sB(\R)^{\otimes d})$)
@@ -4818,54 +5003,6 @@ Absolute continuity is stronger than continuity; it rules out weird,
 intractable cases.
 \end{defn}
 
-\begin{defn}
-(Associated Density for Absolutely Continuous Measures on $(\R^d,\sB(\R)^{\otimes d})$)
-Let $\mu$ be an absolutely continuous on $(\R^d,\sB(\R)^{\otimes d})$.
-Then by Part (ii) of Theorem~\ref{thm:radon}, since $\mu<<\lambda$ and
-$\lambda$ $\sigma$-finite, there exists Borel measurable function
-$f:(\R,\sB(\R)^{\otimes d})\ra(\R,\sB(\R))$
-representing the Radon-Nikodym derivative, which we here call the
-\emph{density}, satisfying
-\begin{align*}
-  \mu[A]
-  = \int_A f \; d\lambda
-  %= \int_A f(x_1,\ldots,x_d)\; dx_1\;\cdots \;dx_d
-  \qquad A\in \sB(\R)^{\otimes d}
-\end{align*}
-Taking $A$ to be rectangle in $\R^d$, that means
-\begin{align*}
-  \mu\big[
-    (a_1,b_1] \times\cdots\times (a_d,b_d]
-  \big]
-  =
-  \int_{a_1}^{b_1}
-  \cdots
-  \int_{a_d}^{b_d}
-  f(x_1,\ldots,x_d)\;
-  dx_1\;\cdots \;dx_d
-\end{align*}
-%The density also satisfies for all $A\in\sB(\R)^{\otimes d}$ and
-%Borel-measurable functions $g$
-%\begin{align*}
-  %\int_A
-  %g \; d\mu
-  %&= \int_A gf \; dx
-%\end{align*}
-\end{defn}
-
-
-\begin{prop}
-\label{prop:densityproduct}
-If $f_1,\ldots,f_d$ are densities on $(\R,\sB(\R))$ then
-\begin{align*}
-  f(x) = f_1(x_1) \cdots f_d(x_d)
-\end{align*}
-is a density on $(\R^d,\sB(\R)^{\otimes d})$ that implies a
-corresponding measure
-\begin{align*}
-  \mu = \mu_1\otimes \cdots \otimes \mu_d
-\end{align*}
-\end{prop}
 
 
 
@@ -9681,6 +9818,14 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 \clearpage
 \section{Stochastic Calculus}
 
+%- Brownian Motion
+%- Ito Process and Diffusion
+%- SDEs
+%- Ito's Lemma
+%- KFE aka Kolmogorov Fwd Equtaion for distributions
+%- Adjoint
+
+
 %In this section, we work heavily with standard Brownian motion
 %$\{W_t\}_{t\geq 0}$ from Definition~\ref{defn:stdbrownian}.
 %This stochastic process is a martingale with respect to its generated
@@ -9692,8 +9837,9 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 
 \subsection{Ito Integral}
 
-Suppose $f$ is Riemann-Stieltjes integrable with respect to weighting
-function $\alpha$. Then
+To motivate the Ito Integral, recall the Riemann-Stieltjes integral.
+In particular, suppose $f$ is Riemann-Stieltjes integrable with respect
+to weighting function $\alpha$. Then
 \begin{align}
   %\int f \; d\alpha
   %=
@@ -9706,20 +9852,22 @@ function $\alpha$. Then
 where $\lVert P\rVert:=\mesh P := \max_n |t_n-t_{n-1}|\ra0$ for some
 partition $P = \{t_0, t_1,\ldots,t_N\}$.
 
-Ito integration is a generalization that replaces determistic weighting
-function $\alpha(t)$ with \emph{stochastic} weighting function
+Ito integration is a generalization that replaces \emph{deterministic}
+weighting function $\alpha(t)$ with \emph{stochastic} weighting function
 $W(t)=W_t$, standard Brownian motion. Note that this implies the
-computed value of the integral is \emph{stochastic} since the weights
-assigned to time increments ($W_{t_n}-W_{t_{n-1}}$ for $[t_{n-1},t_n]$)
-vary across states of nature.  We construct the Ito Integral just like
-the Riemann integral: start with an approximating sum and then take
-limits.
+computed value of the integral is \emph{stochastic} (a random variable)
+since the weights assigned to time increments ($W_{t_n}-W_{t_{n-1}}$ for
+$[t_{n-1},t_n]$) vary across states of nature.  But we construct the Ito
+Integral just like the Riemann integral: start with an approximating sum
+and then take limits.
+We just need to first introduce some definitions that can be used to put
+regularity conditions on the functions that we integrate.
 
 
 \begin{defn}(Adapted to $X_t$)
 Stochastic process $\{V_t\}_{t\geq 0}$ is \emph{adapted} to stochastic
-process $\{X_t\}_{t\geq 0}$ if $V_{t_0}$ and $X_{t_1}-X_{t_0}$ are independent
-RVs for \emph{all} $t_0,t_1$ such that $t_0<t_1$.
+process $\{X_t\}_{t\geq 0}$ if $V_{s}$ and $X_{t}-X_{s}$ are independent
+RVs for \emph{all} $s,t$ such that $s<t$.
 
 Below, we define the Ito integral only for processes \emph{adapted} to
 standard Brownian motion integrator $W_t$ (similar to how the Lebesgue
@@ -9727,17 +9875,17 @@ integral is defined only for \emph{measurable} functions).
 \end{defn}
 
 \begin{rmk}
-In words, this definition requires that $V_t$ does not ``look ahead''
-and incorporate information about $X_{t'}-X_t$.
-Though $V_t$ can still depend on \emph{past} $X_s$ for $s\leq t$ in any
-arbitrary way, this definition says that $V_t$ cannot depend on
-\emph{future} values of stochastic process $X_t$.
+In words, this definition requires that $V_s$ does not ``look ahead''
+and incorporate information about $X_{t}-X_s$.
+Though $V_s$ can still depend on \emph{past} $X_{s'}$ for $s'\leq s$ in
+any arbitrary way, this definition says that $V_s$ cannot depend on
+\emph{future} values of stochastic process $X_s$.
 
 This is useful because, for example, $\{X_t\}_{t\geq 0}$ might describe
 the evolution of some stock's price, and $\{V_t\}_{t\geq0}$ might
 describe our holdings of the stock at time $t$ (i.e. $V_t$ represents a
 trading strategy). Then it's only natural that $V_t$ does not use
-information about \emph{future} $X_s$ (for any $s>t$) to inform our
+information about \emph{future} $X_t$ (for any $t'>t$) to inform our
 trading strategy and asset holdings at time $t$.
 \end{rmk}
 
@@ -9869,10 +10017,9 @@ actually \emph{is} $dt$.
 \clearpage
 \subsection{Stochastic Differential Equations and Diffusion Processes}
 
-\begin{defn}(Ito Diffusion Process)
-Stochastic process $\{X_t\}_{t\geq 0}$ is an
-\emph{Ito Diffusion Process} (or just \emph{diffusion})
-if it can be written
+\begin{defn}(Ito Process, Ito Diffusion)
+Stochastic process $\{X_t\}_{t\geq 0}$ is an \emph{Ito Process} if it
+is the solution to the following equation
 \begin{align}
   X_T = X_0
   + \int_0^T \mu(X_t,t)\; dt
@@ -9881,8 +10028,12 @@ if it can be written
   \label{itodiffusion}
 \end{align}
 where $\mu(X_t,t)$ and $\sigma(X_t,t)$ are the state- and time-dependent
-drift and diffusion coefficients. Generalized and Standard Brownian
-Motion are special cases with constant drift and diffusion.
+drift and diffusion coefficients.
+If drift and diffusion coefficients $\mu(\,\cdot\,)$ and
+$\sigma(\,\cdot\,)$ do \emph{not} depend upon time, $X_t$ is called an
+\emph{Ito Diffusion} (or just \emph{diffusion}).
+%Generalized and Standard Brownian
+%Motion are special cases with constant drift and diffusion.
 \end{defn}
 
 \begin{defn}(Stochastic Differential Equation)
@@ -9896,25 +10047,17 @@ associated \emph{stochastic differential equation} (SDE):
   \label{itosde}
 \end{align}
 Writing down an SDE like Equation~\ref{itosde} is really just shorthand
-to say that ``Solution $\{X_t\}_{t\geq 0}$ is an Ito Diffusion Process
-satisfying Equation~\ref{itodiffusion}.''
+to say that ``Solution $\{X_t\}_{t\geq 0}$ is an Ito Process satisfying
+Equation~\ref{itodiffusion}.''
+Both are equivalent and encode the same information.
 \end{defn}
 
 \begin{defn}(Solutions to SDEs)
-Given any SDE of the form in Equation~\ref{itosde}, the solution is
-(trivially, by definition of the SDE) Equation~\ref{itodiffusion}.
-So what's with all the subsequent sections and math to come? Aren't we
-done? Why is solving SDEs such a big deal?
-
-Well sure, we can easily and directly right down an SDE like
-Equation~\ref{itosde} or the implied/associated Ito Diffusion Process in
-Equation~\ref{itodiffusion}.\footnote{%
-  Either is equivalent. They both encode the same information and
-  Eq.~\ref{itosde} is just shorthand for
-  Eq.~\ref{itodiffusion}.
-}
-\emph{However}, notice that $X_t$ is on both the LHS and the RHS.  To
-truly have a solution for $X_t$, we must write $X_t$ as a function of
+Given any SDE of the form in Equation~\ref{itosde}, all we know is that
+the solution $X_t$ \emph{satisfies} Equation~\ref{itodiffusion} by
+definition. But that doesn't immediately give a solution since $X_t$ is
+on both the LHS and the RHS of Equation~\ref{itosde}.
+To truly have a solution for $X_t$, we must write $X_t$ as a function of
 primitives $(t,W_t)$, and that requires computing the integrals on the
 RHS of Equation~\ref{itodiffusion}.
 \emph{But} the integrals on the RHS of Equation~\ref{itodiffusion} are
@@ -9937,175 +10080,6 @@ So there are two alternative ways to proceed:
     equation and numerically simulating the evolution of $X_t$.
 \end{enumerate}
 \end{defn}
-
-
-\clearpage
-\subsection{Ito's Lemma}
-
-
-\begin{lem}\emph{(Ito's Lemma)}
-Let $X_t$ be an Ito Diffusion process with associated SDE
-\begin{align}
-   dX_t = \mu(X_t,t)\; dt + \sigma(X_t,t)\; dW_t
-   \label{itoslemmadiffusion}
-\end{align}
-Suppose we change variables $Y_t=f(X_t,t)$ where
-$f: \R\times [0,\infty) \rightarrow \R$ is some function twice
-differentiable in $X$, once differentiable in $t$.
-Then $Y_t=f(X_t,t)$ is a also an Ito diffusion satisfying
-\begin{equation}
-   dY_t
-   = df(X_t,t)
-   =
-   \frac{\partial f}{\partial x} \; dX_t
-   + \frac{\partial f}{\partial t} \; dt
-   + \frac{1}{2}
-    \frac{\partial^2 f}{\partial x^2} \; \sigma^2(X_t,t) \; dX_t^2
-\end{equation}
-Notice that this looks like the standard total derivative of $f$, just
-with an extra second order term, which normally disappears in a
-nonstochastic world but must here be retained because argument $X_t$ is
-in fact stochastic.
-
-Note that this can be rewritten into the standard representation of
-Ito's Lemma by using $dX_t^2=dt$, substituting in
-Expression~\ref{itoslemmadiffusion} for $dX_t$, and then collecting
-terms to get
-\begin{align}
-   \label{itoslemma}
-   dY_t
-   = df(X_t,t)
-   =
-   \left[
-    \mu(X_t,t)\frac{\partial f}{\partial x}
-   + \frac{\partial f}{\partial t}
-   + \frac{1}{2}
-     \sigma^2(X_t,t)\frac{\partial^2 f}{\partial x^2}
-   \right]
-   \; dt
-    +
-   \sigma(X_t,t)\frac{\partial f}{\partial x} \; dW_t
-\end{align}
-where all derivatives are evaluated at $(X_t,t)$.
-\end{lem}
-
-
-%\begin{lem}\emph{(Multi-Dimensional Ito's Lemma)}
-%Let $\bsX_t$ be a $N$-dimensional vector Ito diffusion process with
-%associated SDE
-%\begin{align*}
-  %d\bsX_t
-  %= \underbrace{\bsmu(\bsX_t,t)}_{(N\times 1)}\;dt
-  %+ \underbrace{\bssigma(\bsX_t,t)}_{(N\times N)}\;d\bsW_t
-%\end{align*}
-%Suppose we change variables $Y_t=(\bsX_t,t)$ where
-%$\bsf: \R^N\times [0,\infty) \rightarrow \R$ is some function twice
-%differentiable in $\bsx$, once differentiable in $t$.
-%Then $Y_t=f(\bsX_t,t)$ is a also an Ito diffusion satisfying the
-%following SDE\footnote{%
-  %Given in three different, equivalent representations since the result
-  %is often presented in any of the following ways.
-%}
-%\begin{align}
-   %dY_t
-   %= df(\bsX_t,t)
-   %&=
-   %\frac{\partial f}{\partial \bsx'} \; d\bsX_t
-   %+ \frac{\partial f}{\partial t} \; dt
-   %+ \frac{1}{2}
-    %\frac{\partial^2 f}{\partial\bsx\partial\bsx'} \; \sigma^2(\bsX_t,t)
-    %\;dt
-%\end{align}
-%\begin{align}
-  %dY_t
-  %= df(\bsX_t,t)
-  %&=
-  %\left[
-  %\bsmu(\bsX_t,t)'\,
-  %\frac{\partial f}{\partial \bsx}
-  %+
-  %\frac{\partial f}{\partial t}
-  %+
-  %\frac{1}{2}
-  %\bssigma(\bsX_t,t)\bssigma(\bsX_t,t)'
-  %\frac{\partial^2 f}{\partial \bsx\partial\bsx'}
-  %\right]
-  %\;dt
-  %+
-  %\bssigma(\bsX_t,t)'
-  %\frac{\partial f}{\partial \bsx}
-  %\;d\bsW_t
-  %\\
-  %dY_t
-  %= df(\bsX_t,t)
-  %&=
-  %\left[
-  %\bsmu(\bsX_t,t)
-  %\cdot
-  %\nabla_x
-  %+
-  %\nabla_t
-  %+
-  %\frac{1}{2}
-  %\bssigma(\bsX_t,t)\bssigma(\bsX_t,t)'
-  %\nabla_x^2
-  %\right]
-  %f(\bsX_t,t)
-  %\;dt
-  %+
-  %\bssigma(\bsX_t,t)\cdot
-  %\nabla_x
-  %f(\bsX_t,t)
-  %\;d\bsW_t
-%\end{align}
-%where all derivatives are evaluated at $(X_t,t)$.
-
-%For the sake of completeness, let's generalize Ito's Lemma to consider
-%the case of a finite number of Ito processes, $X_1, X_2, \ldots, X_n$,
-   %\[ dX_i(t) = \mu_i(t)\; dt + \sigma_i(t) \; dW_i(t).\]
-%Next, define $Y(t) = f(X_1(t), \ldots, X_n(t), t)$ for some
-%differentiable function $f$.  Then multi-dimensional Ito's Lemma says
-%\begin{align*}
-    %dY(t) &= \sum^n_{i=1} f_{X_i}(X_1(t), \ldots, X_n(t), t) \;
-      %dX_i(t) \\
-    %&+ f_{t}(X_1(t), \ldots, X_n(t), t) \; dt \\
-    %&+ \frac{1}{2} \sum^n_{i=1}\sum^n_{j=1}
-      %f_{X_i,X_j}(X_1(t), \ldots, X_n(t), t) \; \rho_{ij}\sigma_i(t)
-      %\sigma_j(t) \; dt
-%\end{align*}
-%where $\rho_{ij}$ is the correlation coefficient between $dW_i$ and
-%$dW_j$. Note that you'll have to plug back in for the $dX_i$ in the
-%first sum.
-%\\
-%\\
-%We'll mostly consider with the two-dimensional case for the
-%two specific instances below:
-%\begin{itemize}
-   %\item[i.]{$Y(t) = X_1(t)X_2(t)$, which gives us
-      %\[ dY(t) = X_2(t) \; dX_1(t) + X_1(t) \; dX_2(t) +
-	 %\rho_{12}\sigma_1(t)\sigma_2(t) \; dt \]
-      %Note that you'll have to plug back in for $dX_1$ and $dX_2$.
-      %This is a type of integration-by-parts formula because (after
-      %rearranging terms) it relates $X_1\; dX_2$ to $X_2\; dX_1$.
-   %}
-
-   %\item[ii.]{$Y(t) = X_1(t)/X_2(t)$, which gives us
-      %\begin{align*}
-	 %dY(t) = \frac{1}{X_2(t)} dX_1(t) - \frac{X_1(t)}{X_2(t)^2}
-	 %dX_2(t) +  \frac{X_1(t)}{X_2(t)^3} \sigma_2(t)^2 \;dt -
-	 %\frac{1}{X_2(t)^2} \; \rho_{12}\sigma_1(t)\sigma_2(t) \; dt.
-      %\end{align*}
-      %Note that you'll have to plug back in for $dX_1$ and $dX_2$.
-      %This is a type of integration-by-parts formula because (after
-      %rearranging terms) it relates $X_1\; dX_2$ to $X_2\; dX_1$.
-      %}
-%\end{itemize}
-
-%\end{lem}
-
-
-
-
 
 
 
@@ -10210,248 +10184,10 @@ defined by the following SDE:
 
 \subsection{Continuous Time Stochastic Processes}
 
-Here, we develop the necessary machinery in continuous time stochastic
-processes to model asset price evolution properly and with sufficient
-richness and generality. In particular, we discuss a heirarchy of model
-classes that includes Brownian Motion $\subset$ Generalized Brownian
-Motion $\subset$ Diffusions $\subset$ Ito Processes.
-
-
-\subsection{Forward and Backward Equations}
-
-In the sections above, we considered SDEs of the form
-\begin{align*}
-  dX_t = b(X_t,t) dt + \sigma(X_t,t) dW_t
-\end{align*}
-We then tried to solve these to find expressions for the \emph{paths} of $X_t$ as a function of time and Brownian motion paths as follows:
-\begin{align*}
-  X_t = f(t,W_t)
-\end{align*}
-In this section, we try another approach. Here, we try instead to
-describe $X_t$ by describing the evolution of either
-\begin{enumerate}
-  \item The probability distribution of $X_t$ (leads to the Forward
-    Equation)
-  \item Functions or moments of $X_t$ (leads to the Backard Equation)
-\end{enumerate}
-Both use PDE methods. Since $X_t$ is Markov (by the fact that it solves
-the above SDE with particular smoothness and growth conditions on $b$
-and $\sigma$), we will often deal with the transition density:
-\begin{align*}
-  p(x,t|y,s) := P(X_t\in [x,x+dx) \; | \; X_s=y)
-\end{align*}
-
-\begin{defn}
-Given a function $f\in C_c^\infty(\mathbb{R}^d)$ and a time-homogeneous
-process (multi-dimensional) stochastic process $X_t$, define the
-\emph{generator} of $X_t$
-\begin{align}
-  (\mathscr{A}f)(x)=
-  \lim_{t\rightarrow0} \frac{E[f(X_t)|X_0=x]-f(x)}{t}
-  \label{genA}
-\end{align}
-In words, the generator of a time-homogeneous process is the
-expected infinitesimal change of some function of that process.
-\end{defn}
-
-\begin{thm}
-Given a time homogeneous process $X_t$ satisfying SDE
-\begin{align*}
-  dX_t = b(X_t) dt + \sigma(X_t) dW_t
-\end{align*}
-the generator $\mathscr{A}$ of $X_t$ can be written via linear operator
-$\mathscr{L}$
-\begin{align}
-  \mathscr{A}f =
-  \mathscr{L}f &= b \cdot \nabla f
-  + \frac{1}{2} \left(\sigma \sigma^T:\nabla^2 f\right)\label{genL} \\
-  \Leftrightarrow \qquad
-  &= \sum_i b_i \frac{\partial f}{\partial x_i}
-  + \frac{1}{2} \sum_i \sum_j \left(\sigma \sigma^T\right)
-    \frac{\partial^2 f}{\partial x_i \partial x_j}\notag
-\end{align}
-where $\nabla^2 f$ is the Hessian matrix of $f$, and $A:B :=
-\text{tr}(A^T B)$.
-\end{thm}
-\begin{rmk}
-Though $\mathscr{A}f = \mathscr{L}f$, we use separate notation to
-distinguish that $\mathscr{A}$ and $\mathscr{L}$ come from different
-%places: a limit as in (\ref{genA}) versus a simple lifting of
-coefficients from an SDE as in (\ref{genL}), respectively.
-\end{rmk}
-\begin{proof}
-The result follows directly from Ito's Lemma. Therefore apply
-multi-dimensional Ito's Lemma to $f(X_t)$ for homogeneous process $X_t$:
-\begin{align*}
-  df(X_t) &=
-  \left(b\cdot \nabla f + \frac{1}{2}\sigma\sigma^T : \nabla^2 f\right)
-  dt
-  + \nabla f\cdot \sigma \;dW_t\\
-  f(X_t) - f(X_s) &=
-  \int^t_s
-  \left(b\cdot \nabla f + \frac{1}{2}\sigma\sigma^T : \nabla^2 f\right)
-  d\tau
-  +
-  \int^t_s
-  \nabla f\cdot \sigma \;dW_\tau
-\end{align*}
-Now take conditional expectation $E[\;\cdot\;|X_s=x]$ and use the fact
-that the Ito Integral has expectation of zero:
-\begin{align}
-  E[f(X_t)|f(X_s)=x] - f(x) &=
-  E\left[
-  \int^t_s
-  \left(b\cdot \nabla f + \frac{1}{2}\sigma\sigma^T : \nabla^2 f\right)
-  d\tau
-  \; \big|\; f(X_s)=x\right]\notag\\
-  &\qquad
-  +
-  E\left[
-  \int^t_s
-  \nabla f\cdot \sigma \;dW_\tau
-  \; \big|\;f(X_s)=x\right]
-  \notag\\
-  &=
-  E\left[ \int^t_s (\mathscr{L} f)(X_\tau) d\tau
-    \;\big|\:f(X_s)=x\right] + 0
-  \label{genL.proof}
-\end{align}
-From there, form the limit that defines the generator:
-\begin{align*}
-  (\mathscr{A}f)(x)
-  &=\lim_{t\rightarrow0} \frac{E[f(X_t)\;|\;f(X_s)=x] - f(x)}{t}\\
-  \text{Sub in (\ref{genL.proof})} \Rightarrow\qquad
-  &=\lim_{t\rightarrow0} \frac{1}{t}
-  E\left[ \int^t_s (\mathscr{L} f)(X_\tau) d\tau \; \big|\:f(X_s)=x\right]\\
-  &=(\mathscr{L}f)(x)
-\end{align*}
-where the last step follows from the Dominated Convergence Theorem since
-$f$ and all of its derivatives are bounded (K\&S p 323).
-\end{proof}
-
-\begin{thm}{(Forward Kolmogorov Equation and Fokker-Planck Equation)}
-There are two formulations, both of which make use of $\mathscr{L}^*$,
-defined as
-\begin{align*}
-  \mathscr{L}^*f_x = -\nabla_x \cdot (b f)
-  +\frac{1}{2}\nabla^2_x : (a f)
-\end{align*}
-The two formulations are as follows:
-\begin{enumerate}
-  \item The transition probability density $p(x,t|y,s)$ solves
-    \begin{align*}
-      \frac{\partial p}{\partial t} = \mathscr{L}^*_x p
-      \qquad p(x,s|y,s) = \delta(x-y)
-    \end{align*}
-
-  \item If $\rho_0(x)$ is the initial probability desnity and
-    $\rho(x,t)$ is the density at time $t$, then $\rho(x,t)$ solves
-    \begin{align}
-      \frac{\partial \rho}{\partial t} = \mathscr{L}^* \rho
-      \qquad \text{where } \; \rho(x,0) = \rho_0(x)
-      \label{fpeqn}
-    \end{align}
-\end{enumerate}
-\begin{rmk}
-$\mathscr{L}^*$ is the adjoint of $\mathscr{L}$ meaning that
-on the Hilbert Space with inner product
-$\langle\cdot,\cdot\rangle_{L^2}$,\footnote{%
-  The inner product $\langle\cdot,\cdot\rangle_{L^2}$ is defined as
-  \begin{align*}
-    \langle f,g\rangle_{L^2}
-    &= \int_X fg\;d\mu
-  \end{align*}
-}
-we have that $\langle\mathscr{L}f,g\rangle_{L^2} =\langle
-f,\mathscr{L}^*g\rangle_{L^2}$
-\end{rmk}
-\end{thm}
-\begin{proof}
-We take each case separately:
-\begin{enumerate}
-  \item By Ito's Lemma and results we saw above, we can write:
-    \begin{align*}
-      E[f(X_t) \;|\; X_s=y] -f(y)
-      &= E\left[\int^t_s (\mathscr{L}f(X_\tau) d\tau \;\big|\;
-          f(X_s)=y\right]
-    \end{align*}
-    Writing the expectation out explicitly,
-    \begin{align*}
-      \int_{\mathbb{R}^d} f(x)p(x,t|y,s)\;dx  -f(y)
-      &= \int_{\mathbb{R}^d} \int^t_s
-        (\mathscr{L}f)(x) \cdot p(x,\tau|y,s)\; d\tau dx
-    \end{align*}
-    Differentiating both sides with respect to $t$,
-    \begin{align*}
-      \int_{\mathbb{R}^d} f(x) \frac{\partial p}{\partial t}\;dx
-      &= \int_{\mathbb{R}^d}
-        (\mathscr{L}f)(x) \cdot p\; dx
-    \end{align*}
-    And this holds for all test functions $f$, so $p$ is a weak
-    solution.
-\end{enumerate}
-\end{proof}
-
-\begin{thm}{\emph{(Backward Komogorov Equation)}}
-There are 3 formulations. For each, let $p(x,t|y,s)$ denote the
-transition probability of $X_t$, and for a function $f\in
-C^2(\mathbb{R}^d)$, Then it is the case that
-\begin{enumerate}
-  \item Define $u_t^{(x)} := \mathbb{E}[f(X_t)|X_0=x]$ for a
-    time-homogeneous process $X_t$. Then given boundary condition
-    $u^{(x)}_0=f(x)$,
-    \begin{align*}
-      \frac{\partial u^{(x)}_t}{\partial t} = \mathscr{L} u^{(x)}_t
-      \qquad t>0
-    \end{align*}
-  \item For a possibly time-inhomogeneous SDE with solution $X_t$,
-    define $v^{(y)}_t:=E[f(X_T)|X_t~=~y]$. Then given boundary
-    condition $v^{(y)}_T=f(y)$, we have
-    \begin{align*}
-      \frac{\partial v^{(y)}_t}{\partial t}
-      + \mathscr{L} v^{(y)}_t = 0
-      \qquad t < T
-    \end{align*}
-  \item For a Markov process solving a time-inhomogeneous SDE
-    and for boundary condition $p(y,t|x,s) = \delta(x-y)$,
-    \begin{align*}
-      \frac{\partial p}{\partial s} + \mathscr{L}_y p = 0
-      \qquad s<t
-    \end{align*}
-    where $\mathscr{L}_y$ denotes that the derivatives in $\mathscr{L}$
-    are with respect to variable $y$.
-\end{enumerate}
-\end{thm}
-\begin{rmk}
-The second and third formulations should be solved \emph{backward} in
-time, which gives the theorem its name.
-\end{rmk}
-\begin{proof}
-We prove each in turn:
-  \begin{enumerate}
-    \item Recall from Ito's Lemma that for some stochastic process $X_t$
-      and some twice-differentiable function $g: \mathbb{R}^d \times
-      [0,\infty) \rightarrow \mathbb{R}^d$ (a function of both $X_t$ and
-      $t$), we have
-      \begin{align*}
-        d\left(g(X_t,t)\right)
-        &=
-        \left(
-        \frac{\partial g}{\partial t}
-        + b \cdot \nabla_x g
-        + \frac{1}{2} \sigma \sigma^T : \nabla_x^2 g
-        \right)dt
-        +
-        \frac{\partial g}{\partial x} \sigma dW_t
-      \end{align*}
-    \item Relabel time as $t' = t-s$ and consider the function
-      $u(x,t')$.
-  \end{enumerate}
-\end{proof}
 
 \subsection{Probability Flux}
 
-Let's write out the Fokker-Planck Equation (\ref{fpeqn}) as follows:
+Let's write out the Fokker-Planck Equation () as follows:
 \begin{align*}
   \frac{\partial\rho}{\partial t}
   &= \nabla \cdot \left( -b\rho + \frac{1}{2}\nabla \cdot (a\rho)\right)\\
@@ -10679,11 +10415,12 @@ vector-valued discrete-time stochastic processes $\{\bsy_t\}$.
 However, some results will be presented only for univariate time series,
 either because of ease of exposition or analytical tractability that's
 only available in the univariate case. To help distinguish, bold denotes
-multivariate objects (lowercase letters like $\bsy_t$ for vectors and
-uppercase like $\bsA$ for matrices) while non-bold indicates univariate
-objects. Finally, note that for brevity, I generally just write $\{\bsy_t\}$ rather
-than $\{\bsy_t\}\tinfz$ or $\{\bsy_t\}_{t=-\infty}^{\infty}$,
-since no results hinge on whether it's the former or the latter.
+multivariate objects (generally lowercase letters like $\bsy_t$ for
+vectors and uppercase like $\bsA$ for matrices) while non-bold indicates
+univariate objects. Finally, note that for brevity, I generally just
+write $\{\bsy_t\}$ rather than $\{\bsy_t\}\tinfz$ or
+$\{\bsy_t\}_{t=-\infty}^{\infty}$.
+%since no results hinge on whether it's the former or the latter.
 
 
 %\subsection{Linear Difference Equations}
@@ -10708,18 +10445,20 @@ distribution of the stochastic process.
 \begin{defn}(Covariance or Weak Stationarity)
 A stochastic process $\{\bsy_t\}$ is \emph{covariance stationary},
 \emph{weakly stationary}, or just \emph{stationary} if the mean and the
-autocovariance function do not depend upon time, a.k.a. are
-\emph{time homogeneous}.
-In other words, we have for all $t$
+autocovariance function \emph{time homogeneous}, i.e. do not depend upon
+the absolute time index.
+In other words, $\forall t$
 \begin{align*}
   \E[\bsy_t] &= \bsmu \\
-  \Cov(\bsy_t,\bsy_{t+k}) &=
+  \Cov(\bsy_t,\bsy_{t+k}) =
   \E[(\bsy_t-\bsmu)(\bsy_t-\bsmu)']
-  = \bsGamma(k)
+  &= \bsGamma(k)
 \end{align*}
 where $\bsmu$ is a constant vector and $\bsGamma(k)$ is an
 autocovariance function (mapping scalar $k$ into autocovariance
 matrices) that does not depend upon time, just the lag length $k$.
+Notice that strict stationarity implies weak stationarity, but not vice
+versa.
 \end{defn}
 \begin{rmk}
 ``Stationary'' will generally refer to covariance or weak stationarity
@@ -10736,7 +10475,7 @@ traces out a trend.
 
 
 \begin{defn}(White Noise)
-Stochastic process $\{\bsy_t\}$ is a \emph{vector white noise process}
+Stochastic process $\{\bsy_t\}$ is a \emph{white noise process}
 if $\forall t$
 \begin{align*}
   \E[\bsy_t] &= \bso
@@ -10805,8 +10544,8 @@ In words, the \emph{time average} equals the \emph{ensemble average}.
 More explicitly, for stochastic process $\{\bsy_t(\omega)\}$ living in
 state space $(\Omega,\sF,P)$, the average $\frac{1}{T}\sumtT
 \bsy_t(\omega^*)$ over \emph{time indices} (fixing state realization
-$\omega^*$) equals the average $\E[\bsy_t]$ over \emph{state
-realizations} (fixing time index $t$).
+$\omega^*\in\Omega$) equals the average $\E[\bsy_t]$ over
+\emph{state realizations} $\omega\in\Omega$ (fixing time index $t$).
 \end{defn}
 \begin{rmk}
 Later on, Theorem~\ref{thm:ergodic} presents the Ergodic Theorem, which
@@ -10825,8 +10564,10 @@ stationary, again reinforcing that strict stationarity
 \clearpage
 \subsection{Filters, the Lag Operator, and Lag Polynomials}
 
+\subsubsection{Filters}
+
 \begin{defn}(Filter)
-Given sequence of (possibly non-square) $(N\times K)$ matrices
+Given sequence of (possibly non-square) $N\times K$ matrices
 $\{\bsH_j\}_{j=-\infty}^\infty$, the associated
 \emph{two-sided filter} is a function $\bsH:\C\ra\R^{N\times K}$ defined
 as
@@ -10838,16 +10579,17 @@ as
   %\qquad z\in\C
 \end{align*}
 If $\bsH_{j}=\bso$ for either all $j<0$ or $j>0$ (i.e. only
-non-negative/positive powers of $z$ resp.), we use the term
+non-negative/non-positive powers of $z$ resp.), we use the term
 \emph{one-sided filter}.
 In the univariate case, scalars $\{h_j\}$ replace matrices $\{\bsH_j\}$.
 \end{defn}
 \begin{rmk}
-References below to simply ``filter'' apply to either one- or two-sided.
-Filters are hugely important because most processes are written as just
-filtered white noise (see Ex.~\ref{ex:armafiltered}).  Moreover, by
-Wold's Theorem, \emph{any} arbitrary stationary process has such a
-representation.
+References below to simply ``filter'' generally apply to either one- or
+two-sided, unless otherwise specified.
+Filters are hugely important because most processes are built up by
+just filtering white noise (see Ex.~\ref{ex:armafiltered}).  And by
+Wold's Theorem, we can even say that's WLOG (for stationary processes)
+since \emph{any} arbitrary stationary process has such a representation.
 \end{rmk}
 
 \begin{defn}(Factored Filter)
@@ -10865,8 +10607,9 @@ representation, there are often several different ways to factor
 multivariate/matrix filters.
 \end{defn}
 
-\begin{defn}(Square- and Absolutely-Summability)
-Scalar sequence $\{h_j\}$ or the corresponding filter $h(z)$ are called
+\begin{defn}(Square- and Absolute-Summability)
+Scalar sequence $\{h_j\}$ or the corresponding univariate filter $h(z)$
+are called
 \begin{itemize}
   \item \emph{Square-Summable}: If $\sum_{j=-\infty}^\infty h_j^2<\infty$
   \item \emph{Absolutely-Summable}: If $\sum_{j=-\infty}^\infty |h_j|<\infty$
@@ -10877,10 +10620,10 @@ absolutely-summable if square- or absolutely-summable in
 
 \emph{Many} results in time series require either square- or
 absolute-summability.
-In particular, processes built up from infinitely many lags or
-innovations (like an AR($\infty$) or MA($\infty$)) are only well-defined
-if the weights on elements in the infinite past ``decay quick enough,''
-and absolute- and square-summability are effectively just conditions
+For example, processes built up from infinitely many lags or innovations
+(like an AR($\infty$) or MA($\infty$)) are only well-defined if the
+weights on elements in the infinite past ``decay quick enough.''
+Absolute- and square-summability are effectively just conditions
 guaranteeing that.
 \end{defn}
 
@@ -10889,10 +10632,13 @@ Suppose that filter $\{\bsH_j\}$ is absolutely summable. Then it is also
 square-summable.
 \end{prop}
 
+\clearpage
+\subsubsection{Lag Operator and Lag Polynomials}
+
 \begin{defn}(Lag Operator)
 \emph{Lag operator} $L$ is a (linear) operator mapping sequences into
-sequences such that $\{\bsy_{t-1}\}=L\left(\{\bsy_t\}\right)$. We often
-simply write, as shorthand, $\bsy_{t-1}=L\bsy_t$.
+sequences such that $L\left(\{\bsy_t\}\right)=\{\bsy_{t-1}\}$. We often
+simply write, as shorthand, $L\bsy_t=\bsy_{t-1}$.
 
 For lags/leads of more than one time unit, use positive/negative
 \emph{powers} of $L$ (respectively):
@@ -10922,7 +10668,18 @@ Definition~\ref{defn:factoredfilter}).
 Define the \emph{annihilation operator} $[\,\cdot\,]_+$ as an operator
 on lag polynomials so that $[\bsH(L)]_+$ returns a lag polynomial that
 is the same as $\bsH(L)$, but retaining \emph{only} positive powers of
-$L$ while \emph{ignoring/dropping} negative powers of $L$.
+$L$ while \emph{ignoring/dropping} negative powers of $L$:
+\begin{align*}
+  \big[\bsH(L)\big]_+
+  &=
+  \big[
+    \cdots + \bsH_{-2}\;L^{-2} + \bsH_{-1}\;L^{-1} +
+    \bsH_0 + \bsH_1 L + \bsH_2L^2 + \cdots
+  \big]_+
+  \\
+  &=
+  \bsH_0 + \bsH_1 L + \bsH_2L^2 + \cdots
+\end{align*}
 \end{defn}
 
 \begin{defn}(Filtered Series)
@@ -10933,7 +10690,8 @@ filter $\bsH(L)$ to original series $\{\bsx_t\}$:
 \begin{align*}
   \bsy_t =&\; \bsH(L)\bsx_t
   %= \bsH_0 \bsx_t + \bsH_1\bsx_{t-1} + \bsH_2\bsx_{t-2} + \cdots
-  = \cdots + \bsH_{-2}\;\bsx_{t+2} + \bsH_{-1}\;\bsx_{t+1} +
+  \\
+  =&\; \cdots + \bsH_{-2}\;\bsx_{t+2} + \bsH_{-1}\;\bsx_{t+1} +
   \bsH_0\bsx_t + \bsH_1 \bsx_{t-1} + \bsH_2\bsx_{t-2} + \cdots
 \end{align*}
 Also, since the filter is absolutely summable,
@@ -11000,7 +10758,7 @@ $\theta(\,\cdot\,)$.''
 
 
 \clearpage
-\subsection{Inverting Lag Polynomials}
+\subsubsection{Inverting Lag Polynomials}
 
 In time series models, it will often be useful to \emph{invert}
 one-sided finite-order lag polynomials. For example, suppose we have a
@@ -11017,15 +10775,15 @@ In words, current $\bsy_t$ is a linear combination of $\{\bsx_t\}$. By
 \end{align}
 we can write current $\bsx_t$ as a linear combination of $\{\bsy_t\}$,
 provided $\bsH(L)^{-1}$ is a well-defined object.
-So computing lag polynomial inverses enables us construct
-$\bsx_t$ from $\{\bsy_t\}$ and $\bsy_t$ from $\{\bsx_t\}$ just as well.
+So computing lag polynomial inverses enables us to construct $\bsx_t$
+from $\{\bsy_t\}$ just as well as $\bsy_t$ from $\{\bsx_t\}$.
 But of course, now we need to precisely define lag polynomial inverses.
 
 
 \begin{defn}(Lag Polynomial Inverse)
 Let $\bsH(L)$ be a lag polynomial  with square-matrix elements. Define
 the lag polynomial inverse as the filter $\bsH(L)^{-1}$ such that
-\begin{align}
+\begin{align} 
   \bsH(L)^{-1}\bsH(L) =
   \bsH(L)\bsH(L)^{-1} = \bsI
   \label{laginvH}
@@ -11047,12 +10805,20 @@ answers that question.
 \end{defn}
 
 \begin{prop}\emph{(Invertibility Condition)}
-Let $\bsH(L)$ be a lag-polynomial in \emph{non-negative} powers of $L$
-only.
-One-sided
-lag polynomial $\bsH(L)$ is invertible (i.e. $\bsH(L)^{-1}$ is
-well-defined) if and only if \emph{no roots} of the equation
-$\det(\bsH(z))=0$ lie on the complex unit circle.
+Let $\bsH(L)$ be a one-sided lag-polynomial in \emph{non-negative}
+powers of $L$ only.
+Then $\bsH(L)$ is invertible (i.e. $\bsH(L)^{-1}$ is well-defined) if
+and only if \emph{no roots} of the equation $\det(\bsH(z))=0$ lie on the
+complex unit circle, i.e.
+\begin{align*}
+  \not\exists
+  z\in\C\quad
+  \text{s.t.}
+  \begin{cases}
+    |z|=1 \\
+    |B(z)|=0
+  \end{cases}
+\end{align*}
 Moreover,
 \begin{itemize}
   \item $\bsH(L)^{-1}$ has only positive roots
@@ -11062,6 +10828,32 @@ Moreover,
 %unit circle.
 \end{prop}
 
+Start with finite order polynomial
+Factor the polynomial
+Look at roots
+
+MA
+- Suppose B(L) finite order polynomial and nothing on the unit circle
+- Inverse exists and
+- yt = B(L) et => B(L)-1 yt = et
+
+AR
+- Suppose B(L) finite order polynomial, in nonneg powers of L, and
+nothing on the unit circle
+- Then B(L)yt = et => yt = B(L)-1 et
+
+
+Uniqueness of MA rep
+- MA rep generally has different reps (nonuniqueness problem)
+- One of them is the fundamental rep, corresponds to Wold
+- Implies a restriction on the roots
+
+Stationarity of AR rep
+- To get stationarity, restriction on roots similar to the uniquness
+restrictions for MA
+
+
+\clearpage
 \begin{defn}(Univariate Lag Polynomial Inverses)
 Consider function $f(z)=(1-z)$. If we want to compute its inverse for
 $|z|<1$, we could appeal to the geometric sum to write
@@ -11101,15 +10893,15 @@ this.
 \subsection{Wold's Theorem}
 
 This theorem justifies the entire field of \emph{linear} time series
-analysis. In effect, it says that if you give me \emph{any}---repeat,
-\emph{any}---covariance stationary process, we can
-\emph{without loss of generality} write the process as an MA($\infty$)
-process with white noise innovations, i.e. write the process as simply
-filtered white noise.
+analysis presented in this section. In effect, it says that if you give
+me \emph{any}---repeat, \emph{any}---covariance stationary process, we
+can \emph{without loss of generality} write the process as an
+MA($\infty$) process with white noise innovations, i.e. write the
+process as simply filtered white noise.
 That's hugely important and convenient, providing a firm theoretical
 justification for the entire field of linear time series analysis.
 Moreover, it means that we can prove results for the broad class of
-\emph{all} covariance stationary processes by proving results with the
+\emph{all} covariance stationary processes by working with the
 MA($\infty$) Wold representation.
 
 \begin{thm}\emph{(Wold's Theorem)}
@@ -11383,12 +11175,12 @@ perfectly linearly forecastable at all times.
 
 So Wold's Theorem tells us that any covariance stationary process can
 \emph{always} be written as an MA($\infty$) of filtered white noise.
-Does that mean we \emph{always} have to work with MA($\infty$)
+But does that mean we always \emph{work with} that MA($\infty$)
 representation and the infinite sequence $\{\bsw_t\}$ of (unobserved)
-Wold innovations if we want to do linear time series analysis?
+Wold innovations in linear time series analysis?
 Well no, for two possible reasons.
 
-First, maybe the process $\{\bsy_t\}$ has has \emph{special structure}
+First, maybe the process $\{\bsy_t\}$ has \emph{special structure}
 that greatly simplifies its Wold representation.
 Consider two examples where this might happen:
 \begin{enumerate}
@@ -11442,9 +11234,9 @@ Therefore, this section can be viewed in one of two ways:
 \end{enumerate}
 However, in case (ii), we have no guarantee the model innovations
 are, in fact, the Wold innovations $\{\bsw_t\}$, which are very
-precisely and narrowly defined in the Wold's Theorem proof as the
+precisely and narrowly defined in the Wold's Theorem proof (as the
 forecast errors implied by the optimal forecast among linear
-combinations of \emph{all} past observations.  Therefore, I will use
+combinations of \emph{all} past observations).  Therefore, I will use
 $\{\bsvarepsilon_t\}$ to denote MA, AR, and ARMA model innovations in
 this section to highlight this subtle but crucial distinction.
 Only in the special case of interpretation (i) do Wold innovations
@@ -12320,14 +12112,11 @@ discrete-time Fourier transform of the autocovariance function:
   \bsf(\lambda)
   &= \frac{1}{2\pi} \sum_{k=-\infty}^\infty
   \bsGamma(k) e^{-i\lambda k}
-  \label{fourier}
-  \\
-  \iff\qquad
-  &= \frac{1}{2\pi}
+  = \frac{1}{2\pi}
   \left[
     \bsGamma(0) + 2\sum_{k=1}^\infty \bsGamma(k)\cos(k\lambda)
   \right]
-  \notag
+  \label{fourier}
 \end{align}
 Therefore, there is a one-to-one mapping between the spectral density
 $f(\lambda)$ and the autocovariance function $\gamma(k)$.
@@ -12508,36 +12297,37 @@ $\gamma(0)$.
 \clearpage
 \subsection{Long-Run Variance}
 
-With iid observations, the variance of a sum of observations
-$\{y_t\}$ is the sum of the variances. When the observations are
-correlated, that is no longer true. Instead, we need to define the
-\emph{long-run variance}---the asymptotic variance of a sum of a series
-(suitably scaled), allowing for correlation.
+For i.i.d. $\{y_t\}$, we have simply $\Var(\sumtT y_t)=\sumtT\Var(y_t)$,
+but when the observations are correlated, that is no longer true.
+Instead, we need to define the \emph{long-run variance}, $\Omega$---the
+asymptotic variance of a sum of a series (suitably scaled), allowing for
+correlation.
 
 \begin{prop}\emph{(Long-Run Variance)}
 Suppose $\{y_t\}$ is a stationary and ergodic process with absolutely
 summable autocovariances and $\E[y_t]=\mu$. Define the
 \emph{long-run variance} as
 \begin{align}
-  S := \limT \Var\left(\frac{1}{\sqrt{T}}\sumtT (y_t-\mu)\right)
+  \Omega
+  := \limT \Var\left(\frac{1}{\sqrt{T}}\sumtT (y_t-\mu)\right)
   = \sum_{j=-\infty}^\infty \gamma(j)
   \label{clt:lrvar}
 \end{align}
-That last equality is not a definition; it's a result, which we now
-(kinda) prove.
+That last equality is not a definition; it's a result, which we must
+prove.
 \end{prop}
 \begin{proof}
 First, start with expression for the finite-sample (of size $T$)
 statistic:
 \begin{align*}
- S_T
+ \Omega_T
  := \frac{1}{T}\Var\left(\sumtT (y_t-\mu)\right)
 \end{align*}
 Since the observations are autocorrelated, the variance of the sum does
 \emph{not} equal the sum of the variances. There are covariance terms,
 and we have to account for them:
 \begin{align*}
- T \cdot S_T
+ T \cdot \Omega_T
  &= \sumtT \sum_{s=1}^T\Cov((y_t-\mu), (y_s-\mu)) \\
  &= T\cdot \gamma(0) + \sum_{j=1}^T (T-|j|)\cdot \gamma(j)
 \end{align*}
@@ -12552,10 +12342,10 @@ all $j$. Absolutely summable autocovariances ensures convergence.
 Given stationary and ergodic $\{y_t\}$ with $\E[y_t]=\mu$, the long-run
 variance $S$ as defined in Expression~\ref{clt:lrvar} satisfies
 \begin{align*}
-  S = \sum_{j=-\infty}^\infty \gamma(j) = g(1) = 2\pi f(0)
+  \Omega = \sum_{j=-\infty}^\infty \gamma(j) = g(1) = 2\pi f(0)
 \end{align*}
 where
-\begin{enumerate}[label=(\roman*)]
+\begin{enumerate}[label=\emph{(\roman*)}]
   \item $\gamma(j)$ is the $j$th autocovariance
     $\E[(y_t-\mu)(y_{t+j}-\mu)]$
   \item $g(z)$ is the autocovariance generating function
@@ -12574,7 +12364,7 @@ long-run variance formula:
   \psi(z) &= \psi_0 + \psi_1z + \psi_2z^2 + \cdots
   \end{rcases}
   \quad\implies\quad
-  S = \sigma^2 \psi(1)^2
+  \Omega = \sigma^2 \psi(1)^2
 \end{align*}
 \end{cor}
 
@@ -12940,7 +12730,6 @@ lines can be collapsed into double sums, giving a final expression
 It's then easy enough to recognize the second and third terms as
 $\eta_T$ and $\eta_0$ respectively.
 \end{proof}
-
 
 
 
@@ -15179,7 +14968,7 @@ We prove each in turn.
 \end{proof}
 
 \clearpage
-\subsection{$O_p$ and $o_p$ Notation}
+\subsection{$O_P$ and $o_P$ Notation}
 
 In this subsection, we introduce Big-$O$ and Little-$o$ notation, along
 with their probabilistic counterparts, $O_P$ and $o_P$ notation. While
@@ -19475,7 +19264,7 @@ unity $g(1)$:
 \end{defn}
 
 \begin{defn}(Pre-Whitened Estimator)
-This next approach combines both the parametric and non-parameteric
+This next approach combines both the parametric and non-parametric
 approaches. Suppose that $y_t$ follows an MA($\infty$) process
 \begin{align*}
   (y_t -\mu) = \psi(L)\varepsilon_t
@@ -20998,35 +20787,45 @@ Define the \emph{sum of squared residuals} as
 \end{defn}
 
 
-\begin{defn}(OLS Estimates)
-The \emph{OLS Estimator} minimizes the SSR:
+\begin{defn}(OLS Estimator \& Normal Eqs.)
+\label{defn:ols}
+The \emph{OLS Estimator} minimizes SSR:
 \begin{align*}
   \bshatbeta_{OLS}
   =
   \argmin_{\bsb} \;
   (\bsy - \bsX \bsb)'(\bsy - \bsX \bsb)
 \end{align*}
-The FOCs of $K$ equations and $K$ unknowns are called the
-\emph{normal equations}, where the second expression highlights the
-orthogonality of the regressors $\bsX'$ to the residual vector
-$\bsy-\bsX\bsb$.  Since the second derivative is the positive definite
-matrix $\bsX'\bsX$, we have a minimum.
-\begin{align*}
+The FOCs to this problem are $K$ equations in $K$ unknowns, called the
+\emph{normal equations}:
+\begin{align}
   \bsX'\bsX\bsb &= \bsX'\bsy
   \quad\iff\quad
-  0= \bsX'(\bsy-\bsX\bsb)
-\end{align*}
-Solving, we get the OLS estimator, which has the following mean and
-variance:
-\begin{align*}
+  0= \bsX'(\bsy-\bsX\bsb) = \bsX'\bsvarepsilon
+  \label{normalequations}
+\end{align}
+And since the second derivative gives positive definite matrix
+$\bsX'\bsX$, we can in fact solve to find the minimum $\bsb$, which
+gives the OLS formula in Expression~\ref{eq:ols} of the next
+proposition.
+\end{defn}
+
+\begin{prop}\emph{(OLS Formulas)}
+\label{prop:olsformulas}
+We can solve the normal equations in Expression~\ref{normalequations}
+for $\bsb$ to get the following standard formula for the OLS estimator:
+\begin{align}
   \hat{\bsbeta}_{OLS}
-  &= (\bsX'\bsX)^{-1}\bsX'\bsy \\
-  &= (\bsX'\bsX)^{-1}\bsX' (\bsX \bsbeta + \bsvarepsilon)
+  &= (\bsX'\bsX)^{-1}\bsX'\bsy
   = \bsbeta + (\bsX'\bsX)^{-1}\bsX' \bsvarepsilon
-  \\
-  \implies\quad
-  \hat{\bsbeta}_{OLS} - \bsbeta
-  &= (\bsX'\bsX)^{-1}\bsX' \bsvarepsilon \\
+  \label{eq:ols}
+\end{align}
+The second expression\footnote{%
+  which can be derived from the first by substiting in
+  $\bsy=\bsX\bsbeta+\bsvarepsilon$ and simplifying.
+}
+is useful for computing the mean and variance
+\begin{align*}
   \E[\hat{\bsbeta}_{OLS}|\bsX]
   %&=
   %\bsbeta +
@@ -21035,32 +20834,39 @@ variance:
   %\bsbeta +
   %(\bsX'\bsX)^{-1}\bsX' \cdot \E[\bsvarepsilon |\bsX]
   %\\
-  &= \bsbeta \\
+  &= \bsbeta
+  %\\
+  \qquad
   \Var(\hat{\bsbeta}_{OLS}|\bsX)
-  &=
-  \E[(\hat{\bsbeta}_{OLS}-\bsbeta)(\hat{\bsbeta}_{OLS}-\bsbeta)'|\bsX]
-  \\
+  %&=
+  %\E[(\hat{\bsbeta}_{OLS}-\bsbeta)(\hat{\bsbeta}_{OLS}-\bsbeta)'|\bsX]
+  %\\
   %&=
   %\E\left[
     %(\bsX'\bsX)^{-1}\bsX'\bsvarepsilon)
     %(\bsX'\bsX)^{-1}\bsX'\bsvarepsilon)'
   %|\bsX\right]
   %\\
-  &=
+  =
   \left((\bsX'\bsX)^{-1}\bsX'\right)
   \E[\bsvarepsilon\bsvarepsilon' |\bsX]
   \left(\bsX(\bsX'\bsX)^{-1}\right)
 \end{align*}
-With spherical errors, the variance simplifies to
-\begin{align*}
+With spherical errors $\varepsilon|\bsX\sim (\bso,\sigma^2\bsI)$, the
+variance formula simplifies to
+\begin{align}
   \Var(\hat{\bsbeta}_{OLS}|\bsX)
   &=
   \left((\bsX'\bsX)^{-1}\bsX'\right)
   \sigma^2 \bsI_N
   \left(\bsX(\bsX'\bsX)^{-1}\right)
   =\sigma^2 (\bsX'\bsX)^{-1}
-\end{align*}
-Now define the following objects
+  \label{eq:olsvar}
+\end{align}
+\end{prop}
+
+\begin{defn}(Useful Objects)
+To facilitate computations, derivations, etc., define
 \begin{alignat*}{3}
   \text{Projection Matrix}&\quad
   \bsP &&= \bsX(\bsX'\bsX)^{-1}\bsX' \\
@@ -21083,33 +20889,44 @@ Moreover,
 \end{itemize}
 \end{defn}
 
-\begin{defn}(Distribution of Coefficients)
-If we want the mean and variance of individual coefficients or linear
-combinations of coefficients, we have
+\clearpage
+\begin{cor}\emph{(Moments of Linear Combinations of Coefficients)}
+\label{cor:coeffmoments}
+We can compute the mean and variance for any arbitrary linear
+combination of coefficients $\bsR'\bshatbeta_{OLS}$ for
+$\bsR\in\R^{K\times C}$:
 \begin{align*}
-  \E[r'\bshatbeta_{OLS}|\bsX]
-  &= r'\bsbeta \\
-  \Var(r'\bshatbeta_{OLS}|\bsX)
+  \E[\bsR'\bshatbeta_{OLS}|\bsX]
+  &= \bsR'\bsbeta \\
+  \Var(\bsR'\bshatbeta_{OLS}|\bsX)
   &=
-  r'\left((\bsX'\bsX)^{-1}\bsX'\right)
+  \bsR'\left((\bsX'\bsX)^{-1}\bsX'\right)
   \E[\bsvarepsilon\bsvarepsilon' |\bsX]
-  \left(\bsX(\bsX'\bsX)^{-1}\right) r \\
-  &=
-  \sigma^2r'(\bsX'\bsX)^{-1} r
+  \left(\bsX(\bsX'\bsX)^{-1}\right) \bsR
 \end{align*}
-where the second formula for the variance assumed spherical errors. The
-first expression is more general.
-\end{defn}
+Further assuming spherical errors
+$\bsvarepsilon|\bsX\sim (0,\sigma^2\bsI)$, the variance simplifies to
+\begin{align*}
+  \Var(\bsR'\bshatbeta_{OLS}|\bsX)
+  &=
+  \sigma^2\bsR'(\bsX'\bsX)^{-1} \bsR
+\end{align*}
+\end{cor}
+\begin{ex}
+Taking $\bsR$ to be the $i$th basis vector will picks out the $i$th
+coefficient.
+\end{ex}
 
 \begin{defn}(Estimator for $\sigma^2$ and $\Var[\hat{\bsbeta}_{OLS}|\bsX]$)
 Assuming spherical errors, we form the estimator for $\sigma^2$:
 \begin{align*}
-  s^2 &= \frac{SSR(\bsb)}{(n-K)} = \frac{\bse'\bse}{(N-K)}
+  s^2 &= \frac{SSR(\bsb)}{(N-K)} = \frac{\bse'\bse}{(N-K)}
 \end{align*}
 That let's us define an estimator for the covariance matrix of the
-coefficients:
+coefficients in Expression~\ref{eq:olsvar}:
 \begin{align*}
-  \bshatV(\hat{\bsbeta}_{OLS}|\bsX) = s^2(\bsX'\bsX)^{-1}
+  \bshatV
+  = s^2(\bsX'\bsX)^{-1}
 \end{align*}
 \end{defn}
 
@@ -21122,17 +20939,17 @@ Recall that $\bse=\bsM\bsvarepsilon$ where $\bsM$, the annihilator
 matrix, is idempotent. Then
 \begin{align*}
   \E[\bse'\bse|\bsX]
-  &= \E[\bsvarepsilon'\bsM'\bsM\bsvarepsilon|\bsX]\\
-  &= \E[\bsvarepsilon'\bsM\bsvarepsilon|\bsX] \\
-  &= \sumin \sumjn m_{ij}\E[\varepsilon_i\varepsilon_j|\bsX]
+  = \E[\bsvarepsilon'\bsM'\bsM\bsvarepsilon|\bsX]
+  = \E[\bsvarepsilon'\bsM\bsvarepsilon|\bsX]
+  = \sumin \sumjn m_{ij}\E[\varepsilon_i\varepsilon_j|\bsX]
 \end{align*}
 But since we assumed $\E[\varepsilon_i\varepsilon_j|\bsX]=0$, all cross
 terms drop, leaving
 \begin{align*}
   \E[\bse'\bse|\bsX]
   &= \sumin m_{ii}\E[\varepsilon_i\varepsilon_i|\bsX]
-  = \sumin m_{ii}\sigma^2 \\
-  &= \sigma^2 \cdot \trace(\bsM)
+  = \sumin m_{ii}\sigma^2
+  = \sigma^2 \cdot \trace(\bsM)
 \end{align*}
 Almost there. Just use the definition of $\bsM$:
 \begin{align*}
@@ -21434,10 +21251,10 @@ where got to the last line by using the fact that
 $\E[\varepsilon_n\varepsilon_m|\bsX]=0$ for $n\neq m$.
 \\
 \\
-To esitmate this object, we form the natural estimator called the
+To estimate this object, we form the natural estimator called the
 \emph{sandwich estimator}:
 \begin{align*}
-  \bshatV(\hat{\bsbeta}_{OLS}|\bsX)
+  \bshatV
   =
   (\bsX'\bsX)^{-1}
   \left(
@@ -21484,27 +21301,25 @@ those included).
 \clearpage
 \subsection{Coefficient Restrictions}
 
-Suppose that we have linear regression model
+\begin{prop}\emph{(Estimates with Coefficient Restrictions)}
+\label{prop:coeffrestrictions}
+Suppose we want to estimate a linear regression model imposing linear
+coefficient restrictions:
 \begin{align*}
   \bsy = \bsX\bsbeta + \bsvarepsilon
+  \qquad
+  \text{s.t.}
+  \quad
+  \bsR'\bsbeta = \bsr
 \end{align*}
-and we want to estimate $\bsbeta$ while also imposing some restrictions
-$\bsR'\bsbeta = \bsr$, where $\bsR\in\R^{K\times C}$ is a matrix of $C$
-constraints on the $K$ coefficients. We assume that $\rank(\bsR)=C$
-(full column rank), otherwise there would be redundant constraints that
-could be removed without effect.
-\\
-\\
-We estimate by constrained least squares
-\begin{align*}
-  \min_{\bsb} \; &(\bsy-\bsX\bsb)'(\bsy-\bsX\bsb)
-  \\
-  \text{s.t.} \; &
-    \bsR'\bsb = \bsr
-\end{align*}
-whose solution we call $\bshatbeta_*$, while $\bshatbeta_{OLS}$
-represents the unrestricted OLS estimator.
-The basic estimates are
+where $\bsR\in\R^{K\times C}$ is a matrix of $C$ constraints on the $K$
+coefficients. Assume $\rank(\bsR)=C$ (full column rank), otherwise there
+would be redundant constraints that could be pruned.
+
+Let $\bshatbeta_*$ denote the constrained coefficients,
+$\bshatbeta_{OLS}$ the unrestricted OLS estimator. Then
+the point estimate and standard errors for the restricted estimator are
+given by
 \begin{align*}
   \bshatbeta_*
   &=
@@ -21518,7 +21333,15 @@ The basic estimates are
   -
   \sigma^2(\bsX'\bsX)^{-1}  \bsR
   \left(\bsR'(\bsX'\bsX)^{-1}  \bsR\right)^{-1} \bsR'(\bsX'\bsX)^{-1}
-  \\
+\end{align*}
+\end{prop}
+\begin{rmk}
+Since the term subtracted from $\Var[\bshatbeta_{OLS}\;|\;\bsX]$ in the
+expression for $\Var[\bshatbeta_*\;|\;\bsX]$ is a positive semidefinite
+matrix, the constrained estimates have a smaller variance than the OLS
+estimates (though they are biased).
+We can also compute the variance of the difference between estimates
+\begin{align*}
   \Var\left[ \bshatbeta_*-\bshatbeta_{OLS} \;|\;X\right]
   &=
   \sigma^2
@@ -21526,23 +21349,26 @@ The basic estimates are
   \left(\bsR'\left(\bsX'\bsX\right)^{-1}  \bsR\right)^{-1} \bsR'
   \left(\bsX'\bsX\right)^{-1}
 \end{align*}
-Since the term subtracted from $\Var[\bshatbeta_{OLS}\;|\;\bsX]$ in the
-expression for $\Var[\bshatbeta_*\;|\;\bsX]$ is a positive semidefinite
-matrix, the constrained estimates have a smaller variance than the OLS
-estimates (though they are biased).
+\end{rmk}
 
 
-\begin{proof}
-Form the Lagrangian
+\begin{proof}(Proposition~\ref{prop:coeffrestrictions})
+We estimate by constrained least squares
+\begin{align*}
+  \min_{\bsb} \; &(\bsy-\bsX\bsb)'(\bsy-\bsX\bsb)
+  \qquad
+  \text{s.t.} \quad
+  \bsR'\bsb = \bsr
+\end{align*}
+Start by forming the Lagrangian
 \begin{align*}
   \sL
   &=
   (\bsy-\bsX\bsb)'(\bsy-\bsX\bsb)
   + 2\bslambda' (\bsR'\bsb - \bsr)
 \end{align*}
-where $\bslambda$ is a vector the same size as $\bsr$ (possibly also length
-one, i.e.\ a scalar).
-The first order conditions of the Lagrangian with respect to $\bsb$:
+where $\bslambda$ has the same dimensions as $\bsr$.
+This has FOCs with respect to $\bsb$ of
 \begin{align*}
   \frac{d}{d\bsb}
   \left[
@@ -21552,7 +21378,7 @@ The first order conditions of the Lagrangian with respect to $\bsb$:
   &= -2\bsX'\bsy +2\bsX'\bsX\bsb + 2\bsR\bslambda
   =0
 \end{align*}
-Solve for $\bsb$
+Solving for $\bsb$ gives
 \begin{align}
   \bsb &=
   \left(\bsX'\bsX\right)^{-1} \bsX'\bsy
@@ -21683,16 +21509,23 @@ straightforward to derive.
 \end{proof}
 
 
+\clearpage
 \subsection{Inference under Normal Errors}
 
-\begin{prop}
-If we assume
-$\bsvarepsilon|\bsX\sim N(0,\sigma^2\bsI)$, then the variance estimator
-$s^2$ of $\sigma^2$ has distribution
+This entire subsection assumes spherical normally distributed errors
+$\bsvarepsilon|\bsX\sim \calN(0,\sigma^2\bsI)$. Sometimes, we will
+assume $\sigma^2$ is known; other times, we assume unknown.
+
+\begin{prop}\emph{(Distribution of $s^2$)}
+\label{prop:dists2}
+The variance of estimator $s^2$ of $\sigma^2$ has distribution
 \begin{align}
   s^2
-  = \frac{\bse'\bse}{N-K}
-  \sim \frac{\sigma^2}{N-K} \Chi^2_{N-K}
+  := \frac{\bse'\bse}{N-K}
+  \sim
+  \frac{\sigma^2}{N-K}
+  \cdot
+  \Chi^2_{N-K}
   \label{s2dist}
 \end{align}
 \end{prop}
@@ -21700,163 +21533,190 @@ $s^2$ of $\sigma^2$ has distribution
 Since $\bse=\bsM\bsvarepsilon$ where $\bsM$ is the annihilator matrix,
 the definition of $s^2$ gives us
 \begin{align*}
-  (N-K) s^2
-  &= \bse' \bse
-  = (\bsM\bsvarepsilon)' (\bsM\bsvarepsilon)\\
-  &= \sigma^2 \left(\frac{\bsvarepsilon'}{\sigma}\right)\bsM'
-    \bsM\left(\frac{\bsvarepsilon}{\sigma}\right)
-\end{align*}
-Since the matrix $\bsM$ is idempotent, we get
-\begin{align*}
   (N-K) \frac{s^2}{\sigma^2}
-  &= \left(\frac{\bsvarepsilon'}{\sigma}\right)
+  &= \frac{\bse' \bse}{\sigma^2}
+  = \frac{1}{\sigma^2}(\bsM\bsvarepsilon)' (\bsM\bsvarepsilon)
+  = \left(\frac{\bsvarepsilon'}{\sigma}\right)\bsM'
+    \bsM\left(\frac{\bsvarepsilon}{\sigma}\right)
+  = \left(\frac{\bsvarepsilon'}{\sigma}\right)
     \bsM\left(\frac{\bsvarepsilon}{\sigma}\right)
 \end{align*}
-Then $\bsvarepsilon/\sigma$, the standardized error vector, is a
-multivariate normal distribution.Therefore, the above quadratic form is
-$\Chi^2$ with $\rank(\bsM)$ degrees of freedom. But since
-$\rank(\bsM)=\trace(\bsM)$ for idempotent matrices like $\bsM$ and
-$\trace(\bsM)=N-K$, the desired result follows.
+The last inequality followed from the fact that matrix $\bsM$ is
+idempotent ($\bsM'\bsM=\bsM$).
+Lastly, simply note that $\bsvarepsilon/\sigma$ (the standardized error
+vector) is a multivariate normal random vector. Therefore, the above
+quadratic form is $\Chi^2$ with $\rank(\bsM)$ degrees of freedom. Then
+just note that $\rank(\bsM)=\trace(\bsM)$ for idempotent matrices like
+$\bsM$, and that $\trace(\bsM)=N-K$.
 \end{proof}
 
-
-\begin{defn}(Testing Individual Coefficients)
-If we assume $\bsvarepsilon|\bsX \sim N(0,\sigma^2\bsI_N)$, then
+\begin{prop}\emph{(Joint Distribution of $\bshatbeta$)}
+\label{prop:olsjointdist}
+Under the spherical normal errors assumption,
 \begin{align*}
   \bshatbeta - \bsbeta
   \sim
-  N(0,\sigma^2 (\bsX'\bsX)^{-1})
+  \calN\big(\bso,\sigma^2 (\bsX'\bsX)^{-1}\big)
 \end{align*}
-So we can test whether the $k$th regression coefficient equals
-$\beta_{k}^0$ by forming a Z-statistic because, under the null,
+\end{prop}
+\begin{proof}
+This follows directly from Prop.~\ref{prop:olsformulas} or,
+equivalently, Corollary~\ref{cor:coeffmoments} taking $\bsR=\bsI_K$.
+In both cases, we have the mean and variance under spherical but
+\emph{possibly non-normal} errors. Further imposing the normality
+assumption of this section just means that $\bshatbeta$ is multivariate
+normal so that the mean and variance are enough to pin down the whole
+distribution.
+\end{proof}
+
+\begin{prop}\emph{(Testing Individual Coefficients)}
+\label{prop:coefftest}
+To test $H_0:\bsbeta_k=\bsbeta_{k}^0$ given known spherical errors and
+known $\sigma^2$, form the following Z-statistic which has null
+distribution
 \begin{align}
-  z_k = \frac{\hat{\beta}_{k} - \beta_{k}^0}{%
-      \sqrt{\sigma^2\cdot r_k'(\bsX'\bsX)^{-1}r_k}}
-      \sim N(0,1)
+  Z_k = \frac{\bshatbeta_{k} - \bsbeta_{k}^0}{%
+      \sqrt{\sigma^2\cdot \bsr_k'(\bsX'\bsX)^{-1}\bsr_k}}
+      \sim \calN(0,1)
   \label{ztest}
 \end{align}
-where $r_k$ is the $k$th basis element for $\R^K$.
+where $\bsr_k$ is the $k$th basis element for $\R^K$.
 
-Since $\sigma^2$ is generally unknown, we instead construct a
-$t$-statistic using $s^2$, which has a $T_{N-K}$ distribution (see
-proof):
+If $\sigma^2$ is unknown, instead construct a $t$-statistic using $s^2$,
+which has null distribution
 \begin{align*}
-  t_k = \frac{\hat{\beta}_{k} - \beta_{k}^0}{%
-      \sqrt{s^2 \cdot r_k'(\bsX'\bsX)^{-1}r_k}}
+  t_k = \frac{\bshatbeta_{k} - \bsbeta_{k}^0}{%
+      \sqrt{s^2 \cdot \bsr_k'(\bsX'\bsX)^{-1}\bsr_k}}
     \sim T_{N-K}
 \end{align*}
-\end{defn}
+\end{prop}
 \begin{proof}
-Write out the $t$-statistic:
+The $Z$-statistic follows trivially from
+Proposition~\ref{prop:olsjointdist}.
+For the $t-$statistic, write out
 \begin{align*}
   t_k =
-  \frac{\hat{\beta}_{k} - \beta_{k}^0}{%
-      \sqrt{s^2 \cdot r_k'(\bsX'\bsX)^{-1}r_k}}
+  \frac{\bshatbeta_{k} - \bsbeta_{k}^0}{%
+      \sqrt{s^2 \cdot \bsr_k'(\bsX'\bsX)^{-1}\bsr_k}}
   &=
-  \frac{\hat{\beta}_{k} - \beta_{k}^0}{%
-      \sqrt{\sigma^2 \cdot r_k'(\bsX'\bsX)^{-1}r_k}}
+  \frac{\bshatbeta_{k} - \bsbeta_{k}^0}{%
+      \sqrt{\sigma^2 \cdot \bsr_k'(\bsX'\bsX)^{-1}\bsr_k}}
   \cdot
   \left(
   \sqrt{%
   \frac{s^2}{\sigma^2}
   }
-  \right)^{-1} \\
-  \text{By Expressions~\ref{s2dist} and \ref{ztest}}\qquad
-  &\sim
-  N(0,1)
+  \right)^{-1}
+  \sim
+  \calN(0,1)
   \cdot
   \left(
   \frac{\Chi^2_{N-K}}{N-K}
   \right)^{-1}
 \end{align*}
+where distribution statement came from Expressions~\ref{s2dist} and
+\ref{ztest}.
 But the normal and the $\Chi^2$ distribution above are independent
 conditional on $\bsX$, so we're done because that's exactly the
 definition of a $T_{N-K}$-distribution.
 \end{proof}
 
-\begin{defn}($F$-Test)
-Suppose we want to test the linear hypothesis
-$H_0: \bsR'\bsbeta^0 = \bsr$,
-where $\bsR$ is of full column rank and $\bsr$ has dimension $p$,
-corresponding to $p$ restrictions.
-\\
-\\
-If we assume spherical errors,
-$\bsvarepsilon|\bsX\sim N(0,\sigma^2\bsI_N)$, then under the null, we
-know that
+\begin{prop}\emph{($F$-Test)}
+\label{prop:Ftest}
+We want to test the linear hypothesis $H_0: \bsR'\bsbeta^0 = \bsr$,
+where $\bsR\in \R^{K\times C}$ is of full column rank and $\bsr$ has
+dimension $C$ (corresponding to $C$ restrictions).
+Then there are two possibilities
+\begin{itemize}
+  \item \emph{Known $\sigma^2$}:
+    In this case, we can construct
+    \begin{align}
+      \left(\bsR'\bshatbeta-\bsr\right)'
+      \left[\sigma^2 \bsR'(\bsX'\bsX)^{-1}\bsR)\right]^{-1}
+      \left(\bsR'\bshatbeta-\bsr\right)
+      \sim \Chi_C^2
+      \label{Fchisquared}
+    \end{align}
+  \item
+    \emph{Unknown $\sigma^2$}:
+    In this case, we use $s^2$ and construct
+    \begin{align}
+      \frac{%
+      \left(\bsR'\bshatbeta-\bsr\right)'
+      \left[\bsR'(\bsX'\bsX)^{-1}\bsR)\right]^{-1}
+      \left(\bsR'\bshatbeta-\bsr\right)/C
+      }{s^2}
+      \sim F_{C,N-K}
+      \label{Fstat}
+    \end{align}
+\end{itemize}
+These distributions are \emph{exact}, not approximations, by the
+spherical normal error assumption.
+\end{prop}
+\begin{proof}
+By Proposition~\ref{prop:olsjointdist}
+and null hypothesis $\bsR'\bsbeta^0=\bsr$,
+we then have under the null that
 \begin{align*}
   \bsR'(\bshatbeta-\bsbeta^0)
   =
   \bsR'\bshatbeta-\bsr
-  &\sim N(0,\sigma^2 \bsR'(\bsX'\bsX)^{-1}\bsR)
+  &\sim \calN(\bso,\sigma^2 \bsR'(\bsX'\bsX)^{-1}\bsR)
   %\\
   %\iff\qquad
   %\bsR'\bshatbeta-\bsr
   %&\sim N(0,\sigma^2 \bsR'(\bsX'\bsX)^{-1}\bsR)
 \end{align*}
-So then we could jointly test whether the following quadratic form is
-close to zero
-\begin{align*}
-  \left(\bsR'\bshatbeta-\bsr\right)'
-  \left[\sigma^2 \bsR'(\bsX'\bsX)^{-1}\bsR)\right]^{-1}
-  \left(\bsR'\bshatbeta-\bsr\right)
-  \sim \Chi_p^2
-\end{align*}
-But in general, we don't know $\sigma^2$, so we form the $F$-statistic,
-which has the following distribution:
-\begin{align*}
-  F &=
-  \frac{%
-  \left(\bsR'\bshatbeta-\bsr\right)'
-  \left[\bsR'(\bsX'\bsX)^{-1}\bsR)\right]^{-1}
-  \left(\bsR'\bshatbeta-\bsr\right)/p
-  }{s^2}
-  \sim F_{p,N-K}
-\end{align*}
-\end{defn}
+From this joint distribution for the vector $\bsR'\bshatbeta-\bsr$, the
+distribution of the (weighted) sum of squared elements in
+Expression~\ref{Fchisquared} then has the stated $\Chi^2_C$
+distribution.
 
-\begin{proof}
-Write out the definition of the $F$-statistic:
+But if $\sigma^2$ is unknown, we can prove the distributional result in
+Expression~\ref{Fstat} by writing out the statistic in that expression:
 \begin{align*}
   F &=
   \frac{%
   \left(\bsR'\bshatbeta-\bsr\right)'
   \left[\bsR'(\bsX'\bsX)^{-1}\bsR)\right]^{-1}
-  \left(\bsR'\bshatbeta-\bsr\right)/p
-  }{s^2} \\
+  \left(\bsR'\bshatbeta-\bsr\right)/C
+  }{s^2}
+  \\
   &=
   \frac{%
   \left(\bsR'\bshatbeta-\bsr\right)'
   \left[\sigma^2\bsR'(\bsX'\bsX)^{-1}\bsR)\right]^{-1}
-  \left(\bsR'\bshatbeta-\bsr\right)/p
-  }{s^2/\sigma^2} \\
-  &=
+  \left(\bsR'\bshatbeta-\bsr\right)/C
+  }{s^2/\sigma^2}
+  \\
+  &\sim
   \frac{%
-    \Chi^2_p/p
+    \Chi^2_p/C
   }{\Chi^2_{N-K}/(N-K)}
 \end{align*}
-But the fraction is precisely the definition of a $F_{p,N-K}$ distribution.
+where the distribution for the numerator came from
+Expression~\ref{Fchisquared}, and the distribution for the denominator
+came from Proposition~\ref{prop:dists2}.
+And the resulting fraction is precisely the definition of a $F_{C,N-K}$
+distribution.
 \end{proof}
 
 \begin{prop}
-Alternatively, we can motivate the $F$-stat as follows. Consider the sum
-of squared errors from an \emph{unrestricted} minimization problem
-\begin{align*}
-  SSR_U = \min_{\bsb} (\bsy-\bsX\bsb)'(\bsy-\bsX\bsb)
-\end{align*}
-and the sum of squared errors from an \emph{restricted} minimization
-problem with $p = \dim(\bsr)$ constraints:
-\begin{align*}
-  SSR_R &= \min_{\bsb} (\bsy-\bsX\bsb)'(\bsy-\bsX\bsb) \\
-  \text{s.t.} \; \bsR' \bsb &= \bsr
-\end{align*}
-Then we can compute the $F$ statistic as
+The $F$-statistic in Expression~\ref{prop:Ftest} can also be written as
 \begin{align*}
   F = \frac{(SSR_R-SSR_U)/p}{SSR_U/(N-K)}
+  \sim F_{C,N-K}
+\end{align*}
+which is a function of sum of squared residuals defined
+\begin{align*}
+  SSR_U &:= \min_{\bsb} (\bsy-\bsX\bsb)'(\bsy-\bsX\bsb) \\
+  SSR_R &:= \min_{\bsb} (\bsy-\bsX\bsb)'(\bsy-\bsX\bsb)
+  \qquad \text{s.t.} \quad \bsR' \bsb = \bsr
 \end{align*}
 \end{prop}
 
-\begin{prop}
+\clearpage
+\begin{prop}\emph{(Asymptotic Distribution of $F$-Stat)}
 An $F$-distributed random variable has a $\Chi^2$-distributed asymptotic
 distribution in the second degree of freedom:
 \begin{align*}
@@ -22142,41 +22002,25 @@ unconditional homoskedasticity.
 }
 
 When we derive the asymptotic properities of the OLS estimator below, we
-will use a Central Limit Theorem on $\bsg_n=\bsx_n\varepsilon_n$ to say
-that
+will use a Central Limit Theorem on $\bsg_n=\bsx_n\varepsilon_n$ all
+over the place, meaning
 \begin{align*}
   \frac{1}{\sqrt{T}}\sumtT \bsg_n\bsg_n'
   = \frac{1}{\sqrt{T}}\sumtT \varepsilon_n^2\bsx_n\bsx_n'
   \quad\dto\quad \calN(0,\bsOmega)
 \end{align*}
-The correlation structure of $\bsg_n$ will determine what we take as
-the asymptotic variance $\bsOmega$. In particular, if we are willing to
-impose Assumption 5, then we are saying $\bsg_n$ has no autocorrelation,
-as discussed. In that case
-\begin{align*}
-  \frac{1}{\sqrt{T}}\sumtT \bsg_n\bsg_n'
-  =
-  \frac{1}{\sqrt{T}}\sumtT \varepsilon_n^2\bsx_n\bsx_n'
-  \quad&\dto\quad
-  \calN\big(\bso,
-        \underbrace{\E[\bsg_n\bsg_n']}_{=\E[\varepsilon_n^2\bsx_n\bsx_n']}
-        \big)
-\end{align*}
-If, on the other hand, we want to allow for $\bsg_n$ to be
-autocorrelated, we know that
-\begin{align*}
-  \frac{1}{\sqrt{T}}\sumtT \bsg_n\bsg_n'
-  \quad&\dto\quad
-  \calN(\bso,\bsS)
-\end{align*}
-where $\bsS$ is the long-run variance.
+where $\bsOmega$ is (most generally) the long-run variance of $\bsg_n$.
+Therefore, everything below will explicitly allow for violations of
+Assumption 5 and autocorrelation in $\{\bsg_n\}$. Of course, if we
+\emph{are} willing to impose Assumption 5, we get the simplification
+that $\bsOmega=\E[\bsg_n\bsg_n']=\E[\varepsilon_n^2\bsx_n\bsx_n']$.
+But the results below don't generally impose that.
 
-Because the asymptotic distribution will depend on our assumptions about
-the autocorrelation structure of $\bsg_n$, I will simply use $\bsOmega$
-from here on out to denote the appropriate asymptotic variance. Whether
-$\bsOmega$ is $\E[\bsg_n\bsg_n']$ or the long-run variance is up to the
-econometricition to decide. But after that, the econometrics is the
-same.
+So to allow for the greatest generality, I will simply use $\bsOmega$
+in all expressions below. It should be understood that this object
+generally represents the long-run variance of $\{\bsg_n\}$, but might
+simplify further under more stringent assumptions about the
+autocorrelation structure of the series.
 
 
 \clearpage
@@ -22190,18 +22034,20 @@ The OLS estimator has the following properties
   \item \emph{Asymptotic Normality}: Under assumptions 1-4
     \begin{align*}
       \sqrt{N}(\bshatbeta_N- \bsbeta) \dto
-      N(0,\E[\bsx_i\bsx_i']^{-1}\;\bsOmega\;\E[\bsx_i\bsx_i']^{-1})
-      %N(0,\E[\bsx_i\bsx_i']^{-1}\;\E[\varepsilon^2_n\bsx_n\bsx_n']\;\E[\bsx_i\bsx_i']^{-1})
+      \calN\big(
+        \bso,\E[\bsx_n\bsx_n']^{-1}\;\bsOmega\;\E[\bsx_n\bsx_n']^{-1}
+      \big)
+      %N(0,\E[\bsx_n\bsx_n']^{-1}\;\E[\varepsilon^2_n\bsx_n\bsx_n']\;\E[\bsx_n\bsx_n']^{-1})
     \end{align*}
     Adding Assumption 5 and assuming conditional homoskedasticy
     $\E[\varepsilon_n^2|\bsx_n]=\E[\varepsilon_n^2]=\sigma^2$, the
     distribution simplifies
     \begin{align*}
       \sqrt{N}(\bshatbeta_N- \bsbeta) \dto
-      N(0,\sigma^2\E[\bsx_i\bsx_i']^{-1})
+      \calN\big(\bso,\sigma^2\E[\bsx_n\bsx_n']^{-1}\big)
     \end{align*}
 
-  \item Using Assumptions 5, since $\bshatbeta_{OLS}$ is a consistent
+  \item With Assumption 5, since $\bshatbeta_{OLS}$ is a consistent
     estimator for $\bsbeta$, the estimated residuals
     $e_n = y_n - \bsx_n' \bshatbeta$ can be used to construct a
     consistent estimator for $\E[\varepsilon_n^2\bsx_n\bsx_n']$:
@@ -22228,15 +22074,15 @@ The OLS estimator has the following properties
     for $\bshatbeta_{OLS}$:
     \begin{align*}
       \bigg[
-        \frac{1}{N} \underbrace{\sumnN \bsx_n\bsx_n'}_{\bsX'\bsX}
+        \frac{1}{N} \underbrace{\sumnN \bsx_n\bsx_n'}_{=\bsX'\bsX}
       \bigg]^{-1}
       \;
       \bshatOmega\;
       \bigg[
-        \frac{1}{N} \underbrace{\sumnN \bsx_n\bsx_n'}_{\bsX'\bsX}
+        \frac{1}{N} \underbrace{\sumnN \bsx_n\bsx_n'}_{=\bsX'\bsX}
       \bigg]^{-1}
       \;\pto\;
-      \E[\bsx_i\bsx_i']^{-1}\;\bsOmega\;\E[\bsx_i\bsx_i']^{-1}
+      \E[\bsx_n\bsx_n']^{-1}\;\bsOmega\;\E[\bsx_n\bsx_n']^{-1}
     \end{align*}
 
   \item Under Assumptions 1-4, the OLS error variance estimator $s^2$
@@ -22410,42 +22256,45 @@ We prove each in turn
 \subsection{Inference}
 
 \begin{prop}
+\label{prop:asymptoticinference}
 Suppose we have OLS estimator $\bshatbeta_{OLS}$ and we construct the
 above-proposed consistent estimator for its asymptotic variance:
 \begin{align}
   \bshatSigma :=
-  N\cdot
-  \left(\bsX'\bsX\right)^{-1}
+  \left(\bsX'\bsX/N\right)^{-1}
   \bshatOmega
-  \left(\bsX'\bsX\right)^{-1}
+  \left(\bsX'\bsX/N\right)^{-1}
   \quad&\pto\quad
   \bsSigma :=
-  \E[\bsx_i\bsx_i']^{-1}\;\bsOmega\;\E[\bsx_i\bsx_i']^{-1}
+  \E[\bsx_n\bsx_n']^{-1}\;\bsOmega\;\E[\bsx_n\bsx_n']^{-1}
   \notag\\
   \text{where}\quad
   \sqrt{N}(\bshatbeta_{OLS} - \bsbeta)
   \quad &\dto \quad
-  N(0,\bsSigma) \label{trobust}
+  \calN(\bso,\bsSigma)
+  \label{trobust}
 \end{align}
 These results and estimators can be used to conduct the following tests:
 \begin{enumerate}
   \item \emph{Robust $t$-Ratio for Testing Coefficients}: We can
-    test the null hypothesis $H_0:\beta_k = \beta_k^0$ (where $\beta_k$
-    is the $k$th element of $\bsbeta$) by constructing the
+    test the null hypothesis $H_0:\bsbeta_k = \bsbeta_k^0$
+    %(where $\bsbeta_k$ is the $k$th element of $\bsbeta$)
+    by constructing the
     \emph{robust $t$-ratio}:
     \begin{align*}
       t_k =
-      \frac{\sqrt{N}(\hat{\beta}_k-\beta_k^0)}{\sqrt{\hat{\Sigma}_{kk}}}
-      \quad\dto \quad N(0,1)
+      \frac{\sqrt{N}(\bshatbeta_k-\bsbeta_k^0)}{\sqrt{\bshatSigma_{kk}}}
+      \quad\dto \quad \calN(0,1)
     \end{align*}
-    where $\hat{\Sigma}_{kk}$ is the $k,k$th element of $\bshatSigma$.
+    %where $\hat{\Sigma}_{kk}$ is the $k,k$th element of $\bshatSigma$.
 
   \item \emph{Wald Statistic for Testing Linear Hypotheses}:
     Suppose we want to test null hypothesis
     $H_0: \bsR'\bsbeta = \bsr$
     where $\bsR \in \R^{K \times C}$
     and has full column rank,
-    $\rank(\bsR) = C$, i.e.\ no redundant constraints.
+    $\rank(\bsR) = C$.
+    %, i.e.\ no redundant constraints.
     Then
     \begin{align*}
       W = N\cdot
@@ -22458,7 +22307,7 @@ These results and estimators can be used to conduct the following tests:
       \Chi^2_C
     \end{align*}
     where $W = N\cdot F$, the $F$-ratio in the finite-sample, exact
-    section under homoskedasticity.
+    section under iid and homoskedastic errors.
 
   \item \emph{Wald Statistic for Testing Non-Linear Hypotheses}:
     Any nonlinear hypothesis can be written (w.l.o.g.) as
@@ -22480,9 +22329,9 @@ These results and estimators can be used to conduct the following tests:
     i.e. $\bsA$ is the derivative of $\bsa$ evaluated at true parameter
     vector $\bsbeta$.
 
-  \item \emph{``LR'' Test for Non-Linear Hypotheses}:
+  \item \emph{LR Test for Non-Linear Hypotheses}:
     Given Null Hypothesis $H_0: \bsa(\bsbeta) = \bso$ for some function
-    $\bsa:\R^K\ra \R^C$ above,  we consider restricted and unrestricted
+    $\bsa:\R^K\ra \R^C$ above, consider restricted \& unrestricted
     efficient GMM estimates
     \begin{align*}
       \bshatbeta
@@ -22523,11 +22372,11 @@ Now we consider each in turn:
     \begin{align*}
       \sqrt{N}(\bshatbeta - \bsbeta)
       \; &\dto \;
-      N(0,\bsSigma)
+      \calN(0,\bsSigma)
       \quad\implies\quad
       \bsR'\sqrt{N}(\bshatbeta - \bsbeta)
       \; \dto \;
-      N(0,\bsR'\bsSigma\bsR)
+      \calN(0,\bsR'\bsSigma\bsR)
     \end{align*}
     But under the null, $\bsR'\bsbeta = \bsr$, so that
     $\bsR'\sqrt{N}(\bshatbeta - \bsbeta)
@@ -22537,7 +22386,7 @@ Now we consider each in turn:
     \begin{align*}
       \sqrt{N}(\bsR'\bshatbeta - \bsr)
       \; \dto \;
-      N(0,\bsR'\bsSigma\bsR)
+      \calN(0,\bsR'\bsSigma\bsR)
     \end{align*}
     Moreover, we can write $W$ as
     \begin{align*}
@@ -24921,75 +24770,86 @@ Under the conjugate prior, the posterior distribution is given by
 \end{defn}
 
 \clearpage
-\subsubsection{Standard Normal Linear Model (SNLM) aka Regression}
+\subsubsection{Standard Normal Linear Model (SNLM), i.e. Bayesian Regression}
 
 For the purpose of estimating means or regression coefficients, this
-section considers the standard normal linear model in a Bayesian
-context, where we have observations $\{y_n,\bsx_n\}\nN$, with $y_n$
-the dependent variable and $\bsx_n$ a $(K\times 1)$ vector of
-predetermined covariates.
-Note that this is purposefully general. Everything in this section
-is perfectly valid even if $N=1$ (since we're not doing frequentist
-asymptotics) or if $\bsx_n$ is just a constant equal to one for all $n$,
-so that the ``regression coefficient'' we are estimating is really just
-the mean of $\{y_n\}\nN$.
+section presents the standard normal linear model in a Bayesian
+context, where we have observations $\{y_n,\bsx_n\}\nN$, with
+dependent variable $y_n$ and vector $\bsx_n$ of predetermined covariates
+related by regression equation
+\begin{align}
+  y_n
+  =
+  \bsx_n'\bsbeta
+  + \varepsilon_n
+  \qquad\text{where}\quad
+  \bsvarepsilon_n\iid\calN(0,\sigma^2)
+  \label{snlm}
+\end{align}
+This setup is very general, with everything valid even if
+$\bsx_n=1$ (scalar) for all $n$, so $\bsbeta$ is the means of
+$\{y_n\}\nN$; or $N=1$, since we're doing exact finite sample
+Bayesian analysis rather than frequentist asymptotics.
+
 
 \begin{defn}(Model Likelihood)
-Stack $\{\bsx_n\}\nN$ into $(N\times K)$ matrix $\bsX$. Then we have the
-following conditional-on-$\bsX$ likelihood for data $\{y_n\}\nN$ given
-$(K\times 1$) parameter vector $\bsbeta$ and scalar parameter
-$\sigma^2$:
+The model likelihood implied by Expression~\ref{snlm} is
 \begin{align*}
   p(\bsy\,|\,\bsbeta,\sigma^2,\bsX)
+  %=
+  %\prodnN
+  %\phi(\bsy_n; \bsB\bsx_n, \bsSigma)
+  %\sim
+  %\calN(
+  %)
   \;\sim\;\calN(\bsX\bsbeta,\;\sigma^2 \bsI_N)
 \end{align*}
-Note that this setup implies independent, equal-variance errors for each
-observation $(y_n,\bsx_n)$.
+Note that this setup implies iid (hence homoskedastic) errors.
+While this is rather restrictive, accommodating the kind of
+heteroskedasticity allowed in asymptotic/frequentist regression is
+generally much tougher to implement within the Bayesian framework.
 \end{defn}
 
-\begin{defn}(Conjugate Prior)
+
+\begin{defn}(Conjugate Prior and Flat Prior)
 We can get a conjugate prior on parameters $(\bsbeta,\sigma^2)$ if we
-break up the prior into two components as follows:
+break up the prior into two components as follows:\footnote{%
+  Note $Y\sim \text{InvGamma}(\alpha,\beta)$ means that
+  $Y^{-1}\sim\text{Gamma}(\alpha,\beta)$.
+}
 \begin{align*}
   p(\bsbeta,\sigma^2)
   =
-  p(\bsbeta|\sigma^2)p(\sigma^2)
+  p(\bsbeta|\sigma^2)\cdot p(\sigma^2)
   \quad\text{where}\quad
+  \begin{cases}
   p(\bsbeta|\sigma^2)
   &\sim
   \calN\left(\bsbeta_0, \; \frac{\sigma^2\bsI_k}{\kappa_0}
   \right)
-  \quad
+  %\quad
+  \\
   p(\sigma^2)
-  \sim \text{InvGamma}\left(
+  &\sim \text{InvGamma}\left(
   \frac{\nu_0}{2},
   \; \frac{\nu_0\sigma^2_0}{2}
   \right)
+  \end{cases}
 \end{align*}
-Note $Z\sim \text{InvGamma}(\alpha,\beta)$ means that
-$Z^{-1}\sim\text{Gamma}(\alpha,\beta)$.
-Also, by this construction in this conjugate prior, $\bsbeta$ and
-$\sigma^2$ are a priori \emph{dependent}: A high variance prior for
-$\sigma^2$ also induces a high-variance prior distribution for
-$\bsbeta$.
-%But you need this for conjugacy (hence a nice analytically tractable
-%posterior).
-\end{defn}
-\begin{rmk}
-The above assumes simple covariance matrices for the likelihood and
-prior on $\bsbeta$: $\sigma^2\bsI_N$ and $(\sigma^2/\kappa_0)\bsI_K$.
-The former implies independent equal-variance errors; the latter implies
-independent equal-prior-variance elements of $\bsbeta$.
-If we assume arbitrary covariance matrices, things become substantially
-more complicated and non-conjugate.
-\end{rmk}
+Note that this prior, by construction, implies $\bsbeta$ and $\sigma^2$
+are a priori \emph{dependent}: A high variance prior for $\sigma^2$ also
+induces a high-variance prior distribution for $\bsbeta$.
+But this prior also implies that the elements of $\bsbeta$ are (a
+priori) iid, though the data and thus posterior will generally imply
+otherwise ex post.
+This is mostly for analytical convenience and tractability.
 
-\begin{defn}(Flat Prior)
-We can impose a flat/noninformative prior by taking a special limiting
-case of the above conjugate prior.
+The above conjugate prior retains a \emph{flat/noninformative prior} as
+a limiting special case.
 In particular, $\kappa_0\ra0$ puts a flat prior on $\bsbeta$, while
 $\nu_0\ra 0$ puts a flat prior on $\sigma^2$.
 \end{defn}
+
 
 \begin{defn}(Posterior Under Conjugate Prior)
 \label{defn:posteriornormal}
@@ -25042,13 +24902,18 @@ pdf for $\bsbeta$ and an inverse gamma pdf for $\sigma^2$:
 \begin{align}
   p(\bsbeta, \sigma^2 | \bsy,\bsX)
   &\propto
-  \calN(\bsbarbeta,\sigma^2\bsV)
+  \underbrace{%
+    \calN(\bsbarbeta,\sigma^2\bsV)
+  }_{p(\bsbeta| \sigma^2 , \bsy,\bsX)}
   \cdot
-  \operatorname{InvGamma}\left(a,b\right)
+  \underbrace{%
+    \operatorname{InvGamma}\left(a,b\right)
+  }_{p(\sigma^2 | \bsy,\bsX)}
   \label{posteriornormal}
 \end{align}
+where
 \begin{alignat}{3}
-  \bsV^{-1}&=(\bsX'\bsX+\kappa_0\bsI_K)
+  \bsV&=(\bsX'\bsX+\kappa_0\bsI_K)^{-1}
   \qquad
   &&\bsbarbeta
   = \bsV\big(\bsX'\bsy + \kappa_0\bsbeta_0\big) \notag\\
@@ -25065,26 +24930,10 @@ pdf for $\bsbeta$ and an inverse gamma pdf for $\sigma^2$:
   \big]
   \notag
 \end{alignat}
+\end{prop}
+\begin{rmk}
 Like the prior, that's a conditional-on-$\sigma^2$ MVN pdf for $\bsbeta$
 times an Inverse Gamma pdf for $\sigma^2$:
-\begin{align}
-  p(\bsbeta | \sigma^2, \bsy, \bsX)
-  &\propto
-  \calN(\bsbarbeta,\sigma^2\bsV)
-  %=
-  %\calN\bigg(
-  %(\bsX'\bsX+\kappa_0\bsI_K)^{-1}
-  %\big(\bsX'\bsy + \kappa_0\bsbeta_0\big),\;
-  %\sigma^2(\bsX'\bsX+\kappa_0\bsI_K)^{-1}
-  %\bigg)
-  \notag
-  \\
-  p(\sigma^2|\bsy,\bsX)
-  &=\int p(\bsbeta, \sigma^2 | \bsy,\bsX) \; d\bsbeta
-  \;\propto\;
-  \operatorname{InvGamma}\left(a,b\right)
-  \label{sigpos}
-\end{align}
 Thus, to sample from the joint posterior, first sample $\sigma^2$ from
 an $\operatorname{InvGamma}(a,b)$ distribution,\footnote{%
   Could equivalently sample $1/\sigma^2$ from the Gamma distribution
@@ -25092,12 +24941,13 @@ an $\operatorname{InvGamma}(a,b)$ distribution,\footnote{%
 }
 then draw $\bsbeta$ from a $\calN(\bsbarbeta,\sigma^2\bsV)$
 distribution.
-\end{prop}
+\end{rmk}
 
 
 \begin{cor}
-\emph{(Alternative Formula for $p(\bsbeta|\sigma^2,\bsy,\bsX)$)}
-Rather than write the conditional posterior for $\bsbeta$ as in
+\emph{(Alternative Formula for $p(\bsbeta|\sigma^2,\bsy,\bsX)$ with
+Dummy Observations)}
+Rather than write $p(\bsbeta|\sigma^2,\bsy,\bsX)$ as in
 Proposition~\ref{prop:posteriornormal}, we can alternatively write
 \begin{align*}
   p(\bsbeta | \sigma^2, \bsy, \bsX)
@@ -25146,11 +24996,13 @@ where these objects are defined
   %\frac{\bsX'\bsX+\kappa_0\bsI_k}{\sigma^2}
   %\right)^{-1}
 \end{align*}
-This form offers the intuition that we are appending ``dummy
-observations'' to $\bsy$ and $\bsX$ to get $\bsy^*$ and $\bsX^*$. Then
-we just run Weighted OLS (WLS) with $\bsSigma^*$ as our weighting matrix
-on the actual observations plus the dummy observations.
 \end{cor}
+\begin{rmk}
+This alternative offers the intuition that we are augmenting the sample
+$(\bsy,\bsX)$ with ``dummy observations'' to get to $\bsy^*$ and
+$\bsX^*$. Then we just run Weighted OLS (WLS) with $\bsSigma^*$ as our
+weighting matrix on the actual observations plus the dummy observations.
+\end{rmk}
 
 
 \begin{cor}\emph{(Flat Prior Gives OLS)}
@@ -25191,9 +25043,9 @@ with $\nu=N-K+1$ degrees of freedom.
 %\end{align*}
 \end{cor}
 \begin{rmk}
-This last corollary gives a Bayesian interepretation to frequentist
-tables of parameter estimates and t-tests: they simply contain
-information about the posterior conditional distribution of $\bsbeta$.
+This corollary gives a Bayesian interepretation to tables of parameter
+estimates and t-tests: they simply contain information about the
+posterior conditional distribution of $\bsbeta$.
 \end{rmk}
 
 
@@ -25269,16 +25121,10 @@ grouping/rewriting
   + \bshatbeta'(\bsX'\bsX)\bshatbeta
   + \kappa_0 \bsbeta_0'\bsbeta_0
 \end{align*}
-where we used the OLS formula to get to the second line.
-To complete the square, define
-\begin{align*}
-  \bsV^{-1}=(\bsX'\bsX+\kappa_0\bsI_K)
-  \qquad\quad
-  \bsbarbeta =
-  \bsV\big(\bsX'\bsy + \kappa_0\bsbeta_0\big)
-\end{align*}
-We can then use these to continue rewriting $(*)$ and complete the
-square:
+where we used the OLS formula for $\bshatbeta$ to get to the second
+line.
+We can use the definitions of $\bsV$ and $\bsbarbeta$ to continue
+rewriting $(*)$ and complete the square:
 \begin{align*}
   (*)
   &=
@@ -25526,51 +25372,15 @@ Then Prop.~\ref{prop:posteriornormal} simplifies to
   \cdot
   \operatorname{InvGamma}\left(a,b\right)
 \end{align}
+where
 \begin{alignat*}{3}
-  V^{-1}&=(N+\kappa_0)
+  V&=\frac{1}{N+\kappa_0}
   \qquad
   &&\bar{\beta}
   = \frac{1}{N+\kappa_0}\bigg(\sumnN y_n + \kappa_0\beta_0\bigg)
   \\
   a &= \frac{1}{2}[N+v_0]
   \qquad&&b
-  %&=
-  %\frac{1}{2}
-  %\left[
-    %\sumnN (y_n-\bar{y})^2
-    %-
-    %\frac{1}{N+\kappa_0}\bigg(\sumnN y_n + \kappa_0\beta_0\bigg)^2
-    %+ N\bar{y}^2
-    %+ \kappa_0 \beta_0^2 + \nu_0\sigma^2_0
-  %\right]
-  %\\
-  %&=
-  %\frac{1}{2}
-  %\left[
-    %\sumnN (y_n-\bar{y})^2
-    %-
-    %\frac{1}{N+\kappa_0}\bigg(
-      %\bigg(\sumnN y_n\bigg)^2
-      %+ 2\kappa_0\beta_0 \left( \sumnN y_n \right)
-      %+ \kappa_0^2\beta_0^2
-    %\bigg)
-    %+ N\bar{y}^2
-    %+ \kappa_0 \beta_0^2 + \nu_0\sigma^2_0
-  %\right]
-  %\\
-  %&=
-  %\frac{1}{2}
-  %\left[
-    %\sumnN (y_n-\bar{y})^2
-    %-
-    %\frac{1}{N+\kappa_0}\bigg(
-      %(N^2-N(N+\kappa_0))\bar{y}^2
-      %+ 2\kappa_0\beta_0 N\bar{y}
-      %+ (\kappa_0^2- \kappa_0 (N+\kappa_0)) \beta_0^2
-    %\bigg)
-    %+ \nu_0\sigma^2_0
-  %\right]
-  %\\
   =
   \frac{1}{2}
   \left[
@@ -25585,15 +25395,6 @@ marginal posterior for $\sigma^2$, writing things out very explicitly:
 \begin{align*}
   p(\beta | \sigma^2,\bsy,\bsX)
   &\propto
-  %\calN\left(
-    %\frac{%
-      %\frac{N}{\sigma^2} \bar{y} + \frac{\kappa_0}{\sigma^2} \beta_0
-    %}{%
-      %\frac{N}{\sigma^2} + \frac{\kappa_0}{\sigma^2}
-    %}
-  %\; , \; \frac{1}{\frac{N}{\sigma^2} + \frac{\kappa_0}{\sigma^2}}
-  %\right)
-  %=
   \calN\left(
     \frac{N\bar{y} + \kappa_0\beta_0}{N + \kappa_0}
   \; , \; \frac{\sigma^2}{N+\kappa_0}
@@ -25601,8 +25402,6 @@ marginal posterior for $\sigma^2$, writing things out very explicitly:
   \\
   p(\sigma^2|\bsy)
   &\propto
-  %\operatorname{InvGamma}(a,b)
-  %=
   \operatorname{InvGamma}\left(
     \frac{N+v_0}{2},\;
     \frac{1}{2}
@@ -25664,18 +25463,252 @@ Next, we can compute the variance
 \end{ex}
 
 
+\clearpage
+\subsubsection{Multiple Equation SNLM}
 
-%\subsubsection{Non-Informative Prior}
+This material is adapted from Giannone et al (2012), ``Prior Selection
+for VARs.''
+Consider the following multi-equation model where each of the $M$
+equations has on the RHS the same set of regressors $\bstildex_n$ for
+each observation/time-period $n=1,\ldots,N$:
+\begin{align*}
+  \underset{(M\times 1)}{\bstildey_n\vphantom{\varepsilon_n}}
+  =
+  \underset{(M\times K)}{\bstildebeta\,'\vphantom{\varepsilon_n}}
+  \underset{(K\times 1)}{\bstildex_n\vphantom{\varepsilon_n}}
+  + \underset{(M\times 1)}{\bstildevarepsilon_n}
+  \qquad \text{where}\quad
+  \bstildevarepsilon_n\sim
+  \calN(\bso,\underset{(M\times M)}{\bsSigma})
+\end{align*}
+Since $\bstildebeta$ is $(K\times M)$, the $m$th column contains the
+coefficients for equation $m$.
 
-%{\sl Non-Informative Prior}: To get this distribution, we can let
-%$\kappa_0, \nu_0\rightarrow 0$, using the notation from the conjugate
-%prior distribution described above. This gives us
-   %\[ p(\mu) \propto 1, \qquad p(\sigma^2) \propto (\sigma^2)^{-1} \]
-%Putting this together, you get a joint prior density of
-   %\[ p(\mu, \sigma^2) \propto \frac{1}{\sigma^2}, \quad\Leftrightarrow
-      %\quad p(\mu, \ln \sigma) \propto 1 \]
-%where the second expression indicates the prior is flat on the
-%$\mu, \ln \sigma$ scale.
+For estimation and easier manipulation, it will be useful to define the
+following matrices from the primitives of
+$\{\bstildey_n,\bstildex_n,\bstildevarepsilon_n\}\nN$
+\begin{align*}
+  \underset{(N\times M)}{\bstildey}
+  :=
+  \begin{pmatrix}
+    \bstildey_1' \\
+    \vdots\\
+    \bstildey_N' \\
+  \end{pmatrix}
+  \qquad
+  \underset{(N\times K)}{\bstildeX}
+  :=
+  \begin{pmatrix}
+    \bstildex_1' \\
+    \vdots\\
+    \bstildex_N' \\
+  \end{pmatrix}
+  \qquad
+  \underset{(N\times M)}{\bstildevarepsilon}
+  :=
+  \begin{pmatrix}
+    \bstildevarepsilon_1' \\
+    \vdots\\
+    \bstildevarepsilon_N' \\
+  \end{pmatrix}
+\end{align*}
+Next, given these objects, we define the following new sets of objects
+(which are the set of objects we will \emph{actually} use to derive
+results below):
+\begin{align*}
+  \underset{(NM\times 1)}{\bsy := \vc(\bstildey)}
+  \qquad
+  \underset{(NM\times KM)}{\bsX\vphantom{\bsy:=\vc(\bstildey)}}
+  &= \bsI_M \otimes \bstildeX
+  =
+  \begin{pmatrix}
+    \bstildeX  &  &  \\
+     &  \ddots &  \\
+     &  & \bstildeX \\
+  \end{pmatrix}
+  \qquad
+  \underset{(KM\times 1)}{\bsbeta = \vc(\bstildebeta)\vphantom{\bsy:=\vc(\bstildey)}}
+  \qquad
+  \underset{(NM\times 1)}{\bsvarepsilon = \vc(\bstildevarepsilon)\vphantom{\bsy:=\vc(\bstildey)}}
+\end{align*}
+By vec'ing, the first set of $N$ rows in $\bsy,\bsX$, and
+$\bsvarepsilon$ correspond to the first equation $m=1$ (all its
+observations $n=1,\ldots,N$), the second set of $N$ rows to the second
+equation $m=2$, etc. Similarly, the first $K$ elements of $\bsbeta$
+correspond to coefficients of the first equation, etc.
+
+Together, all of this allows us to write the system as
+\begin{align}
+  \boxed{%
+    \bsy = \bsX\bsbeta + \bsvarepsilon
+    \qquad \text{where}\quad
+    \bsvarepsilon\sim
+    \calN(\bso,\bsSigma \otimes \bsI_N)
+  }
+  \label{stackedmodel}
+\end{align}
+To make things more clear, below is a depiction of the above system of
+equations, with $\bsz_{n,m}$ for
+$\bsz\in\{\bstildey,\bstildex,\bstildevarepsilon\}$ denoting the
+$n$th observation's $m$th component/element and $\bstildebeta_{ij}$ denoting
+the $ij$ element of $\bstildebeta$.
+\begin{align*}
+  \underbrace{%
+    \begin{pmatrix}
+      \bstildey_{1,1} \\ \vdots \\ \bstildey_{N,1} \\\\
+      \vdots\;\vdots\\\\
+      \bstildey_{1,M} \\ \vdots \\ \bstildey_{N,M} \\
+    \end{pmatrix}
+  }_{\bsy}
+  &=
+  \underbrace{%
+    \begin{pmatrix}
+      \bstildex_{1,1} & \dots & \bstildex_{1,K} \\
+      \vdots & \ddots & \vdots \\
+      \bstildex_{N,1} & \dots & \bstildex_{N,K} \\\\
+      & & & \ddots\ddots \\\\
+      & &  &  & \bstildex_{1,1} & \dots & \bstildex_{1,K} \\
+      & & & &\vdots & \ddots & \vdots \\
+      & & & & \bstildex_{N,1} & \dots & \bstildex_{N,K} \\
+    \end{pmatrix}
+  }_{\bsX}
+  \underbrace{%
+    \begin{pmatrix}
+      \bstildebeta_{11} \\ \vdots \\ \bstildebeta_{K1} \\\\
+      \vdots\;\vdots\\\\
+      \bstildebeta_{1M} \\ \vdots \\ \bstildebeta_{KM} \\
+    \end{pmatrix}
+  }_{\bsbeta}
+  +
+  \underbrace{%
+    \begin{pmatrix}
+      \bstildevarepsilon_{1,1} \\ \vdots \\ \bstildevarepsilon_{N,1} \\\\
+      \vdots\;\vdots\\\\
+      \bstildevarepsilon_{1,M} \\ \vdots \\ \bstildevarepsilon_{N,M} \\
+    \end{pmatrix}
+  }_{\bsvarepsilon}
+\end{align*}
+Letting $\bsSigma_{ij}$ denote the $ij$ element of $\bsSigma$, note that
+the covariance matrix of $\bstildevarepsilon$ has form
+\begin{align*}
+  \underset{(NM\times NM)}{\bsSigma\otimes \bsI_N}
+  =
+  \begin{pmatrix}
+    \bsSigma_{11}\bsI_N & \cdots & \bsSigma_{1M}\bsI_N \\
+    \vdots & \ddots & \vdots \\
+    \bsSigma_{M1}\bsI_N & \cdots & \bsSigma_{MM}\bsI_N \\
+  \end{pmatrix}
+  =
+  \left(
+  \begin{array}{ccc|c|ccc}
+  \bsSigma_{11} &        &             &  & \bsSigma_{1M} &          & \\
+              & \ddots &             & \cdots &             & \ddots\\
+              &        & \bsSigma_{11} & &             &          & \bsSigma_{1M}\\\hline
+       & \vdots &       & \ddots &      & \vdots   & \\\hline
+  \bsSigma_{M1} &        &             & & \bsSigma_{MM} &          & \\
+              & \ddots &             & \cdots &             & \ddots\\
+              &        & \bsSigma_{M1} & &             &          & \bsSigma_{MM}\\
+  \end{array}
+  \right)
+\end{align*}
+Notice this block structure allows contemporaneous (within $t$)
+correlation only, not \emph{across} time indices:
+\begin{align*}
+  \E[\bstildevarepsilon_1\bstildevarepsilon_n]&=0
+  \qquad\forall
+  t\in\{2,\ldots,N\} \\
+  \E[\bstildevarepsilon_1\bstildevarepsilon_{Nm+1}]&\neq 0
+  \qquad \forall m\in\{1,\ldots,M-1\}
+\end{align*}
+
+
+\begin{defn}(Model Likelihood)
+The model likelihood implied by Expression~\ref{stackedmodel} is
+\begin{align*}
+  p(\bsy|\bsbeta,\bsSigma,\bsX)
+  \sim
+  \calN(\bsX\bsbeta,\bsSigma\otimes \bsI_N)
+\end{align*}
+\end{defn}
+
+\begin{defn}(Conjugate Prior)
+We can get a conjugate prior on parameters $(\bsbeta,\bsSigma)$ if we
+break up the prior into two components:
+Conjugate prior is
+\begin{align*}
+  p(\bsbeta,\bsSigma)
+  =
+  p(\bsbeta|\bsSigma)
+  p(\bsbeta)
+  \qquad \text{where}\quad
+  \begin{cases}
+    p(\bsbeta | \bsSigma)
+    &\sim \calN(\bsbeta_0,\bsSigma\otimes\bsOmega_0),\quad
+    \bsOmega_0\in\R^{K\times K}\\
+    p(\bsSigma) &\sim IW(\bsPsi_0,\nu_0) \\
+  \end{cases}
+\end{align*}
+where for $(M\times M)$ matrix $\bsSigma$, we use the
+\emph{Inverse-Wishart distribution}, which generalizes the Inverse-Gamma
+distribution:
+\begin{align*}
+  p(\bsSigma) \sim IW(\bsPsi,\nu)
+  \quad\implies\quad
+  p(\bsSigma)
+  =
+  \frac{1}{2^{\frac{M\nu}{2}}}
+  \frac{1}{\Gamma_M(\frac{\nu}{2})}
+  |\bsPsi|^{\frac{\nu}{2}}
+  |\bsSigma|^{-\frac{M+\nu+1}{2}}
+  e^{-\frac{1}{2}\trace(\bsPsi\bsSigma^{-1})}
+\end{align*}
+\end{defn}
+
+\begin{defn}(Posterior Under Conjugate Prior)
+The poster is then as follows
+\begin{align*}
+   p(\bsbeta, \sigma^2 | \bsy,\bsX)
+   &\propto
+   p(\bsy|\bsbeta,\bsSigma,\bsX)\cdot p(\bsbeta|\bsSigma)\cdot p(\bsSigma)
+\end{align*}
+Substituting in functional forms and ignoring all constants (i.e.
+non-parameters):
+\begin{align*}
+  p(\bsbeta, \bsSigma^2 | \bsy,\bsX)
+  &\propto
+  \bigg[
+  |\bsSigma\otimes \bsI_N|^{-\frac{1}{2}}
+  e^{-\frac{1}{2}(\bsy-\bsX\bsbeta)(\bsSigma\otimes\bsI_N)^{-1}(\bsy-\bsX\bsbeta)}
+  \bigg]
+  \bigg[
+  |\bsSigma\otimes\bsOmega_0|^{-\frac{1}{2}}
+  e^{-\frac{1}{2}(\bsbeta-\bsbeta_0)'(\bsSigma\otimes\bsOmega_0)^{-1}(\bsbeta-\bsbeta_0)}
+  \bigg]
+  \\
+  &\qquad
+  \times
+  \bigg[
+  |\bsSigma|^{-\frac{M+\nu_0+1}{2}}
+  e^{-\frac{1}{2}\trace(\bsPsi_0\bsSigma^{-1})}
+  \bigg]
+\end{align*}
+Use the fact that $|A\otimes B|=|A|^m|B|^n$ for $A\in\Rnn$ and
+$B\in\Rmm$ to simplify some determinants, drop constants, and end up
+with
+\begin{align*}
+  p(\bsbeta, \bsSigma^2 | \bsy,\bsX)
+  &\propto
+  |\bsSigma|^{-\frac{N+K+M+\nu_0+1}{2}}
+  e^{%
+    -\frac{1}{2}
+    \left[
+    (\bsy-\bsX\bsbeta)'(\bsSigma\otimes I_N)^{-1}(\bsy-\bsX\bsbeta)
+    + (\bsbeta-\bsbeta_0)'(\bsSigma\otimes\bsOmega_0)^{-1}(\bsbeta-\bsbeta_0)
+    + \trace(\bsPsi_0\bsSigma^{-1})
+    \right]
+  }
+\end{align*}
+\end{defn}
 
 
 \clearpage
@@ -25765,6 +25798,225 @@ towards zero and has the following important special cases:
     zero and variance $\frac{1}{2\lambda}$.
 \end{itemize}
 \end{defn}
+
+
+\clearpage
+\subsubsection{Minnesota Prior (via Dummy Observations) for VAR}
+
+This section uses dummy observations to implement a prior on a VAR($L$)
+model (which is a special case of the SNLM) of the form
+\begin{align*}
+  \bsy_t = \bsc + \sum_{\ell=1}^L \Phi_\ell y_{t-\ell} + \bsvarepsilon_t
+  \qquad\text{where}\quad
+  \bsvarepsilon_t \sim \calN(\bso,\bsSigma)
+\end{align*}
+Can be stationary or nonstationary data. Will affect the interpretation
+of $c$.
+
+- Section considers a VAR, special case of a SNLM (generalized to a
+multivariate setting) where the RHS consists of lags of the LHS
+variables
+- Want to implement conjugate prior by introducing dummy observations
+- In other words, rather than chugging through formulas in the last
+section (after generalizing to a multivariate setting) to get the
+posterior mode/mean (footnote: they are the same with a
+conjugate normal prior), simply add pseudo-observations, run OLS on the
+actual and pseudo-observations, and the resulting estimates will be the
+poseterior mean/model (rather than just the MLE estimates if we had used
+only true observations)
+
+- VAR typically run in levels
+
+- Original:
+  - random walk and stationary version
+  - pi2 = 1 (to mitigate issues)
+- Multiple unit roots
+- Single unit root
+
+
+The Minnesota Prior is a procedure to implement a prior
+using dummy observations ($X^*, Y^*$), which
+are built from a small presample.  The fact that we
+use dummy observations to implement the prior implies
+that the parameters have a prior distribution
+conjugate to the likelihood function of the data.
+
+The dummy observiations we will use to implement the
+Minnesota prior center the distribution at a random walk.
+This implies that the coefficient on the first lag will
+cluster near unity, while the other coefficients are
+centered around
+zero---an approach favoring persistence in shocks to the
+data series. The relative ``strength,'' ``tightness,'' or
+``influence'' of this prior can be dialed up or down as well
+via the approach.
+Finally, we will conclude the Minnesota prior implementation
+by considering different restrictions we might want to place
+on how coefficients relate to each other.\footnote{The
+details here need not be followed exactly.  In particular,
+if the data series are detrended and seem stationary, a
+prior centered around a random walk would be a poor choice.
+In that case, this approach should be modififed to center
+all parameters at 0.  Similarly, the general guidelines
+described below can be easily modified to suit any assumed
+distribution for the parameters.}
+
+Now that we have the background, let's detail the procedure
+to form the dummy observations $( Y^*, X^*)$:
+\begin{enumerate}
+    \item First, estimate the mean vector, $\bar{y}$, and the
+	standard deviation vector, $\hat{s}$, based on
+	a short presample of the data from time
+	$-\tau$ to 0 (given that we start at time 1.
+	\[ \bar{y} = \text{mean}\left(Y_{-\tau:0}\right)
+	    \qquad \hat{s} = \text{std}\left(Y_{-\tau:0}\right)
+	    \]
+    \item Next, we'll choose hyperparameters $\lambda_1$ and
+	$\lambda_2$, which control the tightness of our
+	parameters. We'll see below how they factor in.
+    \item Set up dummies for the \emph{first lag} on the $n$
+	components of the dependent variable vector,
+	centering the prior around unity (a random walk):
+	\begin{align*}
+	    Y^*_{1:n} \quad &= \quad X^*_{1:n} \Phi + U \\
+	    \begin{pmatrix} \lambda_1 \hat{s}_1
+		    & 0 & \cdots & 0 \\ 
+		0 & \lambda_1 \hat{s}_2 & \cdots & 0 \\ 
+		\vdots & \vdots & \ddots & \vdots \\
+		0 & 0 & \cdots &
+		\lambda_1 \hat{s}_n \end{pmatrix} &=
+	    \begin{pmatrix} \lambda_1 \hat{s}_1 & 0 & \cdots &
+		0 & 0 & \cdots & 0 \\
+		0 & \lambda_1 \hat{s}_2 & \cdots & 0 & 0 &
+		\cdots & 0 \\
+		\vdots & \vdots & \ddots & \vdots & \vdots &
+		\ddots & \vdots \\
+		0 & 0 & \cdots & \lambda_1 \hat{s}_n &
+		0 & \cdots &  0
+	    \end{pmatrix} \Phi +
+	    \begin{pmatrix}
+		u_{11} & \cdots & u_{1n} \\
+		u_{11} & \cdots & u_{1n} \\
+		\vdots  & \ddots & \vdots \\
+		u_{n1} & \cdots & u_{nn} \\
+	    \end{pmatrix}  \\
+	    & \qquad \qquad \qquad \qquad \qquad
+	    \underbrace{\qquad\qquad}_{
+		\text{$n(p-1) +1$ columns of zeros}}
+	\end{align*}
+
+	Now let's take a moment to understand what this does.
+	We just specified $n$ observations above, each
+	observation corresponding to a different row of the
+	relation we just wrote.  These $n$ ``dummy observations''
+	will simply be tacked onto our sample---appended to the
+	bottom of our sample vector and matrices, $X$ and $Y$.
+	This allows us to estimate $\Phi$ via simple OLS (as
+	above).
+
+	But we know that adding these observations implement
+	a prior. Now just what kind of prior is that exactly?
+	Well, to find out, we upack the matrix relationship
+	we wrote above, considering the generic $i$th row
+	(and $i$th dummy observation) for generality.
+	Letting $\phi_{ij}$ be the $ij$ entry of $\Phi$, we
+	find that the $i$th row imposes
+	\begin{align*}
+	    \lambda_1 \hat{s}_i &= \left(\lambda_1
+	    \hat{s_i}\right) \phi_{ii} + u_{ii}
+	    \qquad i=1,\ldots, n \\
+	    0 &= \left(\lambda_1
+	    \hat{s_i}\right) \phi_{ji} + u_{ji}
+	    \qquad \{ j \neq i \; | \; j = 1, \ldots, n\} \\
+	\text{Rearranging} \qquad & \\
+	    \phi_{ii} &= 1-\frac{u_{ii}}{\lambda_1 \hat{s_i}}
+	    \quad \Rightarrow \quad \phi_{ii} \sim
+	    \text{N}\left(1, \; \frac{\Sigma_{ii}}{
+	    \lambda_1^2 \hat{s}_i^2 }\right)
+	    \qquad i = 1, \ldots, n \\
+	    \phi_{ji} &= -\frac{u_{ji}}{\lambda_1 \hat{s_i}}
+	    \qquad \Rightarrow \quad \phi_{ji} \sim
+	    \text{N}\left(0, \; \frac{\Sigma_{ji}}{
+	    \lambda_1^2 \hat{s}_i^2 }\right)
+	    \qquad \{ j \neq i \; | \; j = 1, \ldots, n\}
+	\end{align*}
+	Thus we can see how the parameter $\lambda_1$ (which
+	must be chosen and cannot be inferred) affects the
+	prior ``tightness'' via the prior variance.
+
+    \item Now we set up dummies for the \emph{remaining lags},
+	all of which we will center at zero. So for the $\ell$th
+	lag (where $\ell = 2, \ldots, p$), we will set up the
+	following:
+	\begin{align*}
+	    Y^*_{a:b} &=
+	    X^*_{a:b} \Phi + U \qquad
+	    \text{where } \begin{cases} a = n(\ell-1) + 1 \\
+					b = n\ell
+			\end{cases} \\
+	    \begin{pmatrix} \mathbf{0} \end{pmatrix}_{n\times n}
+		&= \begin{pmatrix}
+		    0 & \cdots & 0 &
+		    \lambda_1 \hat{s}_1 \ell^{\lambda_2} & 0 &
+		    \cdots & 0 & 0 & \cdots & 0 \\
+		    0 & \cdots & 0 & 0
+		    & \lambda_1 \hat{s}_2 \ell^{\lambda_2}
+		    & \cdots & 0 & 0 & \cdots & 0 \\
+		    \vdots & \ddots & \vdots & \vdots & \vdots &
+		    \ddots & \vdots  & \vdots & \ddots & \vdots \\
+		    0 & \cdots & 0 & 0 & 0 & \cdots
+		    & \lambda_1 \hat{s}_n \ell^{\lambda_2}
+		    & 0 & \cdots & 0 \\
+		\end{pmatrix} \Phi + U \\
+	    & \quad \underbrace{\qquad\qquad}_{n(\ell-1)
+		\text{ cols of zeros}} \qquad \qquad
+		\qquad \qquad \qquad \qquad \;
+		\underbrace{\qquad\qquad}_{n(p-\ell) + 1
+		\text{ cols of zeros}}
+	\end{align*}
+	Similar to what we saw above, we find that this
+	setup (for all $\ell = 2, \ldots, p$)
+	implies the following equations and, as a result,
+	the following prior:
+	\begin{align*}
+	    0 &= \left(\lambda_1
+	    \hat{s_i}\ell^{\lambda_2}\right) \phi_{ji} + u_{ji}
+	    \qquad
+	    \begin{cases} \ell = 2, \ldots, p \\ 
+		j = n(\ell-1)+1, \ldots, \ell n\\
+		i = 1, \ldots, n \\
+	    \end{cases} \\
+	\Rightarrow \quad \phi_{ji} &\sim
+	    \text{N}\left(0, \; \frac{\Sigma_{ji}}{
+	    \lambda_1^2 \hat{s}_i^2 \ell^{2\lambda_2} }\right)
+	\end{align*}
+	It's clear that, with $\lambda_1$ fixed from Step 3,
+	increasing $\lambda_2$ will increasingly tighten
+	the prior on coefficients about 0.
+	Moreover, this effect will grow with the number of
+	lags, placing a sensible ``high bar'' to yield
+	nonzero coefficients for deeper lags once we get to
+	the posterior.
+
+    \item Next, we set up the prior on the entries of the
+	covariance matrix $\Sigma$. We do so by adding
+	$\lambda_3$ entries of the following dummies:
+	\begin{align*}
+	    \begin{pmatrix}
+		\hat{s}_1 &  \cdots & 0 \\
+		\vdots & \ddots & \vdots \\
+		0 & \cdots & \hat{s}_n \\
+	    \end{pmatrix} = \begin{pmatrix}\mathbf{0}
+		\end{pmatrix}_{n \times (np+1)} \Phi + U
+	\end{align*}
+	By repeating these $\lambda_3$ dummies more or less
+	times (by changing $\lambda_3$), we change the tightness
+	of the prior on $\Sigma$.
+
+    \item Finally, we
+
+\end{enumerate}
+
 
 
 \clearpage
@@ -27154,50 +27406,170 @@ MCMC, then sample each $\theta_n | \alpha, \beta$.
 
 
 \clearpage
-\section{Miscellaneous}
+\section{Structural Breaks}
 
-\subsection{Testing for Structural Breaks}
+\subsection{Known Break Date}
 
-Suppose that
+
+\begin{defn}(F-Stat)
+\label{defn:Fchow}
+Suppose we have some stationary process $\{y_t\}$ such that
+\begin{align}
+  y_t
+  &= \mu + \delta \cdot \mathbf{1}\{t>\tau\} + u_t
+  \label{Fchowy}
+\end{align}
+and we want to test the null hypothesis $H_0:\delta=0$, i.e. there is no
+structural break in the mean at \emph{known} date $\tau$.  To test,
+we can use
+\emph{$F_T(\tau)$ statistic}
+\begin{align}
+  F_T(\tau)
+  :=
+  %\frac{1}{\sigma^2}
+  \frac{%
+  \left(
+  \frac{1}{\tau}\sum_{t=1}^\tau y_t
+  -
+  \frac{1}{T-\tau}\sum_{t=\tau+1}^T y_t
+  \right)^2
+  }{\tau^{-1} + (T-\tau)^{-1}}
+  \label{Fchow}
+\end{align}
+Where does this come from?
+The next proposition motivates this definition by deriving this
+statistic as the \emph{optimal} test statistic under certain restrictive
+assumptions about the error process $\{u_t\}$.
+As the name suggests, it's related to a simple F-test of coefficient
+restrictions in a standard linear regression model.
+
+But regardless of whether $F_T$ is, in fact, the \emph{optimal} thing to
+look at, it still seems like a sensible statistic to examine when
+testing for breaks.
+So even if the restrictive conditions on $\{u_t\}$ \emph{do not} hold to
+ensure that $F_T$ is really the optimal test statistic, we can still
+derive its asymptotic distribution under the null and some less
+restrictive assumptions on $\{u_t\}$, and then compare the computed
+statistic to its null asymptotic distribution to test for a break.
+%It may not be strictly optimal, but Expression~\ref{Fchow} at least
+%looks pretty reasonable.
+\end{defn}
+
+\begin{prop}
+\emph{(Chow Test: Null Asymptotic Distribution of $F_T$-Stat under Normal Errors)}
+Suppose we have a stationary process $\{y_t\}$ as in
+Definition~\ref{defn:Fchow}. If we assume the error process is iid
+standard normal $u_t \sim\calN(0,1)$,
+then the $F_T(\tau)$ statistic of Definition~\ref{defn:Fchow}
+has exact finite sample distribution $F_T(\tau)\sim \Chi_1$, and the
+optimal test of a structural break at $\tau$ (called the
+\emph{Chow test}) rejects for large values.
+\end{prop}
+\begin{rmk}
+As stated before, this model is quite restrictive: known break date plus
+standard normal errors, no serial correlation.
+This will all be weakened below.
+We present this merely to show where the $F_T$ statistic in
+Definition~\ref{defn:Fchow} came from, and to show that (in a particular
+special case) the test can be \emph{optimal}.
+\end{rmk}
+\begin{proof}
+We will derive the $F_T$ statistic from the standard formulas for
+testing linear coefficient restrictions in a regression model.
+So to start, rewrite the process in Equation~\ref{Fchowy}:
 \begin{align*}
-  y_t = \mu + \delta \cdot \mathbf{1}\{t>\tau\} + \varepsilon_t
-  \qquad \varepsilon_t \iid(0,1)
+  y_t
+  %&= \mu_1\cdot \mathbf{1}\{t\leq\tau\}
+  %+ \mu_2 \cdot \mathbf{1}\{t>\tau\} + \varepsilon_t
+  %\\
+  &=
+  \bsx_t' \bsbeta + u_t
+  =
+  \begin{pmatrix}
+    \mathbf{1}\{t\leq\tau\} &
+    \mathbf{1}\{t>\tau\}
+  \end{pmatrix}
+  \begin{pmatrix}
+    \mu_1 \\ \mu_2
+  \end{pmatrix}
+  + u_t
+  %\qquad\text{where}\quad
+  %x_t =
 \end{align*}
-Alternatively, this can be written
+This turns out to be the most convient representation, as it implies
+regressor matrix:
 \begin{align*}
-  y_t = \mu_1\cdot \mathbf{1}\{t\leq\tau\}
-  + \mu_2 \cdot \mathbf{1}\{t>\tau\} + \varepsilon_t
-  \qquad \varepsilon_t \iid(0,1)
-\end{align*}
-The regressor matrix $X$ looks like
-\begin{align*}
-  X' =
+  \bsX' =
   \begin{pmatrix}
     1 & \cdots & 1 & 0 & \cdots & 0 \\
     0 & \cdots & 0 & 1 & \cdots & 1 \\
   \end{pmatrix}
   \quad\implies\quad
-  X'X =
+  \bsX'\bsX =
   \begin{pmatrix}
     \tau & 0 \\
     0 & T-\tau\\
   \end{pmatrix}
 \end{align*}
-Clearly, the regression estimates will be $\hat{\mu}_i$ for $\mu_i$.
-We want to test the hypothesis that $\mu_1=\mu_2$, i.e.
+Then the test of the null hypothesis $H_0:\delta=0$ can then be
+equivalently recast as a test of $H_0:\mu_1=\mu_2$, which is a test of
+the following straightforward linear parameter restriction:
 \begin{align*}
-  H_0: r &= R'\beta \\
-  H_0: 0 &=
-  \begin{pmatrix}
-    1 & -1
-  \end{pmatrix}
-  \begin{pmatrix}
-    \mu_1 \\ \mu_2
-  \end{pmatrix}
+  %H_0: r &= R'\beta
+  %\qquad\iff\qquad
+  H_0:
+  0
+  &=
+  \underbrace{%
+    \begin{pmatrix}
+      1 & -1
+    \end{pmatrix}
+    \vphantom{%
+      \begin{pmatrix}
+        \mu_1 \\ \mu_2
+      \end{pmatrix}
+    }
+  }_{\bsR'}
+  \underbrace{%
+    \begin{pmatrix}
+      \mu_1 \\ \mu_2
+    \end{pmatrix}
+  }_{\bsbeta}
 \end{align*}
-With $R$ and $X$ as defined above
-\begin{align*}
-  R'(X'X)^{-1}R
+With normal errors and known unit variance, the usual (and
+\emph{optimal}) test statistic is
+\begin{align}
+  \left(\bsR'\bshatbeta\right)'
+  \left[\bsR'(\bsX'\bsX)^{-1}\bsR)\right]^{-1}
+  \left(\bsR'\bshatbeta\right)
+  \sim \Chi_1^2
+  \label{chowchi}
+\end{align}
+To compute, first note that the OLS estimate (not surprisingly) sets
+$\bshatbeta$ equal to the averages over the relevant portion of the
+sample:
+\begin{align}
+  \bshatbeta
+  =
+  (\bsX'\bsX)^{-1}
+  \bsX\bsy
+  =
+  \begin{pmatrix}
+    \frac{1}{\tau}\sum_{t=1}^\tau y_t\\
+    \frac{1}{T-\tau}\sum_{t=\tau}^Ty_t
+  \end{pmatrix}
+  \quad\implies\quad
+  \bsR'\bshatbeta
+  =
+  \left(\frac{1}{\tau}\sum_{t=1}^\tau y_t\right)
+  -
+  \left( \frac{1}{T-\tau}\sum_{t=\tau}^Ty_t \right)
+  \label{chowRb}
+\end{align}
+From there, we can then compute the following object for the first two
+cases:
+\begin{align}
+  \bsR'(\bsX'\bsX)^{-1}\bsR
   &=
   \begin{pmatrix}
     1 & -1
@@ -27210,22 +27582,226 @@ With $R$ and $X$ as defined above
     1 \\ -1
   \end{pmatrix}
   = \tau^{-1} + (T-\tau)^{-1}
-\end{align*}
-So form the $F$-statistic (though this is really a $\Chi^2$ since I'm
-using the true error variance $\sigma^2=1$, rather than $s^2$)
+  \label{chowvar}
+\end{align}
+Plug in Formulas~\ref{chowRb} and \ref{chowvar} into the statistic
+\ref{chowchi}, we get exactly the $F_T$ statistic form
+in Definition~\ref{defn:Fchow}.
+\end{proof}
+
+Next, we relax the strong assumption of iid standard normal errors.  In
+this case, the $F_T$ statistic of Definition~\ref{defn:Fchow} is not
+necessarily optimal \emph{or} exactly $\Chi_1$ distributed in finite
+samples.
+But we still might want to use that statistic to test for a break
+nonetheless.
+Therefore, we now derive the asymptotic distribution of the $F_T$
+statistic (under the null) allowing for more general assumptions about
+the error process $\{u_t\}$.
+
+\begin{prop}\emph{(Null Asymptotic Distribution of $F_T$-stat)}
+\label{prop:Fchow}
+Suppose we have a stationary process $\{y_t\}$ as in
+Definition~\ref{defn:Fchow}, but with errors $\{u_t\}$ that are not
+necessarily iid standard normal.
+To allow for the greatest generality, assume that
 \begin{align*}
+  u_t = \psi(L)\varepsilon_t
+  \qquad\text{where}\quad
+  \varepsilon_t \sim (0,\sigma^2)
+\end{align*}
+Let $\Omega=\sigma^2\psi(1)$ denote the long run variance of
+$\{u_t\}$ with consistent estimator and $\hat{\Omega}_T$.
+Then for known break date $\tau=sT\in\{1,\ldots,T\}$,
+under the null $H_0:\delta=0$,
+\begin{align}
+  \frac{F_T(\tau)}{\hat{\Omega}_T}
+  \quad\dto\quad
+  \frac{%
+    \left( W(s) - s W(1)\right)^2
+  }{s(1-s)}
+  \label{Fchowasymptotic}
+\end{align}
+for $s\in[0,1]$ where $W(s)$ is standard Brownian motion and $F_T(\tau)$
+is the test statistic in Definition~\ref{defn:Fchow}.
+\end{prop}
+\begin{rmk}
+Given this asymptotic distribution for $F_T(\tau)$ under the null, we can
+form an asymptotically correct test for a structural break
+at $\tau=sT$.
+In practice, this is done first by simulating/drawing many instances of
+the limiting random variable in Expression~\ref{Fchowasymptotic} to get
+a sample from the null asymptotic distribution. Then compute $F_T(\tau)$
+and reject when $F_T(\tau)$ is unlikely according to the null asymptotic
+distribution sample.
+\end{rmk}
+\begin{proof}
+Start by rewriting the expression for the $F$ statistic, starting with
+the numerator. First, note that under the null
+\begin{align*}
+  \left[
+  \frac{1}{\tau}\sum_{t=1}^\tau y_t
+  \right]
+  -
+  \left[
+  \frac{1}{T-\tau}\sum_{t=\tau+1}^T y_t
+  \right]
+  %&=
+  %\left[
+  %\frac{1}{\tau}\sum_{t=1}^\tau (\mu+u_t)
+  %\right]
+  %-
+  %\left[
+  %\frac{1}{T-\tau}\sum_{t=\tau+1}^T (\mu+u_t)
+  %\right]
+  %\\
+  &=
+  \left[
+  \frac{1}{\tau}\sum_{t=1}^\tau u_t
+  \right]
+  -
+  \left[
+  \frac{1}{T-\tau}\sum_{t=\tau+1}^T u_t
+  \right]
+\end{align*}
+where the $\mu$'s from each sum on the LHS simply cancelled out on the
+way to the RHS.
+Use this and continue to simplify the $F$-statistic:
+\begin{align*}
+  \frac{F_T(\tau)}{\hat{\Omega}_T}
+  &=
+  \frac{1}{\hat{\Omega}_T}
+  \frac{%
+  \left(
+  \frac{T}{\tau(T-\tau)}
+  \frac{\tau(T-\tau)}{T}
+  \left[
+  \frac{1}{\tau}
+  \frac{\sqrt{T}}{\sqrt{T}}
+  \sum_{t=1}^\tau u_t
+  -
+  \frac{1}{T-\tau}
+  \frac{\sqrt{T}}{\sqrt{T}}
+  \sum_{t=\tau+1}^T u_t
+  \right]
+  \right)^2
+  }{\tau^{-1} + (T-\tau)^{-1}}
+  \\
+  &=
+  \frac{1}{\hat{\Omega}_T}
+  \frac{%
+  \left(
+  \frac{(T-\tau)}{T}
+  \frac{1}{\sqrt{T}}
+  \sum_{t=1}^\tau u_t
+  -
+  \frac{\tau}{T}
+  \frac{1}{\sqrt{T}}
+  \sum_{t=\tau+1}^T u_t
+  \right)^2
+  }{\tau(T-\tau)/T^2}
+\end{align*}
+Next, define partial sum as in Definition~\ref{fcltsum}
+\begin{align*}
+  W_T^*(s) =
+  \frac{1}{\sqrt{T}}
+  \sum_{t=1}^{\lfloor s T\rfloor}
+  u_t
+  + o_p(1)
+\end{align*}
+Evaluate $F_T(\tau)$ at $\tau=\lfloor sT\rfloor$ and use this definition
+to replace the sums
+\begin{align*}
+  \frac{F_T({\lfloor sT\rfloor})}{\hat{\Omega}}
+  &=
+  \frac{1}{\hat{\Omega}_T}
+  \frac{%
+  \left(
+  \frac{(T-{\lfloor sT\rfloor})}{T}
+  \frac{1}{\sqrt{T}}
+  \sum_{t=1}^{\lfloor sT\rfloor} u_t
+  -
+  \frac{{\lfloor sT\rfloor}}{T}
+  \frac{1}{\sqrt{T}}
+  \sum_{t={\lfloor sT\rfloor}+1}^T u_t
+  \right)^2
+  }{{\lfloor sT\rfloor}(T-{\lfloor sT\rfloor})/T^2}
+  \\
+  &=
+  \frac{1}{\hat{\Omega}_T}
+  \frac{%
+    \left(
+    \frac{(T-{\lfloor sT\rfloor})}{T}
+    W_T^*(s)
+    -
+    \frac{{\lfloor sT\rfloor}}{T}
+    \big[W_T^*(1)-W_T^*(s)\big]
+    \right)^2
+  }{\frac{\lfloor sT\rfloor}{T}\frac{(T-{\lfloor sT\rfloor})}{T}}
+  + o_p(1)
+\end{align*}
+Sending $T\ra\infty$, the Functional Central Limit Theorem
+(\ref{thm:fclt}) implies convergence of
+$W_T^*(s)\dto \sqrt{\Omega} W(s)$, while the continuous mapping theorem
+ensures convergence
+\begin{align*}
+  \frac{F_T(sT)}{\hat{\Omega}_T}
+  \quad
+  \dto
+  \quad
+  \frac{1}{\Omega}
+  \frac{%
+    \Omega \left( (1-s) W(s) - s \big[W(1)-W(s)\big] \right)^2
+  }{s(1-s)}
+  =
+  \frac{%
+    \left( W(s) - s W(1)\right)^2
+  }{s(1-s)}
+\end{align*}
+\end{proof}
+
+\clearpage
+\subsection{$\sup F_T$ Test for Unknown Break Date}
+
+The $F_T(\tau)$ statistic in Definition~\ref{defn:Fchow} of the previous
+section assumed the break date $\tau$ was \emph{known}, and we derived
+null distribution for the statistic (under different assumptions about
+the errors) which we could use to test whether there was, in fact, a
+break in the mean at that \emph{known} date $\tau$.
+This section considers testing for breaks when $\tau$ is unknown.
+
+\begin{defn}($\sup F_T$ Statistic)
+\label{defn:supF}
+Again suppose we have some stationary process $\{y_t\}$
+\begin{align*}
+  y_t
+  &= \mu + \delta \cdot \mathbf{1}\{t>\tau\} + u_t
+  \\
+  \text{where}\quad
+  u_t &= \psi(L)\varepsilon_t
+  \qquad\qquad \varepsilon_t\sim (0,\sigma^2)
+\end{align*}
+If the break date $\tau$ is unknown, we might reasonably look at the
+\emph{maximum} Definition~\ref{defn:Fchow} $F_T(\tau)$ statistic from
+across all break dates. This is called the
+\emph{$\sup F_T$ statistic}, and is defined
+\begin{align*}
+  \text{supF}_T
+  := \sup_{%
+    \tau \in
+    [\,
+      \lfloor \lambda T\rfloor,
+      \lfloor (1-\lambda) T\rfloor
+    \,]
+  }
   F_T(\tau)
-  &=
-  (R'\hat{\beta}-r)'
-  [\sigma^2 R'(X'X)^{-1}R]^{-1}
-  (R'\hat{\beta}-r)
-  \\
-  &=
-  (\hat{\mu}_1-\hat{\mu}_2-0)'
-  [\sigma^2 R'(X'X)^{-1}R]^{-1}
-  (\hat{\mu}_1-\hat{\mu}_2-0)
-  \\
-  &=
+  = \sup_{%
+    \tau \in
+    [\,
+      \lfloor \lambda T\rfloor,
+      \lfloor (1-\lambda) T\rfloor
+    \,]
+  }
   \frac{%
   \left(
   \frac{1}{\tau}\sum_{t=1}^\tau y_t
@@ -27234,450 +27810,83 @@ using the true error variance $\sigma^2=1$, rather than $s^2$)
   \right)^2
   }{\tau^{-1} + (T-\tau)^{-1}}
 \end{align*}
+where $\lambda\in(0,1)$ is some ``trimming'' parameter so we only
+consider break dates near the middle of the sample.
+This is purely for finite-sample numerical reasons so we don't divide by
+something close to zero (as we would near the endpoints for some
+candidate $F_T(\tau)$).
+\end{defn}
 
 
-
-\clearpage
-\section{Time Series GMM}
-
-\subsection{Distribution of Sample Mean}
-\label{sec:mean}
-
-This is a rather straightfoward exercise, but it allows us to derive a
-few important concepts in GMM notation. So let's go ahead.
-
-Given a sample $\{\bsy_t\}^T_{t=1}$ of stationary (typically
-autocorrelated) random variable $\bsy_t$, we defined an
-estimator of the sample mean, $\mathbb{E}_T(\bsy_t)$. Now
-let's characterize that estimator's distribution, since it too is a
-random variable.
-
-First, the mean:
-\begin{align*}
-  \mathbb{E}\left(\mathbb{E}_T(\bsy_t)\right)
-  &= \mathbb{E}\left(\frac{1}{T}\sum^T_{t=1} \bsy_t\right)
-  = \frac{1}{T}\sum^T_{t=1} \mathbb{E}\left(\bsy_t\right)
-  = \frac{1}{T} \times T \; \mathbb{E}\left(\bsy_t\right)\\
-  &= \mathbb{E}\left(\bsy_t\right)
-\end{align*}
-So $\mathbb{E}_T(\bsy_t)$ is an unbiased estimator of the
-unconditional mean of $\bsy_t$.
-
-Now we get the variance of the estimator, accounting for the fact that
-the sample $\{\bsy_t\}_{t=1}^T$ is not necessarily iid (though
-assumed stationary):
+\begin{prop}\emph{(Null Asymptotic Distribution for $\text{supF}_T$-Stat)}
+Suppose we have a stationary process $\{y_t\}$ as in
+Definition~\ref{defn:supF}.
+Let $\Omega=\sigma^2\psi(1)$ denote the long run variance of
+$\{u_t\}$ with consistent estimator and $\hat{\Omega}_T$.
+Then under the null $H_0:\delta=0$,
 \begin{align}
-  \text{Var}(\mathbb{E}_T(\bsy_t))
-  &=
-  \text{Var}\left(
-  \frac{1}{T}\sum^T_{t=1} \bsy_t
-  \right)
-  =
-  \frac{1}{T^2}\text{Var}\left(
-  \sum^T_{t=1} \bsy_t
-  \right)\notag\\
-  &=
-  \frac{1}{T^2}
-  \sum^T_{j=-T} (T-|j|)\text{Cov}\left(
-    \bsy_t, \bsy_{t-j}
-  \right) \notag\\
-  &=
-  \frac{1}{T^2}
-  \left[
-    \sum^T_{t=1} \text{Var}(\boldsymbol{y_t})
-    +
-    2\sum^T_{j=1} (T-|j|)\text{Cov}(\bsy_t,\bsy_{t-j})
-  \right]\notag\\
-  \Rightarrow\quad
-  \text{Var}(\mathbb{E}_T(\bsy_t))
-  &=
-  \frac{1}{T}
-  \left[
-    \text{Var}(\boldsymbol{y_t})
-    +
-    2\sum^T_{j=1} \frac{T-|j|}{T}
-    \text{Cov}(\bsy_t,\bsy_{t-j})
-  \right]
-  \label{eq:estvar}
+  \frac{\text{\emph{supF}}_T}{\hat{\Omega}_T}
+  \quad\dto\quad
+  \sup_{s\in [\lambda,1-\lambda]}
+  \frac{%
+    \left( W(s) - s W(1)\right)^2
+  }{s(1-s)}
+  \label{supFchowasymptotic}
 \end{align}
-A few things to note about this last result:
-\begin{enumerate}
-  \item In the case of iid observations,
-    $\text{Cov}(\bsy_t,\bsy_{t-j})$ will be zero for
-    all $j\neq 0$, in which case we get the classic ``$\sqrt{T}$
-    result'' for the standard deviation:
-    \begin{align*}
-      \text{Var}(\mathbb{E}_T(\bsy_t))
-      &=
-      \frac{\text{Var}(\boldsymbol{y_t})}{T}\\
-      \Rightarrow\quad
-      \sigma(\mathbb{E}_T(\bsy_t))
-      &=
-      \frac{\sigma(\boldsymbol{y_t})}{\sqrt{T}}
-    \end{align*}
-    In words, ``The average of any sample always gives a unbiased
-    estimate of the mean. And when the data is uncorrelated, the
-    precision of that estimate increases at a rate of $\sqrt{T}$.''
-
-  \item When the observations are \emph{not} iid (when there is serial
-    correlation in the sample), Equation~\ref{eq:estvar} says that you
-    don't really have $T$ observations. The serial correlation decreases
-    the number of \emph{effective} observations you have. So crank up
-    the variance of your estimate, depending upon how strong that serial
-    correlation is.
-
-  \item
-    You can see from Equation~\ref{eq:estvar} that when $T$ get's large,
-    $\frac{T-|j|}{T}$ approaches unity, which gives
-    \begin{align*}
-      \lim_{T\rightarrow\infty}
-      \text{Var}(\mathbb{E}_T(\bsy_t))
-      &=
-      \frac{1}{T}
-      \left[
-        \text{Var}(\boldsymbol{y_t})
-        +
-        2\sum^\infty_{j=1}
-        \text{Cov}(\bsy_t,\bsy_{t-j})
-      \right]
-      =
-      \frac{\bsS}{T}
-    \end{align*}
-    where $\bsS$ is the spectral density of $\bsy_t$
-    at frequency at zero.
-\end{enumerate}
-From there, we can use the Central Limit Theorem to state the following
-result.
-
-\begin{thm}
-Given a sample $\{\bsy_t\}_{t=1}^T$ for random variable
-$\bsy_t$
+where $W(s)$ is standard Brownian motion and $\text{supF}_T$ is the test
+statistic in Definition~\ref{defn:supF}.
+\end{prop}
+\begin{proof}
+First, the following is a continuous function of any random element
+$X:[0,1]\ra\R$:
 \begin{align*}
-  \sqrt{T}\left(
-    \mathbb{E}_T(\bsy_t) -\mathbb{E}(\bsy_t)
-  \right)
-  \xrightarrow{d} N(0,\bsS)
+  h(X)
+  :=\sup_{s\in[\lambda,1-\lambda]}
+  \frac{( X(s) -sX(1) )^2}{s(1-s)}
 \end{align*}
-where $\bsS$ is the spectral density at frequency zero defined
+By the same steps in the proof of Proposition~\ref{prop:Fchow}, we can
+write the $\text{supF}_T$ statistic as
 \begin{align*}
-  \bsS :=
-  \sum^\infty_{j=-\infty}
-    \text{\normalfont Cov}(\bsy_t, \bsy_{t-j})
-  =
-  \text{\normalfont Var}(\bsy_t)
-  + 2 \sum^\infty_{j=1}
-  \text{\normalfont Cov}(\bsy_t,\bsy_{t-j})
-\end{align*}
-This holds regardless of whether or not the data are iid or serially
-correlated (since you're using the correct covariance matrix,
-$\bsS$).
-\end{thm}
-
-Suppose that we have random variable
-$\bsy\in \mathbb{R}^m$, with mean and variance-covariance matrix as
-follows:
-\begin{align*}
-  \bsmu &:= \mathbb{E}(\bsy) =
-  \begin{pmatrix}
-    \mathbb{E}(y_1)\\\mathbb{E}(y_2)\\\vdots\\\mathbb{E}(y_m)
-  \end{pmatrix}
-  \in \mathbb{R}^m
+  \frac{\text{{supF}}_T}{\hat{\Omega}_T}
+  :=&\;
+  \frac{1}{\hat{\Omega}_T}
+  \times
+  \sup_{%
+    \tau \in
+    [\;
+      \lfloor \lambda T\rfloor,
+      \lfloor (1-\lambda) T\rfloor
+    \;]
+  }
+  \frac{%
+  \left(
+  \frac{1}{\tau}\sum_{t=1}^\tau y_t
+  -
+  \frac{1}{T-\tau}\sum_{t=\tau+1}^T y_t
+  \right)^2
+  }{\tau^{-1}+(T-\tau)^{-1}}
   \\
-  \bsSigma
-  &:=
-  \mathbb{E}\left[ (\bsy-\bsmu) (\bsy-\bsmu)' \right]
-  \in \mathbb{R}^{m\times m}
+  =&\;
+  \frac{1}{\hat{\Omega}_T}
+  \times
+  \sup_{ s \in [\lambda,1-\lambda]}
+  \frac{1}{\hat{\Omega}_T}
+  \frac{%
+    \left( W_T^*(s) - s W_T^*(1) \right)^2
+  }{s(1-s)}
+  + o_p(1)
+  \\
+  =&\;
+  \frac{1}{\hat{\Omega}_T}
+  h(W_T^*) + o_p(1)
 \end{align*}
-Now suppose that we have an iid sample $\left\{\bsy_i\right\}_{i=1}^N$.
-We can construct an estimator of the first moment vector
-\begin{align*}
-  \bshatmu_N
-  &=
-  \frac{1}{N}
-  \sum^N_{i=1}
-  \bsy_i\\
-  \sqrt{N}(\bshatmu_N - \bsmu)
-  &\dto N(0,\bsSigma)
-\end{align*}
-where the convergence of this estimator follows from the Central Limit
-Theorem.
-
-\begin{rmk}
-The fact that $\bsg(\bsmu)$ is only a function
-of the first moment of $\bsy$ isn't that restrictive if we're willing to
-generalize our notion of $\bsy$. We can easily accommodate more
-complicated moments with a minor tweak.
-
-To see this, suppose that we have some base random variable
-$\bsx\in\mathbb{R}^n$
-\begin{align*}
-  \bsx =
-  \begin{pmatrix}
-    x_1\\x_2\\\vdots\\x_n
-  \end{pmatrix}
-  \in \mathbb{R}^n
-\end{align*}
-along with sample $\{\bsx_i\}_{i=1}^N$. If we want second
-moments or cross-correlations of elements in $\bsx$, simply
-define a function $\bsh: \mathbb{R}^n \rightarrow
-\mathbb{R}^m$ to do the transformations you want and set
-\begin{align*}
-  \bsy
-  :=\bsh(\bsx)
-  =
-  \begin{pmatrix}
-    h_1(\bsx)\\h_2(\bsx)\\\vdots\\h_m(\bsx)
-  \end{pmatrix}
-  \in\mathbb{R}^m
-\end{align*}
-Then, to generate the sample for $\bsy$, just take
-\begin{align*}
-  \{\bsy_i\}_{i=1}^N &:=
-  \left\{\bsh\left(\bsx_i\right)\right\}_{i=1}^N
-\end{align*}
-From there, proceed exactly as before. In this way, we can always use
-the ``first moment representation'' above, leaving open the possibility
-that $\bsy$ is actually a transformation or function of some
-base random variable.
-\end{rmk}
+Since $W_T^*\ra \sqrt{\Omega} W$ and $h(\sqrt{\Omega} W)=\Omega h(W)$,
+the Continuous Mapping Theorem gives that
+$\text{{supF}}_T/\hat{\Omega}_T \dto h(W)$, which is simply the limiting
+random variable in Expression~\ref{supFchowasymptotic}.
+\end{proof}
 
 
-\subsection{Standard Errors}
-
-Next, suppose we have a sample $\{\bsy_t\}^T_{t=1}$. To get
-standard errors for the various objects we will estimate, we proceed in
-a sequence of steps
-\begin{enumerate}
-  \item Define $\bsS$, the spectral density matrix of
-    population moment vector
-    $\bsg(
-    \bsb)=\mathbb{E}[\boldsymbol{f}(\bsy,
-    \bsb)]$ for fixed $\bsb$.
-
-    Given fixed $\bsb$, the vector
-    $\bsg(\bsb)
-    =\mathbb{E}[\boldsymbol{f}(\bsy_t,\bsb)]$
-    is simply the mean of object
-    $\boldsymbol{f}(\bsy_t,\bsb)$.
-    We recall the definition from Section~\ref{sec:mean} for
-    the spectral density at frequency zero:
-    \begin{align*}
-      \bsS = \sum^\infty_{j={-\infty}}
-        \text{Cov}(\boldsymbol{f}(\bsy_t,\bsb),
-          \boldsymbol{f}(\bsy_t,\bsb))
-        =
-        \mathbb{E}\left[
-        \boldsymbol{f}(\bsy_t,\bsb)
-        \boldsymbol{f}(\bsy_t,\bsb)'
-        \right]
-    \end{align*}
-    Nothing deep there, just applying our definition from earlier. Of
-    course, eventually, we'll have to talk about estimating this beast
-    given a sample (since we usually won't know $\bsS$), but
-    for now, let's just take it as given and work through the math for
-    everything else. We'll return to it later.
-
-  \item Use $\bsS$ to derive the standard error of sample mean
-    $\boldsymbol{a}_T\bsg_T(\bsb)$ for fixed
-    $\bsb$.\footnote{We compute standard errors for
-      $\boldsymbol{a}_T\bsg_T(\bsb)$, not just
-      $\bsg_T(\bsb)$ because we impose that the
-      former equals zero, but we don't know anything about the latter.
-      And we will need to use the equality
-      $\boldsymbol{a}_T\bsg_T(\bsb)=0$,
-      Taylor-expand the lefthand side, shuffle things around, and get
-      results in the next step.}
-
-    Just like in Section~\ref{sec:mean}, we have a sample estimate
-    $\bsg_T(\bsb)$ for a population mean vector
-    $\bsg(\bsb)$. We also have $\bsS$, the
-    spectral density at frequency zero. Put this together to get
-    \begin{align*}
-      \sqrt{T}\left(\bsg_T(\bsb)
-      - \bsg(\bsb)\right)
-      &\xrightarrow{d} N(0,\bsS)\\
-      \Rightarrow \quad
-      \text{Var}\left(
-        \boldsymbol{a}
-        \bsg_T(\bsb)
-      \right)
-      &=
-      \frac{\boldsymbol{a}\bsS\boldsymbol{a}'}{T}
-    \end{align*}
-    where $\boldsymbol{a}= \text{plim}\;\boldsymbol{a}_T$.
-
-  \item Use the delta method to derive standard errors for
-    $\bshatb$.
-
-    We know the distribution of $\bsg_T(\bsb)$
-    for any fixed $\bsb$,
-    so we can do the usual delta function math,\footnote{%
-    Note, I could have used the delta method formula above, but the
-    notation makes it
-    tricky to apply here since this derivation treats
-    $\bsg_T(\bsb)$ as the sampling distribution we
-    \emph{know}, and $\bsb$ as the transformation of
-    $\bsg_T(\bsb)$ whose sampling distribution we
-    \emph{want to know}.  Now that's fine since $\bsb$ really
-    is a function of $\bsg_T(\bsb)$ (it's the
-    inverse), but it's not conducive to the notation in the delta method
-    section. So I just opt for the more direct approach this one time.%
-    }
-    writing out a Taylor Series expansion of $\boldsymbol{a}
-    \bsg_T(\bshatb)$ about the true parameter
-    vector $\bsb_0$ to get
-    \begin{align}
-      \boldsymbol{a} \bsg_T(\bshatb)
-      &= 0\notag\\
-      \boldsymbol{a} \bsg_T(\bsb_0)
-      + \boldsymbol{a}
-      \frac{\partial \bsg_T}{\partial \bsb'}
-      (\bshatb-\bsb_0)
-      &= 0\notag\\
-      (\bshatb-\bsb_0)
-      &=
-      -(\boldsymbol{a} \bsd)^{-1}
-      \boldsymbol{a} \bsg_T(\bsb_0)
-      \label{eq:bhat_b0}\\
-      \text{Var}\left(\bshatb-\bsb_0\right)
-      &=
-      (\boldsymbol{a} \bsd)^{-1}
-      \; \left[\text{Var}\left(
-        \boldsymbol{a} \bsg_T(\bsb_0)
-      \right)
-      \right]
-      {(\boldsymbol{a} \bsd)^{-1}}'\notag\\
-      \text{Var}\left(\bshatb-\bsb_0\right)
-      &=
-      \frac{1}{T}
-      (\boldsymbol{a} \bsd)^{-1}
-      \boldsymbol{a} \bsS \boldsymbol{a}'
-      {(\boldsymbol{a} \bsd)^{-1}}'\notag
-    \end{align}
-    where we defined
-    \begin{align*}
-      \bsd &:=
-      \mathbb{E}\left[
-        \frac{\partial \boldsymbol{f}}{\partial \bsb'}
-      \right]
-      =
-      \frac{\partial \bsg_T(\bsb)}{%
-        \partial \bsb'}
-    \end{align*}
-
-  \item Use the delta method to derive standard errors for
-    $\bsg_T(\bshatb)$.
-
-    We just got the distribution of $\bshatb$, now let's
-    get the distribution of $\bsg_T(\bshatb$,
-    which incorporates both variation in our sample \emph{and} in our
-    parameter estimates). Again, delta method
-    \begin{align}
-      \bsg_T(\bshatb)
-      &\approx
-      \bsg_T(\bsb_0)
-      + \bsd
-      \left(\bshatb-\bsb_0\right)\notag\\
-      \text{From (\ref{eq:bhat_b0})}
-      \qquad\qquad
-      &=
-      \bsg_T(\bsb_0)
-      -\bsd(\boldsymbol{a} \bsd)^{-1}
-      \boldsymbol{a} \bsg_T(\bsb_0)\notag \\
-      \bsg_T(\bshatb)
-      &\approx
-      \left(\boldsymbol{I}
-      -\bsd(\boldsymbol{a} \bsd)^{-1}
-      \boldsymbol{a} \right)
-      \bsg_T(\bsb_0)\notag\\
-      \Rightarrow\quad
-      \text{Var}\left(
-      \bsg_T(\bshatb)
-      \right)
-      &\approx
-      \frac{1}{T}
-      \left(\boldsymbol{I}
-      -\bsd(\boldsymbol{a} \bsd)^{-1}
-      \boldsymbol{a} \right)
-      \bsS
-      \left(\boldsymbol{I}
-      -\bsd(\boldsymbol{a} \bsd)^{-1}
-      \boldsymbol{a} \right)'
-      \label{eq:vargtbhat}
-    \end{align}
-    And lastly, just a quick word about this variance.
-
-    Recall that there are $m$ moments, and we set $p$ linear
-    combinations of them to zero. Hence, $p$ elements of
-    $\bsg_T(\bsb)$ will have zero variance
-    for \emph{all} choices of $b$, by construction. That means the
-    variance-covariance matrix for
-    $\bsg_T(\bshatb)$ given by
-    Equation~\ref{eq:vargtbhat} will be \emph{singular}.  Since some
-    formulas require us to invert this object, we will need to use a
-    pseudo-inverse.\footnote{Here's one quick way to do that given
-      variance-covariance matrix $\Sigma$. Do an eigenvalue
-      decomposition $\Sigma = Q\Lambda Q'$. Construct $\Lambda_*$, which
-      simply inverts all non-zero eigenvalues on the diagonal of
-      $\Lambda$, and set $\Sigma^{-1}=Q\Lambda_*Q'$.}
-
-\end{enumerate}
-
-\subsection{Test of Overidentifying Restrictions}
-
-We're trying to set $\bsg_T(\bsb)$ to zero, but
-again, we have to make some tradeoffs and set only a few moments (or
-linear combinations of moments) to zero. We might then run tests to see
-if the remaining moments we didn't force to zero are statistically
-large---i.e.\ far from zero, so bad news for the model.
-
-To that end, form the $J_T$ statistic
-\begin{align}
-  J_T =
-  T
-  \bsg_T(\bshatb)'
-  \left[
-  \left(
-    \boldsymbol{I}-\bsd(\boldsymbol{a}\bsd)^{-1}
-    \boldsymbol{a}
-  \right)
-  \bsS
-  \left(
-    \boldsymbol{I}-\bsd(\boldsymbol{a}\bsd)^{-1}
-    \boldsymbol{a}
-  \right)'
-  \right]^{-1}
-  \bsg_T(\bshatb)
-  \label{eq:jtest}
-\end{align}
-Ignore the details and focus on the intution of the line above: We're
-just squaring and adding up each elements of
-$\bsg_T(\bshatb)$, but weighting those elements
-by the object in brackets, which is precisely the inverse
-variance-covaraince matrix of $\bsg_T(\bshatb)$
-from Equation~\ref{eq:vargtbhat} above.  In other words, we're dividing
-the size of each squared ``deviation from zero'' by its variance (to
-standardize), and then adding all of them up to evaluate the deviations
-\emph{jointly}.
-
-Finally, we just need to specify what distribution $J_T$ follows. By the
-central limit theorem, $\bsg_T(\bshatb)$ should
-be multivariate normal. We standardized all the elements by their
-variance, squared them, and added them up, so we have a sum of squared
-standard normals: $\Chi^2$ distribution
-\begin{align*}
-  J_T \sim \Chi^2_{m-p}
-\end{align*}
-where $m$ is the number of moments and $p$ is the number of parameters
-we estimated. We're used to this kind of degrees of freedom calculation,
-but in the GMM context, it has additional meaning. In particular, we can
-think of the $m-p$ degrees of freedom as a consequence of setting $p$
-elements of $\bsg_T(\bshatb)$ to zero
-\emph{always}. Recall that this meant zero variance for those elements,
-hence a singular variance-covariance matrix for
-$\bsg_T(\bshatb)$ of rank $m-p$. So there are
-only $m-p$ squared standard normals to add up for our $\Chi^2$
-distribution.
 
 
 

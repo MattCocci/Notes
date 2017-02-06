@@ -1,0 +1,2718 @@
+\documentclass[12pt]{article}
+
+\author{Matthew D. Cocci}
+\title{ECO-521: Notes}
+\date{\today}
+
+%% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % most detailed page formatting control
+\usepackage{fullpage} % Simpler than using the geometry package; std effect
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+%% Formatting %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[margin=1in]{geometry}
+    %   Adjust the margins with geometry package
+%\usepackage{pdflscape}
+    %   Allows landscape pages
+%\usepackage{layout}
+    %   Allows plotting of picture of formatting
+
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt}
+    %   Make the header bigger to avoid overlap
+
+%\fancyhf{}
+    %   Erase header settings
+
+%\renewcommand{\headrulewidth}{0.3pt}
+    %   Width of the line
+
+%\setlength{\headsep}{0.2in}
+    %   Distance from line to text
+
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rmk}{Remark}
+\newtheorem*{note}{Note}
+
+% Below supports left-right alignment in matrices so the negative
+% signs don't look bad
+\makeatletter
+\renewcommand*\env@matrix[1][c]{\hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols #1}}
+\makeatother
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+\usepackage{courier}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref}
+\hypersetup{%
+    colorlinks,
+        %   This colors the links themselves, not boxes
+    citecolor=black,
+        %   Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Colors %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{color}
+\definecolor{codegreen}{RGB}{28,172,0}
+\definecolor{codelilas}{RGB}{170,55,241}
+
+% David4 color scheme
+\definecolor{d4blue}{RGB}{100,191,255}
+\definecolor{d4gray}{RGB}{175,175,175}
+\definecolor{d4black}{RGB}{85,85,85}
+\definecolor{d4orange}{RGB}{255,150,100}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{verbatim}
+    %   For including verbatim code from files, no colors
+\usepackage{listings}
+    %   For including code snippets written directly in this doc
+
+\lstdefinestyle{bash}{%
+  language=bash,%
+  basicstyle=\footnotesize\ttfamily,%
+  showstringspaces=false,%
+  commentstyle=\color{gray},%
+  keywordstyle=\color{blue},%
+  xleftmargin=0.25in,%
+  xrightmargin=0.25in
+}
+\lstdefinestyle{log}{%
+  basicstyle=\scriptsize\ttfamily,%
+  showstringspaces=false,%
+  xleftmargin=0.25in,%
+  xrightmargin=0.25in
+}
+
+
+\lstdefinestyle{matlab}{%
+  language=Matlab,%
+  basicstyle=\footnotesize\ttfamily,%
+  breaklines=true,%
+  morekeywords={matlab2tikz},%
+  keywordstyle=\color{blue},%
+  morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+  identifierstyle=\color{black},%
+  stringstyle=\color{codelilas},%
+  commentstyle=\color{codegreen},%
+  showstringspaces=false,%
+    %   Without this there will be a symbol in
+    %   the places where there is a space
+  %numbers=left,%
+  %numberstyle={\tiny \color{black}},%
+    %   Size of the numbers
+  numbersep=9pt,%
+    %   Defines how far the numbers are from the text
+  emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{blue},%
+    %   Some words to emphasise
+}
+
+\newcommand{\matlabcode}[1]{%
+    \lstset{style=matlab}%
+    \lstinputlisting{#1}
+}
+    %   For including Matlab code from .m file with colors,
+    %   line numbering, etc.
+
+\lstdefinelanguage{Julia}%
+  {morekeywords={abstract,break,case,catch,const,continue,do,else,elseif,%
+      end,export,false,for,function,immutable,import,importall,if,in,%
+      macro,module,otherwise,quote,return,switch,true,try,type,typealias,%
+      using,while},%
+   sensitive=true,%
+   %alsoother={$},%
+   morecomment=[l]\#,%
+   morecomment=[n]{\#=}{=\#},%
+   morestring=[s]{"}{"},%
+   morestring=[m]{'}{'},%
+}[keywords,comments,strings]
+
+\lstdefinestyle{julia}{%
+    language         = Julia,
+    basicstyle       = \scriptsize\ttfamily,
+    keywordstyle     = \bfseries\color{blue},
+    stringstyle      = \color{codegreen},
+    commentstyle     = \color{codegreen},
+    showstringspaces = false,
+    literate         = %
+      {ρ}{{$\rho$}}1
+      {ℓ}{{$\ell$}}1
+      {∑}{{$\Sigma$}}1
+      {Σ}{{$\Sigma$}}1
+      {√}{{$\sqrt{}$}}1
+      {θ}{{$\theta$}}1
+      {ω}{{$\omega$}}1
+      {ɛ}{{$\varepsilon$}}1
+      {φ}{{$\varphi$}}1
+      {σ²}{{$\sigma^2$}}1
+      {Φ}{{$\Phi$}}1
+      {ϕ}{{$\phi$}}1
+      {Dₑ}{{$D_e$}}1
+      {Σ}{{$\Sigma$}}1
+      {γ}{{$\gamma$}}1
+      {δ}{{$\delta$}}1
+      {τ}{{$\tau$}}1
+      {μ}{{$\mu$}}1
+      {β}{{$\beta$}}1
+      {Λ}{{$\Lambda$}}1
+      {λ}{{$\lambda$}}1
+      {r̃}{{$\tilde{\text{r}}$}}1
+      {α}{{$\alpha$}}1
+      {σ}{{$\sigma$}}1
+      {π}{{$\pi$}}1
+      {∈}{{$\in$}}1
+      {∞}{{$\infty$}}1
+}
+
+
+%% Bibliographies %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{natbib}
+    %---For bibliographies
+%\setlength{\bibsep}{3pt} % Set how far apart bibentries are
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{enumitem}
+    %   Has to do with enumeration
+\usepackage{appendix}
+%\usepackage{natbib}
+    %   For bibliographies
+\usepackage{pdfpages}
+    %   For including whole pdf pages as a page in doc
+\usepackage{pgffor}
+    %   For easier looping
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\clearpage
+\section{Rational Inattention}
+
+Idea: Attention is information flow; limited attention implemented as a
+bound on information flow or a cost for the information flow.
+
+\subsection{Entropy and Information}
+
+\begin{defn}(Entropy)
+Shannon Entropy of RV $X$ with density $p(x)$
+\begin{align*}
+  H(X)
+  :=
+  \E\big[-\ln\big(p(X)\big)\big]
+\end{align*}
+That definition holds for continuous or discrete RVs, in which case
+$p(x)$ is a density with respect to the Lebesgue or counting measure,
+respectively.
+
+We can also define conditional entropy $H(Y|X)$, which measures how much
+information is required to describe $Y$ (on average) if $X$ already
+known:
+\begin{alignat*}{3}
+  H(Y|X)
+  &:= \E_x\big[H(Y|X=x)\big]
+  &&= \E_x\bigg\{\E_{y|x}\big[-\ln\big(p(Y|X)\big)\big]\bigg\}
+  \\
+  &\;= \int H(Y|X=x)p(x)\;dx
+  &&= \int\left\{
+    \int
+    -\ln\big(p(y|x)\big)
+    p(y|x)\;dy
+  \right\}p(x)\;dx
+  %\\
+  %&&&=
+  %\int \int -\ln\big(p(y|x)\big) p(y|x) p(x)\;dy\;dx
+\end{alignat*}
+Intuitively, entropy measures
+\begin{itemize}
+  %\item How much information/description is required, on average, to
+    %describe $X$ with the probability density function $p(x)$
+  \item How much we \emph{don't} know, or
+    how much we would learn by resolving the uncertainty
+  \item How much ``missing information'' there is in a probability
+    distribution
+  %\item How much we learn from an experiment (i.e. actually observing an
+    %observation).
+\end{itemize}
+%For example, entropy as a function of $p$ for a Bernoulli($p$) RV
+%follows an upside $U$ with maximum entropy at $p=1/2$.
+%Entropy goes to zero as $p\ra 0$ or $p\ra 1$, since no information need
+%be sent (on average) to communicate that $X=0$ or $X=1$ if it alsmost
+%\emph{always} takes on a particular value.
+%If $p=1/2$ and entropy is maximized, then I need to communicate more on
+%average since it's equally likely 0 or 1.
+This above definition of entropy can be derived axiomatically as the
+\emph{only} definition satisfying:
+\begin{itemize}
+  \item Depends \emph{only} on the probability distribution
+    $H(X)=H(p)$.
+  \item $H(X)$ maximized for a uniform RV $X$.
+    %To see this, if $p$ is the density for $X$, compute
+    %\begin{align*}
+      %H(X)
+      %= H(p)
+      %= \max_p \E\big[-\ln\big(p(x)\big)\big]
+      %&= \max_p \int -\ln\big(p(x)\big) p(x)\;dx
+      %\\
+      %\text{FOC w.r.t. $p$}\qquad
+      %0 &=
+      %- 1
+      %-\ln p(x)
+      %\\
+      %p(x)
+      %&=
+      %e^{- 1}
+    %\end{align*}
+
+  \item Unaffected by adding zero probability states
+  \item Additive:
+    It follows the chain rule
+    \begin{align*}
+      H(X,Y) = H(X) + H(Y|X)
+      %= H(X)+\E_x[H(Y|X=x)]
+    \end{align*}
+    Then for two independent RVs, $H(X,Y)=H(X)+H(Y)$.
+    Also ``CRS'' in some sense.
+\end{itemize}
+\end{defn}
+
+\begin{ex}(Entropy of Gaussian RVs)
+Suppose that $X\sim\calN(\mu,\Sigma)$. Then its entropy is
+\begin{align*}
+  H(X)
+  = \frac{1}{2}\ln\big( (2\pi e)^k \cdot|\Sigma|\big)
+\end{align*}
+\end{ex}
+
+\clearpage
+\begin{defn}(Mutual Information)
+Given joint density $p(x,y)$ for $(X,Y)$, define expectation as the
+following expectation (computed by integrating w.r.t. density $p(x,y)$)
+\begin{align*}
+  I(X,Y)
+  := \E\left[
+    \ln\frac{p(X,Y)}{p(Y)p(Y)}
+  \right]
+\end{align*}
+%For continuous and discrete RVs:
+%\begin{align*}
+  %I(X,Y)
+  %&=
+  %\int
+  %\int
+  %\ln\frac{p(x,y)}{p(x)p(y)}
+  %p(x,y)\;dx\,dy
+  %\\
+  %H(X)
+  %&=
+  %\sum_x \sum_y
+  %\ln\frac{p(x,y)}{p(x)p(y)}
+  %p(x,y)
+%\end{align*}
+Mutual information quantifies information that one RV contains about
+another, i.e. the reduction in uncertainty.
+If independent, then $p(x,y)=p(x)p(y)$ and $I(X,Y)=0$.
+From this definition, it's also clear that $I(X,Y)=I(Y,X)$.
+
+Note also that we can rewrite the integrand to get
+\begin{align*}
+  I(X,Y)
+  = \E\left[
+    \ln\frac{p(Y|X)}{p(Y)}
+  \right]
+  = \E\left[
+    -\ln p(Y)
+    + \ln p(Y|X)
+  \right]
+  &= H(Y)-H(Y|X)
+\end{align*}
+or, by a similar derivation,
+\begin{align*}
+  I(X,Y)
+  &= H(X)-H(X|Y)
+\end{align*}
+In either case, the mutal information equals the entropy
+\emph{reduction} from observing one variable.
+%For continuous and discrete RVs, that is:
+%\begin{align*}
+  %I(X,Y)
+  %&=
+  %-\int \ln\big(p(x)\big)p(x)\;dx
+  %+\int \left[\int \ln\big(p(x|y)\big)p(x|y)\;dx\right]p(y)\,dy
+  %\\
+  %I(X,Y)
+  %&=
+  %-\sum_x \ln\big(p(x)\big)p(x)
+  %+\sum_y \left[\sum_x \ln\big(p(x|y)\big)p(x|y)\right]p(y)
+%\end{align*}
+\end{defn}
+
+
+\clearpage
+\subsection{Canonical Problem}
+
+Canonical problem has the following ingredients:
+\begin{itemize}
+  \item The agent maximizes expected utility/payoff $\E[U(X,Y)]$, where
+    $Y$ is some input, state, cost, or fundamental and $X$ is some
+    action taken by the agent
+  \item
+    $Y$ has \emph{known}/\emph{given} density $g(y)$ with respect to
+    dominating measure $\mu_Y$.
+    \emph{However}, $Y$ is \emph{imperfectly observed} by
+    \emph{purposeful, rational, and optimal choice} of the agent.
+    Why?
+
+    We often suppose either that it is \emph{costly} to observe $Y$
+    more accurately, or there is some bound/constraint on
+    the agent's ability to observe $Y$ accurately.
+    All of this will be formulated in the context of mutual information.
+    But most importantly, this is the mechanism that makes inattention
+    rational/optimal.
+  \item
+    Agent chooses some action $X$ based on their imperfect observation
+    of $Y$
+\end{itemize}
+How to make formalize this notation that $Y$ is imperfectly observed?
+Two options
+\begin{enumerate}[label=(\roman*)]
+  \item
+    We could have the agent pick an noisy signal $Z=h(Y,\varepsilon)$ of
+    the true $Y$, where the mapping $h$ and the variance of the noise
+    $\varepsilon$ is chosen by the agent ex ante, with either a cost to
+    lowering variance or a hard limit.
+    Then, the action $X$ could be represented as some function $X=a(Z)$.
+
+    However, notice that $Z$ is a nuisance parameter.
+    It doesn't show up in the utility function $U(X,Y)$, and there may
+    be some indeterminacy, i.e. multiple ways to structure $h(\cdot)$
+    and $\varepsilon$ that generates the same signal $Z$ and/or behavior
+    of the action $X$.
+    This next approach eliminates both of these issues and is much more
+    direct.
+  \item
+    The agent \emph{directly} chooses the joint density $p(x,y)$ over
+    the action and input pair $(X,Y)$, subject to some information
+    constraint.
+\end{enumerate}
+
+\begin{defn}(Canonical Setup with Information Bound)
+We can formulate the above as
+\begin{align*}
+  \max_{p(x,y)}
+  &\;\E[U(X,Y)]
+  \\
+  \qquad \text{s.t.}\quad
+  &
+  \int p(x,y)\;d\mu_X(x)
+  = g(y)
+  \\
+  &
+  I(X,Y)
+  \leq \kappa
+\end{align*}
+where $\mu_X$ is the base measure for $X$.
+Note that we don't assume the base measure $\mu_X$ is
+\emph{automatically} Lebesgue since $X$ might be chosen to be discrete.
+\end{defn}
+
+\begin{defn}(Canonical Setup with Information Cost)
+In the problem above, capacity is free up to a limit.
+Alternatively, can set up the problem as one with variable capacity but
+an information cost $C$ per unit of information:
+\begin{align*}
+  \max_{p(x,y)}
+  &\;\E[U(X,Y)]
+  -
+  \theta \cdot I(X,Y)
+  \\
+  \qquad \text{s.t.}\quad
+  &
+  \int
+  p(x,y)\;d\mu_X(x)
+  = g(y)
+\end{align*}
+\end{defn}
+
+\begin{defn}
+(Lagrangian and FOCs for Canonical Problem with Information Cost)
+The Lagrangian for the second canonical representation is given by
+\begin{align*}
+  \sL
+  &=
+  \E[U(X,Y)]
+  - \theta\cdot I(X,Y)
+  -
+  \lambda(y)
+  \left[
+    g(y) - \int p(x,y)d\mu_X(x)
+  \right]
+\end{align*}
+To simplify, recall one definition of the information
+\begin{align*}
+  I(X,Y)
+  &=
+  \E\left[\ln \frac{p(x,y)}{p(x)p(y)}\right]
+  =
+  \E\left[
+    \ln
+    \frac{p(x,y)}{%
+      \int p(x,y)\;d\mu_Y(y) \times \int p(x,y)\;d\mu_X(x)
+    }
+  \right]
+  \\
+  &=
+  \int\int
+  \left[
+    \ln p(x,y)
+    - \ln\left(\int p(x,y)\;d\mu_X(x)\right)
+    - \ln\left(\int p(x,y)\;d\mu_Y(y)\right)
+  \right]
+  p(x,y)
+  \;d\mu_X(x)\;d\mu_Y(y)
+\end{align*}
+Note since the constraint implies $g(y)=\int p(x,y)\;d\mu_X(x)$, we can
+simplify by subbing in $g(y)$ into the information expression,
+since that equality is implied in the solution anyway.\footnote{%
+  Obviously don't sub that into the bracketed parts that actually
+  enforces the constraint $p(y)=g(y)$
+}
+Then
+\begin{align*}
+  \calL
+  &=
+  \int U(x,y) p(x,y)\;d\mu_X(x)\,d\mu_Y(y)
+  -
+  \lambda(y)
+  \left[
+  g(y)
+  -
+  \int p(x,y)\;d\mu_X(x)
+  \right]
+  \\
+  &\qquad
+  -
+  \theta
+  \bigg[
+  \int \ln\big(p(x,y)\big) p(x,y)\;d\mu_X(x)d\mu_Y(y)
+  - \int \ln\big(g(y)\big) g(y)\;d\mu_Y(y)
+  \\
+  &\qquad\qquad\qquad
+  - \int \ln \left(\int p(x,y')\;d\mu_Y(y')\right)
+      p(x,y)\;d\mu_X(x)\,d\mu_Y(y)
+  \bigg]
+\end{align*}
+The first order condition is as follows (see appendix for more detail on
+how to get it for the double integral in brackets, which is less than
+straightforward):
+\begin{align*}
+  U(x,y)
+  &=
+  -\lambda(y)
+  +
+  \theta
+  \left[
+  \left(
+  \frac{p(x,y)}{p(x,y)}
+  + \ln p(x,y)
+  \right)
+  - 0
+  - \left(
+  1+\ln\left(\int p(x,y)\; d\mu_Y(y)\right)
+  \right)
+  \right]
+  \\
+  &=
+  -\lambda(y)
+  +
+  \theta
+  \ln\left(
+  \frac{p(x,y)}{\int p(x,y)\; d\mu_Y(y)}
+  \right)
+\end{align*}
+Noting that the quotient is a conditional density, this first order
+condition simplifies to
+\begin{align*}
+  U(x,y)
+  &=
+  -\mu(y)
+  +
+  \theta
+  \ln p(y|x)
+  \quad\implies\quad
+  p(y|x)
+  =
+  \tilde{\mu}(y)
+  e^{\frac{1}{\theta}U(x,y)}
+\end{align*}
+which holds for all points where $p(x,y)>0$.
+Can then solve according to the following steps
+\begin{itemize}
+  \item The fact that $p(y|x)$ must be a probability density implies
+    \begin{align*}
+      \forall x
+      \qquad
+      1 = \int p(y|x) \;d\mu_Y(y) =
+      \int
+      \tilde{\mu}(y)e^{\frac{1}{\theta}U(x,y)}\;d\mu_Y(y)
+    \end{align*}
+    Since $\tilde{\mu}(y)$ is fixed across $y$, can set up system of
+    many equations (each corresponding to a different $x$) to solve for
+    the unkown multiplier $\tilde{\mu}(y)$.
+    That then pins down $p(y|x)$.
+
+  \item
+    Given $\tilde{\mu}$ and $p(y|x)$, compute marginal $p(x)$ by
+    using constraint imposed on $p(y)$:
+    \begin{align*}
+      \forall y\qquad
+      g(y)
+      = p(y)
+      = \int p(x,y) \;d\mu_X(x)
+      = \int p(y|x)p(x) \;d\mu_X(x)
+    \end{align*}
+    This holds for all $y$, hence can set up a system of many equations
+    (each corresponding to a different $y$) to solve for the unkown
+    $p(x)$.
+
+
+\end{itemize}
+\end{defn}
+
+
+
+
+\clearpage
+\section{Gaussian Case}
+
+If we assume $Y$ is Gaussian and $U$ quadratic, then the solution will
+also generally imply a Gaussian joint density $p(x,y)$.
+
+\begin{defn}(Simple Gaussian Case)
+Suppose that $U(X,Y)=-(Y-X)^2$, in which case this is a tracking problem
+where we want the action $X$ to match imperfectly observed $Y$.
+We can see from the FOCs above that this utility function implies
+conditional density
+\begin{align*}
+  p(y|x)
+  =
+  e^{\tilde{\mu}(y)}
+  e^{-\frac{1}{\theta}(y-x)^2}
+\end{align*}
+This suggests a normal density with mean $x$ and variance $\theta/2$,
+i.e. $Y|X\sim\calN(X,\theta/2)$.
+But for that to be true, we must be able to choose $\tilde{\mu}(y)$
+correctly \emph{and} satisfy the constraint that
+$g(y)=\int p(x,y)\;d\mu_X(x)$.
+With $Y$ normal, we also need $\theta/2<\sigma^2_Y$, i.e. $X$ \emph{is}
+informative about and correlated with $Y$.
+Otherwise, don't even try to observe $Y$, and just set $X$ equal to the
+mean.
+\end{defn}
+
+
+\begin{defn}(General Gaussian Case)
+Suppose $X$ and $Y$ are vectors and utility quadratic
+\begin{align*}
+  U(X,Y)
+  = -Y'AY + Y'BX - X'CX
+\end{align*}
+$Y$ gaussian implies joint Gaussianity of the solution for $(X,Y)$,
+hence of $Y|X$.
+In that case, information satisfies
+\begin{align*}
+  I(X,Y)
+  =
+  \E\left[
+    \frac{p(X,Y)}{p(X)p(Y)}
+  \right]
+  =
+  \E\left[
+    \frac{p(Y|X)}{p(Y)}
+  \right]
+  &=
+  \E[-\ln p(Y)]
+  -\E[-\ln p(Y|X)]
+  \\
+  \implies\quad
+  I(X,Y)
+  &=
+  H(Y)
+  - H(Y|X)
+\end{align*}
+In other words, information is entropy of $Y$ less entropy of $Y|X$.
+Since entropy for a Gaussian RV $Z$ is proportional to $\ln|\Sigma_Z|$,
+that means we can write
+\begin{align*}
+  I(X,Y)
+  \propto
+  \ln(|\Sigma_Y|)
+  - \ln(|\Sigma_{Y|X}|)
+\end{align*}
+Since $\theta$ is just a scaling constant, that means we can write the
+general static LQ problem as
+\begin{align*}
+  &\boxed{%
+    (*)
+    =
+    \max_{p(x,y)}
+    \E[-Y'AY + Y'BX - X'CX]
+    -\theta(\ln |\Sigma_Y|-\ln|\Sigma_{Y|X}|)
+  }
+  \\
+  &\text{s.t.}\quad
+  \Sigma_Y-\Sigma_{Y|X} \;\text{psd}
+\end{align*}
+where the PSD requirement ensures that $Y$ and $X$ are, in fact,
+correlated.
+Note that this used the fact that we \emph{knew} $Y|X$ would be Gaussian
+(because of quadratic utility/payoff).
+\end{defn}
+
+\clearpage
+\begin{defn}(Solution via Certainty Equivalence)
+Since this is a Gaussian LQ problem, certainty equivalence holds.
+So no matter how much information we choose to collect (i.e. what level
+of information to pick), we can find the optimal $X$ by replacing $Y$
+with $\hat{Y}=\E[Y|\calI]$ (where $\calI$ represents whatever
+information we collect) and then solving deterministic problem.
+We will then pin down the actual level of information (i.e. $\calI$)
+later. But first, let's use certainty equivalence and solve
+\begin{align*}
+  \max_{X}
+  -\hat{Y}'A\hat{Y} + \hat{Y}'BX - X'CX
+  -\theta(\ln |\Sigma_Y|-\ln|\Sigma_{Y|X}|)
+\end{align*}
+This has FOCs w.r.t. $X$ of
+\begin{align*}
+  0 &= B'\hat{Y} - 2CX
+  \quad\implies\quad
+  X =
+  \frac{1}{2}C^{-1}B'\hat{Y}
+\end{align*}
+Hence, we rewrite the original objective function as
+\begin{align*}
+  (*)
+  &=
+  \E[-Y'AY + Y'BX - X'CX]
+  -\theta(\ln |\Sigma_Y|-\ln|\Sigma_{Y|X}|)
+  \\
+  &=
+  \E\left[
+    - Y'AY
+    + \frac{1}{2}Y'BC^{-1}B'\hat{Y}
+    - \frac{1}{4}\hat{Y}'BC^{-1}CC^{-1}B'\hat{Y}
+  \right]
+  -\theta(\ln |\Sigma_Y|-\ln|\Sigma_{Y|X}|)
+  \\
+  &=
+  \E\left[
+    - Y'AY
+    + \frac{1}{2}Y'BC^{-1}B'\hat{Y}
+    - \frac{1}{4}\hat{Y}'BC^{-1}B'\hat{Y}
+  \right]
+  -\theta(\ln |\Sigma_Y|-\ln|\Sigma_{Y|X}|)
+\end{align*}
+Next, note that we can iterate expectations on the middle term
+\begin{align*}
+  (*)
+  &=
+  \E\left[
+    - Y'AY
+    + \frac{1}{2}\E[Y'BC^{-1}B'\hat{Y}|\calI]
+    - \frac{1}{4}\hat{Y}'BC^{-1}B'\hat{Y}
+  \right]
+  -\theta(\ln |\Sigma_Y|-\ln|\Sigma_{Y|X}|)
+  \\
+  &=
+  \E\left[
+    - Y'AY
+    + \frac{1}{4}\hat{Y}'BC^{-1}B'\hat{Y}
+  \right]
+  -\theta(\ln |\Sigma_Y|-\ln|\Sigma_{Y|X}|)
+\end{align*}
+where we combined the middle and last term after iterated expectations
+made them the same. Next, to simplify again, we note that
+\begin{align*}
+  \Var(Y)
+  = \Sigma_Y
+  \quad
+  \Var(Y|X)
+  = \Sigma_{Y|X}
+  \quad
+  \Var(\hat{Y})
+  = \Sigma_H
+  = \Sigma_Y-\Sigma_{Y|X}
+  %\quad
+  %Y = \hat{Y} + \varepsilon
+  %\qquad
+  %\varepsilon\sim\calN(0,\Sigma_{Y|X})
+\end{align*}
+as well as the standard result
+\begin{align*}
+  \E[ZWZ]
+  = \trace(W\Sigma) + \mu'W\mu
+  \qquad \text{where}\quad
+  Z\sim\calN(\mu,\Sigma)
+\end{align*}
+All of this lets us simplify the objective function (ignoring the mean
+terms) to
+\begin{align*}
+  (*)
+  &=
+  -\trace(A\Sigma_Y)
+  +\frac{1}{4}\trace(BC^{-1}B'\Sigma_H)
+  -\theta(\ln |\Sigma_Y|-\ln|\Sigma_{Y|X}|)
+  \\
+  &=
+  -\trace\big(A(\Sigma_H+\Sigma_{Y|X})\big)
+  +\frac{1}{4}\trace(BC^{-1}B'\Sigma_H)
+  -\theta(\ln |\Sigma_Y|-\ln|\Sigma_{Y|X}|)
+  \\
+  &=
+  -\trace(A\Sigma_H)
+  -\trace(A\Sigma_{Y|X})
+  +\frac{1}{4}\trace(BC^{-1}B'\Sigma_H)
+  -\theta(\ln |\Sigma_Y|-\ln|\Sigma_{Y|X}|)
+\end{align*}
+With this form of the objective function, we then solve a maximization
+problem over $\Sigma_{Y|X}$ subject to the no-forgetting constraint that
+$\Sigma_H=\Sigma_Y-\Sigma_{Y|X}$ is positive semidefinite.
+The solution sets $\Sigma_{Y|X}=4\theta (BC^{-1}B')^{-1}$.
+
+\end{defn}
+
+\clearpage
+\section{FTPL}
+
+\subsection{Canonical Problem}
+
+
+\begin{defn}
+Household solves the problem
+\begin{align*}
+  \max_{C,M,B}
+  \; &
+  \E\left[
+    \int_{t=0}^\infty
+    e^{-\beta t}\ln(C_t)\;dt
+  \right]
+  \\
+  \qquad \text{s.t}\quad
+  &
+  C (1+\gamma v) + \frac{\dot{B}+\dot{M}}{P}
+  = Y + \frac{rB}{P} - \tau
+\end{align*}
+\end{defn}
+
+\begin{defn}
+Hamiltonian and FOCs for household problem are as follows:
+\begin{align*}
+  H
+  =
+  e^{-\beta t}
+  \left[
+    \ln(C)
+    -
+    \lambda
+    \left(
+      C \left(1+\gamma \frac{PC}{M}\right)
+      + \frac{\dot{B}+\dot{M}}{P}
+      - Y - \frac{rB}{P} + \tau
+    \right)
+  \right]
+\end{align*}
+FOCs
+\begin{align*}
+  0
+  =
+  \frac{\partial H}{\partial C}
+  -
+  \frac{d}{dt}
+  \frac{\partial H}{\partial \dot{C}}
+  &=
+  e^{-\beta t}
+  \left[
+    \frac{1}{C}
+    -
+    \lambda
+    \left(
+    (1+\gamma v)
+    + \gamma v
+    \right)
+  \right]
+  -0
+  \\
+  \implies\quad
+  \frac{1}{C}
+  &=
+    \lambda
+    \left(
+    1+2\gamma v
+    \right)
+  \\
+  0
+  =
+  \frac{\partial H}{\partial M}
+  -
+  \frac{d}{dt}
+  \frac{\partial H}{\partial \dot{M}}
+  &=
+  e^{-\beta t}
+  \lambda
+  C \gamma \frac{PC}{M^2}
+  +
+  \frac{d}{dt}
+  \left[
+  e^{-\beta t}
+  \frac{\lambda}{P}
+  \right]
+  =
+  e^{-\beta t}
+  \lambda
+  \gamma v^2\frac{1}{P}
+  +
+  \left[
+  -\beta e^{-\beta t}
+  \frac{\lambda}{P}
+  +
+  e^{-\beta t}
+  \frac{\dot{\lambda}}{P}
+  -
+  e^{-\beta t}
+  \frac{\lambda}{P}
+  \frac{\dot{P}}{P}
+  \right]
+  \\
+  \implies\quad
+  \gamma v^2
+  &=
+  \frac{\dot{P}}{P}
+  -
+  \frac{\dot{\lambda}}{\lambda}
+  +
+  \beta
+  \\
+  0
+  =
+  \frac{\partial H}{\partial B}
+  -
+  \frac{d}{dt}
+  \frac{\partial H}{\partial \dot{B}}
+  &=
+  e^{-\beta t} \lambda \frac{r}{P}
+  +
+  \frac{d}{dt}
+  \left[
+  e^{-\beta t} \lambda \frac{1}{P}
+  \right]
+  =
+  e^{-\beta t} \lambda \frac{r}{P}
+  +
+  \left[
+  -\beta e^{-\beta t} \lambda \frac{1}{P}
+  +
+  e^{-\beta t} \dot{\lambda} \frac{1}{P}
+  -
+  e^{-\beta t} \lambda
+  \frac{1}{P}
+  \frac{\dot{P}}{P}
+  \right]
+  \\
+  \implies\quad
+  r
+  &=
+  \beta
+  - \frac{\dot{\lambda}}{\lambda}
+  + \frac{\dot{P}}{P}
+\end{align*}
+Collecting
+\begin{align*}
+  \frac{1}{C}
+  &=
+    \lambda
+    \left(
+    1+2\gamma v
+    \right)
+  \\
+  \gamma v^2
+  &=
+  \frac{\dot{P}}{P}
+  -
+  \frac{\dot{\lambda}}{\lambda}
+  +
+  \beta
+  \\
+  r
+  &=
+  \beta
+  - \frac{\dot{\lambda}}{\lambda}
+  + \frac{\dot{P}}{P}
+\end{align*}
+Differentiate the first FOC with respect to time to get
+\begin{align*}
+  \frac{d}{dt}
+  \left[
+  \frac{1}{C}
+  \right]
+  &=
+  \frac{d}{dt}
+  \left[
+    \lambda
+    \left(
+    1+2\gamma v
+    \right)
+  \right]
+  \quad\implies\quad
+  -\frac{\dot{C}}{C}
+  \frac{1}{C}
+  =
+    \dot{\lambda}
+    \left(
+    1+2\gamma v
+    \right)
+    +
+    2\lambda
+    \gamma \dot{v}
+\end{align*}
+This, with the original FOCs, can be reduced to two equations:
+%\begin{align*}
+  %\begin{rcases}
+    %\frac{1}{C}
+    %=
+    %\lambda
+    %\left(
+    %1+2\gamma v
+    %\right)
+    %\\
+    %-\frac{\dot{C}}{C}
+    %\frac{1}{C}
+    %=
+    %\dot{\lambda}
+    %\left(
+    %1+2\gamma v
+    %\right)
+    %+
+    %2\lambda
+    %\gamma \dot{v}
+    %\\
+    %-\frac{\dot{\lambda}}{\lambda}
+    %= r-\beta -\frac{\dot{P}}{P}
+  %\end{rcases}
+  %\quad\implies\quad
+    %\frac{\dot{C}}{C}
+    %+ \frac{2 \gamma \dot{v}}{\left( 1+2\gamma v \right)}
+    %=
+    %r-\beta -\frac{\dot{P}}{P}
+%\end{align*}
+\begin{align*}
+  \boxed{%
+    \frac{\dot{C}}{C}
+    + \frac{2 \gamma \dot{v}}{\left( 1+2\gamma v \right)}
+    =
+    r-\beta -\frac{\dot{P}}{P}
+  }
+  \quad\qquad
+  \boxed{%
+    \gamma v^2
+    =
+    r
+  }
+\end{align*}
+\end{defn}
+
+\begin{defn}
+The system can be described by the above household optimality
+conditions, a social resource constraint, the definition of $v$ (or
+really $\dot{v}/v$), and the government budget constraint:
+%These are the conditions implied by household optimization. To complete
+%the system, we add two final equations: the definition of $v$
+%(differentiated) and the SRC:
+%\begin{align*}
+  %v
+  %=\frac{PC}{M}
+  %\quad\implies\quad
+  %\frac{\dot{v}}{v}
+  %&=
+  %\frac{\dot{P}}{P}
+  %+ \frac{\dot{C}}{C}
+  %- \frac{\dot{M}}{M}
+  %%\quad\implies\quad
+  %%\frac{\dot{M}}{M}
+  %%=
+  %%\frac{\dot{P}}{P}
+  %\\
+  %Y
+  %&=
+  %C (1+\gamma v)
+%\end{align*}
+\begin{align*}
+  \frac{\dot{C}}{C}
+  + \frac{2 \gamma \dot{v}}{\left( 1+2\gamma v \right)}
+  &=
+  r-\beta -\frac{\dot{P}}{P}
+  \\
+  \gamma v^2
+  &=
+  r
+  \\
+  Y &= C (1+\gamma v)
+  \\
+  \frac{\dot{v}}{v}
+  &=
+  \frac{\dot{P}}{P}
+  + \frac{\dot{C}}{C}
+  - \frac{\dot{M}}{M}
+  \\
+  r\frac{B}{P}
+  &=
+  \tau
+  +
+  \frac{\dot{B}+\dot{M}}{P}
+\end{align*}
+\end{defn}
+
+\begin{defn}(Active Fiscal, Passive Money, $r=\overline{r}$)
+With $r=\overline{r}$ fixed, liquidity preference implies
+fixed velocity:
+\begin{align*}
+  \gamma \overline{v}^2
+  = \overline{r}
+  \quad\implies\quad
+  \overline{v}
+  = \sqrt{\frac{\overline{r}}{\gamma}}
+\end{align*}
+With $Y$ constant, the social resource constraint then implies constant
+$C$, so $\dot{C}=0$.
+With $\dot{C}=\dot{v}=0$ as derived, the intertemporal condition implies
+constant infation rate
+\begin{align*}
+  \frac{\dot{P}}{P}
+  = \overline{r}-\beta
+\end{align*}
+Then, by the definition of $v$, constant $C$, constant $v$, and this
+value of inflation imply
+\begin{align*}
+  \frac{\dot{M}}{M}
+  =
+  \frac{\dot{P}}{P}
+  = \overline{r}-\beta
+\end{align*}
+Hence, real balances $M/P$ are also constant.
+Let $b=B/P$. Then we can rewrite the GBC
+\begin{align*}
+  b=
+  \frac{B}{P}
+  \quad\implies\quad
+  \frac{\dot{b}}{b}
+  =
+  \frac{\dot{B}}{B}
+  - \frac{\dot{P}}{P}
+  \quad\implies\quad
+  \overline{r}b
+  &=
+  \tau
+  +
+  \dot{b}
+  +
+  \frac{\dot{P}}{P}
+  b
+  + \frac{\dot{M}}{P}
+  \\
+  &=
+  \tau
+  +
+  \dot{b}
+  +
+  b
+  (\overline{r}-\beta)
+  + (\overline{r}-\beta)
+    \overline{m})
+  \\
+  \dot{b}
+  &=
+  \beta b
+  - \tau
+  - (\overline{r}-\beta)\overline{m}
+\end{align*}
+where $\overline{m}$ is the constant level of real money balances.
+This is an unstable differential equation in $b$, so anything where
+$\dot{b}\neq 0$ will eventually lead to exploding $b$ values.
+Can those explosive paths be equilibria?
+
+A solution that explodes up will violate TVC.
+A solution that explodes down will imply negative $\dot{b}$ which is not
+allowed.
+Therefore, only $\dot{b}=0$ is consistent with equilibrium.
+And in that case,
+\begin{align*}
+  0
+  &=
+  \beta b
+  - \tau
+  - (\overline{r}-\beta)\overline{m}
+\end{align*}
+Solve for $b$ as a function of parameters and such.
+This will imply a unique initial price level $P_0$, since $B_0$ and
+$M_0$ given.
+\end{defn}
+
+\begin{defn}(Passive Fiscal, Active Money $\dot{M}/M=k$)
+Given the system given above, combine the equation for $\dot{v}/v$ with
+intertemporal and rearrange
+\begin{align*}
+  \frac{\dot{v}}{v}
+  + k
+  + \frac{2 \gamma }{\left( 1+2\gamma v \right)}\dot{v}
+  &=
+  \gamma v^2
+  -\beta
+\end{align*}
+(\emph{Stable Solution})
+Stable solution with $\dot{v}=0$ has constant velocity satisfying
+\begin{align*}
+  k
+  &=
+  \gamma v^2
+  -\beta
+  \quad\implies\quad
+  v = \sqrt{\frac{k+\beta}{\gamma}}
+\end{align*}
+(\emph{Other Solutions})
+What about unstable? First, rearrange the equation above
+\begin{align*}
+  \frac{(1+4\gamma v)}{v(1+2\gamma v)}
+  \dot{v}
+  &=
+  \left[
+  \gamma v^2
+  - k
+  -\beta
+  \right]
+  \quad\implies\quad
+  \boxed{%
+    \dot{v}
+    =
+    \frac{v(1+2\gamma v)}{(1+4\gamma v)}
+    (\gamma v^2 - k -\beta)
+  }
+\end{align*}
+Note that this is explosive. If initial $v$ is above the steady state
+value $\dot{v}>0$, and explode up.
+To make headway, it will be useful to rearrange again:
+\begin{align*}
+  \boxed{%
+    1=
+    \left[
+    \frac{(1+4\gamma v)}{v(1+2\gamma v)}
+    \frac{1}{(\gamma v^2 - k -\beta)}
+    \right]
+    \dot{v}
+  }
+\end{align*}
+Then integrate from $0$ to $t$:
+\begin{align}
+  \boxed{%
+    t=
+    \int_{v_0}^{v_t}
+    \left[
+    \frac{(1+4\gamma v)}{v(1+2\gamma v)}
+    \frac{1}{(\gamma v^2 - k -\beta)}
+    \right]
+    \;dv
+  }
+  \label{int}
+\end{align}
+(\emph{Checking for Upward Exploding Solution})
+On the upward explosive path, $v_t\ra\infty$, and
+the integrand is $O(v^{-3})$. Note that
+\begin{align*}
+  \int_{v_0}^{v_t} v^{-3}\;dv
+  =
+  \left[
+    -\frac{1}{2}
+    v^{-2}
+  \right]_{v_0}^{v_t}
+  =
+  -\frac{1}{2}
+  \frac{1}{v_t^2}
+  +
+  \frac{1}{2}
+  \frac{1}{v_0^2}
+  \quad\implies\quad
+  \lim_{v_t\ra \infty}
+  \int_{v_0}^{v_t} v^{-3}\;dv
+  =
+  \frac{1}{2}
+  \frac{1}{v_0^2}
+\end{align*}
+Note that this is finite, even as $v_t$ explodes up.
+But the LHS in Expression~\ref{int} is unbounded.
+So to maintain the equality in Expression~\ref{int}, it must be the case
+that velocity hits $\infty$ in finite time.
+Otherwise, Expression~\ref{int} would not be true for some $t$ large
+enough.
+Finally, with $v=PC/M$ exploding up, we must have $P\ra \infty$ (since
+consumption must obey the SRC and remain finite). Then $C\ra 0$.
+\\
+\\
+(\emph{Checking for Downward Exploding Solution})
+Note that on downward explosive paths, $v_t\ra 0$.
+To see this, not that if $v_t$ is exploding down, it must be that $v_t$
+will approach or cross zero. So consider what happens to $\dot{v}/v$ as
+$v\ra 0$. In particular, the formula above gives
+\begin{align*}
+  \lim_{v\ra 0}
+    \frac{\dot{v}}{v}
+    =
+  \lim_{v\ra 0}
+    \frac{(1+2\gamma v)}{(1+4\gamma v)}
+    (\gamma v^2 - k -\beta)
+    =
+    -k-\beta
+\end{align*}
+Hence, $v\ra 0$, decreasing at this exponential rate.
+%\begin{align*}
+  %\dot{v}
+  %=
+  %\frac{v(1+2\gamma v)}{(1+4\gamma v)}
+  %(\gamma v^2 - k -\beta)
+  %=
+  %O(v^3)
+%\end{align*}
+%So for $v$ small, $\dot{v}$ is even smaller, so we don't pass through to
+%zero, we just converge to zero slowly.
+%More formally, returning to the integral expression, note that for $v$
+%small
+%\begin{align*}
+  %\frac{1}{v^3}
+  %\leq \frac{1}{v}
+  %\quad\implies\quad
+  %\text{Integrand is $O(v^{-1})$ for small $v$}
+%\end{align*}
+%Moreover,
+%\begin{align*}
+  %\int_{v_t}^{v_0} v^{-1}\;dv
+  %=
+  %\left[
+    %\log(v)
+  %\right]_{v_t}^{v_0}
+  %=
+  %\log(v_0)
+  %- \log(v_t)
+%\end{align*}
+%where the order of integration was switched because exploding down.
+%As $v_t\ra0$, $\log(v_t)\ra -\infty$, and so this integral explodes.
+%So $v$ just converges to zero eventually, not in finite time.
+
+
+GBC, rewritten in terms of real government debt
+\begin{align*}
+  rb
+  &=
+  \tau
+  +
+  \dot{b}
+  +
+  \frac{\dot{P}}{P}
+  b
+  + \frac{\dot{M}}{P}
+  \\
+  \quad\implies\quad
+  \dot{b}
+  &=
+  \left(
+  r - \frac{\dot{P}}{P}
+  \right)
+  b
+  - \frac{\dot{M}}{P}
+  - \tau
+\end{align*}
+With constant money and fiscal rule $\tau=-\phi_0+\phi_1b$:
+\begin{align*}
+  \dot{b}
+  &=
+  \left(
+  r - \frac{\dot{P}}{P}
+  \right)
+  b
+  +\phi_0-\phi_1b
+\end{align*}
+\end{defn}
+
+
+\clearpage
+\section{Problems}
+
+\subsection{Fall 2015}
+
+Household solves the problem
+\begin{align*}
+  \max_{C,M,F,X}
+  \; &
+  \E\left[
+    \int_{t=0}^\infty
+    e^{-\beta t}\ln(C_t)\;dt
+  \right]
+  \\
+  \qquad \text{s.t}\quad
+  &
+  C (1+\gamma v) + \frac{Q\dot{X}+\dot{M}}{P}
+  + \dot{F}
+  = \bar{Y} + \rho F + \frac{X}{P} - \tau
+\end{align*}
+Hamiltonian
+\begin{align*}
+  H
+  =
+  e^{-\beta t}
+  \left[
+    \ln(C)
+    -
+    \lambda
+    \left(
+      C \left(1+\gamma \frac{PC}{M}\right) + \frac{Q\dot{X}+\dot{M}}{P}
+      + \dot{F}
+      - \bar{Y} - \rho F - \frac{X}{P} + \tau
+    \right)
+  \right]
+\end{align*}
+FOCs
+\begin{align*}
+  0
+  =
+  \frac{\partial H}{\partial C}
+  -
+  \frac{d}{dt}
+  \frac{\partial H}{\partial \dot{C}}
+  &=
+  e^{-\beta t}
+  \left[
+    \frac{1}{C}
+    -
+    \lambda
+    \left(
+    (1+\gamma v)
+    + \gamma v
+    \right)
+  \right]
+  -0
+  \\
+  \implies\quad
+  \frac{1}{C}
+  &=
+    \lambda
+    \left(
+    1+2\gamma v
+    \right)
+  \\
+  0
+  =
+  \frac{\partial H}{\partial M}
+  -
+  \frac{d}{dt}
+  \frac{\partial H}{\partial \dot{M}}
+  &=
+  e^{-\beta t}
+  \lambda
+  C \gamma \frac{PC}{M^2}
+  +
+  \frac{d}{dt}
+  \left[
+  e^{-\beta t}
+  \frac{\lambda}{P}
+  \right]
+  =
+  e^{-\beta t}
+  \lambda
+  \gamma v^2\frac{1}{P}
+  +
+  \left[
+  -\beta e^{-\beta t}
+  \frac{\lambda}{P}
+  +
+  e^{-\beta t}
+  \frac{\dot{\lambda}}{P}
+  -
+  e^{-\beta t}
+  \frac{\lambda}{P}
+  \frac{\dot{P}}{P}
+  \right]
+  \\
+  \implies\quad
+  \gamma v^2
+  &=
+  \frac{\dot{P}}{P}
+  -
+  \frac{\dot{\lambda}}{\lambda}
+  +
+  \beta
+  \\
+  0
+  =
+  \frac{\partial H}{\partial X}
+  -
+  \frac{d}{dt}
+  \frac{\partial H}{\partial \dot{X}}
+  &=
+  e^{-\beta t} \lambda \frac{1}{P}
+  +
+  \frac{d}{dt}
+  \left[
+  e^{-\beta t} \lambda \frac{Q}{P}
+  \right]
+  =
+  e^{-\beta t} \lambda \frac{r}{P}
+  +
+  \left[
+  -\beta e^{-\beta t} \lambda \frac{1}{P}
+  + e^{-\beta t} \dot{\lambda} \frac{Q}{P}
+  + e^{-\beta t} \lambda \frac{\dot{Q}}{P}
+  -
+  e^{-\beta t} \lambda
+  \frac{Q}{P}
+  \frac{\dot{P}}{P}
+  \right]
+  \\
+  \implies\quad
+  - \frac{\dot{\lambda}}{\lambda}
+  &=
+  \frac{r}{Q}
+  -\beta \frac{1}{Q}
+  + \frac{\dot{Q}}{Q}
+  -
+  \frac{\dot{P}}{P}
+  \\
+  0
+  =
+  \frac{\partial H}{\partial F}
+  -
+  \frac{d}{dt}
+  \frac{\partial H}{\partial \dot{F}}
+  &=
+  e^{-\beta t}
+  \lambda \rho F
+  +
+  \frac{d}{dt}
+  \left[
+  e^{-\beta t}
+  \lambda
+  \right]
+  =
+  e^{-\beta t}
+  \lambda \rho
+  +
+  \left[
+  -\beta
+  e^{-\beta t}
+  \lambda
+  +
+  e^{-\beta t}
+  \dot{\lambda}
+  \right]
+  \\
+  -\frac{\dot{\lambda}}{\lambda}
+  &=
+  \rho
+  -\beta
+\end{align*}
+Collecting
+\begin{align*}
+  \frac{1}{C}
+  &=
+    \lambda
+    \left(
+    1+2\gamma v
+    \right)
+  \\
+  \gamma v^2
+  &=
+  \frac{\dot{P}}{P}
+  -
+  \frac{\dot{\lambda}}{\lambda}
+  +
+  \beta
+  \\
+  \frac{1}{Q}
+  &=
+  -\frac{\dot{\lambda}}{\lambda}
+  +\frac{\beta}{1}
+  -\frac{\dot{Q}}{Q}
+  +
+  \frac{\dot{P}}{P}
+  \\
+  -\frac{\dot{\lambda}}{\lambda}
+  &=
+  \rho
+  -\beta
+\end{align*}
+%Also
+%\begin{align*}
+  %\frac{\dot{C}}{C}
+  %+ \frac{2 \gamma \dot{v}}{\left( 1+2\gamma v \right)}
+  %&=
+  %r-\beta -\frac{\dot{P}}{P}
+%\end{align*}
+Add to that the
+\begin{align*}
+  \frac{\dot{v}}{v}
+  &=
+  \frac{\dot{P}}{P}
+  + \frac{\dot{C}}{C}
+  - \frac{\dot{M}}{M}
+  \\
+  C (1+\gamma v)
+  + \dot{F}
+  &= \bar{Y} + \rho F
+  \\
+  \frac{Q\dot{X}+\dot{X}}{P}
+  &=
+  \frac{X}{P}
+  -\tau
+\end{align*}
+Combine shit in household FOCs
+\begin{align*}
+  \frac{1}{C}
+  &=
+    \lambda
+    \left(
+    1+2\gamma v
+    \right)
+  \\
+  \gamma v^2
+  &=
+  \frac{\dot{P}}{P}
+  +\rho
+  \\
+  \frac{1}{Q}
+  &=
+  \rho
+  +
+  \frac{\dot{P}}{P}
+\end{align*}
+
+
+
+
+
+
+
+
+
+
+\clearpage
+\subsection{Fall 2008}
+
+\paragraph{Problem 2}
+Central bank budget constraint
+\begin{align*}
+  \frac{\dot{M}-\dot{B}_C}{P}
+  &=
+  \frac{-rB_C}{P}
+  +\tau_C
+\end{align*}
+where $\tau_C$ denotes transfers to the fiscal authority.
+Treasury has budget constraint
+\begin{align*}
+  \frac{\dot{B}_F}{P}
+  +\tau +\tau_C =
+  \frac{rB_F}{P}
+\end{align*}
+Market clearing
+\begin{align*}
+  B_F = B_C + B
+\end{align*}
+For non-steady state solutions, rearrange
+
+
+With constant $v$ \textbf{(why is this the case? is it because
+accommodating fiscal policy)} and $Y$ constant, $C$
+is constant.
+And with $v$ and $C$ constant
+With money growth at a constant rate, $\pi=\dot{P}/P$ will be constant.
+Hence from the intertemporal equation
+\begin{align*}
+  r = \beta + 0.005
+\end{align*}
+
+
+
+
+
+
+
+
+\clearpage
+\paragraph{Problem 2}
+Part (a) is just as in class
+\begin{align*}
+  p(y_t|x_t)
+  \sim \calN(x_t,1/v)
+\end{align*}
+The variables $y_t$ and $x_t$ are jointly normal:
+\begin{align*}
+  \begin{pmatrix}
+    y_t \\ x_t
+  \end{pmatrix}
+  \sim\calN\left(
+  \begin{pmatrix}
+    \mu_{t,y} \\ \mu_{t,x}
+  \end{pmatrix},\;
+  \begin{pmatrix}
+    \sigma^2_{t,y} & \rho_t\sigma_{t,y}\sigma_{t,x} \\
+    &\sigma^2_{t,x}
+  \end{pmatrix}
+  \right)
+\end{align*}
+Then we have
+\begin{align*}
+  x_t
+  &\sim
+  \calN(\mu_{t,x},\sigma^2_{t,x})
+  \\
+  y_t
+  &\sim
+  \calN(\mu_{t,y},\sigma^2_{t,y})
+  \\
+  y_t|x_t
+  &\sim
+  \calN\left(
+    \mu_{t,y}+\rho_t\frac{\sigma_{t,y}}{\sigma_{t,x}}(x_t-\mu_{x,t})
+    ,\;
+    \sigma^2_{t,y} (1-\rho^2_t)
+  \right)
+\end{align*}
+From the FOCs, we know that
+\begin{align*}
+  y_t|x_t
+  \sim
+  \calN\big(x_t,\sigma^2_{t,y}(1-\rho_t^2)\big)
+\end{align*}
+We also know that the mutual information between $x_t,y_t$ satisfy
+\begin{align*}
+  I(x_t,y_t)=-\frac{1}{2}\log (1-\rho^2)
+\end{align*}
+
+
+Mutual information between $x_t$ and $y_t$ satisfies
+\begin{align*}
+\end{align*}
+In each period, we take the distribution of $y_t$ as given, i.e.
+$\mu_{t,y}$ and $\sigma^2_{t,y}$ as given.
+We also know
+
+\clearpage
+\section{Fall 2015}
+
+\paragraph{Problem 2}
+
+Profits summarized by
+\begin{table}[htbp!]
+\centering
+\begin{tabular}{c|cc}
+  & cost & \\\hline
+  price & low & high \\\hline\hline
+  low & 6 & 0 \\
+  high & 3 & 2
+\end{tabular}
+\end{table}
+Want something where all four cells have positive probability.
+Let $q(p,c)$ denote probability of price
+$p\in\{\text{low},\text{high}\}$ and cost
+$c\in\{\text{low},\text{high}\}$,
+with $\pi(p,c)$ denoting profits.
+Then the expected payoff is
+\begin{align*}
+  \E[\text{payoff}]
+  &= \sum_{p,c} \pi(p,c)q(p,c)
+\end{align*}
+We must satisfy, for each $c\in\{\text{low},\text{high}\}$ the following
+constraint
+\begin{align*}
+  0.5 = q(c) = \sum_{p} q(p,c)
+\end{align*}
+Mutual information between price and cost is given by
+\begin{align*}
+  I(p,c)
+  &= H(c) + H(p) - H(p,c)
+  %&= H(c) - H(c|p)
+  %\\
+  %&=
+  %-\sum_c
+  %\ln(q(c))
+  %q(c)
+  %+
+  %\sum_p
+  %\left[
+  %\sum_c
+  %\ln(q(c|p))q(c|p)
+  %\right]
+  %q(p)
+  %\\
+  %&=
+  %-\sum_c
+  %\ln(q(c))
+  %q(c)
+  %+
+  %\sum_p
+  %\sum_c
+  %\ln(q(c|p))q(p,c)
+  %\\
+  %&=
+  %-\sum_c
+  %\ln(q(c))
+  %q(c)
+  %+
+  %\sum_p
+  %\sum_c
+  %\ln\left(\frac{q(p,c)}{q(p)}\right)q(p,c)
+  \\
+  &=
+  -\sum_c
+  \ln(q(c))
+  q(c)
+  -
+  \sum_p
+  \ln\left(q(p)\right)
+  q(p)
+  +
+  \sum_p
+  \sum_c
+  \ln\left(q(p,c)\right)q(p,c)
+  \\
+  &=
+  -\sum_c
+  \ln(q(c))
+  q(c)
+  -
+  \sum_p
+  \left[
+  \ln\left(\sum_c q(p,c)\right)
+  \left(
+  \sum_c
+  q(p,c)
+  \right]
+  \right)
+  +
+  \sum_p
+  \sum_c
+  \ln\left(q(p,c)\right)q(p,c)
+\end{align*}
+Problem can be written
+\begin{align*}
+  \max_{q(p,c)}
+  \sum_p\sum_c
+  \pi(p,c) q(p,c)
+  - \theta
+  \left\{
+  \sum_p
+  \sum_c
+  \ln\left(q(p,c)\right)q(p,c)
+  -
+  \sum_p
+  \left[
+  \ln\left(\sum_c q(p,c)\right)
+  \left(
+  \sum_c
+  q(p,c)
+  \right]
+  \right)
+  \right\}
+\end{align*}
+First order condition with respect to $q(p,c)$ (for any specific
+pair $(p,c)$) is given by
+\begin{align*}
+  \pi(p,c)
+  &=
+  \lambda(c)
+  +
+  \theta
+  \ln q(c|p)
+  \quad\implies\quad
+  q(c|p)
+  =
+  \mu(c)
+  e^{\frac{\pi(p,c)}{\theta}}
+  %\\
+  %&=
+  %\lambda(c)
+  %+
+  %\theta
+  %\left[
+  %\ln q(c,p)
+  %- \ln\left(\sum_c q(c,p)\right)
+  %\right]
+\end{align*}
+Solve in the following sequence of steps
+\begin{itemize}
+  \item Pin down lagrange multipliers:
+    Note that it must be the case that
+    \begin{align*}
+      1 &=
+      \sum_c q(c|p)
+      =
+      \sum_c
+      \mu(c)
+      e^{\frac{\pi(p,c)}{\theta}}
+    \end{align*}
+    This equation holds for both $p$.
+    With the $\pi(p,c)$ and $\theta$ known, this gives two equations in two
+    unknowns that we can solve for $\mu(c)$.
+    Thus, the multipliers and $q(c|p)$ values are completely determined.
+
+  \item
+    We also know that
+    \begin{align*}
+      0.5 = q(c) = \sum_p q(p,c) = \sum_p q(c|p)q(p)
+    \end{align*}
+    This holds for each $c$. That's two equations that we can solve
+    for the two unkowns $q(p)$.
+
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%% APPPENDIX %%
+
+\appendix
+
+\clearpage
+\section{Citations}
+\href{http://www.columbia.edu/~md3405/Behave_Col_BR_3_16.pdf}{here},
+\href{https://infostructuralist.wordpress.com/2012/06/01/information-theory-in-economics-part-i-rational-inattention/}{this},
+
+\clearpage
+\section{Trick for Not Doing Functional Derivative Stuff}
+
+Trick to computing the following functional derivative
+\begin{align*}
+  (*)
+  =
+  \frac{\delta}{\delta f(x,y)}
+  \left[
+    \int \int
+    f(x,y)
+    \ln\left(\int f(x',y)\;dx'\right)
+    \;dx\,dy
+  \right]
+\end{align*}
+Pretend the integrals are sums, and compute the derivative of that.
+In particular, suppose we want the derivative with respect to
+$f(x^*,y^*)$, i.e. with respect to $f$ at point $(x^*,y^*)$.
+Then compute
+\begin{align*}
+  (*)
+  =
+  \frac{d}{df(x^*,y^*)}
+  \sum_x\sum_y
+  \left[
+    f(x,y)
+    \ln\left(\sum_{x'} f(x',y)\right)
+  \right]
+\end{align*}
+Only the term with $y=y^*$ remains, so we can drop the sum over $y$ and
+focus on
+\begin{align*}
+  (*)
+  &=
+  \frac{d}{df(x^*,y^*)}
+  \sum_x
+  \left[
+    f(x,y^*)
+    \ln\left(\sum_{x'} f(x',y^*)\right)
+  \right]
+  \\
+  &=
+  \frac{d}{df(x^*,y^*)}
+  \left[
+    \ln\left(\sum_{x'} f(x',y^*)\right)
+    \times
+    \sum_x
+    f(x,y^*)
+  \right]
+\end{align*}
+We moved out the $\ln$ term since it's a constant with respect to
+$x$ in the sum. Now apply the product rule to the two objects being
+multiplied:
+\begin{align*}
+  (*)
+  &=
+  \frac{d}{df(x^*,y^*)}
+  \left[
+  \ln\left(\sum_{x'} f(x',y^*)\right)
+  \right]
+  \times
+  \left[
+  \sum_x
+  f(x,y^*)
+  \right]
+  +
+  \left[
+    \ln\left(\sum_{x'} f(x',y^*)\right)
+  \right]
+  \times
+  \frac{d}{df(x^*,y^*)}
+  \left[
+    \sum_x
+    f(x,y^*)
+  \right]
+\end{align*}
+To make this expression a little nicer, $f(y^*)=\sum_x f(x,y^*)$ denote
+the marginal distribution. Sub that in wherever we're not taking
+derivatives
+\begin{align*}
+  &=
+  \frac{d}{df(x^*,y^*)}
+  \left[
+  \ln\left(\sum_{x'} f(x',y^*)\right)
+  \right]
+  \times
+  f(y^*)
+  +
+  \ln f(y^*)
+  \times
+  \frac{d}{df(x^*,y^*)}
+  \left[
+    \sum_x
+    f(x,y^*)
+  \right]
+\end{align*}
+Now compute the derivatives, which is quite straightforward
+\begin{align*}
+  (*)
+  &=
+  \frac{1}{f(y^*)}
+  \times
+  f(y^*)
+  +
+  \ln f(y^*)
+  \times
+  1
+  \\
+  &=
+  1
+  +\ln f(y^*)
+\end{align*}
+This is the answer for the functional derivative too.
+
+\clearpage
+\section{Functional Derivative Stuff}
+
+Here's the baseline starting point for functional derivatives, where
+$f(x)$ is a function of some (possibly vector) $x$ and $F[f(x)]$ is a
+functional that depends on $f(x)$:
+\begin{align*}
+  F[f]
+  &=\int L(x,f(x),f'(x))\;dx
+  \\
+  \implies\quad
+  \frac{\delta F[f]}{\delta f(x)}
+  &=
+  \frac{\partial L}{\partial f}
+  - \frac{d}{dx} \frac{\partial L}{\partial f'}
+\end{align*}
+Note that this is the change in $F[f]$ given a change in $f(x)$, i.e. in
+$f$ \emph{at the point} $x$ (leaving the rest unchanged).
+Of course a single point is measure zero, but if we think about
+integrating over points $x$, we'd see that this is the correct
+definition, and it's what follows if we think about taking a Taylor
+exansion or perturbing the entire function in a neighborhood of $x$, and
+sending the window about $x$ to zero.
+
+\begin{defn}(Product Rule)
+We have a product rule between functionals
+\begin{align*}
+  \frac{\delta (FG)[f]}{\delta f(x)}
+  &=
+  \frac{\delta F[f]}{\delta f(x)}
+  G[f]
+  +
+  F[f]
+  \frac{\delta G[f]}{\delta f(x)}
+\end{align*}
+\end{defn}
+
+
+\begin{defn}(Chain Rule, Convential Function $g$)
+We also have a chain rule.  First, suppose we take another conventional
+function $g$. Then
+\begin{align*}
+  \frac{\delta F[g(f)]}{\delta f(x)}
+  &=
+  \frac{\delta F[g(f)]}{\delta g[f(x)]}
+  \cdot
+  \frac{d g(f(x))}{d f(x)}
+  \\
+  \qquad \text{i.e.}\quad
+  \frac{\text{Change in $F[g(f)]$}}{\text{Change in $f$ at $x$}}
+  &=
+  \frac{\text{Change in $F[g(f)]$}}{\text{Change in $g$ at $f(x)$}}
+  \times
+  \frac{\text{Change in $g$ at $f(x)$}}{\text{Change in $f$ at $x$}}
+\end{align*}
+\end{defn}
+
+\begin{defn}(Chain Rule, Operator $G$)
+We might also take another an \emph{operator} $G$ that maps functions
+\emph{into functions} (rather than functions into a number like $F$
+does).
+For ease of notation, let $g := G[f]$ be the function that $G[f]$
+spits out. Then
+\begin{align*}
+  \frac{\delta F[G[f]]}{\delta f(x)}
+  &=\int
+  \frac{\delta F[g]}{\delta g(y)}
+  \cdot
+  \frac{\delta g(y)}{\delta f(x)} \; dy
+  \qquad \text{where}\quad
+  g := G[f]
+  \\
+  \qquad \text{i.e.}\quad
+  \frac{\text{Change in $F[G(f)]$}}{\text{Change in $f$ at $x$}}
+  &=
+  \int
+  \frac{\text{Change in $F[g]$}}{\text{Change in $g$ at $y$}}
+  \times
+  \frac{\text{Change in $g$ at $y$}}{\text{Change in $f$ at $x$}}
+  \;dy
+\end{align*}
+\end{defn}
+
+
+\begin{ex}
+I now use all of these results to compute the following functional
+derivatve
+\begin{align*}
+  \frac{\delta F[f]}{\delta f(x,y)}
+  &=
+  \frac{\delta}{\delta f(x,y)}
+  \left[
+  \int\int
+  f(x,y)\cdot
+  \ln\left( \int f(x',y) \, dx'\right)
+  \; dx\,dy
+  \right]
+  %\\
+  %&=
+  %\frac{\delta}{\delta f(x,y)}
+  %\left\{
+  %\int
+  %\left[
+  %\int
+  %f(x,y)
+  %\; dx
+  %\right]
+  %\times
+  %\left[
+  %\ln\left( \int f(x',y) \, dx'\right)
+  %\right]
+  %\,dy
+  %\right\}
+  %\\
+  %\implies\quad
+  %F[f]
+  %&=
+  %\frac{\delta}{\delta f(x,y)}
+  %\left\{
+  %\int
+  %G[f](y)
+  %\,dy
+  %\right\}
+\end{align*}
+\end{ex}
+
+%\clearpage
+%To do that, define the following objects
+%\begin{alignat*}{4}
+  %H[f]
+  %&:=
+  %\int f(x,y) \, dx
+  %\\
+  %G[f]
+  %&:=
+  %f(x,y)\cdot
+  %\ln\big(H[f](y)\big)
+  %\qquad&&=
+  %\;\;\;\;f(x,y)\cdot
+  %\ln\left( \int f(x',y) \, dx'\right)
+  %\\
+  %F[G[f]]
+  %&:=
+  %\int
+  %G[f]
+  %\; dx\,dy
+  %&&=
+  %\int
+  %f(x,y)\cdot
+  %\ln\left( \int f(x',y) \, dx'\right)
+  %\; dx\,dy
+%\end{alignat*}
+%We can compute derivatives of things.
+%\begin{align*}
+  %\frac{\delta H[f]}{\delta f(x,y)}
+  %&= 1
+  %\\
+  %\frac{\delta G[f]}{\delta f(x,y)}
+  %&=
+  %\ln H[f]
+  %+
+  %f
+  %\frac{1}{H[f]}
+  %\frac{\delta H[f]}{\delta f}
+  %=
+  %\ln H[f]
+  %+
+  %\frac{f}{H[f]}
+  %\\
+  %\frac{\delta F[G]}{\delta G}
+  %&= 1
+%\end{align*}
+
+%\clearpage
+%Define
+%\begin{alignat*}{4}
+  %H[f]
+  %&:=
+  %\int f(x,y) \, dx
+  %\\
+  %G[f]
+  %&:=
+  %f(x,y)\cdot
+  %\ln\big(H[f](y)\big)
+  %\qquad&&=
+  %\;\;\;\;f(x,y)\cdot
+  %\ln\left( \int f(x',y) \, dx'\right)
+  %\\
+  %F[G[f]]
+  %&:=
+  %\int
+  %G[f]
+  %\; dx\,dy
+  %&&=
+  %\int
+  %f(x,y)\cdot
+  %\ln\left( \int f(x',y) \, dx'\right)
+  %\; dx\,dy
+%\end{alignat*}
+%Then
+%\begin{align*}
+  %F[G[H[f]]]
+  %:=
+  %\int
+  %\ln
+  %\left(
+  %\int
+  %f(p,x')
+  %\, dx'
+  %\right)
+  %f(p,x)
+  %\; dp\,dx
+%\end{align*}
+%So start by applying the chain rule:
+%\begin{align*}
+  %\frac{\delta F[G[f]]}{\delta f(p,x)}
+  %&=
+  %\int
+  %\frac{\delta F[G]}{\delta G(p',x')}
+  %\cdot
+  %\frac{\delta G[f](p',x')}{\delta f(p,x)}
+  %\;  dp' \,dx'
+  %\\
+  %&=
+  %\int
+  %1 \cdot
+  %\left[
+  %\ln H[f]
+  %+
+  %\frac{f(p',x')}{H[f](p',x')}
+  %\right]
+  %\;  dp' \,dx'
+  %\\
+  %&=
+  %\int
+  %1 \cdot
+  %\left[
+  %\ln H[f]
+  %+
+  %f(p',x')
+  %\frac{\delta \ln H[f](p',x')}{\delta f(p',x')}
+  %\right]
+  %\;  dp' \,dx'
+%\end{align*}
+%Compute derivatives for shit
+%\begin{align*}
+  %\frac{\delta G}{\delta f(x)}
+  %=
+  %\ln H
+  %\qquad
+  %\frac{\delta H}{\delta f(x)}
+  %=
+  %1
+%\end{align*}
+%First, the inner thing $G[H[f]]$:
+%\begin{align*}
+  %\frac{\delta G[H[f]]}{\delta f(x)}
+  %&=\int
+  %\frac{\delta G[H]}{\delta H(y)}
+  %\cdot
+  %\frac{\delta H[f](y)}{\delta f(x)} \; dy
+  %\\
+  %&=\int
+  %\frac{\delta G[H]}{\delta H(y)}
+  %\cdot
+  %\frac{\delta H[f](y)}{\delta f(x)} \; dy
+%\end{align*}
+%jkkkFrom there, we can differentiate with respect to $f$:
+%\begin{align*}
+  %\frac{\partial I(P,X)}{\partial f(p,x)}
+  %&=
+  %(\ln f(p,x)+1)
+  %- \left[
+      %\ln \int f(p,x') dx'
+      %+
+      %\frac{\int f(p,x')dx'}{\int f(p,x') dx'}
+    %\right]
+  %\\
+  %&=
+  %\ln f(p,x) - \ln \int f(p,x') dx'
+  %=
+  %\ln f(p,x) - \ln f(p)
+  %=
+  %\ln \frac{f(p,x)}{f(p)}
+  %=
+  %\ln f(x|p)
+%\end{align*}
+%Set up the Lagrangian:
+%\begin{align*}
+  %\sL
+  %=
+  %\int
+  %(p-x)(1-p)
+  %f(p,x)\; dp \,dx
+  %- \theta I(P,X)
+  %+
+  %\lambda(x)
+  %\left[
+  %\phi(x;\mu,\sigma^2)
+  %-\int f(p,x)\; dp
+  %\right]
+%\end{align*}
+%\clearpage
+
+
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% SAMPLE CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    %% VIEW LAYOUT %%
+
+        \layout
+
+    %% LANDSCAPE PAGE %%
+
+        \begin{landscape}
+        \end{landscape}
+
+    %% BIBLIOGRAPHIES %%
+
+        \cite{LabelInSourcesFile}  %Use in text; cites
+        \citep{LabelInSourcesFile} %Use in text; cites in parens
+
+        \nocite{LabelInSourceFile} % Includes in refs w/o specific citation
+        \bibliographystyle{apalike}  % Or some other style
+
+        % To ditch the ``References'' header
+        \begingroup
+        \renewcommand{\section}[2]{}
+        \endgroup
+
+        \bibliography{sources} % where sources.bib has all the citation info
+
+    %% SPACING %%
+
+        \vspace{1in}
+        \hspace{1in}
+
+    %% URLS, EMAIL, AND LOCAL FILES %%
+
+      \url{url}
+      \href{url}{name}
+      \href{mailto:mcocci@raidenlovessusie.com}{name}
+      \href{run:/path/to/file.pdf}{name}
+
+
+    %% INCLUDING PDF PAGE %%
+
+        \includepdf{file.pdf}
+
+
+    %% INCLUDING CODE %%
+
+        %\verbatiminput{file.ext}
+            %   Includes verbatim text from the file
+
+        \texttt{text}
+            %   Renders text in courier, or code-like, font
+
+        \matlabcode{file.m}
+            %   Includes Matlab code with colors and line numbers
+
+        \lstset{style=bash}
+        \begin{lstlisting}
+        \end{lstlisting}
+            % Inline code rendering
+
+
+    %% INCLUDING FIGURES %%
+
+        % Basic Figure with size scaling
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[scale=1]{file.pdf}
+            \end{figure}
+
+        % Basic Figure with specific height
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[height=5in, width=5in]{file.pdf}
+            \end{figure}
+
+        % Figure with cropping, where the order for trimming is  L, B, R, T
+            \begin{figure}
+               \centering
+               \includegraphics[trim={1cm, 1cm, 1cm, 1cm}, clip]{file.pdf}
+            \end{figure}
+
+        % Side by Side figures: Use the tabular environment
+
+
