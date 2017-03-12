@@ -62,6 +62,7 @@
 
 \theoremstyle{definition}
 \newtheorem{defn}[thm]{Definition}
+\newtheorem{assump}[thm]{Assumption}
 \newtheorem{ex}[thm]{Example}
 
 \theoremstyle{remark}
@@ -90,7 +91,7 @@
 
 \usepackage{tikz}
 \usetikzlibrary{decorations.pathreplacing}
-\usetikzlibrary{arrows.meta}
+%\usetikzlibrary{arrows.meta}
 \usepackage{graphicx}
 \usepackage{subfigure}
     %   For plotting multiple figures at once
@@ -418,6 +419,7 @@
 \newcommand{\Var}{\operatorname{Var}}
 \newcommand{\asto}{\xrightarrow{a.s.}}
 \newcommand{\pto}{\xrightarrow{P}}
+\newcommand{\uto}{\xrightarrow{u}}
 \newcommand{\msto}{\xrightarrow{m.s.}}
 \newcommand{\dto}{\xrightarrow{d}}
 \newcommand{\Lpto}{\xrightarrow{L_p}}
@@ -501,64 +503,6 @@
 \maketitle
 
 \tableofcontents
-
-
-\clearpage
-\section{Temp}
-
-\begin{align*}
-  \max
-  \;&\E_1[\varphi(y)]
-  \\
-  \qquad \text{s.t.}\quad
-  \alpha
-  &= \E_0[\varphi(y)]
-\end{align*}
-Or
-\begin{align*}
-  \max
-  \;&
-  \int \varphi(y)p_1(y)\;dy
-  \\
-  \qquad \text{s.t.}\quad
-  \alpha
-  &= \int\varphi(y)p_0(y)\;dy
-\end{align*}
-Lagrangian
-\begin{align*}
-  L
-  &=
-  \int \varphi(y)p_1(y)\;dy
-  +
-  \lambda
-  \left(
-  \alpha
-  - \int\varphi(y)p_0(y)\;dy
-  \right)
-\end{align*}
-FOC
-\begin{align*}
-  0
-  &=
-  p_1(y)
-  -
-  \lambda
-  p_0(y)
-  \\
-  \implies\quad
-  p_1(y)
-  &=
-  \lambda
-  p_0(y)
-\end{align*}
-Therefore, we are maxing
-\begin{align*}
-  \int\varphi(y)p_1(y)\;dy
-  =
-  \lambda\int\varphi(y)p_0(y)\;dy
-  = \lambda\alpha
-\end{align*}
-
 
 
 \clearpage
@@ -1122,10 +1066,3352 @@ Under certain conditions
 \end{defn}
 
 
+\clearpage
+\section{Nonparametric Estimation}
+
+%Estimate CDF as a step function, and density from that step function
+
+\subsection{Kernel Density Estimation}
+
+\begin{defn}(Univariate Second Order Kernel)
+A univariate \emph{second order kernel} $K(u)$ is a real-valued
+weighting function $K:\R\ra\R_+$ satisfying:
+\begin{enumerate}[label=(\roman*)]
+  \item (\emph{Density}): $K(u)\geq 0$ and
+    $1=\int_\R K(u)\;du$
+  \item (\emph{Symmetric}): $K(u)=K(-u)$ for all $u\in\R$
+  \item (\emph{Finite Variance}): To calculate second moments from
+    the kernel density estimate, need
+    \begin{align*}
+      \int u^2 K(u)\;du =: k_2 \in (0,\infty)
+    \end{align*}
+\end{enumerate}
+\end{defn}
+
+\begin{defn}(Kernel Density Estimator)
+Suppose we have an iid sample $\{X_n\}\nN$ where each observation has
+density $p(x)$.
+The \emph{kernel density estimator} $\hat{p}(x)$ of density $p$ at point
+$x$ in the support (using kernel $K$ and bandwith $h$) is given by
+\begin{align}
+  \hat{p}(x)
+  =
+  \frac{1}{N}
+  \sumnN
+  \frac{1}{h}
+  K\left(
+  \frac{x-X_n}{h}
+  \right)
+  \label{kernel}
+\end{align}
+Note this estimator is an \emph{average} of iid
+$\frac{1}{h} K\left( \frac{x-X_n}{h} \right)$ terms, which will be
+useful for deriving the mean and variance of this estimator since
+the mean of $\hat{p}(x)$ will be the mean of any individual term, while
+the variance will be $1/N$ times the variance of any individual term.
+\end{defn}
+
+\begin{prop}\emph{(Mean and Variance of Kernel Density Estimator)}
+Suppose we have an iid sample $X_n$ with density function $p(x)$, which
+permits a second order Taylor Expansion so that we can write
+\begin{align}
+  p(x+hu)
+  =
+  p(x)
+  + p'(x) hu
+  + \frac{1}{2}p''(x)h^2u^2
+  + O(h^3)
+  \label{kerneltaylor1}
+\end{align}
+Then the kernel density estimator $\hat{p}(x)$ of density $p$ at point
+$x$ has mean and variance
+\begin{alignat}{3}
+  \E[\hat{p}(x)]
+  &=
+  p(x)
+  +
+  \frac{1}{2}
+  h^2
+  p''(x)
+  \int
+  u^2
+  K(u)
+  \;du
+  + O(h^3)
+  &&=
+  p(x) + O(h^2)
+  \label{kernelmean}
+  \\
+  \Var(\hat{p}(x))
+  &=
+  \frac{1}{Nh}
+  p(x)
+  \int
+  K(u)^2
+  \,
+  du
+  + O(N^{-1})
+  &&=
+  O((Nh)^{-1})
+  \label{kernelvar}
+\end{alignat}
+\end{prop}
+\begin{rmk}
+First notice that $\hat{p}(x)$ is a \emph{biased} estimator of $p(x)$
+with the bias of size $h^2$.
+Second notice that the variance of the estimator goes to zero at rate
+$Nh$ (which we can think of as the ``effective sample size'') rather
+than the usual rate $N$.
+Third notice the bias-variance tradeoff.
+Taking $h\ra 0$ decreases bias in Expression~\ref{kernelmean} but
+blows up the variance in Expression~\ref{kernelvar}.
+To make $\hat{p}(x)$ a consistent estimator, we need to think about
+sending $h\ra 0$ at some appropriate rate as $N$ grows so that both the
+bias and the variance shrink to zero as $N\ra\infty$.
+\end{rmk}
+
+\clearpage
+\begin{proof}
+(\emph{Mean})
+Because the estimator $\hat{p}(x)$ in Definition~\ref{kernel} is an
+average of iid terms, its mean is the mean of any individual term, as
+remarked:
+\begin{align}
+  \E[\hat{p}(x)]
+  =
+  \E\left[
+  \frac{1}{h}
+  K\left(
+  \frac{x-X_n}{h}
+  \right)
+  \right]
+  =
+  \frac{1}{h}
+  \int
+  K\left(
+  \frac{x-v}{h}
+  \right)
+  \;
+  p(v)
+  \;dv
+  \label{kernelmeanstart}
+\end{align}
+Next, change variables to integrate over $u=(v-x)/h$ rather
+than over $v$,\footnote{%
+  This is a standard trick when working with Kernel estimators.
+}
+\begin{align*}
+  \E[\hat{p}(x)]
+  =
+  \int
+  K(-u)
+  \;
+  p(x+hu)
+  \;du
+\end{align*}
+Use the fact that $K$ is symmetric $K(u)=K(-u)$ along with the second
+order Taylor expansion of $p$ about $x$ in
+Expression~\ref{kerneltaylor1} to get:
+\begin{align*}
+  \E[\hat{p}(x)]
+  =
+  \int
+  K(u)
+  \bigg[
+  p(x)
+  + p'(x) hu
+  + \frac{1}{2}p''(x)h^2u^2
+  + O(h^3)
+  \bigg]
+  \;du
+\end{align*}
+Terms with $x$ only are a constant with respect to the variable of
+integration $u$. Moreover, $K(u)$ integrates to one; $uK(u)$ integrates
+to zero ($K$ is symmetric).
+All this implies Eq.~\ref{kernelmean}.
+
+(\emph{Variance})
+Because the estimator $\hat{p}(x)$ in Definition~\ref{kernel} is an
+average of iid terms, its variance is $1/N$ times the variance of any
+individual term:
+\begin{align*}
+  \Var(\hat{p}(x))
+  &=
+  \frac{1}{N}
+  \Var\left(
+  \frac{1}{h}
+  K\left(
+  \frac{x-X_n}{h}
+  \right)
+  \right)
+\end{align*}
+Then by the usual variance formula $\Var(X)=\E[X^2]-\E[X]^2$:
+\begin{align}
+  \Var(\hat{p}(x))
+  &=
+  \frac{1}{N}
+  \bigg\{
+  \underbrace{%
+    \E\left[
+    \frac{1}{h^2}
+    K\left(
+    \frac{x-X_n}{h}
+    \right)^2
+    \right]
+  }_{(i)}
+  -
+  \underbrace{%
+    \E\left[
+    \frac{1}{h}
+    K\left(
+    \frac{x-X_n}{h}
+    \right)
+    \right]^2
+  }_{(ii)}
+  \bigg\}
+  \label{kernelvarstart}
+\end{align}
+First note (ii) equals $\E[\hat{p}(x)]^2$ (by
+Expression~\ref{kernelmeanstart}).
+Then, from Expression~\ref{kernelmean}, we can also write
+\begin{align}
+  (ii)
+  =
+  \E[\hat{p}(x)]^2
+  &=
+  p(x)^2 + O(h^2)
+  \label{kernelvarapprox}
+\end{align}
+That's good enough for (ii).
+Next, we want to compute (i). So start by writing out
+\begin{align*}
+  (i)
+  =
+  \frac{1}{h^2}
+  \E\left[
+  K\left(
+  \frac{x-X_n}{h}
+  \right)^2
+  \right]
+  =
+  \frac{1}{h^2}
+  \int
+  K\left(
+  \frac{x-v}{h}
+  \right)^2
+  p(v)
+  \;
+  dv
+\end{align*}
+Change variables again with $u=(v-x)/h$ and simplify with $K(u)=K(-u)$:
+\begin{align*}
+  (i)
+  =
+  \frac{1}{h}
+  \int
+  K\left( u \right)^2
+  p(x+hu)
+  \;
+  du
+\end{align*}
+Further approximating Expression~\ref{kerneltaylor1} as
+$p(x+hu) = p(x) + O(h)$ and substituting in:
+\begin{align*}
+  (i)
+  =
+  \frac{1}{h}
+  \int
+  K\left( u \right)^2
+  \left[
+  p(x)
+  + O(h)
+  \right]
+  \;
+  du
+  &=
+  p(x)
+  \frac{1}{h}
+  \int
+  K\left( u \right)^2
+  \;
+  du
+  + O(1)
+\end{align*}
+Plugging this for (i) and Expression~\ref{kernelvarapprox} for (ii) into
+Expression~\ref{kernelvarstart}, we can then simplify all the way to
+Expression~\ref{kernelvar}.
+\end{proof}
+
+
+\clearpage
+\begin{prop}\emph{(MSE of $\hat{p}(x)$)}
+Mean square error of estimator $\hat{p}(x)$ is
+\begin{align*}
+  MSE(\hat{p}(x))
+  &=
+  \text{Bias}(\hat{p}(x))^2
+  + \Var(\hat{p}(x))
+  \\
+  &\approx
+  (c_1 h^2)^2
+  +
+  c_2 (Nh)^{-1}
+\end{align*}
+where $c_1$ and $c_2$ are constants implied by the $O(h^2)$
+and $O((Nh)^{-1})$ terms in Expressions~\ref{kernelmean} and
+\ref{kernelvar}. From the full expressions, we see that they equal
+\begin{align*}
+  c_1
+  &= \frac{1}{2}p''(x)\int u^2K(u)\,du
+  \quad\qquad
+  c_2
+  = p(x)\int K(u)^2\,du
+\end{align*}
+\end{prop}
+
+\begin{cor}\emph{(MSE-Optimal $h$)}
+Hence, the MSE minimizing bandwith satisfies is
+\begin{align*}
+  h
+  =
+  \left(
+  \frac{c_2}{4c_1^2}
+  \right)^{1/5}
+  N^{-1/5}
+  \propto
+  N^{-1/5}
+\end{align*}
+The MSE at this optimal bandwidth is therefore
+\begin{align*}
+  MSE(\hat{p}(x))
+  &\propto
+  N^{-4/5}
+\end{align*}
+This is slower than the $N^{-1}$ rate that we have in parameteric
+models.
+\end{cor}
+\begin{proof}
+Simply look at the first order conditions (with respect to $h$) of the
+MSE expression:
+\begin{align*}
+  0
+  &=
+  4c_1^2 h^3
+  -
+  c_2
+  \frac{N}{N^2h^2}
+  \quad\implies\quad
+  h
+  =
+  \left(
+  \frac{c_2}{4c_1^2}
+  \frac{1}{N}
+  \right)^{1/5}
+\end{align*}
+\end{proof}
+
+\begin{defn}(MISE of $\hat{p}(x)$)
+\end{defn}
+MISE definition
+MISE result
+MISE optimal
+
+
+\clearpage
+\subsection{Local Regression}
+
+This section covers nonparametric estimation of the conditional
+expectation function (CEF)
+\begin{align}
+  m(x):=\E[y_n|X_n=x]
+  =
+  \int
+  y
+  \frac{f(x,y)}{f(x)}
+  \;dy
+  \label{CEF}
+\end{align}
+where $X_n$ is some vector of covariates. This is an important object
+because the CEF is the best (i.e. MSE-minimizing) forecaster of $y_n$
+given $X_n$.  Unlike linear regression, nonparametric regression will
+not look for a \emph{linear} approximation to the CEF $m(x)$, but rather
+will try to estimate the nonlinear function $m(x)$ \emph{directly}.
+
+\begin{defn}{(Nadayara-Watson Kernel Regression Estimator)}
+The Nadayara-Watson kernel regression estimator of $m(x)=\E[y_n|X_n=x]$
+replaces the densities $f(x,y),f(x)$ in Expression~\ref{CEF} with kernel
+density estimates $\hat{f}(x,y)$ and $\hat{f}(x)$:
+\begin{align*}
+  \hat{m}(x)
+  &=
+  \int
+  y\frac{\hat{f}(x,y)}{\hat{f}(x)}
+  \;dy
+  =
+  \frac{%
+    \sumnN
+    K\left(
+    \frac{X_n-x}{h}
+    \right)
+    y_n
+  }{%
+    \sumnN
+    K\left( \frac{X_n-x}{h}
+    \right)
+  }
+\end{align*}
+where the final equality came from simplifying, which we now show.
+\end{defn}
+\begin{proof}
+First, start with our kernel density estimates
+\begin{align*}
+  \hat{f}(x)
+  &=
+  \frac{1}{N}
+  \sumnN
+  \frac{1}{h}
+  K\left(
+  \frac{X_n-x}{h}
+  \right)
+  \qquad
+  \hat{f}(x,y)
+  =
+  \frac{1}{N}
+  \sumnN
+  \frac{1}{h^2}
+  K\left(
+  \frac{X_n-x}{h}
+  \right)
+  \tilde{K}\left(
+  \frac{y_n-y}{h}
+  \right)
+\end{align*}
+where $\tilde{K}$ is the kernel for $y$, which potentially differs from
+that for $x$ (it won't really matter).
+Plug these into the integral expression, rewrite the resulting integral
+of the sum as a sum of integrals, and pull out anything with just an $x$
+in it from the integral expression since constant with respect to the
+variable of integration $y$:
+\begin{align*}
+  \hat{m}(x)
+  =
+  \frac{%
+    \sumnN
+    \left[
+    K\left(
+    \frac{X_n-x}{h}
+    \right)
+    \int
+    y
+    \frac{1}{h}
+    \tilde{K}\left(
+    \frac{y_n-y}{h}
+    \right)
+    \;dy
+    \right]
+  }{%
+    \sumnN
+    K\left(
+    \frac{X_n-x}{h}
+    \right)
+  }
+\end{align*}
+Change variables with $u=(y-y_n)/h$, using the fact that
+$\tilde{K}(u)=\tilde{K}(-u)$ to get
+\begin{align*}
+  \hat{m}(x)
+  &=
+  \frac{%
+    \sumnN
+    \left[
+    K\left(
+    \frac{X_n-x}{h}
+    \right)
+    \int
+    (y_n+uh)
+    \tilde{K}(u)
+    \;du
+    \right]
+  }{%
+    \sumnN
+    K\left(
+    \frac{X_n-x}{h}
+    \right)
+  }
+  \\
+  &=
+  \frac{%
+    \sumnN
+    \left[
+    K\left(
+    \frac{X_n-x}{h}
+    \right)
+    \left[
+    y_n
+    \int
+    \tilde{K}(u)
+    \;du
+    +
+    h
+    \int
+    u
+    \tilde{K}(u)
+    \;du
+    \right]
+    \right]
+  }{%
+    \sumnN
+    K\left(
+    \frac{X_n-x}{h}
+    \right)
+  }
+\end{align*}
+Since $\tilde{K}$ is a kernel, the first integral is one, and the second
+integral is zero, and the Nadayara-Watson estimator is obtained.
+\end{proof}
+
+\clearpage
+
+We can also derive estimators of $m(x)$ through local weighted least
+squares, weighting observations $(y_n,X_n)$ with $X_n$ nearby $x$ most
+highly, and downweighting those observations farther away.
+The regression is also ``local'' in the sense that there will be a
+separate regression for each $x$.
+%Whereas parametric linear regression
+%regression imposes a \emph{globally} linear structure on $m(x)$, with
+%common
+
+\begin{defn}(Local Constant Regression Estimator, Nadayara Watson)
+The \emph{local constant regression estimator} of $m(x)=\E[y_n|X_n=x]$
+is
+\begin{align*}
+  \hat{m}(x)
+  =
+  \argmin_{b}
+  \sumnN
+  K\left(
+  \frac{X_n-x}{h}
+  \right)
+  (y_n-b)^2
+\end{align*}
+Note that this is simply weighted least squares regression of $y_n$ on a
+constant $b$, with weights given by the distance of $X_n$ from the point
+$x$ that we're estimating $m(x)$ at.
+Each different point $x$ will have it's own different $\hat{m}(x)$
+corresponding to the $x$-specific optimal $b$ under the $x$-specific
+weights.
+From the FOCs, we get that
+\begin{align*}
+  \hat{m}(x)
+  &=
+  \frac{%
+    \sumnN
+    K\left(
+    \frac{X_n-x}{h}
+    \right)
+    y_n
+  }{%
+    \sumnN
+    K\left( \frac{X_n-x}{h}
+    \right)
+  }
+\end{align*}
+which just so happens to be the same estimator as Nadayara-Watson.
+\end{defn}
+
+\begin{defn}(Local Linear, Local Polynomial Regression)
+The \emph{local polynomial regression estimator} of $m(x)=\E[y_n|X_n=x]$
+is given by \begin{align*}
+  \hat{m}(x)
+  &=
+  \hat{\beta}_0
+  \\
+  \text{where}\quad
+  (\hat{\beta}_0,\ldots,\hat{\beta}_p)
+  &=
+  \argmin_{b_0,\ldots,b_p}
+  \sumnN
+  K\left(
+  \frac{X_n-x}{h}
+  \right)
+  \big(y_n-[b_0+b_1(X_n-x)+\cdots +b_p(X_n-x)^p]\big)^2
+\end{align*}
+The case wehre $p=1$ is called \emph{local linear regression}.
+This is estimator is much better at the boundaries, where the local
+constant regression estimator does poorly.
+\end{defn}
 
 
 
+\clearpage
+\section{Extremum Estimation}
 
+
+\begin{defn}(Criterion Functions)
+Throughout this section, $Q_n:\Theta\ra\R$ denotes a
+\emph{sample criterion function} that is a random function
+which depends on sample size $n$.\footnote{%
+  Strictly speaking, $n$ need not index sample size. Many of the proofs
+  to follow generically work for any sequence of functions
+  $\{Q_n(\theta)\}\ninf$. It's just that $n$ usually denotes sample size
+  in practice.
+}
+Deterministic function $Q:\Theta\ra\R$ denotes the
+\emph{population criterion function}, which is generally the probability
+limit of $Q_n$.
+Without loss of generality, we will try to minimize these functions.
+
+These criterion functions can and should be interpreted very generally.
+Even though the argument $\theta$ of $Q_n,Q$ is typically a finite
+parameter vector in $\Theta=\Rk$, the parameter space $\Theta$ could
+just as well be an infinite dimensional \emph{function space} so that
+$Q_n(\theta),Q(\theta)$ are functionals taking some function $\theta$ as
+their argument.
+\end{defn}
+
+\begin{defn}(Extremum Estimator)
+Estimator $\hat{\theta}$ is said to be an \emph{extremum estimator}
+associated with sample criterion function $Q_n$ if it satisfies
+\begin{align*}
+  Q_n(\hat{\theta})
+  &=
+  \inf_{\theta\in \Theta}
+  Q_n(\theta)
+  +
+  o_P(1)
+\end{align*}
+In words, $\hat{\theta}$ minimizes $Q_n(\theta)$, up to some ``error''
+that shrinks to zero in probability.
+\end{defn}
+
+\begin{defn}(Pointwise Convergence of Random Functions)
+Sequence of random functions $Q_n(\theta)$ is said to
+\emph{converge pointwise} to deterministic function $Q(\theta)$
+if
+\begin{align*}
+  \forall \theta
+  \qquad
+  |Q_n(\theta)-Q(\theta)|
+  =
+  o_P(1)
+\end{align*}
+\end{defn}
+
+\begin{defn}(Uniform Convergence of Random Functions)
+Sequence of random functions $Q_n(\theta)$ is said to
+\emph{converge uniformly} to deterministic function $Q(\theta)$
+if
+\begin{align*}
+  \sup_{\theta\in\Theta}
+  |Q_n(\theta)-Q(\theta)|
+  =
+  o_P(1)
+\end{align*}
+This implies pointwise convergence but is strictly stronger, much like
+how uniform continuity is stronger than pointwise continuity.
+\end{defn}
+
+
+\begin{defn}(Identifiable Uniqueness)
+\emph{Identifiable uniqueness} holds for population criterion function
+$Q(\theta)$ if $\exists! \;\theta_0$ such that
+\begin{align*}
+  \forall \varepsilon>0
+  \qquad
+  \inf_{\theta\in\Theta \setminus B_\varepsilon(\theta_0)}
+  Q(\theta)
+  > Q(\theta_0)
+\end{align*}
+In words, $\theta_0$ is the uniquely identified mininum of $Q(\theta)$
+if it's the unique point such that---for \emph{any} open ball of
+\emph{any} size around $\theta_0$---the points outside that ball all
+lead to a larger value of the population criterion function.
+\end{defn}
+
+\begin{rmk}
+First, why this somewhat pedantic definition?
+It rules out particularly weird and intractable criterion functions.
+
+Second, it's important to note that this a very clinical definition of
+$\theta_0$ and does \emph{not} imbue that $\theta_0$ with any
+economic/substantive meaning, imply that $\theta_0$ is the parameter
+of interest, or imply that the model is correctly specified.
+Those more weighty conclusions follow only if we've made enough
+economic/substantive assumptions about the model and the data generating
+process such that $Q(\theta)$ is the right criterion function and
+$\theta_0$ the true parameter of interest (rather than just a lowly
+minimum, as we have here).
+\end{rmk}
+
+\begin{lem}\emph{(Sufficient Conditions for Identifiable Uniqueness)}
+Suppose that
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item $\Theta$ compact
+  \item $Q(\theta)$ uniquely minimized at $\theta_0$
+  \item $Q(\theta)$ continuous
+\end{enumerate}
+Then identifiable uniqueness holds for $Q(\theta)$.
+\end{lem}
+\begin{proof}
+Let $\varepsilon>0$ be given.
+Since $\Theta$ compact and $B_\varepsilon(\theta_0)$ open, choice
+set $\Theta\setminus B_\varepsilon(\theta_0)$ is compact.
+Since $Q(\theta)$ continuous, a unique minimum $\theta_1$ is attained
+on this compact choice set.
+Therefore, $\inf_{\theta\in\Theta\setminus B_\varepsilon(\theta_0)}
+Q(\theta)=Q(\theta_1)<Q(\theta_0)$,
+where the last inequality (which is precisely identifiable uniqueness)
+followed because $\theta_0$ is the unique minimizer of $Q$.
+\end{proof}
+
+\begin{thm}\emph{(Sufficient Conditions for Consistency)}
+Suppose
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item $\hat{\theta}$ is an extremum estimator, i.e.
+    $Q_n(\hat{\theta}) = \inf_{\theta\in \Theta} Q_n(\theta) + o_P(1)$
+  \item Sample criterion function $Q_n(\theta)$ converges uniformly to
+    population $Q(\theta)$
+  \item Identifiable uniqueness holds for $Q(\theta)$,
+    implying a unique minimizer $\theta_0$
+\end{enumerate}
+Then $\hat{\theta}$ is a consistent estimator for $\theta_0$.
+\end{thm}
+
+\clearpage
+\begin{proof}
+To show consistency, we must show that for given $\varepsilon>0$,
+\begin{align*}
+  P\big[
+    \lVert\hat{\theta}-\theta_0\rVert
+    > \varepsilon
+  \big]
+  \;\ra\;
+  0
+\end{align*}
+First note that we can rewrite the event in the probability as
+\begin{align*}
+  \{
+    \lVert\hat{\theta}-\theta_0\rVert
+    > \varepsilon
+  \}
+  =
+  \{
+    \hat{\theta}\not\in B_\varepsilon(\theta_0)
+  \}
+  =
+  \{
+    \hat{\theta}\in \Theta\setminus B_\varepsilon(\theta_0)
+  \}
+  =
+  \{
+    Q(\hat{\theta})
+    >
+    Q(\theta_0)
+    +
+    \delta
+  \}
+\end{align*}
+where the third equality followed from identifiable uniqueness, since
+$\hat{\theta}\in\Theta\setminus B_\varepsilon(\theta_0)$ implies
+$Q(\hat{\theta})>Q(\theta_0)$, which implies
+$Q(\hat{\theta})>Q(\theta_0)+\delta$ for some $\delta>0$.
+Next, rewrite the event again:
+\begin{align*}
+  \{
+    \lVert\hat{\theta}-\theta_0\rVert
+    > \varepsilon
+  \}
+  =
+  \{
+    Q(\hat{\theta})
+    -
+    Q(\theta_0)
+    >
+    \delta
+  \}
+\end{align*}
+Thus to show $P[\lVert\hat{\theta}-\theta_0\rVert > \varepsilon]$ goes
+to zero, we can show $P[Q(\hat{\theta})-Q(\theta_0)>\delta]$ goes to
+zero. And to do that, break things up:
+\begin{align*}
+  Q(\hat{\theta})
+  -
+  Q(\theta_0)
+  =
+  \underbrace{%
+    Q(\hat{\theta})
+    - Q_n(\hat{\theta})
+  }_{(i)}
+  +
+  \underbrace{%
+    Q_n(\hat{\theta})
+    - Q_n(\theta_0)
+  }_{(ii)}
+  +
+  \underbrace{%
+    Q_n(\theta_0)
+    - Q(\theta_0)
+  }_{(iii)}
+\end{align*}
+From there, note that
+\begin{align*}
+  Q(\hat{\theta}) - Q(\theta_0) > \delta
+  \;\implies\;
+  \text{at least one of the following is true:}
+  \;
+  \begin{cases}
+    A= \{Q(\hat{\theta}) - Q_n(\hat{\theta}) \;\;\;> \delta/3\}\\
+    B= \{Q_n(\hat{\theta}) - Q_n(\theta_0) > \delta/3 \}\\
+    C = \{Q_n(\theta_0) - Q(\theta_0) > \delta/3\} \\
+  \end{cases}
+\end{align*}
+This is easiest to see by noting that if events $A,B,C$ were \emph{all}
+false, there's no way we could have $Q(\hat{\theta}-Q(\theta_0)>\delta$.
+Then from there, we have that
+\begin{align*}
+  P[\lVert\hat{\theta}-\theta_0\rVert>\varepsilon]
+  =
+  P[Q(\hat{\theta}) - Q(\theta_0) > \delta]
+  &\leq P[\text{$A$ or $B$ or $C$}] \\
+  &\leq P[A]+P[B]+P[C]
+\end{align*}
+And so to bound our target
+$P[ \lVert\hat{\theta}-\theta_0\rVert > \varepsilon ]$,
+we can bound the probabilities of $A,B,C$ individually given
+$\varepsilon$ and the corresponding $\delta$.
+So first, uniform convergence of $Q_n$ to $Q$ implies
+\begin{align*}
+  P[A]
+  =
+  P\big[Q(\hat{\theta})-Q_n(\hat{\theta})>\delta/3\big]
+  \leq
+  P\left[\sup_{\theta\in\Theta} |Q(\theta)-Q_n(\theta)|>\delta/3\right]
+  =
+  o(1)
+\end{align*}
+Next, definition of an EE
+$Q_n(\hat{\theta})=\inf_{\theta\in\Theta}Q_n(\theta)+o_P(1)$
+implies $Q_n(\hat{\theta})\leq Q_n(\theta_0)+o_P(1)$, thus
+\begin{align*}
+  P[B]
+  =
+  P[Q_n(\hat{\theta})-Q_n(\theta_0)>\delta/3]
+  \leq
+  P[o_P(1)>\delta/3]
+  =
+  o(1)
+\end{align*}
+Finally, uniform convergence of $Q_n$ to $Q$ again buys us
+\begin{align*}
+  P[C]
+  =
+  P\big[Q_n(\theta_0)-Q(\theta_0)>\delta/3\big]
+  \leq
+  P\left[\sup_{\theta\in\Theta} |Q(\theta)-Q_n(\theta)|>\delta/3\right]
+  =
+  o(1)
+\end{align*}
+Thus, since $P[A],P[B],P[C]$ are all $o(1)$ (i.e. go to zero), their sum
+also goes to zero hence
+\begin{align*}
+  P[\lVert\hat{\theta}-\theta_0\rVert>\varepsilon]
+  &\leq P[A]+P[B]+P[C]
+  = o(1)
+\end{align*}
+\end{proof}
+
+
+\begin{defn}(Stochastic Equicontinuity)
+Sequence of random functions $H_n(\theta)$ are
+\emph{stochastically equicontinuous} if, for all $\varepsilon>0$, there
+exists a $\delta>0$ such that
+\begin{align*}
+  \liminf_{n\ra\infty}
+  P
+  \left[
+    \sup_{\theta\in\Theta}
+    \sup_{\theta'\in B_\delta(\theta)}
+    |H_n(\theta)-H_n(\theta')|
+    \leq
+    \varepsilon
+  \right]
+  \geq 1-\varepsilon
+\end{align*}
+The key point is that $\delta$ works \emph{uniformly} over all
+$\theta\in\Theta$, i.e. does not depend upon $\theta$ and so can be used
+even while looking at $\sup_{\theta\in\Theta}$.
+This is a generalization to a sequence of \emph{random} functions the
+notion of equicontinuity or uniform continuity for a single
+\emph{deterministic} function.
+There, equicontinuity means that for all $\varepsilon>0$, there exists a
+$\delta$ that works \emph{uniformly} over all $\theta$ (i.e. depends
+only on $\varepsilon$, not $\theta$) such that the statement inside the
+square brackets is true.
+
+Note, it may look deep/important that $\varepsilon$ shows up inside the
+square brackets and outside it. But it's really not.
+We just need a small number inside the square brackets, a big number
+outside. We could generalize to make them different, but it wouldn't
+change anything.
+\end{defn}
+
+\clearpage
+\begin{thm}\emph{(Relating Pointwise \& Uniform Convergence)}
+Two directions, near-converses
+\begin{enumerate}[label=\emph{(\alph*)}]
+  \item \emph{(Compact $\Theta$ + SE + PW $\Rightarrow$ UC)}:
+    Suppose that
+    \begin{enumerate}[label=\emph{(\roman*)}]
+      \item $\Theta$ is compact
+      \item $H_n(\theta)$ is a stochastically equicontinuous sequence of
+        random functions
+      \item $H_n(\theta)\pto 0$ for all $\theta\in\Theta$ (i.e.
+        pointwise convergence).
+    \end{enumerate}
+    Then $H_n(\theta)\uto 0$
+  \item \emph{(UC $\Rightarrow$ SE)}
+    Suppose that $H_n(\theta)\uto 0$.
+    Then $H_n(\theta)$ is a stochastically equicontinuous sequence of
+    random functions
+\end{enumerate}
+For extremum estimation, we should think of
+$H_n(\theta)=|Q_n(\theta)-Q(\theta)|$.
+\end{thm}
+\begin{proof}
+(a)
+To show uniform convergence of $H_n$ to $0$, must show for any
+$\varepsilon>0$ that
+\begin{align}
+  (*)
+  =
+  \limn
+  P\left[
+  \sup_{\theta\in\Theta}
+  |H_n(\theta)|\geq\varepsilon
+  \right]
+  \leq \varepsilon
+  \label{Pse}
+\end{align}
+In other words, we must show $H_n$ isn't far from $0$ for any given
+$\varepsilon>0$.
+So first, assumption (ii) stochastic equicontinuity lets us control the
+smoothness of the function $H_n$ in small neighborhoods of any given
+point. In particular, given that $\varepsilon$, there exists a $\delta$
+such that
+\begin{align}
+  \limsup_{n\ra\infty}\;\;
+  P\left[
+    \sup_{\theta\in\Theta}
+    \sup_{\theta'\in B_\delta(\theta)}
+    |H_n(\theta)-H_n(\theta')|
+    \geq
+    \varepsilon
+  \right]
+  \leq \varepsilon
+\end{align}
+Given that $\varepsilon$ and corresponding $\delta$, by compactness of
+$\Theta$, there exists a finite cover of $\Theta$ by balls
+$\{B_\delta(\theta_j)\}_{j=1}^J$ centered at finite number of points
+$\{\theta_j\}_{j=1}^J$.\footnote{%
+  This was the main point of compactness: it lets us focus our attention
+  on a finite number of points $\{\theta_j\}_{j=1}^J$, while SE tells us
+  that the values of the function $H_n$ are close in small neighborhood
+  of those points.
+}
+And since the set of balls covers $\Theta$, we can equivalently rewrite
+$(*)$ as
+\begin{align*}
+  (*)
+  =
+  P\left[
+  \max_j
+  \sup_{\theta'\in B_\delta(\theta_j)}
+  |H_n(\theta')|
+  >\varepsilon
+  \right]
+  &\leq
+  P\left[
+  \max_j
+  \sup_{\theta'\in B_\delta(\theta_j)}
+  \bigg(
+  \big|H_n(\theta')-H_n(\theta_j)\big|
+  +
+  \big|H_n(\theta_j)\big|
+  \bigg)
+  \geq\varepsilon
+  \right]
+  \\
+  &\leq
+  P\bigg[
+  \underbrace{%
+    \max_j
+    \sup_{\theta'\in B_\delta(\theta_j)}
+    \big|H_n(\theta')-H_n(\theta_j)\big|
+  }_{A}
+  +
+  \underbrace{%
+    \max_j
+    \big|H_n(\theta_j)\big|
+    \vphantom{\sup_{\theta'\in B_\delta(\theta_j)}}
+  }_{B}
+  \geq\varepsilon
+  \bigg]
+\end{align*}
+Note the second term dropped the $\sup$ because the argument is at fixed
+at $\theta_j$.
+Next, $A+B>\varepsilon$ implies at least one of $A,B$ is
+individually greater than $\varepsilon/2$.\footnote{%
+  They couldn't \emph{both} be less than $\varepsilon/2$ with their sum
+  greater than $\varepsilon$.
+}
+Then the above implies
+\begin{align*}
+  (*)
+  \quad
+  &\leq
+  \quad
+  P\big[
+    \{A> \varepsilon/2\}
+    \cup \{B>\varepsilon/2\}
+    \geq\varepsilon
+  \big]
+  \quad
+  \leq
+  \quad
+  P[A>\varepsilon/2]
+  +
+  P[B>\varepsilon/2]
+\end{align*}
+Writing out $A,B,C$, the above says
+\begin{align*}
+  (*)
+  &\leq
+  P\bigg[
+    \max_j
+    \sup_{\theta'\in B_\delta(\theta_j)}
+    |H_n(\theta')-H_n(\theta_j)|
+    >\varepsilon/2
+  \bigg]
+  +
+  P\bigg[
+    \max_j
+    |H_n(\theta_j)|
+    >\varepsilon/2
+  \bigg]
+  \\
+  &\leq
+  \underbrace{%
+    P\bigg[
+      \sup_{\theta\in \Theta}
+      \sup_{\theta'\in B_\delta(\theta_j)}
+      |H_n(\theta')-H_n(\theta)|
+      >\varepsilon/2
+    \bigg]
+  }_{\ra\varepsilon}
+  +
+  \underbrace{%
+    \sum_j
+    P\bigg[
+      |H_n(\theta_j)|
+      >\varepsilon/2
+    \bigg]
+  }_{\ra0}
+\end{align*}
+Convergence of the first term as $n\ra\infty$ because of assumed SE of
+sequence $H_n$. Convergence of the sum to zero because $H_n(\theta_j)$
+is $o_P(1)$ for each $\theta_j$ by Assumption (iii) and the sum of $J$
+terms that are $o_P(1)$ is also $o_P(1)$.
+Hence, the limit of $(*)$ is less than $\varepsilon$.
+
+(b)
+Given any $\varepsilon>0$, we need to show that there exists a
+$\delta>0$ such that
+\begin{align*}
+  \limsup_{n\ra\infty}\;\;
+  P\left[
+    \sup_{\theta\in\Theta}
+    \sup_{\theta'\in B_\delta(\theta)}
+    |H_n(\theta)-H_n(\theta')|
+    \geq
+    \varepsilon
+  \right]
+  \leq \varepsilon
+\end{align*}
+But note that
+\begin{align*}
+  P\left[
+    \sup_{\theta\in\Theta}
+    \sup_{\theta'\in B_\delta(\theta)}
+    |H_n(\theta)-H_n(\theta')|
+    \geq
+    \varepsilon
+  \right]
+  \leq
+  P\left[
+    \sup_{\theta\in\Theta}
+    2|H_n(\theta)|
+    \geq
+    \varepsilon
+  \right]
+\end{align*}
+By assumption, $H_n(\theta)\uto 0$, hence the above statement
+probability goes to zero as $n\ra\infty$ by definition of uniform
+convergence.
+\end{proof}
+
+\begin{thm}\emph{(Stochastic Equicontinuity of $M$-Estimators)}
+Suppose that
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item $\Theta$ is compact
+  \item $W_i$ identically distributed.\footnote{%
+      Note, \emph{not} necessary to be \emph{independent}.
+      This accomodates stationary and processes with identically
+      distributed marginals for each observation, but conditionally
+      dependent observations.
+    }
+  \item $\E\left[\sup_{\theta\in\Theta} m(W_i,\theta)\right]<\infty$
+  \item For each $\theta$, the function $m(W_i,\theta)$ is continuous
+    almost everywhere in $W_i$.\footnote{%
+      Note that the points of discontinuity in the $W_i$ argument are
+      allowed to vary across $\theta$
+    }
+\end{enumerate}
+Then
+\begin{enumerate}[label=\emph(\alph*)]
+  \item $\E[m(W_i,\theta)]$ is a continuous function of $\theta$
+  \item
+    $H_n(\theta)=\frac{1}{n}\sumin\big(m(W_i,\theta)-\E[m(W_i,\theta)]\big)$
+    is a SE sequence of functions
+\end{enumerate}
+\end{thm}
+%\begin{proof}
+%For both parts, it will be useful to define the modulus of continuity
+%for observation $i$:
+%\begin{align*}
+  %\omega_{i,\delta}
+  %:=
+  %\sup_{\theta\in\Theta}
+  %\sup_{\theta'\in B_\delta(\theta)}
+  %\lVert m(W_i,\theta)-m(W_i,\theta')\rVert
+%\end{align*}
+%Note that by Assumption (ii)---continuity of $m(W_i,\theta)$.
+%(a)
+%Suppose $\varepsilon>0$ and $\theta$ given.
+%Note that
+%To show continuity, we must show that there exists a $\delta>0$ such
+%that
+%\begin{align*}
+  %\lVert \E[m(W_i,\theta)]-\E[m(W_i,\theta')]\rVert
+  %\leq
+  %\E\big[\lVert m(W_i,\theta)-m(W_i,\theta')\rVert\big]
+  %\leq
+  %\E[\omega_{i,\delta}]
+%\end{align*}
+%\end{proof}
+
+
+\clearpage
+\begin{thm}\emph{(Pointwise LLN)}
+Suppose $\forall\theta\in\Theta$,
+$\E[\lVert m(W_i,\theta)\rVert]<\infty$ and the $W_i$ iid.
+Then
+\begin{align*}
+  \frac{1}{n}
+  \sumin m(W_i,\theta)
+  \quad\pto\quad
+  \E[m(W_i,\theta)]
+  \qquad
+  \forall \theta\in\Theta
+\end{align*}
+\end{thm}
+
+\begin{cor}\emph{(Uniform LLN)}
+Suppose conditions (i)-(iv) of the previous theorem hold and
+\begin{align*}
+  \forall \theta\in\Theta
+  \qquad
+  \frac{1}{n}
+  \sumin
+  m(W_i,\theta)
+  \quad\pto\quad
+  \E[m(W_i,\theta)]
+\end{align*}
+Then
+\begin{align}
+  \sup_{\theta\in\Theta}
+  \left\lVert
+  \frac{1}{n}
+  \sumin
+  m(W_i,\theta)
+  -
+  \E[m(W_i,\theta)]
+  \right\rVert =
+  o_P(1)
+\end{align}
+\end{cor}
+\begin{proof}
+%By the previous Theorem, $H_n$ in Expression~\ref{Hn} is SE.
+Since $\Theta$ compact, $H_n$ SE, and pointwise convergence assumed, we
+get that $H_n$ converges uniformly to $Q(\theta)$ by Part (a) of that
+one big theorem.
+By previous theorem, $Q(\theta)=\E[m(W_i,\theta)]$ is continuous.
+If $Q(\theta)$ is uniquely minimized at $\theta_0$, Lemma gives us
+identifable uniqueness.
+Then if $\hat{\theta}$ is an extremum esitmator, since $Q_n$ converges
+uniformly and ID holds, $\hat{\theta}$ is consistent.
+\end{proof}
+
+\begin{lem}
+Suppose some data-dependent function $L_n(\theta)$ converges uniformly
+to continuous function $L(\theta)$ in some small neighborhood
+$B_\varepsilon(\theta_0)$ about the true parameter value $\theta_0$:
+\begin{align*}
+  \sup_{\theta\in B_\varepsilon(\theta_0)}
+  \lVert L_n(\theta) - L(\theta)\rVert
+  = o_P(1)
+\end{align*}
+Suppose also that we have a consistent estimator
+$\hat{\theta}\pto\theta_0$. Then
+\begin{align*}
+  L_n(\hat{\theta})
+  \pto L(\theta_0)
+\end{align*}
+\end{lem}
+
+\begin{thm}
+Suppose $\hat{\theta}$ is an extremum estimator defined from twice
+differentiable criterion function $Q_n(\theta)$.
+If also
+\begin{align*}
+  \nabla_\theta
+  Q_n(\hat{\theta})
+  =
+  o_P(n^{-1/2})
+\end{align*}
+Then
+\begin{align*}
+  \sqrt{n}(\hat{\theta}-\theta_0)
+  =
+  -(\nabla_{\theta}^2 Q_n(\tilde{\theta}))^{-1}
+  \big[
+  \sqrt{n}\cdot \nabla_{\theta} Q_n(\theta_0)
+  \big]
+  +
+  o_P(1)
+\end{align*}
+which is asymptotically normal by the CLT.
+\end{thm}
+
+
+\clearpage
+\section{VARs}
+
+Three types of concepts, all distinct
+\begin{itemize}
+  \item Shock: Economically meaningful primitive exogeneous forces.
+    They have the following characteristics
+    \begin{itemize}
+      \item Exogenous with respect to other current and lagged endogenous
+        variables in the model. This is putting a finer point on
+        ``primitive'' and ``exogenous''
+      \item Uncorrelated with each other so we can identify unique
+        causual effects
+      \item Represent unanticipated movements in exogenous variables or
+        news about future movements in exogeneous variables
+    \end{itemize}
+  \item Innovation: The residuals from a reduced-form VAR
+  \item Instrument
+\end{itemize}
+These three concepts are all generally distinct.
+It is only through the process of \emph{identification} that we
+link/equate innovations with the shocks
+
+Model
+\begin{align*}
+  Y_t
+  &= B(L)Y_t + \Omega \varepsilon_t
+  \qquad\text{where}\quad
+  \varepsilon_t \sim (0,D)
+  \\
+  B(L)
+  &= B_0 + \sum_{k=1}^p B_kL^k
+\end{align*}
+Corresponding reudced form
+\begin{align*}
+  A(L)Y_t
+  &= \eta_t
+  \qquad\text{where}\quad
+  \eta_t
+  \sim (0,\Sigma_\eta)
+  \\
+  A(L)
+  &= I-\sum_{k=1}^p A_kL^k
+\end{align*}
+Can then link reduced form innovations $\eta_t$ to the structural shocks
+$\varepsilon_t$ by rewriting
+\begin{align*}
+  (I-B_0)Y_t
+  &=
+  \sum_{k=1}^p B_k Y_{t-k}
+  +
+  \Omega \varepsilon_t
+  \\
+  Y_t
+  &=
+  \sum_{k=1}^p A_k Y_{t-k}
+  +
+  \eta_t
+\end{align*}
+From this, deduce that
+\begin{align*}
+  \eta_t
+  &=
+  (I-B_0)^{-1}\Omega\varepsilon_t
+  \\
+  \iff\quad
+  \eta_t
+  &= B_0\eta_t + \Omega \varepsilon_t
+\end{align*}
+
+Identification approaches
+\begin{itemize}
+  \item Triangularization/Cholesky: Impose zero restrictions
+    so that an endogenous variable does not respond to other endogenous
+    variables contemporaneously.
+    The variable ordered ``first'' responds to no other endogenous
+    variables.
+    The variable ordered ``last'' respond to everything else in the
+    system.
+
+  \item Nonzero restrictions, structural VAR: set a coefficient to some
+    number which is known for good theoretical reasons
+
+  \item Heteroscedasticity
+
+  \item High Frequency identification: Use daily data to isolate effect
+    of Fed announcements on rates. If you control for the Fed's
+    information set, then this is plausible identification of shock/news
+
+  \item
+    External Instruments/Proxy SVARs:
+    External series $Z_t$ (outside the endogenous variable vector $Y_t$)
+    is a valid instrument for identifying shock $\varepsilon_{ti}$ if
+    \begin{align*}
+      \E[Z_t\varepsilon_{ti}] &\neq 0 \\
+      \E[Z_t\varepsilon_{tj}] &= 0
+      \qquad
+      \forall j\neq i
+    \end{align*}
+    The first condition ensures relevance/usefullnes. The second
+    condition ensures exogeneity.
+    How to implement
+    \begin{enumerate}
+      \item Estimate reduced form VAR to get estimated residuals
+        $\{\hat{\eta}_t\}$
+      \item Regression $\eta_{tj}$ on $\eta_{ti}$ for $j\neq i$ using
+        $Z_t$ as the instrument.
+        These provide unbiased estimates of the ceofficients
+    \end{enumerate}
+
+  \item
+    Long Run Restrictions:
+    Moving average rep
+    \begin{align*}
+      Y_t = C(L)\eta_t
+      \qquad\text{where}\quad
+      C(L) = A(L)^{-1}
+    \end{align*}
+    Can write $Y_t$ as
+    \begin{align*}
+      Y_t = D(L)\varepsilon_t = C(L)H\varepsilon_t
+    \end{align*}
+    Then want to say that some shock has no effect on some variable in
+    the long run. This amounts to restricting $D^{ij}(1)=0$.
+    This can accommodate whether you want zero long run effect on level
+    or growth rate, depending on whether the variables included are
+    levels or growth rates.
+
+  \item Sign Restrictions
+
+  \item FAVARs: For including more information
+
+  \item DSGE
+\end{itemize}
+Jorda local projection method: For overcoming the negative effects of
+misspecification on estimated IRFs. In the usual way they are computed,
+there's a possibility that the errors would just be compounded.
+Jorda's solution is like iterated vs. direct forecasting.
+
+
+
+\clearpage
+\section{Cochrane on Unit Roots}
+
+\subsection{Facts about Unit Roots and Shit}
+
+Cochrane's Time Series book has a nice little history of this
+literature. He also mentiones Campbell and Perron
+
+Random walk
+\begin{align}
+  y_t = y_{t-1} + \varepsilon_t
+  \label{rw}
+\end{align}
+Spectral density of an AR(1) with $\phi\ra 1$ approaching random walk
+\begin{align*}
+  \lim_{\phi\ra 1}f(\omega)
+  =
+  \lim_{\phi\ra 1}
+  \frac{\sigma^2}{1+\phi^2-2\phi \cos(\omega)}
+  =
+  \frac{\sigma^2}{2(1-\cos(\omega))}
+\end{align*}
+As $\omega\ra 0$, $f(\omega)\ra \infty$, so the spectral density is
+super peaked close to $\omega=0$, i.e. at low frequency.
+
+Random walk a special case of a unit root process. A unit root process
+or difference stationary process or I(1) process generalizes the RW and
+is any process
+\begin{align}
+  y_t &= \mu + y_{t-1} + a(L)\varepsilon_t
+  \label{I1}
+\end{align}
+where $a(L)\varepsilon_t$ is stationary.
+This is unit root because the implicit lag polynomial on $y_t$,
+$(1-z)$, has a root/zero at $z=1$.
+
+Trend stationary is special case of Model~\ref{I1}
+\begin{align*}
+  y_t &= \mu t + b(L)\varepsilon_t
+\end{align*}
+This arises when $a(L)$ in Model~\ref{I1} has a unit root that we can
+factor out so that
+\begin{align*}
+  y_t
+  &= \mu + y_{t-1} + a(L)\varepsilon_t
+  \\
+  (1-L)y_t
+  &= \mu + (1-L)b(L)\varepsilon_t
+  \\
+  \iff\quad
+  y_t
+  &=
+  \mu t
+  +
+  b(L)\varepsilon_t
+\end{align*}
+Hence, if the model is trend-stationary, it is \emph{also} I(1).
+But compare what you get after first differencing the unit root and
+trend stationary processes
+\begin{align*}
+  \Delta y_t
+  &= \mu + a(L)\varepsilon_t\\
+  \Delta y_t
+  &=
+  \mu + (1-L)b(L)\varepsilon_t
+\end{align*}
+In the case of Model~\ref{I1}, the $a(L)$ that remains is generally
+invertible and you can get an AR rep for $\Delta y_t$.
+But in the trend stationary case, the $(1-L)b(L)$ that remains is
+\emph{not} invertible, so no AR rep available.
+
+Rather than think of I(1) processes mechanically as a generalization of
+the random walk, the game of studying these processes is figuring out
+the implications for the level or long run forecast of a process.
+
+Spectral density at frequency zero of the I(1) process is $a(1)$.
+This determines the low frequency movements.
+If a pure random walk, then $a(1)=1$.
+If trend stationary, then $a(1)=0$.
+Of course, intermediate possibilities.
+
+By beveridge nelson, every I(1) process can be written as a sum of a RW
+and a stationary process.
+There are many ways to do such a decomposition but beveridge nelson is
+nice.
+In beveridge nelson, the random walk component today is the value if you
+forecast the model forever into the future, then run back a linear
+trend. The point today in that run-backward linear trend is the random
+walk value.
+In other words, it's the
+
+OLS estimate of $\phi$ in the following model is downward biased
+with too-tight standard errors when $\phi$ close to one:
+\begin{align*}
+  y_t = \phi y_{t-1} + \varepsilon_t
+\end{align*}
+So our $<1$ OLS estimates could actually have been generated by random
+walks.
+
+Suppose you have a random walk model and estimate it like it's something
+trend stationary. This is also bad, and will lead to finding misleading
+nonexistent linear trends that are actualy just random walk.
+
+Suppose you regress a random walk on another random walk. The
+coefficient estimate will be misleadingly high.
+
+
+
+\clearpage
+\subsection{How big is the Random Walk in GNP}
+
+Punchline: GNP does actually revert back to trend, but only over several
+years. So in the short run, GNP behaves like a unit root.
+So if you fit a model to the short run behavior, you will incorrectly
+infer long run persistence too that isn't actually there.
+
+Idea: ``Measure size of random walk component in GNP from the variance
+of its long differences.''
+Two competing models
+\begin{align*}
+  \text{Pure Random Walk:}&\quad
+  y_t
+  = bt + \sum_{j=0}^\infty a_j \varepsilon_{t-j}
+  \\
+  \text{Stationary about Trend:}&\quad
+  y_t
+  = \mu + y_{t-1} + \varepsilon_t
+\end{align*}
+Notice
+\begin{align*}
+  \text{Pure Random Walk}
+  \quad&\implies\quad
+  \Var(y_t-y_{t-k})
+  = k\sigma^2_\varepsilon
+  \\
+  \text{Stationary about Trend}
+  \quad&\implies\quad
+  \Var(y_t-y_{t-k})
+  = 2\sigma^2_y
+\end{align*}
+Can also form variance ratio
+\begin{align*}
+  R
+  &= \frac{\Var(y_t-y_{t-k})/k}{\Var(y_t-y_{t-1})}
+\end{align*}
+
+
+\clearpage
+\section{Great Mortgaging}
+
+Introduce ``long-run annual-frequency dataset on disaggregated
+(mortgage vs. business) bank credit for 17 advanced economies since
+1870.''
+Growth in credit has mostly been rapid growth in mortgage lending, and
+that is robust across countries.
+
+Questions:
+- We see greater bank lending to households relative to businesses.
+  Does this happen in low-growth economies?
+- Maybe mortgage lending is high private return to the banks but low
+  social return because it's not investing in technology or productive
+  assets. Need a mechanism for this to happen in GE
+- Aiyagari with shocks to the borrowing limit that is below zero
+- Why was mortgage loan growth so strong \emph{then}? Has to be
+  securitization and demand for higher yielding assets.
+  But the run up is still slightly after Solomon brothers did their
+  thing.
+- Why is mortgage lending so different from nonmortgage business
+  lending? Is it the size of the balance sheet or the composition (i.e.
+  the simple fact that banks mostly do that now)?
+  We see a run up in bank loans to GDP. But really it's the composition
+  that has changed.
+- Look at banks/credit unions and lenders that differ in the amount that
+  they lend to households vs. to businesses. Are the ones that lend to
+  households more fragile?
+
+
+\clearpage
+\section{Stochastic Processes}
+
+%Want to go from SDE to something deterministic. Two options
+%\begin{itemize}
+  %\item Kolmogorov Backward Equation with Feynman-Kac Formula giving
+    %Solution: Given starting value, compute evolution of expected payoff
+    %at some terminal date, working backwards
+  %\item Kolmogorov Forward Equation, aka Fokker-Planck Equation: Compute
+    %evolution of probability density, given starting distribution
+%\end{itemize}
+
+\subsection{%
+  Continuous Time Stochastic, Markov, and Diffusion Processes and the
+  Transition Functions
+}
+
+
+\begin{defn}(Continuous Time Stochastic Process)
+Given probability space $(\Omega,\sF,P)$ and measurable space
+$(G,\sG)$, a \emph{stochastic process} is a collection of random
+varibles $\{X_t\}_{t\geq 0}$ such that for each fixed $t$,
+$X_t:(\Omega,\sF,P)\ra(G,\sG)$ is a random variable.
+
+Alternatively, rather than fixing $t$ and thinking of $X_t$ as a random
+variable on $(\Omega,\sF,P)$, we can fix $\omega\in\Omega$ and think of
+$X_t(\omega)$ as a \emph{function} of $t\geq 0$.
+This perspective treats stochastic process $\{X_t\}_{t\geq 0}$ as a
+\emph{function-valued} random element, i.e.\ realizations
+$\omega\in\Omega$ are \emph{functions} in some function space like
+$C([0,T],\R^d)$ (the space of continuous functions).
+
+Domain $(\Omega,\sF,P)$ is the \emph{sample space}, while $(G,\sG)$
+is the \emph{state space} of process $\{X_t\}_{t\geq 0}$.
+Often, the state space is $(G,\sG)=(\R^d,\sB(\R^d))$, i.e. Euclidean
+space with the Borel $\sigma$-algebra.
+\end{defn}
+
+\begin{defn}(Markov Process)
+Let $\{X_t\}_{t\geq 0}$ be a stochastic process from $(\Omega,\sF,P)$
+into $(G,\sG)$.
+Let $\sF_t^X:=\sigma(\{X_s\}_{s\geq t})$ be the filtration\footnote{%
+  sequence of $\sigma$-algebras such that
+  $\sF_s\subseteq\sF_t\subseteq\sF$ for all $s\leq t$.
+}
+generated by $\{X_t\}_{t\geq 0}$.
+The the process $\{X_t\}_{t\geq 0}$ is a \emph{Markov process} if it
+satisfies
+\begin{align*}
+  P[X_{t+h}\in A|\sF_t^X]
+  =
+  P[X_{t+h}\in A|X_t]
+  \qquad
+  \begin{cases}
+    \forall t,h\geq 0
+    \\
+    \forall A\in\sG
+  \end{cases}
+\end{align*}
+In words, where the process goes only depends on where it is now, not
+where it's been before.
+
+A Markov process is called \emph{time homogeneous} or
+\emph{strongly stationary} if the probability of moving to $A$ in $h$
+periods does \emph{not} depend upon the current time $t$, only $h$.
+\begin{align}
+  P[X_{t+h}\in A|X_t]
+  =
+  P[X_{h}\in A|X_0]
+  \qquad
+  \forall t
+  \label{timehomog}
+\end{align}
+\end{defn}
+
+\begin{defn}(Transition Function and Density)
+Given any Markov process $\{X_t\}_{t\geq 0}$ from $(\Omega,\sF,P)$ into
+$(G,\sG)$, there is an associated \emph{transition function} which can
+be written
+\begin{align*}
+  Q(A,t|x,s)
+  := P[X_t\in A|X_s=x]
+  \qquad
+  \forall
+  A\in\sG
+\end{align*}
+On the RHS is the probability measure of the sample space
+$(\Omega,\sF)$. On the LHS is a function $Q(A,t|x,s)$ that defines
+another measure, but on the state space $(G,\sG)$.
+%In words, $Q(A,t|X_s,s)$ gives the probability of the stochastic process
+%being in set $A$ at time $t$, given starting point $X_s=x$ at time $s$.
+
+Often, a \emph{transition density} for $Q$ exists so that we can write
+\begin{align*}
+  Q(A,t|x,s)
+  =
+  \int_A q(y,t|x,s)\;dy
+\end{align*}
+If the Markov process is time homogeneous, then only the
+\emph{difference} $t-s$ matters, not the time indices themselves,
+allowing us to use abbreviated notation
+\begin{align}
+  Q(A,t|x)
+  =
+  Q(A,t|x,0)
+  \qquad
+  q(y,t|x)
+  =
+  q(y,t|x,0)
+  \qquad
+  \qquad
+  \forall t
+  \label{transitionhomog}
+\end{align}
+\end{defn}
+
+\clearpage
+\begin{defn}(Diffusion Process)
+Markov process $\{X_t\}_{t\geq 0}$ with transition function $Q(A,t|x,s)$
+is a \emph{diffusion process} with drift and diffusion coefficients
+$(\mu(x,s),\Sigma(x,s))$ if the process satisfies the following
+conditions:
+\begin{enumerate}[label=(\roman*)]
+  \item \emph{Continuity}:
+    For all $x$ in the state-space/range $G$ of $X_t$ and
+    for all $\varepsilon>0$
+    \begin{align*}
+      \int_{|x-y|>\varepsilon}
+      Q(dy,t|x,s)
+      =
+      o(t-s)
+    \end{align*}
+    In words, $X_t$ can be made arbitrarily close to $X_s$ by choosing
+    $t$ close enough to $s$ (and that choice of $t$ works
+    \emph{uniformly} for all $s$).
+
+  \item
+    \emph{Well-Defined Drift and Diffusion Coefficients}:
+    For all $x$ in the state-space/range $G$ of $X_t$ and
+    for all $\varepsilon>0$, there exists functions $\mu(x,s)$ and
+    $\Sigma(x,s)$ such that
+    \begin{align*}
+      \mu(x,s)
+      &=
+      \lim_{t\ra s}
+      \frac{1}{t-s}
+      \int_{|y-x|<\varepsilon}
+      (y-x)
+      \;Q(dy,t|x,s)
+      \\
+      \Sigma(x,s)
+      &=
+      \lim_{t\ra s}
+      \frac{1}{t-s}
+      \int_{|y-x|<\varepsilon}
+      (y-x)(y-x)'
+      \;Q(dy,t|x,s)
+    \end{align*}
+    The above definitions of $\mu,\Sigma$ are very cautious in that they
+    restrict the domain of integration to a small neighborhood about
+    $x$. Hence, they work whether or not $X_t$ has finite first and
+    second moments. But if we're willing to further assume that $X_t$
+    indeed has finite first and second moments, then we could
+    equivalently write
+    \begin{align*}
+      \mu(x,s)
+      &=
+      \lim_{t\ra s}
+      \E\left[
+        \frac{(X_t-X_s)}{t-s}
+        \;\bigg|\;
+        X_s=x
+      \right]
+      \\
+      \Sigma(x,s)
+      &=
+      \lim_{t\ra s}
+      \E\left[
+        \frac{(X_t-X_s)(X_t-X_s)'}{t-s}
+        \;\bigg|\;
+        X_s=x
+      \right]
+    \end{align*}
+\end{enumerate}
+In other words, a diffusion process is simply a Markov process with
+\emph{continuous} sample paths (no jumps) that is fully characterized by
+its first two moments (which must be well-defined).
+
+\end{defn}
+
+\clearpage
+\subsection{Chapman-Kolmogorov}
+
+\begin{prop}\emph{(Chapman-Kolmogorov)}
+For any transition function $Q$ on $(G,\sG)$,
+\begin{align*}
+  Q(A,t|x,s)
+  =
+  \int_{G}
+  Q(A,t|z,u)
+  \;
+  Q(dz,u|x,s)
+  \qquad
+  \forall
+  \begin{cases}
+    A\in\sG \\
+    s\leq u\leq t
+  \end{cases}
+\end{align*}
+i.e. to get to $A$ at time $t$ from $x$ at time $s$, integrate over
+all intermediate stops $z$ at time $u$.
+If a density $q(y,t|x,s)$ exists, then the above implies
+\begin{align*}
+  q(y,t|x,s)
+  =
+  \int_{G}
+  q(y,t|z,u)
+  \;
+  q(z,u|x,s)
+  \;dz
+  \qquad
+  \forall\;
+  s\leq u\leq t
+\end{align*}
+If the process is time-homogeneous, then the Chapman-Kolmogorov equation
+can be expressed
+\begin{align}
+  Q(A,t+s|x)
+  &=
+  \int_{G}
+  Q(A,t|z)
+  \;
+  Q(dz,s|x)
+  \qquad
+  \forall
+  \begin{cases}
+    A\in\sG \\
+    s,t\geq 0
+  \end{cases}
+  \label{chapmankolmogorovhomog}
+  %\\
+  %q(y,t+s|x)
+  %&=
+  %\int_{G}
+  %q(y,t|z)
+  %\;
+  %q(z,s|x)
+  %\;dz
+\end{align}
+An analogous result holds for the density.
+\end{prop}
+\begin{proof}
+The key is using $P[X\in A]=\E[\mathbf{1}_{\{X\in A\}}]$ and the law of
+iterated expectations (LIE):
+\begin{align*}
+  Q(A,t|x,s)
+  =
+  P[X_t\in A|X_s]
+  =
+  P[X_t\in A|\sF_s^X]
+  &=
+  \E[\mathbf{1}_{\{X_t\in A\}}|\sF_s^X]
+  \\
+  \text{LIE: $s\leq u\implies\sF_s\subseteq\sF_u\implies$}
+  \qquad
+  &=
+  \E\big[
+    \E\big[
+    \mathbf{1}_{\{X_t\in A\}}|\sF_u^X
+    \big]
+    \;|\,\sF_s^X
+  \big]
+  \\
+  &=
+  \E\big[
+    P[X_t\in A|\sF_u^X]
+    \;|\,\sF_s^X
+  \big]
+  \\
+  \text{Since $X_t$ Markov}
+  \qquad
+  &=
+  \E\big[
+    P[X_t\in A|X_u]
+    \;|\,X_s
+  \big]
+  \\
+  \text{Writing out the expectation}
+  \qquad
+  &=
+  \int
+  P[X_t\in A|X_u=z]
+  \;Q(dz,u|x,s)
+  \\
+  \implies\quad
+  Q(A,t|x,s)
+  &=
+  \int
+  Q(A,t|z,u)
+  \;Q(dz,u|x,s)
+\end{align*}
+For the time-homogeneous case, fix initial, intermediate, and
+final times at $(0,s,t+s)$. Then the time-inhomogeneous version we have
+already proved says
+\begin{align*}
+  Q(A,t+s|x,0)
+  =
+  \int_{G}
+  Q(A,t+s|z,s)
+  \;
+  Q(dz,s|x,0)
+\end{align*}
+By Property~\ref{transitionhomog} that defines time homogeneous
+processes, we can rewrite this into the form in
+Expression~\ref{chapmankolmogorovhomog}.
+\end{proof}
+
+\clearpage
+\subsection{Markov Semigroup of a Markov Process}
+
+This entire section will focus on time \emph{homogeneous} Markov
+processes.
+
+\begin{defn}(Markov Semigroup)
+Suppose we have time homogeneous Markov process $\{X_t\}_{t\geq 0}$ in
+state space $(G,\sG)$ with associated transition function $Q(A,t|x)$ on
+that state space. Then the \emph{Markov semigroup} $\{P_t\}_{t\geq 0}$
+is a collection of operators on the space of continuous and bounded
+functions
+defined, for each $t\geq 0$, as follows
+\begin{align*}
+  [P_tf](x)
+  &:=
+  \E[f(X_t)|X_0=x]
+  =
+  \int_G
+  f(y)
+  \;Q(dy,t|x)
+\end{align*}
+To be clear, given bounded and continuous function $f(x)$ with domain
+$(G,\sG)$, the output $[P_tf](x)$ is another bounded and continuous
+function with domain $(G,\sG)$.
+It traces out the conditional expectation of $f(X_t)$ as a function of
+different starting points.
+\end{defn}
+
+\begin{prop}\emph{(Properties of Markov Semigroup)}
+\label{markovsemiprop}
+Given collection of operators $\{P_t\}_{t\geq 0}$
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item $P_t$ is a linear operator for all $t$
+  \item $P_{t+s}=P_t\circ P_s$ and $P_0=I$
+  \item Collection $\{P_t\}_{t\geq 0}$ is indeed a semigroup under
+    the binary operation of operator composition, i.e.
+    $(P_t\circ P_s) \circ P_u = P_t\circ (P_s \circ P_u)$
+\end{enumerate}
+\end{prop}
+\begin{proof}
+Point (i) follows directly from the linearity of the expectation.
+Point (ii) follows from
+\begin{align*}
+  [P_0f](x)
+  =
+  \E[f(X_0)|X_0=x]
+  = f(X_0)
+  \quad\implies\quad
+  P_0=I
+\end{align*}
+and also from Chapman-Kolmogorov for time homogeneous processes:
+\begin{align*}
+  [P_{t+s}f](x)
+  &=
+  \int_G
+  f(y)
+  \,Q(dy,t+s|x)
+  =
+  \int_G
+  f(y)
+  \left[
+  \int_{G}
+  Q(dy,t|z)
+  \, Q(dz,s|x)
+  \right]
+\end{align*}
+The last equality was simply Chapman-Kolmogorov.
+Regrouping
+\begin{align*}
+  [P_{t+s}f](x)
+  &=
+  \int_G
+  \int_{G}
+  f(y)
+  Q(dy,t|z)
+  \, Q(dz,s|x)
+  =
+  \int_G
+  [P_tf](y)
+  \, Q(dz,s|x)
+  %=
+  %[P_s[P_tf]\big](y)
+  =
+  \big[
+  (P_t\circ P_s)
+  f
+  \big](x)
+\end{align*}
+\end{proof}
+
+\begin{defn}(Adjoint $P_t^*$ of Markov Semigroup)
+Given semigroup $\{P_t\}_{t\geq 0}$ which is a set of operators on
+bounded and continuous functions, its $L^2$-adjoint
+$\{P_t^*\}_{t\geq 0}$ is a set of operators on
+\emph{probability measures} over the state space $(G,\sG)$.\footnote{%
+  i.e.\ given measure $\mu$ on $(G,\sG)$, $P_t^*\mu$ is \emph{another}
+  measure on $(G,\sG)$.
+}
+The ajoint $P_t^*$ is defined by
+\begin{align}
+  [P_t^*\mu](A)
+  :=
+  %\int_A
+  %[P_t^*\mu](dx)
+  %=
+  \int_G
+  Q(A,t|x)
+  \;\mu(dx)
+  \label{Padjoint}
+\end{align}
+\end{defn}
+\begin{proof}
+To show that $P_t^*$ is the $L^2$-adjoint of $P_t$, write out
+\begin{align*}
+  \int_G
+  [P_tf](x)
+  \;\mu(dx)
+  &=
+  \int_G
+  \E[f(X_t)|X_0=x]
+  \;\mu(dx)
+  \\
+  &=
+  \int_G
+  \int_G
+  f(y)
+  \;Q(dy,t|x)
+  \;\mu(dx)
+  \\
+  &=
+  \int_G
+  f(y)
+  \left[
+  \int_G
+  \;Q(dy,t|x)
+  \;\mu(dx)
+  \right]
+  \\
+  \implies\quad
+  \int_G
+  [P_tf](x)
+  \;\mu(dx)
+  &=
+  \int_G
+  f(y)
+  \;
+  [P_t^*\mu](dy)
+\end{align*}
+This last expression precisely implies that $P_t$ and $P_t^*$ are
+adjoints in $L^2$.
+\end{proof}
+
+
+\begin{prop}\emph{($P_t^*$ Encodes Law of $X_t$)}
+Suppose $X_0\sim \mu_0$, some initial distribution.
+Letting $\mu_t:=P_t^*\mu_0$, the distribution of $X_t$ conditional on
+starting distribution $\mu_0$ satisfies
+\begin{align*}
+  P[X_t\in A\;|\;X_0\sim \mu]
+  =
+  \mu_t[A]
+  := [P_t^*\mu_0](A)
+  \qquad
+  \forall A\in \sG
+\end{align*}
+Hence, $P_t^*$ encodes the conditional law (transition probs) for the
+associated Markov process.
+\end{prop}
+\begin{proof}
+Simply write out the definition of $\mu_t$:
+\begin{align*}
+  \mu_t[A]
+  =
+  [P_t^*\mu_0](A)
+  =
+  \int_G Q(A,t|x)\;\mu_0(dx)
+  =
+  P[X_t\in A\;|\;X_0\sim\mu_0]
+\end{align*}
+which follows straight from the definition of the transition function
+$Q$.
+\end{proof}
+
+
+\clearpage
+\subsection{Infinitesimal Generator of a Markov Process}
+
+Closely related to the Markov semigroup is the associated infinitesimal
+generator, which is another operator on the space of bounded and
+continuous functions.
+
+\begin{defn}(Infinitesimal Generator)
+Given some time homogeneous Markov process $\{X_t\}_{t\geq 0}$ from
+sample space $(\Omega,\sF,P)$ to state space $(\R^d,\sB(\R^d))$, let
+$\{P_t\}_{t\geq 0}$ denote the Markov semigroup operating on continuous
+and bounded functions $f:\R^d\ra\R$.
+Then define the \emph{infinitesimal generator} (or simply
+\emph{generator}) of the Markov semigroup $\{P_t\}_{t\geq 0}$ as
+\begin{align*}
+  \calL f
+  :=
+  \lim_{t\ra 0}
+  \frac{P_tf-f}{t}
+\end{align*}
+$\calL$ is also called the generator of $\{X_t\}_{t\geq 0}$.
+It's an operator that
+maps bounded and continuous functions into other bounded and
+continuous functions, provided the above limit exists.
+\end{defn}
+
+\begin{prop}\emph{(Alternative Relationship between $P_t$ and $\calL$)}
+\label{PtcalL}
+The definition of $\calL$ and Property (ii) of
+Proposition~\ref{markovsemiprop} imply that we can write
+\begin{align*}
+  P_t = e^{t\calL}
+\end{align*}
+\end{prop}
+\begin{rmk}
+Since $\calL$ is an operator (not a number or something that can be
+exponentiated), this is mostly just formal notation, but extremely
+useful formal notation that can be used to derive other results and
+properties of $\calL$ and $\{P_t\}_{t\geq 0}$.
+\end{rmk}
+\begin{proof}
+First, verify Property (ii) of Proposition~\ref{markovsemiprop}:
+\begin{align*}
+  P_{t+s}
+  =
+  e^{(t+s)\calL}
+  =
+  e^{t\calL}
+  e^{s\calL}
+  =
+  P_t\circ P_s
+  \qquad\text{and}\qquad
+  P_0
+  = e^{0\calL} = I
+\end{align*}
+Next, recall the definition of $\calL$, replace $f$ with $P_0f$, and use
+$P_t=e^{t\calL}$ instead:
+\begin{align*}
+  \lim_{t\ra 0}
+  \frac{P_tf-P_0f}{t}
+  =
+  \lim_{t\ra 0}
+  \left[
+  \frac{e^{t\calL}-e^{0\calL}}{t}
+  \right]
+  f
+  =
+  \left[
+  \frac{d}{dt}\big[e^{t\calL}\big]_{t=0}
+  \right]
+  f
+  =
+  \calL e^{0\cdot \calL}
+  f
+  = \calL f
+\end{align*}
+\end{proof}
+
+\begin{defn}(Adjoint $\calL^*$ of Infinitesimal Generator)
+The $L^2$-adjoint of the infinitesimal generator is denoted $\calL^*$,
+and satisfies
+\begin{align*}
+  P_t^*
+  =
+  e^{t\calL^*}
+  \qquad
+  \qquad
+  \int [\calL f](x)\,h(x)\;dx
+  =
+  \int f(x)\,[\calL^* h](x)\;dx
+\end{align*}
+The second expression is just the condition that must hold for $\calL^*$
+to be the adjoint of $\calL$.
+\end{defn}
+
+\clearpage
+\begin{prop}\emph{(Expansion of $\E[f(X_t)|X_0=x]$ with $\calL$)}
+Let $\calL$ denote the infinitesimal generator corresponding to some
+time homogeneous Markov process $\{X_t\}_{t\geq 0}$.
+Then
+\begin{align*}
+  \E[f(X_t)|X_0=x]
+  =
+  e^{t\calL}
+  =
+  \sumninfz
+  \frac{t^n}{n!} [\calL^nf](x)
+\end{align*}
+\end{prop}
+\begin{rmk}
+This is extremely useful for computing (or at least approximating) the
+expected value of $f(X_t)$ given some starting point, which is generally
+tough to do in closed form.
+Instead, the above lets us approximate the expectation with a sum of
+derivatives of the function $f$ multiplied by the drift and diffusion
+terms.
+\end{rmk}
+\begin{proof}
+Use Proposition~\ref{PtcalL} and the definition of $P_t$ to write
+\begin{align*}
+  \E[f(X_t)|X_0=x]
+  =
+  [P_tf](x)
+  =
+  \big[
+  e^{t\calL}
+  f
+  \big](x)
+\end{align*}
+A Taylor series expansion of $e^{t\calL}$ about $t=0$ gives
+\begin{align*}
+  e^{t\calL}
+  =
+  \sumninfz
+  \frac{[t\calL]^n}{n!}
+  \quad\implies\quad
+  [e^{t\calL}f](x)
+  =
+  \left[
+  \left(
+  \sumninfz
+  \frac{t}{n!}
+  \calL^n
+  \right)
+  f
+  \right]
+  (x)
+  =
+  \sumninfz
+  \frac{t}{n!}
+  [\calL^n f]
+  (x)
+\end{align*}
+\end{proof}
+
+
+\clearpage
+Outline
+\begin{enumerate}
+  \item Backward and forward equations from generator formal notation
+  \item Diffusion process with drift and diffusion coefficients.
+    Typically read off an SDE
+  \item Writing as SDEs
+  \item Ito's Lemma
+  \item Backward and forward kolmogorov equations, and definition of
+    $\calL$
+  \item Feynman Kac
+  \item Girsanov's Theorem
+\end{enumerate}
+
+Backward equation: Define
+\begin{align*}
+  u(x,t):=\E[f(X_t)|X_0=x]
+  = [P_tf](x) = e^{t\cal L}f(x)
+\end{align*}
+Differentiate with respect to $t$:
+\begin{align*}
+  \frac{\partial u}{\partial t}
+  =
+  \calL
+  e^{t\cal L}
+  f(x)
+  =
+  \calL
+  u(x,t)
+\end{align*}
+Adding boundary initial condition $u(x,0)=f(x)$ then completes the
+characterization.
+
+Forward equation.
+Given initial distribution $X_0\sim\mu_0$, recall that the law of $X_t$
+is given by
+\begin{align*}
+  \mu_t
+  =P_t^*\mu_0
+  =
+  e^{t\calL^*}\mu_0
+\end{align*}
+Differentiate with respect to $t$ to get
+\begin{align*}
+  \frac{\partial \mu_t}{\partial t}
+  =
+  \calL^* e^{t\calL^*}\mu_0
+  =
+  \calL^* \mu_t
+\end{align*}
+If the conditional law $\mu_t$ of $X_t|X_0\sim \mu_0$ permits a density
+$p(x,t)$ such that $P[X_t\in A|X_0\sim\mu_0]=\int_A p(x,t)\;dx$, then
+the above implies
+\begin{align*}
+  \frac{\partial p}{\partial t}
+  =
+  \calL^* p(x,t)
+  \qquad
+  p(x,0)=p_0(x)
+\end{align*}
+If the initial distribution $\mu_0$ is fixed at $X_0=x$, then
+$p_0(y)=\delta(y-x)$
+
+\clearpage
+Throughout this section, we consider vector stochastic process
+$y_t\in\Rn$ following
+\begin{align}
+  \underset{(n\times 1)}{%
+    dy_t
+    \vphantom{y}
+  }
+  &=
+  \underset{(n\times 1)}{%
+    \mu(y_t,t)
+    \vphantom{y}
+  }
+  \,dt
+  +
+  \underset{(n\times m)}{%
+    \sigma(y_t,t)
+  }
+  \,
+  \underset{(m\times 1)}{%
+    dw_t
+    \vphantom{\mu}
+  }
+  \qquad\text{where}\quad
+  \begin{cases}
+    w_t\in\Rm \\
+    \E[dw_t\,dw_t']
+    =
+    I_m\;dt
+  \end{cases}
+  \label{sdemulti}
+\end{align}
+The Brownian elements being uncorrelated is WLOG since off diagonal
+$\sigma$ elements can induce correlation between different elements of
+vector $y_t$.
+
+\begin{prop}\emph{(Multidimensional Ito)}
+For any continuous $f(y,t)$, process $f(y_t,t)$ evolves
+\begin{align}
+  df(y_t,t)
+  %&=
+  %\partial_t f(y_t,t)
+  %\;dt
+  %+
+  %[\partial_y f(y_t,t)]'\;
+  %dy_t
+  %+
+  %\frac{1}{2}\;
+  %dy_t'
+  %\;
+  %[\partial_{yy} f(y_t,t)]
+  %\;
+  %dy_t
+  &=
+  \frac{\partial f}{\partial t}
+  \;dt
+  +
+  dy_t'
+  \;
+  \left[
+  \frac{\partial f}{\partial y}
+  \right]
+  +
+  \frac{1}{2}\;
+  dy_t'
+  \left[
+  \frac{\partial^2 f}{\partial y\, \partial y'}
+  \right]
+  dy_t
+  \label{itomulti}
+  \\
+  %&=
+  %\left\{
+  %\partial_t f(y_t,t)
+  %+
+  %[\partial_y f(y_t,t)]'\,
+  %\mu(y_t,t)
+  %+
+  %\frac{1}{2}\,
+  %\trace\big(\Sigma(y_t,t)\,\partial_{yy} f(y_t,t)\big)
+  %\right\}
+  %dt
+  %+
+  %\partial_y f(y_t,t)'
+  %\,
+  %\sigma(y_t,t)
+  %\,dw_t
+  &=
+  \left\{
+  \frac{\partial f(y_t,t)}{\partial t}
+  +
+  \mu(y_t,t)'
+  \left[
+  \frac{\partial f(y_t,t)}{\partial y}
+  \right]
+  +
+  \frac{1}{2}\,
+  \trace\left(
+    \Sigma(y_t,t)
+    \left[
+    \frac{\partial^2 f(y_t,t)}{\partial y\,\partial y'}
+    \right]
+  \right)
+  \right\}
+  dt
+  +
+  \left[
+  \frac{\partial f(y_t,t)}{\partial y}
+  \right]'
+  \sigma(y_t,t)
+  \,dw_t
+  \notag
+\end{align}
+where $\Sigma(y,t) := \sigma(y,t)\sigma(y,t)'$.
+\end{prop}
+\begin{proof}
+Drop arguments $(y_t,t)$ for clarity.
+Sub $dy_t$ into Eq.~\ref{itomulti}, retain terms
+at least order $dt$:
+\begin{align*}
+  df_t
+  &=
+  \frac{\partial f}{\partial t}
+  \;dt
+  +
+  \left[
+  \frac{\partial f}{\partial y'}
+  \right]
+  \left(
+  \mu
+  \,dt
+  +
+  \sigma
+  dw_t
+  \right)
+  +
+  \frac{1}{2}
+  \left(
+  dw_t'\,
+  \sigma'
+  \left[
+  \frac{\partial^2 f}{\partial y\,\partial y'}
+  \right]
+  \sigma
+  \,dw_t
+  \right)
+\end{align*}
+Since the term in parentheses is scalar, use the trace and identity
+$\trace(AB)=\trace(BA)$:
+\begin{align*}
+  dw_t'\,
+  \sigma'
+  \left[
+  \frac{\partial^2 f}{\partial y\,\partial y'}
+  \right]
+  \sigma
+  \,dw_t
+  =
+  \trace\left(
+  dw_t'\,
+  \sigma'
+  \left[
+  \frac{\partial^2 f}{\partial y\,\partial y'}
+  \right]
+  \sigma
+  \,dw_t
+  \right)
+  &=
+  \trace\left(
+  \sigma
+  \,dw_t
+  \,dw_t'
+  \,\sigma'
+  \left[
+  \frac{\partial^2 f}{\partial y\,\partial y'}
+  \right]
+  \right)
+\end{align*}
+Since $dw_t\,dw_t'=I_m\;dt$ and $\Sigma=\sigma\sigma'$, we can simplify
+to the second expression.
+\end{proof}
+
+\begin{defn}(Infinitesimal Generator)
+Any diffusion with SDE as in Eq.~\ref{sdemulti} has an associated
+\emph{infinitesimal generator}, a linear operator on scalar-valued
+functions $f(y,t)$:
+\begin{align*}
+  \calL f(y,t)
+  &=
+  \;\,\quad
+  \mu(y,t)'
+  \left[
+  \frac{\partial f(y,t)}{\partial y}
+  \right]
+  +
+  \frac{1}{2}
+  \trace\left(
+    \Sigma(y,t)
+    \left[
+    \frac{\partial^2 f(y,t)}{\partial y\,\partial y'}
+    \right]
+  \right)
+  \\
+  &=
+  \sumin
+  \mu_i(y,t)
+  \left[
+  \frac{\partial f(y,t)}{\partial y_i}
+  \right]
+  +
+  \frac{1}{2}
+  \sumin
+  \sumjn
+  \Sigma_{ij}(y,t)
+  \left[
+  \frac{\partial^2 f(y,t)}{\partial y_i\,\partial y_j}
+  \right]
+\end{align*}
+This is useful because we often want to compute the expected change
+$\E_t[df(y_t,t)]$, and as is clear from the expression for $\calL$,
+$\frac{1}{dt}\E[df(y_t,t)]=\partial f(y_t,t)/\partial t+\calL f(y_t,t)$.
+\end{defn}
+\begin{proof}
+To see where that second expression comes from, write out the definition
+of the trace,
+\begin{align*}
+  \trace\left(
+    \Sigma
+    \frac{\partial^2 f}{\partial y\,\partial y'}
+  \right)
+  =
+  \sum_{i=1}^n
+  \left[
+    \Sigma
+    \frac{\partial^2 f}{\partial y\,\partial y'}
+  \right]_{ii}
+  =
+  \sum_{i=1}^n
+  \Sigma_{i\cdot}
+  \left[
+    \frac{\partial^2 f}{\partial y\,\partial y'}
+  \right]_{\cdot i}
+  =
+  \sum_{i=1}^n
+  \sum_{j=1}^n
+  \Sigma_{ij}
+  \;
+  \frac{\partial^2 f}{\partial y_j\,\partial y_i}
+\end{align*}
+And since
+$\partial^2 f/\partial y_j\,\partial y_i
+=\partial^2 f/\partial y_i\,\partial y_j$
+the result follows.
+\end{proof}
+
+\clearpage
+\begin{cor}\emph{(Compact Ito's Lemma)}
+\label{cor:ito}
+By Ito's Lemma and the definition of $\calL$,
+\begin{align*}
+  df(y_t,t)
+  &=
+  \left\{
+  \frac{\partial f(y_t,t)}{\partial t}
+  +
+  \calL f(y_t,t)
+  \right\}
+  dt
+  +
+  \left[
+  \frac{\partial f(y_t,t)}{\partial y}
+  \right]'
+  \sigma(y_t,t)
+  \,dw_t
+  \notag
+\end{align*}
+\end{cor}
+
+\begin{prop}\emph{(Adjoint $\calL^*$)}
+The linear operator $\calL$, which maps functions scalar-valued
+functions $f(y,t)$ into the reals, has \emph{adjoint} $\calL^*$ with
+respect to the $L^2$ inner product satisfying, for any scalar-valued
+function $g(y,t)$
+\begin{align}
+  \calL^* g(y,t)
+  &=
+  -
+  \sumin
+  \frac{\partial}{\partial y_i}
+  \left[
+  \mu_i(y,t)
+  g(y,t)
+  \right]
+  \;dy
+  +
+  \frac{1}{2}
+  \sumin
+  \sumjn
+  \;
+  \frac{\partial^2}{\partial y_i\,\partial y_j}
+  \big[
+  \Sigma_{ij}(y,t)
+  g(y,t)
+  \big]
+  \label{adjointdefn}
+\end{align}
+\end{prop}
+%\begin{rmk}
+%Note that $p(y,t)$ could really be $p(y,t;x,s)$, i.e. depend upon
+%further arguments like some starting point and time. But this adjoint is
+%really just concerned with derivatives with respect to $y$ and $t$, so
+%we can suppress further arguments without loss of generality.
+%\end{rmk}
+\begin{proof}
+Note that throughout this proof, I suppress dependence of
+$f,g,\mu,\sigma,\Sigma$ on the time index $t$, since we only ever
+differentiate and integrate with respect to $y$.
+Of course, nothing changes if all of these objects depends upon $t$;
+therefore, Expression~\ref{adjointdefn} is still correct.
+
+First, for the $L^2$ inner product, the adjoint $\calL^*$ of $\calL$
+must by definition satisfy
+\begin{align}
+  \langle \calL f, g\rangle
+  =
+  \int_{\Rn} \calL f(y)\; g(y)\;dy
+  =
+  \int_{\Rn} f(y)\;\calL^* g(y)\;dy
+  =
+  \langle f,  \calL^* g\rangle
+  \label{adjoint}
+\end{align}
+So now to prove Expression~\ref{adjoint}, substitute the definition of
+$\calL$ into the LHS integral:
+\begin{align*}
+  \text{LHS} :=
+  \int_{\Rn} \calL f(y)\; g(y)\;dy
+  &=
+  \int_{\Rn}
+  \left(
+  \sumin
+  \mu_i(y)
+  \left[
+  \frac{\partial f(y)}{\partial y_i}
+  \right]
+  +
+  \frac{1}{2}
+  \sumin
+  \sumjn
+  \Sigma_{ij}(y)
+  \left[
+  \frac{\partial^2 f(y)}{\partial y_i\,\partial y_j}
+  \right]
+  \right)
+  g(y)\;dy
+\end{align*}
+We now want to apply integration by parts. But to make things easier,
+break up the integrals and exchanges the sums with the integrals to
+rewrite
+\begin{align*}
+  \text{LHS}
+  &=
+  \sumin
+  \int_{\Rn}
+  \mu_i(y)
+  g(y)
+  \left[
+  \frac{\partial f(y)}{\partial y_i}
+  \right]
+  \;dy
+  +
+  \frac{1}{2}
+  \sumin
+  \sumjn
+  \int_{\Rn}
+  \Sigma_{ij}(y)
+  g(y)
+  \left[
+  \frac{\partial^2 f(y)}{\partial y_i\,\partial y_j}
+  \right]
+  \;dy
+\end{align*}
+And now do integration by parts on the individual integrals (twice for
+the second) to get
+\begin{align*}
+  \int_{\Rn}
+  \mu_i(y)
+  g(y)
+  \left[
+  \frac{\partial f(y)}{\partial y_i}
+  \right]
+  \;dy
+  &=
+  -
+  \int_{\Rn}
+  f(y)
+  \frac{\partial}{\partial y_i}
+  \left[
+  \mu_i(y)
+  g(y)
+  \right]
+  \;dy
+  \\
+  \int_{\Rn}
+  \Sigma_{ij}(y)
+  g(y)
+  \left[
+  \frac{\partial^2 f(y)}{\partial y_i\,\partial y_j}
+  \right]
+  \;dy
+  %&=
+  %-
+  %\int_{\Rn}
+  %\left[
+  %\frac{\partial f(y)}{\partial y_j}
+  %\right]
+  %\left(
+  %\frac{\partial }{\partial y_i}
+  %\big[
+  %\Sigma_{ij}(y)
+  %g(y)
+  %\big]
+  %\right)
+  %\;dy
+  %\\
+  &=
+  \int_{\Rn}
+  f(y)
+  \;
+  \left(
+  \frac{\partial^2 }{\partial y_i\,\partial y_j}
+  \big[
+  \Sigma_{ij}(y)
+  g(y)
+  \big]
+  \right)
+  \;dy
+\end{align*}
+In all above applications of integration by parts
+$\int u\;dv = uv - \int v\;du$, I implicitly assumed $uv=0$.
+This is true if the functions $f(y)$ and $g(y)$ that show up and
+multiply things in the $uv$ term decay to zero sufficiently fast in the
+tails. Since we will use the adjoint for the Kolmogorov Forward Equation
+describing a probability density, this is usually fine.
+
+Putting these pieces back together and exchanging sums with integrals
+gives
+\begin{align*}
+  \text{LHS}
+  &=
+  \int_{\Rn}
+  f(y)
+  \left[
+  -
+  \sumin
+  \frac{\partial}{\partial y_i}
+  \left[
+  \mu_i(y)
+  g(y)
+  \right]
+  \;dy
+  +
+  \frac{1}{2}
+  \sumin
+  \sumjn
+  \;
+  \frac{\partial^2 }{\partial y_i\,\partial y_j}
+  \big[
+  \Sigma_{ij}(y)
+  g(y)
+  \big]
+  \right]
+  dy
+\end{align*}
+By identifying the term in brackets as $\calL^*g$ to satisfy
+Expression~\ref{adjoint}, the result follows.
+\end{proof}
+
+\clearpage
+\begin{prop}\emph{(Backward Equation and Feynman-Kac Formula)}
+Suppose $y_t$ follows SDE~\ref{sdemulti}.
+Let $\tau$ be a stopping time with $\E[\tau]<\infty$. Stopping time
+$\tau$ could depend upon $y$ or could not.
+Suppose also that function $f(y,s)$ satisfies PDE
+\begin{align}
+  0
+  %&=
+  %\partial_s f(y_s,s)
+  %+ \calL f(y_s,s)
+  %+ \Psi_s
+  %- r_sf(y_s,s)
+  &=
+  \frac{\partial  f(y,s)}{\partial s}
+  + \calL f(y,s)
+  + \Psi_s
+  - r_sf(y,s)
+  \qquad
+  \forall s\in[t,\tau]
+  \label{kbe}
+  \\
+  f(y,\tau)
+  &=
+  \Phi(y,\tau)
+  \label{kbeterm}
+\end{align}
+Though $r_s,\Psi_s$ could both depend upon only $(y,s)$, we take
+them here more generally as exogenous functions functions of the time
+index $s$.
+This accomodates both cases where they depend only upon $(y,s)$ or
+instead follow their own diffusion processes. Result is identical.
+
+The solution $f(y,t)$ is then given by the Feynman-Kac formula
+\begin{align*}
+  f(y_t,t)
+  &=
+  \E_t\left[
+    \Phi(y_\tau,\tau)
+    e^{-\int_t^\tau r_u\;du}
+    -
+    \int_t^\tau
+    \Psi_s
+    e^{-\int_t^sr_u\;du}
+    \;
+    ds
+  \right]
+\end{align*}
+The expectation is taken over paths of $y_t$ and $\tau$, conditional on
+the value of $y_t$.
+\end{prop}
+\begin{rmk}
+Equation~\ref{kbe} holds for any $y$ at all times $s\in[t,\tau]$, i.e.
+where the process has not yet been stopped. The second equation gives
+the payoff when the process is stopped. The most common stopping time
+is simply $\tau=T$, a fixed terminal date. Also common is $\tau=T\wedge
+\{y\in\partial B\}$, where $\partial B$ is the boundary of some region
+$B$.  In this last case, the above setup (which allows the payoff
+function $\Phi(y,\tau)$ to depend upon time $\tau$) is also sufficiently
+general to allow for different payoffs whether the process is stopped
+early at $\tau<T$ or at $T$.
+\end{rmk}
+\begin{proof}
+For any continuous $f(y,s)$, define
+$g(y_s,s):=f(y_s,s)e^{-\int_t^sr_u\;du}$.
+By Ito's Lemma,
+\begin{align*}
+  dg(y_s,s)
+  &=
+  e^{-\int_t^sr_u\;du}\bigg\{
+  \partial_s f(y_s,s)
+  -r_s f(y_s,s)
+  +
+  \mu'\;
+  \partial_yf(y_s,s)
+  +
+  \frac{1}{2}\,
+  \trace\left(\sigma'\,
+    \left[
+    \partial_{yy}
+    f(y_s,s)
+    \right]
+  \,\sigma\right)
+  \bigg\}
+  ds
+  \\
+  &\quad
+  +
+  e^{-\int_t^sr_u\;du}
+  \left[
+    \partial_yg(y_s,s)
+  \right]'
+  \sigma
+  \,dw_t
+  \\
+  &=
+  e^{-\int_t^sr_u\;du}\bigg\{
+  \partial_s f(y_s,s)
+  -r_s f(y_s,s)
+  +
+  \calL f(y_s,s)
+  \bigg\}
+  ds
+  +
+  e^{-\int_t^sr_u\;du}
+  \left[
+    \partial_yg(y_s,s)
+  \right]'
+  \sigma
+  \,dw_t
+\end{align*}
+Expression~\ref{kbe} lets us replace the term in curly braces with
+$-\Psi_s$:
+\begin{align*}
+  dg(y_s,s)
+  &=
+  -
+  e^{-\int_t^sr_u\;du}
+  \Psi_s
+  \;
+  ds
+  +
+  e^{-\int_t^sr_u\;du}
+  \left[
+    \partial_yg(y_s,s)
+  \right]'
+  \sigma
+  \,dw_t
+\end{align*}
+Integrate from $t$ to $\tau$ and take conditional expectation on both
+sides, where the expectation is over paths of $y_s$ for $s\in[t,\tau]$,
+conditional on the value $y_t$ today.
+Because $\E[\tau]<\infty$, the $dw_t$ integral has expectation zero as
+usual,\footnote{%
+  That $\E[\tau]<\infty$ impliess $\int_t^\tau h \;dw_t=0$ for any
+  function $h$ is called Dynkin's Theorem.
+}
+leaving us with
+\begin{align*}
+  \E_t[g(y_{\tau},\tau)]
+  &=
+  g(y_t,t)
+  -
+  \E_t\left[
+  \int_t^\tau
+  \Psi_s
+  e^{-\int_t^sr_u\;du}
+  \;
+  ds
+  \right]
+\end{align*}
+Use the terminal condition $f(y_\tau,\tau)=\Phi(y_\tau,\tau)$ plus the
+definition of $g(y,s)$, and rearrange to get the desired result.
+\end{proof}
+
+
+\clearpage
+\begin{prop}\emph{(Kolmogorov Forward Equation, aka Fokker-Planck)}
+Let $p_t(y)$ denote the distribution of the process $\{y_s\}$ at time
+$t$. Then the conditional density $p(y,s)$ of the process for all times
+$s\geq t$ (conditional on $y_t\sim p_t(y)$ at time $t$) is the solution
+of the Kolmogorov Forward (aka Fokker-Planck) PDE:
+\begin{align*}
+  \frac{\partial p(y,s)}{\partial s}
+  &=
+  \calL^* p(y,s)
+\end{align*}
+Naturally, the solution density must satisfy initial condition
+$p(y,t)=p_t(y)$.
+\end{prop}
+
+\begin{proof}
+For any continuous function $f(y,t)$, by Ito's Lemma and
+Corollary~\ref{cor:ito}:
+\begin{align*}
+  df(y,t)
+  &=
+  \bigg\{
+  \frac{\partial f(y,t)}{\partial t}
+  +
+  \calL f(y,t)
+  \bigg\}
+  ds
+  +
+  \frac{\partial f(y,t)}{\partial y'}
+  \sigma(y,t)
+  \,dw_t
+\end{align*}
+Integrate from $t$ to $T$ and take expectation $\E_t$---conditional on
+the initial distribution $p(y,t)=p_t(y)$ for the value of the process
+$y_t$ at time $t$:
+\begin{align*}
+  \E_t[f(y,T)-f(y,t)]
+  &=
+  \E_t\left[
+  \int_t^T
+  \bigg\{
+  \frac{\partial f(y_s,s)}{\partial s}
+  +
+  \calL f(y_s,s)
+  \bigg\}
+  ds
+  \right]
+\end{align*}
+Break up the integral on the RHS, and write out the expectations on the
+LHS and RHS using the density $p(y,s)$, which is the conditional density
+for the process being at $y_s$ at time $s>t$ given initial distribution
+$p(y,t)=p_t(y)$ for $y_t$ at time $t$:
+\begin{align*}
+  \text{LHS}
+  &=
+  \int_{\Rn}
+  f(y,T)
+  p(y,T)
+  \,dy
+  -
+  \int_{\Rn}
+  f(y,t)
+  p(y,t)
+  \,dy
+  \\
+  \text{RHS}
+  &=
+  \underbrace{%
+    \int_{\Rn}
+    \int_t^T
+    \frac{\partial f(y,s)}{\partial s}
+    p(y,s)
+    \;ds
+    \,dy
+  }_{(i)}
+  +
+  \underbrace{%
+    \int_{\Rn}
+    \int_t^T
+    \calL f(y,s)
+    p(y,s)
+    \;ds
+    \,dy
+  }_{(ii)}
+\end{align*}
+To simplify (i), integrate by parts with respect to time (i.e. simplify
+the inner integral):
+\begin{align*}
+  (i)
+  &=
+  \int_{\Rn}
+  \left\{
+  \left[
+    f(y,s)
+    p(y,s)
+  \right]_t^T
+  -
+  \int_t^T
+  f(y,s)\frac{\partial p(y,s)}{\partial s}
+  \;ds
+  \right\}
+  \,dy
+  \\
+  &=
+  \int_{\Rn}
+  \left[
+    f(y,T)
+    p(y,T)
+    -
+    f(y,t)
+    p(y,t)
+  \right]
+  \,dy
+  -
+  \int_{\Rn}
+  \int_t^T
+  f(y,s)\frac{\partial p(y,s)}{\partial s}
+  \;ds
+  \,dy
+\end{align*}
+To simplify (ii), use the fact that $\calL^*$ is the adjoint of $\calL$
+\begin{align*}
+  (ii)
+  &=
+  \int_t^T
+  \int_{\Rn}
+  f(y,s)
+  \calL^* p(y,s)
+  \;dy
+  ds
+\end{align*}
+Putting the LHS and the RHS (via simplified (i) and (ii)) together,
+cancelling terms, and regrouping gives
+\begin{align*}
+  0
+  &=
+  \int_{\Rn}
+  \int_t^T
+  f(y,s)
+  \left[
+  -\frac{\partial p(y,s)}{\partial s}
+  +
+  \calL^* p(y,s)
+  \right]
+  \;ds
+  \,dy
+\end{align*}
+Since $f(y,s)$ was arbitrary and this must hold for any arbitrary
+$f(y,s)$, the term in square brackets must equal zero.
+\end{proof}
+
+\clearpage
+\subsection{Girsanov}
+
+Suppose we have a Brownian motion $W_t$ under $P$.
+Also suppose $g_t$ is an adapted process.
+Define the following object
+\begin{align}
+  \Lambda_t
+  :=
+  \exp\left\{
+    -\int_0^t g_s\;dW_s
+    - \frac{1}{2} \int_0^t g_s^2 \;ds
+  \right\}
+  \label{girsanov}
+\end{align}
+Then
+\begin{itemize}
+  \item $\E[\Lambda_t]=1$, so this object is a RN derivative/change of
+    measure, i.e.  $\Lambda_t=dQ/dP$ for some alternative measure $Q$ so
+    that $\E_Q[X_t]=\E_P[\Lambda_t X_t]$
+
+  \item
+    The process $\tilde{W}_t$ defined by
+    \begin{align*}
+      \tilde{W}_t
+      &= W_t +\int_0^t g_t\;ds
+      \\
+      \implies\quad
+      d\tilde{W}_t
+      &= dW_t + g_t\;dt
+    \end{align*}
+    just so happens to be a Brownian motion under the $Q$ defined by
+    changed of measure $\Lambda_t$ (while $W_t$ is still, as before, a
+    Brownian motion under $P$).
+    Note that $\tilde{W}_t$ is generally \emph{not} a Brownian motion
+    under $P$, while $W_t$ is generally \emph{not} a Brownian motion
+    under $Q$.
+
+  \item
+    We can derive the SDE for $\Lambda_t$ by first taking the log of
+    Expression~\ref{girsanov} to get
+    \begin{align*}
+      \ln \Lambda_t
+      &=
+      -\int_0^t g_s\;dW_s
+      - \frac{1}{2} \int_0^t g_s^2 \;ds
+      \\
+      \implies\quad
+      d(\ln \Lambda_t)
+      &=
+      - \frac{1}{2} g_t^2\;dt
+      - g_t\;dW_t
+      \\
+      \qquad \text{By Ito's Lemma}\quad
+      \frac{d\Lambda_t}{\Lambda_t} &= -g_t\;dW_t
+    \end{align*}
+\end{itemize}
+Converse also holds:
+If there exist equivalent measures $Q$ and $P$ with different Brownian
+motions under them, a process $g_t$ exists such that the implied
+$\Lambda_t$ satisfies $dQ/dP=\Lambda_t$, allowing us to switch back and
+forth between Brownian motions and their corresponding measures
+
+\begin{ex}
+Suppose the process $X_t$ satisfies the following SDE under $P$
+\begin{align*}
+  dX_t = \mu_t \;dt + \sigma_t \; dW_t
+\end{align*}
+Unless $\mu_t=0$, $X_t$ not a martingale under $P$.
+But suppose it's easier to work with $X_t$ when it is a martingale.
+Then we can switch to the measure $Q$ (with it's corresponding Brownian
+Motion $\tilde{W}_t$) by Girsanov's Theorem
+\begin{align*}
+  dX_t
+  &= \mu_t \;dt + \sigma_t \; (d\tilde{W}_t-g_t\;dt)
+  \\
+  &= [\mu_t -\sigma_t g_t]dt + \sigma_t \; d\tilde{W}_t
+\end{align*}
+If we choose $g_t=\frac{\mu_t}{\sigma_t}$, then $X_t$ has no drift under
+the $Q$ associated with $\tilde{W}_t$.
+\end{ex}
+
+\clearpage
+\section{Jump Processes}
+
+
+\begin{defn}(Cadlag Function)
+A function $f:[0,T]\ra\R^d$ is \emph{cadlag} if the $f$ is
+right-continuous, and the lefthand limit $\lim_{\delta \ra 0}
+f(t-\delta)$ exists for any point in the domain, though this lefthand
+limit need \emph{not} equal the righthand limit.
+This allows for jumps.
+\end{defn}
+\begin{defn}(Random, Stopping, Hitting Times)
+A \emph{random time} $\tau$ is a nonnegative random variable.
+
+A \emph{stopping time} with respect to filtration $\{\sF_t\}$ is a
+random time that is also $\sF_t$-measurable for all $t$, i.e.
+$\{\tau\leq t\}\in\sF_t$. In effect, this means that any instant, we can
+tell whether or not the event (i.e. the process stopping) has happened.
+
+Given process $X_t$, a \emph{hitting time} $\tau_A$ is a random variable
+that encodes the first time $X_t$ hits open set $A$:
+\begin{align*}
+  \tau_A(\omega):=\argmin_{t} X_t(\omega)\in A
+\end{align*}
+\end{defn}
+
+
+\begin{defn}(Counting Process)
+Suppose we have an increasing sequence\footnote{%
+  I assume ``increasing sequence'' means $T_n\leq T_{n+m}$ for all
+  $m\geq 0$, realization by realization
+}
+of random times $T_n:\Omega\ra\R_+$ with
+$P[\limn T_n=\infty]=1$.
+Define the \emph{counting process} as $\N$-valued random variable $X_t$
+that counts the number of random times (i.e. number of $T_n$'s)
+occurring within $[0,t]$.
+\begin{align*}
+  X_t
+  =
+  \#\{
+    n
+    \;|\;
+    T_n\leq t,
+    \qquad n\geq 1
+  \}
+  =
+  \sumninf
+  \mathbf{1}_{\{T_n\leq t\}}
+\end{align*}
+$X_t$ is Cadlag by construction, and also piecewise constants with jumps
+of one unit.
+\end{defn}
+
+
+\begin{defn}(Poisson Process)
+The \emph{Poisson Process} $N_t$ is a particular counting process where
+each random time $T_n$ is a partial sum of iid exponential RVs:
+\begin{align*}
+  T_n = \sumin \tau_i
+  \qquad
+  \tau_i\iid \text{Exp}(\lambda)
+\end{align*}
+Denote this process by $N_t\sim\text{Poisson}(\lambda t)$ since
+\begin{align*}
+  P[N_t=n]
+  =
+  e^{-\lambda t}
+  \frac{(\lambda t)^n}{n!}
+\end{align*}
+$N_t$ is the only counting process with independent and stationary
+increments.
+\end{defn}
+
+\begin{defn}(Random Measure)
+Given  an increasing sequence of random times $T_n:\Omega\ra\R_+$,
+define \emph{random measure} $\mu:\Omega\times(\R_+,\sB(\R_+))\ra \N$ on
+the natural numbers:
+%The sequence $T_n:\Omega\ra\R_+$ that we used to define a counting
+%process $X_t$ to count the number of points in $[0,t]$ also
+\begin{align*}
+  \mu(\omega,A)
+  =
+  \#\{
+    n
+    \;|\;
+    T_n(\omega)\in A\in\sB(\R_+),\;\; n\geq 1
+  \}
+\end{align*}
+This measure is \emph{random} because $\mu$ is indexed by $\omega$ in
+its first argument.
+And for each $\omega\in\Omega$, $\mu(\omega,A)$ gives the number of
+jumps (or jump times $T_n$) in the set $A$.
+Of course, since jumps are random, each different $\omega\in\Omega$
+implies a different time/realization for each $T_n(\omega)$, hence a
+different answer for how many jumps occurred in $A$.
+%We can of course take the expectation over $\Omega$ to get
+%\begin{align*}
+%\end{align*}
+
+Since the sequence of random times $\{T_n\}$ can be used to define a
+corresponding counting process $X_t$, we can offer an alternative
+definition of $X_t$ using the random measure $\mu$:
+\begin{align}
+  X_t(\omega)
+  =
+  \mu(\omega,[0,t])
+  =
+  \int_0^t
+  \mu(\omega,ds)
+  \label{jumprelate}
+\end{align}
+Thus the number of jumps of $X_t$ in interval $[s,t]$ is given by
+$\mu(\omega,[s,t])$.
+
+For every counting process, there is a corresponding jump measure, and
+vice versa.
+\end{defn}
+
+\begin{defn}
+Let $\mu(\omega,A)$ be the associated jump measure for Poisson process
+$N_t\sim\text{Poisson}(\lambda t)$.
+Since jump measure $\mu(\omega,A)$ is random, we can take it's
+expectation and use Expression~\ref{jumprelate} along with
+$N_t\sim\text{Poisson}(\lambda t)$
+to simplify
+\begin{align*}
+  \E[\mu(\omega,[0,t])]
+  =
+  \E[N_t(\omega)]
+  =
+  \lambda t
+\end{align*}
+We can think of $\mu$ as the derivative of $N_t$ in the following sense
+\begin{align*}
+  \frac{dN_t(\omega)}{dt}
+  &=
+  \mu(\omega,[t,t+dt])
+  \qquad\text{where}\quad
+  \mu
+  = \sum_{n=1}^\infty \delta_{T_n(\omega)}
+\end{align*}
+i.e. $\mu$ is the sum of Dirac measures at all jump times.
+\end{defn}
+
+\begin{defn}
+Let $(\Omega,\sF,P)$ be a probability space.
+Let $(\R^d,\sG)$ be a a measurable space, and $\lambda$ a positive Radon
+measure on that space.
+Define a \emph{Poisson random measure}
+\begin{align*}
+  \mu:\Omega\times(\R^d,\sG)\ra \N
+\end{align*}
+such that for almost all $\omega\in\Omega$,
+$\mu(\omega,\cdot)$ is a $\N$-valued Radon measure on $(\R^d,\sG)$
+satisfiying, for any $A\in\sG$,
+$\mu(\omega,A)<\infty$ and
+\begin{align*}
+  P[\mu(\omega,A)=n]
+  =
+  e^{-\lambda[A]}
+  \frac{\big(\lambda[A]\big)^n}{n!}
+\end{align*}
+and for any disjoint measurable sets $A_1,\ldots,A_m\in\sG$, the RVs
+$\mu(\omega,A_1),\ldots,\mu(\omega,A_m)$ are independent.
+
+Can also associated a Poisson random measure with a sequence of points
+$\{X_n(\omega)\}\ninf$ in $\R^d$ such that
+\begin{align*}
+  \mu(\omega,A)
+  &=
+  \sumninf \mathbf{1}_{\{X_n(\omega)\in A\}}
+  \\
+  \mu
+  &=
+  \sumninf \delta_{X_n(\omega)}
+\end{align*}
+\end{defn}
+
+\clearpage
+\subsection{Levy Processes}
+
+\begin{defn}(Levy Process)
+Cadlag process $X$ on $\R^d$ with $X_0=0$, satisfying the following three
+properties
+\begin{enumerate}[label=(\roman*)]
+  \item Independent Increments:
+    For any $s<t<u$, the RVs
+    $X_u-X_t$ and $X_t-X_s$ are independent.
+  \item Stationary Increments:
+    The distribution of $X_{t+s}-X_t$ does not depend upon $t$
+  \item Stochastic Continuity:
+    For all $t,\varepsilon>0$,
+    $\lim_{s\ra 0} P[|X_{t+s}-X_t|>\varepsilon]=0$.
+
+    Note that this does not mean the process $X_t$ is strictly
+    continuous, or that any finite interval $[0,T]$ only has a countable
+    or finite number of jumps.
+    Rather it only means that jumps do not happen at deterministic
+    times, and that at any given time $t$, the probability of a jump is
+    zero.
+\end{enumerate}
+\end{defn}
 
 
 
