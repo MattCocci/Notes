@@ -411,7 +411,9 @@
 
 % Various probability and statistics commands
 \newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\med}{\operatorname{med}}
 \newcommand{\vc}{\operatorname{vec}}
+\newcommand{\sign}{\operatorname{sign}}
 \newcommand{\Cov}{\operatorname{Cov}}
 \newcommand{\rank}{\operatorname{rank}}
 \newcommand{\trace}{\operatorname{tr}}
@@ -569,6 +571,819 @@ exogeneity is stronger and does imply predetermined.
 But no need to assume that for strict exogeneity.
 
 
+\clearpage
+\section{Market Demand Models}
+
+\begin{comment}
+Demand for differentiated products
+==================================
+- Why we care about the demand system
+  - Measuring market power of sellers
+  - Measuring welfare
+  - Understanding price effects of mergers
+  - Understanding which new prices might enter the market
+  - Understand how new products affect prices, welfare
+
+- Supply Side
+  - We care about this bc we almost always assume that *prices* we
+    observe are the outcome of a nash equilibrium in prices (Bertrand
+    game)
+  - Each firm maximizes profits by setting price, taking as given
+    - Demand curve for its products (as a fcn of price)
+    - Cost function for producing a certain quantity
+  - The FOC imply a pricing function that says
+
+      price = f(mc, markup)
+
+    where markups are related to demand elasticities.
+  - Thus given an estimated demand system (i.e. estimated elasticities)
+    we can invert the pricing function to recover marginal costs
+  - Of course, to estimate the demand system, we need IVs (typically
+    cost-shifters) to estimate the system (i.e. price elasticities).
+    That's the tough part
+  * Note: elasticities depend upon prices. Typically not a problem for
+    estimation, but is a problem for counterfactuals
+
+- Demand Side
+  - Product Space vs. Char Space (Lancaster 1966, McFadden 1973).
+    - Benefits vs. drawbacks
+  - Product space: estimate aggregate q(p,y)
+    - Models include
+      - Linear Expenditure (Stong, 1954): Building block
+      - Rotterdam (Theil 1965, Barten 1966)
+      - Translog (Christensen, Jorgensen, Lau 1975)
+      - AIDS (Deaton and Muellbauer, 1980)
+    - Problems/difficulties
+      - High dimension with many products
+      - Too often, instruments do not vary enough at product level and
+        are highly colinear
+      - Estimate of *aggregate* demand in rep agent framework, so
+        ignores consumer heterogeneity
+    - How to solve these problems:
+      - Aggregate products into groups and different levels,
+        solves dimensionality
+      - Symmetry assumption for products: Dixit Stiglitz CES, so only
+        one parameter to estimate (but super counterfactual)
+      - Logit demand: Good for questions that deal with the optimal
+        number of products or optimal variety
+    - AIDS specifics
+      - Divide product into subgroups, allow flexibility w/in subgroups
+      - Key assumptions to justify theoretically this practical approach
+        to demand estimation
+        - Preference separability: U(q) = f(u1(q(1)),...,un(q(n)))
+        - Multi-stage budgeting: Consumers allocated total expenditure
+          in stages to different subgroups
+      - Sufficient conditions for those two assumptions
+        - Indirect utility for *each* segment of generalized Gorman
+          Polar Form:
+
+              v_i(p,y_i) = (y_i - f_i(p)) / g(p)
+
+          v_i: indirect utility for agent i given prices p, income y_i.
+          f_i: Expenditure necessary to reach utility level
+          g(): Price index that is the same for all i
+        - Overall utility *additively separable* in sub-utilities
+        - For any level, estimate demand for product i in segment g
+
+            wi = ai + bi*log(yg/Pg) + sum_j gamij log(pj) + ei
+
+          wi: Within segment g expenditure share on product i
+          yg: Total expenditure on segment g
+          Pg: price index for segment g
+          pj: Price for product j
+        - Price indices
+          - Stone log price index: Pg = sum_j wj log(pj)
+          - Deaton and Muellbauer exact price index
+
+            Pg = a0 + sum_j aj pj + (1/2)sumj sumk gamjk*log(pj)*log(pk)
+
+    - Hausman Example
+      - Stages: Whole market, market segments, individ products
+      - Bottom level: AIDS
+      - Middle level: AIDS or log-log
+
+          log qg = ag + bg log(y) + sum delgh log(Ph) + eg
+
+        Neither fully consistent with theory
+      - Highest level: log-log
+
+          log q = a + b log(y) + del log(P) + Z*gam + e
+      - Note: No corner solutions--each consumer buys some of each good
+      - Need to classify some products beforehand
+    - Hausman, Leonard, Zona (1994)
+      - Beer Market
+        - Upper level: Light, premium, popular pirce
+        - Lower level: Five brands within each segments
+      - Idea: There is some underlying pricing model like
+
+          log p_jct = a_jc + log c_jt + om_jct
+
+        a_jc: Product-city FE (city's preference for a brand)
+        c_jt: Product-time cost shifter (constant *across cities*)
+        om_jct: Absorb supply and demand shocks
+
+        *Exploit variation in *price of same brand*, *across cities*
+        *Note: because c_jt fixed across cities, any variation that is
+          common across cities will mechanically be attributed to
+          supply/c_jt---NOT demand through om_jct.
+          Bad assumption if national add campaign?
+\end{comment}
+
+\begin{comment}
+  - Characteristic space: Products are bundles of chars
+    - Theory:
+      - Price competition, taking products as given
+      - Comp in product space with or without subsequent price comp
+    - Empirics: Only do the former, latter Sweeting ECMA 2013 new
+    - Common instrument: Product characteristics
+      - inefficient
+      - Probably inconsistent
+    - Common approach:
+      - Heterogeneous individuals
+      - Discrete choice (i.e. choose one product)
+      - Aggregate up, so diemand depends on distribution of
+        heterogeneous attributes
+    - Theory Model undergirding Discrete-Choice Models
+      - J products in a market, agent chooses one or outside good
+
+          max_j,z U_i(x_j,z)  s.t. y_i = p_j + p_z*z
+
+        x_j: characteristics of j
+        p_j: price
+        y_i: income
+        z:   Quantity of outside good
+      - Use budget constraint to write choice of z out of problem,
+        writing as max over conditional indirect utility function
+
+          max_j U_ij = max_j U_i(x_j, (y_i-p_j)/p_z)
+      - Agent chooses j to maximize this utility, i.e. takes whichever j
+        maximizes U_ij. Thus we can lay down a model for U_ij directly
+
+    - Metrics:
+      - Conditional Indirect Utility: U_ij = U(X_j, p_j, v_ij; theta)
+      - Then augment with error unobserved by econometrician
+
+          U_ij* = U_ij + e
+
+        Distribution of e determines consumer i's choice probs, i.e.
+        consumer i's demand function
+      - Examples:
+        - Two goods: j=0,1,2
+
+            U_ij = delj + e_ij      U_i0 = 0
+
+        - Hotelling: Pure horizontal
+
+            U_ij = ubar + (y_i-p_j) - theta d^2(x_j,v_i)
+
+        - Pure Vertical
+
+            U_ij = del_j - vi*pj      vi > 0
+
+          For all products bought in positive quantities, ordering by
+          price p_j *same* as ordering by quality del_j.
+
+          Higher price -> higher quality del_j
+
+          So wlog, sort products by price/quality
+
+          Agent chooses product j iff
+
+            del_j - v_i * p_j > del_j+1 - v_i * p_j+1
+            del_j - v_i * p_j > del_j-1 - v_i * p_j-1
+
+          Can solve to get that that i chooses j iff
+
+            (del_j+1 - del_j)/(p_j+1-p_j) < v_i < (del_j - del_j-1)/(p_j-p_j-1)
+
+          Hence cutoff points for elasticities determine which products
+          chosen. Given a distribution for v_i, can use that CDF to
+          compute market share
+
+          ***Model implication: Cross-price elasticities for product j
+          are ZERO, except for the neighboring j-1 and j+1 products
+
+
+        - Logit:
+
+            U_ij = ubar + (y_i-p_j) + delta_j + e_ij
+
+          where del_j = f(x_j, p_j, xi_j)
+
+
+      - Generally, two main classes: depending on whether there is an
+        epsilon or not.
+
+        Matters because with eps_ij, product space *never* exhausted.
+        Each new product comes with a new set of eps_ij that, for large
+        enough sample, allow the product to deliver high utility for
+        *someone* so that the person chooses it, guaranteeing the
+        product positive market share and some market power
+
+        The two classes:
+        - Sans eps: For f_y>0, f_p<0, f_yp >= 0
+          - Pure Hedonic (Berry and Pakes 2007):
+
+              U_ij = f(y_i,p_j) + del_j + sum_k b_k * x_jk * v_ik
+
+          - Ideal Type (Anderson, de Palma, Thisse 1992)
+
+              U_ij = f(y_i,p_j) + del_j + sum_k a_k (x_jk - v_ik)^2
+
+        - Cum eps (BLP 1995): Used to reconcile the model with the data.
+          Without, often no way to fit everything. Like sticking in an
+          error term in OLS even when we think relationship is linear
+
+            U_ij = f(y_i,p_j) + del_j + sum_k b_k * x_jk * v_ik + eps_ij
+
+          which retains logit as a special case
+
+        Instruments: Assume X *exogenous* so use
+        - Cost shifters
+        - Functions of X likely to be correlated with markups
+
+    - Logit model: U_ij = del_j + eps_ij where del_j = f(x_j,p_j,xi_j)
+      - Analytic expression in terms of del_j terms
+      - Further restriction: McFadden
+        - del_j = x_j*b - a*p_j + xi_j
+        - Then can rearrange market share equation to get linear form
+
+            del_j = log(s_j) - log(s_0)
+                  = x_j*b - a*p_j + xi_j
+
+          which is a useful linear form
+        - Can use FE to get rid of xi_j
+        - Can instrument for prices using standard IV procedures
+      - Problems: own and cross price elasticities
+        - Own-price: Increasing in absolute value, but really people who
+          buy more expensive products probably *less* sensitive to price
+        - Cross-price: Depends only on market shares and prices, NOT
+          similarities between goods. IIA?
+        *All of function of the lack of heterogeneity
+      - xi_j introduces potential endogeneity of prices.
+        Often assume E[xi_j|X]=0 and built instruments from that.
+        But maybe problematic
+
+    - Nested Logit model: Relaxes IIA by grouping products
+      - Model given by
+
+          U_ij = del_j + zeta_{ig}(sig) + (1-sig)*eps_ij
+
+        where zeta_ig(sig) common to all products in nest g.
+        As sig -> 0, standard logit
+        As sig -> 1, only nests matter
+
+      - Assume that zeta_ig(sigma) ~ s.t. entire term
+
+          zeta_{ig}(sig) + (1-sig)*eps_ij
+
+        is EV so we get back standard logit formulas
+
+      - Example nesting: Outside good in one nest, rest in other nest.
+        Yields linear equation
+
+          log(s_j) - log(s_0) = x_j*b - a*p_j + sig*log(s_{j/g}) + xi_j
+
+        Instrument for prices and s_{j/g}
+
+    - BLP, aka Random Coefficients, Mixed Logit, Heterogeneous Logit
+      - Generalizes logit model from b to bi
+
+          U_ij = ( x_j*b_i - a*p_j + xi_j ) + eps_ij
+          b_i  = b + Sigma*v_i
+
+        so then
+
+          U_ij    = delta_j + v_ij
+          delta_j = x_j*b - a*p_j + xi_j      Mean utility for brand j
+          v_ij    = x_j Sigma v_i + eps_ij
+
+        xi_j and eps_ij not observed by econometrician, only consumer.
+        Former probably correlated with price p_j, maybe char X_j
+
+        So like logit, but residual term v_ij *no longer* iid, so
+        consumers who like one product more likely to like similar
+        products
+
+      - Need to be able to invert and write del(s), i.e. del as a
+        function of shares, rather than just s(del) (shares as a
+        function of delta). Can then write GMM moment conditions
+
+        In earlier models, done analytically. In BLP, must do
+        numerically, conditional on nonlinear model params, i.e. Sigma.
+        Given that, can spec moment conds. But also need moment conds to
+        identify Sigma params too
+
+        Also need to simulate shares
+
+      - Two step estimator:
+        - GMM objective function is
+        - Inverson to Recover Deltas: Given observed shares and guesses
+          for del and Sigma, can set up system of J+1 eqs in the dels
+
+            s_j = s_j(del0, ..., del_J)
+
+          where LHS is data and RHS is simulated from model, given Sigma
+          and taking draws of v_i
+
+        - Assume instrument Z s.t. E[xi*Z] = 0 where xi = del-X*b-a*p
+          under *true* params a,b
+        - Construct sample version of that moment
+        - Estimate a,b by minning that sample criterion function
+        - BUT, that depends on delta which we don't know -> TWO STEPS
+        - Invert this system to get the dels, which can be used to calc
+          the above sample criterion function
+
+      - Algo
+        - Fix theta2
+        - Kick around delta until shares equated
+        - Given delta, compute xi
+        - Given xi, form GMM objective function, which depends on whole
+          vector theta
+        - Kick around theta untily you minimize the objective function
+
+      - Suppose we had s^{-1}, the inverse shares which returns delta as
+        a function of theta2. Ignore the fact that we need to compute
+        the deltas numerically; just assume we have an analytical
+        expression. Algo steps
+        - Form xi = s^{-1}-x*b - a*p
+        - Find instruments for xi
+        - Write GMM objective function
+\end{comment}
+
+
+\begin{prop}
+\emph{(Motivation: Consumer Optimization)}
+Want to get to the indirect utility functions (over characteristics)
+that we use for estimation, from a basic utility maximization over
+quantities of the goods consumed, subject to some BC.
+\end{prop}
+
+
+\begin{prop}
+Start with general consumer preferences given by continuous utility
+function
+\begin{align*}
+  U(Q_0,Q_t)
+  \qquad\text{where}\quad
+  \begin{cases}
+    Q_0 & \text{Amount of numeraire consumed} \\
+    Q_t &
+    \text{Amount of inside good consumed---one of the $J$ options}
+    \\
+  \end{cases}
+\end{align*}
+Let $f$ be a function such that $f'>0>f''$ and
+\begin{align*}
+    f(Q_t) = x_{jt}\beta_i + \xi_{jt} + \varepsilon_{ijt}
+\end{align*}
+Special cases:
+\begin{itemize}
+  \item Quasilinear, $U(Q_0,Q_t)=f(Q_t)+Q_0$:
+    (conditional) indirect utility is then
+    \begin{align*}
+      u_{ijt}
+      = \alpha_i (I_i-p_{jt}) + x_{jt}\beta_i + \xi_{jt} +
+      \varepsilon_{ijt}
+    \end{align*}
+  \item Cobb-Douglass, $U(Q_0,Q_t)=Q_0^\alpha f(Q_t)^{1-\alpha}$
+    (conditional) indirect utility is then
+    \begin{align*}
+      u_{ijt}
+      = \alpha \ln(I_i-p_{jt}) + x_{jt}\beta_i + \xi_{jt} +
+      \varepsilon_{ijt}
+    \end{align*}
+\end{itemize}
+From latter case, we see why the argument to indirect utility is
+$I_i-p_{jt}$ rather than $p_{jt}$ alone.
+\end{prop}
+
+
+\clearpage
+\begin{defn}
+(General Discrete Choice Model in Characteristics Space)
+Products are bundles of characteristics, and agents in any given market
+choose a single product.
+The ultimate choice is determined by the indirect utility function,
+denoted most generally by
+\begin{align*}
+  u_{ijt}
+  =
+  U(x_{jt},\xi_{jt},I_i-p_{jt},D_{it},v_{it};\theta)
+  + \varepsilon_{ijt}
+\end{align*}
+where
+\begin{itemize}
+  \item $u_{ijt}$:
+    Utility for individual $i$ when choosing product $j$
+    in market $t$
+  \item $x_{jt}$: Observed product characteristics
+  \item $\xi_{jt}$: Unobserved product characteristics.
+    Worry about correlation with price.
+    Acts as a residual, soaking up everything about the product we
+    don't/can't explain by characteristics and can be used to reduce the
+    dimension when many characteristics.
+  \item $I_i-p_{jt}$: Income less price. It's this difference that
+    matter, which is why write $I_i-p_{jt}$ as the argument, rather than
+    $I_i$ and $p_{jt}$ separately. Only in particular special cases can
+    we separate things out (like the quasilinear case below); in others,
+    not.
+  \item $D_{it}$: Observed consumer attributes (like demographics).
+    Often have the distribution from something like CPS
+  \item $v_{it}$: Unobserved consumer attributes.
+    Often assume particular distribution like normal.
+  \item $\varepsilon_{ijt}$: iid error term that reflects the
+    econometrician's ignorance, i.e. imperfect specification and
+    observation of
+    $U(x_{jt},\xi_{jt},I_i-p_{jt},D_{it},v_{it};\theta)$,
+    which forces us to put an error term $\varepsilon_{ijt}$ into the
+    model to plug the gap between model and data.
+\end{itemize}
+Thus model-predicted market share of produt $j$ in market $t$ is given
+$\theta$ is
+\begin{align*}
+  \sigma_{jt}(\theta)
+  &=
+  \E_{D_{it},v_{it},\varepsilon_{ijt}}
+  \big[
+    \mathbf{1}\{u_{ijt}>u_{ikt}\;\text{for all other $k$}\}
+  \big]
+\end{align*}
+A market is defined as that grouping such that, within $jt$, the terms
+$(x_{jt},p_{jt},\xi_{jt})$ don't vary.
+Those are allowed to vary only \emph{across} markets, by assumption.
+\end{defn}
+
+
+
+
+
+\begin{defn}
+(Special Case: Random Coefficient, a.k.a.\ Mixed Logit, a.k.a.\ BLP
+Model)
+This is a particular specification of the indirect utility function.
+\begin{align*}
+  u_{ijt}
+  &= x_{jt}\beta_i + \alpha_ip_{jt} + \xi_{jt} + \varepsilon_{ijt} \\
+  \qquad\text{where}\quad
+  \begin{pmatrix}
+    \alpha_i \\ \beta_i
+  \end{pmatrix}
+  &=
+  \begin{pmatrix}
+    \alpha \\ \beta
+  \end{pmatrix}
+  + \Pi D_{it} + \Sigma v_{it}
+\end{align*}
+Can rewrite in terms of mean indirect utility $\delta_{ijt}$ with
+market-specific $\delta_{jt}$ and person-specific deviation from that
+mean utility $\mu_{ijt}$ (plus error due to the econometrician's
+ignorance):
+\begin{align*}
+  u_{ijt} &=
+  \underbrace{%
+    x_{jt}\beta + \alpha p_{jt} +\xi_{jt}
+  }_{\delta_{jt}=\delta(x_{jt},p_{jt},\xi_{jt};\theta_1)}
+  +
+  \underbrace{%
+      \begin{pmatrix}
+        p_{jt} & x_{jt}
+      \end{pmatrix}
+      \begin{pmatrix}
+        \Pi D_{it} + \Sigma v_{it}
+      \end{pmatrix}
+  }_{\mu_{ijt}=\mu(x_{jt},p_{jt},D_{ii},v_{it};\theta_2)}
+  +\varepsilon_{ijt}
+\end{align*}
+The key difference relative to the logit model is the introduction of
+nonzero $\mu_{ijt}$, which captures the \emph{interaction} of
+characteristics and consumer attributes (including observed demographics
+$D_{it}$ and unobserved attributes $v_{it}$).
+In the logit model, $\mu_{ijt}=0$ by assumption.
+
+The tough part, when we have market-level data only (not
+consumer-level), is estimation of $\theta_2=(\Pi,\Sigma)$---the
+parameters governing hterogeneity---since we don't observe individual
+choices \emph{within} $jt$.
+However, we can still estimate/identify $\theta_2$ because we observe
+different markets $t$, and those markets have different distributions
+of consumer attributes.
+That variation in the distribution of consumer attributes across markets
+helps us identify $\theta_2$.
+
+With consumer-level data, we have multiple observations with $\xi_{jt}$
+held fixed and use the variation we see in demographics across people.
+With market-level data, no such luck.
+\emph{But}, we do see different markets with different distributions of
+characteristics, although the $\xi_{jt}$ are \emph{also} changing across
+these markets.
+\end{defn}
+
+
+\begin{comment}
+\begin{defn}
+(Special Case: Linear Mixed Logit Model, EVI Errors, No Unobserved
+Consumer Heterogeneity)
+In that case
+\begin{align*}
+  P[y_{it}=j|D_{it},x_t,p_t,\xi_t;\theta]
+  &=
+  P[y_{it}=j|D_{it},x_t,p_t,\xi_t;\theta]
+\end{align*}
+\end{defn}
+
+
+
+\paragraph{Estimation with Consumer-Level Data}
+For simplicity, suppose that $\Sigma=0$ so that we have model
+\begin{align*}
+  u_{ijt} &=
+  \underbrace{%
+    x_{jt}\beta + \alpha p_{jt} +\xi_{jt}
+  }_{\delta_{jt}=\delta(x_{jt},p_{jt},\xi_{jt};\theta_1)}
+  +
+  \underbrace{%
+      \begin{pmatrix}
+        p_{jt} & x_{jt}
+      \end{pmatrix}
+      \begin{pmatrix}
+        \Pi D_{it}
+      \end{pmatrix}
+  }_{\mu_{ijt}=\mu(x_{jt},p_{jt},D_{it},v_{it};\theta_2)}
+  +\varepsilon_{ijt}
+\end{align*}
+Further suppose that $\varepsilon_{ijt}$ are EV Type I distributed.
+Can then estimate in two steps:
+\begin{enumerate}
+  \item By assuming that $\varepsilon_{ijt}$ are EV Type I distributed,
+    \begin{align*}
+      P[y_{it}=j|D_{it},x_t,p_t,\xi_t;\theta]
+      &=
+      P[y_{it}=j|D_{it},,x_t,p_t,\delta_{jt};\theta]
+      \\
+      &=
+      \frac{%
+        \exp\big\{
+          \delta_{jt}+
+          (p_{jt} \; x_{jt})
+          \Pi D_{it}
+        \big\}
+      }{%
+        1+
+        \sum_{k=1}^J
+        \exp\big\{
+          \delta_{kt}+
+          (p_{kt} \; x_{kt})
+          \Pi D_{it}
+        \big\}
+      }
+    \end{align*}
+    From this, we can estimate $\delta_{jt}$ terms and $\Pi$.
+
+    \paragraph{$\Pi$ Identification}
+    Parameter $\Pi$ is identified via variation in $D_{it}$ holding
+    $\delta_{jt}$ fixed. In other words, variation in
+    demographics/characteristics \emph{holding fixed} product-market
+    attributes.
+
+    \paragraph{$\Sigma$ Identification}
+    In the more complex case with $\Sigma\neq 0$, that matrix is
+    identified from within market share variation in choice
+    probabilities, i.e. holding market share fixed?
+
+
+  \item
+    We know that
+    \begin{align*}
+      \delta_{jt}=x_{jt}\beta + \alpha p_{jt}+\xi_{jt}
+    \end{align*}
+    So given $\delta_{jt}$ estimates from step 1, recover $\beta$ and
+    $\alpha$.
+
+    Note: since we expect $p_{jt}$ and $\xi_{jt}$ to be correlated, need
+    an IV for prices or an assumption about the panel/autocorrelation
+    structure of $\xi_{jt}$ for identification/estimation.
+
+    \paragraph{$\theta_1$ Identification}
+    This is identified from variation across markets
+\end{enumerate}
+\end{comment}
+
+
+\clearpage
+\paragraph{Estimation with Market-Level Data}
+Recall our starting point:
+\begin{align*}
+  u_{ijt} &=
+  \underbrace{%
+    x_{jt}\beta + \alpha p_{jt} +\xi_{jt}
+  }_{\delta_{jt}=\delta(x_{jt},p_{jt},\xi_{jt};\theta_1)}
+  +
+  \underbrace{%
+      \begin{pmatrix}
+        p_{jt} & x_{jt}
+      \end{pmatrix}
+      \begin{pmatrix}
+        \Pi D_{it} + \Sigma v_{it}
+      \end{pmatrix}
+  }_{\mu_{ijt}=\mu(x_{jt},p_{jt},D_{ii},v_{it};\theta_2)}
+  +\varepsilon_{ijt}
+\end{align*}
+We'd naturally think to estimate this model's parameters by choosing
+$\theta$ such that model-predicted $\sigma_{jt}(\theta)$ matches the
+observed market shares $s_{jt}$.
+However, as mentioned, $\sigma_{jt}(\theta)$ involves $\xi_{jt}$, which
+worry about being corellated with price $p_{jt}$.
+Therefore, we need some IV approach, and it's not clear how to
+formulate/accomplish that by just minimizing the distance between
+$s_{jt}$ and $\sigma_{jt}(\theta)$.
+Moreover, $\sigma_{jt}(\theta)$ is super nonlinear, despite the utility
+representation looking very linear for a given individual.
+So maybe we can help our estimation by exploiting linearity somehow.
+
+All this suggests finding a proper orthogonality condition for the
+model, so we do GMM estimation.
+To start, suppose that we have vector of instruments $z_{jt}$ such that
+\begin{align*}
+  0 = \E[\xi_{jt}z_{jt}]
+  = \E[(\delta_{jt}-x_{jt}\beta-\alpha p_{jt})z_{jt}]
+\end{align*}
+Often, $z_{jt}=(x_{jt}'\,\tilde{z}_{jt})'$ where $\tilde{z}_{jt}$ is an
+scalar instrument for price.
+Conditional on $\delta_{jt}$, that's enough moment conditions to
+identify $(\alpha \beta')'$.
+Of course, the above moment condition isn't immediately and obviously
+useful because we \emph{don't} know $\delta_{jt}$, and that \emph{also}
+depends on parameters. So we need some way to estimate $\delta_{jt}$ and
+more moments to identify the $\theta_2$ parameters which determine
+$\delta_{jt}$.
+
+The big BLP innovation is to note/prove that, under weak conditions, we
+can invert (numerically) the model's share equation
+$\sigma_j(\delta_t,x_t,p_t;\theta_2)$ to find the $\delta_t$
+that equates model $\sigma_j(\delta_t,x_t,p_t;\theta_2)$ to
+observed shares $s_t$.
+Thus we can write
+\begin{align*}
+  \delta_{jt}=\sigma_{jt}^{-1}(s_t,x_t,p_t;\theta_2)
+\end{align*}
+Then we can rewrite the above moment condition as
+\begin{align*}
+  0
+  = \E[(\sigma_{jt}^{-1}(s_t,x_t,p_t;\theta_2)-x_{jt}\beta-\alpha p_{jt})z_{jt}]
+  = \E[\xi_{jt}(\theta)z_{jt}]
+\end{align*}
+But of course, that's not enough to to identify all the parameters,
+$z_{jt}$ is not large enough. We need to add more instruments to get to
+$Z_{jt}$, which has enough to identify $\theta_2$ as well. Then we have
+\begin{align*}
+  0
+  = \E[(\sigma_{jt}^{-1}(s_t,x_t,p_t;\theta_2)-x_{jt}\beta-\alpha p_{jt})Z_{jt}]
+  = \E[\xi_{jt}(\theta)Z_{jt}]
+\end{align*}
+Thus instruments play two roles:
+\begin{itemize}
+  \item Generate moments to identify consumer-level parameters
+    $\theta_2$.
+
+    Unlike with consumer data (where we have multiple observations
+    within a $jt$ to identify individual-level parameters), we don't
+    have that here.
+    Here we don't have that and must use the instruments to identify the
+    parameters $\theta_2$.
+
+    Very clear in nested logit example
+
+  \item Deal with correlation of prices and errors
+\end{itemize}
+
+
+\clearpage
+Ideal experiment: randomly vary prices, characteristics, and product
+characteristics. See where consumers switch. IVs try to mimic that.
+Sources of IVs:
+\begin{itemize}
+  \item Supply-side information (BLP)
+  \item Many markets, $T$ large, lots of variation in demographics
+    and product choices across those markets (Nevo)
+  \item Micro-moments/information (MicroBLP)
+\end{itemize}
+Price approximately equals marginal cost plus markup.
+So look for things that are exogeneous which impact marginal cost or
+markup.
+\begin{itemize}
+  \item
+    Characteristics-based Instruments:
+    Assume $\E[\xi_{jt}|x_t]=0$ where $x_t$ is across
+    \emph{all} products.\footnote{%
+      This make sense if we assume $x_{jt}$ set before $\xi_{jt}$.
+    }
+    Can then take as an instrument \emph{any} function of $x_t$.
+    BLP proposed the following:
+    \begin{itemize}
+      \item Own characteristics
+      \item Average characteristics of other products produced by
+        \emph{same} firm
+      \item Average characteristics of products produced by
+        \emph{competitors}
+    \end{itemize}
+    Latter two (proximity of given product to others) affects markup
+    term, affects price.
+    As you move across markets $jt$, competition in the form of
+    different products with different characteristics \emph{vary}, which
+    affect markup.
+
+  \item Cost-based Instruments:
+    These instruments affect marginal costs, which shifts price
+    \begin{itemize}
+      \item
+        Assume $\E[\xi_{jt}|w_t]=0$ where $w_t$ includes characteristics
+        (not in $x_t$ since we already built moments from them) that
+        enter cost side only, but \emph{not} demand side.
+        Then $\xi_{jt}$ is independent of $w_t$, allowing us to form
+        instruments as functions of $w_t$.
+
+      \item Price of inputs for each company, interacted with product
+        dummies to generate variation by product within the same company
+
+      \item Indirect measures of cost
+
+        Example: Prices of the product in \emph{other} markets, e.g.
+        price of cereal in Portland as instrument for price of cereal in
+        Boston.
+
+        Validity argument: after controlling for common effects for the
+        product (common Cheerios effect), assume everything left over in
+        $\xi_{jt}$ after controlling for these things is independent across
+        markets.
+        (Not valid if regional coordination between Boston and Maine prices)
+
+        Example: local product managers who don't coordinate, so after
+        controlling for the Cheerios effect, the price in Portland reflects
+        the efforts of marketing manager in Portland, which is independent
+        of price in Boston.
+        It has identification power because marginal cost of producing
+        Cheerios is common across markets, hence prices are correlated
+        across markets by ``price equals MC plus markup.''
+    \end{itemize}
+
+  \item Dynamic panel:
+    Assume $\xi_{jt}=\rho \xi_{jt-1}+\eta_{jt}$, moment condition
+    $\E[\eta_{jt}|x_{t-1}]=0$.
+\end{itemize}
+Nested logit is a special case of RC, where characteristics are
+\emph{segment dummies} with a \emph{very particular} distribution on
+those dummies.
+
+Connect elasticities to markups via Bertrand pricing model.
+That's where all the implied markups come from.
+Supply side side, where we can back out markup.
+
+
+\clearpage
+$\xi_{jt}$ is econometrically a residual that ensures observed market
+share equals model market share.
+Since only $\delta_{jt}$ (not $\mu_{ijt}$) is a \emph{linear} function
+of $\xi_{jt}$ (so that $\xi_{jt}$ is effectively just an error term),
+that's equivalent to playing around with $\delta_{jt}$ until observed
+market share equals model market share.
+And under weak conditions, we can invert the share relationship to write
+$\delta_{jt}$ as a function of observed shares, characteristics, prices,
+and $\theta_2$ (individual characteristic parameters).
+Then once we have $\delta_{jt}$, which is a linear function of
+$\xi_{jt}$ which acts like a residual, we can form a moment condition
+and effectively regress $\delta_{jt}$ on $jt$-specific variables to
+recover $\xi_{jt}$ and identify parameters.
+
+Algo
+\begin{itemize}
+  \item Develop function mapping $(\delta_t,\theta_2)$ into shares:
+    $\sigma_j(\delta_t,x_t,p_t;\theta_2)$.
+
+    Assume that $\varepsilon_{ijt}$ so that things are in logit form,
+    then compute $\sigma_j$ from expectation via simulation, drawing
+    $(D_{it},v_{it})$ from some distribution
+
+  \item Given a guess for $\theta_2$, search for $\delta_2$ such that
+    $\sigma_j=s_j$, using the function from the first step.
+
+    Do this by contraction mapping
+
+  \item
+    Use computed $\delta_t$ to compute $\xi_{jt}$ and form the GMM
+    objective function as a function of total $\theta$.
+    In particular, form error term $\xi_{jt}(\theta)$ as
+    inverse share less $x_{jt}\beta_+\alpha p_{jt}$.
+
+  \item Search for $\theta$ that minimizes objective function
+\end{itemize}
+Identification
+\begin{itemize}
+  \item Ideal experiment: Randomly vary prices and characteristics, see
+    what people buy/switch to
+  \item Instruments are trying to mimic this
+\end{itemize}
+
 
 
 
@@ -638,6 +1453,7 @@ From now on, I will use the customary phrase ``experiment'' rather than
 \end{rmk}
 
 \begin{defn}(Sequence of Experiments)
+\label{defn:seqexp}
 A \emph{sequence of experiments} is the sequence
 \begin{align*}
   \big\{\Omega_n,\sF_n,\{P_{n,\theta}\}_{\theta\in  \Theta}
@@ -660,25 +1476,47 @@ underlying $P_\theta$.
 \clearpage
 \subsection{Contiguity}
 
-\begin{defn}(Contiguity)
-Suppose we have sequence of experiments
+\begin{prop}
+\emph{(Absolute Continuity and Eventually Measure-Zero Sets)}
+Suppose $Q<<P$, i.e. $Q$ absolutely continuous w.r.t. $P$.
+Then for any sequence of measurable sets $\{A_n\}\subseteq \sF$,
 \begin{align*}
-  \big\{\Omega_n,\sF_n,\{P_n,Q_n\}\big\}_{n\in\N}
+  \limn P[A_n] = 0
+  \qquad\implies\qquad
+  \limn Q[A_n] = 0
 \end{align*}
-Sequence of measures $Q_n$ is \emph{contiguous} to $P_n$, denoted $Q_n
-\vartriangleleft P_n$, if and only if
+This will be the notion of absolute continuity that we generalize to
+define contiguity.
+\end{prop}
+\begin{cor}
+\emph{(Abs. Continuity and Transferring $o_P$ to $o_Q$)}
+Given sequence of RVs $\{X_n\}\ninf$
+\begin{align*}
+  \begin{rcases}
+    X_n = o_P(1) \\
+    Q<<P \\
+  \end{rcases}
+  \quad\implies\quad
+  X_n=o_Q(1)
+\end{align*}
+\end{cor}
+
+\begin{defn}(Contiguity)
+Suppose we have sequence of experiments as in
+Definition~\ref{defn:seqexp}.
+Then sequence of measures $Q_n$ is \emph{contiguous} to $P_n$, denoted
+$Q_n \vartriangleleft P_n$, if and only if
 \begin{align*}
   P_n[A_n]\ra 0
   \quad\implies\quad
   Q_n[A_n]\ra 0
 \end{align*}
-This generalizes absolute continuity of measures to \emph{sequences} of
+This generalizes abs. continuity of measures to \emph{sequences} of
 measures.
-Contiguity is useful because it allows us to transfer convergence in
-probability or distribution under the baseline experiment with $P_n$ to
-the contiguous experiment with $Q_n$. Often the baseline experiment with
-$P_n$ is some well-behaved experiment we know a lot about, while $Q_n$
-is a trickier experiment that's we'd \emph{like} to know more about.
+Contiguity is useful because it lets us transfer convergence in
+probability or distribution under some well-behaved, well-understood,
+baseline experiment with $P_n$ to the often messier contiguous
+experiment with $Q_n$, which we'd \emph{like} to know more about.
 
 Correct image: Sequence of measures ``on top of each other'' in the
 limit, can't distinguish.
@@ -715,9 +1553,9 @@ escaped to infinity and the experiments are close even in the limit.
 \emph{(Generalized LeCam's Third Lemma)}
 %: Deriving Asymptotic
 %Distribution of the Contiguous Model from Baseline Model)}
-Suppose we have a sequence of experiments with measures $P_n,Q_n$ and
-RV $X_n$ (generally some test, statistic, etc.) such that $Q_n<<P_n$ for
-all $n$ and
+Suppose we have sequence of experiments with measures $P_n,Q_n$ such
+that $Q_n<<P_n$ for all $n$. Suppose also that we have RV $X_n$
+(generally some test, statistic, etc.) and
 \begin{align*}
   \left(\frac{dQ_n}{dP_n},X_n\right)
   \quad\underset{P_n}{\dto}\quad
@@ -974,32 +1812,127 @@ Finally, we can always choose a function $T$ so that
 \end{align*}
 Check that this has the correct distribution under $g$ by importance
 sampling.
-
-
 \end{proof}
 
 
 
-%\subsubsection{Local Asymptotic Normality}
-
-%\begin{defn}(Local Asymptotic Normality)
-%Model is locally asymptotical normal if
-%\begin{align*}
-  %\ln
-  %\frac{p(y_{1:T}|\theta_0+gT^{-1/2})}{p(y_{1:T}|\theta_0)}
-  %\dto
-  %\calN\left(-\frac{1}{2}g'\calI g, g'\calI g\right)
-%\end{align*}
-%Just like small sample behavior of log like from model
-%\begin{align*}
-  %Y \sim \calN(\calI^{1/2}g,I_k)
-%\end{align*}
-%\end{defn}
+\subsection{Local Asymptotic Normality}
 
 
+Standard approach to asymptotics and testing that we often see:
+- Derive the asymptotic distribution of some estimator or test stat.
+  Often because of the CLT, that limiting distribution is normal
+- Construct a test based on that asymptotic limit. The test is
+  constructed to satisfy certain coverage and size restrictions
+- Construct a finite-sample approximation to that test
+- Wave our hands and say that ``this statistic/test/procedure is
+  justified asymptotically''
 
-\clearpage
-\section{Limits of Experiments}
+Now we want to make all of this more formal and general, which is
+possible in the limits of experiments framework
+
+Most generally, our problem is that we're trying to use a finite sample
+of size $n$ to estimate or conduct tests for some parameter I don't
+know, say parameter $g$.\footnote{%
+  It could just as well be $\theta$---$g$ is just a label that will be
+  more convenient as we'll see later.
+}
+Ideally, we'd also like optimal estimators and tests
+
+Now the basic problem can be stated as follows:
+- Given my finite sample $n$, I'm trying to distinguish whether the
+  parameter is actually alternative $g$ or baseline/null value $g_0$
+- Limits of experiments: suppose the of likelihood ratios (between $g$
+  and $g_0$) for this finite sample problem converges to a likelihood
+  ratio (between $g$ and $g_0$) of some other single-observation
+  model/experiment under the null $g_0$.
+- Then this asymptotic limit experiment can be used to give asymptotic
+  justification to tests and test statistics in the sequence of
+  experiments
+- The task of distinguishing between $g$ and $g_0$ at any point $n$
+  along the sequence of experiments can be approximated by the task of
+  distinguishing between $g$ and $g_0$ in the limit experiment.
+- The limit experiment can also be used to establish optimality results.
+  In particular, no test in the sequence of experiments can do better
+  asymptotically that an optimal test in the limit experiment
+
+I want to compare estimation procedures and tests and test statistics
+Asymptotics aren't much help because often, the true parameter can be
+known with precision
+
+Solution: reparameterize the model and see how well a method/procedure
+does in distinguishing between contiguous alternatives indexed by some
+local parameter, since those are the only ones that are asymptotically
+tough.
+
+Thus the problem is now one of inference about the value of some local
+parameter
+
+How do we do inference about this local parameter?
+- NP says look at the likelihood ratio between the baseline law and any
+  contiguous alternative
+- Since we want to consider what happens asymptotically, we thus look at
+  the asymptotic limit of the likelihood ratio.
+- If the asymptotic limit of the likelihood ratio (between the baseline
+  law and some contiguous alternative) looks like the likelihood ratio
+  of some other model (between some baseline and alternative),
+  then we can use what we know about optimal tests in this limit model
+  to study tests in the sequence of experiments
+
+LAN
+- Most parameteric models can be reparameterized so that the likelihood
+  ratio between some baseline law and any contiguous alternative
+  converges to the likelihood ratio of a normal location model.
+- In other words, inference about the local parameter in the original
+  model looks inference about the mean in a normal model with one
+  observation
+- For this to be the case, all we need is that the log LR admits a
+  particular taylor expansion.
+  For smooth parametric models, this is almost always the case
+- Therefore, trying to do inference about the local parameter is often
+  akin to doing inference about the mean
+
+Representation Theorem
+- Every sequence of statistics in the local experiments is matched by
+  a statistic in the limit experiment
+
+ML intuition
+- The following result is not explicitly given by the rep thm, but it is
+  often true
+- Often an MLE in the sequence of experiments is matched by an MLE in
+  the limit experiment.
+- MLE in the limit experiment when LAN: Just X, the obs, itself
+- MLE in sequence of experiments $\hat{g}=\sqrt{n}(\hat{\theta}-\theta)$
+- Thus $\hat{g}$ should converge in distribution to $X$ under any $h$
+- Under $h=0$ where $\theta$ is the true, $X\sim\calN(0,\calI^{-1})$
+- Thus  $\hat{g}=\sqrt{n}(\hat{\theta}-\theta)$ goes to
+  $\calN(0,\calI^{-1})$
+
+All of this is useful because we can study the behavior of statistics
+under contiguous alternatives.
+- LAN implies contiguity
+- Contiguity + LeCam's third lets us get the limit dist of stats under
+  any contiguous alternative, given the limit dist under the baseline
+  law
+
+Definition 7.14 of LAN
+Special case: iid smooth parameteric model
+
+
+
+\begin{defn}(Local Asymptotic Normality)
+Model is locally asymptotical normal if
+\begin{align*}
+  \ln
+  \frac{p(y_{1:T}|\theta_0+gT^{-1/2})}{p(y_{1:T}|\theta_0)}
+  \dto
+  \calN\left(-\frac{1}{2}g'\calI g, g'\calI g\right)
+\end{align*}
+Just like small sample behavior of log like from model
+\begin{align*}
+  Y \sim \calN(\calI^{1/2}g,I_k)
+\end{align*}
+\end{defn}
 
 \begin{rmk}
 As $N\ra\infty$, an unknown parameter $\theta$ will eventually be known
@@ -1642,805 +2575,1980 @@ constant regression estimator does poorly.
 \end{defn}
 
 
+\clearpage
+\section{Conditional Moment Restrictions and Optimal Instruments}
+
+We have a conditional moment restriction
+Want unconditional moment condition
+Multiply by instruments
+Choice of instruments
+Optimal choice of instruments
+Coincides with FGLS in linear model case
+
+
+
 
 \clearpage
-\section{Extremum Estimation}
+\section{Bootstrap}
 
+\subsection{General Procedure}
 
-\begin{defn}(Criterion Functions)
-Throughout this section, $Q_n:\Theta\ra\R$ denotes a
-\emph{sample criterion function} that is a random function
-which depends on sample size $n$.\footnote{%
-  Strictly speaking, $n$ need not index sample size. Many of the proofs
-  to follow generically work for any sequence of functions
-  $\{Q_n(\theta)\}\ninf$. It's just that $n$ usually denotes sample size
-  in practice.
-}
-Deterministic function $Q:\Theta\ra\R$ denotes the
-\emph{population criterion function}, which is generally the probability
-limit of $Q_n$.
-Without loss of generality, we will try to minimize these functions.
+We have an $M$-estimator $\hat{\theta}$, and we want standard errors.
+To be precise, here's the setup:
+\begin{enumerate}
+  \item (\emph{Population CDF/Distribution}):
+    Data $y_n\sim F_0$, the population CDF/distribution
+  \item (\emph{Drawn/Realized Sample}):
+    We have $\{y_n\}\nN\iid F_0$
+  \item (\emph{Population Quantities}):
+    Associated with the $M$-estimator is population criterion function
+    $Q(\theta)$ and true parameter value $\theta_0$
+    \begin{align*}
+      \theta_0
+      = \argmin_{\theta\in\Theta}
+      Q(\theta)
+      \qquad\text{where}\quad
+      Q(\theta)
+      :=
+      \E_{F_0}[q(y_n,\theta)]
+    \end{align*}
+  \item (\emph{Sample Quantities}):
+    Compute estimtator $\hat{\theta}$ from the sample criterion function
+    $Q_N(\theta)$
+    \begin{align*}
+      \hat{\theta}
+      = \argmin_{\theta\in\Theta}
+      Q_N(\theta)
+      \qquad\text{where}\quad
+      Q_N(\theta)
+      :=
+      \frac{1}{N}
+      \sumnN
+      q(y_n,\theta)
+    \end{align*}
 
-These criterion functions can and should be interpreted very generally.
-Even though the argument $\theta$ of $Q_n,Q$ is typically a finite
-parameter vector in $\Theta=\Rk$, the parameter space $\Theta$ could
-just as well be an infinite dimensional \emph{function space} so that
-$Q_n(\theta),Q(\theta)$ are functionals taking some function $\theta$ as
-their argument.
-\end{defn}
-
-\begin{defn}(Extremum Estimator)
-Estimator $\hat{\theta}$ is said to be an \emph{extremum estimator}
-associated with sample criterion function $Q_n$ if it satisfies
-\begin{align*}
-  Q_n(\hat{\theta})
-  &=
-  \inf_{\theta\in \Theta}
-  Q_n(\theta)
-  +
-  o_P(1)
-\end{align*}
-In words, $\hat{\theta}$ minimizes $Q_n(\theta)$, up to some ``error''
-that shrinks to zero in probability.
-\end{defn}
-
-\begin{defn}(Pointwise Convergence of Random Functions)
-Sequence of random functions $Q_n(\theta)$ is said to
-\emph{converge pointwise} to deterministic function $Q(\theta)$
-if
-\begin{align*}
-  \forall \theta
-  \qquad
-  |Q_n(\theta)-Q(\theta)|
-  =
-  o_P(1)
-\end{align*}
-\end{defn}
-
-\begin{defn}(Uniform Convergence of Random Functions)
-Sequence of random functions $Q_n(\theta)$ is said to
-\emph{converge uniformly} to deterministic function $Q(\theta)$
-if
-\begin{align*}
-  \sup_{\theta\in\Theta}
-  |Q_n(\theta)-Q(\theta)|
-  =
-  o_P(1)
-\end{align*}
-This implies pointwise convergence but is strictly stronger, much like
-how uniform continuity is stronger than pointwise continuity.
-\end{defn}
-
-
-\begin{defn}(Identifiable Uniqueness)
-\emph{Identifiable uniqueness} holds for population criterion function
-$Q(\theta)$ if $\exists! \;\theta_0$ such that
-\begin{align*}
-  \forall \varepsilon>0
-  \qquad
-  \inf_{\theta\in\Theta \setminus B_\varepsilon(\theta_0)}
-  Q(\theta)
-  > Q(\theta_0)
-\end{align*}
-In words, $\theta_0$ is the uniquely identified mininum of $Q(\theta)$
-if it's the unique point such that---for \emph{any} open ball of
-\emph{any} size around $\theta_0$---the points outside that ball all
-lead to a larger value of the population criterion function.
-\end{defn}
-
-\begin{rmk}
-First, why this somewhat pedantic definition?
-It rules out particularly weird and intractable criterion functions.
-
-Second, it's important to note that this a very clinical definition of
-$\theta_0$ and does \emph{not} imbue that $\theta_0$ with any
-economic/substantive meaning, imply that $\theta_0$ is the parameter
-of interest, or imply that the model is correctly specified.
-Those more weighty conclusions follow only if we've made enough
-economic/substantive assumptions about the model and the data generating
-process such that $Q(\theta)$ is the right criterion function and
-$\theta_0$ the true parameter of interest (rather than just a lowly
-minimum, as we have here).
-\end{rmk}
-
-\begin{lem}\emph{(Sufficient Conditions for Identifiable Uniqueness)}
-Suppose that
-\begin{enumerate}[label=\emph{(\roman*)}]
-  \item $\Theta$ compact
-  \item $Q(\theta)$ uniquely minimized at $\theta_0$
-  \item $Q(\theta)$ continuous
-\end{enumerate}
-Then identifiable uniqueness holds for $Q(\theta)$.
-\end{lem}
-\begin{proof}
-Let $\varepsilon>0$ be given.
-Since $\Theta$ compact and $B_\varepsilon(\theta_0)$ open, choice
-set $\Theta\setminus B_\varepsilon(\theta_0)$ is compact.
-Since $Q(\theta)$ continuous, a unique minimum $\theta_1$ is attained
-on this compact choice set.
-Therefore, $\inf_{\theta\in\Theta\setminus B_\varepsilon(\theta_0)}
-Q(\theta)=Q(\theta_1)<Q(\theta_0)$,
-where the last inequality (which is precisely identifiable uniqueness)
-followed because $\theta_0$ is the unique minimizer of $Q$.
-\end{proof}
-
-\begin{thm}\emph{(Sufficient Conditions for Consistency)}
-Suppose
-\begin{enumerate}[label=\emph{(\roman*)}]
-  \item $\hat{\theta}$ is an extremum estimator, i.e.
-    $Q_n(\hat{\theta}) = \inf_{\theta\in \Theta} Q_n(\theta) + o_P(1)$
-  \item Sample criterion function $Q_n(\theta)$ converges uniformly to
-    population $Q(\theta)$
-  \item Identifiable uniqueness holds for $Q(\theta)$,
-    implying a unique minimizer $\theta_0$
-\end{enumerate}
-Then $\hat{\theta}$ is a consistent estimator for $\theta_0$.
-\end{thm}
-
-\clearpage
-\begin{proof}
-To show consistency, we must show that for given $\varepsilon>0$,
-\begin{align*}
-  P\big[
-    \lVert\hat{\theta}-\theta_0\rVert
-    > \varepsilon
-  \big]
-  \;\ra\;
-  0
-\end{align*}
-First note that we can rewrite the event in the probability as
-\begin{align*}
-  \{
-    \lVert\hat{\theta}-\theta_0\rVert
-    > \varepsilon
-  \}
-  =
-  \{
-    \hat{\theta}\not\in B_\varepsilon(\theta_0)
-  \}
-  =
-  \{
-    \hat{\theta}\in \Theta\setminus B_\varepsilon(\theta_0)
-  \}
-  =
-  \{
-    Q(\hat{\theta})
-    >
-    Q(\theta_0)
-    +
-    \delta
-  \}
-\end{align*}
-where the third equality followed from identifiable uniqueness, since
-$\hat{\theta}\in\Theta\setminus B_\varepsilon(\theta_0)$ implies
-$Q(\hat{\theta})>Q(\theta_0)$, which implies
-$Q(\hat{\theta})>Q(\theta_0)+\delta$ for some $\delta>0$.
-Next, rewrite the event again:
-\begin{align*}
-  \{
-    \lVert\hat{\theta}-\theta_0\rVert
-    > \varepsilon
-  \}
-  =
-  \{
-    Q(\hat{\theta})
-    -
-    Q(\theta_0)
-    >
-    \delta
-  \}
-\end{align*}
-Thus to show $P[\lVert\hat{\theta}-\theta_0\rVert > \varepsilon]$ goes
-to zero, we can show $P[Q(\hat{\theta})-Q(\theta_0)>\delta]$ goes to
-zero. And to do that, break things up:
-\begin{align*}
-  Q(\hat{\theta})
-  -
-  Q(\theta_0)
-  =
-  \underbrace{%
-    Q(\hat{\theta})
-    - Q_n(\hat{\theta})
-  }_{(i)}
-  +
-  \underbrace{%
-    Q_n(\hat{\theta})
-    - Q_n(\theta_0)
-  }_{(ii)}
-  +
-  \underbrace{%
-    Q_n(\theta_0)
-    - Q(\theta_0)
-  }_{(iii)}
-\end{align*}
-From there, note that
-\begin{align*}
-  Q(\hat{\theta}) - Q(\theta_0) > \delta
-  \;\implies\;
-  \text{at least one of the following is true:}
-  \;
-  \begin{cases}
-    A= \{Q(\hat{\theta}) - Q_n(\hat{\theta}) \;\;\;> \delta/3\}\\
-    B= \{Q_n(\hat{\theta}) - Q_n(\theta_0) > \delta/3 \}\\
-    C = \{Q_n(\theta_0) - Q(\theta_0) > \delta/3\} \\
-  \end{cases}
-\end{align*}
-This is easiest to see by noting that if events $A,B,C$ were \emph{all}
-false, there's no way we could have $Q(\hat{\theta}-Q(\theta_0)>\delta$.
-Then from there, we have that
-\begin{align*}
-  P[\lVert\hat{\theta}-\theta_0\rVert>\varepsilon]
-  =
-  P[Q(\hat{\theta}) - Q(\theta_0) > \delta]
-  &\leq P[\text{$A$ or $B$ or $C$}] \\
-  &\leq P[A]+P[B]+P[C]
-\end{align*}
-And so to bound our target
-$P[ \lVert\hat{\theta}-\theta_0\rVert > \varepsilon ]$,
-we can bound the probabilities of $A,B,C$ individually given
-$\varepsilon$ and the corresponding $\delta$.
-So first, uniform convergence of $Q_n$ to $Q$ implies
-\begin{align*}
-  P[A]
-  =
-  P\big[Q(\hat{\theta})-Q_n(\hat{\theta})>\delta/3\big]
-  \leq
-  P\left[\sup_{\theta\in\Theta} |Q(\theta)-Q_n(\theta)|>\delta/3\right]
-  =
-  o(1)
-\end{align*}
-Next, definition of an EE
-$Q_n(\hat{\theta})=\inf_{\theta\in\Theta}Q_n(\theta)+o_P(1)$
-implies $Q_n(\hat{\theta})\leq Q_n(\theta_0)+o_P(1)$, thus
-\begin{align*}
-  P[B]
-  =
-  P[Q_n(\hat{\theta})-Q_n(\theta_0)>\delta/3]
-  \leq
-  P[o_P(1)>\delta/3]
-  =
-  o(1)
-\end{align*}
-Finally, uniform convergence of $Q_n$ to $Q$ again buys us
-\begin{align*}
-  P[C]
-  =
-  P\big[Q_n(\theta_0)-Q(\theta_0)>\delta/3\big]
-  \leq
-  P\left[\sup_{\theta\in\Theta} |Q(\theta)-Q_n(\theta)|>\delta/3\right]
-  =
-  o(1)
-\end{align*}
-Thus, since $P[A],P[B],P[C]$ are all $o(1)$ (i.e. go to zero), their sum
-also goes to zero hence
-\begin{align*}
-  P[\lVert\hat{\theta}-\theta_0\rVert>\varepsilon]
-  &\leq P[A]+P[B]+P[C]
-  = o(1)
-\end{align*}
-\end{proof}
-
-
-\begin{defn}(Stochastic Equicontinuity)
-Sequence of random functions $H_n(\theta)$ are
-\emph{stochastically equicontinuous} if, for all $\varepsilon>0$, there
-exists a $\delta>0$ such that
-\begin{align*}
-  \liminf_{n\ra\infty}
-  P
-  \left[
-    \sup_{\theta\in\Theta}
-    \sup_{\theta'\in B_\delta(\theta)}
-    |H_n(\theta)-H_n(\theta')|
-    \leq
-    \varepsilon
-  \right]
-  \geq 1-\varepsilon
-\end{align*}
-The key point is that $\delta$ works \emph{uniformly} over all
-$\theta\in\Theta$, i.e. does not depend upon $\theta$ and so can be used
-even while looking at $\sup_{\theta\in\Theta}$.
-This is a generalization to a sequence of \emph{random} functions the
-notion of equicontinuity or uniform continuity for a single
-\emph{deterministic} function.
-There, equicontinuity means that for all $\varepsilon>0$, there exists a
-$\delta$ that works \emph{uniformly} over all $\theta$ (i.e. depends
-only on $\varepsilon$, not $\theta$) such that the statement inside the
-square brackets is true.
-
-Note, it may look deep/important that $\varepsilon$ shows up inside the
-square brackets and outside it. But it's really not.
-We just need a small number inside the square brackets, a big number
-outside. We could generalize to make them different, but it wouldn't
-change anything.
-\end{defn}
-
-\clearpage
-\begin{thm}\emph{(Relating Pointwise \& Uniform Convergence)}
-Two directions, near-converses
-\begin{enumerate}[label=\emph{(\alph*)}]
-  \item \emph{(Compact $\Theta$ + SE + PW $\Rightarrow$ UC)}:
-    Suppose that
-    \begin{enumerate}[label=\emph{(\roman*)}]
-      \item $\Theta$ is compact
-      \item $H_n(\theta)$ is a stochastically equicontinuous sequence of
-        random functions
-      \item $H_n(\theta)\pto 0$ for all $\theta\in\Theta$ (i.e.
-        pointwise convergence).
-    \end{enumerate}
-    Then $H_n(\theta)\uto 0$
-  \item \emph{(UC $\Rightarrow$ SE)}
-    Suppose that $H_n(\theta)\uto 0$.
-    Then $H_n(\theta)$ is a stochastically equicontinuous sequence of
-    random functions
-\end{enumerate}
-For extremum estimation, we should think of
-$H_n(\theta)=|Q_n(\theta)-Q(\theta)|$.
-\end{thm}
-\begin{proof}
-(a)
-To show uniform convergence of $H_n$ to $0$, must show for any
-$\varepsilon>0$ that
-\begin{align}
-  (*)
-  =
-  \limn
-  P\left[
-  \sup_{\theta\in\Theta}
-  |H_n(\theta)|\geq\varepsilon
-  \right]
-  \leq \varepsilon
-  \label{Pse}
-\end{align}
-In other words, we must show $H_n$ isn't far from $0$ for any given
-$\varepsilon>0$.
-So first, assumption (ii) stochastic equicontinuity lets us control the
-smoothness of the function $H_n$ in small neighborhoods of any given
-point. In particular, given that $\varepsilon$, there exists a $\delta$
-such that
-\begin{align}
-  \limsup_{n\ra\infty}\;\;
-  P\left[
-    \sup_{\theta\in\Theta}
-    \sup_{\theta'\in B_\delta(\theta)}
-    |H_n(\theta)-H_n(\theta')|
-    \geq
-    \varepsilon
-  \right]
-  \leq \varepsilon
-\end{align}
-Given that $\varepsilon$ and corresponding $\delta$, by compactness of
-$\Theta$, there exists a finite cover of $\Theta$ by balls
-$\{B_\delta(\theta_j)\}_{j=1}^J$ centered at finite number of points
-$\{\theta_j\}_{j=1}^J$.\footnote{%
-  This was the main point of compactness: it lets us focus our attention
-  on a finite number of points $\{\theta_j\}_{j=1}^J$, while SE tells us
-  that the values of the function $H_n$ are close in small neighborhood
-  of those points.
-}
-And since the set of balls covers $\Theta$, we can equivalently rewrite
-$(*)$ as
-\begin{align*}
-  (*)
-  =
-  P\left[
-  \max_j
-  \sup_{\theta'\in B_\delta(\theta_j)}
-  |H_n(\theta')|
-  >\varepsilon
-  \right]
-  &\leq
-  P\left[
-  \max_j
-  \sup_{\theta'\in B_\delta(\theta_j)}
-  \bigg(
-  \big|H_n(\theta')-H_n(\theta_j)\big|
-  +
-  \big|H_n(\theta_j)\big|
-  \bigg)
-  \geq\varepsilon
-  \right]
-  \\
-  &\leq
-  P\bigg[
-  \underbrace{%
-    \max_j
-    \sup_{\theta'\in B_\delta(\theta_j)}
-    \big|H_n(\theta')-H_n(\theta_j)\big|
-  }_{A}
-  +
-  \underbrace{%
-    \max_j
-    \big|H_n(\theta_j)\big|
-    \vphantom{\sup_{\theta'\in B_\delta(\theta_j)}}
-  }_{B}
-  \geq\varepsilon
-  \bigg]
-\end{align*}
-Note the second term dropped the $\sup$ because the argument is at fixed
-at $\theta_j$.
-Next, $A+B>\varepsilon$ implies at least one of $A,B$ is
-individually greater than $\varepsilon/2$.\footnote{%
-  They couldn't \emph{both} be less than $\varepsilon/2$ with their sum
-  greater than $\varepsilon$.
-}
-Then the above implies
-\begin{align*}
-  (*)
-  \quad
-  &\leq
-  \quad
-  P\big[
-    \{A> \varepsilon/2\}
-    \cup \{B>\varepsilon/2\}
-    \geq\varepsilon
-  \big]
-  \quad
-  \leq
-  \quad
-  P[A>\varepsilon/2]
-  +
-  P[B>\varepsilon/2]
-\end{align*}
-Writing out $A,B,C$, the above says
-\begin{align*}
-  (*)
-  &\leq
-  P\bigg[
-    \max_j
-    \sup_{\theta'\in B_\delta(\theta_j)}
-    |H_n(\theta')-H_n(\theta_j)|
-    >\varepsilon/2
-  \bigg]
-  +
-  P\bigg[
-    \max_j
-    |H_n(\theta_j)|
-    >\varepsilon/2
-  \bigg]
-  \\
-  &\leq
-  \underbrace{%
-    P\bigg[
-      \sup_{\theta\in \Theta}
-      \sup_{\theta'\in B_\delta(\theta_j)}
-      |H_n(\theta')-H_n(\theta)|
-      >\varepsilon/2
-    \bigg]
-  }_{\ra\varepsilon}
-  +
-  \underbrace{%
-    \sum_j
-    P\bigg[
-      |H_n(\theta_j)|
-      >\varepsilon/2
-    \bigg]
-  }_{\ra0}
-\end{align*}
-Convergence of the first term as $n\ra\infty$ because of assumed SE of
-sequence $H_n$. Convergence of the sum to zero because $H_n(\theta_j)$
-is $o_P(1)$ for each $\theta_j$ by Assumption (iii) and the sum of $J$
-terms that are $o_P(1)$ is also $o_P(1)$.
-Hence, the limit of $(*)$ is less than $\varepsilon$.
-
-(b)
-Given any $\varepsilon>0$, we need to show that there exists a
-$\delta>0$ such that
-\begin{align*}
-  \limsup_{n\ra\infty}\;\;
-  P\left[
-    \sup_{\theta\in\Theta}
-    \sup_{\theta'\in B_\delta(\theta)}
-    |H_n(\theta)-H_n(\theta')|
-    \geq
-    \varepsilon
-  \right]
-  \leq \varepsilon
-\end{align*}
-But note that
-\begin{align*}
-  P\left[
-    \sup_{\theta\in\Theta}
-    \sup_{\theta'\in B_\delta(\theta)}
-    |H_n(\theta)-H_n(\theta')|
-    \geq
-    \varepsilon
-  \right]
-  \leq
-  P\left[
-    \sup_{\theta\in\Theta}
-    2|H_n(\theta)|
-    \geq
-    \varepsilon
-  \right]
-\end{align*}
-By assumption, $H_n(\theta)\uto 0$, hence the above statement
-probability goes to zero as $n\ra\infty$ by definition of uniform
-convergence.
-\end{proof}
-
-\begin{thm}\emph{(Stochastic Equicontinuity of $M$-Estimators)}
-Suppose that
-\begin{enumerate}[label=\emph{(\roman*)}]
-  \item $\Theta$ is compact
-  \item $W_i$ identically distributed.\footnote{%
-      Note, \emph{not} necessary to be \emph{independent}.
-      This accomodates stationary and processes with identically
-      distributed marginals for each observation, but conditionally
-      dependent observations.
-    }
-  \item $\E\left[\sup_{\theta\in\Theta} m(W_i,\theta)\right]<\infty$
-  \item For each $\theta$, the function $m(W_i,\theta)$ is continuous
-    almost everywhere in $W_i$.\footnote{%
-      Note that the points of discontinuity in the $W_i$ argument are
-      allowed to vary across $\theta$
-    }
-\end{enumerate}
-Then
-\begin{enumerate}[label=\emph(\alph*)]
-  \item $\E[m(W_i,\theta)]$ is a continuous function of $\theta$
   \item
-    $H_n(\theta)=\frac{1}{n}\sumin\big(m(W_i,\theta)-\E[m(W_i,\theta)]\big)$
-    is a SE sequence of functions
+    (\emph{Asymptotic Distribution}):
+    Estimate $\hat{\theta}$ has asymptotic distribution
+    \begin{align*}
+      \sqrt{N}(\hat{\theta}-\theta_0)
+      \quad\dto\quad
+      \calN(0,\Sigma_{F_0})
+    \end{align*}
+    The whole point of the bootstrap is that we want $\Sigma_{F_0}$,
+    but we don't know it and can't construct an analytical formula for
+    it (or at least do so easily).
 \end{enumerate}
-\end{thm}
-%\begin{proof}
-%For both parts, it will be useful to define the modulus of continuity
-%for observation $i$:
-%\begin{align*}
-  %\omega_{i,\delta}
-  %:=
-  %\sup_{\theta\in\Theta}
-  %\sup_{\theta'\in B_\delta(\theta)}
-  %\lVert m(W_i,\theta)-m(W_i,\theta')\rVert
-%\end{align*}
-%Note that by Assumption (ii)---continuity of $m(W_i,\theta)$.
-%(a)
-%Suppose $\varepsilon>0$ and $\theta$ given.
-%Note that
-%To show continuity, we must show that there exists a $\delta>0$ such
-%that
-%\begin{align*}
-  %\lVert \E[m(W_i,\theta)]-\E[m(W_i,\theta')]\rVert
-  %\leq
-  %\E\big[\lVert m(W_i,\theta)-m(W_i,\theta')\rVert\big]
-  %\leq
-  %\E[\omega_{i,\delta}]
-%\end{align*}
-%\end{proof}
+Enter bootstrap, which takes as given/fixed the sample from Step 2
+\& uses it to estimate $\Sigma_{F_0}$.
+\begin{enumerate}
+  \item (\emph{Population CDF/Distribution}):
+    Now suppose the \emph{empirical distribution} $F_N$ is our
+    population CDF/distribution, where $F_N$ denotes the distribution
+    that places probability $1/N$ on each observation in our
+    drawn/realized sample $\{y_n\}\nN$ from Step 2 above.
+    In other words, we now take as our population the equal-weighted
+    multinomial distribution whose support is the actually-realized
+    values of the sample.
+
+  \item (\emph{Pseudo-Sample}):
+    We can easily draw pseudo-samples (replications) from that
+    population distribution by sampling with with replacement
+    $\{y_{nm}^*\}\nN\iid F_N$, where $m$ indexes these simulated
+    pseudo-samples.
+    %We will now think about ``estimating'' the parameter from these
+    %pseudo-samples/replications, so we now return to the criterion
+    %functions.
+    %Eventually, we will want to draw many such
+    %pseudo-samples/replications $m=1,\ldots,M$.
+    %But for now, just fix $m$.
+
+  \item (\emph{Population Quantities}):
+    As always, there is a population criterion function $Q^*(\theta)$
+    and ``true'' value $\theta^*_0$ associated with this population
+    distribution
+    \begin{align*}
+      \theta_0^*
+      =
+      \argmin_{\theta\in\Theta}
+      Q^*(\theta)
+      \qquad\text{where}\quad
+      Q^*(\theta)
+      =
+      \E_{F_N}[q(y_{nm}^*,\theta)]
+      =
+      \sumnN
+      \frac{1}{N}
+      q(y_n,\theta)
+    \end{align*}
+    Second expression for $Q^*(\theta)$ from writing out
+    expectation under empirical measure $F_N$.
+
+    \emph{Key Insight}: Notice $Q^*(\theta)=Q_N(\theta)$, hence
+    $\theta_0^*=\hat{\theta}$.
+    In words, the \emph{population} criterion function $Q^*$ of
+    pseudo-samples $\{y_{nm}^*\}\nN$ coincides with the \emph{sample}
+    criterion function $Q_N$ from our original problem.
+    Hence, rather mechanically, $\theta_0^*=\hat{\theta}$.
+
+  \item (\emph{Sample Quantities}):
+    Given  pseudo sample $\{y^*_{nm}\}\nN$, compute the $m$th
+    pseudo-sample estimate $\hat{\theta}_m$ from the sample criterion
+    function $Q_{Nm}^*(\theta)$
+    \begin{align*}
+      \hat{\theta}_m^*
+      = \argmin_{\theta\in\Theta}
+      Q_{Nm}^*(\theta)
+      \qquad\text{where}\quad
+      Q_{Nm}(\theta)
+      :=
+      \frac{1}{N}
+      \sumnN
+      q(y_{nm}^*,\theta)
+    \end{align*}
+
+  \item
+    (\emph{Asymptotic Distribution}):
+    Estimator $\hat{\theta}_m^*$ has some asymptotic distribution
+    \begin{align*}
+      \sqrt{N}(\hat{\theta}_m^*-\theta_0^*)
+      =
+      \sqrt{N}(\hat{\theta}_m^*-\hat{\theta})
+      \quad\dto\quad
+      \calN(0,\Sigma_{F_N})
+    \end{align*}
+    where we used that $\theta_0^*=\hat{\theta}$, as argued in Step 3.
+
+  \item
+    (\emph{Estimate $\Sigma_{F_0}$ by Estimating $\Sigma_{F_N}$}):
+    For large $N$, empirical distribution $F_N$ is close to population
+    distribution $F_0$.\footnote{%
+      In fact, $F_N$ is the best estimator of $F_0$ when we don't have
+      any restrictions on $F_0$.
+    }
+    Therefore, a consistent estimator for $\Sigma_{F_N}$ is also
+    consistent for $\Sigma_{F_0}$. Here's how we construct one such
+    consistent estimator.
+    \begin{enumerate}[label=(\roman*)]
+      \item Draw $M$ pseudo-samples $\{y_{nm}^*\}\nN$ for $m=1,\ldots,M$
+        from empirical distribution $F_N$, with replacement.
+      \item Given the $M$ pseudo-samples, compute $M$ pseudo-estimates
+        $\{\hat{\theta}_m^*\}_{m=1}^M$
+      \item Given pseudo-estimates, compute sample variance
+        \begin{align*}
+          \hat{\Sigma}_{F_N}
+          =\Var_M(\sqrt{N}\big(\hat{\theta}_m^*-\hat{\theta})\big)
+        \end{align*}
+        where $\Var_M(\cdot)$ is the sample variance in a sample of size
+        $M$.
+        %For large $M$, this should be close to $\Sigma_{F_N}$.
+      \item
+        $\hat{\Sigma}_{F_N}$ is a consistent estimator for
+        $\Sigma_{F_N}$, which we argued is a consistent for
+        $\Sigma_{F_0}$.
+        Therefore, $\hat{\Sigma}_{F_N}$ is also a consistent estimator
+        for $\Sigma_{F_0}$.
+    \end{enumerate}
+    Note, in practice, we replace Step (iii) with just directly
+    computing $\Var_M(\hat{\theta}_m^*)$, which estimates
+    $\Sigma_{F_0}/N$ directly, which is the variance for $\hat{\theta}$,
+    rather than the $\sqrt{N}$-normalized quantity.
+\end{enumerate}
+
+\clearpage
+\subsection{Improving on the Asymptotics}
+
+This section considers testing with some statistic $T_N$ constructed
+from a sample of size $N$.
+
+For concreteness, suppose we  consider a test that rejects for large
+values of $T_N$, i.e.  $\varphi_N(T_N)=\mathbf{1}\{T_N> T_N^{cv}\}$,
+where $T_N^{cv}$ is some critical value that could depend upon sample
+size.
+Constructing such a test requires choosing $T_N^{cv}$ to nail the
+$\alpha$-level, i.e. choosing $T_N^{cv}$ to satisfy
+\begin{align*}
+  \alpha \geq \E[\varphi_N(T_N)]
+  = P[T_N> T_N^{cv}]
+  %= 1-P[T\leq T_{cv}]
+  = 1-F_N(T_N^{cv})
+\end{align*}
+where $F_N(x)=P[T_N\leq x]$ is the CDF of the test statistic $T_N$.
+In general, since we don't know the exact finite-sample distribution of
+$T_N$, the function $F_N(x)=P[T_N\leq x]$ is unknown, so the above test
+is infeasible.
+However, there are two approaches for constructing approximate
+asymptotically valid tests, which we now consider.
+\begin{enumerate}
+  \item \emph{Asymptotic Approach}:
+    Supose that we were able to set up the test statistic in such a way
+    that $T_N\dto\calN(0,1)$.
+    Then we can approximate $F_N(x)=P[T_N\leq x]$ with $\Phi(x)$, which
+    will be correct asymptotically by the assumed convergence in
+    distribution.
+
+    We can see this more clearly by writing out the Edgeworth expansion
+    of $F_N(x)=P[T_N\leq x]$, given the assumed convergence in
+    distribution
+    \begin{align}
+      F_N(x)=P[T_N\leq x] =
+      \Phi(x) +
+      \frac{1}{\sqrt{N}}
+      R(x,F_0)
+      +
+      O_p(1/N)
+      \label{FN}
+    \end{align}
+    Clearly as $N\ra\infty$, $\Phi(x)$ dominates, suggesting that
+    $\Phi(x)$ is not a bad approximation.
+
+
+  \item \emph{Bootstrap Approach}:
+    Alternatively, suppose we generate $M$ bootstrap pseudo-samples and
+    recompute the test statistic for each pseudo-sample to get
+    collection $\{T_{Nm}^*\}_{m=1}^M$ of pseudo-test statistics.
+    Then we could approximate $F_N(x)=P[T_N\leq x]$ with
+    \begin{align*}
+      F_N^*(x)
+      =P[T_{Nm}^*\leq x]
+      =
+      \frac{1}{M}
+      \sum_{m=1}^M
+      \mathbf{1}\{
+        T_{Nm}^* \leq x
+      \}
+    \end{align*}
+    In words, just use the bootstrap sample CDF $F_N^*(x)$ of
+    estimates $\{T_{Nm}^*\}_{m=1}^M$.
+    Importantly, by the properties of the bootstrap, it's the case that
+    \begin{align}
+      F_N^*(x)=P[T_N^*\leq x] =
+      \Phi(x) +
+      \frac{1}{\sqrt{N}}
+      R(x,F_N)
+      +
+      O_p(1/N)
+      \label{bootstart}
+    \end{align}
+\end{enumerate}
+To compare these approaches, consider the approximation error.
+First, rearrange Expression~\ref{FN}. Second, subtract the expansion for
+$F_N^*(x)$ from Expression~\ref{FN} for $F_N(x)$.
+This gives
+\begin{alignat}{3}
+  F_N(x)
+  -
+  \Phi(x)
+  &=
+  \frac{1}{\sqrt{N}}
+  R(x,F_0)
+  +
+  O_p(N^{-1})
+  &&=
+  O_P(1/\sqrt{N})
+  \label{phiapprox}
+  \\
+  F_N(x)
+  - F_N^*(x)
+  &=
+  \frac{1}{\sqrt{N}}
+  \big(
+  R(x,F_0)
+  -
+  R(x,F_N)
+  \big)
+  +
+  O_p(N^{-1})
+  &&=
+  O_P(1/N)
+  \label{bootapprox}
+\end{alignat}
+Expression~\ref{phiapprox} followed because $R(x,F_0)$ is some $O_P(1)$
+quantity.
+Expression~\ref{bootapprox} followed because $F_n-F_0$ hence
+$R(x,F_n)-R(x,F_0)$ are $O_p(1/\sqrt{N})$ so that the first term
+in the difference is also $O_p(1/N)$, leaving only $O_p(1/N)$.
+
+Comparing the two approximations, we see that using the bootstrap
+approximation $F_N^*(x)$ improves upon the convergence rate relative to
+the asymptotic approximation $\Phi(x)$.
+
+Note the bootstrap improvement depended \emph{crucially} upon the fact
+that $T_N$ was a \emph{pivotal} statistic, i.e. it's asymptotic
+distribution $\calN(0,1)$ didn't depend upon any unkown parameters that
+must be estimated.
+To see why, suppose instead that $T_N\dto \calN(0,\sigma^2)$, where
+$\sigma^2$ is an unknown parameter that we can consistently estimate
+with $\hat{\sigma}_N$.
+Then
+\begin{alignat*}{3}
+  F_N(x)
+  &=
+  P[T_N\leq x]
+  &&=
+  \Phi\left(
+  \frac{x}{\sigma}
+  \right)
+  +
+  \frac{1}{\sqrt{N}}
+  R(x,F_0)
+  +
+  O_p(1/N)
+  \\
+  F_N^*(x)
+  &=
+  P[T_N^*\leq x]
+  &&=
+  \Phi\left(
+  \frac{x}{\hat{\sigma}_n}
+  \right)
+  +
+  \frac{1}{\sqrt{N}}
+  R(x,F_N)
+  +
+  O_p(1/N)
+\end{alignat*}
+Subtracting the second line from the first gives
+\begin{align*}
+  F_N(x)
+  - F_N^*(x)
+  &=
+  \Phi\left(
+  \frac{x}{\sigma}
+  \right)
+  -
+  \Phi\left(
+  \frac{x}{\hat{\sigma}_n}
+  \right)
+  +
+  \frac{1}{\sqrt{N}}
+  \big(
+  R(x,F_0)
+  - R(x,F_N)
+  \big)
+  +
+  O_p(1/N)
+\end{align*}
+Since $\sigma-\hat{\sigma}_n=O_p(1/\sqrt{N})$, the difference in
+$\Phi(\cdot)$ terms is also $O_p(1/\sqrt{N})$---they don't cancel as
+before. Hence $F_N(x)-F_N^*(x)=O_p(1/\sqrt{N})$ and we get the same rate
+of convergence as the asymptotic approximation.
+
+\clearpage
+\subsection{Bias Reduction}
+
+Sample $\{X_i\}$, from which we want to compute estimates of
+$(\mu,\theta)$ where $\theta=g(\mu)$.
+Given an unbiased estimator $\hat{\mu}$ of $\mu$, a natural estimator of
+$\theta$ is $\hat{\theta}=g(\hat{\mu})$.
+But in general, there will be a bias term if $g(\mu)$ is curved
+(non-linear), i.e.
+\begin{align*}
+  \E[\hat{\theta}]=\E[g(\hat{\mu})] \neq g(\mu)
+  = \theta
+\end{align*}
+We can see this by a second order Taylor expansion of $g(\hat{\mu})$
+about the true value $\mu$, giving
+\begin{align*}
+  \text{Bias}[g(\hat{\mu})]
+  \approx
+  \frac{1}{2}
+  \E[(\hat{\mu}-\mu)g''(\mu)(\hat{\mu}-\mu)]
+\end{align*}
+We can estimate this by employing boostrap if we note that, completely
+analogously,
+\begin{align*}
+  \text{Bias}[g(\hat{\mu}^*)]
+  \approx
+  \frac{1}{2}
+  \E_{F_n}[(\hat{\mu}^*-\hat{\mu})g''(\hat{\mu})(\hat{\mu}^*-\hat{\mu})]
+\end{align*}
+That's a population statement, which we can use to motivate a sample
+estimator of $\text{Bias}[g(\hat{\mu}^*)]$, which we can use to
+approximate $\text{Bias}[g(\hat{\mu})]$.
+In other wrods, we can use bootstrap to adjust our original estimate
+$\hat{\theta}=g(\hat{\mu})$ for bias:
+\begin{align*}
+  \hat{\theta}
+  -
+  \frac{1}{M}\sum_{m=1}^M
+  (\hat{\theta}_m^*-\hat{\theta})
+\end{align*}
+where $\hat{\theta}=g(\hat{\theta})$ is the estimate in our sample, and
+$\hat{\theta}_m^*=g(\hat{\mu}_m^*)$ the estimate in the $m$th bootstrap
+sample.  The average of difference $(\hat{\theta}_m^*-\hat{\theta})$ is
+an estimate of the bias.
+
+
+
 
 
 \clearpage
-\begin{thm}\emph{(Pointwise LLN)}
-Suppose $\forall\theta\in\Theta$,
-$\E[\lVert m(W_i,\theta)\rVert]<\infty$ and the $W_i$ iid.
-Then
-\begin{align*}
-  \frac{1}{n}
-  \sumin m(W_i,\theta)
-  \quad\pto\quad
-  \E[m(W_i,\theta)]
-  \qquad
-  \forall \theta\in\Theta
-\end{align*}
-\end{thm}
+\subsection{Residual Bootstrap}
 
-\begin{cor}\emph{(Uniform LLN)}
-Suppose conditions (i)-(iv) of the previous theorem hold and
+Suppose we have linear model
 \begin{align*}
-  \forall \theta\in\Theta
-  \qquad
-  \frac{1}{n}
-  \sumin
-  m(W_i,\theta)
-  \quad\pto\quad
-  \E[m(W_i,\theta)]
+  y_n = x_n'\beta + \varepsilon_n
 \end{align*}
-Then
-\begin{align}
-  \sup_{\theta\in\Theta}
-  \left\lVert
-  \frac{1}{n}
-  \sumin
-  m(W_i,\theta)
-  -
-  \E[m(W_i,\theta)]
-  \right\rVert =
-  o_P(1)
-\end{align}
-\end{cor}
-\begin{proof}
-%By the previous Theorem, $H_n$ in Expression~\ref{Hn} is SE.
-Since $\Theta$ compact, $H_n$ SE, and pointwise convergence assumed, we
-get that $H_n$ converges uniformly to $Q(\theta)$ by Part (a) of that
-one big theorem.
-By previous theorem, $Q(\theta)=\E[m(W_i,\theta)]$ is continuous.
-If $Q(\theta)$ is uniquely minimized at $\theta_0$, Lemma gives us
-identifable uniqueness.
-Then if $\hat{\theta}$ is an extremum esitmator, since $Q_n$ converges
-uniformly and ID holds, $\hat{\theta}$ is consistent.
-\end{proof}
+Rather than draw bootstrap samples of $(y_n,x_n)$, we can just sample
+residuals and re-estimate.
 
-\begin{lem}
-Suppose some data-dependent function $L_n(\theta)$ converges uniformly
-to continuous function $L(\theta)$ in some small neighborhood
-$B_\varepsilon(\theta_0)$ about the true parameter value $\theta_0$:
-\begin{align*}
-  \sup_{\theta\in B_\varepsilon(\theta_0)}
-  \lVert L_n(\theta) - L(\theta)\rVert
-  = o_P(1)
-\end{align*}
-Suppose also that we have a consistent estimator
-$\hat{\theta}\pto\theta_0$. Then
-\begin{align*}
-  L_n(\hat{\theta})
-  \pto L(\theta_0)
-\end{align*}
-\end{lem}
+\paragraph{Naive Residual Bootstrap}
+Procedure as follows
+\begin{enumerate}
+  \item Estimate $\hat{\beta}$ and use it to estimate residuals
+    $\{\hat{\varepsilon}_n\}\nN$
+  \item Draw pseudo-samples of the residuals
+    $\{\hat{\varepsilon}_{nm}^*\}\nN$ for $m=1,\ldots,M$.
+  \item Construct pseudo-samples $\{y_{nm}^*\}\nN$ of the dependent
+    variable, where $y_{nm}^*=x_n'\hat{\beta}+\hat{\varepsilon}_{nm}^*$
+  \item Given pseudo-samples $\{y_{nm}^*,x_n\}\nN$, recompute estimates
+    $\{\hat{\beta}_m^*\}_{m=1}^M$.
+\end{enumerate}
+Note that this assumes the residuals are \emph{heteroskedastic}. If not,
+this \emph{does not work}, and Wild bootstrap should be used instead.
 
-\begin{thm}
-Suppose $\hat{\theta}$ is an extremum estimator defined from twice
-differentiable criterion function $Q_n(\theta)$.
-If also
+\paragraph{Wild Bootstrap}
+Procedure as follows
+\begin{enumerate}
+  \item Estimate $\hat{\beta}$ and use it to estimate residuals
+    $\{\hat{\varepsilon}_n\}\nN$
+  \item Construct pseudo-samples $\{y_{nm}^*\}\nN$ of the dependent
+    variable, where
+    \begin{align*}
+      y_{nm}^*=x_n'\hat{\beta}+w_m^*\hat{\varepsilon}_{n}
+      \qquad\text{where}\quad
+      w_m
+      =
+      \begin{cases}
+        -c & \text{with some probability} \\
+        \,\;\;c & \text{with some probability} \\
+      \end{cases}
+    \end{align*}
+    In words, for observation $n$ of pseudo-sample $m$, you are
+    \emph{always} using the $n$th estimated residual
+    $\hat{\varepsilon}_n$ (which solves the worry about
+    heteroscedasticity).
+    But you just flip the sign via $w_m^*$ with some probability.
+  \item Given pseudo-samples $\{y_{nm}^*,x_n\}\nN$, recompute estimates
+    $\{\hat{\beta}_m^*\}_{m=1}^M$.
+\end{enumerate}
+
+\clearpage
+\subsection{Block Bootstrap for Time Series}
+
+
+\clearpage
+\section{Non-Standard Inference}
+
+%Normal case: $\hat{\theta}=\theta_0 + O_P(1/\sqrt{n})=\theta_0+o_P(1)$
+%Weak ID: $\theta_0=O_p(1/\sqrt{n})$ too, so can't consistently estimate
+%$\theta_0$
+
+%Many weak instruments: $\hat{\theta}\pto\theta_0$ but only with
+%$m\ra\infty$, i.e. consistency only achieved by number of instruments
+%going to infinity, which together can obtain identification
+
+Consider a GMM setup with moment conditions
 \begin{align*}
-  \nabla_\theta
-  Q_n(\hat{\theta})
-  =
-  o_P(n^{-1/2})
+  0 = \E[g_n(\theta_0)]
 \end{align*}
-Then
+Throughout this section, we want to test
+\begin{align*}
+  H_0: \theta=\theta_0
+\end{align*}
+As always, under the assumption that $\theta_0$ is the true value, we
+can Taylor expand the FOCs defining estimator $\hat{\theta}$
+(assuming here that our weighting matrix is a consistent estimator
+$\hat{\Omega}^{-1}$ for the efficient choice $\Omega^{-1}$)
+to get the usual expression
 \begin{align*}
   \sqrt{n}(\hat{\theta}-\theta_0)
   =
-  -(\nabla_{\theta}^2 Q_n(\tilde{\theta}))^{-1}
-  \big[
-  \sqrt{n}\cdot \nabla_{\theta} Q_n(\theta_0)
-  \big]
-  +
-  o_P(1)
+  \big(\overline{G}_n'\hat{\Omega}^{-1}_n\overline{G}_n\big)^{-1}
+  \overline{G}_n'\hat{\Omega}^{-1}_n
+  \sqrt{n}\;\overline{g}_n(\theta_0)
 \end{align*}
-which is asymptotically normal by the CLT.
-\end{thm}
+where $\overline{G}_n$ and $\hat{\Omega}_n$ are both evaluated at
+$\theta_0$.
+There are two possibilities
+\begin{itemize}
+  \item
+    \emph{Strong Identification}:
+    $\overline{G}_n\pto G$, fixed nonzero matrix
+  \item
+    \emph{Weak Identification}:
+    $\sqrt{n}(\overline{G}-G)=O_p(1)$
+\end{itemize}
+
+Want to test hypothesis about parameters
+
+Start from Taylor-expanded FOC defining $\hat{\theta}$
+
+Potential problem: Weak ID, thing not well defined
+
+Efficient test with strong ID
+- Limit of params is usual normal efficient GMM asymptotic dist
+- Construct wald state from it
+- Goes to chi square
+
+AR test with strong ID
+- It's inefficient, but can think about doing it anyway
+- Gives a stat
+- Test of whether the moment conditions do in fact equation zero
+- We *assume* the model is true and test if some theta0 is the param
+value assuming the truth of that model
+- Differs from J test which tests the truth of the model using
+overidentification
+
+AR test with weak ID
+- Still well defined, still works, can run it
+
+K-test with weak IV
+- Can rewrite the usual wald stat
+- That's another way to write the optimal test under strong ID, so will
+give the same result under strong ID, but also works under weak ID
+- Uncorrelate
+
+
 
 
 \clearpage
-\section{VARs}
+\section{Clustering}
 
-Three types of concepts, all distinct
-\begin{itemize}
-  \item Shock: Economically meaningful primitive exogeneous forces.
-    They have the following characteristics
-    \begin{itemize}
-      \item Exogenous with respect to other current and lagged endogenous
-        variables in the model. This is putting a finer point on
-        ``primitive'' and ``exogenous''
-      \item Uncorrelated with each other so we can identify unique
-        causual effects
-      \item Represent unanticipated movements in exogenous variables or
-        news about future movements in exogeneous variables
-    \end{itemize}
-  \item Innovation: The residuals from a reduced-form VAR
-  \item Instrument
-\end{itemize}
-These three concepts are all generally distinct.
-It is only through the process of \emph{identification} that we
-link/equate innovations with the shocks
-
-Model
+Consider a GMM setup, where we will need convergence in distribution of
+the following object to derive the asymptotic distribution of our GMM
+estimator
 \begin{align*}
-  Y_t
-  &= B(L)Y_t + \Omega \varepsilon_t
-  \qquad\text{where}\quad
-  \varepsilon_t \sim (0,D)
-  \\
-  B(L)
-  &= B_0 + \sum_{k=1}^p B_kL^k
+  \sqrt{N}\bar{g}_N(\theta)
+  \quad\dto\quad
+  \calN(0,\Omega)
 \end{align*}
-Corresponding reudced form
+Normally, the observations are iid in which case the above convergence
+in distribution obtains by the CLT with
+$\Omega=\Var(g_n(\theta_0))=\E[g_n(\theta_0)g_n(\theta_0)']$.\footnote{%
+  Note that the parts that converge in probability are not a problem. A
+  generalized LLN that deals with not-too-strongly correlated data will
+  work just fine. The dependence only affects the above part, where the
+  asymptotic variance needs to be generalized from the usual
+  iid CLT case.
+}
+But now consider non-iid observations, which will ultimately change the
+expression for $\Omega$ and corresponding consistent estimators.
+
+Specifically, suppose instead that the sample $\{g_n(\theta)\}\nN$
+breaks up into clusters of size $N_c$ for $c=1,\ldots,C$ with
+$N=\sum_{c=1}^CN_c$.
+Let also $I_c$ denote the indices for cluster $c$.
+The data is indepenent only \emph{across} clusters, but dependent within
+clusters.
+So to start, write out the population variance of our object of interest
 \begin{align*}
-  A(L)Y_t
-  &= \eta_t
-  \qquad\text{where}\quad
-  \eta_t
-  \sim (0,\Sigma_\eta)
-  \\
-  A(L)
-  &= I-\sum_{k=1}^p A_kL^k
+  \Var\big(\sqrt{N}\bar{g}_N(\theta_0)\big)
+  =
+  \frac{1}{N}
+  \Var\left(
+    \sumnN
+    g_n(\theta_0)
+  \right)
+  =
+  \frac{1}{N}
+  \sum_{c=1}^C
+  \Var\left(
+    \sum_{n\in I_c}
+    g_n(\theta_0)
+  \right)
 \end{align*}
-Can then link reduced form innovations $\eta_t$ to the structural shocks
-$\varepsilon_t$ by rewriting
+The second expression just used the definition of $\bar{g}_N(\theta)$.
+The third expression followed by the assumption of independence across
+clusters. Now if define moment condition ``blocks''
 \begin{align*}
-  (I-B_0)Y_t
-  &=
-  \sum_{k=1}^p B_k Y_{t-k}
-  +
-  \Omega \varepsilon_t
-  \\
-  Y_t
-  &=
-  \sum_{k=1}^p A_k Y_{t-k}
-  +
-  \eta_t
+  b_c(\theta)
+  =
+  \sum_{n\in I_c}
+  g_n(\theta)
 \end{align*}
-From this, deduce that
+Use this to rewrite the above variance expression as
 \begin{align*}
-  \eta_t
-  &=
-  (I-B_0)^{-1}\Omega\varepsilon_t
-  \\
-  \iff\quad
-  \eta_t
-  &= B_0\eta_t + \Omega \varepsilon_t
+  \Var\big(\sqrt{N}\bar{g}_N(\theta_0)\big)
+  =
+  \frac{1}{N}
+  \sum_{c=1}^C
+  \Var(b_c(\theta))
+  =
+  \frac{1}{N}
+  \sum_{c=1}^C
+  \E[b_c(\theta)b_c(\theta)']
+\end{align*}
+Define the following estimator based on ``blocked'' moment conditions:
+\begin{align*}
+  \hat{\Omega}_{cl}
+  =
+  \frac{1}{N}
+  \sum_{c=1}^C
+  b_c(\theta)b_c(\theta)'
 \end{align*}
 
-Identification approaches
-\begin{itemize}
-  \item Triangularization/Cholesky: Impose zero restrictions
-    so that an endogenous variable does not respond to other endogenous
-    variables contemporaneously.
-    The variable ordered ``first'' responds to no other endogenous
-    variables.
-    The variable ordered ``last'' respond to everything else in the
-    system.
 
-  \item Nonzero restrictions, structural VAR: set a coefficient to some
-    number which is known for good theoretical reasons
 
-  \item Heteroscedasticity
+- Start with variance of $\sqrt{n}\bar{g}$
+- Variance of sum is sum of variance of clusters
 
-  \item High Frequency identification: Use daily data to isolate effect
-    of Fed announcements on rates. If you control for the Fed's
-    information set, then this is plausible identification of shock/news
+\clearpage
+Linear model
+\begin{align*}
+  y_{ig}
+  =
+  \beta'x_{ig} + u_{ig}
+  =
+  \beta_1'x_{1,g} + \beta_2'x_{2,ig} + u_{ig}
+\end{align*}
+No longer assume $u_{ig}$ iid.
+Instead, assume $u_{ig}$ correlated within $g$, but no across $i$.
+Also, allow for heteroskedasticity.
+
+Further points
+\begin{enumerate}
+  \item When the issue arises:
+    This kind of correlation in errors can arise naturally (villages,
+    schools, families) or can be \emph{induced} by correlation of RHS
+    regressors within groups (most often perfect correlation when one
+    RHS variable varies only at some group level).
+    Pointed out by Moulton.
 
   \item
-    External Instruments/Proxy SVARs:
-    External series $Z_t$ (outside the endogenous variable vector $Y_t$)
-    is a valid instrument for identifying shock $\varepsilon_{ti}$ if
-    \begin{align*}
-      \E[Z_t\varepsilon_{ti}] &\neq 0 \\
-      \E[Z_t\varepsilon_{tj}] &= 0
-      \qquad
-      \forall j\neq i
-    \end{align*}
-    The first condition ensures relevance/usefullnes. The second
-    condition ensures exogeneity.
-    How to implement
+    Note: We will not worry about the fact that the ``correct'' or
+    ``true'' model might not look like the above.
+    We will thus assume that the model for $y_{ig}$ is, in fact, linear
+    \emph{or} that we are only interested in estimating a linear
+    model (which could be viewed as an approximation to a nonlinear
+    model).
+
+  \item
+    Goal: Valid inference in the presence of clustering.
+
+  \item
+    Estimation approaches:
+    Two solutions for the linear model above.
     \begin{enumerate}
-      \item Estimate reduced form VAR to get estimated residuals
-        $\{\hat{\eta}_t\}$
-      \item Regression $\eta_{tj}$ on $\eta_{ti}$ for $j\neq i$ using
-        $Z_t$ as the instrument.
-        These provide unbiased estimates of the ceofficients
+      \item (FGLS):
+        Model the correlation structure, estimate by FGLS.
+        Can robustify
+
+      \item (Cluster-Robust SE):
+        Cluster robust standard errors, where we assume \emph{independence}
+        of errors across clusters, but allow for correlation of errors
+        within clusters and general heteroscedasticity (within and across
+        clusters).
+
+        We should view all of this as a generalization of White (1980)
+        robust standard errors
+
+        OLS formula and the asymptotic variance.
+        As always, we can \emph{do} OLS (form the OLS estimator) even in the
+        presence of clusters or misspecification (i.e. the linear regression
+        model isn't exactly correct).
+        It's just inefficient, and we could do better with GLS or with a
+        fully specified model.
+        However, we will just ``do'' OLS henceforth and derive the
+        appropriate standard errors on the point estimate (which are
+        generally larger than what we would get with the correct model), but
+        appropriate
+
+        To get this, we need
+        \begin{enumerate}
+          \item Usual sampling assumption (Fixed $N_g$, $G\ra\infty$):
+            Large number of small clusters (possibly of different sizes).
+            We randomly draw those clusters.
+            There are enough clusters to account for arbitrary correlation
+            within cluster
+
+          \item Alternative sampling assumption,
+            ($N_g\ra\infty$, Fixed $G$):
+            Small number of clusters that we draw many observations from.
+
+            Arises from stratified sampling.
+            Population first stratified into $G$ non-overlapping groups (like
+            states or just cut up into some arbitrary groups to save money)
+            then a large number of observations are taken from each group,
+            or (alternatively) we randomly pick a few groups to sample from,
+            then take a large numbers from those groups.
+            regardless, typically fixed $G$, large $N_g$ analysis.
+        \end{enumerate}
     \end{enumerate}
 
+
   \item
-    Long Run Restrictions:
-    Moving average rep
-    \begin{align*}
-      Y_t = C(L)\eta_t
-      \qquad\text{where}\quad
-      C(L) = A(L)^{-1}
-    \end{align*}
-    Can write $Y_t$ as
-    \begin{align*}
-      Y_t = D(L)\varepsilon_t = C(L)H\varepsilon_t
-    \end{align*}
-    Then want to say that some shock has no effect on some variable in
-    the long run. This amounts to restricting $D^{ij}(1)=0$.
-    This can accommodate whether you want zero long run effect on level
-    or growth rate, depending on whether the variables included are
-    levels or growth rates.
+    Approach (ii):
+    Model setup and derivation of asymptotic variance
 
-  \item Sign Restrictions
-
-  \item FAVARs: For including more information
-
-  \item DSGE
+  \item
+    Approach (i): FGLS
+\end{enumerate}
+Papers
+\begin{itemize}
+  \item Cameron and Miller 2010 is just a shorter version of their
+    ``Practitioner's guide''
+  \item
 \end{itemize}
-Jorda local projection method: For overcoming the negative effects of
-misspecification on estimated IRFs. In the usual way they are computed,
-there's a possibility that the errors would just be compounded.
-Jorda's solution is like iterated vs. direct forecasting.
+
+\clearpage
+Least Squares
+\begin{enumerate}
+  \item
+    Cast into GMM and extremum estimation form
+  \item
+    Standard errors and the matrix in the middle
+    \begin{itemize}
+      \item Time series and long run-variance
+      \item Clustered standard errors
+      \item White standard errors
+      \item Usual homoskedastic errors
+    \end{itemize}
+  \item Inference
+\end{enumerate}
+
+\clearpage
+\section{Simulated Method of Moments}
+
+Model defined by moment condition
+\begin{align*}
+  0 = \E_w\big[\E_\varepsilon[g(W_i,\varepsilon_i,\theta)]\big]
+\end{align*}
+where the integral/expectation
+$\E_\varepsilon[g(W_i,\varepsilon_i,\theta)]$ is tough to compute
+analytically, even though the distribution of errors
+$F_\varepsilon(\varepsilon)$ is known---often $\calN(0,1)$ or
+$U[0,1]$---and $g(W_i,\varepsilon_i,\theta)$ is easy to compute.
+
+
+\clearpage
+\section{Stein's Estimator}
+
+Suppose $Y \sim \calN(\mu,I_d)$.
+The fact that $\Var(Y)=I_d$ is wlog for normal RVs since we can always
+uncorrelate/rotate any normal RV to get one with identity variance.
+This normal setup with unknown mean is very important since that's often
+the situation we face in parameter estimation in the asymptotic limit.
+So this section's results apply to all those cases.
+
+\begin{defn}(Stein's Estimator)
+Stein's estimator for vector $\mu$ is defined
+\begin{align*}
+  \hat{\mu}_{JS,\lambda}
+  =
+  \lambda
+  +
+  \left(
+  1-
+  \frac{d-2}{\lVert Y\rVert^2}
+  \right)
+  (Y-\lambda)
+\end{align*}
+and Stein's ``positive part'' estimator is defined
+\begin{align*}
+  \hat{\mu}_{JS,PP}
+  =
+  \max
+  \left\{
+  1-
+  \frac{d-2}{\lVert Y\rVert^2}
+  ,0
+  \right\}
+  Y
+\end{align*}
+\end{defn}
+
+
+
+\begin{prop}
+Throughout, we consider MSE loss, i.e. risk function
+\begin{align*}
+  R(\hat{\mu},\mu)
+  = MSE(\hat{\mu},\mu)
+  =\E[\lVert\hat{\mu}-\mu\rVert^2]
+\end{align*}
+Multiple parts to this proposition:
+\begin{enumerate}[label=\emph{(\roman*)}]
+  \item $\hat{\mu}_{MLE}=Y$
+  \item $R(\hat{\mu}_{MLE},\mu)=\E[\lVert Y-\mu\rVert^2]=d$
+  \item If $d<3$, then $\hat{\mu}_{MLE}$ is admissable.
+  \item $\hat{\mu}_{MLE}$ is \emph{inadmissable} for $d\geq 3$.
+    In particular $\hat{\mu}_{JS,\lambda}$ (for any $\lambda$) or
+    $\hat{\mu}_{JS,PP}$ has weakly lower risk for all $\mu$ (and
+    strictly lower for at least one value).
+\end{enumerate}
+\end{prop}
+\begin{rmk}
+This is a pretty \emph{crazy} result. The elements of $Y$ are
+\emph{uncorrelated/independent}. They don't provide any information
+about each other. And yet, shrinking all elements based on the
+$L^2$-norm of $Y$ helps produce a better estimator of vector $\mu$.
+
+Moreover, it's not that we're shrinking towards some special value
+like zero---$\hat{\mu}_{JS,\lambda}$ is better for \emph{any} $\lambda$.
+We still get that the estimator dominates MLE.
+
+Of course, one important caveat: This is an only an improvement when we
+consider risk for estimating the \emph{entire vector} $\mu$.
+If we were just trying to estimate a single element, we don't get any
+improvement (since this is effectively just the $d<3$ case).
+The gains only come when estimating/testing the \emph{entire} parameter
+vector.
+
+Finally, one last caveat. All of this also assumes that the possible
+range of $\mu$ is unbounded. If we knew that $\mu$ had to lie in some
+range, we might be able to use that to get a risk improvement.
+\end{rmk}
+
+\begin{defn}(Other Estimator)
+The following also does well for $d\geq 3$:
+\begin{align*}
+  \hat{\mu}
+  =
+  \bar{Y}
+  +
+  \left(
+  1-
+  \frac{d-3}{\lVert Y-\bar{Y}\rVert}
+  (Y-\bar{Y})
+  \right)
+\end{align*}
+where $\bar{Y}$ is the mean across elements.
+\end{defn}
+
+
+
+
+
+
+
+%\clearpage
+%\section{VARs}
+
+%Three types of concepts, all distinct
+%\begin{itemize}
+  %\item Shock: Economically meaningful primitive exogeneous forces.
+    %They have the following characteristics
+    %\begin{itemize}
+      %\item Exogenous with respect to other current and lagged endogenous
+        %variables in the model. This is putting a finer point on
+        %``primitive'' and ``exogenous''
+      %\item Uncorrelated with each other so we can identify unique
+        %causual effects
+      %\item Represent unanticipated movements in exogenous variables or
+        %news about future movements in exogeneous variables
+    %\end{itemize}
+  %\item Innovation: The residuals from a reduced-form VAR
+  %\item Instrument
+%\end{itemize}
+%These three concepts are all generally distinct.
+%It is only through the process of \emph{identification} that we
+%link/equate innovations with the shocks
+
+%Model
+%\begin{align*}
+  %Y_t
+  %&= B(L)Y_t + \Omega \varepsilon_t
+  %\qquad\text{where}\quad
+  %\varepsilon_t \sim (0,D)
+  %\\
+  %B(L)
+  %&= B_0 + \sum_{k=1}^p B_kL^k
+%\end{align*}
+%Corresponding reudced form
+%\begin{align*}
+  %A(L)Y_t
+  %&= \eta_t
+  %\qquad\text{where}\quad
+  %\eta_t
+  %\sim (0,\Sigma_\eta)
+  %\\
+  %A(L)
+  %&= I-\sum_{k=1}^p A_kL^k
+%\end{align*}
+%Can then link reduced form innovations $\eta_t$ to the structural shocks
+%$\varepsilon_t$ by rewriting
+%\begin{align*}
+  %(I-B_0)Y_t
+  %&=
+  %\sum_{k=1}^p B_k Y_{t-k}
+  %+
+  %\Omega \varepsilon_t
+  %\\
+  %Y_t
+  %&=
+  %\sum_{k=1}^p A_k Y_{t-k}
+  %+
+  %\eta_t
+%\end{align*}
+%From this, deduce that
+%\begin{align*}
+  %\eta_t
+  %&=
+  %(I-B_0)^{-1}\Omega\varepsilon_t
+  %\\
+  %\iff\quad
+  %\eta_t
+  %&= B_0\eta_t + \Omega \varepsilon_t
+%\end{align*}
+
+%Identification approaches
+%\begin{itemize}
+  %\item Triangularization/Cholesky: Impose zero restrictions
+    %so that an endogenous variable does not respond to other endogenous
+    %variables contemporaneously.
+    %The variable ordered ``first'' responds to no other endogenous
+    %variables.
+    %The variable ordered ``last'' respond to everything else in the
+    %system.
+
+  %\item Nonzero restrictions, structural VAR: set a coefficient to some
+    %number which is known for good theoretical reasons
+
+  %\item Heteroscedasticity
+
+  %\item High Frequency identification: Use daily data to isolate effect
+    %of Fed announcements on rates. If you control for the Fed's
+    %information set, then this is plausible identification of shock/news
+
+  %\item
+    %External Instruments/Proxy SVARs:
+    %External series $Z_t$ (outside the endogenous variable vector $Y_t$)
+    %is a valid instrument for identifying shock $\varepsilon_{ti}$ if
+    %\begin{align*}
+      %\E[Z_t\varepsilon_{ti}] &\neq 0 \\
+      %\E[Z_t\varepsilon_{tj}] &= 0
+      %\qquad
+      %\forall j\neq i
+    %\end{align*}
+    %The first condition ensures relevance/usefullnes. The second
+    %condition ensures exogeneity.
+    %How to implement
+    %\begin{enumerate}
+      %\item Estimate reduced form VAR to get estimated residuals
+        %$\{\hat{\eta}_t\}$
+      %\item Regression $\eta_{tj}$ on $\eta_{ti}$ for $j\neq i$ using
+        %$Z_t$ as the instrument.
+        %These provide unbiased estimates of the ceofficients
+    %\end{enumerate}
+
+  %\item
+    %Long Run Restrictions:
+    %Moving average rep
+    %\begin{align*}
+      %Y_t = C(L)\eta_t
+      %\qquad\text{where}\quad
+      %C(L) = A(L)^{-1}
+    %\end{align*}
+    %Can write $Y_t$ as
+    %\begin{align*}
+      %Y_t = D(L)\varepsilon_t = C(L)H\varepsilon_t
+    %\end{align*}
+    %Then want to say that some shock has no effect on some variable in
+    %the long run. This amounts to restricting $D^{ij}(1)=0$.
+    %This can accommodate whether you want zero long run effect on level
+    %or growth rate, depending on whether the variables included are
+    %levels or growth rates.
+
+  %\item Sign Restrictions
+
+  %\item FAVARs: For including more information
+
+  %\item DSGE
+%\end{itemize}
+%Jorda local projection method: For overcoming the negative effects of
+%misspecification on estimated IRFs. In the usual way they are computed,
+%there's a possibility that the errors would just be compounded.
+%Jorda's solution is like iterated vs. direct forecasting.
+
+
+\clearpage
+\section{Extreme Value Theory}
+
+\subsection{Overview}
+
+Given an iid sample $\{X_i\}_{i=1}^n$, our goal in this section is to
+characterize the distrbution of the sample max, $X_{(n)}$.
+There are a few possible approaches.
+
+In theory, if we knew the CDF $F(x)$ of the $X_i$, we could easily
+construct the distribution of the max: $X_{(n)}\sim F(x)^n$.
+Of course, in practice, we often don't know $F(x)$, and estimating
+$\hat{F}(x)$ then constructing $\hat{F}(x)^n$ will be extremely
+sensitive to sampling error.
+In that case, we take our cue from the CLT, which states that
+given \emph{any} starting CDF $F(x)$ (subject to certain regularity
+conditions), the limit of suitably scaled $\bar{X}_n$ converges to a
+nondegenerate mean-zero normal RV (for some some variance).
+
+Analogously, we show in this section that given \emph{any} starting
+CDF $F(x)$ (subject to certain regularity conditions), the limit of
+suitably scaled $X_{(n)}$ converges to a nondegenerate RV with
+distribution in the \emph{extreme value family} (for some EV
+parameter).
+More formally, for some sequence of normalizing constants
+$\{a_n,b_n\}$,\footnote{%
+  We must scale $X_{(n)}$ by normalizing constants $\{a_n,b_n\}$
+  because otherwise, for any CDF $F$, the distribution of
+  $X_{(n)}\sim F(x)^n$ converges to a degenerate distribution with
+  all mass on the max value on the support of $X_i$.
+}
+\begin{align}
+  \frac{X_{(n)}-b_n}{a_n}
+  \quad
+  \dto
+  \quad
+  X\sim G(x)
+\end{align}
+where $G(x)$ is some CDF in the extreme value family.
+We can also equivalently express convergence in distribution as
+pointwise convergence of the sequence of CDFs:
+\begin{align}
+  \boxed{%
+  G(x)
+  =\lim_{n\ra\infty}P\left[\frac{X_{(n)}-b_n}{a_n} \leq x\right]
+  %=\lim_{n\ra\infty}P[X_{(n)} \leq a_nx+b_n]
+  =\lim_{n\ra\infty}F(a_nx+b_n)^n
+  }
+  \label{ev:key}
+\end{align}
+Expression~\ref{ev:key} is thus the key organizing expression for
+this entire section. It implies three important tasks to grapple
+with:
+\begin{enumerate}
+  \item \emph{Existence}:
+    Given $F$, does there exist a sequence of constants
+    $\{a_n,b_n\}$ and a limiting distribution $G(x)$ such that
+    Expression~\ref{ev:key} holds?
+  \item \emph{Characterization of $G(x)$}:
+    As mentioned, we will show that anytime the limit in
+    Expression~\ref{ev:key} in fact exists, the functional form of
+    $G(x)$ is tightly restricted.
+    Specifically, $G(x)$ falls within the EV family for some EV
+    parameter.\footnote{%
+      Again, much like how always
+      $\sqrt{n}(\bar{X}_n-\mu)\dto\calN(0,\sigma^2)$
+      for some $\sigma^2$ provided the CLT holds.
+    }
+  \item
+    \emph{Domain of Attraction}:
+    Given a limiting $G(x)$, we will identify the necessary and
+    sufficient conditions on the original distribution $F(x)$ such
+    that Expression~\ref{ev:key} holds.
+    Thus, each $G(x)$ will have an associated
+    \emph{domain of attraction}, i.e. an associated class of functions
+    for which Expression~\ref{ev:key} holds.
+\end{enumerate}
+Finally, throughout this section, for any nondecreasing $f(y)$,
+$f^{-1}(x)$ denotes the \emph{left-continuous inverse}, i.e. the the
+smallest $y$ such that $f(y)\geq x$. In words, start at the origin and
+increase $y$ until you hit the first $y$ (which you've approached from
+the left) such that $f(y)$ clears $x$.
+%Suppose there exists a sequence of transformations $h_n(\cdot)$ such
+%that $h_n(X_{(n)})$ has a nondegenerate limit distribution.
+%In other words, suppose there exists a nondegenerate limit distribution
+%$G(x)$ such that, for all points $x$ of continuity of $G(x)$, we have
+%\begin{align*}
+  %G(x)
+  %=\lim_{n\ra\infty}P[h_n(X_{(n)}) \leq x]
+  %=\lim_{n\ra\infty}P[X_{(n)} \leq h^{-1}_n(x)]
+%\end{align*}
+%In the simplest case, $h_n(y)=(y-b_n)/a_n$, i.e. a linear transformation
+%in which case the above condition can be restated as
+
+
+\clearpage
+\subsection{Extreme Value (EV) Family of Distributions}
+
+
+\begin{defn}(EV Family of Distributions)
+For EV index, scale, and location parameters
+$(\gamma,\mu,\sigma)\in\R\times \R \times \R_{++}$,
+the \emph{EV family of distributions} for RV $X\sim G(x)$ is defined by
+CDF:
+\begin{align*}
+  G(x)
+  =
+  P[X\leq x]
+  &=
+  \begin{cases}
+    \exp\left(
+    -\left[1+\gamma \left(\frac{x-\mu}{\sigma}\right)\right]^{-1/\gamma}
+    \right)
+    & \gamma\neq 0
+    \\
+    \exp\left(
+    -e^{-\frac{x-\mu}{\sigma}}
+    \right)
+    & \gamma =0
+  \end{cases}
+  \qquad\text{for $x\;$ s.t.}\quad
+  1+\gamma \left(\frac{x-\mu}{\sigma}\right)>0
+\end{align*}
+Ignoring scale and location $(\mu,\sigma)$ (which are just normalizing
+constants), this distribution family depends only upon
+the \emph{EV index} $\gamma$, which controls shape.
+As we will prove, if Expression~\ref{ev:key} holds, then $G(x)$
+\emph{must} be in this class of EV distributions for some
+$(\gamma,\sigma,\mu)$.
+\end{defn}
+
+\begin{defn}(EV Family: Alternative Standardizations)
+The above CDF is for some $X\sim G(x)$, although it is sometimes easier
+to work with standardized quantities, defined as follows with
+corresponding CDFs:
+\begin{alignat*}{5}
+  S :=\frac{X-\mu}{\sigma}
+  \;\sim\;
+  \tilde{G}(s)
+  &=
+  P[S\leq s]
+  %&&=
+  %P\,[X\leq \sigma s+\mu]
+  &&=
+  \begin{cases}
+    \exp\left(
+    -\left[1+\gamma s\right]^{-1/\gamma}
+    \right)
+    & \gamma\neq 0
+    \\
+    \exp\left(
+    -e^{-s}
+    \right)
+    & \gamma =0
+  \end{cases}
+  \\
+  Y :=1+\gamma\left(\frac{X-\mu}{\sigma}\right)
+  \;\sim\;
+  \tilde{G}(y)
+  &=
+  P[Y\leq y]
+  %&&=
+  %P\left[
+    %X\leq \mu+\sigma\left(\frac{y-1}{\gamma}\right)
+  %\right]
+  &&=
+  \exp\left(
+  -y^{-1/\gamma}
+  \right)
+\end{alignat*}
+\end{defn}
+
+\begin{defn}(EV Family: Alternative Parameterizations)
+The above formulations of CDF $G(x)$ (with $\gamma$ unrestricted) is the
+most general. But for different ranges of $\gamma$, the CDF simplifies
+into special cases with their own alternative names, formulations, and
+supports, which we now enumerate.
+For simplicity, rather than work with the CDF of $X\sim G(x)$, I will
+work with the CDFs of standardized quantities $S\sim \tilde{G}(s)$ and
+$Y\sim\tilde{G}(y)$:
+\begin{itemize}
+  \item
+    $(\gamma=0)$
+    \emph{Type I or Gumbel distribution}:
+    Support equals the full real line.
+    \begin{align*}
+      \tilde{G}(s) = \exp\big(-e^{-s}\big)
+      \qquad\text{where}\quad
+      s=\frac{x-\mu}{\sigma} \in \R
+    \end{align*}
+
+  \item
+    $(\gamma>0)$
+    \emph{Type II or Frechet distribution}:
+    This distribution has a lower limit, but a heavy right tail with no
+    upper limit.  Moments greater than $\alpha$ do not exist.
+    \begin{align*}
+      G(y)
+      =
+      \begin{cases}
+        \exp\left(
+        -y^{-\alpha}
+        \right)
+        & y >0
+        \\
+        0 & y\leq 0
+      \end{cases}
+      \qquad\text{where}\quad
+      \begin{cases}
+        \alpha = 1/\gamma \\
+        y = 1+\gamma \left(\frac{x-\mu}{\sigma}\right)>0
+      \end{cases}
+    \end{align*}
+
+  \item
+    $(\gamma<0)$
+    \emph{Type III or Reversed-Weibull distribution}:
+    This distribution has an upper limit.
+    \begin{align*}
+      G(y)
+      =
+      \begin{cases}
+        \exp\left(
+        -(-y)^{\alpha}
+        \right)
+        & y <0
+        \\
+        1 & y\geq 0
+      \end{cases}
+      \qquad\text{where}\quad
+      \begin{cases}
+        \alpha = -1/\gamma \\
+        y = -\left(1+\gamma \left(\frac{x-\mu}{\sigma}\right)\right)<0
+      \end{cases}
+    \end{align*}
+\end{itemize}
+\end{defn}
+
+\begin{defn}
+Let $U$ denote the following left inverse:
+\begin{align*}
+  U(t)
+  =
+  \left[
+  \frac{1}{1-F(\,\cdot\,)}
+  \right]^{-1}
+  =
+  F^{-1}\left(1-\frac{1}{t}\right)
+  %H^{-1}(t)
+  %\qquad\text{where}\quad
+  %H(x)
+  %=
+  %\frac{1}{1-F(x)}
+  \qquad t>1
+\end{align*}
+Hence $U(t)$ returns the $1-1/t$ quantile.
+This is a useful reparameterization for the proofs and also for
+interpretation.
+In particular, $U(t)=F^{-1}(1-1/t)$ equals the level that we expect an
+observation to exceed (on average or in a large sample) once every $t$
+periods/observations.
+\end{defn}
+
+\begin{defn}
+Relatedly, let $D(x)$ denote the left inverse of $G(\cdot)$ evaluated at
+$e^{-1/x}$:
+\begin{align*}
+  D(x):= G^{-1}\left(e^{-1/x}\right)
+  =
+  \mu+\sigma
+  \left(
+  \frac{x^{\gamma}-1}{\gamma}
+  \right)
+\end{align*}
+Note that the first equality is a definition of $D(x)$.
+The second equality is a result that follows from using the functional
+form of the extreme value family CDF. Of course, we will have to prove
+that $G(x)$ does indeed have that functional form, which we do below.
+For now, just take as given.
+\end{defn}
+
+
+\begin{thm}\emph{(Tail Behavior)}
+Let $a(t)\underset{t\ra t_*}{\sim} b(t)$ denote $\lim{t\ra t_*} a(t)/b(t)=1$.
+Then
+\begin{itemize}
+  \item $(\gamma=0)$: $1-G_0(y)\underset{t\ra\infty}{\sim} e^{-y}$
+  \item $(\gamma>0)$: $1-G(y)\underset{t\ra\infty}{\sim} y^{-1/\gamma}$
+\end{itemize}
+\end{thm}
+\begin{proof}
+We prove each in turn:
+\begin{itemize}
+  \item $(\gamma=0$):
+    Take the limit of the ratio of $1-G_0(y)=1-\exp(-e^{-y})$ to $e^{-y}$:
+    \begin{align*}
+      \lim_{y\ra\infty}
+      \frac{1-\exp(-1/e^y)}{1/e^{y}}
+      =
+      \frac{0}{0}
+    \end{align*}
+    So then by L'Hospital:
+    \begin{align*}
+      \lim_{y\ra\infty}
+      \frac{1-\exp(-1/e^y)}{1/e^{y}}
+      =
+      \lim_{y\ra\infty}
+      \frac{\frac{d}{dy}[1-\exp(-e^{-y})]}{\frac{d}{dy}[e^{-y}]}
+      =
+      \lim_{y\ra\infty}
+      \frac{-\exp(-e^{-y})e^{-y}}{-e^{-y}}
+      =
+      \lim_{y\ra\infty}
+      \exp(-e^{-y})
+      = 1
+    \end{align*}
+
+  \item
+    ($\gamma>0$):
+    Take the limit of the ratio of
+    $1-G(y)=1-\exp(-y^{-1/\gamma})$
+    to $y^{-1/\gamma}$:
+    \begin{align*}
+      \lim_{y\ra\infty}
+      \frac{1-\exp(-1/y^{1/\gamma})}{1/y^{1/\gamma}}
+      =
+      \frac{0}{0}
+    \end{align*}
+    So then by L'Hospital:
+    \begin{align*}
+      \lim_{y\ra\infty}
+      \frac{1-\exp(-y^{-1/\gamma})}{y^{-1/\gamma}}
+      =
+      \lim_{y\ra\infty}
+      \frac{%
+        \frac{d}{dy}[1-\exp(-y^{-1/\gamma})]
+      }{%
+        \frac{d}{dy}[y^{-1/\gamma}]
+      }
+      =
+      \lim_{y\ra\infty}
+      \frac{%
+        -\frac{1}{\gamma}
+        \exp(-y^{-1/\gamma})[y^{-1/\gamma-1}]
+      }{%
+        -
+        \frac{1}{\gamma}
+        y^{-1/\gamma-1}
+      }
+      = 1
+    \end{align*}
+\end{itemize}
+\end{proof}
+
+
+\clearpage
+\subsection{Alternative Formulations of Key Limit}
+
+This section develops alternative (but equivalent) ways to write key limit
+relation, Expression~\ref{ev:key}, reproduced here:
+\begin{align}
+  G(x)
+  =\lim_{n\ra\infty}P\left[\frac{X_{(n)}-b_n}{a_n} \leq x\right]
+  =\lim_{n\ra\infty}F(a_nx+b_n)^n
+  \label{ev:key2}
+\end{align}
+for some sequence of constants $\{a_n,b_n\}$ and where $G(x)$ is a
+member of the EV class of distributions for some $(\gamma,\mu,\sigma)$.
+Thus, we know more about the functional form of the limiting
+distribution, which original Expression~\ref{ev:key} was otherwise
+agnostic about.
+
+The purpose of developing alternative-but-equivalent ways of writing the
+key limit relation lies mainly in simplifying the proofs.
+It will often be easier to prove some result that's \emph{equivalent}
+to Expression~\ref{ev:key2}, rather than prove the statement directly.
+Therefore, it's useful to have a list of alternative-but-equivalent
+formulations of Expression~\ref{ev:key2}.
+
+
+%Restatement of key limit relation: By introducing Theorem 1.1.3 into the
+%results of Theorem 1.1.2, you get Theorem 1.1.6
+
+\begin{thm}\emph{(Equivalent Formulations of Key Limit)}
+Suppose Expression~\ref{ev:key2} holds for some sequence of constants
+$\{a_n,b_n\}$ and some EV distribution $G$ characterized by
+$(\gamma,\mu,\sigma)$. Then the following are equivalent:
+\begin{alignat*}{3}
+  %=
+  &&
+  G(x)
+  &=\lim_{n\ra\infty}F(a_nx+b_n)^n
+  \\
+  &&
+  \log G(x) &=\lim_{n\ra\infty}n \log\big(F(a_nx+b_n)\big)
+  \\
+  &&
+  1 &=\lim_{n\ra\infty} \frac{-F(a_nx+b_n)}{1-F(a_nx+b_n)}
+  \\
+  &&
+  \frac{1}{-\log G(x)}
+  &=\lim_{n\ra\infty} \frac{1}{n\big(1-F(a_nx+b_n)\big)}
+  \\
+  &&
+  -\log G(x)
+  &=\lim_{n\ra\infty} n\big(1-F(a_nx+b_n)\big)
+  \\
+  &&
+  D(x)
+  &=
+  \limn
+  \frac{U(nx)-b_n}{a_n}
+\end{alignat*}
+Letting $(a(t),b(t)):=(a_{[t]},b_{[t]})$, we could also write the last
+two slightly more generally as
+\begin{alignat*}{3}
+  &&
+  -\log G(x)
+  &=\limt t\big(1-F(a(t)x+b(t))\big)
+  \\
+  &&
+  D(x)
+  &=
+  \limt
+  \frac{U(tx)-b(t)}{a(t)}
+\end{alignat*}
+\end{thm}
+
+\clearpage
+\subsection{Proof of EV Distribution Limit}
+
+Recall that we want to show that when a limiting distribution exist as
+in Expression~\ref{ev:key}, the CDF has funcitonal form, for some
+$(\gamma,\mu,\sigma)\in \R\times \R \times \R_+$, as follows:
+\begin{align*}
+  G(x)
+  &=
+  \exp\left(
+  -\left[1+\gamma \left(\frac{x-\mu}{\sigma}\right)\right]^{-1/\gamma}
+  \right)
+  \qquad\text{for $x\;$ s.t.}\quad
+  1+\gamma \left(\frac{x-\mu}{\sigma}\right)>0
+\end{align*}
+First a lemma we will need to prove the result, and then the proof
+itself. Advance warning: the proof is rather technical with little in
+the way of intuition.
+
+
+\begin{lem}
+Suppose $\{f_n\}$ is a sequence of nondecreasing functions and $g$ is
+also a nondecreasing function.
+Suppose that
+\begin{align*}
+  \limn f_n(x) = g(x)
+  \qquad
+  \text{$\forall x\in(a,b)$ s.t. $g$ cts at $x$}
+\end{align*}
+Then for left inverses $f^{-1}_n,g^{-1}$, we have
+\begin{align*}
+  \limn f^{-1}_n(y) = g^{-1}(y)
+  \qquad
+  \text{$\forall y\in(g(a),g(b))$ s.t. $g^{-1}$ cts at $y$}
+\end{align*}
+\end{lem}
+
+\begin{proof}
+First, some definitions (one old, several new).
+Supposing that $x=1$ is a continuity point\footnote{%
+  If not, use $U(tx_0)$ for any continuity point $x_0$.
+  It's much messier.
+}
+of $D(x)$ (whose definition is reproduced below), define\footnote{%
+  We will argue below that $A(y)$ and $H'(0)$ (hence $Q(t)$) are
+  well-defined.
+}
+\begin{alignat*}{3}
+  D(x)&:= \limt\frac{U(tx)-b(t)}{a(t)}
+  &
+  \qquad
+  \quad
+  E(x)
+  &:=
+  D(x)-D(1)
+  %D(x)-D(x_0)
+  %= \limt \frac{U(tx)-U(tx_0)}{a(t)}
+  = \limt \frac{U(tx)-U(t)}{a(t)}
+  \qquad
+  \\
+  A(y)
+  &:= \limt \frac{a(ty)}{a(t)}
+  \qquad
+  &
+  H(t)
+  &:= E(e^t)
+  \\
+  %t_0&:=\log x_0
+  &
+  \qquad
+  &
+  Q(t)&:=H(t)/H'(0)
+\end{alignat*}
+Notice $Q(t)$ is built from $H(t)$ is built from $E(x)$.
+%is built from $D(x)$ is built from $U(t)$.
+We will thus proceed in a sequence of steps, characterizing properties
+of $E(x)$, then $H(t)$, then $Q(t)$.
+From the properties of $Q(t)$, we then derive a differential equation
+that $Q(t)$ satisfies, whose solution will prove our result.
+\begin{itemize}
+  \item (Characterize $E(xy)$):
+    Below, we will want to compute the derivative $H'(t)$.
+    The usual definition $\lim_{s\ra0}(H(t+s)-H(t))/s$ involves the term
+    $H(t+s)=E(e^{t+s})=E(e^t e^s)$. Therefore, it will be useful to
+    characterize $E(xy)$ for any $x,y>0$. We will show that
+    \begin{align*}
+      E(xy)&=E(x)A(y)+E(y)
+    \end{align*}
+    Writing out in full, that statement is equivalent to showing that:
+    \begin{align*}
+      \limt
+      \frac{U(txy)-U(t)}{a(t)}
+      &=
+      \left(
+      \limt
+      \frac{U(tx)-U(t)}{a(t)}
+      \right)
+      \left(
+      \limt
+      \frac{a(ty)}{a(t)}
+      \right)
+      +
+      \limt
+      \frac{U(ty)-U(t)}{a(t)}
+    \end{align*}
+    We can show that by starting with the fraction on the LHS, then
+    breaking things up:
+    \begin{align*}
+      \frac{U(txy)-U(t)}{a(t)}
+      =
+      \frac{U(tyx)-U(ty)}{a(ty)}
+      \frac{a(ty)}{a(t)}
+      +
+      \frac{U(ty)-U(t)}{a(t)}
+    \end{align*}
+    Take limits on both sides and $t\ra\infty$, the result follows.
+
+  \clearpage
+  \item (Characterize $H(t)$):
+    First, it's value at zero is given by
+    \begin{alignat*}{3}
+      H(0)
+      &= E(e^{0})=E(1) &&= 0
+    \end{alignat*}
+    Next, we consider derivatives.
+    For any $t$ s.t. that $H'(t)$ exists (and there will be at least
+    one such $t$), the derivative is defined:
+    \begin{align*}
+      H'(t)
+      &=\lim_{s\ra 0} \frac{H(t+s)-H(t)}{s}
+    \end{align*}
+    Using our result about $E(xy)$ and the definition of function
+    $H(t)$, we can write $\forall t,s$:
+    \begin{align}
+      H(t+s)
+      = E(e^{t+s})
+      = E(e^{s}e^t)
+      &=
+      E(e^s)
+      A(e^t)
+      +
+      E(e^t)
+      \notag
+      \\
+      \text{Definition of $H(t)$}
+      \implies\qquad
+      H(t+s)
+      &=
+      H(s)A(e^t)+H(t)
+      \label{H(t+s)}
+      \\
+      \text{Since $H(0)=0$}\qquad
+      \implies\qquad
+      H(t+s)
+      &=
+      (H(s)-H(0))A(e^t)+H(t)
+    \end{align}
+    Let $t_*$ be such that derivative $H'(t_*)$ exists.
+    Then by the above expression for $H(t_*+s)$,
+    \begin{align*}
+      H'(t_*)
+      =
+      \lim_{s\ra 0}
+      \frac{H(t_*+s)-H(t_*)}{s}
+      &=
+      \lim_{s\ra 0}
+      \frac{H(s)-H(0)}{s}A(e^{t_*})
+      =
+      H'(0)A(e^{t_*})
+    \end{align*}
+    The final inequality followed because $H'(t_*)$ exists and
+    $A(e^{t_*})$ is well-defined (since $A(y)$ is
+    well-defined\footnote{%
+      By assumption here, though this could be proved.
+    }).
+    Thus the limit must exist, and that limit is the definition of
+    $H'(0)$, which is a number and is well-defined.
+
+    Now that last line established that $H'(t_*)=H'(0)A(e^{t_*})$ and
+    that $H'(0)$ is well-defined. But more generally, for \emph{any}
+    $t$ (not just $t_*$), the above derived identity lets us write:
+    \begin{align*}
+      \lim_{s\ra 0}
+      \frac{H(t+s)-H(t)}{s}
+      =
+      \lim_{s\ra 0}
+      \frac{H(s)-H(0)}{s}A(e^{t})
+      =
+      H'(0)A(e^{t})
+    \end{align*}
+    Since $H'(0),A(e^t)$ exist and are well-defined for any $t$,
+    the left-most limit exist and is well-defined \emph{for any $t$}.
+    But that leftmost limit is just the definition
+    of $H'(t)$. Therefore, $H'(t)$ exists and is well-defined for
+    \emph{any} $t$, i.e. $H$ is everywhere differentiable and
+    \begin{align}
+      H'(t)=H'(0)A(e^t)
+      \quad\implies\quad
+      A(e^t) = \frac{H'(t)}{H'(0)}
+      = Q'(t)
+      \label{HQ}
+    \end{align}
+    Summarizing, we thus have $H(0)=0$ and $H'(t)=H'(0)A(e^t)$.
+
+  \clearpage
+  \item
+    (Characterizing $Q(t)$):
+    First, values of $Q(t)$,
+    \begin{alignat*}{5}
+      Q(0) &= \frac{H(0)}{H'(0)} &&= \frac{0}{H'(0)} &&= 0
+      \\
+      Q'(0) &=
+      \frac{d}{dt}\left[\frac{H(t)}{H'(0)}\right]_{t=0}
+      &&=
+      \frac{H'(0)}{H'(0)} &&= 1
+    \end{alignat*}
+    Next, we want to derive the differential equation for $Q(t)$.  That
+    involves derivatives of $Q(t)$, which involve terms like
+    $Q(t+s)-Q(t)$ that we now compute, starting with
+    Expression~\ref{H(t+s)}:
+    \begin{align}
+      \text{Expression~\ref{H(t+s)}}\implies\quad
+      H(t+s)-H(t) &= H(s)A(e^t)
+      \notag
+      \\
+      \text{Dividing by $H'(0)$}\qquad\quad\;
+      \frac{H(t+s)-H(t)}{H'(0)} &= \frac{H(s)}{H'(0)}A(e^t)
+      \notag
+      \\
+      \text{Definition of $Q(t)$}\qquad\quad\;\;
+      Q(t+s)-Q(t)&= Q(s)A(e^t)
+      \notag
+      \\
+      \text{Expression~\ref{HQ}}\qquad\quad\;\;\,
+      Q(t+s)-Q(t)&= Q(s)Q'(t)
+      \label{sub1}
+    \end{align}
+    We could have also started with $H(t+s)-H(s)=H(t)A(e^s)$ (which
+    simply swaps $t,s$ values), which would have given
+    \begin{align}
+      Q(t+s)-Q(s)&= Q(t)Q'(s)
+      \label{sub2}
+    \end{align}
+    Combine Expressions~\ref{sub1} and~\ref{sub2} (eliminating
+    $Q(t+s)$), rearrange, and divide by $s>0$:
+    \begin{alignat*}{5}
+      %Q(s)+Q(t)Q'(s)&= Q(t)+Q(s)Q'(t)
+      %\\
+      %\text{Rearrange again, divide by $s$}\qquad\quad\;\;
+      &
+      \qquad
+      Q(t)\frac{Q'(s)-1}{s}
+      &&= \frac{Q(s)}{s}(Q'(t)-1)
+      \\
+      \text{ $Q'(0)=1$ and $Q(0)=0$}\qquad
+      &
+      Q(t)\frac{Q'(s)-Q'(0)}{s}
+      &&= \frac{Q(s)-Q(0)}{s}(Q'(t)-1)
+      \\
+      \text{$s\ra0$}\qquad
+      &
+      \qquad\quad\;\;
+      Q(t)Q''(0)
+      &&= Q'(0)(Q'(t)-1)
+      \\
+      \text{$Q'(0)=1$}\qquad
+      &
+      \qquad\quad\;\;
+      Q(t)Q''(0)
+      &&= Q'(t)-1
+      \\
+      \text{Differentiating}\qquad
+      &
+      \qquad\quad\;\;
+      Q'(t)Q''(0)
+      &&= Q''(t)
+      \\
+      \text{Rearrange}\qquad
+      &
+      \qquad\qquad\quad\;\;
+      Q''(0)
+      &&=
+      \frac{Q''(t)}{Q'(t)}
+    \end{alignat*}
+    Notice that we can rewrite this last expression as differential
+    equation:
+    \begin{align*}
+      (\log Q'(t))'=Q''(0)=:\gamma\in\R
+    \end{align*}
+    where $\gamma$ is just a constant representing the extreme value
+    parameter, \emph{defined} to equal the value
+    of the second derivative of $Q(t)$ at zero.
+    (Thus $Q'(0)=0$ and $Q''(0)=\gamma$.)
+    It's value depends upon the particular properties of our underlying
+    functions.
+
+  \item
+    (Solve Differential Equation):
+    Given the above diffeq, integrate from zero to $t$:
+    \begin{align*}
+      \int_0^t (\log Q'(s))'\;ds
+      &= \int_0^t \gamma \;ds
+      \\
+      \text{Using $Q'(0)=1$ so $\log Q'(0)=0$}
+      \qquad\qquad\qquad\qquad
+      Q'(t)
+      &= e^{\gamma t}
+      \\
+      \text{Integrate again}
+      \qquad\qquad\quad
+      \int_0^t Q'(s)\;ds
+      &= \int_0^t e^{\gamma s}\;ds
+      \\
+      \text{Using $Q(0)=0$}
+      \qquad\qquad\qquad\qquad
+      Q(t)
+      &= \frac{e^{\gamma t}-1}{\gamma}
+    \end{align*}
+    Unpack the definition of $Q(t)$ to rewrite this in terms of $H(t)$
+    and $D(x)$:
+    \begin{align*}
+      \frac{e^{\gamma t}-1}{\gamma}
+      = Q(t)
+      = \frac{H(t)}{H'(0)}
+      = \frac{E(e^t)}{H'(0)}
+      &= \frac{D(e^t)-D(1)}{H'(0)}
+      \\
+      \text{Letting $t=\log(x)$}\qquad
+      \frac{x^{\gamma}-1}{\gamma}
+      &= \frac{D(x)-D(1)}{H'(0)}
+      \\
+      D(x)
+      &=
+      D(1)+H'(0)\left(\frac{x^{\gamma}-1}{\gamma}\right)
+      \\
+      \implies\quad
+      D^{-1}(y)
+      &=
+      \left[
+      1+\gamma\left(\frac{y-D(1)}{H'(0)}\right)
+      \right]^{1/\gamma}
+    \end{align*}
+    Recall that $D(x)=G^{-1}(e^{-1/x})$.
+    Then $D^{-1}(y)=-1/\log(G(y))$.
+    Equating that with the expression for $D^{-1}(y)$ above,
+    \begin{align*}
+      -\frac{1}{\log G(y)}
+      &=
+      \left[
+      1+\gamma\left(\frac{y-D(1)}{H'(0)}\right)
+      \right]^{1/\gamma}
+      \\
+      \implies\quad
+      G(y)
+      &=
+      \exp\left(
+      -\left[
+      1+\gamma\left(\frac{y-D(1)}{H'(0)}\right)
+      \right]^{-1/\gamma}
+      \right)
+    \end{align*}
+    The constants $D(1)$ and $H'(0)$ are the scale and location
+    parameters.
+
+
+
+\end{itemize}
+
+
+\end{proof}
+
+
+
+\clearpage
+\subsection{Domains of Attraction}
+
+Necessary \& Sufficient Conditions on $F$ to Have Limit $G$
+
+
+\clearpage
+\subsection{$k$ Largest Order Statistics}
+
+Throughout this subsection, we suppose that there exist sequence of
+constants $\{a_n,b_n\}$ such that Expression~\ref{ev:key} holds for some
+CDF $G(x)$ in the EV family with parameters $(\gamma,\mu,\sigma)$, i.e.
+\begin{align}
+  G(x)
+  =\lim_{n\ra\infty}P\left[\frac{X_{(n)}-b_n}{a_n} \leq x\right]
+  \label{ev:key3}
+\end{align}
+Now, rather than just deriving the distribution of $X_{(n)}$ only, we
+here derive the joint and marginal distributions of the $k>1$
+largest order statistics $\big(X_{(n-k+1)},\ldots,X_{(n)})$, with $k$
+fixed for all $n$.
+Note that throughout, the normalizing constants $\{a_n,b_n\}$ and
+parameters $(\gamma,\mu,\sigma)$ are exactly \emph{the same} as those
+(explicit or implicit) in Expression~\ref{ev:key3}.
+
+\begin{thm}\emph{(Marginal Distributions of $k$ Largest Order Statistics)}
+The limiting distribution for the normalized $r$th order statistic where
+$r\in\{n-k+1,\ldots,n\}$ satisfies
+\begin{align*}
+  \limn
+  P\left[
+    \frac{X_{(r)}-b_n}{a_n}
+    \leq
+    x
+  \right]
+  = G_{r}(x)
+  &=
+  \exp\left(
+    -\tau(x)
+  \right)
+  \sum_{s=0}^{r-1}
+  \frac{\tau(x)^s}{s!}
+  \quad\text{where}\;
+  \tau(x)
+  =
+  \left[
+    1+\gamma\left(\frac{x-\mu}{\sigma}\right)
+  \right]^{-1/\gamma}
+\end{align*}
+for all $x$ such that
+$1+\gamma\left(\frac{x-\mu}{\sigma}\right)>0$.
+\end{thm}
+\begin{rmk}
+Note that this is the marginal CDF for the $r$th order statistic
+\emph{only}.
+The joint distribution of the $k$ largest is more complicated and
+cannot simply be constructed by multiplying the densities of the $k$
+largest order statistics (since those order statistics aren't
+independent). Hence the theorem below.
+\end{rmk}
+
+\begin{thm}\emph{(Joint Distribution of $k$ Largest Order Statistics)}
+The joint density of the normalized $k$ largest order statistics
+\begin{align*}
+  \begin{pmatrix}
+    \frac{X_{(n-k+1)}-b_n}{a_n}
+    & \cdots &
+    \frac{X_{(n)}-b_n}{a_n}
+  \end{pmatrix}
+\end{align*}
+is given by the following expression:
+\begin{align*}
+  f(x_{n-k+1},\ldots,x_n)
+  &=
+  \begin{cases}
+  \exp\left(
+    -
+    \left[
+      1+\gamma\left(\frac{x_{n-k+1}-\mu}{\sigma}\right)
+    \right]^{-1/\gamma}
+  \right)
+  \times
+  \prod_{r=1}^k
+  \frac{1}{\sigma}
+  \left[
+    1+\gamma\left(\frac{x_{r}-\mu}{\sigma}\right)
+  \right]^{-\frac{1}{\gamma}-1}
+  & \gamma\neq 0
+  \\
+  \exp\left(
+    -
+    e^{%
+      -\frac{x_{n-k+1}-\mu}{\sigma}
+    }
+  \right)
+  \times
+  \prod_{r=1}^k
+  \frac{1}{\sigma}
+  e^{
+    - \frac{x_{r}-\mu}{\sigma}
+  }
+  & \gamma= 0
+  \end{cases}
+\end{align*}
+for all $(x_{n-k+1},\ldots,x_n)$ s.t.\
+$x_{n-k+1}\leq \ldots\leq x_n$
+and s.t.\
+$1+\gamma\left(\frac{x_r-\mu}{\sigma}\right)>0$
+for all $r=1,\ldots,k$.
+\end{thm}
+\begin{rmk}
+Note that this is the CDF for the $r$th order statistic \emph{only}.
+The joint distribution of the $k$ largest is more complicated and
+cannot simply be constructed by multiplying the densities of the $k$
+largest order statistics (since those order statistics aren't
+independent). Hence the theorem below.
+\end{rmk}
+
+
+
+
+\clearpage
+\subsection{Examples}
+
+Normal
+
+
+\clearpage
+
+
+
+\clearpage
+
+\begin{comment}
+\clearpage
+\begin{lem}
+The following limit statements are equivalent
+\begin{align*}
+  \frac{1}{-\log G(x)}
+  &=\lim_{n\ra\infty} \frac{1}{n\big(1-F(a_nx+b_n)\big)}
+  \quad\iff\quad
+  D(x)
+  =
+  \limn
+  \frac{U(nx)-b_n}{a_n}
+\end{align*}
+\end{lem}
+\begin{proof}
+Write out the second limit statement using the defintion of $D(x)$ and
+$U(t)$:
+\begin{align*}
+  G^{-1}(e^{-1/x})
+  =
+  \limn
+  \frac{H^{-1}(nx)-b_n}{a_n}
+\end{align*}
+Compute the inverse functions of the LHS and RHS
+\begin{align*}
+  y = G^{-1}(e^{-1/x})
+  \quad&\implies\quad
+  x = \frac{1}{-\log G(y)}
+  \\
+  y= \frac{H^{-1}(nx)-b_n}{a_n}
+  \quad&\implies\quad
+  x
+  = \frac{1}{n}H(a_ny+b_n)
+  = \frac{1}{n(1-F(a_ny+b_n)}
+\end{align*}
+Therefore, by the Lemma
+\begin{align*}
+  D(x)
+  =
+  \limn
+  \frac{U(nx)-b_n}{a_n}
+  \quad\implies\quad
+  \frac{1}{-\log G(y)}
+  =
+  \limn
+  \frac{1}{n(1-F(a_ny+b_n)}
+\end{align*}
+which is the first limit statement.
+\end{proof}
+\end{comment}
+
+
 
 
 
@@ -2552,73 +4660,73 @@ coefficient estimate will be misleadingly high.
 
 
 
-\clearpage
-\subsection{How big is the Random Walk in GNP}
+%\clearpage
+%\subsection{How big is the Random Walk in GNP}
 
-Punchline: GNP does actually revert back to trend, but only over several
-years. So in the short run, GNP behaves like a unit root.
-So if you fit a model to the short run behavior, you will incorrectly
-infer long run persistence too that isn't actually there.
+%Punchline: GNP does actually revert back to trend, but only over several
+%years. So in the short run, GNP behaves like a unit root.
+%So if you fit a model to the short run behavior, you will incorrectly
+%infer long run persistence too that isn't actually there.
 
-Idea: ``Measure size of random walk component in GNP from the variance
-of its long differences.''
-Two competing models
-\begin{align*}
-  \text{Pure Random Walk:}&\quad
-  y_t
-  = bt + \sum_{j=0}^\infty a_j \varepsilon_{t-j}
-  \\
-  \text{Stationary about Trend:}&\quad
-  y_t
-  = \mu + y_{t-1} + \varepsilon_t
-\end{align*}
-Notice
-\begin{align*}
-  \text{Pure Random Walk}
-  \quad&\implies\quad
-  \Var(y_t-y_{t-k})
-  = k\sigma^2_\varepsilon
-  \\
-  \text{Stationary about Trend}
-  \quad&\implies\quad
-  \Var(y_t-y_{t-k})
-  = 2\sigma^2_y
-\end{align*}
-Can also form variance ratio
-\begin{align*}
-  R
-  &= \frac{\Var(y_t-y_{t-k})/k}{\Var(y_t-y_{t-1})}
-\end{align*}
+%Idea: ``Measure size of random walk component in GNP from the variance
+%of its long differences.''
+%Two competing models
+%\begin{align*}
+  %\text{Pure Random Walk:}&\quad
+  %y_t
+  %= bt + \sum_{j=0}^\infty a_j \varepsilon_{t-j}
+  %\\
+  %\text{Stationary about Trend:}&\quad
+  %y_t
+  %= \mu + y_{t-1} + \varepsilon_t
+%\end{align*}
+%Notice
+%\begin{align*}
+  %\text{Pure Random Walk}
+  %\quad&\implies\quad
+  %\Var(y_t-y_{t-k})
+  %= k\sigma^2_\varepsilon
+  %\\
+  %\text{Stationary about Trend}
+  %\quad&\implies\quad
+  %\Var(y_t-y_{t-k})
+  %= 2\sigma^2_y
+%\end{align*}
+%Can also form variance ratio
+%\begin{align*}
+  %R
+  %&= \frac{\Var(y_t-y_{t-k})/k}{\Var(y_t-y_{t-1})}
+%\end{align*}
 
 
-\clearpage
-\section{Great Mortgaging}
+%\clearpage
+%\section{Great Mortgaging}
 
-Introduce ``long-run annual-frequency dataset on disaggregated
-(mortgage vs. business) bank credit for 17 advanced economies since
-1870.''
-Growth in credit has mostly been rapid growth in mortgage lending, and
-that is robust across countries.
+%Introduce ``long-run annual-frequency dataset on disaggregated
+%(mortgage vs. business) bank credit for 17 advanced economies since
+%1870.''
+%Growth in credit has mostly been rapid growth in mortgage lending, and
+%that is robust across countries.
 
-Questions:
-- We see greater bank lending to households relative to businesses.
-  Does this happen in low-growth economies?
-- Maybe mortgage lending is high private return to the banks but low
-  social return because it's not investing in technology or productive
-  assets. Need a mechanism for this to happen in GE
-- Aiyagari with shocks to the borrowing limit that is below zero
-- Why was mortgage loan growth so strong \emph{then}? Has to be
-  securitization and demand for higher yielding assets.
-  But the run up is still slightly after Solomon brothers did their
-  thing.
-- Why is mortgage lending so different from nonmortgage business
-  lending? Is it the size of the balance sheet or the composition (i.e.
-  the simple fact that banks mostly do that now)?
-  We see a run up in bank loans to GDP. But really it's the composition
-  that has changed.
-- Look at banks/credit unions and lenders that differ in the amount that
-  they lend to households vs. to businesses. Are the ones that lend to
-  households more fragile?
+%Questions:
+%- We see greater bank lending to households relative to businesses.
+  %Does this happen in low-growth economies?
+%- Maybe mortgage lending is high private return to the banks but low
+  %social return because it's not investing in technology or productive
+  %assets. Need a mechanism for this to happen in GE
+%- Aiyagari with shocks to the borrowing limit that is below zero
+%- Why was mortgage loan growth so strong \emph{then}? Has to be
+  %securitization and demand for higher yielding assets.
+  %But the run up is still slightly after Solomon brothers did their
+  %thing.
+%- Why is mortgage lending so different from nonmortgage business
+  %lending? Is it the size of the balance sheet or the composition (i.e.
+  %the simple fact that banks mostly do that now)?
+  %We see a run up in bank loans to GDP. But really it's the composition
+  %that has changed.
+%- Look at banks/credit unions and lenders that differ in the amount that
+  %they lend to households vs. to businesses. Are the ones that lend to
+  %households more fragile?
 
 
 \clearpage
@@ -2824,6 +4932,596 @@ properties
     zero.
 \end{enumerate}
 \end{defn}
+
+
+\clearpage
+\section{HAC Corrections}
+
+\paragraph{Setup}
+Stationary $\{y_t\}$ with mean $\mu$ and LRV
+\begin{align*}
+  \omega^2
+  =
+  \limT \Var(\sqrt{T}\hat{\mu})
+  =
+  \sum_{j=-\infty}^\infty \gamma(j)
+\end{align*}
+\paragraph{Why we care}
+Want to construct tests and confidence intervals for $\mu$, which we can
+do via the CLT since
+\begin{align*}
+  \sqrt{T}(\hat{\mu}-\mu)
+  \dto \calN(0,\omega^2)
+\end{align*}
+\paragraph{Spectral}
+We have that
+\begin{align*}
+  \omega^2 = 2\pi f(0)
+  \qquad\text{where}\quad
+  f(\lambda)
+  =
+  \frac{1}{2\pi}
+  \sum_{j=-\infty}^\infty
+  \cos(j\lambda)\gamma(j)
+\end{align*}
+Also can define
+\begin{align*}
+  Z_\ell^{\cos}
+  =
+  \frac{\sqrt{2}}{\sqrt{T}}
+  \sumtT
+  \cos\big(2\pi\ell(t-1)/T\big)y_t
+  \quad\qquad
+  Z_\ell^{\sin}
+  =
+  \frac{\sqrt{2}}{\sqrt{T}}
+  \sumtT
+  \sin\big(2\pi\ell(t-1)/T\big)y_t
+\end{align*}
+We have $T$ random variables $\sqrt{T}\hat{\mu}$,
+$\{Z_\ell^{\cos}\}_{\ell=1}^{(T-1)/2}$, and
+$\{Z_\ell^{\sin}\}_{\ell=1}^{(T-1)/2}$
+such that all pairwise correlations go to zero and
+\begin{align*}
+  \E\big[(Z_\ell^{\cos})^2\big]
+  \ra
+  2\pi f(2\pi\ell/T)
+  \quad\qquad
+  \E\big[(Z_\ell^{\sin})^2\big]
+  \ra
+  2\pi f(2\pi\ell/T)
+\end{align*}
+From which we can define the periodogram
+\begin{align*}
+  p_\ell
+  =
+  \frac{1}{2}
+  \big(
+  (Z_\ell^{\cos})^2
+  +(Z_\ell^{\sin})^2
+  \big)
+  \quad\implies\quad
+  \E[p_\ell]
+  \ra
+  2\pi f(2\pi\ell/T)
+\end{align*}
+Can also define
+\begin{align*}
+  Y_\ell
+  =
+  \frac{\sqrt{2}}{\sqrt{T}}
+  \sum_{\ell=1}^T
+  \cos\big(\pi\ell(t-1/2)/T\big)y_t
+  \qquad
+  \ell=1,\ldots,T-1
+\end{align*}
+Note that
+\begin{align*}
+  \E[Y_\ell^2]
+  \pto 2\pi f(\pi\ell/T)
+\end{align*}
+
+
+\paragraph{Consistent Estimators of $\omega^2$}
+There are a few
+\begin{itemize}
+  \item \emph{Periodogram}:
+    Assume $f(\lambda)$ flat over frequencies $[0,2\pi n_T/T]$ for some
+    $n_T$ that depends upon sample size $T$ and satisfies $n_T\ra\infty$ and
+    $n_T/T\ra 0$.
+    Then estimate
+    \begin{align*}
+      \hat{\omega}_{p,n_T}^2=
+      \frac{1}{n_T}\sum_{\ell=1}^{n_T}p_\ell
+      %\quad\pto\quad\omega^2
+    \end{align*}
+
+  \item \emph{Kernel}:
+    For some kernel $k$ and $S_T$ such that $S_T\ra\infty$ and
+    $S_T/T\ra\infty$, define
+    \begin{align*}
+      \hat{\omega}^2_{k,S_T}
+      =
+      \sum_{j=-T+1}^{T-1}
+      k(j/S_T)\hat{\gamma}(j)
+      \approx
+      \sum_{\ell=1}^{(T-1)/2}
+      K_{T,\ell}p_\ell
+      \qquad\text{where}\quad
+      K_{T,\ell}
+      =
+      \frac{2}{T}
+      \sum_{j=-T+1}^{T-1}
+      \cos(2\pi j\ell/T)k(j/S_T)
+    \end{align*}
+    Note that $\sum_{\ell=1}^{(T-1)/2}K_{T,\ell}\ra 1$.
+
+  \item
+    Consistently estimate the parameters of an ARMA for the process,
+    plug in these estimates of the parameters into the analytical
+    formula for the spectrum of an ARMA at frequency zero.
+
+    One way to estimate those parameters is to construct construct
+    Whittle's approximate log-likelihood from the asymptotic normality
+    of the $p_\ell$ coordinates.
+\end{itemize}
+\paragraph{Inconsistent LRV Estimators}
+If we're doing testing, we care about the distribution of
+\begin{align*}
+  t=
+  \frac{\sqrt{T}(\hat{\mu}-\mu)}{\hat{\omega}}
+\end{align*}
+But in general, we can't ignore uncertainty about $\hat{\omega}$ (i.e.
+treate $\hat{\omega}\approx \omega$).
+Rather, $\hat{\omega}$ might not have a nondegenerate distribution.
+For example, if we construct $\hat{\omega}^2$ as the average of the
+first few periodogram ordinates, we need to use only a few periodogram
+coordinates to avoid bias in $\hat{\omega}$.
+But that means we can't quite invoke the CLT.
+
+Better to then think of $\hat{\omega}$ as a RV, in which case $t$ really
+does have a student's $t$ distribution with $2n$ degrees of freedom
+(where $n$ is the number of periodogram coordinates).
+
+Can also construct
+\begin{align*}
+  \hat{\omega}_{Y,q}^2
+  =
+  \frac{1}{q}
+  \sum_{\ell=1}^q Y_\ell^2
+\end{align*}
+
+
+\clearpage
+Outline
+\begin{enumerate}
+  \item
+    Put data into vector, treat data as a function on $\Z$ with
+    period $T$ (the number of observations).
+    Discrete Fourier transform to get the coefficients.
+
+  \item Define basis and Fourier frequencies from that basis.
+    Show that basis is in fact a basis.
+
+  \item Derive Fourier coefficients, which we get from the discrete
+    Fourier transform
+
+  \item Periodogram definition
+  \item Write data vector out in terms of the basis, then switch to sin
+    and cosine notation.
+    Get another orthonormal basis
+  \item Relate periodogram to sample autocvariance function
+  \item Linear interpolation of periodogram
+  \item Convergence of periodogram to population specture
+  \item
+\end{enumerate}
+
+\clearpage
+Two nonparametric estimators:
+\begin{itemize}
+  \item Kernel average of periodogram ordinates about zero, with
+    bandwidth term $\ra\infty$ so that as the sample size grows, you use
+    a smaller fraction of ordinates (but still infinitely many).
+  \item Weighted sum of sample autocovariances
+\end{itemize}
+Some facts about these two representations
+\begin{itemize}
+  \item They are \emph{exactly} equivalent if we match the kernel and
+    the weights appropriately.
+    And those weights will approximately sum to one.
+  \item More usefully, the weights are approximately related to the
+    Fourier transform of the kernel, called the spectral lag window.
+    Sometimes we start with the spectral lag window, and recover the
+    kernel.
+  \item Both estimators are nonnegative. This can be seen most easily in
+    the kernel way of writing things, and then that carries over
+    immediately to the autocovariance way of writing things
+\end{itemize}
+Therefore, we have three representations of the nonparametric estimator
+given kernel $K$
+\begin{align*}
+  \hat{\omega}^2
+  &=
+  b_T
+  \Delta
+  \sum_{\ell \in F_T}
+  K(b_T\lambda_\ell)
+  I_T(\lambda_\ell)
+  =
+  \sum_{k=-(T-1)}^{T-1}
+  w_T(k)
+  \hat{\gamma}(k)
+  \approx
+  \sum_{k=-(T-1)}^{T-1}
+  H(k/b_T)
+  \hat{\gamma}(k)
+\end{align*}
+where
+\begin{align*}
+  w_T(k)
+  =
+  b_T
+  \Delta
+  \sum_{\ell\in F_T}
+  K(b_T\lambda_\ell)
+  e^{-i\lambda_\ell k}
+  \quad\qquad
+  H(c) =
+  \int_{-\infty}^\infty
+  K(s)
+  e^{-ics}
+  \;ds
+\end{align*}
+Let $\Delta = 2\pi/T$ denote the spacing between Fourier frequencies so
+that $\lambda_\ell=\Delta \ell$.
+Then define estimator
+\begin{align*}
+  \hat{\omega}^2
+  &=
+  b_T
+  \Delta
+  \sum_{\ell \in F_T}
+  K(b_T\lambda_\ell)
+  I_T(\lambda_\ell)
+  \qquad\text{where $b_T$ s.t.}\quad
+  \begin{cases}
+    b_T \;\quad\ra\infty \\
+    b_T/T \ra0
+  \end{cases}
+\end{align*}
+Note that the weights sum to one approximately:
+\begin{align*}
+  b_T
+  \Delta
+  \sum_{\ell\in F_T}
+  K(b_T\lambda_\ell)
+  =
+  b_T\Delta
+  \sum_{\ell\in F_T}
+  K\left(
+    b_T\Delta
+    \ell
+  \right)
+  =
+  \frac{1}{u_T}
+  \sum_{\ell=[-(T-1)/2]}^{[T/2]}
+  K(\ell/u_T)
+  \quad
+  \ra
+  \quad
+  \int_{-\infty}^\infty K(s)
+  =1
+\end{align*}
+where $u_T=(b_T\Delta)^{-1}\ra\infty$ since
+$b_T\Delta = 2\pi b_T/T\ra 0$.
+
+To derive a formula for this estimator in terms of $\hat{\gamma}(k)$,
+use the definition of $I_T(\lambda_\ell)$:
+\begin{align*}
+  \hat{\omega}^2
+  &=
+  b_T
+  \Delta
+  \sum_{\ell\in F_T}
+  K(b_T\lambda_\ell)
+  \delta_\ell
+  \overline{\delta}_\ell
+  \\
+  &=
+  b_T
+  \Delta
+  \sum_{\ell\in F_T}
+  \left[
+  K(b_T\lambda_\ell)
+  \left(
+  \frac{1}{\sqrt{T}}
+  \sumtT y_te^{i\lambda_\ell t}
+  \right)
+  \left(
+  \frac{1}{\sqrt{T}}
+  \sumtT y_te^{-i\lambda_\ell t}
+  \right)
+  \right]
+  \\
+  &=
+  b_T
+  \Delta
+  \frac{1}{T}
+  \sum_{\ell\in F_T}
+  \left[
+    K(b_T\lambda_\ell)
+  \left(
+  \sumtT
+  \sum_{s=1}^T
+  y_ty_s
+  e^{-i\lambda_\ell t}
+  e^{i\lambda_\ell s}
+  \right)\right]
+\end{align*}
+Write out all the terms of the sums, grouping as follows:
+\begin{align*}
+  \hat{\omega}^2
+  &=
+  b_T
+  \Delta
+  \frac{1}{T}
+  \sum_{\ell\in F_T}
+  \bigg[
+    K(b_T\lambda_\ell)
+  \bigg(
+  \big[
+    y_1^2e^{-i\lambda_\ell 1}e^{i\lambda_\ell 1}
+    +
+    \cdots
+    +
+    y_T^2e^{-i\lambda_\ell T}e^{i\lambda_\ell T}
+  \big]
+  \\
+  &\quad\qquad\qquad\qquad\qquad\quad
+  +
+  \big[
+    y_2y_1
+    e^{-i\lambda_\ell 2}e^{i\lambda_\ell 1}
+    +
+    \cdots
+    +
+    y_{T}y_{T-1}
+    e^{-i\lambda_\ell T}e^{i\lambda_\ell (T-1)}
+  \big]
+  \\
+  &\quad\qquad\qquad\qquad\qquad\quad
+  +
+  \big[
+    y_1y_2
+    e^{-i\lambda_\ell 1}e^{i\lambda_\ell 2}
+    +
+    \cdots
+    +
+    y_{T-1}y_T
+    e^{-i\lambda_\ell (T-1)}e^{i\lambda_\ell T}
+  \big]
+  \\
+  &\quad\qquad\qquad\qquad\qquad\quad
+  +
+  \big[
+    y_3y_1
+    e^{-i\lambda_\ell 3}e^{i\lambda_\ell 1}
+    +
+    \cdots
+    +
+    y_{T}y_{T-2}
+    e^{-i\lambda_\ell T}e^{i\lambda_\ell (T-2)}
+  \big]
+  \\
+  &\quad\qquad\qquad\qquad\qquad\quad
+  +
+  \big[
+    y_1y_3
+    e^{-i\lambda_\ell 1}e^{i\lambda_\ell 3}
+    +
+    \cdots
+    +
+    y_{T-2}y_T
+    e^{-i\lambda_\ell (T-2)}e^{i\lambda_\ell T}
+  \big]
+  \\
+  &\quad\qquad\qquad\qquad\qquad\quad
+  \;\,\vdots
+  \\
+  &\quad\qquad\qquad\qquad\qquad\quad
+  +
+  \big[
+    y_Ty_1
+    e^{-i\lambda_\ell T}e^{i\lambda_\ell 1}
+  \big]
+  \\
+  &\quad\qquad\qquad\qquad\qquad\quad
+  +
+  \big[
+    y_1y_T
+    e^{-i\lambda_\ell 1}e^{i\lambda_\ell T}
+  \big]
+  \bigg)
+  \bigg]
+\end{align*}
+By writing things out this way, we see that we can regroup to write the
+estimator as:
+\begin{align*}
+  \hat{\omega}^2
+  &=
+  b_T
+  \Delta
+  \frac{1}{T}
+  \sum_{\ell\in F_T}
+  \bigg[
+    K(b_T\lambda_\ell)
+  \bigg(
+  \sum_{t=1}^T
+  y_t^2
+  +
+  \sum_{k=1}^{T-1}
+  \sum_{t=k+1}^T
+  \big[
+  y_ty_{t-k}
+  e^{-i\lambda_\ell k}
+  +
+  y_{t-k}y_{t}
+  e^{i\lambda_\ell k}
+  \big]
+  \bigg)
+  \bigg]
+  \\
+  &=
+  b_T
+  \Delta
+  \frac{1}{T}
+  \sum_{\ell\in F_T}
+  \bigg[
+    K(b_T\lambda_\ell)
+  \bigg(
+  \sum_{k=-(T-1)}^{T-1}
+  \sum_{t=k+1}^T
+  y_ty_{t-k}
+  e^{-i\lambda_\ell k}
+  \bigg)
+  \bigg]
+\end{align*}
+Reorder the sums in the above expression:
+\begin{align*}
+  \hat{\omega}^2
+  &=
+  b_T
+  \Delta
+  \sum_{k=-(T-1)}^{T-1}
+  \sum_{\ell\in F_T}
+  \left[
+    K(b_T\lambda_\ell)
+  e^{-i\lambda_\ell k}
+  \left(
+  \frac{1}{T}
+  \sum_{t=k+1}^T
+  y_ty_{t-k}
+  \right)
+  \right]
+\end{align*}
+Identify $\hat{\gamma}(k)$ as the term in parentheses and define
+$w_T(k)$ to get final expression
+\begin{align*}
+  \hat{\omega}^2
+  &=
+  \sum_{k=-(T-1)}^{T-1}
+  w_T(k)
+  \hat{\gamma}(k)
+  \qquad\text{where}\quad
+  w_T(k)
+  =
+  b_T
+  \Delta
+  \sum_{\ell\in F_T}
+  K(b_T\lambda_\ell)
+  e^{-i\lambda_\ell k}
+  %\sum_{\ell=[-(T-1)/2]}^{[T/2]}
+  %K(b_T\Delta \ell)
+  %e^{-i\Delta \ell k}
+\end{align*}
+To better understand the weight function, we examine the limiting
+behavior of $w_T(k)$.
+But to get a sensible limit, we can't just fix $k$ and take
+$T\ra\infty$.
+Instead, we must examine the limit of $w_T(k_T)$---that is, the limit of
+$w_T$ \emph{along a sequence} of lags $k_T$.
+To see how to choose that sequence, start by writing out the definition
+\begin{align*}
+  w_T(k_T)
+  &=
+  b_T
+  \Delta
+  \sum_{\ell\in F_T}
+  K(b_T\Delta \ell)
+  e^{-i\Delta \ell k_T}
+  =
+  b_T
+  \Delta
+  \sum_{\ell\in F_T}
+  K(b_T\Delta \ell)
+  e^{-i\ell b_T\Delta (k_T/b_T)}
+\end{align*}
+To get a sensible limit, it's clear that we must choose
+$k_T$ so that $k_T/b_T=c+o(1)$,
+for any constant $c$.
+Then
+\begin{align*}
+  w_T(k_T)
+  &=
+  b_T
+  \Delta
+  \sum_{\ell\in F_T}
+  K(b_T\Delta \ell)
+  e^{-ic\ell b_T\Delta}
+  +
+  o_p(1)
+  =
+  \frac{1}{u}
+  \sum_{\ell\in F_T}
+  K(\ell/u)
+  e^{-ic\ell/u}
+  +
+  o(1)
+\end{align*}
+where $u=(b_T\Delta)^{-1}\ra\infty$ since $b_T\Delta=2\pi b_T/T\ra 0$.
+Therefore
+\begin{align*}
+  w_T(k_T)
+  =
+  \frac{1}{u}
+  \sum_{\ell\in F_T}
+  K(\ell/u)
+  e^{-ic\ell/u}
+  +
+  o(1)
+  \quad\ra\quad
+  \int_{-\infty}^\infty
+  K(s)
+  e^{-ics}
+  \;ds
+  =: H(c) = H(k_T/b_T)
+\end{align*}
+Notice that $w_T(k_T)$ converges to $H(c)$ (the spectral lag window),
+which is the Fourier Transform of $K(s)$ (the kernel or spectral
+window).\footnote{%
+  The inverse transform is given by
+  $K(c)=\frac{1}{2\pi}\int_{-\infty}^\infty H(s)e^{-isc}\,ds$
+}
+
+So given $w_T(k_T)\ra H(k_T/b_T)$, we will approximate
+$w_T(k)\approx H(k/b_T)$; therefore,
+\begin{align*}
+  \hat{\omega}^2
+  &=
+  \sum_{k=-(T-1)}^{T-1}
+  w_T(k)
+  \hat{\gamma}(k)
+  \approx
+  \sum_{k=-(T-1)}^{T-1}
+  H(k/b_T)
+  \hat{\gamma}(k)
+\end{align*}
+With a kernel that integrats to unity, then $H(0)=1$.
+And with $k/b_T\ra 0$ for all fixed $k$, all sample autocovariances get
+weight one, so we just add up all sample covariances. Hence,
+$\hat{\omega}^2\ra\omega^2$.
+
+The Bartlett window is $H(x)=(1-|x|)\mathbf{1}\{|x|<1\}$, which gives
+the Newey-West estimator.
+
+
+
+
+
+
+
+
+
 
 
 

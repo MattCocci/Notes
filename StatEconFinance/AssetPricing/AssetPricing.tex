@@ -624,139 +624,6 @@ Alternatively, can also rewrite Equation~\ref{eq:contingentprice} using
 \end{align*}
 
 
-\clearpage
-\subsection{Continuous Time}
-
-Agent maximizes utility given endowment by buying/selling asset over
-time, which pays dividends continuously at rate $D_t$ per unit time and
-has price $p_t$ following a diffusion:\footnote{%
-  Price follows
-  $dp_t/p_t = \mu(\,\cdot\,)\; dt + \sigma(\,\cdot\,) \; dW_t$
-  where $\mu(\,\cdot\,)$ and $\sigma(\,\cdot\,)$ are functions that can
-  depend upon $t$, $p_t$, or other state variables, allowing
-  us to generate non-Gaussian dynamics (though $W_t$ normal).
-}
-\begin{align*}
-  \max \;
-  \E_t \int_{0}^\infty e^{-\rho s} u(c_{t+s})\; ds
-\end{align*}
-FOCs involving $\Lambda_t$, analogue of SDF $m_{t+1}$ that represents
-discounted level of MU:
-%\begin{align*}
-  %p_tu'(c_t)
-  %= \E_t
-  %\int_{0}^\infty e^{-\delta s} u'(c_{t+s})D_{t+s}\; ds
-%\end{align*}
-%Equivalently, we have
-\begin{align}
-  p_t\Lambda_t
-  =&\; \E_t
-  \int_{0}^\infty \Lambda_{t+s}D_{t+s}\; ds
-  \label{pemxcont1}
-  \\
-  \Lambda_t :=&\; e^{-\rho t} u'(c_t)
-\end{align}
-Difference Eq.~\ref{pemxcont1} between $t+\Delta$ and $t$, take cond.
-exp. $\E_t$ of both sides, send $\Delta\ra 0$, rearrange to get
-fundamental pricing eq.
-%\begin{align*}
-  %\E_t
-  %\left[
-  %\Lambda_{t+\Delta}p_{t+\Delta}
-  %-\Lambda_tp_t
-  %\right]
-  %\\
-  %&= \E_t\left[
-  %\int_{0}^\infty \Lambda_{t+\Delta+s}D_{t+\Delta+s}\; ds
-  %-
-  %\int_{0}^\infty \Lambda_{t+s}D_{t+s}\; ds
-  %\right]
-  %\\
-  %&=
-  %-\E_t
-  %\int_{0}^\Delta \Lambda_{t+s}D_{t+s}\; ds
-  %\\
-  %\implies\quad
-%\end{align*}
-%Sending $\Delta\ra 0$ and rearranging, we get
-%fundamental pricing equation
-\begin{align}
-  \boxed{%
-  0 = \Lambda_t D_t \;dt + \E_t[d(\Lambda_tp_t)]
-  }
-  \label{pemxcont2}
-\end{align}
-If $D_t=0$, martingale MU-weighted price.
-
-Use Ito's Lemma to break up $d(\Lambda_tp_t)$, obtain equivalent
-fundamental pricing eqn:
-\begin{align*}
-  \boxed{%
-  0 = \Lambda D \,dt
-  + \E_t[p \,d\Lambda + \Lambda \, dp + d\Lambda \,dp]
-  }
-  %\label{pemxcont3}
-\end{align*}
-If $\Lambda$ and $p$ never zero, divide through by $\Lambda p$:
-\begin{align}
-  \boxed{%
-  0 = \frac{D}{p} \,dt
-  + \E_t\left[
-    \frac{d\Lambda}{\Lambda} + \frac{dp}{p}
-    + \frac{d\Lambda}{\Lambda}\frac{dp}{p}
-    \right]
-  }
-  \label{pemxcont4}
-\end{align}
-Now \emph{returns}.
-Holding the asset at $t$ earns total \emph{net payoff} $dp_t + D_t dt$
-over the next instant. Hence total instantaneous \emph{net return} at
-$t$
-%(denoted $dR_t$\footnote{
-  %To see that $dR_t$ is the proper notation for a net return, consider a
-  %net return in discrete time, which equals
-  %$R_{t+1}-1= (p_{t+1}+D_{t+1})/p_t - p_t/p_t=R_{t+1}-R_t$.
-%})
-is given by that net payoff over price
-\begin{align}
-  %dR_t =
-  \frac{dp_t}{p_t}
-  + \frac{D_t}{p_t} dt
-  \label{returnscont}
-\end{align}
-The \emph{risk free asset} pays instantaneous net return
-%$dR_t=r^f_t dt$,
-$r^f_t dt$.\footnote{%
-  $r^f_t$ is the level of the risk free rate at $t$.
-  As in discrete time, even though $r^f_t\neq r^f_s$ in general, it is
-  ``risk free'' in sense that the net rate of return over the next
-  instant has no Brownian term and is simply $r^f_t\;dt$.
-}
-Equating with Eq.~\ref{returnscont}, we see two ways to model this
-asset: (i) Constant $p_t=1$ with $D_t=r_t^f$
-or (ii) $dp_t/p_t=r^f_t\;dt$ with $D_t=0$.
-Using either in Eq.~\ref{pemxcont4}, we can get the continuous time
-analog of Eq.~\ref{rf}:
-\begin{align}
-  r^f_t\;dt =
-  -\E_t\left[ \frac{d\Lambda_t}{\Lambda_t} \right]
-  \label{rfcts}
-\end{align}
-Now use Eq.~\ref{rfcts} to get the continuous time analog of the risk
-adjustment formula (\ref{riskadjret})
-\begin{align*}
-  \E_t\left[
-     \frac{dp_t}{p_t}
-  \right]
-  +
-  \frac{D_t}{p_t} dt
-  =
-  r^f_t\;dt
-  - \E_t\left[
-     \frac{d\Lambda_t}{\Lambda_t}\frac{dp_t}{p_t}
-    \right]
-  %\label{pemxcont5}
-\end{align*}
 
 
 \clearpage
@@ -2076,6 +1943,24 @@ Third from covariance between these two sources.
 
 \subsection{Portfolio Choice FOCs}
 
+There are essentially two FOCs that characterize the entire portfolio
+choice problem wherein the agent chooses an optimal portfolio and level
+of consumption:
+\begin{enumerate}
+  \item Returns, $\forall i$: $1=\E_t[M_{t+1}R_{t+1}^i]$
+  \item SDF:
+    An equation defining the SDF, which pins down consumption through
+    $1=\E_t[M_{t+1}R_{t+1}^w]$, where $R_{t+1}^w$ is the return on the
+    wealth portfolio.
+
+    The exact expression for the SDF depends on the functional form of
+    utility.
+    \begin{itemize}
+      \item CRRA:
+        $M_{t+1}=\beta\left(\frac{C_{t+1}}{C_t}\right)^{-\gamma}$
+      \item EZ:
+    \end{itemize}
+\end{enumerate}
 Takeing returns $R^n_{t+1}$ as given,
 the rep agent chooses portfolio weights $B_t^n$ to maximize recursive
 Epstein-Zin utility with EIS $\sigma$ and risk-aversion parameter
@@ -3947,57 +3832,9 @@ shot, rather than first running the time series regression, and then
 running the cross-sectional regression.
 
 
+\newpage
 \section{The Fundamental Theorem of Asset Pricing}
 
-\subsection{Introduction}
-
-Derivatives require special pricing techniques aside from the traditional
-discounted cash flow (DCF) approach, as DCF requires an estimate of the
-appropriate risk-adjusted rate of return.  However, the risk of a 
-derivative varies over time, which makes it difficult to estimate the
-derivative's risk-adjusted return.
-
-As a result, derivatives pricing turns to the no-arbitrage approach (NA),
-which eliminates the need to build risk into the model.  
-
-\subsection{Trading Strategy and Derivative Pricing Definitions}
-
-A \textbf{trading strategy} is a dynamically-rebalanced portfolio.
-\\
-\\
-A trading strategy is \textbf{self-financing} if it generates no 
-intermediate cash inflows and requires no intermediate outflows between
-the time the portfolio is initiated and the time it is liquidated.  This
-implies that
-   \begin{itemize}
-      \item[i.]{All dividends are reinvestd.}
-      \item[ii.]{Value of the assets sold at a rebalance time must 
-	 equal the value of the assets bought.}
-   \end{itemize}
-A trading strategy is \textbf{strictly positive} if the value of the 
-traded portfolio can never become zero or negative.
-\\
-\\ 
-Let $N$ be the value of a \emph{strictly positive}, \emph{self-financing}
-trading strategy.  Then $N$ is a \textbf{numeraire process} or, simply,
-a \textbf{numeraire}. Here are a few examples:
-\begin{itemize}
-   \item[-]{Price of Dividend paying asset: 
-	 NO, as there are intermediate 
-	 cash outflows, violating self-financing condition.}
-   \item[-]{The price of a forward contract: NO, as it can go negative,
-      violating the strictly positive condition.}
-   \item[-]{Price of a Foreign Currency: 
-      NO, as it is equivalent to a dividend
-      paying asset because you think of it as an investment in an
-      interest-bearing account.}
-   \item[-]{Price of a non-defaultable zero-coupon bond: YES.}
-   \item[-]{Value of a money market account earning the risk free rate,
-      where there are no interim deposits or withdrawals: YES.}
-\end{itemize}
-
-
-\newpage
 \subsection{Fundamental Theorem of Asset Pricing (No Dividends)}
 
 \subsubsection{Statement of Theorem}
@@ -4714,182 +4551,2390 @@ generalizing the BS and Black models to allow the volatility
 of the underlying asset to vary and be negatively correlated with price.
 
 
+
+
 \clearpage
-\section{Pricing Derivatives in Continuous Time}
+\section{Overview: Asset Pricing in Continuous Time}
 
-Deriviative pricing is a form of relative pricing that computes the
-prices of derivative assets based on the price of \emph{other} assets
-traded in the market. This is possible because the assumptions of
-perfect markets, complete markets, and no arbitrage imply that asset
-dynamics must be related in very specific ways so that portfolios
-offering the same payoffs have the same price. In other words, no
-arbitrage restricts the joint dynamics of asset prices, and those
-restrictions can be exploited in useful ways.
+In this and the next few sections, we want to
+\emph{characterize the evolution of} and then \emph{compute} asset
+prices.
+We must do the former before the latter because price \emph{today}
+depends upon price in the \emph{future} (since agents can resell
+long-lived assets).
+Hence we define the investment universe, characterize price
+dynamics/evolution, and then compute the level of prices.
 
-\begin{defn}(Environment: Risk-Free Asset, Underlying, Derivative)
-Consider an economy with perfect markets (no transaction costs, short
-sale constraints, perfectly divisible assets, etc.), and three assets:
-\begin{itemize}
-  \item \emph{Risk-Free}:
-    Any agent can borrow or lend arbitrary amounts at risk-free rate
-    $r_t$, which is possibly stochastic (changing over time).
+%\begin{defn}(Trading Strategy, Self-Financing, and Strictly Positive)
+%A \emph{trading strategy} is a dynamically-rebalanced portfolio.
+%The agent buys and sells assets over time to adjust the portfolio---in
+%theory, trading can occur at each instant.
 
-  \item \emph{Underlying}:
-    There exists some underlying object that is the basis for some
-    derivative and evolves according to diffusion
-    \begin{align}
-      dS_t = \mu_t\;dt + \sigma_t\;dZ_t
-      \label{underlying}
-    \end{align}
-    This could be some non-traded state variable like inflation,
-    or the price of some traded asset that also pays dividends
-    $D_t^S\;dt$ over the next instant.\footnote{%
-      The dividend rate $D_t^S$ can change over time.
-      All formulas will be the same.
-    }
-    Note that the drift and diffusion coefficients $\mu_t,\sigma_t$
-    are indexed by time since they could generally depend upon
-    \emph{lots} of things: $t$ directly, the level of $S_t$, other state
-    variables. But for simplicity, I only subscript by $t$, sweeping all
-    of these other possibilities into the $t$ subscript.
+%A trading strategy is \emph{self-financing} if it generates no
+%intermediate cash inflows and requires no intermediate outflows between
+%the time the portfolio is initiated and the time it is liquidated.
+%This requires that any and all dividends are reinvested, and purchases
+%of assets (at rebalancing time) are financed entirely by sales of other
+%asset for a net-zero change in wealth/money invested (i.e. no money in
+%or out, until liquidation).
 
-  \item \emph{Derivative}:
-    There is a derivative asset with price $f_t$, terminal payoff
-    $\Phi(S_T)$, dividend payments at rate $D_t^f$ (perhaps related to
-    $S_t$ and $D_t^S$, perhaps not), and evolution
-    \begin{align}
-      %\frac{df_{t}}{f_{t}}
-      %&=
-      %\tilde{\mu}_t
-      %\; dt
-      %+
-      %\tilde{\sigma}_t
-      %\;dZ_t
-      df_{t}
-      &=
-      \tilde{\mu}_t
-      \; dt
-      +
-      \tilde{\sigma}_t
-      \;d\tilde{Z}_t
-      \label{dfi}
-    \end{align}
-    for some drift \& diffusion terms $\tilde{\mu}_t,\tilde{\sigma}_t$
-    that could depend on $t,f_t,S_t,$ other state variables.
-    Again, for simplicitly, I sweep all of these possibilities into the
-    $t$ subscript.
-    Note also that the Brownian motion term is not a priori the same as
-    that driving $S_t$ in Expression~\ref{underlying}.
-    It could differ. However, below we will assume complete markets,
-    which will imply that $\tilde{Z}_t=Z_t$, i.e. the source of risk
-    driving the price of the derivative is the same as that driving the
-    underlying. But that only follows \emph{after} imposing complete
-    markets.
+%A trading strategy is \emph{strictly positive} if the value of the
+%traded portfolio can never become zero or negative.
+%\end{defn}
 
-\end{itemize}
-Now for two key restrictions that we'll impose on this economy, which
-will allow us to price assets: complete markets and no arbitrage.
-\end{defn}
-
-
-\begin{prop}
-\emph{(No Arbitrage: Restriction on Riskless Portfolio Returns)}
-\label{prop:keypricing}
-In perfect markets with no arbitrage, any riskless portfolio with price
-$\Pi_t$ paying dividends $D_t^\Pi\,dt$ satisfies
-\begin{align}
-  \frac{d\Pi_t+ D_t^\Pi\;dt}{\Pi_t}
-  &=
-  r_t\;dt
-  \label{noarb}
-\end{align}
-The LHS is the total return: capital gains plus dividends.
-This holds instant-by-instant. So if portfolio is riskless for all
-$t\in[0,T]$, then Expression~\ref{noarb} holds for all $t\in[0,T]$.
-\end{prop}
-%\begin{rmk}
-%This suggests a method for pricing by no arbitrage:
-%Synthesize a \emph{riskless} portfolio by combining any two assets, and
-%price either asset in terms of the other.
-%\end{rmk}
-\begin{proof}
-Any violation of Expression~\ref{noarb} implies an arbitrage
-opportunity.
-\end{proof}
-
-\begin{prop}
-\label{prop:complete}
-\emph{(Complete Markets: Restriction on Dynamics)}
-In complete markets with no-arbitrage, the price of any derivative whose
-payoff/value depends only upon $S_t$ can be written as
-\begin{align}
-  f_t=f(S_t,t)
-  \label{pricingfcn}
-\end{align}
-In words, price is a function of only the underlying $S_t$ and time
-$t$.  Then by Ito's Lemma,
-\begin{align}
-  df_t
+\paragraph{Investment Universe}
+An agent can buy and sell assets dynamically over time in perfect
+markets (no frictions).
+Specifically, we consider an investment universe with $I$ assets that
+have returns $dr_t^i=dp_t^i/p_t^i$ $i=1,\ldots,I$
+all stacked into vector $r_t$, along with risk-free bond returning
+$dr_t^0$.
+We assume these rates of return follow Ito Processes,\footnote{%
+  The beauty of continuous time is that this assumption is WLOG if
+  prices evolve smoothly, and so we need only characterize the drift and
+  diffusion terms. The Ito assumption is only restrictive if prices
+  jump. And while they do in the data, we don't consider that here.
+}
+\begin{align*}
+  dr_t^0 &= r^f_t \;dt \\
+  \frac{dp_t}{p_t}
   =
-    \left[
-      \frac{\partial f}{\partial t}
-      +
-      \frac{\partial f}{\partial S}
-      \mu_t
-      +
-      \frac{1}{2}
-      \frac{\partial^2 f}{\partial S^2}
-      \sigma_t^2
-    \right]
+  \underset{(I\times 1)}{dr_t\vphantom{\mu(x_t)}}
+  &=
+  \underset{(I\times 1)}{\mu_t}
+  \;dt
+  +
+  \underset{(I\times N)}{\sigma_t\vphantom{\mu(x_t)}}
+  \underset{(N\times 1)}{dZ_t\vphantom{\mu(x_t)}}
+  \;\quad\qquad\text{where}\quad
+  \;\Sigma_t\;dt
+  :=
+  \sigma_t
+  dZ_t
+  dZ_t'
+  \sigma_t'
+\end{align*}
+Note that rather than make the drift and diffusion coefficients
+functions with arguments, we just subscript by $t$---which will proxy
+for dependence upon upon calendar time $t$, level of the return vector
+$r_t$, or some general state vector $x_t$ evolving according to its own
+diffusion
+\begin{align}
+  \underset{(S\times 1)}{dx_t\vphantom{\mu(x_t)}}
+  &=
+  \underset{(S\times 1)}{\mu^x_t}
+  \;dt
+  +
+  \underset{(S\times M)}{\sigma^x_t}
+  \underset{(M\times 1)}{dZ_t^x\vphantom{\mu(x_t)}}
+  \qquad\text{where}\quad
+  \Sigma^x_t\;dt
+  :=
+  \sigma^x_t
+  dZ_t^x
+  {dZ_t^x}'
+  {\sigma^x_t}'
+  \label{dx}
+\end{align}
+Again, subscript by $t$ to proxy for any dependence upon $t,r_t,x_t$.
+%Without loss of generality, $\E[dZ_{ti}\,dZ_{tj}^x]=0$ for all $i,j$.
+%(all of which we supress as arguments and just sweep into the $t$
+%subscript)
+%Note also that drift and diffusion coefficients are time homogeneous
+%without loss of generality since for any vector of state variables $x$,
+%we can always let $\tilde{x}=(y,\tau)$ where $\tau$ is another state
+%satisfying $d\tau=dt$. Then we'd have time non-homogeneity.
+
+
+\paragraph{Characterizing Equilibrium Price Dynamics}
+By the assumption that all returns follow an Ito process, we need only
+characterize ($\mu_t, \sigma_t, r_t^f$) to fully characterize price
+dynamics.
+And as we'll see, equilibrium implies tight and specific
+\emph{restrictions} on those objects, forcing them to be related in a
+specific way. On top of that, equilibrium implies existence of a
+stochastic discount factor $\xi_t$.
+
+The equilibrium restrictions and the SDF can be summarized in the
+following two SDEs. The first is just a rewrite of the the evolution of
+$dp_t/p_t$ in a useful way that recognizes/imposes equilibrium
+restriction $\mu_t=r_t^f\mathbf{1}+\sigma_t\pi_t'$.
+The second is the law of motion for the SDF.
+\begin{align}
+  \frac{dp_t}{p_t}
+  =
+  dr_t
+  &=
+  \underbrace{%
+    (r_t^f\mathbf{1}+\sigma_t\pi_t')
+  }_{=\mu_t}
+  \;dt
+  +
+  \sigma_t
+  dZ_t
+  \label{ctskey1}
+  \\
+  -
+  \frac{d\xi_t}{\xi_t}
+  &=
+  r_t^f\;dt + \pi_t \;dZ_t
+  \label{ctskey2}
+\end{align}
+$\pi_t$ is called the \emph{price of risk} (which we discuss further
+below).
+These two equations then serve as the entire basis for \emph{computing}
+asset prices in continuous time.
+
+\clearpage
+Note that we can derive the above characterization of equilibrium price
+dynamics from three diferent starting points:
+\begin{itemize}
+  \item Ad-Hoc Generalization of Discrete-Time Pricing Formula
+  \item Consumption-Savings Problem with Optimal Portfolio Choice
+    (which implies no arb)
+  \item No-Arbitrage alone (leaving out the consumption-savings
+    portfolio problem flourishes)
+\end{itemize}
+But regardless of starting point, we end up at the same location:
+Equations~\ref{ctskey1} and~\ref{ctskey2}.
+
+\paragraph{Computing Prices}
+Two broad (but distinct) approaches to using Equations~\ref{ctskey1}
+and~\ref{ctskey2}:
+\begin{itemize}
+  \item \emph{Absolute Pricing}:
+    This approach allows us to price \emph{all} assets by deriving or
+    specifying a process for $\pi_t$, which is related to marginal
+    utility at the equilibrium (i.e. optimal, feasible) consumption
+    level, which in turn depends upon investment opportunties.
+
+    This approach is most relevant for economists who have a model for
+    marginal utility (or equivalently, $\pi_t$), but not so relevant
+    practitioners.
+
+  \item \emph{Relative pricing}:
+    This approach allows us to price only \emph{redundant} assets
+    given prices already observable in the market.
+    This approach doesn't require specifying or deriving a process
+    process for $\pi_t$.
+    It just recognizes that there exists \emph{some} $\pi_t$ (generally
+    unknown to us) and a corresponding restriction on asset price
+    dynamics, and then exploits the equilibrium conditions that
+    follow from mere existence of $\pi_t$ and those restrictions to
+    arrive at prices for redundant assets.
+
+    This approach is useful for practitioners who want to price
+    derivatives \emph{given} observable stock prices, but not so much
+    for the economist who cares about $\pi_t$ and the price of stocks in
+    the first place.
+\end{itemize}
+Under these two pricing umbrellas, there are again two approaches.
+They will give the same price, but are quite distinct approaches
+both in theory and practice/implementation.
+\begin{itemize}
+  \item Martingale (or Monte Carlo) Approach:
+    Corresponding to any other asset in the market (called the
+    \emph{numeraire}) with price $n_t$,
+    there exists a probability measure $P^n$ and associated
+    expectation $\E_t^n$ such that $p_t/n_t$ is a martingale, i.e.
+    $p_t/n_t = \E_t^n[p_T/n_T]$.
+    If we know $n_t$ and can draw $(p_T,n_T)$ under measure $P^n$
+    (in many cases we can), then we can compute the expectation via
+    Monte Carlo and deduce $p_t$.
+
+  \item PDE Approach:
+    Given two derivatives (redundant assets) on the same underlying
+    asset, this approach buys and sells the redundant assets in just
+    the right quantities so that the portfolio is risk-free.
+    By no arbitrage, that riskless portfolio must earn the riskless
+    rate, which (together with Ito's Lemma) implies a PDE that the
+    derivatives' SDEs must satisfy to preclude arbitrage.
+    That PDE can be solved to a pricing function for the derivatives.
+\end{itemize}
+
+
+
+\clearpage
+\section{Characterizing Equilibrium Price Dynamics}
+
+This subsection details three different approaches for deriving the two
+key equations for continuous time asset pricing, reproduced here:
+\begin{align*}
+  \frac{dp_t}{p_t}
+  =
+  dr_t
+  &=
+  \underbrace{%
+    (r_t^f\mathbf{1}+\sigma_t\pi_t')
+  }_{=\mu_t}
+  \;dt
+  +
+  \sigma_t
+  dZ_t
+  \\
+  -
+  \frac{d\xi_t}{\xi_t}
+  &=
+  r_t^f\;dt + \pi_t \;dZ_t
+\end{align*}
+The three approaches or starting points for getting to these SDEs are as
+follows.
+\begin{enumerate}
+  \item
+    \emph{Ad-Hoc Generalization of Discrete-Time Pricing Formula}:
+    Starting only from the fundamental \emph{discrete time} asset
+    pricing condition, the ad-hoc martingale approach gives a quick and
+    direct characterization of the continuous time SDF and fundamental
+    asset pricing condition.
+    This approach dispenses with the full-blown consumption-savings
+    problem of the next approach.
+
+  \item
+    \emph{Consumption-Savings Problem with Optimal Portfolio Choice}:
+    We pursue both the Hamiltonian and HJB formulations of the
+    continuous time consumption-savings problem.
+
+    The Hamiltonian formulation quite directly yields an SDF and the
+    fundamental pricing condition.
+    It is, however, less useful and direct for ultimately computing the
+    optimal consumption and portfolio choice. The strength of this
+    approach lies in its quick and direct characterization of
+    the SDF and the drift of $dr_t$, not real quantities like
+    $c_t,\omega_t$.
+    That's easier in the HJB formulation.
+
+    The HJB formulation can be solved directly to yield optimal
+    consumption and portfolio choice, which is an advantage over the
+    Hamiltonian approach.
+    Given those optimal real quantities, the HJB formulation can then be
+    massaged to reproduce the same SDF and pricing condition as in the
+    Hamiltonian approach.
+    We will show this.
+
+  \item \emph{No Arbitrage}:
+\end{enumerate}
+
+\clearpage
+\subsection{Ad-Hoc Generalization of Discrete-Time Pricing Formula}
+\label{subsec:adhoc}
+
+\paragraph{Martingale Pricing Condition}
+Let $p_t$ be the cum-dividend price vector for any asset, i.e.
+price assuming reinvestment of all dividends.
+Recall then rearrange the discrete time pricing equation between time
+periods $t\leq T$,
+\begin{align}
+  p_t
+  =
+  \E_t\left[
+    e^{-\rho(T-t)}
+    \frac{u'(c_{T})}{u'(c_t)}
+    p_{T}
+  \right]
+  \qquad\iff\qquad
+  \underbrace{e^{-\rho t}u'(c_t) }_{\xi_t}
+  p_t
+  =
+  \E_t[
+    \underbrace{e^{-\rho T}u'(c_T) }_{\xi_T}
+    p_{T}
+  ]
+  \label{pximart}
+\end{align}
+Since $T\geq t$ was arbitrary, the latter expression says that the price
+of \emph{any} asset discounted by marginal utility is a
+\emph{martingale}.
+
+\paragraph{SDF and Fundamental Pricing Condition}
+With $\xi_t:=e^{-\rho t}u'(c_t)$, suppose $\xi_t$ (like returns) follows
+GBM for some as-yet-unspecified drift and diffusion
+$(\mu_t^\xi,\pi_t)$, i.e.
+\begin{align*}
+  -\frac{d\xi_t}{\xi_t}
+  &=
+  \mu_t^\xi
+  \;dt
+  +
+  \pi_t
+  \;dZ_t
+\end{align*}
+We now determine the equilibrium restriction on coefficients
+$(\mu_t^\xi,\pi_t)$ so that price discounted by marginal utility
+$\xi_tp_t$ is in fact a martingale for \emph{any} asset/price $p_t$, as
+implied by Line~\ref{pximart}.
+
+First, start with the vector of risky asset returns, which follow
+\begin{align*}
+  dr_t
+  =
+  \frac{dp_t}{p_t}
+  =
+  \mu_t
+  \;dt
+  +
+  \sigma_t
+  \;dZ_t
+\end{align*}
+By Ito's Lemma, dynamics for $\xi_tp_t$ are given by
+\begin{align*}
+  \frac{d(\xi_tp_t)}{\xi_tp_t}
+  &=
+  \big[
+    -\mu_t^\xi\mathbf{1}+\mu_t-\sigma_t\pi_t'
+  \big]
   dt
   +
-    \left[
-    \frac{\partial f}{\partial S}
-    \sigma_t
-    \right]
+  (-\pi_t+\sigma_t)
   \;dZ_t
-  \label{evoderiv}
-\end{align}
-To match Expression~\ref{dfi}, this then restricts the values of
-$\tilde{\mu}_t,\tilde{\sigma}_t,\tilde{Z}_t$, implying that they equal
-\begin{align*}
-  \tilde{\mu}_t
-  &=
-  \frac{\partial f}{\partial t}
-  +
-  \frac{\partial f}{\partial S}
-  \mu_t
-  +
-  \frac{1}{2}
-  \frac{\partial^2 f}{\partial S^2}
-  \sigma_t^2
-  \qquad
-  \quad
-  \tilde{\sigma}_t
-  =
-  \frac{\partial f}{\partial S}
-  \sigma_t
-  \qquad
-  \quad
-  d\tilde{Z}_t
-  =
-  dZ_t
 \end{align*}
-\end{prop}
+For $\xi_tp_t$ to be a martingale, the drift must equal zero, i.e.
+\begin{align}
+  -\mu_t^\xi\mathbf{1}+\mu_t-\sigma_t\pi_t'
+  = 0
+  \qquad\iff\qquad
+  \mu_t
+  =
+  \mu_t^\xi\mathbf{1}
+  +\sigma_t\pi_t'
+  \label{pinmuxi}
+\end{align}
+Finally, to pin down $\mu_t^\xi$, note that the above martingale pricing
+relationship must \emph{also} hold for the riskless asset,
+which is exactly like the risky case, but with
+$(\mu_t,\sigma_t)=(r_t^f,0)$.
+So then from Expression~\ref{pinmuxi}, we must have $\mu_t^\xi=r_t^f$.
+
+Thus we have SDF and pricing relationship
+\begin{align*}
+  \boxed{%
+  -
+  \frac{d\xi_t}{\xi_t}
+  =
+  r_t^f\;dt + \pi_t\;dZ_t
+  \quad
+  \qquad
+  \mu_t
+  =
+  r_t^f\mathbf{1}
+  +\sigma_t\pi_t'
+  }
+\end{align*}
+As of yet, the process for $\pi_t$ is unspecified. But that's fine for
+now. We just wanted these two equations anyway.
+And as mentioned, in the relative pricing paradigm, we don't really
+\emph{need} to find/characterize $\pi_t$.
+
+
+
+\clearpage
+\subsection{Consumptions-Savings Problem with Optimal Portfolio Choice}
+
+This alternative approach to deriving the two key equations solves an
+agent's consumption-savings problem with optimal portfolio choice.
+
+
+\subsubsection{Setup}
+
+The investment univrse is the same as before.
+Therefore, we need only specify how wealth evolves and the portfolio
+problem for the agent.
+
+
+\begin{defn}(Portfolio Allocation and Wealth Process)
+Suppose an agent has wealth $w_t$.
+A \emph{portfolio allocation} at time $t$ is a set of weights
+$\{\omega_{it}\}_{i=0}^I$ such that $\omega_{it}$ fraction of wealth is
+invested in asset $i$ at time $t$. The weights must sum to one.
+Alternatively, the allocation can be summarized by $I$-dimensional
+vector $\omega_t=(\omega_{1t},\ldots,\omega_{It})$ for the risky assets,
+with $1-\sum_{i=1}^I \omega_{it}$ capturing the amount invested in the
+riskless asset.
+
+If the agent consumes at rate $c_t$, then the wealth process evolves
+according to
+\begin{align*}
+  dw_t
+  &
+  =
+  -c_t\;dt
+  +
+  \left[
+  \sum_{i=0}^n
+  \omega_{it}
+  \,dr_t^i
+  \right]
+  w_t
+  =
+  -c_t\;dt
+  +
+  \left[
+  dr_t^0
+  +
+  \omega_{t}'
+  \left(
+  dr_t
+  -
+  dr_t^0
+  \mathbf{1}
+  \right)
+  \right]
+  w_t
+\end{align*}
+%where $\mathbf{1}$ is the length-$I$ ones vector.
+%In square brackets is the average net rate of return, which multiplies
+%wealth $w_t$ to give the net return flow. Subtracting consumption
+%spending gives the change in wealth.
+Substituting in the underlying SDEs for $dr_t^0$ and $dr_t$ (from above)
+and regrouping,
+\begin{align}
+  \frac{dw_t}{w_t}
+  %&=
+  %-c_t\;dt
+  %+
+  %\left[
+  %r_f\;dt
+  %+
+  %\omega_{t}'
+  %\left(
+  %\mu\;dt + \sigma\;dZ_t
+  %-
+  %r_f
+  %\mathbf{1}
+  %\;dt
+  %\right)
+  %\right]
+  %w_t
+  %\\
+  %&=
+  %\big[
+  %\big(r_f(x_t)w_t -c_t\big)
+  %+
+  %\omega_{t}'
+  %\big(\mu(x_t) - r_f(x_t)\mathbf{1}\big)w_t
+  %\big]
+  %dt
+  %+
+  %w_t
+  %\omega_{t}'
+  %\sigma(x_t)
+  %\;dZ_t
+  &=
+  \left[
+  \left(r^f_t -\frac{c_t}{w_t}\right)
+  +
+  \omega_{t}'
+  \big(\mu_t - r^f_t\mathbf{1}\big)
+  \right]
+  dt
+  +
+  \omega_{t}'
+  \sigma_t
+  \;dZ_t
+  \label{dw/w}
+\end{align}
+%This will be used in the formulation of the portfolio problem.
+%Rewrite by first popping off the first term of the sum and use the
+%identity $1=\suminz \omega_{it}$ to rewrite $\omega_{0t}$ as $1-\sumin
+%\omega_{it}$:
+%\begin{align*}
+  %dw_t
+  %&=
+  %-c_t\;dt
+  %+
+  %\left[
+  %\left(
+  %1-\sumin \omega_{it}
+  %\right)
+  %dr_t^0
+  %+
+  %\sumin
+  %\omega_{it}
+  %dr_t^i
+  %\right]
+  %w_t
+  %\\
+  %&=
+  %-c_t\;dt
+  %+
+  %\left[
+  %dr_t^0
+  %+
+  %\sumin
+  %\omega_{it}
+  %\left(
+  %dr_t^i
+  %-dr_t^0
+  %\right)
+  %\right]
+  %w_t
+%\end{align*}
+
+%Note that what matters for the portfolio allocation problem is the joint
+%evolution of wealth $w_t$ and the state vector $y_t$. So define
+%$y_t=(w_t,x_t)$ and write
+%\begin{align*}
+  %\underbrace{%
+    %\begin{pmatrix}
+    %dw_t \\
+    %dx_t
+    %\end{pmatrix}
+  %}_{dy_t}
+  %=
+  %\underbrace{%
+    %\begin{pmatrix}
+    %\big(r_f(x_t)w_t -c_t\big)
+    %+
+    %\omega_{t}'
+    %\big(\mu(x_t) - r_f(x_t)\mathbf{1}\big)w_t
+    %\\
+    %\mu_x(x_t)
+    %\end{pmatrix}
+  %}_{\mu_y(y_t)}
+  %dt
+  %+
+  %\;
+  %\underbrace{%
+    %\begin{pmatrix}
+      %w_t
+      %\omega_{t}'
+      %\sigma(x_t)
+      %& 0
+      %\\
+      %0 & \sigma_x(x_t)
+    %\end{pmatrix}
+  %}_{\sigma_y(y_t)}
+  %\underbrace{%
+    %\begin{pmatrix}
+      %dZ_t
+      %\\
+      %dZ_t^x
+    %\end{pmatrix}
+  %}_{dZ_t^y}
+%\end{align*}
+%Then define
+%\begin{align*}
+  %\Sigma_y(y_t)
+  %&=
+  %\sigma_y(y_t)dZ_t^y
+  %{dZ_t^y}'\sigma_y(y_t)'
+  %=
+  %\begin{pmatrix}
+    %\Sigma(y_t) & \Sigma_{\cdot x}(y_t) \\
+    %\Sigma_{x\cdot}(y_t) & \Sigma_{x}(y_t)
+  %\end{pmatrix}
+  %%\\
+  %%&=
+  %%\begin{pmatrix}
+    %%w_t
+    %%\omega_{t}'
+    %%\sigma(x_t)
+    %%& 0
+    %%\\
+    %%0 & \sigma_x(x_t)
+  %%\end{pmatrix}
+  %%\begin{pmatrix}
+    %%dZ_t
+    %%\\
+    %%dZ_t^x
+  %%\end{pmatrix}
+  %%\begin{pmatrix}
+    %%dZ_t'
+    %%&
+    %%{dZ_t^x}'
+  %%\end{pmatrix}
+  %%\begin{pmatrix}
+    %%w_t
+    %%\sigma(x_t)'
+    %%\omega_{t}
+    %%& 0
+    %%\\
+    %%0 & \sigma_x(x_t)'
+  %%\end{pmatrix}
+%\end{align*}
+\end{defn}
+
+\begin{defn}(Portfolio Allocation Problem)
+\label{portfolioproblem}
+The agent's portfolio allocation problem is to maximize expected
+discounted lifetime utility, subject to wealth evolution SDE~\ref{dw/w}
+and (if there is a relevant state vector for returns) SDE~\ref{dx}:
+\begin{align*}
+  \max_{c_t,\omega_t}
+  \;&
+  \E_0\left[
+    \int_0^\infty
+    e^{-\rho s}
+    u(c_s)
+    \;ds
+  \right]
+  %\label{Jdef}
+  \notag
+  \\
+  \qquad\text{s.t.}\quad
+  &
+  \begin{pmatrix}
+    dw_t \\ dx_t
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    (
+    (r_t^fw_t-c_t)
+    +
+    \omega_{t}'
+    (\mu_t - r^f_t\mathbf{1})
+    )w_t
+    \\
+    \mu_t^x
+  \end{pmatrix}
+  dt
+  +
+  \begin{pmatrix}
+    w_t
+    \omega_{t}'
+    \sigma_t
+    & 0
+    \\
+    0 & \sigma_t^x
+  \end{pmatrix}
+  \begin{pmatrix}
+    dZ_t
+    \\
+    dZ_t^x
+  \end{pmatrix}
+\end{align*}
+Thus, the joint state vector for this portfolio problem is $(w_t,x_t)$,
+with which we can write an HJB equation and Hamiltonian.
+\end{defn}
 \begin{rmk}
-The above relationship derived using no arbitrage thus restricts the way
-in which the pricing function $f(S_t,t)$, the coefficients
-$\tilde{\mu}_t,\tilde{\sigma}_t$ determining the evolution of $f_t$,
-the coefficients $\mu_t,\sigma_t$ determining the evolution of $S_t$,
-and the driving randomness $Z_t,\tilde{Z}_t$ are all related.
-Coupled with the restriction in previous
-Proposition~\ref{prop:keypricing}, this will be enough to pin down the
-pricing function $f(S_t,t)$.
+For later use, it's useful to define
+$\Sigma_t^{rx}\,dt=\sigma_t\,dZ_t\,dZ_t^x{}'\sigma_t^x{}'\in\R^{I\times S}$.
 \end{rmk}
 
 
 \clearpage
-\subsection{Pricing a Derivative on Some Traded Asset}
+\subsubsection{Hamiltonian Approach}
+
+
+\paragraph{Writing the Hamiltonian}
+Given Problem~\ref{portfolioproblem}, we can write out the Hamiltonian
+$\calH(w_t,x_t,(c_t,\omega_t),\xi_t,\pi_t)$. In doing so, we will
+partition the multipliers into two pieces.
+\begin{align*}
+  \calH
+  &=
+  e^{-\rho t}
+  u(c_t)
+  +
+  \begin{pmatrix}
+    \xi_t \\ \xi_t^*
+  \end{pmatrix}'
+  \begin{pmatrix}
+    (r_t^fw_t-c_t)
+    +
+    \omega_{t}'
+    (\mu_t - r^f_t\mathbf{1})w_t
+    \\
+    \mu_t^x
+  \end{pmatrix}
+  +
+  \trace\left(
+  \begin{pmatrix}
+    \tilde{\pi}_t & \tilde{\pi}_t^{12}
+    \\
+    \tilde{\pi}_t^{21} & \tilde{\pi}_t^*
+  \end{pmatrix}'
+  \begin{pmatrix}
+    w_t
+    \omega_{t}'
+    \sigma_t
+    & 0
+    \\
+    0 & \sigma_t^x
+  \end{pmatrix}
+  \right)
+\end{align*}
+As always, the first matrix in the trace operator (before taking the
+transpose) has the same dimension as the diffusion matrix in the trace
+operator.
+Multiplying things out and simplifying the trace term using properties
+of the trace operator,\footnote{%
+  i.e.
+  $\trace\left( \tilde{\pi}_t' [ w_t\omega_t'\sigma_t ] \right)
+  =\trace\left( [ w_t\omega_t'\sigma_t ] \tilde{\pi}_t' \right)$.
+  Latter expression in parentheses is a scalar, so we can drop
+  $\trace(\,\cdot\,)$.
+}
+we get
+\begin{align*}
+  \calH
+  &=
+  e^{-\rho t}
+  u(c_t)
+  +
+  \xi_t\big[
+    (r_t^fw_t-c_t)
+    +
+    \omega_{t}'
+    (\mu_t - r^f_t\mathbf{1})w_t
+  \big]
+  +{\xi_t^*}'\mu_t^x
+  + w_t \omega_{t}' \sigma_t\tilde{\pi}_t'
+  +
+  \trace(\tilde{\pi}_t^*{}'\sigma_t^x)
+\end{align*}
+Next, replace multiplier $\tilde{\pi}_t$ with $-\xi_t\pi_t$ (which
+changes nothing but leads to nicer formulas/intuition), rearrange:
+\begin{align*}
+  \calH
+  &=
+  e^{-\rho t}
+  u(c_t)
+  +
+  \xi_t
+  \big[
+  (r^f_tw_t -c_t)
+  +
+  \omega_{t}'
+  (\mu_t - r^f_t\mathbf{1})w_t
+  \big]
+  -
+  \xi_t w_t\omega_t'\sigma_t
+  \pi_t'
+  +
+  \xi_t^*{}'\mu_t^x
+  +
+  \trace(\tilde{\pi}_t^*{}'\sigma_t^x)
+\end{align*}
+\paragraph{Optimality Conditions}
+Differentiate with respect to controls $(c_t,\omega_t)$ to get the FOCs,
+the differentiate with respect to $w_t$ to get the law of motion for
+$\xi_t$:
+\begin{align*}
+  \xi_t
+  &=
+  e^{-\rho t}
+  u'(c_t)
+  \\
+  0
+  &=
+  \xi_t(\mu_t-r^f_t\mathbf{1})w_t
+  -
+  \xi_t
+  w_t \sigma_t\pi_t'
+  \\
+  d\xi_t
+  &=
+  -\xi_t\big[
+  r_f
+  + \omega_t'(\mu-r_f\mathbf{1})
+  - \omega_t'\sigma\pi_t'
+  \big]
+  dt
+  -
+  \xi_t\pi_t
+  dZ_t
+\end{align*}
+Simplify the second FOC and use it to simplify the drift in SDE for
+$\xi_t$.
+Altogether, we then have the following characterization of optimal
+portfolio choice---expressed in terms of an SDF $\xi_t$ and the
+fundamental asset pricing condition, which is just a restriction on
+expected returns:
+\begin{align*}
+  \boxed{%
+  -
+  \frac{d\xi_t}{\xi_t}
+  =
+  r^f_t
+  \;dt
+  +
+  \pi_t
+  \;dZ_t
+  \qquad\text{and}\qquad
+  \mu_t
+  =
+  r_t^f\mathbf{1}
+  +
+  \sigma_t\pi_t'
+  }
+\end{align*}
+A few things to note.
+\begin{itemize}
+  \item
+    The above conditions assume that the investor is a price-taker and
+    atomistic, i.e. choice of $(c_t,\omega_t)$ does not to influence
+    either the drift or diffusion coefficients for returns or the state
+    vector.
+    Mathematically, $d\sigma_t/dc_t=0$, $d\mu_t/d\omega_t=0$, etc. which
+    is why no such derivative terms showed up in the conditions above.
+  \item
+    The above conditions don't include differentiation of the
+    Hamiltonian by $x_t$ (hence don't include the evolution of
+    $\xi_t^*$) which we would need for a \emph{full} characterization of
+    the solution.
+    Thus, the above conditions are only a partial characterization, but
+    far enough for out purposes (and irrelevant if returns don't depend
+    upon a state variable so that $\xi_t^*$ doesn't even exist).
+\end{itemize}
+
+
+\clearpage
+\subsubsection{HJB Approach}
+
+
+\paragraph{Writing the HJB}
+Letting $J(w_t,x_t,t)$ denote the value function,
+write the HJB equation,\footnote{%
+  We opt for the time-nonhomogeneous representation to allow the the
+  problem to depend upon calendar time $t$---either because the drift
+  and diffusion coefficients do or because of some terminal date.
+}
+\begin{align*}
+  0
+  =
+  \max_{c_t,\omega_t}
+  \;
+  u(c_t)
+  &+
+  J_t
+  +
+  J_{w}
+  \big[
+    (r^f_tw_t -c_t)
+    +
+    \omega_t'
+    (\mu_t - r^f_t\mathbf{1})w_t
+  \big]
+  +
+  J_{x'}
+  \mu_t^x
+  \\
+  %&
+  %+
+  %\frac{1}{2}
+  %\trace\left(
+  %\begin{pmatrix}
+    %w_t
+    %\omega_{t}'
+    %\sigma_t
+    %& 0
+    %\\
+    %0 & \sigma_t^x
+  %\end{pmatrix}
+  %\begin{pmatrix}
+    %dZ_t
+    %\\
+    %dZ_t^x
+  %\end{pmatrix}
+  %\begin{pmatrix}
+    %dZ_t
+    %\\
+    %dZ_t^x
+  %\end{pmatrix}'
+  %\begin{pmatrix}
+    %w_t
+    %\omega_{t}'
+    %\sigma_t
+    %& 0
+    %\\
+    %0 & \sigma_t^x
+  %\end{pmatrix}'
+  %\begin{pmatrix}
+    %\frac{\partial^2 J}{\partial w^2}
+    %&
+    %\frac{\partial^2 J}{\partial w\,\partial x'}
+    %\\
+    %\frac{\partial^2 J}{\partial x\,\partial w}
+    %&
+    %\frac{\partial^2 J}{\partial x\,\partial x'}
+  %\end{pmatrix}
+  %\right)
+  %\\
+  %&
+  %+
+  %\frac{1}{2}
+  %\trace\left(
+  %\begin{pmatrix}
+    %w_t
+    %\omega_{t}'
+    %\sigma_t
+    %dZ_t
+    %\\
+    %\sigma_t^x
+    %dZ_t^x
+  %\end{pmatrix}
+  %\begin{pmatrix}
+    %w_t
+    %dZ_t'\sigma_t'\omega_{t}
+    %&
+    %dZ_t^x{}'\sigma_t^x{}'
+  %\end{pmatrix}'
+  %\begin{pmatrix}
+    %\frac{\partial^2 J}{\partial w^2}
+    %&
+    %\frac{\partial^2 J}{\partial w\,\partial x'}
+    %\\
+    %\frac{\partial^2 J}{\partial x\,\partial w}
+    %&
+    %\frac{\partial^2 J}{\partial x\,\partial x'}
+  %\end{pmatrix}
+  %\right)
+  %\\
+  %&
+  %+
+  %\frac{1}{2}
+  %\trace\left(
+  %\begin{pmatrix}
+    %w_t^2
+    %\omega_{t}'
+    %\Sigma_t
+    %\omega_{t}
+    %&
+    %w_t
+    %\omega_t'
+    %\Sigma_t^{rx}
+    %\\
+    %w_t
+    %\Sigma_t^{rx}{}'
+    %\omega_{t}
+    %&
+    %\Sigma_t^x
+  %\end{pmatrix}
+  %\begin{pmatrix}
+    %\frac{\partial^2 J}{\partial w^2}
+    %&
+    %\frac{\partial^2 J}{\partial w\,\partial x'}
+    %\\
+    %\frac{\partial^2 J}{\partial x\,\partial w}
+    %&
+    %\frac{\partial^2 J}{\partial x\,\partial x'}
+  %\end{pmatrix}
+  %\right)
+  %\\
+  %&
+  %+
+  %\trace\left(
+  %\begin{pmatrix}
+    %w_t^2
+    %\omega_{t}'
+    %\Sigma_t
+    %\omega_{t}
+    %\frac{\partial^2 J}{\partial w^2}
+    %+
+    %&
+    %\\
+    %&
+    %w_t
+    %\Sigma_t^{rx}{}'
+    %\omega_{t}
+    %\frac{\partial^2 J}{\partial w\,\partial x'}
+    %+
+    %\Sigma_t^x
+    %\frac{\partial^2 J}{\partial x\,\partial x'}
+  %\end{pmatrix}
+  %\right)
+  %\\
+  &
+  +
+  \frac{1}{2}
+  J_{ww}
+  w_t^2
+  \omega_{t}'
+  \Sigma_t
+  \omega_{t}
+  +
+  \frac{1}{2}
+  \trace\left(
+    \Sigma_t^x
+    J_{xx'}
+  \right)
+  +
+  %\trace\left(
+  w_t
+  \omega_t'
+  \Sigma_t^{rx}
+  J_{xw}
+  %\right)
+\end{align*}
+\paragraph{Optimality Conditions}
+Differentiate with respect to $c_t$ and $\omega_t$ to characterize
+optimal $(c_t,\omega_t)$. Unlike the Hamiltonian approach, we will have
+an explicit expression for $\omega_t$.
+\begin{align}
+  u'(c_t)
+  &=
+  J_w
+  \qquad
+  \qquad
+  0
+  =
+  J_w (\mu_t-r_t^f\mathbf{1})w_t
+  +
+  J_{ww}
+  w_t^2\Sigma_t\omega_t
+  +
+  w_t\Sigma_t^{rx}J_{xw}
+  \label{hjbomega}
+\end{align}
+Rearrange the FOCs to solve explicitly for $(c_t,\omega_t)$:
+\begin{align}
+  \boxed{%
+  c_t=u'{}^{-1}(J_w)
+  \qquad \text{and}\qquad
+  \omega_t
+  =
+  -
+  \frac{1}{w_tJ_{ww}}
+  \left[
+  J_w
+  \Sigma_t^{-1}
+  (\mu_t - r^f_t\mathbf{1})
+  +
+  \Sigma_t^{-1}
+  \Sigma_t^{rx}
+  J_{xw}
+  \right]
+  }
+  \label{hjbopt}
+\end{align}
+Note that, first, these conditions depend upon derivatives of
+$J(w_t,x_t,t)$, and second, they also look \emph{very} different from
+those in the Hamiltonian approach.
+Below, we describe both how to solve for $J$ (so we can compute optimal
+$c_t,\omega_t$) and how to relate this approach to the Hamiltonian
+approach, i.e. how to derive the SDF and fundamental asset pricing
+condition.
+But before proceeding in both tasks, the following simplification of the
+HJB helps.
+
+\paragraph{Simplifying the HJB}
+At optimal $(c_t^*,\omega_t^*)$, Condition~\ref{hjbomega} implies that the
+HJB satisfies
+\begin{align}
+  0
+  =
+  u(c_t^*)
+  &+
+  J_t
+  +
+  J_{w}
+  (r^f_tw_t -c_t^*)
+  -
+  \frac{1}{2}
+  J_{ww}
+  w_t^2
+  \omega_{t}^*{}'
+  \Sigma_t
+  \omega_{t}^*
+  +
+  J_{x'}
+  \mu_t^x
+  +
+  \frac{1}{2}
+  \trace\left(
+    \Sigma_t^x
+    J_{xx'}
+  \right)
+  \label{hjbshort}
+\end{align}
+%This intermediate step simplified the longer HJB equation above.
+%Now use this expression to proceed on our two tasks: Solving
+%for $J$ and relating the HJB and Hamiltonian approaches.
+
+\paragraph{Solving for $J(w_t,x_t,t)$}
+Substitute in Formulas~\ref{hjbopt} for $(c_t^*,\omega_t^*)$ into
+Equation~\ref{hjbshort} to get the following second order PDE for the
+value function $J$:
+\begin{align*}
+  0
+  &=
+  u\big(u'{}^{-1}(J_w)\big)
+  +
+  J_t
+  +
+  J_w
+  \big(r^f_tw_t -u'{}^{-1}(J_w)\big)
+  -
+  \frac{1}{2}
+  \frac{J_w^2}{J_{ww}}
+  (\mu_t - r^f_t\mathbf{1})'
+  \Sigma_t^{-1}
+  (\mu_t - r^f_t\mathbf{1})
+  \\
+  &
+  \quad
+  +
+  J_{x'}
+  \mu_t^x
+  +
+  \frac{1}{2}
+  \trace\left(
+    \Sigma_t^x
+    J_{xx'}
+  \right)
+  -
+  \frac{1}{2}
+  \frac{1}{J_{ww}}
+  \;
+  J_{wx'}
+  \Sigma_t^{rx}{'}
+  \Sigma_t^{-1}
+  \Sigma_t^{rx}
+  J_{xw}
+  -
+  \frac{J_w}{J_{ww}}
+  (\mu_t - r^f_t\mathbf{1})'
+  \Sigma_t^{-1}
+  \Sigma_t^{rx}
+  J_{xw}
+\end{align*}
+In the case where there is no state variable, the second line
+disappears. There are two approaches for solving this differential
+equation for $J$ (and then optimal $c_t,\omega_t$ as a consequence):
+\begin{itemize}
+  \item \emph{Analytically}:
+    Guess and verify. In particular, guess that the value function
+    $J(\,\cdot\,)$ has some functional form (typically the same as
+    utility), compute and plug in derivatives, and identitfy/choose
+    coefficients so that the above equation holds.
+
+  \item
+    \emph{Computationally}:
+    The HJB equation at optimal $(c,\omega)$ is a second-order PDE in
+    $J(\,\cdot\,)$, which can be solved numerically.
+\end{itemize}
+Below, we solve the problem analytically for CRRA utility and its log
+special case.
+
+\paragraph{Relating HJB and Hamiltonian Approaches}
+We can also derive the same SDF and fundamental asset pricing condition
+as in the Hamiltonian approach.\footnote{%
+  And we don't even need to solve for $J$, $c_t$, or $\omega_t$ to do
+  so. Those are a bonus of the HJB approach, but not necessary for this
+  part.
+}
+Define the following
+\begin{align*}
+  \xi_t
+  =
+  \xi(w_t,x_t,t)
+  &:=
+  J_w(w_t,x_t,t)
+\end{align*}
+Then, by Ito's Lemma, $\xi_t=\xi(w_t,x_t,t)$ evolves
+\begin{align*}
+  d\xi_t
+  &=
+  \frac{\partial\xi}{\partial t}\,dt
+  + \frac{\partial\xi}{\partial w_t}\,dw_t
+  +
+    \frac{1}{2}
+    \frac{\partial^2\xi}{\partial w_t^2}\,dw_t^2
+  + \frac{\partial\xi}{\partial x_t'}\,dx_t
+  +
+    \frac{1}{2}
+    \trace\left(
+    dx_t
+    dx_t'
+    \frac{\partial^2\xi}{\partial x_t\,\partial x_t'}
+    \right)
+  +
+  \trace
+  \left(
+  dw_t
+  dx_t'
+  \frac{\partial^2\xi}{\partial x_t\,\partial w_t}
+  \right)
+\end{align*}
+Use the SDEs of $w_t$ and $x_t$ to substitute in and simplify
+\begin{align*}
+  d\xi_t
+  &=
+  J_{wt}
+  dt
+  +
+  J_{ww}
+  \,dw_t
+  +
+    \frac{1}{2}
+    J_{www}
+    \,dw_t^2
+  + J_{wx'}
+    \,dx_t
+  +
+    \frac{1}{2}
+    \trace\left(
+    dx_t
+    dx_t'
+    J_{wxx'}
+    \right)
+  +
+  \trace
+  \left(
+  dw_t
+  dx_t'
+  J_{wxw}
+  \right)
+  \\
+  &=
+  \bigg\{
+    J_{wt}
+    +
+    J_{ww}
+    \left(r^f_tw_t-c_t\right)
+    +
+    J_{ww}
+    \omega_{t}'
+    \big(\mu_t - r^f_t\mathbf{1}\big)w_t
+    +
+    \frac{1}{2}
+    J_{www}
+    w_t^2
+    \omega_{t}'
+    \Sigma_t
+    \omega_{t}
+  \\
+  &\qquad
+    + J_{wx'}\mu_t^x
+    +
+    \frac{1}{2}
+    \trace\left(
+    \Sigma_t^x
+    J_{wxx'}
+    \right)
+    +
+    w_t\omega_t'\Sigma_t^{rx}
+    J_{wxw}
+  \bigg\}
+  dt
+  +
+  J_{ww}
+  w_t
+  \omega_{t}'
+  \sigma_t
+  \;dZ_t
+  + J_{wx'}
+  \sigma^x_t
+  dZ_t^x
+\end{align*}
+To simplify further, multiply through optimal portfolio
+Condition~\ref{hjbomega} by $\omega_t'/w_t$, then differentiate both
+that result and maximized HJB Equation~\ref{hjbshort} with respect to
+wealth $w_t$---using the envelope theorem to ignore changes in $c$ and
+$\omega$ that result from changes in $w$, i.e.\ using
+$dc_t/dw_t=d\omega_t/dw_t=0$ at the HJB-maximizing choices of the
+controls.
+(Also multiply through the portfolio condition by $w_t$ again.)
+\begin{align*}
+  0
+  &=
+  J_{ww} \omega_t'(\mu_t-r_t^f\mathbf{1})w_t
+  +
+  J_{www}
+  w_t^2\omega_t'\Sigma_t\omega_t
+  +
+  J_{ww}
+  w_t\omega_t'\Sigma_t\omega_t
+  +
+  w_t\omega_t'\Sigma_t^{rx}J_{xww}
+  \\
+  0
+  &=
+  J_{tw}
+  +
+  J_{ww}
+  (r^f_tw_t -c_t)
+  +
+  J_{w}
+  r^f_t
+  -
+  \frac{1}{2}
+  J_{www}
+  w_t^2
+  \omega_{t}{}'
+  \Sigma_t
+  \omega_{t}
+  -
+  J_{ww}
+  w_t
+  \omega_{t}{}'
+  \Sigma_t
+  \omega_{t}
+  +
+  J_{x'w}
+  \mu_t^x
+  +
+  \frac{1}{2}
+  \trace\left(
+    \Sigma_t^x
+    J_{xx'w}
+  \right)
+\end{align*}
+Use both of these to simplify the SDE for $\xi_t$:
+\begin{align*}
+  d\xi_t
+  &=
+  -r^f_t
+  J_w
+  \,
+  dt
+  +
+  J_{ww}
+  w_t
+  \omega_{t}'
+  \sigma_t
+  \;dZ_t
+  + J_{wx'}
+  \sigma^x_t
+  dZ_t^x
+\end{align*}
+Finally, substitute in optimal $\omega_t'$:
+\begin{align*}
+  d\xi_t
+  &=
+  -r_t^f
+  J_w
+  \,
+  dt
+  -
+  \left[
+  J_w
+  \Sigma_t^{-1}
+  (\mu_t - r^f_t\mathbf{1})
+  +
+  \Sigma_t^{-1}
+  \Sigma_t^{rx}
+  J_{xw}
+  \right]'
+  \sigma_t
+  \;dZ_t
+  + J_{wx'}
+  \sigma^x_t
+  dZ_t^x
+\end{align*}
+Identify $\xi_t=J_w$ and then recognize that, by the definitions of
+$\Sigma_t$ and $\Sigma_t^{rx}$, the second term in brackets and the
+final term in the expression cancel, leaving
+\begin{align*}
+  -\frac{d\xi_t}{\xi_t}
+  &=
+  r_t^f
+  \,
+  dt
+  +
+  \underbrace{%
+    (\mu_t - r^f_t\mathbf{1})'
+    \Sigma_t^{-1}
+    \sigma_t
+  }_{\pi_t}
+  \;dZ_t
+  \qquad
+  \mu_t
+  =
+  r_t^f\mathbf{1}+\sigma_t\pi_t'
+\end{align*}
+where the second equation came just from the formula for $\pi_t$, which
+we identified as the diffusion term in the SDE for $\xi_t$.
+
+\clearpage
+\subsubsection{Infinite Horizon CRRA Special Case}
+Suppose that utility has power/CRRA form
+\begin{align*}
+  u(c) &= \frac{c^{1-\gamma}}{1-\gamma}
+  \quad\implies\quad
+  u'(c)
+  =
+  c^{-\gamma}
+\end{align*}
+(\emph{Guess $v(w)$})
+To solve analytically, guess that the value function \emph{also} has
+power form:
+\begin{align*}
+  v(w) &= k\frac{w^{1-\gamma}}{1-\gamma}
+  \quad\implies\quad
+  v'(w)
+  =
+  kw^{-\gamma}
+  \quad\implies\quad
+  v''(w)
+  =
+  -\gamma kw^{-\gamma-1}
+\end{align*}
+(\emph{Optimal Controls})
+Then the FOCs for optimal consumption and utility become
+\begin{alignat*}{5}
+  c^{-\gamma}
+  &=
+  kw^{-\gamma}
+  &
+  \quad\implies\quad
+  &
+  c
+  &&=
+  k^{-\frac{1}{\gamma}}w
+  \\
+  \omega
+  &=
+  \frac{kw^{-\gamma}}{w\cdot \gamma kw^{-\gamma-1}}
+  \Sigma^{-1}(\mu - r_f\mathbf{1})
+  &
+  \quad\implies\quad
+  &
+  \omega
+  &&=
+  \frac{1}{\gamma}
+  \Sigma^{-1}(\mu - r_f\mathbf{1})
+\end{alignat*}
+Notice that optimal consumption is a constant fraction of wealth.
+\\
+\\
+(\emph{Volatility of Return to Wealth, $\Var(dw_t/w_t)$})
+Recalling our SDE for $w_t$, the volatility of the return to wealth
+$dw_t/w_t$ is given by the following expression related to price of risk
+$\pi_t$:
+\begin{align*}
+  \omega'\sigma
+  =
+  \frac{1}{\gamma}
+  (\mu - r_f\mathbf{1})'\Sigma^{-1}
+  \sigma
+  =
+  \frac{\pi}{\gamma}
+\end{align*}
+(\emph{Determination of $k$})
+To complete the charactertization, we just need to determine $k$.
+For that, recall the simplified HJB-at-equality expression:
+\begin{align*}
+  \rho v(w)
+  &=
+  u(c)
+  +
+  v'(w)
+  \left\{
+  \big(r_fw -c\big)
+  -
+  \frac{1}{2}
+  \frac{v'(w)}{v''(w)}
+  (\mu - r_f\mathbf{1})'
+  \Sigma^{-1}
+  (\mu - r_f\mathbf{1})
+  \right\}
+\end{align*}
+Substitute in optimal consumption and the functional forms from above
+\begin{align*}
+  \rho
+  k\frac{w^{1-\gamma}}{1-\gamma}
+  &=
+  \frac{\big[k^{-\frac{1}{\gamma}}w\big]^{1-\gamma}}{1-\gamma}
+  +
+  kw^{-\gamma}
+  \left\{
+  \big(r_fw -k^{-\frac{1}{\gamma}}w\big)
+  +
+  \frac{1}{2}
+  \frac{kw^{-\gamma}}{\gamma k w^{-\gamma-1}}
+  (\mu - r_f\mathbf{1})'
+  \Sigma^{-1}
+  (\mu - r_f\mathbf{1})
+  \right\}
+\end{align*}
+Simplify and collect terms, which gives an expression for $k$:
+\begin{align*}
+  k
+  &=
+  \left(
+  \frac{1}{\gamma}
+  \left\{
+  \rho
+  -
+  (1-\gamma)
+  \left[
+  r_f
+  +
+  \frac{1}{2\gamma}
+  (\mu - r_f\mathbf{1})'
+  \Sigma^{-1}
+  (\mu - r_f\mathbf{1})
+  \right]
+  \right\}
+  \right)^{-\gamma}
+\end{align*}
+This together with the above value function and optimal policies
+characterize the solution.
+\\
+(\emph{Equilibrium Consumption Process})
+Suppose that the consumption process follows
+\begin{align*}
+  \frac{dc}{c} = \mu^c\;dt + \sigma^c\;dZ_t
+\end{align*}
+Then by Ito's Lemma, non-discounted marginal utility
+\begin{align*}
+  \frac{d(c_t^{-\gamma})}{c_t^{-\gamma}}
+  =
+  \left(
+  -\gamma \mu_t^c
+  + \frac{\gamma(\gamma+1)}{2}
+  (\sigma_t^c)^2
+  \right)
+  dt
+  -
+  \gamma\sigma_t^c\;dZ_t
+\end{align*}
+This implies the following equilibrium risk-free rates and price of
+risk:
+\begin{align*}
+  r_f =
+  \rho
+  +\gamma \mu_t^c
+  -
+  \frac{\gamma(\gamma+1)}{2}
+  (\sigma_t^c)^2
+  \quad\qquad
+  \pi_t
+  =
+  \gamma_t\sigma_t^c
+  =
+  (\mu-r_f\mathbf{1})'\Sigma^{-1}\sigma
+\end{align*}
+
+
+\subsubsection{Log Utility Special Case}
+
+\paragraph{Solution with Log Utility}
+If $\gamma\ra 1$ so $u(c)=\log(c)$, the $k$ equation simplifies
+drastically to $k=1/\rho$.
+This means that the value function, optimal consumption, and the optimal
+portfolio are characterized by
+\begin{align*}
+  v(w)
+  = \frac{u(w)}{\rho}
+  = \frac{1}{\rho}
+  \frac{w^{1-\gamma}}{1-\gamma}
+  \quad\qquad
+  c=\rho w
+  \quad\qquad
+  \omega
+  =
+  \Sigma^{-1}(\mu-r_f\mathbf{1})
+\end{align*}
+Moreover, the volatility of returns to wealth equals
+\begin{align*}
+  \omega'\sigma
+  =
+  (\mu - r_f\mathbf{1})'\Sigma^{-1}
+  \sigma
+  =
+  \pi
+\end{align*}
+If there is a single asset $I=1$, then the volatility of returns to
+wealth simply equals the Sharpe ratio.
+
+Another way to deduce that result: with log utility
+$\xi_t=e^{-\rho t}/c_t=e^{-\rho t}/w_t$, so clearly the volatility of
+$c_t$ and $w_t$ returns should be equal, and should equal the negative
+of the volatility of $\xi_t$ returns (which is $-\pi_t$) by that
+expression.
+
+
+
+
+
+
+\clearpage
+\subsection{No Arbitrage Approach}
+
+To be precise in the derivativations of this section, I will use
+$\mathbf{1}_d$ and $\bso_d$ to denote the ones and zero (column) vector
+of dimension/length $d$.
+
+\paragraph{Portfolio Returns}
+Let $\omega_t\in\R^I$ be a portfolio allocation at time $t$ among the
+$I$ risky assets with instantaneous returns $dr_t=dp_t/p_t$,
+satisfying $\omega_t'\mathbf{1}_I=1$.
+As in the portfolio choice problem, $\omega_t$ can change over time but
+is fixed over instant in which returns $dr_t=dp_t/p_t$ are realized.
+Hence, the overall return on this portfolio is given by\footnote{%
+  Note that replacing $\Pi_t$ with $w_t$ gives the same SDE as that in
+  the previous section describing the evolution of \emph{wealth}.
+  I stick with $\Pi_t$ notation because it's more traditional in this
+  approach to abstract from any notion of an agent investing his total
+  wealth, and instead just focus on the price evolution of a
+  portfolio---which could be formed by \emph{any} agent in the market
+  and need not represent the sum total of that agent's wealth.
+}
+\begin{align*}
+  \frac{d\Pi_t}{\Pi_t}
+  = \omega_t'\frac{dp_t}{p_t}
+  = \omega_t'dr_t
+  = \omega_t'\mu_t\;dt + \omega_t'\sigma_t\;dZ_t
+\end{align*}
+%Before moving on, I speak of returns for simplicity, but the setup is
+%slightly more general. In particular, $dr_t$ could be the evolution of
+
+\paragraph{No Arbitrage Condition}
+Suppose that the above portfolio is risk-free, i.e.
+$\omega_t'\sigma_t=\bso_N'$.
+Then by no arbitrage, the porfolio returns must satisfy
+\begin{align*}
+  r_t^f\;dt
+  =
+  \frac{d\Pi_t}{\Pi_t}
+  = \omega_t'\mu_t\;dt + 0\cdot \;dZ_t
+  \quad\implies\quad
+  r_t^f = \omega_t'\mu_t
+\end{align*}
+Together with $\omega_t'\mathbf{1}_I=1$, this can be further rearranged
+to yield
+\begin{align}
+  0 &= \omega_t'(\mu_t-r_t^f\mathbf{1}_I)
+  \qquad\implies\qquad
+  \bso_N' = \omega_t'(\mu_t-r_t^f\mathbf{1}_I)\mathbf{1}_N'
+  \label{noarbalmost}
+\end{align}
+
+\paragraph{Deducing the Condition}
+By assumption, the portfolio is riskless, i.e.
+$\omega_t\sigma_t=\bso_N'$.
+Using that in the final expression in Line~\ref{noarbalmost} and
+rearranging then gives
+\begin{align*}
+  %\omega_t'\sigma_t = \omega_t'(\mu_t-r_t^f\mathbf{1}_I)\mathbf{1}_N'
+  %\quad\implies\quad
+  \bso_N'
+  =
+  \omega_t'
+  \big[
+  (\mu_t-r_t^f\mathbf{1}_I)\mathbf{1}_N'
+  -\sigma_t
+  \big]
+\end{align*}
+Next, let $\pi_t'\in \R^N$ be \emph{any} $N$-dimensional column vector
+satisfying $\mathbf{1}_N'\pi_t'=1$ (wlog, as we'll discuss), and
+postmultiply both sides of the above expression by $\pi_t'$ to get
+\begin{align}
+  0
+  =
+  \omega_t'
+  \big[
+  (\mu_t-r_t^f\mathbf{1}_I)\mathbf{1}_N'\pi_t'
+  -\sigma_t\pi_t'
+  \big]
+  =
+  \omega_t'
+  \big[
+  (\mu_t-r_t^f\mathbf{1}_I)
+  -\sigma_t\pi_t'
+  \big]
+  \label{noarbpi}
+\end{align}
+For this problem to be interesting, the portfolio should be nontrivial,
+$\omega_t\neq0$. Therefore, the term in brackets must equal $\bso_I$.
+Using that and rearranging gives, as desired,
+\begin{align}
+  \boxed{%
+  \mu_t
+  =
+  r_t^f\mathbf{1}+\sigma_t\pi_t'
+  }
+  \label{noarbresult}
+\end{align}
+A few things about $\pi_t$.
+We said $\mathbf{1}_N'\pi_t'=1$ because,
+as is clear from Expression~\ref{noarbpi}, if
+$\mathbf{1}_N'\pi_t'\neq 1$, we'd just divide through by
+$\mathbf{1}_N'\pi_t'$ anyway, which would mean
+$\pi_t'/(\mathbf{1}_N'\pi_t')$ postmultiplying $\sigma_t$ (rather than
+$\pi_t$).
+And \emph{that} vector would sum to one.
+
+Second, it may seem weird that we let $\pi_t$ be \emph{any}
+$N$-dimensional vector satisfying $\mathbf{1}_N'\pi_t'$.
+But as mentioned, for relative pricing, we don't care about the actual
+value of $\pi_t$. We care only that \emph{some} $\pi_t$ exists,
+satisfying Expression~\ref{noarbresult}.
+This will be even more clear when we discuss martingale pricing where we
+\emph{arbitrarily specify} $\pi_t$ as whatever is most convenient.
+
+
+\clearpage
+\section{Computing Prices}
+
+
+In this section, we start from the following fundamental pricing SDEs,
+derived above
+\begin{align}
+  -
+  \frac{d\xi_t}{\xi_t}
+  =
+  r_t^f\;dt + \pi_t \;dZ_t
+  \qquad
+  \quad
+  \frac{dp_t}{p_t}
+  =
+  dr_t
+  &=
+  \underbrace{%
+    (r_t^f\mathbf{1}+\sigma_t\pi_t')
+  }_{=\mu_t}
+  \;dt
+  +
+  \sigma_t
+  \;dZ_t
+  \label{fundamental}
+\end{align}
+We first derive impliciations of these, which builds intuition for the
+two pricing approaches.
+
+\subsection{Expected Returns and Risk Prices}
+
+\begin{defn}(Price of Risk)
+Vector $\pi_t\in \R^N$ summarizes the \emph{price of risk}, with
+different elements of the vector-valued process corresponding to risk
+prices of different elements (risks) of $Z_t$.
+The following corollary to the fundamental pricing SDEs motivates this
+name.
+\end{defn}
+
+
+\begin{prop}\emph{(Expected Excess Return Formula in Equilibrium)}
+For any single asset $i$, Expressions~\ref{fundamental} imply the
+following formula for expected excess returns:
+\begin{align}
+  \mu_{ti}
+  -r_t^f
+  &=
+  \sigma_{t,i\cdot}\pi_t'
+  =
+  \sum_{n=1}^N \sigma_{t,in}\pi_{tn}
+  \label{sharpegeneral}
+\end{align}
+Alternatively, we can express things in a formula more familiar from
+discrete-time analysis.
+\begin{align}
+  \E\left[ dr_t-r_t^f\;dt \right]
+  &=
+  - \E_t\left[
+     \frac{d\Lambda_t}{\Lambda_t}\frac{dp_t}{p_t}
+    \right]
+  =
+  -
+  \Cov\left(dr_{ti},\frac{d\xi_t}{\xi_t}\right)
+  \label{sharpegeneral2}
+\end{align}
+\end{prop}
+\begin{rmk}
+Line~\ref{sharpegeneral} says that the expected excess return on asset
+$i$ depends on the exposure $\sigma_{t,in}$ asset $i$ has to the $n$th
+risk, which delivers $\pi_{tn}$ extra units of excess return per unit
+exposure to that risk.
+If there is a single risk factor, $N=1$, Line~\ref{sharpegeneral}
+(rearranged) implies that all assets that agents hold in equilibrium
+have \emph{identical} Sharpe ratios, equal to price of risk $\pi_t$:
+\begin{align*}
+  \pi_t =
+  \frac{\mu_{ti}-r_t^f}{\sigma_{ti}}
+  %(\mu_{ti}-r_t^f)/\sigma_{ti}
+\end{align*}
+Line~\ref{sharpegeneral2} says that expected returns are determined by
+covariance of returns with the SDF.
+
+\end{rmk}
+
+
+\clearpage
+\subsection{Choice of $\pi_t$ and Change of Measure}
+
+In the consumption-savings derivation, we pinned down $\pi_t$ very
+precisely as the diffusion term for $-d\xi_t/\xi_t$, where
+$\xi_t=e^{-\rho t}u'(c_t)$, discounted marginal utility.
+And since $\xi_t$ is related to consumption/MU (which is related to
+investment opportunities), the particular $\pi_t$ that arises from the
+full consumption-savings problem depends crucially upon the
+specification of utility/risk preference and investment opportunities.
+
+
+\emph{However}, we also made the case above that in the no-arbitrage
+approach (and relative pricing more generally), we often don't
+\emph{want} to specify a utility function and really \emph{don't care}
+about the exact process $\pi_t$.
+We merely care that \emph{there exists} some $\pi_t$ so that returns'
+expectation and volatility are jointly related in a coherent and
+consistent way, i.e. as in Line~\ref{sharpegeneral} or
+\ref{sharpegeneral2} for some (any) $\pi_t$.
+That risk price process \emph{can}, of course, be rationalized by
+some assumptions about utility. But it need not be.
+We're after replicating portfolios and no-arbitrage conditions that hold
+\emph{regardless} of utility/risk preferences.
+
+
+Therefore, in an important sense, we can \emph{choose} the price of
+risk, setting it equal to some $\pi_t^*\neq \pi_t$.
+The advantage is that a different choice $\pi_t^*$ of risk prices (as
+distinct from $\pi_t$ in Expression~\ref{fundamental}) can make the
+pricing problem easier, as we'll see.
+Thus we should think about risk prices $\pi_t^*$ as a
+\emph{parameter/index} corresponding to \emph{different} worlds with
+different risk preferences/marginal utilities.
+And so the next definition defines alternative $\pi_t^*$-dynamics,
+which is folloed by a theorem that shows that choice of price of risk
+$\pi_t^*$ has a nice interpretation as a change of measure from the
+measure implicity in Expression~\ref{fundamental}.
+
+\begin{defn}
+($\pi^*_t$, Historical/Physical, \& Risk-Neutral Measures and Dynamics)
+Most generally, the $\pi^*_t$-Dynamics given arbitrary price of risk
+process $\pi_t^*$ are given by
+\begin{align}
+  %-
+  %\frac{d\xi_t}{\xi_t}
+  %=
+  %r_t^f\;dt + \pi_t^* \;dZ_t^{\pi_t^*}
+  %\qquad
+  %\quad
+  \frac{dp_t}{p_t}
+  =
+  dr_t=(r_t^f\mathbf{1}+\sigma_t{\pi_t^*}{}')\;dt
+  + \sigma_t\;dZ_t^{\pi^*_t}
+  \label{altfundamental}
+\end{align}
+Associated with the dynamics of each particular $\pi_t^*$ process are a
+particular measure, expectation operator, and Brownian motion term under
+that measure: $(P^{\pi_t^*},\E_t^{\pi_t^*},Z_t^{\pi_t^*})$.
+Different $\pi_t^*$ choices imply distinct values/objects in this
+triplet.
+
+There are two particularly important special cases:
+\begin{itemize}
+  \item $\pi_t^*=\pi_t$,
+    $(P^{\pi_t},\E^{\pi_t},Z_t^{\pi_t})$ or simply
+    $(P,\E,Z_t)$:
+    This corresponds to the
+    \emph{historical/physical measure}\footnote{%
+      ``Historical'' is a common but probably bad name for it.
+      It's not some backward looking estimate of the process like that
+      name might suspect, but rather just the actual process in our
+      world.
+    }
+    where $\pi_t^*=\pi_t$, the actually-observed diffusion
+    coefficient of the growth rate of marginal utility
+    $d\xi_t/\xi_t$.\footnote{%
+      By ``actually observed,'' I mean corresponding to the marginal
+      utility process we see in the data, not adjusting to some other
+      $\pi_t^*$ to make pricing most convenient.
+    }
+    In this case, Expression~\ref{altfundamental} coincides with
+    Expression~\ref{fundamental}.
+
+  \item
+    $\pi_t^*=0$,  $(P^0,\E^0,Z_t^0)$:
+    This corresponds to the \emph{risk-neutral measure} since under
+    $\pi_t^*=0$, equilibrium condition
+    $\mu_t=r_t^f\mathbf{1}+\sigma_t\pi_t^*{}'$ implies that riskier
+    assets do \emph{not} command higher expected returns.
+    This only obtains if agents are risk neutral, i.e. don't care about
+    risk, hence bid up prices until expected returns are equalized
+    regardless of risk.
+\end{itemize}
+\end{defn}
+
+
+\begin{comment}
+- Finish 25.3
+
+- Section: Change of Measure
+  - SDF is the radon-nikodym derivative
+- Martingale method
+
+
+- No arbitrage as a consequence of equilibrium, primitive or result
+- Pricing formulas *with* dividends
+  \begin{align}
+    \boxed{%
+    0 = \Lambda_t D_t \;dt + \E_t[d(\Lambda_tp_t)]
+    }
+    %\label{pemxcont2}
+  \end{align}
+  Now \emph{returns}.
+  Holding the asset at $t$ earns total \emph{net payoff} $dp_t + D_t dt$
+  over the next instant. Hence total instantaneous \emph{net return} at
+  $t$
+  %(denoted $dR_t$\footnote{
+    %To see that $dR_t$ is the proper notation for a net return, consider a
+    %net return in discrete time, which equals
+    %$R_{t+1}-1= (p_{t+1}+D_{t+1})/p_t - p_t/p_t=R_{t+1}-R_t$.
+  %})
+  is given by that net payoff over price
+  \begin{align}
+    %dR_t =
+    \frac{dp_t}{p_t}
+    + \frac{D_t}{p_t} dt
+    \label{returnscont}
+  \end{align}
+
+- View the equilibrium condition as a restriction.
+  Given volatility and price of risk, determines expected returns.
+- Be more explicit that xi_t is an SDF
+
+- PDE Pricing
+  - Intro: Redundant asset price evolution
+  - Main Idea: Return on riskless portfolio must equal rf
+  - Pricing PDE without pi_t
+  - Pricing PDE with pi_t, useful for nontraded underlying
+  - Solving the PDEs using Feynman-Kac
+
+
+Things to nail
+- Using the SDF process and FOC for any asset
+  - Highlight that this form of pricing is for a *single investor*,
+    depends on his value function and investment opportunity set.
+    Investors with different preferences or different investment
+    opportunity sets generally have different SDFs
+  - Rewriting the LOMs for assets
+  - Rewriting port problem as a choice over volatility of wealth,
+    which we get by rewriting wealth evolution in terms of the price
+    of risk
+  - Change of measure
+  - Risk neutral approach
+  - Excess return formula, E[dri - drj] = Cov(dri-drj, dw/w)
+  - Cochrane formulas
+- CRRA utility, v(w) = u(zeta_t*w_t)/rho where zeta_t captures
+  investment opportunties, hedging demand. Constant if no state. Show
+  by guess and verify, Formulas dc/c SDE, risk free rate, and price of risk
+- Log special case: Vol of wealth = sharpe ratio = price of risk,
+  Consumpion = rho * net worth in log case
+\end{comment}
+
+\begin{thm}
+\emph{(Different Risk Prices Equivalent to Change of Measure)}
+\label{thm:chgmeasure}
+Choice of risk price process $\pi_t^*$ corresponds to a change of
+measure from the physical dynamics in
+Expression~\ref{fundamental} with associated $(P,\E_t,Z_t)$,
+\emph{into} $\pi_t^*$-dynamics in of Expression~\ref{altfundamental}
+with associated $(P^{\pi_t^*},\E_t^{\pi_t^*},Z_t^{\pi_t^*})$.
+This change of measure from $\pi_t\Rightarrow\pi_t^*$ is
+implied/implemented by Radon-Nikodym derivative
+\begin{align}
+  \Lambda_t^{\pi_t^*}
+  &=
+  \exp\left\{
+    -\int_0^t (\pi_s-\pi_s^*)\;dZ_s
+    -
+    \frac{1}{2}
+    \int_0^t (\pi_s-\pi_s^*)(\pi_s-\pi_s^*)'\;ds
+  \right\}
+  \label{Lambda}
+\end{align}
+This implies $\E_t^{\pi_t^*}[x_t] = \E_t[\Lambda_t^{\pi_t^*} x_t]$,
+where the former expectation is when
+$x_t\sim (P^{\pi_t^*},\E_t^{\pi_t^*},Z_t^{\pi_t^*})$.
+and the latter expectation is when
+$(\Lambda_t^{\pi_t^*},x_t)\sim (P,\E_t,Z_t)$.
+\end{thm}
+
+
+\begin{cor}
+\emph{(SDF is a Discounted RN Derivative)}
+\label{cor:sdfrn}
+SDF $\xi_t$ in SDE~\ref{fundamental} corresponds to
+\begin{align*}
+  \xi_t&=e^{-r_t^f\cdot t}\Lambda_t^{0}
+  %\qquad\text{where}\quad
+  %\text{$\Lambda_t$ is RN derivative~(\ref{Lambda}) with $\pi_t^*=0$}
+\end{align*}
+Moreover, with constant risk-free rate $r_t^f=r^f$, this implies
+$\E_t[\xi_tx_t] =e^{-r^f\cdot t}\E_t^{0}[x_t]$.
+%$\E_t[\xi_tx_t]$ is the expectation when $(\xi_t,x_t)\sim P$
+%with associated Brownian term $Z_t$, while
+%term $\E_t^{0}[x_t]$ is the expectation when $x_t~P^{0}$
+%with associated Brownian motion $Z_t^{0}$.
+
+%Thus pricing with the SDF $\xi_tp_t=\E_t[\xi_Tp_T]$ can
+%\emph{alternatively} be accomplished by computing the expectation under
+%the risk-neutral measure/dynamics.
+\end{cor}
+\begin{rmk}
+In words, the SDF $\xi_t$ (which evolves under the physical measure
+according to Expression~\ref{fundamental}) is effectively the
+Radon-Nikodym derivative that converts from the physical measure
+$\pi_t^*=\pi_t$ into the risk-neutral $\pi_t^*=0$ measure, plus some
+discounting.
+\end{rmk}
+
+\begin{proof}
+(Theorem~\ref{thm:chgmeasure})
+This is just a direct corollary of Girsanov's Theorem, in which the RN
+derivative of Expression~\ref{Lambda} converts from the measure with
+Brownian motion $Z_t$ to another with Brownian motion here denoted
+$Z_t^{\pi_t^*}$. They are related as follows
+\begin{align*}
+  dZ_t = dZ_t^{\pi_t^*} - (\pi_t-\pi_t^*)'\;dt
+\end{align*}
+Plug that in for $dZ_t$ in the original SDEs in
+Line~\ref{fundamental} to get the above dynamics in
+Line~\ref{altfundamental}.
+\end{proof}
+
+\begin{proof}
+(Corollary~\ref{cor:sdfrn})
+We first use the definition of $\Lambda_t$ to derive it's
+dynamics, then derive the dynamics of $\xi_t=e^{-r_t^ft}\Lambda_t$ by
+Ito's Lemma, which gives an SDF SDE matching
+Line~\ref{fundamental}.
+
+So first, take logs of the formula for $\Lambda_t$ in
+Expression~\ref{Lambda}, difference, and rearrange to get
+\begin{align*}
+  d\ln\Lambda_t
+  =
+  - \frac{1}{2}\pi_t\pi_t'\;dt
+  - \pi_t\;dZ_t
+\end{align*}
+Let $\xi_t^*=\xi^*(\ln\Lambda_t)=e^{\ln \Lambda_t}=\Lambda_t$.
+By Ito's Lemma,
+\begin{align*}
+  d\xi_t^*
+  &=
+  \frac{d\xi^*}{d(\ln\Lambda_t)}d\ln\Lambda_t
+  +
+  \frac{1}{2}
+  \frac{d^2\xi^*}{d(\ln\Lambda_t)^2}(d\ln\Lambda_t)^2
+  \\
+  \text{Sub in derivatives and SDE $d\ln\Lambda_t$}
+  \qquad
+  d\xi_t^*
+  &=
+  \xi_t^*
+  \left[
+  - \frac{1}{2}
+    \pi_t\pi_t'\;dt
+  - \pi_t\;dZ_t
+  \right]
+  +
+  \frac{1}{2}
+  \xi_t^*
+  \pi_t\pi_t'\;dt
+  \\
+  \text{Rearrange and use $\xi_t^*=\Lambda_t$}
+  \qquad
+  \frac{d\Lambda_t}{\Lambda_t}
+  &=
+  - \pi_t\;dZ_t
+\end{align*}
+Given $\xi_t=\xi(t,\Lambda_t)=e^{-r_t^ft}\Lambda_t$,
+use Ito's Lemma, sub in $d\Lambda_t/\Lambda_t$, and rearrange
+\begin{align*}
+  d\xi_t
+  &=
+  \frac{\partial \xi}{\partial t}\;dt
+  + \frac{\partial \xi}{\partial \Lambda_t}d\Lambda_t
+  + \frac{1}{2}\frac{\partial^2 \xi}{\partial \Lambda_t^2}(d\Lambda_t)^2
+  =
+  -r_t^f \xi_t\;dt
+  + \xi_t\frac{d\Lambda_t}{\Lambda_t}
+  =
+  -r_t^f \;dt
+  - \pi_t\;dZ_t
+\end{align*}
+Which is exactly what we wanted to show.
+\end{proof}
+
+
+\clearpage
+\subsection{Martingale Method and Change of Numeraire}
+
+This section starts with the following martingale theorem,
+which was true by construction in the first approach to deriving
+fundamental pricing Theorem~ and is true as a
+consequence of Ito's Lemma in the other approaches.
+We also generalize the result to non-physical measures.
+This makes use of the fact that we don't really care about $\pi_t$, so
+we just pick something convenient to most easily compute prices.
+
+\begin{thm}
+\emph{($\xi_tp_t$ is a Martingale under $P$)}
+In equilibrium, $\xi_tp_t$ is a martingale under physical measure $P$,
+i.e.  $\xi_tp_t=\E_t[\xi_T\pi_T]$ for all $T\geq t$.
+\end{thm}
+\begin{rmk}
+Note that this martingale property for $\xi_tp_t$ is guaranteed true
+\emph{only} under physical measure $P$, but generally not under
+different $\pi^*_t$-measures with $\pi^*_t$ distinct from the phsyical
+$\pi_t$.
+And yet, we can directly generalize the implications and logic of that
+theorem to arrive at the martingale pricing method, as embodied in the
+following theorem.
+\end{rmk}
+\begin{proof}
+See Subsection~\ref{subsec:adhoc}.
+\end{proof}
+
+\begin{thm}
+\emph{($p_t/n_t$ is a Martingale under Forward Risk Neutral $\sigma_t^n$-Measure)}
+\label{thm:martingalepricing}
+Let $n_t$ be any asset.
+In equilibrium, for any value of the price of risk vector $\pi_t^*$, it
+has $\pi_t^*$-dynamics
+\begin{align*}
+  \frac{dn_t}{n_t}
+  =
+  \underbrace{(r_t^f+\sigma_t^n\pi_t^*{}')}_{\mu_t^n}\;dt
+  + \sigma_t^n\;dZ_t^{\pi_t^*}
+\end{align*}
+Then the process $p_t/n_t$ is a martingale under the
+$\pi^*=\sigma_t^n$-measure,
+called the
+\emph{forward risk-neutral measure with respect to $n_t$}.
+\begin{align}
+  \frac{p_t}{n_t}
+  = \E^{\sigma_t^n}_t\left[\frac{p_T}{n_T}\right]
+  \quad\implies\quad
+  p_t
+  =
+  e^{-(\delta^n-\delta^p)(T-t)}
+  \E^{\sigma_t^n}_t\left[\frac{n_t}{n_T}p_T\right]
+  \label{martprice}
+\end{align}
+%where $\delta^X := D^X/X_t$.
+\end{thm}
+%\begin{proof}
+%Start by defining
+%$g_{ti}=g_i(p_{ti},n_t,t)= \frac{p_{ti}}{n_t} e^{t(\delta^p_i-\delta^n)}$.
+%Derive its dynamics by Ito's Lemma\footnote{%
+  %We see here why we assumed constant dividends. If not, $g_t$ would
+  %also be a function of time-varying $\delta_t^X$.
+%}
+%\begin{align*}
+  %dg_{ti}
+  %&=
+  %\frac{\partial g_i}{\partial t}
+  %\;dt
+  %+
+  %\frac{\partial g_i}{\partial p_{ti}}
+  %dp_{ti}
+  %+
+  %\frac{\partial g_i}{\partial n_t}
+  %dn_t
+  %+
+  %\frac{1}{2}
+  %\frac{\partial^2 g_i}{\partial p_{ti}^2}
+  %(dp_{ti})^2
+  %+
+  %\frac{1}{2}
+  %\frac{\partial^2 g_i}{\partial n_t^2}
+  %(dn_t)^2
+  %+
+  %\frac{\partial^2 g_i}{\partial p_{ti}\,\partial n_t}
+  %(dp_{ti})
+  %(dn_t)
+  %\\
+  %&=
+  %\left[
+  %(\delta^p_i-\delta^n)
+  %\;dt
+  %+
+  %\frac{dp_{ti}}{p_{ti}}
+  %-
+  %\left(
+  %\frac{dn_t}{n_t}
+  %\right)
+  %+
+  %\left(
+  %\frac{dn_t}{n_t}
+  %\right)^2
+  %-
+  %\left(
+    %\frac{dp_{ti}}{p_{ti}}
+  %\right)
+  %\left(
+  %\frac{dn_t}{n_t}
+  %\right)
+  %\right]
+  %\frac{p_{ti}}{n_t}
+  %e^{-t(\delta^p_i-\delta^N)}
+%\end{align*}
+%Divide through by $g_{ti}=p_{ti}/n_te^{-t(\delta^p_i-\delta^n)}$,
+%substitute in the SDEs, collect terms, and simplify
+%\begin{align*}
+  %\frac{dg_t}{g_t}
+  %&=
+  %\left[
+  %(\delta^p_i-\delta^n)
+  %+ (r_t^f + \sigma_{t,i\cdot}\pi_t^*{}' - \delta^p_i)
+  %- (r_t^f + \sigma_t^n\pi_t^*{}' - \delta^n)
+  %+
+  %-
+  %\sigma_{ti}'
+  %\sigma_{t}^n
+  %\right]
+  %dt
+  %+
+  %\left[
+  %\hat{\sigma}_{t}
+  %-
+  %\bar{\sigma}_{t}
+  %\right]
+  %dZ_t
+  %\\
+  %&=
+  %(\hat{\sigma}_{t} -\bar{\sigma}_{t})
+  %(\lambda_t-\bar{\sigma}_{t})
+  %dt
+  %+
+  %\left[
+  %\hat{\sigma}_{t}
+  %-
+  %\bar{\sigma}_{t}
+  %\right]
+  %dZ_t
+%\end{align*}
+%We can make this a martingale by choosing $\lambda_t=\bar{\sigma}_{t}$,
+%in which case
+%\begin{align*}
+  %g_t = \E_t[g_T]
+  %\quad\iff\quad
+  %e^{t(\delta^f-\delta^N)}
+  %\frac{f_t}{N_t}
+  %&=
+  %\E_t^{N}
+  %\left[
+  %e^{T(\delta^f-\delta^N)}
+  %\frac{f_T}{N_T}
+  %\right]
+%\end{align*}
+%Rearranging gives the expression above.
+%\end{proof}
+
+
+\paragraph{Martingale Pricing Method: Intuition and Practice}
+Theorem~\ref{thm:martingalepricing} is the foundation for the
+\emph{martingale pricing method}.
+In this approach, we simply choose a \emph{numeraire asset} $n_t$ in the
+market and compute expectations under the $\pi_t^*=\sigma_t^n$-measure.
+The choice of $n_t$ is done to make the computation of the expectation
+in Expression~\ref{martprice} most convenient (more below).
+
+Why is this useful? And why wouldn't we just use the PDE pricing method
+of the next section?
+Often, we can easily simulate/draw $(p_T,n_T)$ under
+$\sigma_t^n$-dynamics, while $n_t$ is known/observed in the market.
+Then the task of computing $p_t$ becomes a Monte-Carlo problem:
+simulate many draws $(p_T^i,n_T^i)$ under $\sigma_t^n$-dynamics and
+average to estimate the expectation/price,
+$\hat{p}_t=\frac{1}{N}\sum_{i=1}^N\frac{n_t}{n_T^i}p_T^i$.
+That's computationally straightforward and simple.
+
+The only catch is that we need to be able to draw/simulate $(p_T,n_T)$.
+And at first pass, it might seem strange that we could do so despite
+$p_t$ (the price we're trying to compute) being unknown. But really,
+this is exactly the situation we face when pricing derivatives:
+the \emph{terminal price} $p_T$ of the asset is
+usually a simple known deterministic function of some underlying asset
+like a stock or bond price (whose dynamics we know and can simulate
+under the $\pi^*_n$-measure),
+while current price $p_t$ that we want to compute is unknown.
+And with a convenient choice of numeraire asset $n_t$ (like a bond that
+matures with face value $n_t=\$1$ no matter what), drawing/simulating
+$(p_T,n_T)$ is often no problem.
+
+
+
+\clearpage
+%A \emph{numeraire process} is any strictly positive, self-financing
+%trading strategy.
+
+%Examples include the price of a non-defaultable ZCB or the value of a
+%money-market account (earning the risk-free rate) with no interim
+%deposits or withdrawals.
+
+%Examples do \emph{not} include a dividend-paying asset (unless
+%\emph{all} dividends are reinvested) or the price of a foward contract.
+%The former produces interim cash flows (unless reinvested), and the
+%latter can go negative.
+
+
+\begin{cor}\emph{(Money Market as Numeraire)}
+Suppose we choose $N_t$ to be the riskless money market account that
+pays risk free rate $r_t$ and no dividends, with $N_0=1$:
+\begin{align}
+  \frac{dN_{t}}{N_{t}}
+  &=
+  r_t
+  dt
+  \quad\implies\quad
+  N_t=e^{\int_0^t r_s\;ds}
+  \label{dNmoney}
+\end{align}
+As is apparent from the SDE, this corresponds to $\lambda_t=0$---a
+risk-neutral world where $Z_t$ is not priced.
+By substituting the above expression for $N_t$ into
+Formula~\ref{martprice} and $\lambda_t=0$ into
+%Dynamics~\ref{fNdynamicsf}, we get the price of the derivative and
+dynamics for $f_t$ and $S_t$ of
+\begin{align*}
+  f_t
+  &=
+  \E_t^{N}
+  \left[
+  e^{-\int_t^T r_s\;ds}
+  f_T
+  \right]
+  \\
+  \frac{df_{t}}{f_{t}}
+  &=
+  r_t
+  \,dt
+  +
+  \hat{\sigma}_{t}\;dZ_t
+  \\
+  \frac{dS_{t}}{S_{t}}
+  &=
+  r_t
+  \,dt
+  +
+  \sigma_{t}\;dZ_t
+\end{align*}
+Given these dynamics, we can use Monte Carlo to simulate the above
+expectation.
+\end{cor}
+
+\begin{cor}
+\emph{(ZCB as Numeraire)}
+Suppose $N_t=B(t,T)$, the price at $t$ of a no-default zero
+coupon bond paying $B(T,T)=\$1$ at $T$. Then letting
+$\lambda_t$ equal the volatility of $B(t,T)$,
+\begin{align*}
+  f_t
+  =
+  B(t,T)
+  \;\E_t^B[f_T]
+\end{align*}
+where $\E^B_t$ is the conditional expectation under the measure where the
+price of risk $\lambda_t$ equals the volatility of ZCB price $B(t,T)$.
+This expression is convenient because discounting is \emph{outside}
+of the expectation.
+\end{cor}
+\begin{rmk}
+The fact that $B(t,t)$ has no \emph{default} risk does \emph{not} imply
+that the bond has no \emph{price} risk over the next instant, which is
+why $\lambda_t\neq 0$. In general, the price $B(t,T)$ will fluctuate,
+unlike the Money Market account which climbed at fixed rate $r_t$ over
+the next instant (no uncertainty), even if $r_t$ changes over time.
+\end{rmk}
+
+
+\clearpage
+\subsection{PDE Approach}
+
+\begin{comment}
+- The very process of constructing a riskless portfolio, which should be
+  taken care of in the part on no-arb
+- if you can construct a riskless portfolio, then
+  price of derivative is the some function of the underlying.
+  The returns on the riskless portfolio only depends upon time.
+  (Relate deriv price, asset price, time).
+  Can solve for price?
+\end{comment}
 
 %There are two approaches to the replication plus no-arbitrage pricing
 %strategy.
@@ -4904,95 +6949,244 @@ pricing function $f(S_t,t)$.
 %pricing function in Expression~\ref{pricingfcn}.
 
 
+\begin{thm}
+\emph{(Restricted Dynamics of Redundant Assets)}
+\label{thm:complete}
+In complete markets with no-arbitrage, the price of any derivative whose
+price depends only upon the underlying assets with price vector $r_t$
+satisfies, for some (currently unknown) function $f$,
+\begin{align}
+  f_t = f(r_t,t)
+  \label{pricingfcn}
+\end{align}
+In words, price is a function of only the underlying price vector $r_t$
+and time $t$.
+And then, by Ito's Lemma, the price $f_t$ of this derivative has
+dynamics
+\begin{align}
+  df_t
+  =
+  \underbrace{%
+    \left[
+      \frac{\partial f}{\partial t}
+      +
+      \mu_t'
+      \frac{\partial f}{\partial r_t}
+      +
+      \frac{1}{2}
+      \trace\left(
+      \Sigma_t
+      \frac{\partial^2 f}{\partial r_t\;\partial r_t'}
+      \right)
+    \right]
+  }_{f_t\mu_t^f}
+  dt
+  +
+  \underbrace{%
+    \left[
+    \frac{\partial f}{\partial r_t'}
+    \right]
+    \sigma_t
+  }_{f_t\sigma_t^f}
+  \;dZ_t
+  \label{evoderiv}
+\end{align}
+\end{thm}
+\begin{rmk}
+Note that at this point, we don't actually \emph{know} what the function
+$f(r_t,t)$ is.
+But the beauty of continuous time Ito calculus is that we know the SDE
+the derivative price \emph{must} satisfy---namely, SDE~\ref{evoderiv}.
+In other words, Ito's Lemma restricts the dynamics of the derivative
+price $f_t=f(r_t,t)$, which we will soon exploit to pin down the pricing
+function.
+\end{rmk}
+
 \begin{prop}\emph{(Synthesized Risk-Free Portfolio)}
 \label{prop:rf}
-Suppose $S_t$ is the price of some traded asset.
 Let $\Pi_t$ denote the price of the portfolio that buys
-$\Delta=\frac{\partial f}{\partial S}$ units of the underlying asset
+$\Delta_t=\frac{\partial f}{\partial r_t}$ units of the underlying asset
 and shorts one unit of the derivative, implying price/value
 \begin{align}
-  \Pi_t &= \frac{\partial f}{\partial S} S_t - f_t
+  \Pi_t = \Delta_t'r_t - f_t
+  \qquad\text{where}\quad
+  \Delta_t = \frac{\partial f}{\partial r_t}
   \label{portrf}
 \end{align}
-Then this portfolio is risk-free, with price evolution and dividend rate
-as below
+This particular choice of $\Delta_t$ makes the portfolio risk-free with
+price dynamics
 \begin{align}
   d\Pi_t
+  =
+  \Delta_t' dr_t - df_t
   &=
+  -
   \left[
-  -
   \frac{\partial f}{\partial t}
-  -
+  +
   \frac{1}{2}
-  \frac{\partial^2 f}{\partial S^2}
-  \sigma^2_t
-  \right]
-  dt
-  \label{dpicancelled}
-  \\
-  D_t^\Pi
-  &=
-  \frac{\partial f}{\partial S}
-  D_t^S - D_t^f
+  \trace\left(
+  \Sigma_t
+  \frac{\partial^2 f}{\partial r_t\,\partial r_t'}
+  \right)
+  \right]dt
+  %D_t^\Pi
+  %=
+  %\frac{\partial f}{\partial S}
+  %D_t^S - D_t^f
   \label{divpi}
 \end{align}
 \end{prop}
 \begin{proof}
 The goal is to synthesize a risk-free portfolio from the underlying
-asset with price $S_t$ and the derivative with price $f_t=f(S_t,t)$.
-A guess for such a portfolio is one that holds $\Delta$ units\footnote{%
-  where $\Delta$ is some not-yet-specified constant we determine
-  later. It's a fixed number over the next instant
+assets with price vector $r_t$ and the derivative with price
+$f_t=f(r_t,t)$.
+A guess for such a portfolio is one that buys $\Delta_t$
+units\footnote{%
+  where $\Delta_t$ is some constant, fixed at time $t$ and over the next
+  instant, that we pin down later.
 }
-of the underlying and shorts one unit of the derivative at each instant,
-implying
-\begin{align}
-  \Pi_t = \Delta S_t - f_t
-  \quad \implies\quad
-  \begin{cases}
-    d\Pi_t = \Delta \; dS_t - df_t \\
-    D_t^\Pi = \Delta D_t^S - D_t^f
-  \end{cases}
-  \label{dpi}
-\end{align}
-Subbing in the expressions for $dS_t$ and $df_t$
-(Proposition~\ref{prop:complete}) into the expression for $d\Pi_t$:
+of the underlying assets \& shorts one unit of the derivative at any
+$t$,
+as in Expression~\ref{portrf} for $\Pi_t$.
+Then, by the SDE for $r_t$ and SDE~\ref{evoderiv} for $f_t$ in the
+previous proposition,
+%\begin{align}
+  %\Pi_t = \Delta_t' r_t - f_t
+  %\quad \implies\quad
+  %\begin{cases}
+    %d\Pi_t = \Delta \; dS_t - df_t \\
+    %D_t^\Pi = \Delta D_t^S - D_t^f
+  %\end{cases}
+  %\label{dpi}
+%\end{align}
 \begin{align*}
   d\Pi_t
   &=
   \left[
-  \Delta \mu_t
+  \Delta_t' \mu_t
   -
   \frac{\partial f}{\partial t}
   -
-  \frac{\partial f}{\partial S}
-  \mu_t
+  \mu_t'
+  \frac{\partial f}{\partial r_t}
   -
   \frac{1}{2}
-  \frac{\partial^2 f}{\partial S^2}
-  \sigma^2_t
+  \trace\left(
+  \Sigma_t
+  \frac{\partial^2 f}{\partial r_t\;\partial r_t'}
+  \right)
   \right]
   dt
   +
   \left[
-  \Delta \sigma_t
-  - \frac{\partial f}{\partial S}
+  \Delta_t' \sigma_t
+  -
+  \frac{\partial f}{\partial r_t'}
   \sigma_t
   \right]
   \;dZ_t
 \end{align*}
 We see that we can make this expression risk-free by choosing
-$\Delta = \frac{\partial f}{\partial S}$, which will cancel the terms
+$\Delta_t = \frac{\partial f}{\partial r_t}$, which will cancel the terms
 on $dZ_t$ (as well as terms with $\mu_t$), giving
-Expressions~\ref{portrf}, \ref{dpicancelled}, and \ref{divpi}, as
-desired.
+Expressions~\ref{portrf} and \ref{divpi}, as desired.
 \end{proof}
 
 
-\begin{prop}\emph{(Pricing PDE)}
+\clearpage
+\begin{thm}\emph{(PDE Pricing Formulas)}
 \label{pdetraded}
-By no arbitrage, the pricing function $f_t=f(S,t)$ satisfies
+By no arbitrage, $f_t=f(r_t,t)$ satisfies
 \begin{align}
+  \boxed{%
+  0
+  =
+  \frac{\partial f}{\partial t}
+  +
+  r_t^f
+  \frac{\partial f}{\partial r_t'}
+  r_t
+  +
+  \frac{1}{2}
+  \trace\left(
+  \Sigma_t
+  \frac{\partial^2 f}{\partial r_t\,\partial r_t'}
+  \right)
+  -
+  r_t^f
+  f_t
+  %0
+  %=
+  %\frac{\partial f}{\partial t}
+  %+
+  %\frac{\partial f}{\partial S}
+  %\left[
+  %r_t
+  %S_t
+  %- D_t^S
+  %\right]
+  %+
+  %\frac{1}{2}
+  %\frac{\partial^2 f}{\partial S^2}
+  %\sigma^2_t
+  %+
+  %D_t^f
+  %-
+  %r_t
+  %f_t
+  }
+  \label{pricingpde}
+\end{align}
+We can also rewrite this as
+\begin{align*}
+  \boxed{%
+  0=
+  \frac{\partial f}{\partial t}
+  +
+  \frac{\partial f}{\partial r_t'}
+  [\mu_t-\sigma_t\pi_t']
+  +
+  \frac{1}{2}
+  \trace\left(
+  \Sigma_t
+  \frac{\partial^2 f}{\partial r_t\;\partial r_t'}
+  \right)
+  -f_tr_t^f
+  }
+\end{align*}
+These are PDEs we can solve to for pricing function $f_t=f(S_t,t)$. It
+holds $\forall t$ prior to expiry for \emph{any} derivative.
+Derivatives only differ in the boundary conditions imposed upon this
+PDE.
+\end{thm}
+\begin{rmk}
+The second PDE is useful for pricing derivatives on an underlying $r_t$
+that is \emph{not} traded. Even though $r_t$ is not traded, it can
+be observed (hence $\mu_t,\sigma_t$ can be observed), and a price of
+risk $\pi_t$ can be postulated so this PDE can be solved for pricing
+function $f(S_t,t)$.
+But if $r_t$ \emph{is}, in fact, traded, this proposition is equivalent
+to the first expression.
+\end{rmk}
+\begin{proof}
+By the pricing formula, we know that
+\begin{align*}
+  \mu_t^f=r_t^f+\sigma_t^f\pi_t'
+  \quad\implies\quad
+  0=f_tr_t^f+f_t\sigma_t^f\pi_t'-f_t\mu_t^f
+\end{align*}
+Substitute in for $f_t\mu_t^f$ and $f_t\sigma_t^f$ and rearrange:
+\end{proof}
+
+
+\clearpage
+\subsubsection{Solving the Pricing PDEs with the Feynman-Kac Formula}
+
+Summarizing, we now have two pricing PDEs, either of which, we could
+solve for price $f_t$ of any derivative, subject to appropriate boundary
+conditions specific to that derivative:
+\begin{align*}
   0
   &=
   \frac{\partial f}{\partial t}
@@ -5012,253 +7206,7 @@ By no arbitrage, the pricing function $f_t=f(S,t)$ satisfies
   -
   r_t
   f_t
-  \label{pricingpde}
-\end{align}
-This is a PDE we can solve to for pricing function $f_t=f(S_t,t)$. It
-holds $\forall t$ prior to expiration.
-\end{prop}
-\begin{proof}
-By Proposition~\ref{prop:rf}, the portfolio defined in
-Expression~\ref{portrf} is risk-free and earns dividends as in
-Expression~\ref{divpi}.
-Therefore, no arbitrage implies by Proposition~\ref{prop:keypricing}
-\begin{align*}
-  \frac{%
-    d\Pi_t +
-    \left[
-      \frac{\partial f}{\partial S} D_t^S - D_t^f
-    \right]dt
-  }{\Pi_t}
-  &=
-  r_t\;dt
-  \quad\implies\quad
-  d\Pi_t
-  +
-  \left[
-    \frac{\partial f}{\partial S} D_t^S - D_t^f
-  \right]dt
-  =
-  r_t\Pi_t\;dt
-\end{align*}
-Sub the expressions for $d\Pi_t$ and $\Pi_t$ into the above
-expression
-\begin{align*}
-  \left[
-  -
-  \frac{\partial f}{\partial t}
-  -
-  \frac{1}{2}
-  \frac{\partial^2 f}{\partial S^2}
-  \sigma^2_t
-  \right]
-  dt
-  +
-  \left[
-    \frac{\partial f}{\partial S} D_t^S - D_t^f
-  \right]dt
-  =
-  r_t\left[
-  \frac{\partial f}{\partial S}S_t
-  -
-  f_t
-  \right]
-  \;dt
-\end{align*}
-Then just rearrange to get Expression~\ref{pricingpde}.
-\end{proof}
-
-\clearpage
-\subsection{Market Price of Risk \& Pricing Derivatives on Nontraded
-Underlying}
-
-In this subsection, we suppose that we have at least two linearly
-independent derivatives on the same underlying $S_t$.
-Unlike the previous section, we are slightly more general in that we do
-\emph{not} assume that $S_t$ is traded asset.
-However, everything here does also apply to that section because the
-trivial ``derivative'' of just $S_t$ is still a derivative on $S_t$, so
-the pair $(S_t,f_t)$ in the previous subsection would qualify as two
-linearly independent derivatives on $S_t$.
-
-
-\begin{prop}\emph{(Synthesized Risk-Free Portfolio)}
-\label{synthport}
-For any two derivatives on underlying $S_t$ with prices $f_{ti}$ and
-$f_{tj}$, let $\Pi_t$ denote the price of the portfolio that buys
-$\theta_i=\tilde{\sigma}_{tj}$ units of derivative $i$ and shorts
-$\theta_j=\tilde{\sigma}_{ti}$ units of derivative $j$:
-\begin{align*}
-  \Pi_t
-  &=
-  %\theta_i f_{ti} - \theta_j f_{tj}
-  %=
-  \tilde{\sigma}_{tj}
-  f_{ti}
-  -
-  \tilde{\sigma}_{ti}
-  f_{tj}
-\end{align*}
-The above choice of weights
-$(\theta_i,\theta_j)=(\tilde{\sigma}_{tj},\tilde{\sigma}_{ti})$ implies
-that this portfolio is risk-free, with price evolution and dividend rate
-as below:
-\begin{align}
-  d\Pi_t
-  &=
-  \big[
-  \tilde{\sigma}_{tj}\tilde{\mu}_{ti}
-  -
-  \tilde{\sigma}_{ti}\tilde{\mu}_{tj}
-  \big]
-  dt
-  \label{portevol}
   \\
-  D_t^\Pi
-  &=
-  %\theta_i D_{ti}^f
-  %- \theta_j D_{tj}^f
-  %=
-  \tilde{\sigma}_{tj}
-  D_{ti}^f
-  -
-  \tilde{\sigma}_{ti}
-  D_{tj}^f
-\end{align}
-\end{prop}
-\begin{proof}
-The goal is to create a risk-free portfolio through some linear
-combination of any two derivatives $i,j$.
-So form a portfolio through buying $\theta_i$ units of derivative $i$
-and shorting $\theta_j$ units of derivative $j$, where
-$\theta_i,\theta_j$ are fixed constants we choose to make the
-portfolio risk-free:
-\begin{align*}
-  \Pi_t
-  &= \theta_i f_{ti} - \theta_j f_{tj}
-  \quad\implies\quad
-  d\Pi_t
-  = \theta_i df_{ti} - \theta_j df_{tj}
-\end{align*}
-Use Expression~\ref{dfi} for the dynamics of $f_{ti},f_{tj}$ to
-substitute in for $df_{ti},df_{tj}$:
-\begin{align*}
-  d\Pi_t
-  &=
-  \big[
-  \theta_i\tilde{\mu}_{ti}
-  -
-  \theta_j\tilde{\mu}_{tj}
-  \big]
-  dt
-  +
-  \big[
-  \theta_i\tilde{\sigma}_{ti}
-  -
-  \theta_j\tilde{\sigma}_{tj}
-  \big]
-  \;dZ_t
-\end{align*}
-This shows that we can make the portfolio risk-free by choosing
-\begin{align*}
-  \theta_i\tilde{\sigma}_{ti}
-  &=
-  \theta_j\tilde{\sigma}_{tj}
-  \quad\implies\quad
-  (\theta_i,\theta_j)=(\tilde{\sigma}_{tj},\tilde{\sigma}_{ti})
-\end{align*}
-This then implies the desired expressions.
-\end{proof}
-
-\begin{prop}\emph{(Market Price of Risk)}
-\label{prop:lambda}
-There exists a stochastic process $\lambda_t$ called the
-\emph{market price of risk} such that, for any derivative
-$f_{t}=f(S_t,t)$ on $S_t$,
-\begin{align}
-  \lambda_t
-  &=
-  \frac{%
-    \tilde{\mu}_{t}+D_{t}^f
-    -
-    r_tf_{t}
-  }{\tilde{\sigma}_{t}}
-  =
-  \frac{%
-    \frac{\tilde{\mu}_{t}+D_{t}^f}{f_{t}}
-    -
-    r_t
-  }{\tilde{\sigma}_{t}/f_{t}}
-  \label{lambda}
-\end{align}
-The second expression divided through by $f_{t}$ to express $\lambda_t$
-terms of returns: the numerator is price return plus dividend yield less
-risk free rate, while the denominator is return volatility.
-The formula implies risk-premia or expected excess returns
-for \emph{all} derivatives on $S_t$ satisfy
-\begin{align*}
-  \text{\emph{(Risk Premium)}}
-  =
-  \frac{\tilde{\mu}_t+D_{t}^f}{f_{t}}
-  -
-  r_t
-  =
-  \lambda_t\frac{\tilde{\sigma}_{t}}{f_{t}}
-\end{align*}
-One unit of standard deviation in return $\tilde{\sigma}_t$ earns
-$\lambda_t$ units of expected excess return, hence the name ``price of
-risk'' (of $S_t$ or $Z_t$ risk, in particular).
-\end{prop}
-\begin{rmk}
-Identical instantaneous Sharpe ratios (hence risk-prices) for all
-derivatives on common underlying $S_t$ follows because the underlying
-and derivative prices are all driven by a \emph{single} source of risk
-($Z_t$, the Brownian term driving $S_t$).
-And so by no arbitrage, that risk should have the same price across all
-assets/derivatives driven only by that risk.
-That is the thrust of this proposition.
-
-Finally, since one possible derivative is always $f(S_t,t)=S_t$, this
-also implies any derivative will have a Sharpe ratio equal to that of
-the underlying asset, if $S_t$ is traded.
-\end{rmk}
-\begin{proof}
-Since the portfolio of Proposition~\ref{synthport} is risk-free, no
-arbitrage implies
-\begin{align*}
-  \frac{d\Pi_t + D_t^\Pi\;dt}{\Pi_t}
-  &= r_t\; dt
-  \quad\implies\quad
-  d\Pi_t  + D_t^\Pi\;dt
-  = r_t\Pi_t\; dt
-\end{align*}
-Substituting in the expressions for $\Pi_t$, $D_t^\Pi$, and $d\Pi_t$
-gives
-\begin{align*}
-  \tilde{\sigma}_{tj}
-  \big[\tilde{\mu}_{ti}+D_{ti}^f\big]
-  -
-  \tilde{\sigma}_{ti}
-  \big[\tilde{\mu}_{tj}+D_{tj}^f\big]
-  &=
-  r_t \tilde{\sigma}_{tj}
-  f_{ti}
-  - r_t\tilde{\sigma}_{ti}
-  f_{tj}
-\end{align*}
-Rearranging and dividing through by $\sigma_{ti}\sigma_{tj}$ gives
-\begin{align*}
-  \frac{\tilde{\mu}_{ti}+D_{ti}^f-r_t f_{ti}}{\tilde{\sigma}_{ti}}
-  &=
-  \frac{\tilde{\mu}_{tj}+D_{tj}^f-r_t f_{tj}}{\tilde{\sigma}_{tj}}
-\end{align*}
-Since derivatives $i,j$ were arbitrary, this implies all instantaneous
-Sharpe ratios must equal some common value, which we label $\lambda_t$.
-\end{proof}
-
-\begin{prop}\emph{(Pricing PDE)}
-\label{pdenontraded}
-The price $f_{t}=f(S_t,t)$ of any derivative on $S_t$ satisfies
-\begin{align*}
   0
   &=
   \frac{\partial f}{\partial t}
@@ -5276,452 +7224,11 @@ The price $f_{t}=f(S_t,t)$ of any derivative on $S_t$ satisfies
   \sigma_t^2
   + D_t^f - r_tf_t
 \end{align*}
-This is a PDE that we can solve to get the price $f_{t}$.
-\end{prop}
-\begin{rmk}
-This proposition is useful for trading derivatives on an underlying
-$S_t$ that is \emph{not} traded. Even though $S_t$ is not traded, it can
-be observed (hence $\mu_t,\sigma_t$ can be observed), and a price of
-risk $\lambda_t$ can be postulated so this PDE can be solved for pricing
-function $f(S_t,t)$.
-But if $S_t$ \emph{is}, in fact, traded, this proposition is equivalent
-to Proposition~\ref{pdetraded}, as we will show in the corollary below.
-\end{rmk}
-\begin{proof}
-Rearrange Expression~\ref{lambda}, which was derived from complete
-markets plus no-arbitrage:
-\begin{align*}
-  \tilde{\mu}_t + D_t^f - r_tf_t
-  &=
-  \tilde{\sigma}_t\lambda_t
-\end{align*}
-Sub in the expressions for $\tilde{\mu}_t,\tilde{\sigma}_t$
-derived in Prop~\ref{prop:complete} from complete markets plus
-no-arbitrage:
-\begin{align*}
-  \left[
-  \frac{\partial f}{\partial t}
-  +
-  \frac{\partial f}{\partial S}
-  \mu_t
-  +
-  \frac{1}{2}
-  \frac{\partial^2 f}{\partial S^2}
-  \sigma_t^2
-  \right]
-  + D_t^f - r_tf_t
-  &=
-  \lambda_t
-  \left[
-  \frac{\partial f}{\partial S}
-  \sigma_t
-  \right]
-\end{align*}
-Rearrange to get the expression above.
-\end{proof}
-
-\begin{cor}\emph{(Equivalence to Proposition~\ref{pdetraded})}
-Consider the trivial derivative on $S_t$: a derivative that literally is
-just $S_t$ itself, i.e. replicates its dividend payments and price
-exactly at each instant. Then by no-arbitrage,
-\begin{align*}
-  \big(f_t,\tilde{\mu}_t,\tilde{\sigma}_t,D_t^f\big)
-  =(S_t,{\mu}_t,{\sigma}_t,D_t^S)
-\end{align*}
-And even though trivial, it is a derivative on $S_t$, hence must satisfy
-Expression~\ref{lambda}:
-\begin{align*}
-  \lambda_t
-  =
-  \frac{%
-    \mu_{t}+D_{t}^S
-    -
-    r_tS_{t}
-  }{\sigma_{t}}
-  \quad\implies\quad
-  \mu_{t}
-  -
-  \lambda_t\sigma_{t}
-  =
-  r_tS_{t}
-  -
-  D_{t}^S
-\end{align*}
-This gives an expression for $\mu_t-\lambda_t\sigma_t$, which we can
-substitute into the PDE in Proposition~\ref{pdenontraded} to get
-\emph{exactly} the PDE in Expression~\ref{pdetraded}.
-So in an important sense, the propositions are equivalent.
-\end{cor}
-
-\begin{prop}
-\emph{(Alternative Expression for Derivative Price Evolution)}
-Suppose that the price $f_t$ of some derivative that pays dividends at
-rate $D_tf_t$ and whose price evolves according
-to\footnote{%
-  This is slightly different from
-  Expression~\ref{dfi}, which had Brownian term $\tilde{Z}_t$.
-  But since complete markets implies $\tilde{Z}_t=Z_t$ anyway by
-  Proposition~\ref{prop:complete}, just rewrite it like this for
-  simplicity.
-}
-\begin{align*}
-  df_{t}
-  &=
-  \tilde{\mu}_tf_t
-  \; dt
-  +
-  \tilde{\sigma}_tf_t
-  \;dZ_t
-\end{align*}
-If $\lambda_t$ is the market price of $Z_t$ risk, then we can
-equivalently rewrite the dynamics of $f_t$ as
-\begin{align*}
-\end{align*}
-\end{prop}
-\begin{proof}
-With $\lambda_t$ representing the price of $Z_t$, the driving source of
-risk for $f_t$, Proposition~\ref{prop:lambda} says that
-\begin{align*}
-  \lambda_t
-  &=
-  \frac{%
-    \tilde{\mu}_{t}f_t+D_{t}^f
-    -
-    r_tf_{t}
-  }{\tilde{\sigma}_{t}}
-\end{align*}
-Simply rearrange to isolate $\tilde{\mu}_t$.
-\end{proof}
-
-\begin{proof}
-
-\clearpage
-Suppose that
-\begin{align*}
-  f_t &= \tilde{\mu}_t\;dt + \tilde{\sigma}_t\;dZ_t \\
-  g_t &= \hat{\mu}_t\;dt + \hat{\sigma}_t\;dZ_t \\
-\end{align*}
-derivative payments $D_t^f$ and $D_t^g$. Ito's Lemma
-\begin{align*}
-  h_t
-  = h(f_t,g_t,t)
-  %= \frac{e^{-D_t^ft}f_t}{e^{-D_t^gt}g_t}
-  = \frac{f_t}{g_t}
-\end{align*}
-Multidimensional Ito's Lemma
-\begin{align*}
-  dh_t
-  &=
-  \frac{\partial h}{\partial f}
-  df_{t}
-  +
-  \frac{\partial h}{\partial g}
-  dg_{t}
-  +
-  \frac{1}{2}
-  \frac{\partial^2 h}{\partial f^2}
-  (df_t)^2
-  +
-  \frac{1}{2}
-  \frac{\partial^2 h}{\partial g^2}
-  (dg_{t})^2
-  +
-  \frac{\partial^2 h}{\partial f\,\partial g}
-  (df_{t})
-  (dg_{t})
-  \\
-  &=
-  \left[
-  \frac{\partial h}{\partial f}
-  \tilde{\mu}_t
-  +
-  \frac{\partial h}{\partial g}
-  \hat{\mu}_t
-  +
-  \frac{1}{2}
-  \frac{\partial^2 h}{\partial f^2}
-  \tilde{\sigma}^2_t
-  +
-  \frac{1}{2}
-  \frac{\partial^2 h}{\partial g^2}
-  \hat{\sigma}^2_t
-  +
-  \frac{\partial^2 h}{\partial f\,\partial g}
-  \tilde{\sigma}_t
-  \hat{\sigma}_t
-  \right]
-  dt
-  +
-  \left[
-  \frac{\partial h}{\partial f}
-  \tilde{\sigma}_t
-  +
-  \frac{\partial h}{\partial g}
-  \hat{\sigma}_t
-  \right]
-  dZ_t
-  \\
-  dh_t
-  &=
-  \left[
-  \frac{1}{g_t}
-  \tilde{\mu}_t
-  -
-  \frac{f_t}{g_t^2}
-  \hat{\mu}_t
-  +
-  \frac{f_t}{g_t^3}
-  \hat{\sigma}^2_t
-  -
-  \frac{1}{g_t^2}
-  \tilde{\sigma}_t \hat{\sigma}_t
-  \right]
-  dt
-  +
-  \left[
-  \frac{1}{g_t}
-  \tilde{\sigma}_t
-  -
-  \frac{f_t}{g_t^2}
-  \hat{\sigma}_t
-  \right]
-  dZ_t
-\end{align*}
-By definition of lambda
-\begin{align*}
-  \lambda_t
-  &=
-  \frac{%
-    \tilde{\mu}_{t}+D_{t}^f
-    -
-    r_tf_{t}
-  }{\tilde{\sigma}_{t}}
-  \quad\implies\quad
-  \tilde{\mu}_{t}
-  =
-  \tilde{\sigma}_{t}\lambda_t
-  -D_{t}^f
-  + r_tf_{t}
-\end{align*}
-And so
-\begin{align*}
-  0
-  &=
-  \frac{1}{g_t}
-  \left[
-  \tilde{\sigma}_{t}\lambda_t
-  -D_{t}^f
-  + r_tf_{t}
-  \right]
-  -
-  \frac{f_t}{g_t^2}
-  \left[
-  \hat{\sigma}_{t}\lambda_t
-  -D_{t}^g
-  + r_tg_{t}
-  \right]
-  +
-  \frac{f_t}{g_t^3}
-  \hat{\sigma}^2_t
-  -
-  \frac{1}{g_t^2}
-  \tilde{\sigma}_t \hat{\sigma}_t
-  \\
-  0
-  &=
-  g_t
-  \tilde{\sigma}_{t}\lambda_t
-  -
-  f_t
-  \hat{\sigma}_{t}\lambda_t
-  +
-  \frac{f_t}{g_t}
-  \hat{\sigma}^2_t
-  -
-  \tilde{\sigma}_t \hat{\sigma}_t
-  \\
-  \lambda=\hat{\sigma}_t/g_t
-  \quad\implies\quad
-  0
-  &=
-  \tilde{\sigma}_{t}
-  \hat{\sigma}_t
-  -
-  f_t
-  \hat{\sigma}_{t}
-  \hat{\sigma}_t/g_t
-  +
-  \frac{f_t}{g_t}
-  \hat{\sigma}^2_t
-  -
-  \tilde{\sigma}_t \hat{\sigma}_t
-\end{align*}
-Sub into the above
-\begin{align*}
-  0
-  &=
-  \frac{1}{f_{t1}}
-  \left[
-  \tilde{\sigma}_{t1}\lambda_t
-  -D_{t1}^f
-  + r_tf_{t1}
-  \right]
-  -
-  \frac{1}{f_{t2}}
-  \left[
-  \tilde{\sigma}_{t2}\lambda_t
-  -D_{t2}^f
-  + r_tf_{t2}
-  \right]
-  -
-  \frac{1}{f_{t2}^2}
-  \tilde{\sigma}_{t2}^2
-  \\
-  &=
-  \left[
-  \frac{1}{f_{t1}}
-  \tilde{\sigma}_{t1}\lambda_t
-  -
-  \frac{1}{f_{t1}}
-  D_{t1}^f
-  + r_t
-  \right]
-  -
-  \left[
-  \frac{1}{f_{t2}}
-  \tilde{\sigma}_{t2}\lambda_t
-  -
-  \frac{1}{f_{t2}}
-  D_{t2}^f
-  + r_t
-  \right]
-  -
-  \frac{1}{f_{t2}^2}
-  \tilde{\sigma}_{t2}^2
-  \\
-  &=
-  \left[
-  \frac{1}{f_{t1}}
-  \tilde{\sigma}_{t1}\lambda_t
-  -
-  \frac{1}{f_{t1}}
-  D_{t1}^f
-  \right]
-  -
-  \left[
-  \frac{1}{f_{t2}}
-  \tilde{\sigma}_{t2}\lambda_t
-  -
-  \frac{1}{f_{t2}}
-  D_{t2}^f
-  \right]
-  -
-  \frac{1}{f_{t2}^2}
-  \tilde{\sigma}_{t2}^2
-  \\
-  &=
-  \left[
-  \frac{1}{f_{t1}}
-  \tilde{\sigma}_{t1}\lambda_t
-  -
-  \frac{1}{f_{t1}}
-  D_{t1}^f
-  \right]
-  -
-  \left[
-  \frac{1}{f_{t2}}
-  \tilde{\sigma}_{t2}\lambda_t
-  -
-  \frac{1}{f_{t2}}
-  D_{t2}^f
-  \right]
-  -
-  \frac{1}{f_{t2}^2}
-  \tilde{\sigma}_{t2}^2
-\end{align*}
-\end{proof}
-
-
-
-\clearpage
-\subsection{Equivalent Martingale Measures}
-
-Suppose we have a set of derivatives indexed by $i$ whose prices are all
-driven by some common source of risk $Z_t$ (either the Brownian term for
-the underlying traded assets or the Brownian term for the non-traded
-underlying). They will have some dynamics which we can write WLOG as
-\begin{align}
-  \frac{df_{ti}}{f_{ti}}
-  =
-  \mu_{ti}\;dt
-  +\sigma_{ti}\;dZ_t
-  \label{originaldynamics}
-\end{align}
-where $\mu_{ti}$ and $\sigma_{ti}$ potentially depend on $f_{ti}$ or the
-underlying asset(s).
-Next, recall that all of these derivatives on that common source of risk
-must satisfy
-\begin{align}
-  \lambda_{t}=\frac{\mu_{ti}-r}{\sigma_{ti}}
-  \qquad
-  \forall i
-  \label{marketprice}
-\end{align}
-where $\lambda_t$ is the ``exogenous'' \emph{market price of risk}
-common for all assets. Here ``exogenous'' means ``generally not
-determined by the price of the derivatives.'' Only if the underlying
-asset is \emph{traded} (which is a trivial derivative on the underlying)
-do we know $\lambda_t$ in which case
-\begin{align*}
-  \lambda_{t}=\frac{\mu_{tS}-r}{\sigma_{tS}}
-\end{align*}
-where $\mu_{tS}$ and $\sigma_{tS}$ are the mean and variance for the
-traded \emph{underlying} asset with price $S_t$.
-But regardless, Expression~\ref{marketprice} implies that we can rewrite
-the dynamics of any dervative $i$ in Expression~\ref{originaldynamics} as
-\begin{align}
-  \frac{df_{ti}}{f_{ti}}
-  =
-  (r+\lambda_t\sigma_{ti})
-  \;dt
-  +\sigma_{ti}\;dZ_t
-  \label{martmeasure}
-\end{align}
-Now first, notice that this \emph{must} hold for all
-$i$---\emph{regardless} of $\lambda_t$---by no-arbitrage.
-
-Now in theory, we can solve these SDEs to write $f_{ti}$ as a function
-of $\lambda_t$, $Z_t$, and the arguments of $\mu_{ti},\sigma_{ti}$.
-But there's another approach that's easier and, rather than solving SDEs
-analytically, exploits the fact that we can instead simulate diffusions
-and compute expectations much more easily.
-
-In particular, we use the fact that no arbitrage ties together any two
-derivatives $f_{ti}$ and $f_{tj}$ in a very particular way (through
-their common $\lambda_t$ as is apparent in
-Expression~\ref{martmeasure}), and we can exploit that tight
-relationship.
-So to start, by Ito's Lemma, derive the dynamics of
-$f_{ti}/f_{tj}$. We get an SDE.
-That SDE is true \emph{regardless} of whatever stochastic process
-$\lambda_t$ represents. And a special choice of $\lambda_t=\sigma_{tj}$
-makes the ratio $f_{ti}/f_{tj}$ a martingale implying that
-\begin{align*}
-  f_t = g_t\E_t^g\left[\frac{f_T}{g_T}\right]
-\end{align*}
-So then, as long as we can simulate $f_T$ and $g_T$ under that
-$\lambda_t$, we can compute $f_t$.
-
-We think of $\lambda_t$ indexing different hypothetical worlds. But in
-each world, no matter what $\lambda_t$ there is, the assets prices must
-be linked by no arbitrage.
-
-
-\clearpage
-\subsection{Pricing by the Risk-Neutral Approach}
+Again, if the underlying is traded, then the two PDEs are equivalent.
+We now discuss how to solve these pricing PDEs for the price $f_t$.
 
 \begin{prop}\emph{(Risk-Neutral Pricing)}
-Propositions~\ref{pdetraded} and~\ref{pdenontraded} both implied
+Proposition~\ref{pdetraded} both implied
 PDEs for the pricing function $f_t=f(S_t,t)$ of the form
 \begin{align*}
   0
@@ -5774,11 +7281,2821 @@ The trick is just to recognize that we take the expectation not under
 the \emph{true} dynamics of $S_t$, but under the dynamics implied by the
 Feynman-Kac solution's PDE.
 \end{rmk}
+\begin{rmk}
+Notice from the risk-neutral dynamics of a non-traded underlying,
+\begin{align*}
+  \E^*[dS]
+  =
+  \E[dS] - \lambda_t \sigma_t\;dt
+\end{align*}
+
+\end{rmk}
+
+\clearpage
+\subsection{Applications}
+
+\subsubsection{Term Structure Models}
+
+Suppose that the underlying $S_t$ is the short rate $r_t$.
+Then the risk-neutral dynamics of that thing are
+\begin{align*}
+  dr_t
+  =
+  [\mu_t-\lambda_t\sigma_t]\;dt
+  + \sigma_t \;dZ_t
+\end{align*}
+A model is then a specification of the drift and diffusion in the
+risk-neutral dynamics. Then, can just price any bond by Feynman-Kac.
+Examples: ZCB, coupon bond, etc.
+
+\begin{defn}(One Factor Vasicek)
+Risk neutral dynamics
+\begin{align*}
+  dr_t
+  &=
+  \beta(\alpha-r_t)\;dt
+  +
+  \sigma\;dZ_t
+\end{align*}
+Special feature: If real-world dynamics are Vasicek and $\lambda=0$
+constant, then the risk-neutral dynamics are also Vasicek. That's if you
+think writing down straight away Vasicek risk-neutral dynamics is
+ad-hoc, and you want to know how the real world measure is related to
+the risk-neutral measure.
+
+Can also get a closed-form expression for price of ZCBs.
+\end{defn}
+
+With single-factor models, returns on bonds of all maturities perfectly
+correlated.
+So introduce multifactor model.
+
+Suppose factors independent and $r=\sumiN F_n$. Under assumption of
+independent factors, can get a closed-form price of ZCBs.
+
+Affine two-factor model, with possible correlation between factors.
+Setup and dynamics.
+
+Quadratic model. If the factors are gaussian, Quadratic-Gaussian model.
+
+
+\subsubsection{Default Model}
+
+Stopping time $\tilde{T}$ that determines time of default.
+Bond price changes. Use conditioning to get the price.
 
 
 
 
 \clearpage
+\section{Empirical Methods}
+
+Threats to internal validity (i.e. is our causal inference valid?):
+\begin{itemize}
+  \item Ommitted variable:
+    Omitted a RHS variable that's also correlated with the outcome
+    $Y_i$, and provides an alternative explanation.
+    Mechanically, $\Cov(X_i,\varepsilon_i)\neq 0$
+  \item Simultaneity: $(X_i,Y_i)$ jointly determined like prices and
+    quantities, i.e. $X_i$ endogenous
+  \item Selection: Treatment not random, there's selection into
+    treatment group, so there's a correlation there even in absence of
+    causal effect
+  \item Bad inference: Ignore cross-sectional or time-series correlation
+    between residuals, i.e. don't cluster or use HAC, respectively
+  \item Measurement Error: In $X_i$, attenuation bias towards zero. In
+    $y_i$, higher variance of estimate and reduces power
+\end{itemize}
+Fixed effects versus clustering:
+Suppose
+\begin{align*}
+  Y_{it} = \alpha_i + X_{it}'\beta + \varepsilon_{it}
+\end{align*}
+We can run two regressions
+\begin{itemize}
+  \item Estimate the above model with fixed effects $\alpha_i$
+  \item Estimate the above model with $\alpha_i$ not included and
+    cluster standard errors since $\alpha_i$ get swept into the
+    residual
+\end{itemize}
+Result depends upon $\Cov(\alpha_i,X_{it})$:
+\begin{itemize}
+  \item $\Cov(\alpha_i,X_{it})=0$:
+    OLS unbiased, just a clustering problem where SE must be corrected
+  \item $\Cov(\alpha_i,X_{it})\neq 0$:
+    Bias problem, need to add the FE
+\end{itemize}
+Estimating fixed effect regressions
+\begin{itemize}
+  \item \texttt{areg yvar xvar, absorb(firmvar)}
+
+    This generally yields larger standard errors than \texttt{xtreg}
+    since it treats each fixed affect as a parameter to be estimated in
+    the degrees of freedom adjustment, boosting standard errors
+  \item Two steps
+    \begin{itemize}
+      \item \texttt{xtset firmvar}
+      \item \texttt{xtreg yvar xvar, fe}
+    \end{itemize}
+    This generally yields smaller standard errors than than
+    \texttt{areg} because it does not count fixed effects as parameters
+    to be estimated in the degrees of freedom adjustment, leading to
+    smaller standard erorrs
+
+    This is appropriate when we cluster standard errors and FE are
+    nested within clusters, i.e. all observations for a given FE group
+    are in the same cluster.
+    This comes up a lot.
+    For example, if we have have firm FE, and we cluster standard errors
+    by firm, industry, or state (provided that all firms are located in
+    a single state) then we can run \texttt{xtreg}
+    because each firm shows up in a single cluster.
+\end{itemize}
+
+
+
+\clearpage
+\section{Survey}
+
+Without frictions, we have fund flows based on heterogeneity (i.e.
+differences in productivity, patience, risk aversion), but no
+sense in which this is inefficient, things are misallocated, or output
+suboptimal.
+Productive agents hold most of the productive capital.
+With frictions, not true.
+Wealth distribution matters.
+
+Persistence and amplification two key themes.
+Persistence because agents need to rebuild/recover in face of frictions.
+Amplification because of fire sales and feedback effects.
+
+Exogenous vs. endogenous risk. Instability of the financial system is
+lots of endogenous risk per unit exogeneous risk
+
+Terms
+- Fire sale: Forced to sell capital at low prices
+- Loss spiral: Net worth decline because of fire sales
+- Margin spiral: Margins or haircuts rise forcing agents to lower
+leverage, which further depresses prices
+- Collateral run: Collateral values drop and margins rise
+- Counterparty run: in unsecured lending markets, your counterparty runs
+
+Three distinct liquidity concepts for physical capital
+- Technology: physical capital investment reversible
+- Market: physical capital can be sold easily without market impact
+- Funding: Whether the asset can be used as collateral for funding.
+Determined by maturity structure of debt and sensitivity of
+margins/haircuts
+
+This matters because we want to know how big the firesale discount is,
+which determines the magnitude of amplification
+
+Liquidity mismatch between technological and market liquidity on the
+asset side and funding liquidity on the liability side of balance sheet
+
+Ex ante demand for liquid assets so agents can smooth consumption when
+shocks (individual or aggregate) hit by selling these liquid assets.
+Purest example: money. No intrinsic value, but very high liquidity.
+Interacts with borrowing constraint, and how close people are to it.
+
+Price distortions for liquid assets lead to *constrained inefficient*
+outcome, driven by the fact that agent actions have pecuniary
+externalities (affect prices), which affects the choices of other agents
+who take prices as given.
+Room for Pareto improvements by the gov't
+
+Financial institutions mitigate some frictions, but introduce fragility
+on their own. Four functions
+1.  banks can insure against idiosyncratic shocks by pooling,
+    But banks have a liquidity mismatch (because borrow short lend long)
+2.  Use their superior monitoring tech, incentivize the borrowers
+3.  Creation of money-like securities (that aren't sensitive to
+    information, so don't need to collect info or worry about asymmetric
+    info)
+4.  By exposing themselves to bank runs (being fragile), productive
+    agents can pledge more future cash flows ex ante somehow
+
+Financial institutions: Key to understnad interactions between price
+stability and financial stability
+- They let productive agents issue debt and equity claims to less
+productive agents through monitoring role
+- Can channel funds themselves from less productive to more productive
+- Banks create inside money, which productive agents can use
+- Shocks lead banks to contract inside money
+
+Financing restrictions/constraints
+- Debt/credit: limit to debt financing, often value of collateral
+- Equity: limit extent to which can sell off risky claims (which might
+exist bc agent needs skin in the game)
+- Incomplete markets: certain risk cannot be sold off at all
+- Limited participation: some agents excluded from markets totally
+- OLG models: currently living cannot write contracts with unborn
+
+Towsend 1979:
+- Costly state verification
+- Asymmetric info ex post (after inv return realized) btw Debtor, Lender
+- Debtor learns payoff at end; lender only does if pay monitoring cost
+- Debt optimal contract bc minimizes socially wasteful monitoring costs
+- Only need to monitor the state in default
+- Monitoring costs exists, external funding more expensive
+
+Stiglitz and Weiss (1981)
+- Asymetric info ex ante: borrowers more info abt payoff vol of project
+- Limited liability means lenders worse off with higher vol
+- Lemons problem as in Akerlof (1970)
+- Increasing interest rates to deal with asymmetric info actually
+doesn't work bc leads to a worsening of credit applicants, the low vol
+people stop applying, but the higher vol people don't stop
+- Ration overall credit, charge a lower rate
+
+Hart and Moore (1994)
+- Incomplete contracts -> limited pledgeability
+- Payments in certain states not exactly specified
+- In those future states, debtors and lenders renegotiate obligations
+- Knowing that today, certain payoff realizations non-pledgeable
+- Ex ante funding often limited then
+- Skin in the game constraint must be imposed
+- Restricts one-on-one contract arrangements
+- Solution: change ex-post bargaining outcome by *collateralizing*
+initial contract
+- Foundation for lit that uses collateral/margin/haircut constraints
+- Foundation for lit on limited enforcement of contracts
+  - Bulow and Rogoff (1989)
+  - Kehoe and Levine (1993)
+  - Alvarez and Jermann (2000)
+  - Cooley, Marimon, Quadrini (2004)
+
+
+Empirical macro literature on credit constraints
+- Bank lending Channel: constraint primarily on bank/lender side
+  - Bernanke (1983)
+  - Slovin, Sushka, Poloncheck (1993): borrowers whose main banking
+    relationship with bank that went bust had abnorm worse returns until
+    bailout, then abnorm better
+  - Peek and Rosengren: US branches of Japanese banks lent less after
+    Japanese house price bust
+  - Gan (2007)
+- Bal sheet channel: constraint primarily on hhold/firm/borrower side
+
+Corporate finance: deviations from neoclassical theory of investment,
+i.e. showing that financing matters
+- Lamont (1997): After a sharp decrease in oil prices, non-oil division
+of oil conglomerates *reduced* investment
+- Bakke and Whited (2011): RD design exploiting mandatory contributions
+to defined benefit plans. Firms with large cash flows cut R\&D, working
+capital, employment
+- Blanchard, de Silanes, Shleifer (1994): Firm acquisitions respond
+positively to windfalls from legal settlements unrelated to ongoing
+lines of business
+
+Corporate finance: Collateral Value
+- Benmelech, Garmaise, Moskowitz (2005): commercial prop loans more
+generous (lower rate, higher LTV, longer maturities and duration) if
+underlying properties have fewer zoning restrictions, i.e. have higher
+market liquidity and more easily redeployable
+
+Other books and surveys
+- Brunneremeier 2001, 2008 Bubbles survey
+- Freixas and Rochet (1997)
+- Bhattacharya, Boot, Thakor (2004)
+- Heathcote, Storesletten, Violante (2009)
+- Gertler and Kiyotaki (2010)
+- Shin (2010)
+- Veldkamp (2011)
+- Quadrini (2011)
+
+\clearpage
+\subsection{Persistence}
+
+Outline
+\begin{itemize}
+  \item Emprical Fact: Temporary shocks can have long-lasting effects
+  \item Key Papers:
+    Bernanke and Gertler (1989) and Carlstrom and Fuerst (1997)
+  \item Key model friction: Costly state verification of Towsend (1979)
+\end{itemize}
+We will develop the Carlstrom and Fuerst (1997) model.
+Model setup and environment:
+\begin{itemize}
+  \item Agents: Unit mass of agents, divided into two types with
+    different roles.
+    \begin{itemize}
+      \item Household/lenders, mass $1-\eta$
+      \item Entrepreneurs/borrowers, mass $\eta$.
+        They alone can produce capital (subject to idiosyncratic
+        productivity differences across entrepreneurs), which they do by
+        investing their own net worth and loans from households.
+    \end{itemize}
+  \item Output Production: $Y_t=f(K_t,L_t)$, standard.
+    Only capital production is nonstandard.
+  \item Capital Production:
+    Each entrepreneur can produce capital (with the consumption good as
+    the only input) via a linear production function; however,
+    productivity differs idiosyncratically across entrepreneurs.
+
+    Specifically, given $i_t$ units of the consumption good, each
+    entrepreneur can produce $\omega i_t$ units of capital, which can be
+    sold within-period at unit price $q_t$, where $\omega\iid G(\omega)$
+    across time and entrepreneurs with $\E[\omega]=1$.
+    Individual productivity draws $\omega$ are unknown to each
+    entrepreneur before choosing investment amount $i_t$ (so each
+    maximizes \emph{expected} profits).
+    It is also unknown to lenders/households after investment and
+    production, unless they pay a verification cost, as discussed in the
+    next bullet.
+
+  \item
+    Key Friction and Financial Markets:
+    Costly state verification of Towsend (1979).
+    After realization of $\omega$ and production, an entrepreneur's
+    productivity $\omega$ is observable to households/lenders only at
+    verification cost $\mu i_t$ (given lending $i_t$).
+    Household/lender can't seize the entrepreneur's capital without
+    first paying this verification cost and learning how much there is
+    to sieze.
+\end{itemize}
+\clearpage
+We now proceed to the problems
+\begin{itemize}
+  \item Household/lender:
+    The household must determine a consumption and lending policy.
+    Regarding the lending policy, this is technically an equilibrium
+    result that follows from the costly state verification imposed on
+    this problem, but let's just say right now that households will only
+    be willing to offer debt contracts, where an entrepreneur promises
+    to repay $\bar{\omega}_ti_t$ when they invest $i_t$. It is this
+    cutoff rate $\bar{\omega}_t$ that is determined in equilibrium.
+    If the entrepreneur isn't productive enough to repay this amount,
+    then (and only then) the lender/household pays the verification cost
+    and siezes all the capital.
+
+  \item Entrepreneur problem:
+    Any given entrepreneur with net worth $n_t$ maximizes expected
+    proceeds from investment---``expected'' since they make their
+    investment decision prior to their productivity realization.
+    Note that capital production takes place within period and is
+    sold/valued at within-period price $q_t$.
+    Hence, each entrepreneur chooses investment amount $i_t$ to solve
+    \begin{align*}
+      \max_{i_t}
+      \;
+      q_t
+      \left[
+      0 +
+      i_t\int_{\overline{\omega}_t}^\infty
+      %(\omega-\overline{\omega}_t(i_t))\;dG(\omega)
+      (\omega-\overline{\omega}_t)\;dG(\omega)
+      \right]
+      %\quad
+      %\text{s.t. Constraint~\ref{cf:be}}
+    \end{align*}
+    %First,
+    The zero in brackets is the amount the entrepreneur gets
+    conditional on default; the integral is the amount conditional on
+    regular repayment.
+    %Second, by writing $\overline{\omega}_t(i_t)$, we allow the cutoff
+    %to depend upon the investment amount.
+    %we make sure that the
+    %problem is subject to breakeven Constraint~\ref{cf:be}.
+\end{itemize}
+Equilibrium
+\begin{itemize}
+  \item
+    (\emph{Household Lending Condition}):
+    Households are lenders in a competitive market, hence cutoff
+    $\bar{\omega}_t$ is determined by a zero-profit condition.
+    Let $i_t$ denote investment, $n_t$ an entrepreneur's net worth
+    (which makes up the non-borrowed part of their investment) so that
+    the loan amount is $i_t-n_t$, $\bar{\omega}_ti_t$ the repayment
+    amount, and $q_t$ the price of capital.
+    Then there is the following zero-profit condition (again, because of
+    a competitive lending market) which says that the loan amount
+    $i_t-n_t$ must equal expected proceeds from the loan (i.e. the
+    amount of capital that can be resold at price $q_t$):
+    \begin{align}
+      i_t-n_t
+      &=
+      q_t
+      \bigg[
+      \int_0^{\overline{\omega}_t}
+      i_t(\omega-\mu)\;dG(\omega)
+      +
+      \int_{\overline{\omega}_t}^\infty
+      \bar{\omega}_ti_t\;dG(\omega)
+      \bigg]
+      \notag
+      \\
+      &=
+      i_tq_t
+      \bigg[
+      \int_0^{\overline{\omega}_t}
+      (\omega-\mu)\;dG(\omega)
+      +
+      \overline{\omega}_t\big(1-G(\overline{\omega}_t))
+      \bigg]
+      \label{cf:be}
+    \end{align}
+    The first integral in either line corresponds to proceeds
+    conditional on default and audit.  The second integral corresponds
+    to regular repayment of the debt contract.  This pins down
+    $\overline{\omega}_t(i_t)$, i.e.  $\overline{\omega}_t$ as a
+    function of $i_t$, the investment amount.
+    Note that there is no risk premium since we assume that lenders can
+    diversify across entrepreneurs and their idiosyncratic productivity
+    risk.
+
+  \item
+    (\emph{Entrepreneur Condition}):
+    Maximize subject to the breakeven condition gives linear investment
+    rule
+    \begin{align*}
+      i_t=\psi(q_t)n_t
+      \qquad\text{where}\quad
+      \psi'>0
+    \end{align*}
+    \begin{comment}
+    If the objective function is positive, then the investor wants to
+    borrow as much as possible. That means the breakeven constraint of
+    the lender entirely pins down investment $i_t$
+    \begin{align*}
+      i_t-n_t
+      &=
+      i_tq_t
+      \bigg[
+      \int_0^{\overline{\omega}_t}
+      (\omega-\mu)\;dG(\omega)
+      +
+      \overline{\omega}_t\big(1-G(\overline{\omega}_t))
+      \bigg]
+      \\
+      i_t
+      &=
+      n_t
+      \underbrace{%
+        \left(
+        1-
+        q_t
+        \bigg[
+        \int_0^{\overline{\omega}_t}
+        (\omega-\mu)\;dG(\omega)
+        +
+        \overline{\omega}_t\big(1-G(\overline{\omega}_t))
+        \bigg]
+        \right)^{-1}
+      }_{\psi(q_t)}
+    \end{align*}
+    Hence borrowing is linear in net worth, and in particular, they just
+    lever up their net worth.
+    Leverage $\psi(q_t)$ is increasing in $q_t$.
+    So borrowing increasing in net worth $n_t$ and price of capital $q_t$,
+    and then so is investment.
+    \end{comment}
+    Return on internal funds to the entrepreneur is maximized profit
+    divided by net worth $n_t$, which is (using the expression for $i_t$
+    above)
+    \begin{align*}
+      \rho(q_t)
+      &=
+      \frac{%
+        i_tq_t
+        \int_{\overline{\omega}_t}^\infty
+        (\omega-\overline{\omega}_t)\;dG(\omega)
+      }{n_t}
+      =
+      \psi(q_t)
+      q_t
+      \int_{\overline{\omega}_t}^\infty
+      (\omega-\overline{\omega}_t)\;dG(\omega)
+      >1
+      \quad\text{b/c agency costs}
+    \end{align*}
+
+  \item
+    (\emph{Capital Supply}):
+    By linearity, investment rule $i_t=n_t\psi(q_t)$ can be aggregated
+    easily into aggregate supply of capital, which is an increasing
+    function of price of capital $q_t$ and agg net worth $N_t$.
+
+  \item
+    (\emph{Capital Demand}):
+    Let $R_{t+1}^k$ be the return to holding capital from period $t$ to
+    $t+1$:
+    \begin{align*}
+      R_{t+1}^k =
+      \frac{A_{t+1}f'(K_{t+1})+q_{t+1}(1-\delta)}{q_t}
+    \end{align*}
+    Risk averse hholds solve a consumption-savings (capital accumulation)
+    problem, which gives EE,
+    \begin{align*}
+      u'(c_t)
+      =
+      \underline{\beta}
+      \E_t
+      \big[
+        R_{t+1}^k
+        u'(c_{t+1})
+      \big]
+    \end{align*}
+    Less patient $\beta<\underline{\beta}$ risk-neutral agents solve a
+    consumption-savings (capital accumulation) problem, which implies EE
+    \begin{align*}
+      1
+      =
+      {\beta}
+      \E_t
+      \big[
+        R_{t+1}^k
+        \rho(q_{t+1})
+      \big]
+    \end{align*}
+    Note that the assumption $\beta<\underline{\beta}$ implies entre want to
+    consume early.
+    But the \emph{higher} return on investing with internal funds mean they
+    want to postpone consumption.
+    Need to calibrate $\beta\rho(q)=\underline{\beta}$ to balance, and
+    prevent entre from never consuming and just self-financing.
+
+    Aggregate demand for capital is pinned down by the two EE's together,
+    and the result is downward sloping in $q_{t}$.
+
+
+\end{itemize}
+
+
+Results
+\begin{itemize}
+  \item Entre net worth $N_t$ persistent. Anything that eventually leads
+    to a shock to $N_t$ can tighten or loosen the financing friction,
+    which affects investment
+  \item Somewhat curiously, a negative supply shock (from a negative net
+    worth shock that leads to lower quantities and tighter frictions)
+    \emph{increases} the price $q_t$ (because less net worth, can't
+    produce as much, scarcer capital, higher price), which dampens the
+    propagation of the net worth shock.
+    Differs from GG and KM
+\end{itemize}
+
+Compares to Bernanke and Gertler (1989) which was OLG with two-period
+lived agents.
+Entre earn labor income in first period, invest these earnings and
+outside funding from hholds to make capital for \emph{next} period.
+After production, capital depreciates fully, so
+$R_t^k = A_tf'(K_t)$.
+Supply curve of capital for next period
+\begin{align*}
+  K_{t+1}
+  =S(\E[R_{t+1}^k],N_t)
+\end{align*}
+increasing in both arguments.
+
+Demand curve for next period only depends on its expected rent,
+implicitly defined by
+\begin{align*}
+  \E[A_{t+1}]f'(K_{t+1})
+  = \E[R_{t+1}^k]
+\end{align*}
+which is decreasing in expected return given concave $f$.
+
+Persistence mechanism:
+- Negative productivity shock in $t$ decreases wage $w_t$
+- Decreases current entre net worth
+- Increases borrowing frictions
+- Decreased investment in capital for period $t+1$
+- Reduces output next period, and so wage and net worth, keeping the
+depressed effect alive
+
+\textcolor{red}{%
+Questions:
+\begin{itemize}
+  \item How $\omega(i_t)$ works
+\end{itemize}
+}
+
+
+\subsubsection{Dynamic Amplification}
+
+Bernanke, Gertler, Gilchrist (1999)
+
+Nonlinear adjustment costs of capital, hence variation in Tobin's q,
+which is the main amplification booster above and beyond BG and CF.
+Convex adjustment costs make sure price of capital *drops* (rather than
+increases as in BG and CF) with a negative net worth shock
+
+Risk averse hholds and risk-neutral investors.
+Entre are the only ones who can hold capital.
+Investment delegated to separate investment sector (which ensures
+adjustment costs are separate from investor's decision of how much
+capital to hold) where
+\begin{align*}
+  K_{t+1}
+  &=
+  (1-\delta)K_t +
+  \Phi(I_t/K_t)
+  K_t
+  \qquad
+  \Phi'>0,\;
+  \Phi''<0,\;
+  \Phi(0)=0
+  \\
+  \iff\qquad
+  K_{t+1}-K_t
+  &=
+  \big(
+  \Phi(I_t/K_t)
+  -\delta
+  \big)
+  K_t
+\end{align*}
+The term $\Phi(\cdot)-\delta$ is \emph{technological illiqudity} because
+it represents how easy/tough to scale up or down investment.
+Asume the capital producing sector is competitive.
+They take the price of capital $q_t$ as given, and choose amount $I$
+of investment to produce $\Phi(I/K)K$ new units of capital, solving
+\begin{align*}
+  \max_I
+  \;
+  q_t\Phi(I/K)K
+  -
+  I
+  \quad\implies\quad
+  q_t
+  = \Phi'(I/K)^{-1}
+\end{align*}
+Note that this is Tobin's $q$ (market value of capital over book value
+of one unit of capital), and it generally differs from one.
+
+Same kind of setup: entre buy $k_{t+1}$ units of capital in period $t$
+(for production next period) at price $q_t$.
+Since their net worth is $n_t$, they borrow $q_tk_{t+1}-n_t$.
+Let $R_{t+1}^k$ denote aggregate equilibrium return at $t+1$, and again
+we have idiosyncratic returns $\omega R_{t+1}^k$ for
+$\omega\iid G(\omega)$ where $\E[\omega]=1$.
+Verification costs are a fraction $\mu\in(0,1)$ of the amount extracted
+from entre.
+Let $R_{t+1}$ denote the risk free rate.
+If $R_{t+1}^k$ and $R_{t+1}$ deterministic, then households who lend
+$q_tk_{t+1}-n_t$ demand that the payoff to giving money to entrepreneurs
+matches the payoff to just investing that amount in the risk free rate:
+\begin{align*}
+  R_{t+1}(q_tk_{t+1}-n_t)
+  &=
+  q_tk_{t+1}
+  \bigg[
+  \int_0^{\overline{\omega}_t}
+  (1-\mu)\omega R_{t+1}^k\;dG(\omega)
+  +
+  \overline{\omega}_tR_{t+1}^k\big(1-G(\overline{\omega}_t))
+  \bigg]
+  \\
+  &=
+  q_tk_{t+1}
+  R_{t+1}^k
+  \bigg[
+  (1-\mu)\int_0^{\overline{\omega}_t}
+  \omega\;dG(\omega)
+  +
+  \overline{\omega}_t\big(1-G(\overline{\omega}_t))
+  \bigg]
+\end{align*}
+Now suppose there is aggregate uncertainty.
+It's still the case that households can insure against idiosyncratic
+entre risk, but they can't necessarily insurage against aggregate
+$R_{t+1}$ and $R_{t+1}^k$ risk.
+How to cope?
+
+Well, BGG assume that since the entre are risk neutral, they insure the
+households against aggregate risk, so that the above equation holds
+state-by-state.
+This is key to solving the model, and also the large amplification.
+But note that the resulting contracts with perfect insurance are
+\emph{not} optimal.
+For the planner, there's a tradeoff between insuring the household
+against aggregate risk and minimizing expected verification costs.
+
+So then entre maximize expected net worth in the next period subject to
+the above state-by-state constraint, postponing consumption. (This means
+they would accmulate infinite wealth, except they are killed off with
+some probability at each $t$, in which case they are forced to consume
+all wealth before they are replaced with a new entre.)
+\begin{align*}
+  \max_{k_{t+1}}
+  &\;
+  \E\left[
+  q_tk_{t+1}R_{t+1}^k
+  \int_{\overline{\omega}_t}^\infty
+  (\omega-\overline{\omega}_t)\;dG(\omega)
+  \right]
+  \\
+  \text{s.t.}\quad
+  &
+  R_{t+1}(q_tk_{t+1}-n_t)
+  =
+  q_tk_{t+1}
+  R_{t+1}^k
+  \bigg[
+  (1-\mu)\int_0^{\overline{\omega}_t}
+  \omega\;dG(\omega)
+  +
+  \overline{\omega}_t\big(1-G(\overline{\omega}_t))
+  \bigg]
+\end{align*}
+If the integral in the expectation is positive, they want as much
+$k_{t+1}$ as they can get, so that we just solve the constraint for
+$k_{t+1}$ (replacing $R_{t+1}^k$ with $\E[R_{t+1}^k]$, since up to
+log-linearization, that's what matters):
+\begin{align*}
+  k_{t+1}
+  &=
+  R_{t+1}n_t
+  \left(
+  R_{t+1}q_t
+  -
+  q_t
+  \E[
+  R_{t+1}^k
+  ]
+  \bigg[
+  (1-\mu)\int_0^{\overline{\omega}_t}
+  \omega\;dG(\omega)
+  +
+  \overline{\omega}_t\big(1-G(\overline{\omega}_t))
+  \bigg]
+  \right)^{-1}
+  \\
+  &=
+  n_t
+  \psi\left(
+  \frac{\E[R_{t+1}^k]}{R_{t+1}}
+  \right)
+\end{align*}
+Capital expenditure linear in net worth.
+Aggregate across entre to get capital supply that is increasing in
+$\E[R_{t+1}^k]$ and aggregate net worth $N_t$.
+
+Need demand to close the model.
+The expected gross return to a unit of capital is $R_{t+1}^k$.
+That equal the expected return to buying a unit of capital at price
+$q_t$ and using it for production next period or something, i.e.
+\begin{align*}
+  \E[R_{t+1}^k]
+  =
+  \E\left[
+  \frac{1}{q_t}
+  \big(
+  A_{t+1}f'(K_{t+1})
+  + q_{t+1}(1-\delta)
+  + q_{t+1}\Phi(I_{t+1}/K_{t+1})
+  - I_{t+1}/K_{t+1}
+  \big)
+  \right]
+\end{align*}
+Overall, new effect in that decrease in aggregate capital implied by
+negative shock to net worth \emph{reduces} the price of capital $q_t$,
+which further decreases net worth and amplifies things.
+
+
+\paragraph{Kiyotaki Moore, Credit Cycles (1997)}
+Not costly state verification anymore but rather collateral constraint
+on borrowing due to incomplete contracts.
+Also, two productive sectors (with different levels of productivity)
+rather than one.
+Durable assets serving two roles: collateral and production.
+Fixed total aggregate capital, so capital \emph{extremely}
+nonreversible, i.e. extreme tech illiquiditiy.
+Focus instead on \emph{market} liquidity:
+At what price capital can be redeployed and sold off to the second best
+use by reallocating from one group to another.
+Amplification from firesales of capital from more to less productive
+capital, depressing prices.
+Static amplification from debt overhang, and further dynamic
+amplification because of persistence that feeds back to today.
+Goods:
+\begin{itemize}
+  \item Land, fixed supply $\overline{K}$
+  \item Fruit, perishable
+\end{itemize}
+Agents
+\begin{enumerate}
+  \item Farmers, measure 1
+  \item Gatherers, measure $m$
+\end{enumerate}
+Markets, in which fruit is the numeraire
+\begin{itemize}
+  \item Land spot market, $q_t$ units of fruit per unit land
+  \item One-period credit market,
+    $R_t$ units of units of fruit at $t+1$ per unit fruit today
+\end{itemize}
+Assumptions
+\begin{enumerate}
+  \item $\beta<\beta'$: Farmer's more impatient. Implies farmers don't
+    want to postpone production. Also implies that farmers borrow and
+    gatherers lend.
+    %Farmers will try to borrow as much as possible from gatherers. (Only
+    %a collateral constraint from limited commitment limits the amount
+    %they borrow.) As a result, the lenders/gatherers set the interest
+    %rate.
+    %Implication: $R_t=1/\beta'=R$, i.e.\ lenders/gatherers set interest
+    %rate
+  \item $c>\left(\frac{1}{\beta}-1\right)a$ or equivalently
+    $\frac{a+c}{a}>\frac{1}{\beta}$:
+    Ensures in equilibrium that farmer doesn't want to consume
+    \emph{more} than $c$, the nontradeable amount, i.e. trades all
+    tradeable fruit.
+  \item Farmers cannot commit to produce or to turn over fruit; could
+    just walk away and not produce or steal the fruit.
+    Only recourse for lender is the ability to sieze the collateral/land
+    and resell.
+    Hence to cope with this limited commitment, they lend only up to the
+    resale value of the collateral (land).
+\end{enumerate}
+
+\clearpage
+Equilibrium:
+Sequence of prices $\{q_t,R_t\}$ and quantities
+$\{k_t,k_t',b_t,b_t',x_t,x_t'\}$
+such that
+\begin{itemize}
+  \item Farmer Max: $\{k_t,b_t,x_t\}$ solve
+    \begin{align*}
+      \max_{k_t,b_t,x_t} &\;
+      \E_t\left(
+      \sum_{s=0}^\infty
+      \beta^sx_{t+s}
+      \right)
+      \\
+      \text{s.t.}\quad
+      &
+      \underbrace{q_t(k_t-k_{t-1})}_{New Land}
+      + \underbrace{R_{t-1}b_{t-1}}_{Repay}
+      + x_t
+      =
+      \underbrace{(a+c)k_{t-1}}_{Production}
+      + \underbrace{b_t}_{New Debt}
+      \\
+      &
+      R_{t}b_t \leq q_{t+1}k_t
+      \\
+      &x_t\geq ck_{t-1}
+    \end{align*}
+    Notice that of total output $(a+c)k_{t-1}$, only $ak_{t-1}$ is
+    tradeable. This makes sure the farmer doesn't continually postpone
+    consumption.
+    The collateral constraint says that the farmer cannot promise to
+    repay more than the value of the land tomorrow.
+  \item Gatherer Max: $\{k_t',b_t',x_t'\}$ maxes the gatherer problem
+    \begin{align*}
+      \max_{x_t',k_t',b_t'} &\;
+      \E_t\left(
+      \sum_{s=0}^\infty
+      {\beta'}^sx_{t+s}'
+      \right)
+      \\
+      \text{s.t.}\quad
+      &
+      \underbrace{q_t(k_t'-k_{t-1}')}_{New Land}
+      + \underbrace{R_{t-1}b_{t-1}'}_{Repay}
+      + x_t'
+      =
+      \underbrace{G(k_{t-1}')}_{Production}
+      + \underbrace{b_t'}_{New Debt}
+      \qquad\text{where}\quad
+      G'>0, G''<0
+    \end{align*}
+    Notice that we put no restriction on the amount the gatherer can
+    lend or borrow
+  \item Market Clearing for land, fruit, debt with unit mass of
+    farmers and mass $m$ of gatherers:
+    \begin{align*}
+      \overline{K} &= k_t + mk_t' \\
+      x_t+mx_t' &= (a+c)k_{t-1} + mG(k_{t-1}') \\
+      0 &= b_t + mb_t'
+    \end{align*}
+\end{itemize}
+
+\clearpage
+Characterizing Equilibrium
+\begin{enumerate}
+  \item
+    \emph{$u_t$, User Cost Definition}:
+    It will be useful to define the user cost of capital (cost to buy
+    less proceeds from resale tomorrow).
+    \begin{align*}
+      u_t = q_t - \frac{q_{t+1}}{R}
+    \end{align*}
+     Also equals downpayment rate since farmer can buy amount of land
+     $k_{t}$ with $q_{t}k_t$ of their own money less borrowings up to
+     $b_t = (q_{t+1}/R)k_t$.
+
+     The fact that user cost equals downpayment rate comes entirely from
+     the way the budget constraint is set up.
+     The lender uses the resale amount to determine how much is safe to
+     lend to you.
+     Could think about generalizing this.
+     %Would seem to have important implications for housing too
+
+  \item
+    Gatherer problem: Setup the Lagrangian, ignoring the expectation
+    \begin{align*}
+      \calL
+      =
+      \sum_{t=0}^\infty
+      {\beta'}^tx_{t}'
+      -
+      \lambda_t
+      \big[
+      q_t(k_t'-k_{t-1}')
+      + R_{t-1}b_{t-1}'
+      + x_t'
+      - G(k_{t-1}')
+      - b_t'
+      \big]
+      %-
+      %\mu_t
+      %\big[
+      %Rb_t' - q_{t+1}k_t'
+      %\big]
+    \end{align*}
+    Then the FOCs are given by
+    \begin{alignat*}{3}
+      \partial x_t':&
+      \qquad
+      0 &&=
+      {\beta'}^t
+      - \lambda_t
+      \\
+      \partial k_t':&
+      \qquad
+      0 &&=
+      -\lambda_tq_t
+      + \lambda_{t+1}q_{t+1}
+      + \lambda_{t+1}G'(k_{t+1}')
+      %+ \mu_tq_{t+1}
+      \\
+      \partial b_t':&
+      \qquad
+      0 &&=
+      -\lambda_{t+1}R_t
+      + \lambda_t
+      %- \mu_tR
+    \end{alignat*}
+    By the first FOC, ${\beta'}^t=\lambda_t$.
+    That together with the third FOC, implies $R_t=1/\beta'=R$, where
+    $R$ is clearly a constant.
+    Using both of those in the second FOC imply
+    \begin{align*}
+      \frac{G'(k_{t+1}')}{R}
+      &=
+      q_t
+      -\frac{q_{t+1}}{R} = u_t
+    \end{align*}
+
+  \item $R_t=R=1/\beta$: As just derived, this expression holds.
+    Because the gatherers are unrestricted in their asset holdings
+    (while farmers are constrained), the lenders/gatherers set the
+    interest rate in this economy.
+    We will use this and directly in the farmer's problem below and omit
+    the time subscript since we now know $R_t=R$ in equilibrium.
+
+  \item Farmer Problem:
+    Use guess and verify to show the two inequality constraints are
+    binding near steady state, i.e. farmer borrows as much as possible
+    $b_t=q_{t+1}k_t/R$ and consumes only the nontradeable amount
+    $x_t=ck_{t-1}$, selling \emph{all} tradeable output and using the
+    proceeds to invest in land.
+    We will prove this, but first, to help with that proof,  derive
+    some results under the assumption that both constraints are binding.
+
+    If both constraints are binding (which we prove below), then
+    \begin{align*}
+      Rb_t &= q_{t+1}k_t
+      \\
+      x_t &= ck_{t-1}
+    \end{align*}
+    Given this guess, we can elimiate $x_t$ and $b_t$ from the budget
+    constraint and simplify to
+    \begin{align*}
+      %q_t(k_t-k_{t-1})
+      %+ Rb_{t-1}
+      %+ ck_{t-1}
+      %&=
+      %(a+c)k_{t-1}
+      %+ \frac{q_{t+1}k_t}{R}
+      %\\
+      k_t
+      &=
+      \frac{1}{u_t}
+      [
+      (a+q_t)k_{t-1}
+      - Rb_{t-1}
+      ]
+    \end{align*}
+    That came from rewriting the period $t$ budget constraint using the
+    fact that the period $t$ inequality constraints were binding. Since
+    the inequality constraints are \emph{also} binding at $t-1$, we can
+    substitute in for $b_{t-1}$ to get
+    \begin{align*}
+      k_t
+      &=
+      \frac{1}{u_t}
+      [
+      (a+q_t)k_{t-1}
+      - R\frac{1}{R}q_tk_{t-1}
+      ]
+      =
+      \frac{1}{u_t}
+      ak_{t-1}
+    \end{align*}
+    Hence in steady state where $k_t=k_{t-1}$, $u_t=a$.
+
+    That all assumes the constraints are binding. Let's prove it now.
+    To show that the strategy ``both constraints binding'' (i.e. sell
+    all tradeable output and use proceeds to invest in land) is optimal,
+    use the concept of unimprovability. That is, show that we
+    \emph{cannot} get an improvement in the objective function by any
+    one-period deviation at $t$ from that ``both constraints binding''
+    strategy (with the one-period deviation followed by returning to the
+    ``both constraints binding'' strategy in every subsequent period).
+
+    So considering the marginal unit of fruit at $t$, there are three
+    possibilities. Note \emph{only} three because of linear utility.
+    With linear utility, the agent just maxes out whatever the optimal
+    strategy is: invest everything, eat everything, save everything. No
+    need to consider intermediate possibilities.
+    \begin{enumerate}[label=(\roman*)]
+      \item Baseline ``both constraints binding'' strategy:
+        The marginal unit of tradeable fruit is sold to buy
+        land/investment.
+        How much land can the agent buy with that marginal unit of
+        fruit? In any period $t$, agent can borrow/lever-up one unit of
+        fruit/tradeable output into $1/u_t$ units of land (since $u_t$
+        is the required downpayment per unit land). Under this strategy,
+        the marginal unit of fruit at $t$ yields sequence of payoffs
+        from period $t$ onwards of
+        \begin{align*}
+          \text{Baseline Strategy}:&\qquad
+          \left\{
+            0,
+            \quad
+            \frac{c}{u_t},
+            \quad
+            \frac{a}{u_t}
+            \frac{c}{u_{t+1}}
+            ,
+            \quad
+            \frac{a}{u_t}\frac{a}{u_{t+1}}\frac{c}{u_{t+2}},
+            \cdots
+          \right\}
+        \end{align*}
+        To see where that comes from, consider the amount of land
+        holdings this marginal unit of fruit generates.  Recall that the
+        strategy being considered is ``always sell all tradeable output
+        to buy land.''
+        So in period $t$, the agent sells the marginal unit of fruit to
+        get $1/u_t$ units of land for the start of next period, $t+1$.
+        That land thus generates $a/u_t$ units of tradeable output in
+        period $t+1$, which can be sold to get $(a/u_t)/u_{t+1}$ units
+        of land for period $t+2$.
+        Then, that land generates $a(a/u_t/u_{t+1})$ units of tradeable
+        output in period $t+2$ which can be sold to get
+        $[a(a/u_t/u_{t+1})]/u_{t+2}$ units of land for period $t+3$, and
+        so on and so forth.
+        Thus beginning-of-period land holdings the single unit of
+        fruit generates are
+        \begin{align*}
+          \text{Beginning of Period Land Holdings}:&\qquad
+          \left\{
+            0,
+            \quad
+            \frac{1}{u_t},
+            \quad
+            \frac{a}{u_t}
+            \frac{1}{u_{t+1}}
+            ,
+            \quad
+            \frac{a}{u_t}
+            \frac{a}{u_{t+1}}
+            \frac{1}{u_{t+2}}
+            ,
+            \quad
+            \cdots
+          \right\}
+        \end{align*}
+        If those are beginning of period land holdings, $c$ times those
+        amounts is then the nontradeable output/fruit generated by those
+        land holdings, and hence the consumption since the agent is only
+        consuming nontradeable ouptut, as discussed.
+
+        Thus in steady state where $u_t=a$ for all $t$, the strategy has
+        discounted payoff
+        \begin{align*}
+            %0
+            %+
+            %\beta
+            %\frac{c}{a}
+            %+
+            %\beta^2
+            %\frac{a}{a}
+            %\frac{c}{a}
+            %+
+            %\beta^3
+            %\frac{a}{a}\frac{a}{a}\frac{c}{a}
+            %+
+            %\cdots
+            %=
+            0
+            +
+            \beta
+            \frac{c}{a}
+            +
+            \beta^2
+            \frac{c}{a}
+            +
+            \beta^2
+            \frac{c}{a}
+            +
+            \cdots
+            =
+            \frac{c}{a}
+            \left[
+            \frac{1}{1-\beta}
+            -1
+            \right]
+            =
+            \frac{c}{a}
+            \frac{\beta}{1-\beta}
+        \end{align*}
+
+      \item Eat Strategy: Rather than invest, just eat the marginal unit
+        of fruit today and invest/save nothing.
+        This generates consumption profile
+        \begin{align*}
+          \text{Eat Strategy}:&\qquad
+          \left\{
+            1,
+            \quad
+            0,
+            \quad
+            0,
+            \quad
+            0,\cdots
+          \right\}
+        \end{align*}
+        Thus, this has expected discounted payoff of 1.
+
+      \item Save Strategy: Rather than invest, the agent can save in
+        period $t$, i.e. pay down debt in this period---yielding no
+        utility but saving interest payments later---before returning to
+        the baseline ``both constraints binding'' strategy.
+        This generates consumption profile
+        \begin{align*}
+          \text{Save Strategy}:&\qquad
+          \left\{
+            0,
+            \quad
+            0,
+            \quad
+            R\frac{c}{u_{t+1}},
+            \quad
+            R\frac{a}{u_{t+1}}
+            \frac{c}{u_{t+2}}
+            ,
+            \quad
+            R\frac{a}{u_{t+1}}
+            \frac{a}{u_{t+2}}
+            \frac{c}{u_{t+3}}
+            ,
+            \quad
+            \cdots
+          \right\}
+        \end{align*}
+        Notice that this is just a shifted version of the baseline
+        strategy since savings gives me no utility today at $t$.
+        And when I return to $t+1$, by the unimprovability approach, I'm
+        back on the ``both constraints binding strategy'' where I'm
+        investing everything I can.
+        And so that extra unit of savings I stored from $t$ to $t+1$
+        generated $R$ units of fruit, which are sold for $R/u_{t+1}$
+        units of land, which produce $Rc/u_{t+1}$ units of land in
+        period $t+2$, and so on.
+
+        Thus this has expected discounted payoff in steady state where
+        $u_t=a$ for all $t$ of
+        \begin{align*}
+            0
+            +
+            0
+            +
+            \beta^2
+            R\frac{c}{a}
+            +
+            \beta^3
+            R
+            \frac{c}{a}
+            +
+            \cdots
+            =
+            R
+            \frac{c}{a}
+            \left[
+              \frac{1}{1-\beta}
+              - 1 - \beta
+            \right]
+            =
+            R
+            \frac{c}{a}
+            \left[
+              \frac{\beta^2}{1-\beta}
+            \right]
+        \end{align*}
+
+    \end{enumerate}
+    Now to verify that the ``both constraints binding'' strategy is
+    optimal, compare the expected discounted utily from the strategies
+    in steady state.
+    The ``both constraints binding'' strategy is optiimal provided both
+    \begin{align*}
+        \frac{c}{a}
+        \left[
+          \frac{\beta}{1-\beta}
+        \right]
+        >
+        1
+        \qquad
+        \qquad
+        \frac{c}{a}
+        \left[
+          \frac{\beta}{1-\beta}
+        \right]
+        >
+        R
+        \frac{c}{a}
+        \left[
+          \frac{\beta^2}{1-\beta}
+        \right]
+    \end{align*}
+    Using the fact that $R=1/\beta'$ and simplifying, this inequalities
+    are equivalent to checking
+    \begin{align*}
+        \frac{c}{a}
+        >
+        \frac{1}{\beta}
+        -1
+        \qquad
+        \qquad
+        \frac{\beta}{1-\beta}
+        >
+        \frac{\beta}{\beta'}
+        \frac{\beta}{1-\beta}
+    \end{align*}
+    By Assumptions 1 and 2, both of these statements are true. Hence the
+    ``both constraints binding'' strategy is optimal.
+
+
+  \item Use market clearing $\overline{K}=k_t + mk_t'$ to substitute
+    out $k_t'$ in the above expression to get
+    \begin{align*}
+      u_t
+      &=
+      \frac{G'(k_{t+1}')}{R}
+      =
+      \frac{1}{R}
+      G'\left(\frac{\overline{K}-k_t}{m}\right)
+    \end{align*}
+
+\end{enumerate}
+Summarizing, equilibrium is characterized by
+\begin{align*}
+  k_t
+  &=
+  \frac{1}{u_t}
+  [
+  (a+q_t)k_{t-1}
+  - R\frac{1}{R}q_tk_{t-1}
+  ]
+  =
+  \frac{1}{u_t}
+  ak_{t-1}
+  \\
+  x_t&= ck_{t-1}
+  \\
+  u_t &= q_t - \frac{q_{t+1}}{R}
+  \\
+  u_t
+  &=
+  \frac{1}{R}
+  G'\left(\frac{\overline{K}-k_t}{m}\right)
+\end{align*}
+
+
+\subsection{Credit Quantity Constraints via Margins}
+
+\subsection{Demand for Liquid Assets}
+
+
+\clearpage
+\subsection{Role of Financial Intermediation}
+
+
+
+\clearpage
+\section{Bubbles}
+
+\subsection{Markus Survey}
+
+Two-phases, interlinked
+- Run-Up
+- Burst
+
+Bubble: Large, sustained mispricing of real or financial assets
+- Typically explosive
+- Exceeds fundamental because investors believe they can sell at an even
+  higher price in the future
+
+Why we care
+- Prices affect real allocations
+- Bubbles might distort incentives and allocations
+- Burst might lead to balance sheet recessiosn
+
+Features and facts to match
+- Displacement (tech, financial innovation) that heightens expectations
+- Boom phase: low vol, credit expansion, increase in investment
+- Euphoria: Overvalued, explosive, buy only to sell later, high volume
+- Profit taking by more sophisticated investors who realize
+- Panic: Dump, price spiral, margin calls, weak balance sheets
+
+Rational Bubbles without frictions
+- Explosive price path, which is why investors willing to hold
+- As long as bubble continues, price of asset must grow explosively
+- Price is a fundamental and bubble component
+- Expected discounted value of bubble component tomorrow is bubble
+  component today. Hence must grow
+- The fact/insight that bubble must grow explosively restricts some
+  rational bubbles. In particular if a bubble is bounded, can't exist,
+  because can't grow as we'd need it to
+- Bubbles cannot *start* in rational bubble model. Must already be there
+  since it can't grow from zero
+- No negative bubble because can't keep growing below zero
+- Conditions for rational bubble
+  - Cannot be common knowledge that initial allocation is interim pareto
+    efficient. Must be gains from trade or beliefs that there are gains
+    from trade
+  - Prices cannot be fully revealing, must be asymettricaly informed
+    even after inferring info from prices
+  - Investors must be constrained from (short) selling desired number of
+    shares in one future contingency
+- OLG
+  - Samuelson: Fiat money with positive price in OLG model
+  - Diamond (1965)
+    - Capital serves as store of value
+    - in CE, interest rate equals MPK
+    - Golden rule: Under optimal K, MPK = pop growth rate
+    - Golden rule not necessarily satisfied in OLG
+    - K can exceed gold rule so MPK < pop growth rate
+    - Dynamically inefficient
+    - Can issue government debt to restore efficiency
+  - Tirole
+    - Bubble on capital can achieve same objective
+    - Initial allocation not pareto efficient, so bubble can lead to
+      pareto improvement
+    - Happens because bubble crowds out investment, lowering K back to
+      golden rule
+    - BUT, bubble associated with lower investment, and burst leads to
+      investment boom, which is counterfactual
+- Market incompleteness
+  - Borrowing constraints
+  - Bewley, bubble in money or capital because of precautionary savings,
+    not OLG structure. Still K accumulation
+- Noise traders, DeLong
+  - Two assets with identical deterministic cash flows
+  - Rational risk averse arbitrageurs have *finite* horizon
+  - Reluctant to take on positions that fully equate prices bc presence
+    of irrational noise traders may increase mispricing
+  - Only partial trade against mispricing
+  - Combination of short horizons, risk aversion, noise trader risk
+
+* What about additive rather than multiplicative rational bubble
+
+
+Informational Frictions
+- Three reasons rational traders might not eliminate a bubble
+  - Fundamental risk: Might jump and justify, lose them money
+  - Shorter Horizon: May lose money in near term
+  - Informational frictions: Ride bubble to profit. Not uncertainty
+    about behavior of *irrational noise traders*, but uncertainty about
+    the other rational traders
+- Abreu-Brunnermeier
+  - Lack of coordination allows the bubble to persistent
+  - Single agent cannot bring down bubble alone
+  - Fundamental value and price (both equal) grow, but then past a
+    certain point, price starts to exceed the fundamental value
+  - Individual traders start exogenously geting aware of the bubble,
+    sequentially
+  - Key assumption: Does not know when relative to other traders he has
+    learned about the bubble. Starting time of bubble is unknown for
+    each trader
+  - Those who learn of bubble early have lower estimate of fundamentals
+    and estimates an earlier starting point of the bubble than
+    subsequent raders
+  - Never common knowledge that bubble has emerged
+  - Synchronization problem: No single trader can burst bubble
+  - Optimal bubble-riding
+- Harrison and Kreps (1978)
+  - Dynamic model
+  - Heterogeneity in beliefs
+  - Price exceeds even the valuation of the most optimistic investor
+  - Because of high resale value in the future
+  - No shorting, which is essential
+- Scheinkman and Xiong
+  - Heterogeneity in beliefs
+  - Large trading volume and high price volatility with that
+
+
+
+
+%% APPPENDIX %%
+
+% \appendix
+
+
+\clearpage
+\section{Pricing Derivatives in Continuous Time}
+
+Deriviative pricing is a form of relative pricing that computes the
+prices of derivative assets based on the price of \emph{other} assets
+traded in the market. This is possible because the assumptions of
+perfect markets, complete markets, and no arbitrage imply that asset
+dynamics must be related in very specific ways so that portfolios
+offering the same payoffs have the same price. In other words, no
+arbitrage restricts the joint dynamics of asset prices, and those
+restrictions can be exploited to price derivative assets.
+
+\begin{defn}(Environment: Risk-Free Asset, Underlying, Derivative)
+Consider an economy with perfect markets (no transaction costs, short
+sale constraints, perfectly divisible assets, etc.), and three classes
+of objects:
+\begin{itemize}
+  \item \emph{Risk-Free}:
+    Any agent can borrow or lend arbitrary amounts at risk-free rate
+    $r_t$, which is possibly stochastic (changing over time).
+
+  \item \emph{Underlying}:
+    There exists some underlying vector $S_t\in\Rn$ collecting assets,
+    factors, states that are the basis for some derivative(s),
+    evolving according to the SDE\footnote{%
+      We could have equivalently introduced correlation across elements
+      But this is more convenient for analysis.
+    }
+    \begin{align}
+      dS_{t} = \mu_{t}\;dt + \sigma_{t}\;dZ_{t}
+      \qquad \text{where}\quad
+      \begin{cases}
+        \sigma_t \;= \diag\{\sigma_{t1},\ldots,\sigma_{tn}\} \\
+        \rho_{ij}=\E[dZ_{ti}\;dZ_{tj}]
+      \end{cases}
+      \label{2underlying}
+    \end{align}
+    Elements of $S_t$ could be non-traded state variables like
+    inflaton, prices of traded assets that also pay dividend vector
+    $D_{t}^S\;dt$ over the next instant, etc.\footnote{%
+      The dividend pyament vector $D_{t}^S$ can change over tme.
+      All formulas will be the same.
+    }
+    Note that the drift and diffusion coefficients
+    $\mu_{t},\sigma_{t}$ are indexed by time since they could
+    generally depend upon \emph{lots} of things: $t$ directly, the level
+    of $S_{t}$, other state variables. But for simplicity, I only
+    subscript by $t$, sweeping all of these other possibilites into the
+    $t$ subscript.
+
+  \item \emph{Derivative}:
+    There is a derivative asset with price $f_t$ paying dividends
+    $D_t^f$ over the next instant (perhaps a function $S_{t}$ and
+    $D_{t}^S$, perhaps not), and evolution
+    \begin{align}
+      %\frac{df_{t}}{f_{t}}
+      %&=
+      %\tilde{\mu}_t
+      %\; dt
+      %+
+      %\tilde{\sigma}_t
+      %\;dZ_t
+      df_{t}
+      &=
+      \tilde{\mu}_t
+      \; dt
+      +
+      \tilde{\sigma}_t
+      \;d\tilde{Z}_t
+      \label{2dfi}
+    \end{align}
+    for some \emph{unknown} drift \& diffusion terms
+    $\tilde{\mu}_t,\tilde{\sigma}_t$ that could depend on $t,f_t,S_t,$
+    other state variables.
+    Again, for simplicitly, I sweep all of these possibilities into the
+    $t$ subscript.
+    Note also that the $d\tilde{Z}_t$ is not a priori related to $dZ_t$
+    driving $S_t$ in Expression~\ref{2underlying}.
+    It could differ. However, below we will assume complete markets,
+    which will imply that $\tilde{Z}_t,Z_t$ are related (and in fact
+    identical if $S_t$ scalar).
+    But any relationship only follows \emph{after} imposing complete
+    markets.
+
+    Finally, if price $f_t$ is always positive, it is sometimes
+    convenient to reexpress SDE~\ref{2dfi}
+    \begin{align}
+      \frac{df_{t}}{f_t}
+      &=
+      \hat{\mu}_t
+      \; dt
+      +
+      \hat{\sigma}_t
+      \;d\tilde{Z}_t
+      \qquad \text{where}\quad
+      (\tilde{\mu}_t,\tilde{\sigma}_t)=(f_t\hat{\mu}_t,f_t\hat{\sigma}_t)
+      \label{2dfi2}
+    \end{align}
+\end{itemize}
+Now for two key restrictions that we'll impose on this economy, which
+will allow us to price assets: complete markets and no arbitrage.
+\end{defn}
+\clearpage
+\begin{rmk}
+To emphasize: coefficients $(\tilde{\mu}_t,\tilde{\sigma}_t)$ and
+$(\hat{\mu}_t,\hat{\sigma}_t)$ are \emph{unknown}.
+If we knew them, we could in principle just solve SDE~\ref{2dfi} or
+\ref{2dfi2} for the price $f_t$. But the whole point is that we
+\emph{don't know} the SDE that the derivative $f_t$ price follows.
+So in effect, Expressions~\ref{2dfi} and \ref{2dfi2} are really only
+saying that the derivative price follows \emph{some} diffusion process.
+That's without loss of generality (provided the process doesn't jump),
+but also without any real content since the diffusion coefficients are
+unknown.
+It is only through no arbitrage and complete markets arguments that we
+can \emph{derive} those coefficients.\footnote{%
+  Even if we only ``derive'' them implicitly---glossing over them to go
+  straight to price, as is often the case.
+}
+\end{rmk}
+
+\begin{prop}
+\emph{(No Arbitrage: Restriction on Riskless Portfolio Returns)}
+\label{2prop:keypricing}
+In perfect markets with no arbitrage, any riskless portfolio with price
+$\Pi_t$ paying dividends $D_t^\Pi\,dt$ satisfies
+\begin{align}
+  \frac{d\Pi_t+ D_t^\Pi\;dt}{\Pi_t}
+  &=
+  r_t\;dt
+  \label{2noarb}
+\end{align}
+The LHS is the total return: capital gains plus dividends.
+This holds instant-by-instant. So if portfolio is riskless for all
+$t\in[0,T]$, then Expression~\ref{2noarb} holds for all $t\in[0,T]$.
+\end{prop}
+%\begin{rmk}
+%This suggests a method for pricing by no arbitrage:
+%Synthesize a \emph{riskless} portfolio by combining any two assets, and
+%price either asset in terms of the other.
+%\end{rmk}
+\begin{proof}
+Any violation of Expression~\ref{2noarb} implies an arbitrage
+opportunity.
+\end{proof}
+
+\begin{prop}
+\label{2prop:complete}
+\emph{(Complete Markets: Restriction on Dynamics)}
+In complete markets with no-arbitrage, the price of any derivative whose
+payoff/value depends only upon underlying vector $S_t$ satisfies for
+some function $f$
+\begin{align}
+  f_t=f(S_t,t)
+  \label{2pricingfcn}
+\end{align}
+In words, price is a function of only the underlying $S_t$ and time
+$t$.
+So then by multidimensional Ito's Lemma, the evolution of $f_t=f(S_t,t)$
+must satisfy
+\begin{align}
+  df_t
+  =
+    \left[
+      \frac{\partial f}{\partial t}
+      +
+      \mu_t'
+      \frac{\partial f}{\partial S}
+      +
+      \frac{1}{2}
+      \trace\left(
+      \Sigma_t
+      \frac{\partial^2 f}{\partial S\;\partial S'}
+      \right)
+    \right]
+  dt
+  +
+    \left[
+    \frac{\partial f}{\partial S'}
+    \right]
+    \sigma_t
+  \;dZ_t
+  %\label{2evoderiv}
+\end{align}
+where $\Sigma_t := \sigma_t\E[dZ_tdZ_t']\sigma_t$.
+To match Expression~\ref{2dfi} or its equivalent Expression~\ref{2dfi2}
+(for non-zero price derivatives), this then restricts the values of
+$\tilde{\mu}_t,\tilde{\sigma}_t,\tilde{Z}_t$, implying that they equal
+\begin{align*}
+  \tilde{\mu}_t
+  =
+  \hat{\mu}_t
+  f_t
+  &=
+  \frac{\partial f}{\partial t}
+  +
+  \mu_t'
+  \frac{\partial f}{\partial S}
+  +
+  \frac{1}{2}
+  \trace\left(
+  \Sigma_t
+  \frac{\partial^2 f}{\partial S\;\partial S'}
+  \right)
+  \qquad
+  \;
+  \tilde{\sigma}_t\;d\tilde{Z}_t
+  =
+  \hat{\sigma}_t
+  f_t\;d\tilde{Z}_t
+  =
+  \frac{\partial f}{\partial S'}
+  \sigma_t
+  \;dZ_t
+  %\qquad
+  %\;
+  %d\tilde{Z}_t
+  %=
+  %dZ_t
+\end{align*}
+%If $S_t$ is scalar, then also
+%$\tilde{\sigma}_t=\frac{\partial f}{\partial S}\sigma_t$ and
+%$\tilde{Z}_t=Z_t$.
+\end{prop}
+\begin{rmk}
+The above relationship derived using no arbitrage in complete markets
+thus restricts the way in which the pricing function $f(S_t,t)$, the
+coefficients $(\tilde{\mu}_t,\tilde{\sigma}_t)$ or equivalently
+$(\hat{\mu}_t,\hat{\sigma}_t)$ determining the evolution of $f_t$, the
+coefficients $\mu_t,\sigma_t$ determining the evolution of $S_t$, and
+the driving randomness $Z_t,\tilde{Z}_t$ are all related.  Coupled with
+the restriction in previous Proposition~\ref{2prop:keypricing}, this will
+be enough to pin down the pricing function $f(S_t,t)$.
+\end{rmk}
+
+\begin{cor}
+Suppose that the payoff/value of derivative with price $f_{ti}$ depends
+only on a single element $S_{ti}$ of the state vector:
+$f_{ti}=f_i(S_{ti},t)$. Then the above formulas simplify to
+\begin{align}
+  df_{ti}
+  =
+  \underbrace{%
+    \left[
+      \frac{\partial f_i}{\partial t}
+      +
+      \mu_{ti}
+      \frac{\partial f_i}{\partial S_i}
+      +
+      \frac{1}{2}
+      \Sigma_{t,ii}
+      \frac{\partial^2 f_i}{\partial S_i^2}
+    \right]
+  }_{\tilde{\mu}_{ti}\,=\,\hat{\mu}_{ti}f_{ti}}
+  dt
+  +
+  \underbrace{%
+    \frac{\partial f_i}{\partial S_i}
+    \sigma_{ti}
+    \;dZ_{ti}
+  }_{\tilde{\sigma}_{ti}\,d\tilde{Z}_t\,=\,\hat{\sigma}_{ti}f_{ti}\,d\tilde{Z}_t}
+\end{align}
+Subscripting derivative price $f_{ti}$ and its drift and diffusion
+coefficients by $i$ emphasizes that this derivative depends only upon
+$Z_{ti}$ risk.  Note that the above also implies $\tilde{Z}_t=Z_{ti}$
+for this derivative.
+\end{cor}
+
+\clearpage
+\subsection{Market Price of Risk}
+
+%In this subsection, we suppose that we have at least two linearly
+%independent derivatives on the same underlying $S_t$.
+%Unlike the upcoming section, we are slightly more general in that we do
+%\emph{not} assume that $S_t$ is traded asset.
+%However, everything here also applies to the next section because
+%the trivial ``derivative'' of just the underlying is still a derivative
+%(with price $S_t=f(S_t,t)$), so the pair of underlying and derivative
+%with prices $(S_t,f_t)$ in the previous subsection would qualify as two
+%linearly independent derivatives on $S_t$.
+
+
+\begin{lem}\emph{(Synthesized Risk-Free Portfolio)}
+\label{2synthport}
+For any two derivatives on $i$th element $S_{ti}$ of underlying $S_t$
+with prices $f_{ti}$ and $g_{ti}$, let $\Pi_t$ denote the price of the
+portfolio that buys $\theta^f=\tilde{\sigma}_{ti}^g$ units of derivative
+$f$ and shorts $\theta^g=\tilde{\sigma}_{ti}^f$ units of derivative $g$:
+\begin{align*}
+  \Pi_t
+  &=
+  \tilde{\sigma}_{ti}^g
+  f_{ti}
+  -
+  \tilde{\sigma}_{ti}^f
+  g_{ti}
+\end{align*}
+The above choice of weights
+$(\theta^f,\theta^g)=(\tilde{\sigma}_{ti}^g,\tilde{\sigma}_{ti}^f)$
+implies that this portfolio is risk-free, with price evolution and
+dividend rate as below:
+\begin{align}
+  d\Pi_t
+  &=
+  \big[
+  \tilde{\sigma}_{ti}^g\,\tilde{\mu}_{ti}^f
+  -
+  \tilde{\sigma}_{ti}^f\,\tilde{\mu}_{ti}^g
+  \big]
+  dt
+  \label{2portevol}
+  \\
+  D_t^\Pi
+  &=
+  %\theta_i D_{ti}^f
+  %- \theta_j D_{tj}^f
+  %=
+  \tilde{\sigma}_{ti}^g
+  D_{ti}^f
+  -
+  \tilde{\sigma}_{ti}^f
+  D_{ti}^g
+\end{align}
+\end{lem}
+\begin{proof}
+The goal is to create a risk-free portfolio through some linear
+combination of any two derivatives $f,g$.
+So form a portfolio by buying $\theta^f$ units of derivative $f$
+and shorting $\theta^g$ units of derivative $g$, where
+$\theta^f,\theta^g$ are fixed constants we choose to make the
+portfolio risk-free:
+\begin{align*}
+  \Pi_t
+  &= \theta^f f_{ti} - \theta^g g_{ti}
+  \quad\implies\quad
+  d\Pi_t
+  = \theta^f df_{ti} - \theta^g dg_{ti}
+\end{align*}
+Use Expression~\ref{2dfi} for the dynamics of $f_{ti},g_{ti}$ to
+substitute in for $df_{ti},dg_{ti}$:
+\begin{align*}
+  d\Pi_t
+  &=
+  \big[
+  \theta^f\,\tilde{\mu}_{ti}^f
+  -
+  \theta^g\,\tilde{\mu}_{ti}^g
+  \big]
+  dt
+  +
+  \big[
+  \theta^f\,\tilde{\sigma}_{ti}^f
+  -
+  \theta^g\,\tilde{\sigma}_{ti}^g
+  \big]
+  \;dZ_{ti}
+\end{align*}
+where I also used $\tilde{Z}_t=Z_{ti}$ for a derivative on $S_{ti}$
+only.
+This shows that we can make the portfolio risk-free by choosing
+\begin{align*}
+  \theta^f\,\tilde{\sigma}_{ti}^f
+  &=
+  \theta^g\,\tilde{\sigma}_{ti}^g
+  \quad\implies\quad
+  (\theta^f,\theta^g)
+  =(\tilde{\sigma}_{ti}^g,\tilde{\sigma}_{ti}^f)
+\end{align*}
+This then implies the desired portfolio expressions.
+\end{proof}
+
+\begin{prop}\emph{(Market Price of Risk)}
+\label{2prop:lambda}
+There exists a process $\lambda_{ti}$ called the
+\emph{market price of $S_{ti}$ (or $Z_{ti}$) risk} such that, for any
+derivative $f_{ti}=f_i(S_{ti},t)$ on element $S_{ti}$ of underlying
+$S_t$
+\begin{align}
+  \lambda_{ti}
+  &=
+  \frac{%
+    \tilde{\mu}_{ti}+D_{ti}^f
+    -
+    r_tf_{ti}
+  }{\tilde{\sigma}_{ti}}
+  =
+  \frac{%
+    \hat{\mu}_{ti}+\frac{D_{ti}^f}{f_{ti}}
+    -
+    r_t
+  }{\hat{\sigma}_{ti}}
+  \label{2lambda}
+\end{align}
+The second expression divided through by $f_{ti}$ to express
+$\lambda_{ti}$ terms of expected returns: numerator is expected return
+plus div. yield less risk free rate, while the denominator is return
+volatility.  The formula implies risk-premia or expected excess returns
+for \emph{all} derivatives on $S_{ti}$ satisfy
+\begin{align*}
+  \text{\emph{(Risk Premium)}}
+  =
+  \hat{\mu}_{ti}+\frac{D_{ti}^f}{f_{ti}}
+  -
+  r_t
+  =
+  \lambda_{ti}\hat{\sigma}_{ti}
+\end{align*}
+One standard deviation in return $\hat{\sigma}_{ti}$ on $Z_{ti}$ risk
+earns $\lambda_{ti}$ units of expected excess return, hence the name
+``price of risk'' ($Z_{ti}$- or $S_{ti}$-risk, in particular).
+\end{prop}
+\begin{rmk}
+In some sense, it's natural that all derivatives on common underlying
+$S_t$ have identical instantaneous Sharpe ratios (hence risk-prices),
+since those derivatives are all driven by a \emph{single} source of risk
+($S_t$ or, more specifically, it's Brownian term $Z_t$).
+And so by no arbitrage, that risk should have the same price across all
+assets/derivatives driven only by that risk.
+That is the thrust of this proposition.
+
+Finally, since one possible derivative is always $f(S_t,t)=S_t$, this
+also implies any derivative will have a Sharpe ratio equal to that of
+the underlying asset, if $S_t$ is traded.
+\end{rmk}
+\begin{proof}
+Since the portfolio of Proposition~\ref{2synthport} is risk-free, no
+arbitrage implies
+\begin{align*}
+  \frac{d\Pi_t + D_t^\Pi\;dt}{\Pi_t}
+  &= r_t\; dt
+  \quad\implies\quad
+  d\Pi_t  + D_t^\Pi\;dt
+  = r_t\Pi_t\; dt
+\end{align*}
+Substituting in the expressions for $\Pi_t$, $D_t^\Pi$, and $d\Pi_t$
+gives
+\begin{align*}
+  \tilde{\sigma}_{ti}^g
+  \big[\tilde{\mu}_{ti}^f+D_{ti}^f\big]
+  -
+  \tilde{\sigma}_{ti}^f
+  \big[\tilde{\mu}_{ti}^g+D_{ti}^g\big]
+  &=
+  r_t \tilde{\sigma}_{ti}^g
+  f_{ti}
+  - r_t\tilde{\sigma}_{ti}^f
+  g_{ti}
+\end{align*}
+Rearranging and dividing through by $\sigma_{ti}\sigma_{tj}$ gives
+\begin{align*}
+  \frac{\tilde{\mu}_{ti}^f+D_{ti}^f-r_t f_{ti}}{\tilde{\sigma}_{ti}^f}
+  &=
+  \frac{\tilde{\mu}_{ti}^g+D_{ti}^g-r_t g_{ti}}{\tilde{\sigma}_{ti}^g}
+\end{align*}
+Since derivatives $f_{ti},g_{ti}$ were arbitrary, this implies all
+instantaneous Sharpe ratios must equal some common value, which we label
+$\lambda_{ti}$.
+Then just recall
+$(\tilde{\mu}_t,\tilde{\sigma}_t)=(\hat{\mu}_tf_t,\hat{\sigma}_tf_t)$.
+\end{proof}
+
+\begin{prop}
+\emph{(Alternative Expression for Derivative Price Evolution)}
+For any derivative paying dividends $D^f_t\,dt$ with price $f_t$
+evolving according to Expression~\ref{2dfi2},\footnote{%
+  This is slightly different from Expression~\ref{2dfi2}, which had
+  Brownian term $\tilde{Z}_t$.
+  But since complete markets implies $\tilde{Z}_t=Z_t$ anyway by
+  Proposition~\ref{2prop:complete}, just rewrite it like this for
+  simplicity.
+}
+we can equivalently rewrite its dynamics as
+\begin{align}
+  \frac{df_{t}}{f_t}
+  &=
+  \left[
+  r_t+\lambda_t\hat{\sigma}_{t}
+  -\frac{D_{t}^f}{f_{t}}
+  \right]
+  \; dt
+  +
+  \hat{\sigma}_t
+  \;dZ_t
+  \label{2dflambda}
+\end{align}
+where $\lambda_t$ is the market price of $Z_t$ risk.
+Note that this must hold for \emph{any} derivative on $S_t$ (i.e. driven
+solely by $Z_t$ risk with price $\lambda_t$).
+\end{prop}
+\begin{proof}
+Rearrange the expression for $\lambda_t$ in
+Proposition~\ref{2prop:lambda} to isolate $\hat{\mu}_t$, and then
+substitute that expression in for $\hat{\mu}_t$ in
+Expression~\ref{2dfi2}.
+%\begin{align*}
+  %\lambda_t
+  %&=
+  %\frac{%
+    %\hat{\mu}_{t}+\frac{D_{t}^f}{f_{t}}
+    %-
+    %r_t
+  %}{\hat{\sigma}_{t}}
+  %\quad\implies\quad
+  %\hat{\mu}_{t}
+  %=
+  %r_t+\lambda_t\hat{\sigma}_{t}
+  %-\frac{D_{t}^f}{f_{t}}
+%\end{align*}
+\end{proof}
+
+\begin{cor}
+\label{2cor:dSlambda}
+The previous proposition holds for \emph{any} derivative on $S_t$,
+including the trivial derivative, in which case
+Expression~\ref{2dflambda} reduces to
+\begin{align*}
+  dS_{t}
+  &=
+  \underbrace{%
+    \left[
+    S_tr_t+\lambda_t\sigma_{t}
+    -D_{t}^S
+    \right]
+  }_{\mu_t}
+  \; dt
+  +
+  \sigma_t
+  \;dZ_t
+\end{align*}
+\end{cor}
+
+
+\clearpage
+\subsection{Pricing by the Martingale Method and Change of Numeraire}
+
+In this section, we price derivatives by exploiting the defining feature
+of martingales:
+\begin{align}
+  X_t = \E_t^Q[X_T]
+  \label{2martingale}
+\end{align}
+So if $X_t$ were \emph{unknown} but we could draw $X_T$ according to the
+measure $Q$ associated with the expectation, Expression~\ref{2martingale}
+suggests a way to estimate $X_t$: Monte Carlo---simply draw/simulate
+many copies of $X_T$ according to measure $Q$ and then average to get
+$X_t$.
+
+Now at first pass, it might seem strange that we could draw $X_T$
+despite $X_t$ being unknown. But really, this is exactly the situation
+we face when pricing derivatives.  The \emph{terminal price} $f_T$ of is
+usually a simple known deterministic function of the underlying $S_T$
+(whose dynamics we know and can simulate), while current price $f_t$
+that we want to compute is unknown.
+
+All of this suggests a framework for pricing derivatives:
+Find a measure $Q$ under which $f_t$ is a martingale, specify the
+dynamics of the underlying $S_t$ under $Q$, and use Monte Carlo to
+estimate $f_t$. So can we do that?
+More or less, as we now develop.
+
+Recall the two representations we had for the real-world dynamics (i.e.
+under the true/physical measure) of the price:
+\begin{align*}
+  \frac{df_{t}}{f_t}
+  &=
+  \hat{\mu}_t
+  \; dt
+  +
+  \hat{\sigma}_t
+  \;dZ_t
+  =
+  \left[
+  r_t+\lambda_t\hat{\sigma}_{t}
+  -\frac{D_{t}^f}{f_{t}}
+  \right]
+  \; dt
+  +
+  \hat{\sigma}_t
+  \;dZ_t
+\end{align*}
+Again, this is the actual evolution of $f_t$ under the historical,
+real-world, or physical measure $P$. We would ideally like to change to
+measure $Q$ under which $f_t$ is a martingale.
+Girsanov's theorem tells us how to do that: simply adjust $\lambda_t$.
+By Girsanov's theorem, a change of measure is (without loss of
+generality) equivalent to a change in the price of risk $\lambda_t$
+here.
+Rather than think of $\lambda_t$ as pinned down uniquely by the assets
+in the market\footnote{%
+  or, more deeply, the marginal utility of agents
+}
+under historical measure $P$, we can instead think of $\lambda_t$ as
+indexing \emph{different} measures, corresponding to different
+hypothetical worlds with different prices of risk and different dynamics
+for $f_t$.
+We then consciously \emph{choose} or \emph{specify} $\lambda_t$ under
+some convenient measure $Q$.
+Because asset prices are linked by no arbitrage, the price is the
+same under $Q$ as under $P$, no matter choice of $\lambda_t$.
+
+Now to return to our question: Can we choose $\lambda_t$ to make $f_t$ a
+martingale?
+Not directly. For $f_t$ to be a martingale, the above expression implies
+that we'd need to choose
+\begin{align*}
+  0
+  &=
+  r_t+\lambda_t\hat{\sigma}_{t}
+  -\frac{D_{t}^f}{f_{t}}
+  \quad\implies\quad
+  \lambda_t
+  =
+  \frac{\frac{D_{t}^f}{f_{t}} - r_t}{\hat{\sigma}_{t}}
+\end{align*}
+But that's obviously counterfactual, since we know that $\lambda_t$
+satisfies the other expression. Hence, we can't make $f_t$ a martingale
+\emph{directly}.
+
+But there's hope: we can choose a numeraire process $N_t$ and make
+$f_t/N_t$ a martingale. And that will be the approach of the remainder
+of this subsection. And since there are many possible choices of $N_t$,
+and the measure will be subscripted $Q_N$ since it will change with
+$N_t$.
+
+
+\clearpage
+The most comnmon choice of numeraire $N_t$ (but not necessarily the only
+choice) is some other option on the same underlying. Then, given any
+$\lambda_t$ for the price of risk of the underlying,\footnote{%
+  really the price of risk of the underlying's uncertainty $Z_t$
+}
+the dynamics of $f_t$ and $N_t$ satisfy (assuming constant dividends)
+\begin{align}
+  \frac{df_{t}}{f_{t}}
+  &=
+  %\hat{\mu}_{t}\;dt
+  %+
+  %\hat{\sigma}_{t}\;dZ_t
+  %=
+  \left[
+    r_t + \lambda_t\hat{\sigma}_t
+    - \frac{D^f}{f_t}
+  \right]
+  dt
+  +
+  \hat{\sigma}_{t}\;dZ_t
+  \label{2fNdynamicsf}
+  \\
+  \frac{dN_{t}}{N_{t}}
+  &=
+  %\bar{\mu}_{t}\;dt
+  %+
+  %\bar{\sigma}_{t}\;dZ_t
+  %=
+  \left[
+    r_t + \lambda_t\bar{\sigma}_t
+    - \frac{D^N}{N_t}
+  \right]
+  dt
+  +
+  \bar{\sigma}_{t}\;dZ_t
+  \label{2fNdynamicsN}
+\end{align}
+%where I superscript the Brownian term by $\lambda$ to emphasize that
+%different choices of $\lambda$ change the measure, i.e. the measure of
+%the Brownian motion term.\footnote{%
+  %Although this is pretty immaterial, since for any two choices
+  %$\lambda_t,\lambda_t'$, the Brownian term has an identical
+  %distribution $Z_t^\lambda\overset{d}{=}Z_t^{\lambda'}$.
+  %Things generally change element-by-element in the sample space, i.e.
+  %$Z_t^\lambda\neq Z_t^{\lambda'}$, but we mostly care about the
+  %distribution.
+%}
+Given this, we first choose $\lambda_t$ to make $f_t/N_t$ (discounted by
+any dividends) a martingale. So then given this $\lambda_t$, $r_t$, and
+volatility and dividend rates, we've pinned down the particular
+measure/dynamics under that $\lambda_t$ assumption, which we can use to
+price the asset.
+After showing all of this, we then give examples of particular $N_t$
+choices.
+
+
+\begin{thm}
+\emph{(Martingale Pricing with Forward Risk-Neutral Measure w.r.t. $N_t$)}
+Suppose $f_t,N_t$ are derivatives on the same underlying with
+dynamics given by Expr.~\ref{2fNdynamicsf} and \ref{2fNdynamicsN}.
+Then choosing the following price of risk implies
+\begin{align}
+  \lambda_t = \bar{\sigma}_t
+  \quad\implies\quad
+  f_t
+  &=
+  e^{-(\delta^N-\delta^f)(T-t)}
+  N_t
+  \;
+  \E_t^{N}
+  \left[
+  \frac{f_T}{N_T}
+  \right]
+  \label{2martprice}
+\end{align}
+where $\delta^X := D^X/X_t$ and $\E_t^N$ denotes the conditional
+expectation given initial values $(f_t,N_t)$ using the measure
+associated with price of risk $\lambda_t=\bar{\sigma}_t$ (the volatility
+of the numeraire $N_t$).  In other words, it's the conditional
+expectation with dynamics given by Expressions~\ref{2fNdynamicsf} and
+\ref{2fNdynamicsN} taking $\lambda_t=\bar{\sigma}_t$.
+This measure is called the
+\emph{forward risk-neutral measure with respect to $N_t$}.
+\end{thm}
+
+\begin{proof}
+Start by defining
+$g_t=g(f_t,N_t,t)= \frac{f_t}{N_t} e^{t(\delta^f-\delta^N)}$.
+Derive its dynamics by Ito's Lemma\footnote{%
+  We see here why we assumed constant dividends. If not, $g_t$ would
+  also be a function of time-varying $\delta_t^X$.
+}
+\begin{align*}
+  dg_t
+  &=
+  \frac{\partial g}{\partial t}
+  \;dt
+  +
+  \frac{\partial g}{\partial f_t}
+  df_t
+  +
+  \frac{\partial g}{\partial N_t}
+  dN_t
+  +
+  \frac{1}{2}
+  \frac{\partial^2 g}{\partial f^2_t}
+  (df_t)^2
+  +
+  \frac{1}{2}
+  \frac{\partial^2 g}{\partial N_t^2}
+  (dN_t)^2
+  +
+  \frac{\partial^2 g}{\partial f_t\,\partial N_t}
+  (df_t)
+  (dN_t)
+  \\
+  &=
+  \left[
+  (\delta^f-\delta^N)
+  \;dt
+  +
+  \frac{df_t}{f_t}
+  -
+  \left(
+  \frac{dN_t}{N_t}
+  \right)
+  +
+  \left(
+  \frac{dN_t}{N_t}
+  \right)^2
+  -
+  \left(
+    \frac{df_t}{f_t}
+  \right)
+  \left(
+  \frac{dN_t}{N_t}
+  \right)
+  \right]
+  \frac{f_t}{N_t}
+  e^{-t(\delta^f-\delta^N)}
+\end{align*}
+Divide through by $g_t=f_t/N_te^{-t(\delta^f-\delta^N)}$, substitute
+in the SDEs, collect terms, and simplify
+\begin{align*}
+  \frac{dg_t}{g_t}
+  &=
+  \left[
+  (\delta^f-\delta^N)
+  + (r_t + \lambda_t\hat{\sigma}_{t} - \delta^f)
+  - (r_t +\lambda_t\bar{\sigma}_{t} - \delta^N)
+  +\bar{\sigma}_{t}^2
+  -
+  \hat{\sigma}_{t}
+  \bar{\sigma}_{t}
+  \right]
+  dt
+  +
+  \left[
+  \hat{\sigma}_{t}
+  -
+  \bar{\sigma}_{t}
+  \right]
+  dZ_t
+  \\
+  &=
+  (\hat{\sigma}_{t} -\bar{\sigma}_{t})
+  (\lambda_t-\bar{\sigma}_{t})
+  dt
+  +
+  \left[
+  \hat{\sigma}_{t}
+  -
+  \bar{\sigma}_{t}
+  \right]
+  dZ_t
+\end{align*}
+We can make this a martingale by choosing $\lambda_t=\bar{\sigma}_{t}$,
+in which case
+\begin{align*}
+  g_t = \E_t[g_T]
+  \quad\iff\quad
+  e^{t(\delta^f-\delta^N)}
+  \frac{f_t}{N_t}
+  &=
+  \E_t^{N}
+  \left[
+  e^{T(\delta^f-\delta^N)}
+  \frac{f_T}{N_T}
+  \right]
+\end{align*}
+Rearranging gives the expression above.
+\end{proof}
+
+\begin{cor}\emph{(Money Market as Numeraire)}
+Suppose we choose $N_t$ to be the riskless money market account that
+pays risk free rate $r_t$ and no dividends, with $N_0=1$:
+\begin{align}
+  \frac{dN_{t}}{N_{t}}
+  &=
+  r_t
+  dt
+  \quad\implies\quad
+  N_t=e^{\int_0^t r_s\;ds}
+  \label{2dNmoney}
+\end{align}
+As is apparent from the SDE, this corresponds to $\lambda_t=0$---a
+risk-neutral world where $Z_t$ is not priced.
+By substituting the above expression for $N_t$ into
+Formula~\ref{2martprice} and $\lambda_t=0$ into
+Dynamics~\ref{2fNdynamicsf}, we get the price of the derivative and
+dynamics for $f_t$ and $S_t$ of
+\begin{align*}
+  f_t
+  &=
+  \E_t^{N}
+  \left[
+  e^{-\int_t^T r_s\;ds}
+  f_T
+  \right]
+  \\
+  \frac{df_{t}}{f_{t}}
+  &=
+  r_t
+  \,dt
+  +
+  \hat{\sigma}_{t}\;dZ_t
+  \\
+  \frac{dS_{t}}{S_{t}}
+  &=
+  r_t
+  \,dt
+  +
+  \sigma_{t}\;dZ_t
+\end{align*}
+Given these dynamics, we can use Monte Carlo to simulate the above
+expectation.
+\end{cor}
+
+\begin{cor}
+\emph{(ZCB as Numeraire)}
+Suppose $N_t=B(t,T)$, the price at $t$ of a no-default zero
+coupon bond paying $B(T,T)=\$1$ at $T$. Then letting
+$\lambda_t$ equal the volatility of $B(t,T)$,
+\begin{align*}
+  f_t
+  =
+  B(t,T)
+  \;\E_t^B[f_T]
+\end{align*}
+where $\E^B_t$ is the conditional expectation under the measure where the
+price of risk $\lambda_t$ equals the volatility of ZCB price $B(t,T)$.
+This expression is convenient because discounting is \emph{outside}
+of the expectation.
+\end{cor}
+\begin{rmk}
+The fact that $B(t,t)$ has no \emph{default} risk does \emph{not} imply
+that the bond has no \emph{price} risk over the next instant, which is
+why $\lambda_t\neq 0$. In general, the price $B(t,T)$ will fluctuate,
+unlike the Money Market account which climbed at fixed rate $r_t$ over
+the next instant (no uncertainty), even if $r_t$ changes over time.
+\end{rmk}
+
+
+
+\clearpage
+\subsection{Pricing by PDEs}
+
+\subsubsection{Traded Underlying}
+
+%There are two approaches to the replication plus no-arbitrage pricing
+%strategy.
+%First, we could replicate the \emph{derivative} through
+%buying/selling the underlying and risk free.
+%Alternatively, we can replicate the \emph{risk-free} asset through
+%buying/selling the underlying and derivative in just such a way
+%that the uncertainty/risk $Z_t$ cancels out, and we end up with a
+%risk-free portfolio.
+%We pursue this latter approach, which allows us to apply the
+%following proposition to derive a pricing PDE which we can solve for the
+%pricing function in Expression~\ref{2pricingfcn}.
+
+
+\begin{prop}\emph{(Synthesized Risk-Free Portfolio)}
+\label{2prop:rf}
+Suppose $S_t$ is the price of some traded asset.
+Let $\Pi_t$ denote the price of the portfolio that buys
+$\Delta=\frac{\partial f}{\partial S}$ units of the underlying asset
+and shorts one unit of the derivative, implying price/value
+\begin{align}
+  \Pi_t &= \frac{\partial f}{\partial S} S_t - f_t
+  \label{2portrf}
+\end{align}
+Then this portfolio is risk-free, with price evolution and dividend rate
+\begin{align}
+  d\Pi_t
+  &=
+  \left[
+  -
+  \frac{\partial f}{\partial t}
+  -
+  \frac{1}{2}
+  \frac{\partial^2 f}{\partial S^2}
+  \sigma^2_t
+  \right]
+  dt
+  \qquad\qquad
+  D_t^\Pi
+  =
+  \frac{\partial f}{\partial S}
+  D_t^S - D_t^f
+  \label{2divpi}
+\end{align}
+\end{prop}
+\begin{proof}
+The goal is to synthesize a risk-free portfolio from the underlying
+asset with price $S_t$ and the derivative with price $f_t=f(S_t,t)$.
+A guess for such a portfolio is one that holds $\Delta$ units\footnote{%
+  where $\Delta$ is some not-yet-specified constant we determine
+  later. It's a fixed number over the next instant
+}
+of the underlying and shorts one unit of the derivative at each
+$t\in [0,T]$, implying
+\begin{align}
+  \Pi_t = \Delta S_t - f_t
+  \quad \implies\quad
+  \begin{cases}
+    d\Pi_t = \Delta \; dS_t - df_t \\
+    D_t^\Pi = \Delta D_t^S - D_t^f
+  \end{cases}
+  \label{2dpi}
+\end{align}
+Subbing in the expressions for $dS_t$ and $df_t$
+(Proposition~\ref{2prop:complete}) into the expression for $d\Pi_t$:
+\begin{align*}
+  d\Pi_t
+  &=
+  \left[
+  \Delta \mu_t
+  -
+  \frac{\partial f}{\partial t}
+  -
+  \frac{\partial f}{\partial S}
+  \mu_t
+  -
+  \frac{1}{2}
+  \frac{\partial^2 f}{\partial S^2}
+  \sigma^2_t
+  \right]
+  dt
+  +
+  \left[
+  \Delta \sigma_t
+  - \frac{\partial f}{\partial S}
+  \sigma_t
+  \right]
+  \;dZ_t
+\end{align*}
+We see that we can make this expression risk-free by choosing
+$\Delta = \frac{\partial f}{\partial S}$, which will cancel the terms
+on $dZ_t$ (as well as terms with $\mu_t$), giving
+Expressions~\ref{2portrf} and \ref{2divpi}, as desired.
+\end{proof}
+
+
+\begin{prop}\emph{(Pricing PDE)}
+\label{2pdetraded}
+By no arbitrage, the pricing function $f_t=f(S,t)$ satisfies
+\begin{align}
+  \boxed{%
+  0
+  =
+  \frac{\partial f}{\partial t}
+  +
+  \frac{\partial f}{\partial S}
+  \left[
+  r_t
+  S_t
+  - D_t^S
+  \right]
+  +
+  \frac{1}{2}
+  \frac{\partial^2 f}{\partial S^2}
+  \sigma^2_t
+  +
+  D_t^f
+  -
+  r_t
+  f_t
+  }
+  \label{2pricingpde}
+\end{align}
+This is a PDE we can solve to for pricing function $f_t=f(S_t,t)$. It
+holds $\forall t$ prior to expiry for \emph{any} derivative.
+Derivatives only differ in the boundary conditions imposed upon this
+PDE.
+\end{prop}
+\begin{proof}
+By Proposition~\ref{2prop:rf}, the portfolio defined in
+Expression~\ref{2portrf} is risk-free and earns dividends as in
+Expression~\ref{2divpi}.
+Therefore, no arbitrage implies by Proposition~\ref{2prop:keypricing}
+\begin{align*}
+  \frac{%
+    d\Pi_t +
+    \left[
+      \frac{\partial f}{\partial S} D_t^S - D_t^f
+    \right]dt
+  }{\Pi_t}
+  &=
+  r_t\;dt
+  \quad\implies\quad
+  d\Pi_t
+  +
+  \left[
+    \frac{\partial f}{\partial S} D_t^S - D_t^f
+  \right]dt
+  =
+  r_t\Pi_t\;dt
+\end{align*}
+Sub Expressions~\ref{2portrf} and \ref{2divpi} for $d\Pi_t$ and $\Pi_t$
+and rearrange to get Expression~\ref{2pricingpde}.
+%\begin{align*}
+  %\left[
+  %-
+  %\frac{\partial f}{\partial t}
+  %-
+  %\frac{1}{2}
+  %\frac{\partial^2 f}{\partial S^2}
+  %\sigma^2_t
+  %\right]
+  %dt
+  %+
+  %\left[
+    %\frac{\partial f}{\partial S} D_t^S - D_t^f
+  %\right]dt
+  %=
+  %r_t\left[
+  %\frac{\partial f}{\partial S}S_t
+  %-
+  %f_t
+  %\right]
+  %\;dt
+%\end{align*}
+\end{proof}
+
+
+
+\clearpage
+\subsubsection{Nontraded Underlying}
+
+\begin{prop}\emph{(Pricing PDE)}
+\label{2pdenontraded}
+The price $f_{t}=f(S_t,t)$ of any derivative on $S_t$ satisfies
+\begin{align*}
+  \boxed{%
+    0
+    =
+    \frac{\partial f}{\partial t}
+    +
+    \frac{\partial f}{\partial S}
+    \big[
+    \mu_t
+    -
+    \lambda_t
+    \sigma_t
+    \big]
+    +
+    \frac{1}{2}
+    \frac{\partial^2 f}{\partial S^2}
+    \sigma_t^2
+    + D_t^f - r_tf_t
+  }
+\end{align*}
+This is a PDE that we can solve to get the price $f_{t}$.
+Derivatives only differ in the boundary conditions imposed on this PDE.
+\end{prop}
+\begin{rmk}
+This proposition is useful for pricing derivatives on an underlying
+$S_t$ that is \emph{not} traded. Even though $S_t$ is not traded, it can
+be observed (hence $\mu_t,\sigma_t$ can be observed), and a price of
+risk $\lambda_t$ can be postulated so this PDE can be solved for pricing
+function $f(S_t,t)$.
+But if $S_t$ \emph{is}, in fact, traded, this proposition is equivalent
+to Proposition~\ref{2pdetraded}; see below.
+\end{rmk}
+\begin{proof}(Proposition~\ref{2pdenontraded})
+Rearrange Expression~\ref{2lambda} defining the market price of risk
+$\lambda_t$, which was derived from complete markets plus no-arbitrage:
+\begin{align*}
+  0
+  &=
+  \tilde{\mu}_t
+  - \tilde{\sigma}_t\lambda_t
+  + D_t^f - r_tf_t
+\end{align*}
+Then simply sub in the expressions for $\tilde{\mu}_t,\tilde{\sigma}_t$
+derived in Prop~\ref{2prop:complete} from complete markets plus
+no-arbitrage, and rearrange to get the pricing PDE.
+%\begin{align*}
+  %\left[
+  %\frac{\partial f}{\partial t}
+  %+
+  %\frac{\partial f}{\partial S}
+  %\mu_t
+  %+
+  %\frac{1}{2}
+  %\frac{\partial^2 f}{\partial S^2}
+  %\sigma_t^2
+  %\right]
+  %+ D_t^f - r_tf_t
+  %&=
+  %\lambda_t
+  %\left[
+  %\frac{\partial f}{\partial S}
+  %\sigma_t
+  %\right]
+%\end{align*}
+\end{proof}
+
+
+\begin{proof}
+(Equivalence of Pricing PDEs in Propositions~\ref{2pdenontraded} and \ref{2pdetraded})
+Consider the trivial derivative on the underlying: a derivative with
+price $f_t$ that literally is just the underlying itself\footnote{%
+  Replicating any dividends payments as well
+}
+so that its price is simply $S_t=f(S_t,t)$.
+Then by no-arbitrage,
+\begin{align*}
+  \big(f_t,\tilde{\mu}_t,\tilde{\sigma}_t,D_t^f\big)
+  =(S_t,{\mu}_t,{\sigma}_t,D_t^S)
+\end{align*}
+And even though trivial, it is a derivative on $S_t$, hence must satisfy
+Expression~\ref{2lambda}:
+\begin{align*}
+  \lambda_t
+  =
+  \frac{%
+    \mu_{t}+D_{t}^S
+    -
+    r_tS_{t}
+  }{\sigma_{t}}
+  \quad\implies\quad
+  \mu_{t}
+  =
+  \lambda_t\sigma_{t}
+  +
+  r_tS_{t}
+  -
+  D_{t}^S
+\end{align*}
+This gives an expression for $\mu_t$, which we can substitute into the
+PDE in Proposition~\ref{2pdenontraded} to get \emph{exactly} the PDE in
+Expression~\ref{2pdetraded}.
+%\begin{align*}
+  %0
+  %&=
+  %\frac{\partial f}{\partial t}
+  %+
+  %\frac{\partial f}{\partial S}
+  %\left[
+  %r_t
+  %S_t
+  %- D_t^S
+  %\right]
+  %+
+  %\frac{1}{2}
+  %\frac{\partial^2 f}{\partial S^2}
+  %\sigma^2_t
+  %+
+  %D_t^f
+  %-
+  %r_t
+  %f_t
+%\end{align*}
+\end{proof}
+
+
+\clearpage
+\subsubsection{Solving the Pricing PDEs with the Feynman-Kac Formula}
+
+Summarizing, we now have two pricing PDEs, either of which, we could
+solve for price $f_t$ of any derivative, subject to appropriate boundary
+conditions specific to that derivative:
+\begin{align*}
+  0
+  &=
+  \frac{\partial f}{\partial t}
+  +
+  \frac{\partial f}{\partial S}
+  \left[
+  r_t
+  S_t
+  - D_t^S
+  \right]
+  +
+  \frac{1}{2}
+  \frac{\partial^2 f}{\partial S^2}
+  \sigma^2_t
+  +
+  D_t^f
+  -
+  r_t
+  f_t
+  \\
+  0
+  &=
+  \frac{\partial f}{\partial t}
+  +
+  \frac{\partial f}{\partial S}
+  \big[
+  \mu_t
+  -
+  \lambda_t
+  \sigma_t
+  \big]
+  +
+  \frac{1}{2}
+  \frac{\partial^2 f}{\partial S^2}
+  \sigma_t^2
+  + D_t^f - r_tf_t
+\end{align*}
+Again, if the underlying is traded, then the two PDEs are equivalent.
+We now discuss how to solve these pricing PDEs for the price $f_t$.
+
+\begin{prop}\emph{(Risk-Neutral Pricing)}
+Propositions~\ref{2pdetraded} and~\ref{2pdenontraded} both implied
+PDEs for the pricing function $f_t=f(S_t,t)$ of the form
+\begin{align*}
+  0
+  &=
+  \frac{\partial f}{\partial t}
+  +
+  \frac{\partial f}{\partial S}
+  a_t
+  +
+  \frac{1}{2}
+  \frac{\partial^2 f}{\partial S^2}
+  b_t^2
+  +
+  D_t
+  -
+  r_t
+  f_t
+\end{align*}
+Supposing terminal payoff $\Phi(S_T)$, their solution is given by the
+Feynman-Kac formula
+\begin{align*}
+  f(S_t,t)
+  &=
+  \E^*_t\left[
+    \Phi(S_T)
+    e^{-\int_t^T r_s\;ds}
+    +
+    \int_t^T
+    D_s
+    e^{-\int_t^s r_u\;du}
+    \;ds
+  \right]
+\end{align*}
+where the expectation is conditional on the initial value $S_t$ and
+taken over future paths until $S_T$ assuming that the underlying has
+\emph{risk-neutral dynamics}
+\begin{align*}
+  dS_t
+  &= a_t\;dt + b_t\;dZ_t
+\end{align*}
+\end{prop}
+\begin{rmk}
+In words, the pricing function $f(S,t)$ that we'd like to compute is
+characterized by the pricing PDE.
+We can solve that PDE in any number of ways.
+But one easy way is to recognize that the pricing PDE has the form of
+the Feynman-Kac solution's PDE.
+So then we can just use the Feynman-Kac formula.
+The trick is just to recognize that we take the expectation not under
+the \emph{true} dynamics of $S_t$, but under the dynamics implied by the
+Feynman-Kac solution's PDE.
+\end{rmk}
+\begin{rmk}
+Notice from the risk-neutral dynamics of a non-traded underlying,
+\begin{align*}
+  \E^*[dS]
+  =
+  \E[dS] - \lambda_t \sigma_t\;dt
+\end{align*}
+
+\end{rmk}
+
+
+
+\clearpage
+\subsection{Term Structure Models}
+
+Suppose that the underlying $S_t$ is the short rate $r_t$.
+Then the risk-neutral dynamics of that thing are
+\begin{align*}
+  dr_t
+  =
+  [\mu_t-\lambda_t\sigma_t]\;dt
+  + \sigma_t \;dZ_t
+\end{align*}
+A model is then a specification of the drift and diffusion in the
+risk-neutral dynamics. Then, can just price any bond by Feynman-Kac.
+Examples: ZCB, coupon bond, etc.
+
+\begin{defn}(One Factor Vasicek)
+Risk neutral dynamics
+\begin{align*}
+  dr_t
+  &=
+  \beta(\alpha-r_t)\;dt
+  +
+  \sigma\;dZ_t
+\end{align*}
+Special feature: If real-world dynamics are Vasicek and $\lambda=0$
+constant, then the risk-neutral dynamics are also Vasicek. That's if you
+think writing down straight away Vasicek risk-neutral dynamics is
+ad-hoc, and you want to know how the real world measure is related to
+the risk-neutral measure.
+
+Can also get a closed-form expression for price of ZCBs.
+\end{defn}
+
+With single-factor models, returns on bonds of all maturities perfectly
+correlated.
+So introduce multifactor model.
+
+Suppose factors independent and $r=\sumiN F_n$. Under assumption of
+independent factors, can get a closed-form price of ZCBs.
+
+Affine two-factor model, with possible correlation between factors.
+Setup and dynamics.
+
+Quadratic model. If the factors are gaussian, Quadratic-Gaussian model.
+
+
+\clearpage
+\subsection{Default Model}
+
+Stopping time $\tilde{T}$ that determines time of default.
+Bond price changes. Use conditioning to get the price.
+
+
+
+
+
+
+
+
+
+
+
 
 
 

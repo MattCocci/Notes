@@ -214,6 +214,7 @@
 \newcommand{\ra}{\rightarrow}
 \newcommand{\diag}{\operatorname{diag}}
 \newcommand{\proj}{\operatorname{proj}}
+\newcommand{\trace}{\operatorname{tr}}
 \newcommand{\ch}{\text{ch}}
 \newcommand{\dom}{\text{dom}}
 
@@ -229,6 +230,7 @@
 \newcommand{\sA}{\mathscr{A}}
 
 % Mathcal
+\newcommand{\calL}{\mathcal{L}}
 \newcommand{\calB}{\mathcal{B}}
 \newcommand{\calD}{\mathcal{D}}
 \newcommand{\calF}{\mathcal{F}}
@@ -11183,7 +11185,7 @@ saw a similar result in the KKT section. But also as in the KKT
 conditions, a few extra conditions having to do with convexity can
 guarantee the solution is globablly optimal.
 
-\subsubsection{Canonical Sequential Formulation and the Hamiltonian}
+\subsubsection{Canonical Sequential Formulation}
 
 \begin{defn}{(Canonical Sequential Formulation: Control-State Rep)}
 \label{defn:sequential-altrep-cts}
@@ -11501,10 +11503,279 @@ same for a vector $x$):
 Together, all of these imply the Hamilton-Jacobi-Bellman equation above.
 \end{proof}
 
+\clearpage
+\subsection{Continuous-Time Stochastic Dynamic Optimization}
+
+\subsubsection{Canonical Problem}
+
+\begin{defn}(Canonical Problem)
+We want to solve
+\begin{align}
+  J(x,t)
+  =
+  \max_{y_t}
+  \;&
+  \E_t\left[
+    \int_t^T
+    \varphi(x_s,y_s,s)\;ds
+    +
+    \Phi(x_T,T)
+  \right]
+  %\label{Jdef}
+  \notag
+  \\
+  \qquad\text{s.t.}\quad
+  &
+  \underset{(n\times 1)}{%
+    \vphantom{\mu(x_t,y_t,t)}
+    dx_t
+  }
+  =
+  \underset{(n\times 1)}{%
+    \mu(x_t,y_t,t)
+  }
+  \;dt
+  +
+  \underset{(n\times m)}{%
+    \vphantom{\mu(x_t,y_t,t)}
+    \sigma(x_t,y_t,t)
+  }
+  \underset{(m\times 1)}{%
+    \vphantom{\mu(x_t,y_t,t)}
+    dZ_t
+  }
+  \notag
+  \\
+  & x_t = x,\quad
+  \text{Constraints on $y_t$}
+  \notag
+\end{align}
+where $J(x,t)$ is the value function for all $t\leq T$ starting from
+$x_t=x$.
+
+Note that potentially $T=\infty$, giving an infinite horizon problem.
+And as it turns out, a useful way to think about the infinite horizon
+problem is simply the finite horizon problem (which can often be
+often characterized more easily), and then taking the limit
+$T\ra\infty$.
+\end{defn}
+
+\begin{defn}
+(Canonical Stationary Infinite Horizon Problem and Value Function)
+The most common special of the above canonical problem is given by
+\begin{align}
+  J(x,t)
+  =
+  \max_{y_t}
+  \;&
+  \E_t\left[
+    \int_t^\infty
+    e^{-\rho s}
+    u(x_s,y_s)
+    \;ds
+  \right]
+  %\label{Jdef}
+  \notag
+  \\
+  \qquad\text{s.t.}\quad
+  &
+  dx_t
+  =
+  \mu(x_t,y_t)\;dt
+  +
+  \sigma(x_t,y_t)\;dZ_t
+  \notag
+  \\
+  & x_t=x,
+  \quad\text{Constraints on $y_t$}
+  \notag
+\end{align}
+\end{defn}
+
+
+\subsubsection{Hamiltonian Approach}
+
+\begin{defn}(Hamiltonian)
+The \emph{Hamiltonian} for the canonical problem with no constraints on
+$y_t$ is given by
+\begin{align*}
+  \calH(x_t,y_t,\xi_t,\pi_t,t)
+  =
+  \varphi(x_t,y_t,t)
+  +
+  \xi_t'
+  \mu(x_t,y_t,t)
+  +
+  \trace\left(
+  \pi_t'
+  \sigma(x_t,y_t,t_t)
+  \right)
+\end{align*}
+for $\xi\in \R^n$ and $\pi\in\R^{n\times m}$.
+Note that it's also sometimes convenient to use a trace operator
+property to rewrite $\trace(\pi_t' \sigma) =\trace(\sigma\pi_t')$.
+\end{defn}
+
+\begin{prop}\emph{(Stochastic Maximum Principle)}
+The solution is characterized by
+\begin{itemize}
+  \item
+    Pair $(x_t^*,y_t^*)$ such that
+    \begin{align*}
+      y_t^*
+      =
+      \argmin_{y_t}
+      \calH(x_t^*,y_t,\xi_t,\pi_t,t)
+    \end{align*}
+    In practice, just differentiate $\calH$ with respect to $y_t$,
+    set equal to zero, and solve.
+
+  \item Law of motion for multiplier $\xi_t$ given by
+    \begin{align*}
+      d\xi_t
+      &=
+      -\frac{\partial \calH(x_t^*,y_t^*,\xi_t,\pi_t,t)}{\partial x}
+      \;dt
+      +
+      \pi_t
+      \;dZ_t
+      \qquad\text{where}\quad
+      \xi_T
+      =
+      -\frac{\partial \Phi(x_T,T)}{\partial x}
+    \end{align*}
+\end{itemize}
+\end{prop}
+%http://www.qfl-berlin.de/sites/default/files/Yusong%20Li.pdf
+
+
+\clearpage
+\subsubsection{Hamilton-Jacobi-Bellman Approach}
+
+\begin{prop}\emph{(HJB Equation for Canonical Problem)}
+The \emph{Hamilton-Jacobi-Bellman Equation} $J(x,t)$ associated with the
+canonical finite horizon problem satisfies
+\begin{align*}
+  0
+  &=
+  \max_{y_t}
+  \;
+  \varphi(x_t,y_t,t)
+  +
+  \frac{\partial J(x_t,t)}{\partial t}
+  +
+  \calL J(x_t,t)
+  \\
+  \qquad\text{s.t.}
+  &
+  \quad\qquad
+  J(x_T,T)=\Phi(X_T,T)
+  \\
+  &
+  \quad\qquad
+  \text{\emph{(Any other constraints on $y_t$)}}
+\end{align*}
+where $\calL$ is the infinitesimal generator of the SDE for the state
+$x_t$:
+\begin{align*}
+  \calL f(x)
+  =
+  \frac{\partial f(x)}{\partial x'}
+  \mu(x,y,t)
+  +
+  \frac{1}{2}
+  \trace\left(
+  \Sigma(x,y,t)
+  \frac{\partial^2 f(x)}{\partial x\,\partial x'}
+  \right)
+\end{align*}
+\end{prop}
+\begin{rmk}
+This is then essentially a sequence of static problems.
+Solve by adding a multiplier on any constraints and getting the FOCs in
+$y_t$.
+\end{rmk}
+\begin{proof}
+By the principle of optimality, can wewrite the canonical problem by
+breaking up
+\begin{align*}
+  J(x_t,t)
+  =
+  \max_{y_t}
+  \;&
+  \E_t\left[
+    \int_t^T
+    \varphi(x_s,y_s,s)\;ds
+    +
+    \Phi(X_T,T)
+  \right]
+  =
+  \max_{y_t}
+  \;
+  \E_t\left[
+    \int_t^\tau
+    \varphi(x_s,y_s,s)\;ds
+    +
+    J(x_\tau,\tau)
+  \right]
+\end{align*}
+Second $\tau\ra t$, can rewrite the equation as
+\begin{align*}
+  J(x_t,t)
+  =
+  \max_{y_t}
+  \;
+  \E_t\left[
+    \varphi(x_t,y_t,t)\;dt
+    +
+    J(x_t,t)
+    +
+    dJ(x_t,t)
+  \right]
+\end{align*}
+The first two terms in the expectation are known at $t$. The final term
+has expectation
+$\left[\frac{\partial J(x_t,t)}{\partial t}+\calL J(x_t,t)\right]\;dt$.
+Cancel $J(x_t,t)$ on both sides and divide through by $dt$.
+\end{proof}
+
+\begin{cor}
+\emph{(HJB Equation for Canonical Stationary Infinite Horizon Problem)}
+In the special case of the infinite horizon problem,
+\begin{align*}
+  \rho v(x)
+  =
+  \max_{y}
+  \;&
+  u(x,y)
+  +
+  \calL v(x)
+  \\
+  \qquad\text{s.t.}
+  &
+  \;
+  \text{\emph{(Any constraints on $y$)}}
+\end{align*}
+where $v(x):=J(x,0)$ represents the time-homoegenous part.
+\end{cor}
+\begin{proof}
+From the canonical stationary problem, it's clear that
+\begin{align}
+  \forall t
+  \qquad
+  J(x_t,t)
+  &= e^{-\rho t}J(x_t,0)
+  =: e^{-\rho t}v(x_t)
+  \label{vdef}
+\end{align}
+Compute derivatives of $J(x_t,t)$ from this last definition, rewrite
+in terms of $v(x_t)$, sub into the HJB, drop time
+subscripts, cancel, and rearrange to get the representation above.
+\end{proof}
+
 
 \clearpage
 \section{Numerical Optimization}
-
 
 Numerical optimization is necessary when we cannot analytically solve
 for the minimizing $x^*$, and still convenient when
