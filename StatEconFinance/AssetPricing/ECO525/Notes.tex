@@ -1,0 +1,3916 @@
+\documentclass[12pt]{article}
+
+\author{Matthew D. Cocci}
+\title{ECO-525: Notes to Second Half}
+\date{\today}
+
+%% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % most detailed page formatting control
+\usepackage{fullpage} % Simpler than using the geometry package; std effect
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+%% Formatting %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[margin=1in]{geometry}
+    %   Adjust the margins with geometry package
+%\usepackage{pdflscape}
+    %   Allows landscape pages
+%\usepackage{layout}
+    %   Allows plotting of picture of formatting
+
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt}
+    %   Make the header bigger to avoid overlap
+
+%\fancyhf{}
+    %   Erase header settings
+
+%\renewcommand{\headrulewidth}{0.3pt}
+    %   Width of the line
+
+%\setlength{\headsep}{0.2in}
+    %   Distance from line to text
+
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rmk}{Remark}
+\newtheorem*{note}{Note}
+
+% Below supports left-right alignment in matrices so the negative
+% signs don't look bad
+\makeatletter
+\renewcommand*\env@matrix[1][c]{\hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols #1}}
+\makeatother
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+\usepackage{courier}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+%\usetikzlibrary{arrows.meta}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref}
+\hypersetup{%
+    colorlinks,
+        %   This colors the links themselves, not boxes
+    citecolor=black,
+        %   Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Colors %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{color}
+\definecolor{codegreen}{RGB}{28,172,0}
+\definecolor{codelilas}{RGB}{170,55,241}
+
+% David4 color scheme
+\definecolor{d4blue}{RGB}{100,191,255}
+\definecolor{d4gray}{RGB}{175,175,175}
+\definecolor{d4black}{RGB}{85,85,85}
+\definecolor{d4orange}{RGB}{255,150,100}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{verbatim}
+    %   For including verbatim code from files, no colors
+\usepackage{listings}
+    %   For including code snippets written directly in this doc
+
+\lstdefinestyle{bash}{%
+  language=bash,%
+  basicstyle=\footnotesize\ttfamily,%
+  showstringspaces=false,%
+  commentstyle=\color{gray},%
+  keywordstyle=\color{blue},%
+  xleftmargin=0.25in,%
+  xrightmargin=0.25in
+}
+\lstdefinestyle{log}{%
+  basicstyle=\scriptsize\ttfamily,%
+  showstringspaces=false,%
+  xleftmargin=0.25in,%
+  xrightmargin=0.25in
+}
+
+
+\lstdefinestyle{matlab}{%
+  language=Matlab,%
+  basicstyle=\footnotesize\ttfamily,%
+  breaklines=true,%
+  morekeywords={matlab2tikz},%
+  keywordstyle=\color{blue},%
+  morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+  identifierstyle=\color{black},%
+  stringstyle=\color{codelilas},%
+  commentstyle=\color{codegreen},%
+  showstringspaces=false,%
+    %   Without this there will be a symbol in
+    %   the places where there is a space
+  %numbers=left,%
+  %numberstyle={\tiny \color{black}},%
+    %   Size of the numbers
+  numbersep=9pt,%
+    %   Defines how far the numbers are from the text
+  emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{blue},%
+    %   Some words to emphasise
+}
+
+\newcommand{\matlabcode}[1]{%
+    \lstset{style=matlab}%
+    \lstinputlisting{#1}
+}
+    %   For including Matlab code from .m file with colors,
+    %   line numbering, etc.
+
+\lstdefinelanguage{Julia}%
+  {morekeywords={abstract,break,case,catch,const,continue,do,else,elseif,%
+      end,export,false,for,function,immutable,import,importall,if,in,%
+      macro,module,otherwise,quote,return,switch,true,try,type,typealias,%
+      using,while},%
+   sensitive=true,%
+   %alsoother={$},%
+   morecomment=[l]\#,%
+   morecomment=[n]{\#=}{=\#},%
+   morestring=[s]{"}{"},%
+   morestring=[m]{'}{'},%
+}[keywords,comments,strings]
+
+\lstdefinestyle{julia}{%
+    language         = Julia,
+    basicstyle       = \scriptsize\ttfamily,
+    keywordstyle     = \bfseries\color{blue},
+    stringstyle      = \color{codegreen},
+    commentstyle     = \color{codegreen},
+    showstringspaces = false,
+    literate         = %
+      {ρ}{{$\rho$}}1
+      {ℓ}{{$\ell$}}1
+      {∑}{{$\Sigma$}}1
+      {Σ}{{$\Sigma$}}1
+      {√}{{$\sqrt{}$}}1
+      {θ}{{$\theta$}}1
+      {ω}{{$\omega$}}1
+      {ɛ}{{$\varepsilon$}}1
+      {φ}{{$\varphi$}}1
+      {σ²}{{$\sigma^2$}}1
+      {Φ}{{$\Phi$}}1
+      {ϕ}{{$\phi$}}1
+      {Dₑ}{{$D_e$}}1
+      {Σ}{{$\Sigma$}}1
+      {γ}{{$\gamma$}}1
+      {δ}{{$\delta$}}1
+      {τ}{{$\tau$}}1
+      {μ}{{$\mu$}}1
+      {β}{{$\beta$}}1
+      {Λ}{{$\Lambda$}}1
+      {λ}{{$\lambda$}}1
+      {r̃}{{$\tilde{\text{r}}$}}1
+      {α}{{$\alpha$}}1
+      {σ}{{$\sigma$}}1
+      {π}{{$\pi$}}1
+      {∈}{{$\in$}}1
+      {∞}{{$\infty$}}1
+}
+
+
+%% Bibliographies %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{natbib}
+    %---For bibliographies
+%\setlength{\bibsep}{3pt} % Set how far apart bibentries are
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{enumitem}
+    %   Has to do with enumeration
+\usepackage{appendix}
+%\usepackage{natbib}
+    %   For bibliographies
+\usepackage{pdfpages}
+    %   For including whole pdf pages as a page in doc
+\usepackage{pgffor}
+    %   For easier looping
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+\maketitle
+
+\section{Challenges to Representative Agent Theories}
+
+Standard asset pricing framework of Lucas (1978) and Breeden (1979)
+
+\subsection{Review of Rep-Agent Framework (Cochrane)}
+
+\begin{defn}(Household Problem)
+There is a risky asset that costs $p_t$ units of the consumption good
+and pays dividends at rate $D_t$ at time $t$.
+Household solves
+\begin{align*}
+  \max \E_0\left[\int_0^\infty e^{-\rho t}u(c_t)\;dt\right]
+\end{align*}
+This has first order conditions
+\begin{align}
+  p_t u'(c_t) =
+  \E_t\left[\int^\infty_0 e^{-\rho s}u'(c_{t+s})D_{t+s}\;ds\right]
+  \label{pemx}
+\end{align}
+In equilibrium with this rep agent, prices adjust until $c_t=e_t$, the
+endowment, for all $t$.
+\end{defn}
+
+\begin{defn}(Stochastic Discount Factor)
+The above equation suggests defining stochastic discount factor in
+levels as follows
+\begin{align}
+  \Lambda_t
+  &:= e^{-\rho t} u'(e_t)
+  = e^{-\rho t} u'(c_t)
+  \label{sdf}
+\end{align}
+We can get an SDE describing the evolution of this variable in one of
+two ways:
+\begin{itemize}
+  \item Just writing down a process for this SDF
+  \item Specifying an SDE for $c_t$ or $e_t$, then deriving an SDE for
+    $\Lambda_t$ by Ito's Lemma
+\end{itemize}
+\end{defn}
+
+\begin{defn}(Fundamental Pricing Equation)
+In continuous time,
+\begin{align*}
+  0 &= \Lambda_t D_t\;dt + \E_t[d(\Lambda_t p_t)]
+\end{align*}
+This arises by breaking up the expected payoff from the dividend stream
+in Expression~\ref{pemx} into the sum of two components: the
+instantaneous dividend flow plus the resale value at time $dt$.
+Approximate and take limits.
+Breaking up $d(\Lambda_t p_t)$ by Ito's Lemma, we can also rewrite as
+\begin{align*}
+  0 &= \frac{D_t}{p_t}\;dt +
+  \E_t\left[
+    \frac{d\Lambda_t}{\Lambda_t}
+    +
+    \frac{dp_t}{p_t}
+    +
+    \frac{d\Lambda_t}{\Lambda_t}
+    \frac{dp_t}{p_t}
+  \right]
+\end{align*}
+\end{defn}
+
+\begin{defn}(Risk Free Rate)
+We can think of this as an asset with $p_t=1$ always (i.e. $dp_t=0$)
+that pays dividend $r^f_t$, or as an asset with price following
+$dp_t/p_t=r^f_t\;dt$ that pays no dividend. In either case, the above
+pricing formula gives
+\begin{align*}
+  r_t^f\;dt
+  &=
+  -
+  E_t\left[
+    \frac{d\Lambda_t}{\Lambda_t}
+  \right]
+\end{align*}
+\end{defn}
+
+\begin{defn}(Expected Return Formula)
+The second fundamental pricing formula and the risk free rate means we
+can again rewrite the fundamental pricing equation---this time as
+\begin{align}
+  \E_t\left[
+    \frac{dp_t}{p_t}
+  \right]
+  +
+  \frac{D_t}{p_t}\;dt
+  &=
+  r_t^f\;dt
+  -
+  \E_t\left[
+    \frac{d\Lambda_t}{\Lambda_t}
+    \frac{dp_t}{p_t}
+  \right]
+  \label{expR}
+\end{align}
+This has the expected return on the LHS.
+It equals the risk free rate plus a risk premium that equals covariance
+of the SDF with the price of the asset.
+
+Now suppose we have processes for the price and the SDF.
+For example, suppose
+\begin{align*}
+  \frac{dp_t}{p_t}
+  &= \mu^p \;dt + \sigma_p dZ_t \\
+  \frac{d\Lambda_t}{\Lambda_t}
+  &= \mu^\Lambda \;dt + \sigma_\Lambda dZ_t
+\end{align*}
+If the SDF specified above \emph{really does} price the asset with price
+process $p_t$, then it \emph{must} be the case that
+Expression~\ref{expR} holds.
+Substituting in the prices processes, this implies the following
+restrictions on parameters/processes
+\begin{align*}
+  \mu^p\;dt
+  +
+  \frac{D_t}{p_t}\;dt
+  &=
+  r_t^f\;dt
+  -
+  \sigma_p\sigma_\lambda\;dt
+  \quad\implies\quad
+  -\sigma_p\sigma_\lambda
+  =
+  \mu^p
+  +
+  \frac{D_t}{p_t}
+  - r_t^f
+\end{align*}
+Note that the assumed processes for $p_t$ and $\Lambda_t$ were very
+particular, i.e. geometric Brownian motions.
+However, the point of this was much more general.
+Stated again: Whatever processes we assume for $p_t$ and $\Lambda_t$,
+Expression~\ref{expR} \emph{must} hold for $\Lambda_t$ to \emph{really}
+price the asset. By substituting in the assumed SDEs for $p_t$ and
+$\Lambda_t$ (which are often more general that simple GBM), we can
+derive equlibrium restrictions on the processes and parameters.
+\end{defn}
+
+\begin{defn}(Risk Neutral Pricing)
+We can almost always modify the measure so that
+\end{defn}
+
+
+
+
+%Single representative agent who consumes their endowment $c_t=e_t$ each
+%period, where
+%\begin{align}
+  %\frac{de_t}{e_t}
+  %&= \mu_e\; dt + \sigma_e \;dZ_t
+  %\label{endow}
+%\end{align}
+%Given SDE~\ref{endow} for the endowment, can derive an SDE for the SDF
+%$\Lambda_t$ by Ito's Lemma
+%\begin{align*}
+  %d\Lambda_t
+  %&=
+  %-\rho \Lambda_t
+  %dt
+  %+
+  %e^{-\rho t}
+  %u''(e_t)
+  %de_t
+  %+ \frac{1}{2}
+  %e^{-\rho t}
+  %u'''(e_t)
+  %(de_t)^2
+  %\\
+  %&=
+  %-\rho \Lambda_t
+  %dt
+  %+
+  %e^{-\rho t}
+  %u'(e_t)
+  %\frac{u''(e_t)}{u'(e_t)}
+  %de_t
+  %+ \frac{1}{2}
+  %e^{-\rho t}
+  %u'(e_t)
+  %\frac{u'''(e_t)}{u'(e_t)}
+  %(de_t)^2
+  %\\
+  %&=
+  %-\rho \Lambda_t
+  %dt
+  %+
+  %\Lambda_t
+  %\frac{e_tu''(e_t)}{u'(e_t)}
+  %\frac{de_t}{e_t}
+  %de_t
+  %+ \frac{1}{2}
+  %\Lambda_t
+  %\frac{e_t^2u'''(e_t)}{u'(e_t)}
+  %\left(\frac{de_t}{e_t}\right)^2
+%\end{align*}
+%Hence
+%\begin{align*}
+  %\frac{d\Lambda_t}{\Lambda_t}
+  %&=
+  %-\rho
+  %\; dt
+  %+
+  %\frac{e_tu''(e_t)}{u'(e_t)}
+  %\frac{de_t}{e_t}
+  %+ \frac{1}{2}
+  %\frac{e_t^2u'''(e_t)}{u'(e_t)}
+  %\left(\frac{de_t}{e_t}\right)^2
+%\end{align*}
+%Sub in for $de_t$ and $(de_t)^2$:
+%\begin{align*}
+  %\frac{d\Lambda_t}{\Lambda_t}
+  %&=
+  %-\rho
+  %\; dt
+  %+
+  %\frac{e_tu''(e_t)}{u'(e_t)}
+  %\big[
+    %\mu_e\;dt + \sigma_e\;dZ_t
+  %\big]
+  %+ \frac{1}{2}
+  %\frac{e_t^2u'''(e_t)}{u'(e_t)}
+  %\sigma_e^2 \;dt
+  %\\
+  %&=
+  %\left[
+  %-\rho
+  %+
+  %\frac{e_tu''(e_t)}{u'(e_t)}
+  %\mu_e
+  %+
+  %\frac{1}{2}
+  %\frac{e_t^2u'''(e_t)}{u'(e_t)}
+  %\sigma_e^2
+  %\right] dt
+  %+
+  %\frac{e_tu''(e_t)}{u'(e_t)}
+  %\sigma_e\;dZ_t
+%\end{align*}
+%Defining relative risk aversion $\gamma(e_t)$, we can rewrite this
+%\begin{align*}
+  %\frac{d\Lambda_t}{\Lambda_t}
+  %&=
+  %\left[
+  %-\rho
+  %-
+  %\gamma(e_t)
+  %\mu_e
+  %+
+  %\frac{1}{2}
+  %\frac{e_t^2u'''(e_t)}{u'(e_t)}
+  %\sigma_e^2
+  %\right] dt
+  %-
+  %\gamma(e_t)
+  %\sigma_e\;dZ_t
+  %\\
+  %\text{where}\quad
+  %\gamma(e_t)
+  %&=
+  %-\frac{e_tu''(e_t)}{u'(e_t)}
+%\end{align*}
+%Often though, we just write down an SDE for $\Lambda_t$ directly, rather
+%than derive it from some endowment process.
+
+
+
+\clearpage
+\subsection{Puzzles and Anomalies}
+
+List of things:
+\begin{itemize}
+  \item \emph{Equity Premium Puzzle}:
+    Stocks are not really correlated with consumption growth.
+    Hence stocks should not really command any premium, but they do.
+    Need really high risk aversion to explain.
+
+    Efforts to explain
+    \begin{itemize}
+      \item Exotic Preferences (Epstein-Zin)
+      \item Distaster Risk
+      \item Long-run risk
+      \item Heterogeneity in agents
+    \end{itemize}
+
+  \item
+    \emph{Risk Free Rate Puzzle}:
+    The risk-free rate is very low. Consistent with low risk aversion.
+    This is a direct tension with the equity premium puzzle.
+
+  \item
+    \emph{Volatility Puzzle}:
+    Need time-varying risk aversion (hence time varying discount rates),
+    otherwise can't justify the volatility of stock returns given the
+    volatility of dividend returns (Shiller ``excess volatility''
+    result).
+
+  \item
+    \emph{Time Series Predictability Puzzle}:
+    Dividend-price ratio (and other things) forecast subsequent
+    \emph{expected} returns. In other words, expected excess returns are
+    time-varying.
+    The variance of stocks are \emph{also} time-varying, so that's the
+    obvious candidate, even though there's not a strong empirical
+    relationship.
+
+  \item
+    \emph{Cross Sectional Predictability Puzzle}:
+    Fama-French factors
+
+  \item
+    \emph{Long-Term Reversal}, DeBondt and Thaler (1985):
+    Stock's \emph{past} 3-year return \emph{negatively} predicts
+    \emph{future} returns.
+
+  \item
+    \emph{Medium-Term Momentum}, Jegadeesh and Titman (1993):
+    Stock's \emph{past} $k$-month (for $k\in\{1,\ldots,12\}$)
+    \emph{positively} predicts \emph{future} returns.
+
+  \item
+    \emph{Post-Earnings Announcement Drift}, Bernard and Thomas (1989):
+    Surprise in recent earnings announcement \emph{postively}
+    predictures future returns.
+    In other words, \emph{under-reaction} to initial announcement.
+    Differs from momentum, because the drift does \emph{not} mean-revert
+    over longer run.
+
+  \item
+    \emph{Turnover}:
+    There are two separate turnover results
+    \begin{itemize}
+      \item \emph{Long-Term}, Datar, Naik, Radcliffe (1998):
+        High volume over past \emph{year} \emph{negatively} predicts
+        future returns
+      \item \emph{Short-Term}, Gervais, Kaniel, Mingelgrin (2001):
+        High volume over past \emph{week} \emph{positively} predicts
+        future returns
+    \end{itemize}
+
+  \item
+    \emph{Volatility}:
+    Two results
+    \begin{itemize}
+      \item Stocks with high \emph{beta} have lower alphas
+      \item Stocks with high \emph{idiosyncratic volatility} have lower alphas
+    \end{itemize}
+\end{itemize}
+
+
+
+\subsection{Historical Bubbles}
+
+Definition: Asset price vastly exceeding fundamentals.
+Examples include
+\begin{itemize}
+  \item Dutch tulip bubble
+  \item 1920s in the US
+  \item Internet Bubble
+  \item Palm/3Com (Lamont and Thaler)
+  \item Chinese Warrants
+\end{itemize}
+Explanations
+\begin{itemize}
+  \item Mis-measured fundamentals
+  \item Rational bubbles: infinite maturity and unbounded prices
+  \item Optimism
+  \item Speciulation between investors
+\end{itemize}
+
+
+\subsection{Investor Behavior}
+
+
+Individual Investors:
+Datasets are
+\begin{itemize}
+  \item SCF
+  \item Discount brokerage data, Odean (1998)
+  \item 401(k) data, Huberman and Jiang (2006)
+  \item Finnish data, Grinblatt and Keloharju (2001)
+  \item Swedish data, Calvet, Campbell, Sodini (2009)
+\end{itemize}
+Topics
+\begin{itemize}
+  \item Non-participation
+  \item Under-diversification:
+    \begin{itemize}
+      \item Home bias
+      \item Concentration in a few stocks in the market
+      \item Owning stocks in your own company
+    \end{itemize}
+  \item Excessive trading, Barber and Odean (2000): those who trade most
+    do worse
+  \item Disposition effect: Agents more likely to sell stocks where
+    they've realized a gain since purchase, versus hold stocks where
+    they've realized a loss since purchase
+\end{itemize}
+
+
+\clearpage
+\section{Noise Traders}
+
+\subsection{Rational Learning Benchmark in Discrete Time}
+
+\paragraph{Belief Evolution}
+Three periods, no discounting between periods.
+There's some unobserved fundamental value $f$, which will be the
+terminal payoff announced in final period.
+\begin{itemize}
+  \item $t=0$: Set the prior $p(f)\sim\calN(\overline{f},\sigma_f^2)$
+
+  \item $t=1$: Observe signal $s$ that's correlated with $f$
+    \begin{align*}
+      s &= f + \varepsilon
+      \quad
+      \text{where}\quad
+       \varepsilon\sim\calN(0, \sigma_\varepsilon^2)
+      \qquad\implies\qquad
+      p(s|f) \sim\calN(f, \sigma_\varepsilon^2)
+    \end{align*}
+    Given signal, form posterior
+    \begin{align*}
+      p(f|s)
+      &\propto
+      p(s|f)
+      \cdot p(f)
+      =
+      \calN\bigg(
+        %\underbrace{%
+          \overline{f}
+          + \frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon}
+          (s-\overline{f})
+        %}_{\hat{f}}
+        ,\;\;
+        \frac{1}{\tau_f+\tau_\varepsilon}
+      \bigg)
+    \end{align*}
+    where $\tau_x=1/\sigma^2_x$, i.e. the inverse variance which is
+    called the ``precision.''
+
+  \item $t=2$: Fundamental value $f$ realized and agents get payoff
+    equal to $f$.
+\end{itemize}
+Henceforth, let $\calI_t$ denote the information set at time
+$t$, i.e. $\calI_0=\emptyset$, $\calI_1=\{s\}$, $\calI_2=\{s,f\}$.
+Using this notation, note that a rational agent's beliefs about $f$
+follow a martingale:
+\begin{align*}
+  \E\big[ \E[f|\calI_{t+1}] \;\big|\;\calI_t\big]
+  = \E[f|\calI_{t}]
+\end{align*}
+which follows from $\calI_t\subset \calI_{t+1}$ and the law of iterated
+expectations.
+
+\paragraph{Prices}
+For a risk a risk neutral agent, $p_t = \E[f|\calI_t]$ so that price
+in each period is
+\begin{align*}
+  p_0
+  &=
+  \E[f|\calI_0]
+  =
+  \overline{f}\\
+  p_1
+  &=
+  \E[f|\calI_1]
+  =
+  \overline{f}
+  + \frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon}
+  (s-\overline{f})
+  \\
+  p_2
+  &=
+  \E[f|\calI_2]
+  =
+  f
+\end{align*}
+
+\paragraph{Price Dynamics}
+Under risk neutrality, prices follow a martingale:
+\begin{align*}
+  \E[p_{t+1}|\calI_t]
+  = \E\big[\E[f|\calI_{t+1}]|\calI_t\big]
+  = \E[f|\calI_t]
+  = p_t
+\end{align*}
+The first equality used risk neutrality, which implies implies
+$p_{t+1}=\E[f|\calI_{t+1}]$.  The second equality applied the law of
+iterated expectations, which was valid since $\calI_t\subset
+\calI_{t+1}$.  Finally, the last equality again used risk neutrality,
+which implies $p_{t}=\E[f|\calI_{t}]$.
+And $\E[p_{t+1}|\calI_t]=p_t$ is precisely the definition of a
+martingale.
+
+The fact that prices follow a martingale implies that price changes have
+unconditional \emph{expectation} of zero:
+\begin{align*}
+  \forall t
+  \qquad
+  \E[p_{t+1}-p_t]
+  =
+  \E[p_{t+1}-p_t|\calI_0]
+  =
+  p_0 - p_0
+  = 0
+\end{align*}
+What about the unconditional \emph{variance} of price changes?
+Use the price expressions we derived above to compute
+\begin{align*}
+  \Var(p_1-p_0)
+  &=
+  \Var\left(
+  \left[
+  \overline{f}
+  + \frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon}
+  (s-\overline{f})
+  \right]
+  -\overline{f}
+  \right)
+  \\
+  &=
+  \left(
+  \frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon}
+  \right)^2
+  \Var(s)
+  =
+  \left(
+  \frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon}
+  \right)^2
+  \Var(f+\varepsilon)
+  \\
+  \text{Since $\varepsilon\perp f$}\qquad
+  &=
+  \left(
+  \frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon}
+  \right)^2
+  \big[
+    \sigma^2_f
+    +
+    \sigma^2_\varepsilon
+  \big]
+  =
+  \left(
+  \frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon}
+  \right)^2
+  \left[
+    \frac{1}{\tau_f}
+    +
+    \frac{1}{\tau_\varepsilon}
+  \right]
+  \\
+  \implies\quad
+  \Var(p_1-p_0)
+  &=
+  \frac{\tau_\varepsilon}{\tau_f(\tau_f+\tau_\varepsilon)}
+\end{align*}
+Next, compute
+\begin{align*}
+  \Var(p_2-p_1)
+  &=
+  \Var\left(
+    f
+    - \left[
+    \overline{f}
+    + \frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon}
+    (s-\overline{f})
+    \right]
+  \right)
+  \\
+  &=
+  \Var\left(
+    f
+    - \frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon} s
+  \right)
+  =
+  \Var\left(
+    f
+    - \frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon} (f+\varepsilon)
+  \right)
+  \\
+  &=
+  \Var\left(
+   \frac{\tau_f}{\tau_f+\tau_\varepsilon} f
+    - \frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon} \varepsilon
+  \right)
+  \\
+  \text{Since $\varepsilon\perp f$}\qquad
+  &=
+  \left(\frac{\tau_f}{\tau_f+\tau_\varepsilon}\right)^2
+  \Var\left(
+    f
+  \right)
+  +
+  \left(\frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon}\right)^2
+  \Var\left(
+  \varepsilon
+  \right)
+  %\\
+  %&=
+  %\left(\frac{\tau_f}{\tau_f+\tau_\varepsilon}\right)^2
+  %\sigma^2_f
+  %+
+  %\left(\frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon}\right)^2
+  %\sigma^2_\varepsilon
+  \\
+  &=
+  \frac{\tau_f}{\left(\tau_f+\tau_\varepsilon\right)^2}
+  + \frac{\tau_\varepsilon}{\left(\tau_f+\tau_\varepsilon\right)^2}
+  \\
+  \implies\quad
+  \Var(p_2-p_1)
+  &= \frac{1}{\tau_f+\tau_\varepsilon}
+\end{align*}
+Note also that price changes are uncorrelated:
+\begin{align*}
+  \Cov(p_1-p_0,\,p_2-p_1)
+  &=
+  \Cov\left(
+    \frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon}
+    s
+    ,\;
+    f - \frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon} s
+  \right)
+  \\
+  &=
+  \Cov\left(
+    \frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon} (f+\varepsilon)
+    ,\;
+    f
+    - \frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon} (f+\varepsilon)
+  \right)
+  %\\
+  %&=
+  %\Cov\left(
+    %\frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon}f
+    %+ \frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon}\varepsilon
+    %,\;
+    %\frac{\tau_f}{\tau_f+\tau_\varepsilon}f
+    %- \frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon} \varepsilon
+  %\right)
+  \\
+  &=
+  \frac{\tau_\varepsilon\tau_f}{(\tau_f+\tau_\varepsilon)^2}
+  \Var(f)
+  - \left(\frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon}\right)^2
+  \Var(\varepsilon)
+  \\
+  &=
+  \frac{\tau_\varepsilon\tau_f}{(\tau_f+\tau_\varepsilon)^2}
+  \sigma^2_f
+  - \left(\frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon}\right)^2
+  \sigma^2_\varepsilon
+  %\\
+  %&=
+  %\frac{\tau_\varepsilon\tau_f}{(\tau_f+\tau_\varepsilon)^2}
+  %\frac{1}{\tau_f}
+  %- \left(\frac{\tau_\varepsilon}{\tau_f+\tau_\varepsilon}\right)^2
+  %\frac{1}{\tau_\varepsilon}
+  %\\
+  %&=
+  %\frac{\tau_\varepsilon}{(\tau_f+\tau_\varepsilon)^2}
+  %- \frac{\tau_\varepsilon}{(\tau_f+\tau_\varepsilon)^2}
+  \\
+  \implies\quad
+  \Cov(p_1-p_0,\;p_2-p_1)
+  &= 0
+\end{align*}
+Summarizing
+\begin{align*}
+  \E[p_{t+1}-p_t]
+  &= 0
+  \\
+  \Var(p_1-p_0)
+  &=
+  \frac{\tau_\varepsilon}{\tau_f(\tau_f+\tau_\varepsilon)}
+  \\
+  \Var(p_2-p_1)
+  &= \frac{1}{\tau_f+\tau_\varepsilon}
+  \\
+  \Cov(p_1-p_0,\;p_2-p_1)
+  &= 0
+  \\
+  \Var(p_1-p_0)
+  +\Var(p_2-p_1)
+  &=
+  \frac{1}{\tau_f}
+  =\sigma^2_f
+\end{align*}
+From this last line, we see that the signal affects the intertemporal
+resolution of uncertainty. We still have variance $\sigma_f^2$ overall.
+But it's spread between time periods, and at time $t=1$, uncertainty is
+lower than the unconditional uncertainty $\sigma^2_f$.
+The signal, however, does not lower \emph{overall}/\emph{average}
+volatility.
+Also, key result: Rational learning means there's no serial correlation
+in prices and returns.
+
+
+\subsection{Rational Learning Benchmark, Binomial}
+
+Periods $t=0,1,2$.
+Probability $\pi$ of moving up between periods 0 and 1, and between 1
+and 2.
+
+
+\clearpage
+\subsection{Rational Learning, Continuous Time, Continuous State}
+
+\paragraph{Theorem 12.7 (Lipster and Shiryaev)}
+We have partially observable vector processes $(\theta_t,\xi_t)$ with
+$\theta_t$ unobservable and $\xi_t$ observable following
+\begin{align*}
+  d\theta_t &=
+  \big[a_0+a_1\theta_t\;\big]\,dt
+  + \sum_{i=1}^2 b_idW_i(t)
+  \\
+  d\xi_t
+  %&=
+  %\big[A_0 + A_1\theta_t\big]dt
+  %+ B\;dW_2(t)
+  &=
+  \big[A_0 + A_1\theta_t\big]dt
+  + \sum_{i=1}^2 B_idW_i(t)
+\end{align*}
+where coefficients $a,A,b,B$ are, in general, vector- and matrix-valued
+functions that can \emph{all} depend upon $(t,\xi)$, time and the
+observable (though omitted in the above expressions for clarity).
+The Brownian motion terms are also vectors, with $W_1$ the same size as
+$\theta$ and $W_2$ the same size as $\xi$.
+The two Brownian motion terms are assumed independent.\footnote{%
+  This is WLOG because both equations can depend on \emph{either}
+  Brownian motion term.
+}
+
+The task is to construct a distribution characterizing beliefs about
+unobservable $\theta_t$ at time $t$, having only observed
+$\{\xi_s\}_{s\leq t}$.
+With a Gaussian prior distribution
+$\theta_0|\xi_0\sim\calN(\hat{\theta}_0,v_0)$, the estimated time-$t$
+distribution for $\theta_t|\{\xi_s\}_{s\leq t}$ will
+also be Gaussian for all $t$,
+\begin{align*}
+  \theta_t|\{\xi_s\}_{s\leq t}\sim\calN(\hat{\theta}_t,v_t)
+\end{align*}
+Hence we need only characterize the evolution of mean and variance
+$(\hat{\theta}_t,v_t)$ %(which are, in general, nonlinear functions of $\xi_t$)
+(rather than a full distribution), and conditional mean $\hat{\theta}_t$
+is an optimal mean square estimate of $\theta_t$.
+And by Liptser and Shiryaev, we can describe the evolution of
+$(\hat{\theta}_t,v_t)$ by the optimal filtering SDEs:
+\begin{align*}
+  d\hat{\theta}_t &=
+  \big[
+  a_0 + a_1\hat{\theta}_t
+  \big]\;dt
+  %\\
+  %&\quad
+  +
+  \big[
+    (b\circ B)
+    + v_t A_1'
+  \big]
+  \big(B\circ B\big)^{-1}
+  \big[
+    d\xi_t - \big(A_0+A_1\hat{\theta}_t\big)\;dt
+  \big]
+  \\
+  \frac{dv_t}{dt}
+  &=
+  a_1v_t
+  + v_t a_1'
+  + (b\circ b)
+  %\\
+  %&\quad
+  -
+  \big[
+    (b\circ B)
+    + v_tA_1'
+  \big]
+  \big(B\circ B\big)^{-1}
+  \big[
+    (b\circ B)
+    + v_tA_1'
+  \big]
+\end{align*}
+where, again, \emph{all} coefficients are allowed to depend upon
+$(t,\xi)$ (though omitted in above expressions for clarity).
+Note also
+\begin{align*}
+  B \circ B
+  &= B_1B_1' + B_2B_2'
+  \qquad
+  b\circ B
+  = b_1B_1' + b_2B_2'
+  \qquad
+  b\circ b
+  = b_1b_1' + b_2b_2'
+\end{align*}
+Of interest will also be the ``steady state'' value $\overline{v}$ where the
+effect of the prior has totally washed out, and we've observed a long
+enough history of $\xi_t$ that new observations don't reduce uncertainty
+about $\theta_t$ any more. In that case, $dv_t/dt=0$ and steady
+state $\overline{v}$ solves
+\begin{align*}
+  0
+  &=
+  a_1\overline{v}
+  + \overline{v} a_1'
+  + (b\circ b)
+  %\\
+  %&\quad
+  -
+  \big[
+    (b\circ B)
+    + \overline{v}A_1'
+  \big]
+  \big(B\circ B\big)^{-1}
+  \big[
+    (b\circ B)
+    + \overline{v}A_1'
+  \big]
+\end{align*}
+
+\clearpage
+\paragraph{Corollary}
+Suppose both $\theta_t$ and $\xi_t$ are one-dimensional and each
+equation only depends on its own Brownian motion, i.e. $b_2=0$ and
+$B_1=0$ so that
+\begin{align*}
+  d\theta_t &= \big[a_0+a_1\theta_t\;\big]\,dt + b_1\,dW_1(t)
+  \\
+  d\xi_t &= \big[A_0 + A_1\theta_t\big]dt + B_2\,dW_2(t)
+\end{align*}
+This is a special case of the above theorem where
+$B \circ B = B_2^2$ , $b\circ B = 0$, and $b\circ b = b_1^2$.
+Therefore, the optimal filtering formulas simplify
+\begin{align*}
+  d\hat{\theta}_t &=
+  \big[
+  a_0 + a_1\hat{\theta}_t
+  \big]\;dt
+  +
+  \frac{A_1v_t}{B_2^2}
+  \big[
+    d\xi_t - \big(A_0+A_1\hat{\theta}_t\big)\;dt
+  \big]
+  \\
+  \frac{dv_t}{dt}
+  &=
+  2a_1v_t
+  + b_1^2
+  %\\
+  %&\quad
+  -
+  \frac{A_1^2v_t^2}{B_2^2}
+\end{align*}
+%Again, \emph{all} coefficients are allowed to depend upon
+%$(t,\xi)$ (though omitted for clarity).
+
+\paragraph{Example}
+Suppose we have an observable dividend process $D_t$ whose evolution
+depends on some unobserved fundamental process $f_t$ as follows:
+\begin{align*}
+  df_t
+  &= -\lambda(f_t-\overline{f})\;dt + \sigma_f\;dZ_f(t)
+  = \big[\lambda \overline{f} -\lambda f_t\big]\;dt + \sigma_f\;dZ_f(t)
+  \\
+  dD_t
+  &= f_t\;dt + \sigma_D \;dZ_D(t)
+\end{align*}
+(\emph{Beliefs})
+By the formulas
+\begin{align}
+  d\hat{f}_t &=
+  -\lambda(
+  \hat{f}_t-\overline{f}
+  )\;dt
+  +
+  \frac{\Sigma_t}{\sigma_D}
+  \underbrace{%
+    \frac{1}{\sigma_D}
+    \big[
+      dD_t - \hat{f}_t\;dt
+    \big]
+  }_{\hat{Z}_D(t)}
+  \label{fhat}
+  \\
+  d\Sigma_t
+  &=
+  \left(
+  \sigma^2_f
+  -2\lambda \Sigma_t
+  - \frac{\Sigma_t^2}{\sigma_D^2}
+  \right)dt
+  \notag
+\end{align}
+where $\hat{Z}_D(t)=\frac{1}{\sigma_D}[dD_t-\hat{f}_t\;dt]$ is a
+standard brownian motion in the agent's information set.
+We can interpret the evolution of the posterior mean and variance as
+\begin{align*}
+  d\hat{f}_t &=
+  -\lambda(
+  \hat{f}_t-\overline{f}
+  )\;dt
+  +
+  \frac{\Cov_t(dD_t,df_{t+dt})}{\Var_t(dD_t)}(dD_t-\hat{f}_t\,dt)
+  \\
+  d\Sigma_t
+  %=
+  %\left(
+  %\sigma^2_f
+  %-2\lambda \Sigma_t
+  %- \frac{\Sigma_t^2}{\sigma_D^2}
+  %\right)dt
+  &=
+  %\left(
+  %\sigma^2_f
+  %-2\lambda \Sigma_t
+  %\right)dt
+  %- \frac{\Sigma_t^2}{\sigma_D^2}dt
+  %=
+  d\big(\Var_t(f_t)\big)
+  - \frac{\Cov_t(dD_t,df_{t+dt})^2}{\Var_t(dD_t)}
+\end{align*}
+Also, the evolution of $\Sigma_t$ follows a deterministic differential
+equation. And we can factor the polynomial in $\Sigma^2_t$ on the RHS of
+the differential equation as follows
+\begin{align*}
+  \frac{d\Sigma_t}{dt}
+  &=
+  -\frac{1}{\sigma^2_D}
+  \left(
+  \Sigma_t^2
+  +2\lambda \sigma_D^2\Sigma_t
+  -\sigma^2_f\sigma_D^2
+  \right)
+  =
+  -\frac{1}{\sigma^2_D}
+  (\Sigma_t-a_+)
+  (\Sigma_t-a_-)
+\end{align*}
+where $a_+$ is the postive root of the polynomial and $a_-$ the
+negative.
+This is a separable differential equation we can solve to get
+%\begin{align*}
+  %\int
+  %\frac{d\Sigma_t}{%
+    %(\Sigma_t-a_+)
+    %(\Sigma_t-a_-)
+  %}
+  %&=
+  %\int
+  %-\frac{1}{\sigma^2_D}
+  %dt
+  %\\
+  %\ln\big(
+    %(\Sigma_t-a_+)
+    %(\Sigma_t-a_-)
+  %\big)
+  %f(\Sigma_t)
+  %&=
+  %-\frac{1}{\sigma^2_D}t
+%\end{align*}
+%Need to choose $f(\Sigma_t)$ so that
+%\begin{align*}
+  %\frac{1}{%
+    %(\Sigma_t-a_+)
+    %(\Sigma_t-a_-)
+  %}
+  %&=
+  %\frac{d}{d\Sigma_t}
+  %\left[
+  %\ln\big(
+    %(\Sigma_t-a_+)
+    %(\Sigma_t-a_-)
+  %\big)
+  %f(\Sigma_t)
+  %\right]
+  %\\
+  %&=
+  %\frac{1}{(\Sigma_t-a_+) (\Sigma_t-a_-)}
+  %f(\Sigma_t)
+  %+
+  %\ln\big(
+    %(\Sigma_t-a_+)
+    %(\Sigma_t-a_-)
+  %\big)
+  %f'(\Sigma_t)
+  %\\
+  %&=
+  %\frac{1}{(\Sigma_t-a_+) (\Sigma_t-a_-)}
+  %f(\Sigma_t)
+  %+
+  %\ln\big(
+    %(\Sigma_t-a_+)
+    %(\Sigma_t-a_-)
+  %\big)
+  %f(\Sigma_t)
+  %\frac{f'(\Sigma_t)}{f(\Sigma_t)}
+  %\\
+  %&=
+  %\frac{1}{(\Sigma_t-a_+) (\Sigma_t-a_-)}
+  %f(\Sigma_t)
+  %-
+  %\frac{1}{\sigma_D^2}t
+  %\frac{f'(\Sigma_t)}{f(\Sigma_t)}
+  %\\
+  %1
+  %&=
+  %f(\Sigma_t)
+  %-
+  %[(\Sigma_t-a_+) (\Sigma_t-a_-)]
+  %\frac{f'(\Sigma_t)}{f(\Sigma_t)}
+  %\frac{1}{\sigma_D^2}t
+%\end{align*}
+\begin{align*}
+  \frac{\Sigma_t-a_+}{\Sigma_t-a_-}
+  &=
+  \frac{\Sigma_0-a_+}{\Sigma_0-a_-}
+  e^{-\frac{(a_+-a_-)}{\sigma^2_D}t}
+  \qquad
+  \text{and}
+  \qquad
+  \Sigma_t\ra a_+
+\end{align*}
+
+\clearpage
+(\emph{Pricing})
+We might now also consider how a risk-neutral investor would value the
+asset that pays the dividend stream, given $\{D_s\}_{s=0}^t$, which
+implies $\hat{f}_t$.
+Given risk-free interest rate is $r$, the price for a risk-neutral
+investor is naturally
+\begin{align*}
+  p(\hat{f}_t)
+  =
+  \E\left[
+    \int_{0}^\infty e^{-rs}D_{t+s}\;ds
+    \;\big|\;\hat{f}_t
+  \right]
+  =\E\left[\int_t^\infty e^{-r(s-t)}D_s\;ds\;\big|\;\hat{f}_t\right]
+\end{align*}
+To compute the integral, we need an expression for $D_t$.
+To start, recall $\hat{Z}_D(t)$, (the Brownian motion in the investor's
+information set), whose definition implies
+\begin{align*}
+  \hat{Z}_D(t)
+  :=
+  \frac{1}{\sigma_D}
+  \big[
+    dD_t-\hat{f}_t\;dt
+  \big]
+  \quad\implies\quad
+  dD_t
+  &=
+  \hat{f}_t\;dt+\sigma_D\;d\hat{Z}_D(t)
+  %\\
+  %\quad\implies\quad\;\,
+  %D_{t+s}
+  %&=
+  %D_t
+  %+
+  %\int_t^{t+s} \hat{f}_{w}\;dw
+  %+\sigma_D\int_{t}^{t+s} \hat{Z}_D(w)\;dw
+\end{align*}
+Next, suppose we use Ito's Lemma to obtain the SDE for $e^{-rs}D_s$:
+\begin{align*}
+  d\big(e^{-rs} D_s\big)
+  &=
+  -re^{-rs}D_s\;ds
+  + e^{-rs} dD_s
+  \\
+  &=
+  -re^{-rs}D_s\;ds
+  + e^{-rs}
+  \left[
+  \hat{f}_s\;ds+\sigma_D\;d\hat{Z}_D(s)
+  \right]
+  %\\
+  %&=
+  %-re^{-rs}D_s\;ds
+  %+ e^{-rs} \hat{f}_s\;ds
+  %+ e^{-rs}+\sigma_D\hat{Z}_D(s)
+\end{align*}
+Integrate on both sides
+\begin{align*}
+  \lim_{T\ra\infty} e^{-rT} D_T
+  -
+  e^{-rt} D_t
+  &=
+  -r\int_t^\infty e^{-rs}D_s\;ds
+  +
+  \int_t^\infty
+  e^{-rs} \hat{f}_s\;ds
+  +
+  \int_t^\infty
+  e^{-rs}
+  \sigma_D\;d\hat{Z}_D(s)
+\end{align*}
+Note that since $D_t$ stationary, the limit on the LHS equals zero.
+Now take expectation conditional on $\hat{f}_t$.
+Note that the last Ito integral will drop, since it's a martingale:
+\begin{align*}
+  \E\big[
+  - e^{-rt} D_t
+  \;\big|\;\hat{f}_t\big]
+  &=
+  -r\E\left[\int_t^\infty e^{-rs}D_s\;ds\;\big|\;\hat{f}_t\right]
+  +
+  \E\left[
+  \int_t^\infty
+  e^{-rs}
+  \hat{f}_s\;ds\;\big|\;\hat{f}_t\right]
+\end{align*}
+Multply by $e^{rt}$ and rearrange
+\begin{align*}
+  r\E\left[\int_t^\infty e^{-r(s-t)}D_s\;ds\;\big|\;\hat{f}_t\right]
+  &=
+  D_t
+  +
+  \E\left[ \int_t^\infty e^{-r(s-t)}
+  \hat{f}_s\;ds\;\big|\;\hat{f}_t\right]
+\end{align*}
+Assuming
+\begin{align*}
+  \hat{f}_{t+w}
+  &=
+  \hat{f}_{t}
+  e^{-\lambda w}
+  +
+  \overline{f}
+  (1-e^{-\lambda w})
+  +
+  \lambda \overline{f}
+  \int_t^{t+w}
+  e^{-\lambda (t+w-x)}
+  \frac{\Sigma_x}{\sigma_D}
+  \;d\hat{Z}_D(x)
+\end{align*}
+Then
+\begin{align*}
+  \E\left[ \int_0^\infty e^{-rs}
+  \hat{f}_{t+s}\;ds\;\big|\;\hat{f}_t\right]
+  &=
+  \E\left[ \int_0^\infty
+  e^{-rs}
+  \left[
+  \hat{f}_{t}
+  e^{-\lambda s}
+  +
+  \overline{f}
+  (1-e^{-\lambda s})
+  \right]
+  \;ds
+  \;\big|\;\hat{f}_t\right]
+  \\
+  &=
+  \hat{f}_{t}
+  \int_0^\infty
+  e^{-(\lambda+r) s}
+  \;ds
+  +
+  \overline{f}
+  \int_0^\infty
+  (
+  e^{-rs}
+  -e^{-(\lambda+r) s}
+  )
+  \;ds
+  \\
+  &=
+  \frac{\hat{f}_{t}}{(\lambda+r)}
+  +
+  \overline{f}
+  \left[
+  -\frac{1}{r}
+  e^{-rs}
+  +\frac{1}{\lambda+r}
+  e^{-(\lambda+r) s}
+  \right]_0^\infty
+  \\
+  &=
+  \frac{\hat{f}_{t}}{(\lambda+r)}
+  +
+  \overline{f}
+  \frac{\lambda}{r(\lambda+r)}
+\end{align*}
+
+
+
+
+
+
+\clearpage
+Assume the asset is ex-dividend, so we drop that $D_t$ on the RHS
+because the agent doesn't get that initial payment. Then the price is
+\begin{align*}
+\end{align*}
+To compute the integral on the RHS, want to solve following SDE
+to get an expression for $\hat{f}_t$:
+\begin{align*}
+  d\hat{f}_t
+  &=
+  -\lambda(
+  \hat{f}_t-\overline{f}
+  )\;dt
+  +
+  \frac{\Sigma_t}{\sigma_D}
+  \hat{Z}_D(t)
+\end{align*}
+To solve, use Ito's Lemma on function
+$g_t = g(\hat{f}_t,t) = \hat{f}_t e^{\lambda t}$.
+The final result is solution
+%\begin{align*}
+  %dg_t
+  %&=
+  %\frac{dg}{dt}\;dt
+  %+ \frac{dg}{d\hat{f}}\;d\hat{f}
+  %+ \frac{1}{2}\frac{d^2g}{d\hat{f}^2}\;(d\hat{f})^2
+  %\\
+  %&=
+  %\left[
+  %\frac{dg}{dt}
+  %+ \frac{1}{2}\frac{d^2g}{d\hat{f}^2}
+    %\frac{\Sigma_t^2}{\sigma_D^2}
+  %-\frac{dg}{d\hat{f}}
+  %\lambda(
+  %\hat{f}_t-\overline{f}
+  %)
+  %\right]dt
+  %+
+  %\frac{dg}{d\hat{f}}
+  %\frac{\Sigma_t}{\sigma_D}
+  %\hat{Z}_D(t)
+  %\\
+  %&=
+  %\left[
+  %\lambda g_t
+  %-e^{\lambda t}
+  %\lambda(
+  %\hat{f}_t-\overline{f}
+  %)
+  %\right]dt
+  %+
+  %e^{\lambda t}
+  %\frac{\Sigma_t}{\sigma_D}
+  %\hat{Z}_D(t)
+  %\\
+  %&=
+  %\left[
+  %\lambda g_t
+  %- \lambda g_t
+  %+ e^{\lambda t} \lambda \overline{f}
+  %\right]dt
+  %+
+  %e^{\lambda t}
+  %\frac{\Sigma_t}{\sigma_D}
+  %\hat{Z}_D(t)
+  %\\
+  %&=
+  %\lambda e^{\lambda t} \overline{f}
+  %dt
+  %+
+  %e^{\lambda t}
+  %\frac{\Sigma_t}{\sigma_D}
+  %\hat{Z}_D(t)
+%\end{align*}
+%Then
+\begin{align*}
+  %g_{t+s}
+  %&=
+  %g_t
+  %+
+  %\int_t^{t+s}
+  %\lambda \overline{f} e^{\lambda w}\;dw
+  %+
+  %\int_t^{t+s}
+  %\lambda \overline{f} e^{\lambda w}
+  %\frac{\Sigma_w}{\sigma_D}
+  %\;d\hat{Z}_D(w)
+  %\\
+  %&=
+  %g_t
+  %+
+  %\big[
+  %\overline{f}
+  %e^{\lambda w}
+  %\big]_t^{t+s}
+  %+
+  %\lambda \overline{f}
+  %\int_t^{t+s}
+  %e^{\lambda w}
+  %\frac{\Sigma_w}{\sigma_D}
+  %\;d\hat{Z}_D(w)
+  %\\
+  %&=
+  %g_t
+  %+
+  %\overline{f}
+  %e^{\lambda t}(e^{\lambda s}-1)
+  %+
+  %\lambda \overline{f}
+  %\int_t^{t+s}
+  %e^{\lambda w}
+  %\frac{\Sigma_w}{\sigma_D}
+  %\;d\hat{Z}_D(w)
+  %\\
+  %\implies\quad
+  %\hat{f}_{t+w}
+  %e^{\lambda(t+w)}
+  %&=
+  %\hat{f}_{t}
+  %e^{\lambda t}
+  %+
+  %\overline{f}
+  %e^{\lambda t}(e^{\lambda w}-1)
+  %+
+  %\lambda \overline{f}
+  %\int_t^{t+w}
+  %e^{\lambda x}
+  %\frac{\Sigma_x}{\sigma_D}
+  %\;d\hat{Z}_D(x)
+  %\\
+  \hat{f}_{t+w}
+  &=
+  \hat{f}_{t}
+  e^{-\lambda w}
+  +
+  \overline{f}
+  (1-e^{-\lambda w})
+  +
+  \lambda \overline{f}
+  \int_t^{t+w}
+  e^{-\lambda (t+w-x)}
+  \frac{\Sigma_x}{\sigma_D}
+  \;d\hat{Z}_D(x)
+\end{align*}
+Plugging into the expression for $D_{t+s}$, we get
+\begin{align*}
+  D_{t+s}
+  &=
+  D_t
+  +
+  \int_0^{s}
+  \left[
+  \hat{f}_{t}
+  e^{-\lambda w}
+  +
+  \overline{f}
+  (1-e^{-\lambda w})
+  +
+  \lambda \overline{f}
+  \int_t^{t+w}
+  e^{-\lambda (t+w-x)}
+  \frac{\Sigma_x}{\sigma_D}
+  \;d\hat{Z}_D(x)
+  \right]
+  dw
+  \\
+  &\qquad
+  +\sigma_D[\hat{Z}_D(t+s)-\hat{Z}_D(t)]
+  \\
+  &=
+  D_t
+  +
+  \hat{f}_{t}
+  \int_0^{s}
+  e^{-\lambda w}
+  \;dw
+  +
+  \overline{f}
+  \int_0^{s}
+  (1-e^{-\lambda w})
+  \;dw
+  +
+  \lambda \overline{f}
+  \int_0^{s}
+  \int_t^{t+w}
+  e^{-\lambda (t+w-x)}
+  \frac{\Sigma_x}{\sigma_D}
+  \;d\hat{Z}_D(x)
+  \;dw
+  \\
+  &\qquad
+  +\sigma_D[\hat{Z}_D(t+s)-\hat{Z}_D(t)]
+  \\
+  &=
+  D_t
+  -
+  \frac{\hat{f}_{t}}{\lambda}
+  \big[e^{-\lambda w}\big]_0^{s}
+  +
+  \overline{f}
+  \left[w+\frac{1}{\lambda}e^{-\lambda w}\right]_0^{s}
+  +
+  \lambda \overline{f}
+  \int_0^{s}
+  \int_t^{t+w}
+  e^{-\lambda (t+w-x)}
+  \frac{\Sigma_x}{\sigma_D}
+  \;d\hat{Z}_D(x)
+  \;dw
+  \\
+  &\quad
+  +\sigma_D[\hat{Z}_D(t+s)-\hat{Z}_D(t)]
+  \\
+  &=
+  D_t
+  +
+  \frac{\hat{f}_{t}}{\lambda}
+  (1-e^{-\lambda s})
+  +
+  \overline{f}
+  \left[s-\frac{1}{\lambda}(1-e^{-\lambda s})\right]
+  +
+  \lambda \overline{f}
+  \int_0^{s}
+  \int_t^{t+w}
+  e^{-\lambda (t+w-x)}
+  \frac{\Sigma_x}{\sigma_D}
+  \;d\hat{Z}_D(x)
+  \;dw
+  \\
+  &\quad
+  +\sigma_D[\hat{Z}_D(t+s)-\hat{Z}_D(t)]
+  \\
+  &=
+  D_t
+  +
+  \frac{1}{\lambda}(1-e^{-\lambda s})
+  (\hat{f}_t-\overline{f})
+  + \overline{f}s
+  +
+  \lambda \overline{f}
+  \int_0^{s}
+  \int_t^{t+w}
+  e^{-\lambda (t+w-x)}
+  \frac{\Sigma_x}{\sigma_D}
+  \;d\hat{Z}_D(x)
+  \;dw
+  +\sigma_D[\hat{Z}_D(t+s)-\hat{Z}_D(t)]
+\end{align*}
+Now, sub in
+\begin{align*}
+  p(\hat{f}_t)
+  =
+  \E\left[
+    \int_{0}^\infty e^{-rs}D_{t+s}\;ds
+    \;\big|\;\hat{f}_t
+  \right]
+\end{align*}
+
+\clearpage
+Suppose
+\begin{align*}
+  d\hat{f}_t
+  &=
+  -\lambda(
+  \hat{f}_t-\overline{f}
+  )\;dt
+  +
+  \frac{\Sigma_t}{\sigma_D}
+  \;d\hat{Z}_D(t)
+  \\
+  dD_t
+  &=
+  \hat{f}_t\;dt+\sigma_D\;d\hat{Z}_D(t)
+  \\
+  p(\hat{f}_t)
+  &=
+  \frac{1}{\lambda+r}\hat{f}_t
+  +
+  \frac{\lambda}{r(\lambda+r)}
+  \overline{f}
+  \\
+  \implies\quad
+  dp_t
+  &=
+  \frac{1}{\lambda+r}
+  d\hat{f}_t
+  =
+  -\frac{\lambda}{\lambda+r}
+  (
+  \hat{f}_t-\overline{f}
+  )\;dt
+  +
+  \frac{1}{\lambda+r}
+  \frac{\Sigma_t}{\sigma_D}
+  \;d\hat{Z}_D(t)
+\end{align*}
+The excess return process is then
+\begin{align*}
+  dq_t
+  &=
+  dD_t
+  +
+  dp_t
+  - rp_t\;dt
+  \\
+  &=
+  \left[
+  \hat{f}_t\;dt+\sigma_D\;d\hat{Z}_D(t)
+  \right]
+  +
+  \left[
+  -\frac{\lambda}{\lambda+r}
+  (
+  \hat{f}_t-\overline{f}
+  )\;dt
+  +
+  \frac{1}{\lambda+r}
+  \frac{\Sigma_t}{\sigma_D}
+  \hat{Z}_D(t)
+  \right]
+  \\
+  &\qquad
+  -
+  r
+  \left[
+  \left(
+  \frac{1}{\lambda+r}\hat{f}_t
+  +
+  \frac{\lambda}{r(\lambda+r)}
+  \overline{f}
+  \right)
+  \;dt
+  \right]
+  \\
+  &=
+  \left[
+  \frac{\lambda+r}{\lambda+r}
+  \sigma_D +
+  \frac{1}{\lambda+r}
+  \frac{\Sigma_t}{\sigma_D}
+  \right]
+  \hat{Z}_D(t)
+\end{align*}
+
+
+
+\clearpage
+\subsection{Rational Learning, Continuous Time, Discrete State}
+
+\paragraph{Theorem 9.1, Liptser and Shiryaev}
+Random processes $(\theta_t,\xi_t)$ where $\theta_t$ is an unobservable
+component taking with a finite number of states, and observable $\xi_t$
+follows
+\begin{align*}
+  d\xi_t
+  &= A_t(\theta_t,\xi_t)\;dt + B_t(\xi_t)\;dW_t
+\end{align*}
+Given $\{\xi_s\}_{0}^t$, we want to construct estimates of the posterior
+probability that $\theta_t=i$ for some state $i$. So define the
+posterior probabilities as
+\begin{align*}
+  \pi^i_t
+  &:= P\big[\theta_t=i\;|\;\{\xi_s\}_{s=0}^t\big]
+  %\\
+  %\lambda_{ij}(t)
+  %&:=
+  %P[\theta_{t+dt}=j|\theta_t=i]
+  %\qquad\forall t
+\end{align*}
+Moreover, let $\lambda_{ij}(t)$ denote the ifinitesimal transition
+probablity from $i$ to $j$ at time $t$ (i.e. the flow rate from the
+infinitesimal generator so transition probability of $\lambda\,dt$
+implies flow rate/infinitesimal-transition-probability of $\lambda$,
+while $1-\lambda\,dt$ implies $-\lambda$).
+
+Then the posterior probablitites follow the following SDE\footnote{%
+  Note the coefficient on $dt$ is incorrect in the book's theorem
+  statement. See proof for correct coefficient.
+}
+\begin{align*}
+  d\pi_t^j
+  &=
+  \left[
+  \sum_i
+  \lambda_{ij}(t)
+  \pi^i_t
+  \right]
+  dt
+  +
+  \pi^j_t
+  \left[
+  \frac{A_t(j,\xi)-\sum_i A_t(i,\xi)\pi^i_t}{B_t(\xi)}
+  \right]
+  d\overline{W}_t
+  \\
+  \text{where}\quad
+  d\overline{W}_t
+  &=
+  \frac{d\xi_t-\left[\sum_i A_t(i,\xi)\pi^i_t\right]\;dt}{B_t(\xi)}
+\end{align*}
+%Substituting in $d\overline{W}_t$, this is equivalent to
+%\begin{align*}
+  %d\pi_t^j
+  %&=
+  %\left[
+  %\sum_i
+  %\lambda_{ij}(t)
+  %\pi^i_t
+  %\right]
+  %dt
+  %+
+  %\frac{\pi^j_t}{B_t(\xi_t)^2}
+  %\left[
+  %A_t(j,\xi)-\sum_i A_t(i,\xi)\pi^i_t
+  %\right]
+  %\left[
+  %d\xi_t-\left(\sum_i A_t(i,\xi)\pi^i_t\right)dt
+  %\right]
+  %\\
+  %&=
+  %\left[
+  %\sum_i
+  %\lambda_{ij}(t)
+  %\pi^j_t
+  %-
+  %\frac{%
+    %\pi^j_t
+    %\big(
+    %A_t(j,\xi)-\sum_i A_t(i,\xi)\pi^i_t
+    %\big)
+    %\big(
+    %\sum_i A_t(i,\xi)\pi^i_t
+    %\big)
+  %}{B_t(\xi_t)^2}
+  %\right]
+  %dt
+  %+
+  %\frac{%
+    %\pi^j_t
+    %\big(
+    %A_t(j,\xi)-\sum_i A_t(i,\xi)\pi^i_t
+    %\big)
+  %}{B_t(\xi_t)^2}
+  %d\xi_t
+%\end{align*}
+
+\paragraph{Corollary}
+Consider the special case of two states
+$\{\overline{\theta}, \underline{\theta}\}$ with
+\begin{align*}
+  d\xi_t
+  &= \theta_t \, dt + \sigma \,dW_t
+\end{align*}
+and with transition probabilities in the infinitesimal generator given
+by
+\begin{align*}
+  \lambda_{11}(t)
+  = \lambda_{11}
+  &= -\lambda
+  \qquad
+  \lambda_{22}(t)
+  = \lambda_{22}
+  = -\mu
+\end{align*}
+With only two states, we only need an SDE for
+$\pi_t^1=P[\theta_t=\overline{\theta}|\{\xi_s\}_{s=0}^t]$.
+By the formula above,
+\begin{align*}
+  d\pi_t^1
+  &=
+  (
+  -\lambda\pi_t^1 + \mu\pi_t^2
+  )
+  \pi_t^1
+  dt
+  +
+  \frac{\pi_t^1}{\sigma^2}
+  \big(
+  \overline{\theta}
+  - \big[\overline{\theta}\pi_t^1 + \underline{\theta}\pi_t^2\big]
+  \big)
+  \left(
+  d\xi_t
+  -
+  \E_t[d\xi_t]
+  \right)
+\end{align*}
+where $\E_t$ is the expectation taken at time time where the posterior
+probability is given by $\pi_t^1$.
+Substituting in $\pi_t^2=1-\pi_t^1$ and dropping the superscript, we
+then have
+\begin{align*}
+  d\pi_t
+  &=
+  (
+  -\lambda\pi_t + \mu(1-\pi_t)
+  )
+  dt
+  +
+  \frac{\pi_t}{\sigma^2}
+  \big(
+  \overline{\theta}
+  - \big[\overline{\theta}\pi_t + \underline{\theta}(1-\pi_t)\big]
+  \big)
+  \left(
+  d\xi_t
+  -
+  \E_t[d\xi_t]
+  \right)
+  \\
+  &=
+  (
+  \mu-(\mu+\lambda)\pi_t
+  )
+  \,dt
+  +
+  \left(
+  \frac{\overline{\theta} - \underline{\theta}}{\sigma}
+  \right)
+  \pi_t(1-\pi_t)
+  \frac{\left( d\xi_t - \E_t[d\xi_t] \right)}{\sigma}
+\end{align*}
+Letting $\pi^s = \frac{\mu}{\lambda+\mu}$ denote the steady state value
+of $\pi$, rewrite the coefficient on $dt$ to get
+\begin{align*}
+  d\pi_t
+  &=
+  (\mu+\lambda)(\pi^s-\pi_t)
+  dt
+  +
+  \left(
+  \frac{\overline{\theta} - \underline{\theta}}{\sigma}
+  \right)
+  \pi_t(1-\pi_t)
+  \frac{\left( d\xi_t - \E_t[d\xi_t] \right)}{\sigma}
+\end{align*}
+
+
+\clearpage
+\subsection{Overconfidence}
+
+Four dates, no disocounting between periods. There's some unobserved
+fundamental value $\theta$, which will be the terminal payoff announced
+in the final period.
+\begin{itemize}
+  \item $t=0$: Set the prior
+    $p(\theta)\sim\calN(0,\sigma_\theta^2)$
+
+  \item $t=1$: Informed investor observes private signal $s$ that's
+    correlated with $\theta$. In reality,
+    \begin{align*}
+      s_1 &= \theta + \varepsilon
+      \quad
+      \text{where}\quad
+       \varepsilon\sim\calN(0, \sigma_\theta^2)
+      \qquad\implies\qquad
+      s_1|\theta \sim\calN(\theta, \sigma_\varepsilon^2)
+    \end{align*}
+    \emph{However}, informed investors are overconfident and
+    \emph{believe} the error has lower variance:
+    \begin{align*}
+      s_1|\theta \sim\calN(\theta, \sigma_C^2)
+      \qquad\text{where}\quad
+      \sigma^2_{C}<\sigma^2_\varepsilon
+    \end{align*}
+    Therefore, they form the posterior for $\theta$ using that incorrect
+    variance:
+    \begin{align*}
+      p(\theta|s_1)
+      &\propto
+      p(s_1|\theta)
+      \cdot p(\theta)
+      =
+      \calN\bigg(
+        \underbrace{
+          \frac{\tau_C}{\tau_\theta+\tau_C}
+          (\theta+\varepsilon)
+        }_{\overline{\theta}_1}
+        ,\;\;
+        \underbrace{
+        \frac{1}{\tau_\theta+\tau_C}
+        }_{\sigma^2_1}
+      \bigg)
+    \end{align*}
+    where $\tau_x=1/\sigma^2_x$, i.e. the inverse variance which is
+    called the ``precision.''
+
+  \item $t=2$:
+    All investors observe a public signal
+    \begin{align*}
+      s_2
+      = \theta + \eta
+      \qquad\text{where}\quad
+      \begin{cases}
+        \eta \sim \calN(0,\sigma^2_P) \\
+        \eta \perp \varepsilon
+      \end{cases}
+    \end{align*}
+    Its variance $\sigma^2_P$ is \emph{correctly} observed by investors.
+    Therefore, they form the posterior for $\theta$ using their
+    posterior from the last time as the prior:
+    \begin{align*}
+      p(\theta|s_1,s_2)
+      &\propto
+      p(s_2|\theta)
+      \cdot
+      p(\theta|s_1)
+      =
+      \calN\bigg(
+        \overline{\theta}_1
+        +
+        \frac{\tau_P}{\tau_P+\tau_1}
+        (s_2-\overline{\theta}_1)
+        ,\;\;
+        \frac{1}{\tau_P+\tau_1}
+      \bigg)
+    \end{align*}
+    Substituting in for $\overline{\theta}_1$ and $\sigma^2_1$, the mean
+    is then
+    \begin{align*}
+      \overline{\theta}_1
+      +
+      \frac{\tau_P}{\tau_P+\tau_1}
+      (s_2-\overline{\theta}_1)
+      &=
+      \frac{\tau_C}{\tau_\theta+\tau_C}
+      (\theta+\varepsilon)
+      +
+      \frac{\tau_P}{\tau_P+\tau_1}
+      \left(
+        (\theta+\eta)
+        -\frac{\tau_C}{\tau_\theta+\tau_C}
+        (\theta+\varepsilon)
+      \right)
+      \\
+      &=
+      \left[
+      \frac{\tau_C}{\tau_\theta+\tau_C}
+      +
+      \frac{\tau_P}{\tau_P+\tau_1}
+      \frac{\tau_\theta}{\tau_\theta+\tau_C}
+      \right]
+      \theta
+      +
+      \left[
+      \frac{\tau_C}{\tau_\theta+\tau_C}
+      -
+      \frac{\tau_P}{\tau_P+\tau_1}
+      \frac{\tau_C}{\tau_\theta+\tau_C}
+      \right]
+      \varepsilon
+      +
+      \frac{\tau_P}{\tau_P+\tau_1}
+      \eta
+      \\
+      &=
+      \frac{\tau_C(\tau_P+\tau_1)+\tau_P\tau_\theta}{(\tau_\theta+\tau_C)(\tau_P+\tau_1)}
+      \theta
+      +
+      \left[
+      \frac{\tau_C(\tau_P+\tau_1)-\tau_P\tau_C}{(\tau_\theta+\tau_C)(\tau_P+\tau_1)}
+      \right]
+      \varepsilon
+      +
+      \frac{\tau_P}{\tau_P+\tau_1}
+      \eta
+    \end{align*}
+    Replace
+    \begin{align*}
+      (\text{Mean})
+      &=
+      \frac{\tau_C(\tau_P+\tau_1)+\tau_P\tau_\theta}{(\tau_\theta+\tau_C)(\tau_P+\tau_1)}
+      \theta
+      +
+      \left[
+      \frac{\tau_C(\tau_P+\tau_1)-\tau_P\tau_C}{(\tau_\theta+\tau_C)(\tau_P+\tau_1)}
+      \right]
+      \varepsilon
+      +
+      \frac{\sigma_1^2}{\sigma_P^2+\sigma_1^2}
+      \eta
+      \\
+      &=
+      \frac{\tau_C(\tau_P+\tau_1)+\tau_P\tau_\theta}{(\tau_\theta+\tau_C)(\tau_P+\tau_1)}
+      \theta
+      +
+      \left[
+      \frac{\tau_C(\tau_P+\tau_1)-\tau_P\tau_C}{(\tau_\theta+\tau_C)(\tau_P+\tau_1)}
+      \right]
+      \varepsilon
+      +
+      \frac{\frac{1}{\tau_\theta+\tau_C}}{\sigma_P^2+\frac{1}{\tau_\theta+\tau_C}}
+      \eta
+      \\
+      &=
+      \frac{\tau_C(\tau_P+\tau_1)+\tau_P\tau_\theta}{(\tau_\theta+\tau_C)(\tau_P+\tau_1)}
+      \theta
+      +
+      \left[
+      \frac{\tau_C(\tau_P+\tau_1)-\tau_P\tau_C}{(\tau_\theta+\tau_C)(\tau_P+\tau_1)}
+      \right]
+      \varepsilon
+      +
+      \frac{%
+        \frac{1}{\frac{1}{\sigma_\theta^2}+\frac{1}{\sigma_C^2}}
+      }{%
+        \sigma_P^2
+        + \frac{1}{\frac{1}{\sigma_\theta^2}+\frac{1}{\sigma_C^2}}
+      }
+      \eta
+      \\
+      &=
+      \frac{\tau_C(\tau_P+\tau_1)+\tau_P\tau_\theta}{(\tau_\theta+\tau_C)(\tau_P+\tau_1)}
+      \theta
+      +
+      \left[
+      \frac{\tau_C(\tau_P+\tau_1)-\tau_P\tau_C}{(\tau_\theta+\tau_C)(\tau_P+\tau_1)}
+      \right]
+      \varepsilon
+      +
+      \frac{%
+        \sigma^2_\theta\sigma_C^2
+      }{%
+        \sigma_P^2\sigma_\theta^2
+        +\sigma_P^2\sigma_C^2
+        + \sigma^2_\theta\sigma_C^2
+      }
+      \eta
+    \end{align*}
+
+
+\end{itemize}
+\paragraph{Prices}
+For a risk-neutral agent, $p_t=\E[\theta|\calI_t]$
+(where the expectation is taken under the agent's misspecified measure)
+so that price in each period
+\begin{align*}
+  p_0
+  &=
+  \E[\theta|\calI_0]
+  =
+  \overline{\theta} \\
+  p_1
+  &=
+  \E[\theta|\calI_1]
+  =
+  \overline{\theta}
+  + \frac{\tau_C}{\tau_\theta+\tau_C}
+  (s_1-\overline{\theta})
+  =
+  -\frac{\tau_\theta}{\tau_\theta+\tau_C}
+  \overline{\theta}
+  +
+  \frac{\tau_C}{\tau_\theta+\tau_C}
+  (\theta+\varepsilon)
+  \\
+\end{align*}
+
+
+
+
+\clearpage
+\section{Limits of Arbitrage}
+
+\subsection{Noise Trader Risk}
+
+Assets
+\begin{itemize}
+  \item Safe Asset $s$: Pays fixed dividend of $r$, perfectly elastic
+    supply. Numeraire, so price is normalized to one.
+  \item Risky Asset $u$: Pays fixed dividend $r$, but supply fixed at
+    one unit. Price is $p_t$
+\end{itemize}
+Each period $t$, a unit mass of agents consisting of two types of
+agents.
+\begin{itemize}
+  \item Measure $1-\mu$ of rational agents (denoted by $i$) with
+    rational expectations of market prices.
+    Denote their expected price by $\E^i[p_{t+1}]=\E[p_{t+1}]$.
+
+  \item Measure $\mu$ of noise traders (denoted by $n$) who misperceive
+    the expected price so that, for \emph{all} noise-trading agents,
+    there is a common source $\rho_t$ of misperception at time $t$ so
+    \begin{align*}
+      \E^n_t[p_{t+1}]
+      =
+      \E_t[p_{t+1}]
+      +
+      \rho_t
+      \qquad\text{where}\quad
+      \rho_t
+      \sim\calN(\rho^*,\sigma_\rho^2)
+    \end{align*}
+\end{itemize}
+Each type of agent is born with zero wealth.
+
+
+
+\clearpage
+\section{Heterogeneous Beliefs}
+
+\subsection{Aggree to Disagree}
+
+History of thought:
+\begin{itemize}
+  \item Harsanyi (1968, Management Science):
+    People should have \emph{common prior beliefs} so that any
+    difference in subjective beliefs are due entirely to differences in
+    subsequent information
+  \item Aumann (1976, Annals of Statistics) showed that people with
+    common prior cannot agree to disagree.
+  \item Milgrom and Stokey (1982, JET) and Tirole (1982, Ecta):
+    When all agents are rational and share common beliefs, asymmetric
+    information cannot generate trading
+\end{itemize}
+Hence, asymmetric information \emph{cannot} be the \emph{sole} driver of
+trading. So left with the following other explanations for trading
+\begin{itemize}
+  \item Heterogeneious Priors:
+    Savage view, Morris (1995, Economics and Philosophy)
+  \item Noise traders: Agents with distorted beliefs, or rationality not
+    common knowledge
+  \item Asymmetric information + Noise Traders:
+    The addition of noise traders is enough to make asymmetric
+    information cause trading. Without those noise traders, no trade
+    theorem above.
+    Examples
+    \begin{itemize}
+      \item Grossman and Stiglitz (1980, AER)
+      \item Kyle (1985, Ecta)
+    \end{itemize}
+\end{itemize}
+
+
+\clearpage
+\subsection{Short Sale Constraints and Asset Price Bubbles}
+
+\subsubsection{Static Models}
+
+Miller (1997, JF): Short sale constraints + heterogeneous beliefs can
+make stocks overpriced, so that price only reflects the view of the
+optimists.
+
+Two dates $t=0,1$ with a single risky asset that has terminal payoff
+\begin{align*}
+  f \sim\calN(\mu,\sigma^2)
+\end{align*}
+However, investors have diverse beliefs.
+Specifically, there is a continuum of agents with beliefs about the mean
+satisfying $\mu_i\sim U[\mu-\kappa,\mu+\kappa]$.
+Agents maximize expected utility over terminal wealth subject to these
+beliefs
+\begin{align*}
+  \max_{x_i}
+  \;&
+  \E^i\big[
+    -\exp\big\{
+      -\gamma(W_0 + (f-p)x_i)
+    \big\}
+  \big]
+  \qquad
+  \text{s.t.}\quad
+  f \sim\calN(\mu_i,\sigma^2)
+\end{align*}
+By normality and CARA, this is equivalent to solving
+\begin{align*}
+  %&\max_{x_i}
+  %-\exp\left\{
+  %\E^i\big[
+      %-\gamma(W_0 + (f-p)x_i)
+  %\big]
+  %+
+  %\frac{1}{2}
+  %\Var^i\big(
+      %-\gamma(W_0 + (f-p)x_i)
+  %\big)
+  %\right\}
+  %\\
+  \iff\qquad
+  &\max_{x_i}
+  \;\;
+  \E^i\big[
+      \gamma(W_0 + (f-p)x_i)
+  \big]
+  -
+  \frac{1}{2}
+  \Var^i\big(
+      -\gamma(W_0 + (f-p)x_i)
+  \big)
+  \\
+  \iff\qquad
+  &\max_{x_i}
+  \;\;
+  \gamma(\mu_i-p)x_i
+  -
+  \frac{\gamma^2}{2}\sigma^2x^2_i
+\end{align*}
+Hence demand satisfies
+\begin{align*}
+  0&=
+  \gamma(\mu_i-p)
+  -
+  \gamma^2\sigma^2
+  x_i
+  \quad\implies\quad
+  x_i
+  =
+  \frac{\mu_i-p}{\gamma\sigma^2}
+\end{align*}
+Suppose no short sales are allowed.
+With quantity $Q$, that means
+\begin{align*}
+  Q
+  = \int \max\{x_i,0\}\;di
+  &=
+  \int_{\mu-\kappa}^{\mu+\kappa}
+  \max\left\{\frac{\mu_i-p}{\gamma\sigma^2},0\right\}
+  f(\mu_i)
+  \;d\mu_i
+  \\
+  &=
+  \int_{\max\{p,\mu-\kappa\}}^{\mu+\kappa}
+  \frac{\mu_i-p}{\gamma\sigma^2}
+  \frac{1}{2\kappa}
+  \;d\mu_i
+  \\
+  &=
+  \frac{1}{2\kappa}
+  \frac{1}{\gamma\sigma^2}
+  \int_{\max\{p,\mu-\kappa\}}^{\mu+\kappa}
+  (\mu_i-p)
+  \;d\mu_i
+  \\
+  \implies\quad
+  Q
+  &=
+  \frac{1}{2\kappa}
+  \frac{1}{\gamma\sigma^2}
+  \frac{(\mu_i-p)^2}{2}|_{\max\{p,\mu-\kappa\}}^{\mu+\kappa}
+\end{align*}
+Two cases. First suppose $p\leq \mu-\kappa$ so the short sale
+constraints are non-binding. Then
+\begin{align*}
+  Q
+  &=
+  \frac{1}{4\kappa}
+  \frac{1}{\gamma\sigma^2}
+  \left[
+  (\mu+\kappa-p)^2
+  -
+  (\mu-\kappa-p)^2
+  \right]
+  \quad\implies\quad
+  \boxed{%
+    p = \mu -\gamma\sigma^2 Q
+  }
+\end{align*}
+Recall that's the price assuming
+\begin{align*}
+  p \leq \mu-\kappa
+  \quad\iff\quad
+  \mu -\gamma\sigma^2 Q
+  \leq \mu-\kappa
+  \quad\iff\quad
+  \gamma\sigma^2 Q
+  \geq \kappa
+\end{align*}
+That's a restriction on parameters that may or may not hold. If it does,
+the above price is the equilibrium price.
+If not, then look for another equilibrium where $p>\mu-\kappa$, implying
+\begin{align*}
+  Q
+  &=
+  \frac{1}{4\kappa\gamma\sigma^2}
+  (\mu+\kappa-p)^2
+  \quad\implies\quad
+  \boxed{%
+    p = \mu+\kappa- 2\sigma\sqrt{\kappa\gamma Q}
+  }
+\end{align*}
+
+
+
+
+
+
+
+\clearpage
+\subsubsection{Dynamic Model: Harrison and Kreps (1978, QJE)}
+
+The right to resell makes investors more eager to hold an asset then if
+forced to hold forever.
+The expected payoff from buy and hold is lower than the actual initial
+valuation with the ability to resell if beliefs are right.
+
+%Time $t=0,1,2$. Agents differ in their beliefs about the probabilities
+%of the payoff attaining different terminal values.
+%No short sales, so whoever values more buys the asset; whoever values
+%less sells it.
+
+
+%\subsubsection{Dynamic Model: Scheinkman and Xiong (2003, JPE)}
+
+
+\subsubsection{Complete Markets Eequilibrium with Heterogeneous Beliefs}
+
+Ingredients
+\begin{itemize}
+  \item
+    Endowment economy with a single risky asset whose dividend follows
+    \begin{align*}
+      \frac{dD_t}{D_t}
+      &= f_t\;dt +\sigma dZ(t)\\
+      df_t
+      &= -\lambda_f(f_t-\mu)\;dt + \sigma_fdZ_f(t)
+    \end{align*}
+    with $\mu$ unobserved.
+
+  \item
+    $I$ agents in the economy with different beliefs about $\mu$.
+    Each agent maximizes expected lifetime utility based on that belief
+    \begin{align*}
+      \E^i\left[
+        \int_0^\infty
+        e^{-\beta t}
+        \frac{1}{1-\gamma}
+        c_{t,i}^{1-\gamma}
+        \;dt
+      \right]
+    \end{align*}
+  \item
+    Market clearing $D_t=\sum_i c_{t,i}$
+
+  \item
+    Complete markets means there's a representative agent.
+
+
+\end{itemize}
+
+
+
+
+
+\subsection{Endogenous Risk in GE}
+
+Single risky asset that follows
+\begin{align*}
+  \frac{dD_t}{D_t}
+  &= f_t\;dt + \sigma dZ_t
+  \\
+  df_t
+  &= -\lambda_f(f_t-\mu)\;dt + \sigma_fdZ_f(t)
+\end{align*}
+However, $I$ agents misperceive the mean.
+In particular, agent $i$ believes the mean of $f_t$ is $\mu+I_i$, hence
+has beliefs
+\begin{align*}
+  df_t^i
+  &= -\lambda_f\big(f_t^i-(\mu+I_i)\big)\;dt + \sigma_fdZ_f^i(t)
+\end{align*}
+where $f_t^i,Z_f^i(t)$ are processes under the measure for agent $i$.
+Everyone maxes utility subject to their beliefs
+\begin{align*}
+  \max \E^i\int_0^\infty e^{-\beta t}
+  \frac{c_{t,i}^{1-\gamma}}{1-\gamma}
+  \;dt
+\end{align*}
+Market clearing
+\begin{align*}
+  D_t = \sum_{i=1}^I c_{t,i}
+\end{align*}
+To make things easier, transform agent $i$'s expectation in the
+expectation of some representative agent $R$ who has teh correct
+beliefs. In particular,
+\begin{align*}
+  df_t^i
+  &=
+  -\lambda_f\big(f_t^i-(\mu+I_i)\big)\;dt
+  + \sigma_f\big(dZ_f(t) + \alpha \;dt\big)
+  \\
+  &=
+  -\lambda_f\left(
+    f_t^i-\mu-I_i- \frac{\sigma_f}{\lambda_f} \alpha\right)\;dt
+  + \sigma_fdZ_f(t)
+\end{align*}
+From this, we see that if we choose
+\begin{align*}
+  \alpha
+  =
+  - \frac{\lambda_f}{\sigma_f} I_i
+\end{align*}
+then the beliefs of agent $i$ will coincide with the truth.
+That implies the following RN derivative to change the mesaure
+\begin{align*}
+  \frac{d\xi_{t,i}}{\xi_{t,i}}
+  &=
+  \frac{\lambda_f}{\sigma_f} I_i
+  dZ_f(t)
+\end{align*}
+Because complete markets, social planner solves
+\begin{align*}
+  \max_{c_{t,i}}
+  \sum_{i=1}^I
+  \xi_{t,i}
+  \frac{c_{t,i}^{1-\gamma}}{1-\gamma}
+  -\lambda_t
+  \left(
+  \sum_{i=1}^I c_{t,i}-D_t
+  \right)
+\end{align*}
+First order condition for $c_{t,i}$:
+\begin{align*}
+  \xi_{t,i}
+  c_{t,i}^{-\gamma}
+  &=
+  \lambda_t
+  \quad\implies\quad
+  c_{t,i}
+  =
+  \lambda_t^{-1/\gamma}
+  \xi_{t,i}^{1/\gamma}
+\end{align*}
+Plug back into market clearing
+\begin{align*}
+  D_t
+  &=
+  \sum_{i=1}^I c_{t,i}
+  =
+  \sum_{i=1}^I
+  \lambda_t^{-1/\gamma}
+  \xi_{t,i}^{1/\gamma}
+  \quad\implies\quad
+  \lambda_t
+  =
+  D_t^{-\gamma}
+  \left(
+  \sum_{i=1}^I
+  \xi_{t,i}^{1/\gamma}
+  \right)^{\gamma}
+\end{align*}
+Note that $\lambda_t$ is the SDF, i.e. marginal utility.
+It's evolution in agent $R$'s probability measure can be derived by
+Ito's Lemma. But first recall all the processes:
+\begin{align*}
+  \frac{dD_t}{D_t}
+  &=
+  f_t\;dt + \sigma dZ_t
+  \\
+  df_t
+  &=
+  -\lambda_f
+  (f_t-\mu)dt
+  + \sigma_f dZ_f(t)
+  \\
+  \frac{d\xi_{t,i}}{\xi_{t,i}}
+  &=
+  \frac{\lambda_f}{\sigma_f} I_i
+  dZ_f(t)
+  \qquad i = 1,\ldots,I
+\end{align*}
+Then by Ito
+\begin{align*}
+  d\lambda_t
+  &=
+  \frac{d\lambda}{dD_t}
+  dD_t
+  +
+  \frac{1}{2}
+  \frac{d^2\lambda}{dD_t^2}
+  (dD_t)^2
+  +
+  \sum_{i=1}^I
+  \frac{d\lambda}{d\xi_{t,i}}
+  d\xi_{t,i}
+  +
+  \frac{1}{2}
+  \sum_{i=1}^I
+  \frac{d^2\lambda}{d\xi_{t,i}^2}
+  (d\xi_{t,i})^2
+  \\
+  &=
+  -\gamma
+  \lambda_t
+  \frac{dD_t}{D_t}
+  +
+  \gamma(\gamma+1)
+  \frac{1}{2}
+  \lambda_t
+  \left(
+  \frac{dD_t}{D_t}
+  \right)^2
+  +
+  \lambda_t
+  \sum_{i=1}^I
+  \left(
+  \frac{\xi_{t,i}^{1/\gamma}}{\sum_{i=1}^I \xi_{t,i}}
+  \right)
+  \frac{d\xi_{t,i}}{\xi_{i,t}}
+  \\
+  &\qquad
+  +
+  \frac{\lambda_t}{2}
+  \frac{\gamma-1}{\gamma}
+  \sum_{i=1}^I
+  \left[
+    \left(
+    \frac{\xi_{t,i}^{1/\gamma}}{\sum_{i=1}^I \xi_{t,i}}
+    \right)^2
+    -
+    \left(
+    \frac{\xi_{t,i}^{1/\gamma}}{\sum_{i=1}^I \xi_{t,i}}
+    \right)
+  \right]
+  \left(
+  \frac{d\xi_{t,i}}{\xi_{i,t}}
+  \right)^2
+\end{align*}
+Define consumption shares
+\begin{align*}
+  \eta_{t,i}
+  =
+  \frac{c_{t,i}}{D_t}
+  =
+  \frac{\xi_{t,i}^{1/\gamma}}{\sum_{i=1}^I \xi_{t,i}}
+\end{align*}
+Then rewrite Ito thing
+\begin{align*}
+  d\lambda_t
+  &=
+  -\gamma
+  \lambda_t
+  \frac{dD_t}{D_t}
+  +
+  \gamma(\gamma+1)
+  \frac{\lambda_t }{2}
+  \left(
+  \frac{dD_t}{D_t}
+  \right)^2
+  +
+  \lambda_t
+  \sum_{i=1}^I
+  \eta_{t,i}
+  \frac{d\xi_{t,i}}{\xi_{i,t}}
+  +
+  \frac{\lambda_t}{2}
+  \frac{\gamma-1}{\gamma}
+  \sum_{i=1}^I
+  \left[
+    \eta_{t,i}^2
+    -
+    \eta_{t,i}
+  \right]
+  \left(
+  \frac{d\xi_{t,i}}{\xi_{i,t}}
+  \right)^2
+\end{align*}
+Substitute in the proceses for $D_t$ and $\xi_{t,i}$ defined/derived
+above
+\begin{align*}
+  d\lambda_t
+  &=
+  -\gamma
+  \lambda_t
+  \left[
+    f_t\;dt + \sigma \;dZ_t
+  \right]
+  +
+  \frac{\gamma(\gamma+1)\lambda_t\sigma^2}{2}
+  \;dt
+  +
+  \lambda_t
+  \frac{\lambda_f}{\sigma_f}
+  \left(
+  \sum_{i=1}^I
+  \eta_{t,i}
+  I_i
+  \right)
+  dZ_f(t)
+  \\
+  &\qquad
+  +
+  \left[
+  \frac{\lambda_t}{2}
+  \frac{\gamma-1}{\gamma}
+  \frac{\lambda_f^2}{\sigma^2_f}
+  \sum_{i=1}^I
+  \left(
+    \eta_{t,i}^2
+    -
+    \eta_{t,i}
+  \right)
+  I_i^2
+  \right]
+  \;dt
+\end{align*}
+Divide through by $\lambda_t$ and group terms
+\begin{align*}
+  \frac{d\lambda_t}{\lambda_t}
+  &=
+  \left[
+    -\gamma
+    f_t
+    + \frac{\gamma(\gamma+1)\sigma^2}{2}
+    +
+    \frac{1}{2}
+    \frac{\gamma-1}{\gamma}
+    \frac{\lambda_f^2}{\sigma^2_f}
+    \sum_{i=1}^I
+    \left(
+      \eta_{t,i}^2
+      -
+      \eta_{t,i}
+    \right)
+    I_i^2
+  \right]
+  \;dt
+  - \gamma \sigma \;dZ_t
+  +
+  \frac{\lambda_f}{\sigma_f}
+  \left(
+  \sum_{i=1}^I
+  \eta_{t,i}
+  I_i
+  \right)
+  dZ_f(t)
+\end{align*}
+Thus, the risk free rate is
+\begin{align*}
+  r_t^f\;dt
+  =
+  \E
+  \left[
+  -\frac{d\lambda_t}{\lambda_t}
+  \right]
+  =
+  \left[
+    \gamma
+    f_t
+    - \frac{\gamma(\gamma+1)\sigma^2}{2}
+    -
+    \frac{1}{2}
+    \frac{\gamma-1}{\gamma}
+    \frac{\lambda_f^2}{\sigma^2_f}
+    \sum_{i=1}^I
+    \left(
+      \eta_{t,i}^2
+      -
+      \eta_{t,i}
+    \right)
+    I_i^2
+  \right]
+  \;dt
+\end{align*}
+Hence, we can rewrite
+\begin{align*}
+  \frac{d\lambda_t}{\lambda_t}
+  &=
+  -r_t^f\;dt
+  jk- \gamma \sigma \;dZ_t
+  +
+  \frac{\lambda_f}{\sigma_f}
+  \left(
+  \sum_{i=1}^I
+  \eta_{t,i}
+  I_i
+  \right)
+  dZ_f(t)
+\end{align*}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%\subsection{Welfare Analysis}
+
+
+
+
+\clearpage
+\section{Equilibrium with Asymmetric Information}
+
+\subsection{CARA Gaussian Problem}
+
+Suppose an agent chooses a portfolio to maximize CARA utility over
+terminal wealth $W$. If all returns are Gaussian, than terminal wealth
+$W$ will also be Gaussian and the utility maximization problem
+simplifies to
+\begin{align*}
+  \max\; \E[-\exp\{\rho W\}]
+  =
+  \max \; \E[W] - \frac{\rho}{2} \Var(W)
+\end{align*}
+where $\rho$ is the risk aversion parameter which is also inverse risk
+tolerance, $\eta=1/\rho$.
+Note that the expectation and variance can be conditional on some
+information set.
+
+Suppose there are two assets available to trade: risk-free and risky,
+where
+\begin{table}[htbp!]
+\centering
+\begin{tabular}{c|cccc}
+  & Endowment & Holdings after Trading & price per Unit & payoff per unit \\\hline\hline
+  Risk-free & $b_0$ & $b$ & 1 & $R_f$ \\
+  Risky & $x_0$ & $x$ & $p$ & $R\sim\calN$ \\
+\end{tabular}
+\end{table}
+With this setup, the pre-trading budget constraint is
+Budget constraint
+\begin{align*}
+  W_0 = b_0 + px_0 = b + px
+  \quad\implies\quad
+  b = b_0 + p(x_0 - x)
+\end{align*}
+End of period wealth is then given by
+\begin{align*}
+  W
+  &= R_f b + R x
+  = R_f [b_0 + p(x_0 - x)] + R x
+  \quad \implies\quad
+  \begin{cases}
+    \E[W]
+    \;\;\;= R_f [b_0 + p(x_0 - x)] + \E[R] x
+    \\
+    \Var[W]
+    = x^2\Var(R)
+  \end{cases}
+\end{align*}
+Hence, agents are maximizing
+\begin{align*}
+  \E[W]
+  -\frac{\rho}{2}\Var(W)
+  &=
+  R_f [b_0 + p(x_0 - x)] + \E[R] x
+  - \frac{\rho}{2} x^2\Var(R)
+  \\
+  \text{FOC w.r.t. $x$:}\qquad
+  0 &= -R_fp + \E[R] - \rho x\Var[R]
+  \\
+  \quad\implies\quad
+  x &= \frac{\E[R] - R_fp}{\rho\Var[R]}
+\end{align*}
+
+
+\subsection{Symmetric Info Benchmark}
+
+Suppose $I$ investors like the type above, each with their own risk
+aversion coefficient $\rho^i$, but common beliefs so everyone agrees
+that $R\sim\calN(\mu,\sigma^2)$.
+Letting $X$ denote the exogenously given aggregate supply of the asset,
+we can solve for price via market clearing
+\begin{align*}
+  X =
+  \sum_{i=1}^I
+  x^i
+  =
+  \sum_{i=1}^I
+  \frac{\E[R] - R_fp}{\rho^i\Var[R]}
+  \quad\implies\quad
+  \boxed{%
+    p
+    =
+    \frac{1}{R_f}
+    \left[
+    \E[R]
+    -
+    X
+    \frac{\Var[R]}{ \sum_{i=1}^I \frac{1}{\rho^i} }
+    \right]
+  }
+\end{align*}
+Then, in equilibrium, demand satisfies
+\begin{align*}
+  x^i &=
+  \frac{\E[R] - R_fp}{\rho^i\Var[R]}
+  =
+  \frac{X}{ \rho^i\sum_{i=1}^I \frac{1}{\rho^i} }
+\end{align*}
+
+
+\subsection{Grossman (1976)}
+
+Suppose $I$ investors like the type above, each with their own risk
+aversion coefficient $\rho^i$, but \emph{heterogeneous} beliefs due to
+private signals correlated with the random fundamental return:
+\begin{align*}
+  R &\sim \calN(\mu,\sigma^2_R) \\
+  s^i &\sim \calN(R, \sigma^2_s)
+\end{align*}
+We now compute a Rational Expectations Equilibrium:
+\begin{itemize}
+  \item Conjecture an equilibrium pricing function given all the signals
+    \begin{align*}
+      p = \alpha_0 + \alpha_1
+      S
+      \qquad\text{where}\quad
+      S
+      :=
+      \frac{1}{I}\sum_{i=1}^I s^i
+      \sim
+      \calN\big(R, \sigma^2_{S}\big)
+      \bigg)
+      \qquad
+      \sigma^2_{S}
+      =
+      \frac{\sigma^2_s}{I}
+    \end{align*}
+
+  \item
+    Compute Posteriors:
+    This is necessary to compute individual demand.
+    Agents see their own signal $s^i$ and the price $p$, so their
+    information set is at least $(s^i,p)$.
+    But in a REE, they \emph{also} know the pricing function and the
+    coefficients on the pricing function, so their information set is
+    actually $(s^i,p,S)$ since they can infer $S$.
+    And that's actually a better signal of returns $R$ than anything.
+    So the posterior mean and variance (which are all we need because of
+    Gaussianity) satisfy
+    \begin{align*}
+      \E[R|s_i,p]
+      = \E[R|s_i,p,S]
+      = \E[R|S]
+      &=
+      \frac{\tau_R}{\tau_R+\tau_{S}}
+      \;\mu
+      + \frac{\tau_{S}}{\tau_R+\tau_{S}}
+      \;
+      S
+      \\
+      \Var(R|s_i,p)
+      =
+      \Var(R|S)
+      &=
+      \frac{1}{\tau_R+\tau_{S}}
+    \end{align*}
+
+  \item
+    Derive Individual Demand:
+    Given the posterior mean and variance for each agent (which happen
+    to be the same), we can derive individual demand, which follows the
+    same form as always
+    \begin{align*}
+      x_i
+      =
+      \frac{\E[R|S]-R_fp}{\rho^i \Var(R|S)}
+      =
+      \frac{1 }{\rho^i}
+      \left[
+        \frac{\tau_R}{\tau_R+\tau_{S}}
+        \;\mu
+        + \frac{\tau_{S}}{\tau_R+\tau_{S}}
+        \;
+        S
+        -R_fp
+      \right]
+      (\tau_R+\tau_{S})
+    \end{align*}
+
+
+  \item
+    Impose market clearing:
+    Letting $X$ denote the exogenously given aggregate supply of the
+    asset, impose market clearing
+    \begin{align*}
+      X
+      =
+      \sum_{i=1}^I x_i
+      &=
+      \sum_{i=1}^I
+      \frac{\E[R|S]-R_fp}{\rho^i \Var(R|S)}
+      %\\
+      =
+      \sum_{i=1}^I
+      \frac{1 }{\rho^i}
+      \left[
+        \frac{\tau_R}{\tau_R+\tau_{S}}
+        \;\mu
+        + \frac{\tau_{S}}{\tau_R+\tau_{S}}
+        \;
+        S
+        -R_fp
+      \right]
+      (\tau_R+\tau_{S})
+    \end{align*}
+    Solve for price
+    \begin{align*}
+      p
+      &=
+      \frac{1}{R^f(\tau_R+\tau_S)}
+      \left[
+      \tau_R \mu
+      - X
+      \left(
+      \sum_{i=1}^I
+      \frac{1 }{\rho^i}
+      \right)^{-1}
+      + \tau_{S} S
+      \right]
+    \end{align*}
+  \item
+    Impose Rationality:
+    Sub in conjectured pricing function on the LHS, identify
+    coefficients
+    \begin{align*}
+      \alpha_0 + \alpha_1 S
+      &=
+      \frac{1}{R^f}
+      \left[
+      \frac{\tau_R}{\tau_R+\tau_S}
+       \mu
+      -
+      \frac{X}{\tau_R+\tau_S}
+      \left(
+      \sum_{i=1}^I
+      \frac{1 }{\rho^i}
+      \right)^{-1}
+      \right]
+      +
+      \frac{1}{R^f}
+      \frac{\tau_{S}}{\tau_R+\tau_S}
+      S
+    \end{align*}
+
+
+
+
+\end{itemize}
+
+
+
+
+%\clearpage
+%\subsection{Grossman and Stiglitz (1980, AER)}
+
+
+
+\clearpage
+\subsection{Hellwig (1980, AER)}
+
+Suppose $I$ traders, $\rho$ for investor $i$, and information
+dispersed among traders
+\begin{align*}
+  s^i|R \sim \calN\big(R,(\sigma_\varepsilon^i)^2\big)
+\end{align*}
+Let $\Delta s^i = s^i-\E[s^i]$, $\Delta X = X-\E[X]$, etc.
+\begin{itemize}
+  \item
+    Conjecture an equilibrium pricing function
+    $p = \alpha_0 + \sum_i\alpha_s^i \Delta s^i + \alpha_x \Delta X$
+
+  \item
+    Compute Posteriors:
+    Everything Gaussian, so just need to pin down mean and variance.
+    Moreover, the conditional expectation will be a linear function of
+    the random variables in the conditioning information set
+    \begin{align*}
+      \E[R|s^i,p]
+      &=
+      \E[R]
+      + \beta_s^i \Delta s^i
+      + \beta_p^i \Delta p
+      \quad\qquad
+      \Var[R|s^i,p]
+      =
+      \frac{1}{\tau^i_{v|s^i,p}}
+    \end{align*}
+    where $\beta_s^i$ and $\beta_p^i$ are the projection coefficients
+    derived from the conditional Gaussian formulas.
+    Since they will depend on estimates of $\alpha$, the actual values
+    must be determined later, once we determine the coefficients, but we
+    know that they will be well-defined by the end of this.
+
+  \item
+    Derive individual demand, letting $\eta=1/\rho$:
+    \begin{align*}
+      x^i
+      =
+      \eta^i \tau^i_{v|s^i,p}
+      \big(
+        \E[R|s^i,p]
+        - R_fp
+      \big)
+      =
+      \sum_i
+      \eta^i \tau^i_{v|s^i,p}
+      \big(
+        \E[R]
+        + \beta_s^i \Delta s^i
+        + \beta_p^i \Delta p
+        - R_fp
+      \big)
+    \end{align*}
+
+  \item
+    Impose Market Clearing:
+    \begin{align*}
+      X
+      = \sum_i x^i
+      &=
+      \sum_i
+      \eta^i \tau^i_{v|s^i,p}
+      \big(
+        \E[R]
+        + \beta_s^i \Delta s^i
+        + \beta_p^i \Delta p
+        - R_fp
+      \big)
+    \end{align*}
+    Use the fact that $\E[p]=\alpha_0$ so $\Delta p = (p-\alpha_0)$ to
+    get
+    \begin{align*}
+      X
+      %&=
+      %\sum_i
+      %\eta^i \tau^i_{v|s^i,p}
+      %\big(
+        %\E[R]
+        %+ \beta_s^i \Delta s^i
+        %+ \beta_p^i (p-\alpha_0)
+        %- R_fp
+      %\big)
+      %\\
+      &=
+      \sum_i
+      \eta^i \tau^i_{v|s^i,p}
+      \big(
+        \E[R]
+        + \beta_s^i \Delta s^i
+        - \beta_p^i \alpha_0
+        + (\beta_p^i-R_f) p
+      \big)
+    \end{align*}
+    Solve for $p$
+    \begin{align*}
+      p
+      &=
+      \frac{%
+        -X
+        +
+        \sum_i
+        \eta^i \tau^i_{v|s^i,p}
+        \big(
+          \E[R]
+          + \beta_s^i \Delta s^i
+          - \beta_p^i \alpha_0
+        \big)
+      }{%
+        \sum_i
+        \eta^i \tau^i_{v|s^i,p}
+        (R_f-\beta_p^i)
+      }
+    \end{align*}
+
+  \item
+    Impose Rationality:
+    Substitute in $X=\E[X]+\Delta X$, rearrange/breakup price expression
+    \begin{align*}
+      p
+      &=
+      \underbrace{%
+        \frac{%
+          -\E[X]
+          +
+          \sum_i
+          \eta^i \tau^i_{v|s^i,p}
+          \big(
+            \E[R]
+            - \beta_p^i \alpha_0
+          \big)
+        }{%
+          \sum_i
+          \eta^i \tau^i_{v|s^i,p}
+          (R_f-\beta_p^i)
+        }
+      }_{\alpha_0}
+      +
+      \sum_i
+      \underbrace{%
+        \left(
+        \frac{%
+          \eta^i \tau^i_{v|s^i,p}
+          \beta_s^i
+        }{%
+          \sum_j
+          \eta^j \tau^j_{v|s^j,p}
+          (R_f-\beta_p^j)
+        }
+        \right)
+      }_{\alpha_s^i}
+      \Delta s^i
+      -
+      \underbrace{%
+        \frac{%
+          1
+        }{%
+          \sum_i
+          \eta^i \tau^i_{v|s^i,p}
+          (R_f-\beta_p^i)
+        }
+      }_{\alpha_x}
+      \Delta X
+    \end{align*}
+    %Identifying coefficients, that means the $\alpha$ coefficients
+    %satisfy
+    %\begin{align*}
+      %\alpha_0
+      %&=
+      %\frac{%
+        %-\E[X]
+        %+
+        %\sum_i
+        %\eta^i \tau^i_{v|s^i,p}
+        %\big(
+          %\E[R]
+          %- \beta_p^i \alpha_0
+        %\big)
+      %}{%
+        %\sum_i
+        %\eta^i \tau^i_{v|s^i,p}
+        %(R_f-\beta_p^i)
+      %}
+      %\\
+      %\alpha_s^i
+      %&=
+      %\frac{%
+        %\eta^i \tau^i_{v|s^i,p}
+      %}{%
+        %\sum_j
+        %\eta^j \tau^j_{v|s^j,p}
+        %(R_f-\beta_p^j)
+      %}
+      %\beta_s^i
+      %\\
+      %\alpha_x
+      %&=
+      %-
+      %\frac{%
+        %1
+      %}{%
+        %\sum_i
+        %\eta^i \tau^i_{v|s^i,p}
+        %(R_f-\beta_p^i)
+      %}
+    %\end{align*}
+\end{itemize}
+Special case, $\rho^i=\rho$ for all $i$ so $\eta_i=\eta$ for all $i$.
+Also assume $\sigma_\varepsilon^i=\sigma_\varepsilon$ for all $i$.
+\begin{itemize}
+  \item
+    Equilibrium pricing function conjecture becomes
+    \begin{align*}
+      p =
+      \alpha_0
+      + \alpha_s \frac{1}{I}\sum_i \Delta s^i
+      + \alpha_x \Delta X
+    \end{align*}
+  \item
+    Compute Posteriors:
+    With common signal variance, everyone puts the same weights on
+    objects, hence the mean and variance simplify to
+    \begin{align*}
+      \E[R|s^i,p]
+      &=
+      \E[R]
+      + \beta_s \Delta s^i
+      + \beta_p \Delta p
+      \\
+      \Var[R|s^i,p]
+      &=
+      \frac{1}{\tau}
+    \end{align*}
+    %where $\beta_s^i$ and $\beta_p^i$ are the projection coefficients
+    %derived from the conditional Gaussian formulas.
+    %Since they will depend on estimates of $\alpha$, the actual values
+    %must be determined later, once we determine the coefficients, but we
+    %know that they will be well-defined by the end of this.
+
+  \item
+    Individual demand simplifies to
+    $x^i = \eta \tau \big( \E[R|s^i,p] - R_fp \big)$
+
+  \item
+    %Market clearing
+    %\begin{align*}
+      %X
+      %=
+      %\sum_i x^i
+      %&=
+      %\eta \tau
+      %\sum_i
+      %\big( \E[R|s^i,p] - R_fp \big)
+      %\\
+      %&=
+      %\eta \tau
+      %\sum_i
+      %\big(
+        %\E[R]
+        %+ \beta_s \Delta s^i
+        %- \alpha_0\beta_p
+        %+ p(\beta_p - R_f)
+      %\big)
+      %%\\
+      %%\implies\quad
+      %%p
+      %%\sum_i
+      %%\eta \tau
+      %%(R_f-\beta_p
+      %%&=
+      %%-X
+      %%+
+      %%\eta \tau
+      %%\sum_i
+      %%\big(
+        %%\E[R]
+        %%+ \beta_s \Delta s^i
+        %%- \alpha_0\beta_p
+      %%\big)
+    %\end{align*}
+    Market clearing simplifies the expression for $p$
+    \begin{align*}
+      p
+      &=
+      \frac{%
+        -X
+        +
+        \eta \tau
+        \sum_i
+        \big(
+          \E[R]
+          + \beta_s \Delta s^i
+          - \beta_p \alpha_0
+        \big)
+      }{%
+        \eta \tau
+        \sum_i
+        (R_f-\beta_p)
+      }
+    \end{align*}
+
+  \item
+    Impose Rationality:
+    Substitute in $X=\E[X]+\Delta X$, rearrange/breakup price expression
+    \begin{align*}
+      p
+      &=
+      \underbrace{%
+        \frac{%
+          -\E[X]
+          +
+          \eta \tau
+          \sum_i
+          \big(
+            \E[R]
+            - \beta_p \alpha_0
+          \big)
+        }{%
+          \eta \tau
+          \sum_i
+          (R_f-\beta_p)
+        }
+      }_{\alpha_0}
+      +
+      \underbrace{%
+        \frac{%
+          I\beta_s
+        }{%
+          \sum_j
+          (R_f-\beta_p)
+        }
+      }_{\alpha_s}
+      \frac{1}{I}
+      \sum_i
+      \Delta s^i
+      +
+      \underbrace{%
+        \frac{%
+          - 1
+        }{%
+          \eta \tau
+          \sum_i
+          (R_f-\beta_p)
+        }
+      }_{\alpha_x}
+      \Delta X
+    \end{align*}
+\end{itemize}
+We now derive coefficients through a sequence of steps
+\begin{itemize}
+  \item
+    Recall the assumptions for random variables
+    \begin{align*}
+      R\sim\calN(\mu,\sigma^2_R)
+      \qquad
+      s^i|R \sim\calN(R,\sigma^2_\varepsilon)
+      \qquad
+      X\sim\calN(\overline{X},\sigma^2_x)
+    \end{align*}
+    Together, these imply that price has variance
+    \begin{alignat*}{3}
+      \Var(s_i)
+      &=\Var(R+\varepsilon)
+      = \Var(R)+\Var(\varepsilon)
+      &&=\sigma^2_R+\sigma^2_\varepsilon
+      \\
+      \Cov(s^i,R)
+      &=
+      \Cov(R+\varepsilon,R)
+      &&= \sigma^2_R
+      \\
+      \Var(p)
+      &=
+      \Var\left(
+        \alpha_s\frac{1}{I}\sum_i\Delta s^i
+        +\alpha_x\Delta X
+      \right)
+      \\
+      &=
+      \alpha_s^2
+      \Var\left(
+        R
+        +\frac{1}{I}
+        \sum_i
+        \varepsilon^i
+      \right)
+      +\alpha_x^2\Var\left(
+        \Delta X
+      \right)
+      &&=
+      \alpha_s^2 \left(
+        \sigma^2_R+\frac{\sigma^2_\varepsilon}{I}
+      \right)
+      + \alpha_x^2 \sigma^2_x
+      \\
+      \Cov( s^i, p)
+      &=
+      \Cov\left(s^i,\alpha_s \frac{1}{I}\sum_j\Delta s^j\right)
+      =
+      \alpha_s
+      \Cov\left(
+        R+\varepsilon^i,\;
+        R
+        +
+        \frac{1}{I}
+        \sum_j \varepsilon^j
+      \right)
+      \\
+      &
+      =
+      \alpha_s
+      \Var(R)
+      + \frac{\alpha_s}{I}\Var(\varepsilon^i)
+      &&=
+      \alpha_s\left(\sigma^2_R+\frac{\sigma^2_\varepsilon}{I}\right)
+      \\
+      \Cov(R,\Delta p)
+      &=
+      \Cov\left(R,\alpha_s\frac{1}{I}\sum_i \Delta s_i\right)
+      = \alpha_s\frac{1}{I}\sum_i \Cov\left(R,\Delta s_i\right)
+      &&= \alpha_s\sigma^2_R
+    \end{alignat*}
+
+  \item
+    First, derive $\beta$ projection coefficients in terms of $\alpha$
+    coefficients. To do that, note by the results in the last bullet
+    point and the joint normality of everything
+    \begin{align*}
+      \begin{pmatrix}
+        R \\  \Delta s^i \\ \Delta p
+      \end{pmatrix}
+      \sim
+      \calN
+      \left(
+      \begin{pmatrix}
+        \mu \\  0 \\ 0
+      \end{pmatrix},\;
+      \begin{pmatrix}
+        \sigma^2_R
+          & \sigma^2_R
+          & \alpha_s\sigma^2_R\\
+          & \sigma^2_R+\sigma^2_\varepsilon
+          & \alpha_s
+          \left(\sigma^2_R+\frac{\sigma^2_\varepsilon}{I}\right)\\
+          &
+          &
+          \alpha_s^2
+          \left(\sigma^2_R+\frac{\sigma^2_\varepsilon}{I}\right) + \alpha_x^2 \sigma^2_x
+      \end{pmatrix}
+      \right)
+    \end{align*}
+    By the usual normal formulas, we get $\beta_s$, $\beta_p$, $\tau$.
+
+\end{itemize}
+
+
+
+
+\clearpage
+\subsection{Kyle 1985}
+
+Notes based on
+\href{http://www.alexchinco.com/comparing-kyle-and-grossman-stiglitz/}{this}.
+
+
+
+
+
+
+
+
+
+%% APPPENDIX %%
+
+% \appendix
+
+
+
+
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% SAMPLE CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    %% VIEW LAYOUT %%
+
+        \layout
+
+    %% LANDSCAPE PAGE %%
+
+        \begin{landscape}
+        \end{landscape}
+
+    %% BIBLIOGRAPHIES %%
+
+        \cite{LabelInSourcesFile}  %Use in text; cites
+        \citep{LabelInSourcesFile} %Use in text; cites in parens
+
+        \nocite{LabelInSourceFile} % Includes in refs w/o specific citation
+        \bibliographystyle{apalike}  % Or some other style
+
+        % To ditch the ``References'' header
+        \begingroup
+        \renewcommand{\section}[2]{}
+        \endgroup
+
+        \bibliography{sources} % where sources.bib has all the citation info
+
+    %% SPACING %%
+
+        \vspace{1in}
+        \hspace{1in}
+
+    %% URLS, EMAIL, AND LOCAL FILES %%
+
+      \url{url}
+      \href{url}{name}
+      \href{mailto:mcocci@raidenlovessusie.com}{name}
+      \href{run:/path/to/file.pdf}{name}
+
+
+    %% INCLUDING PDF PAGE %%
+
+        \includepdf{file.pdf}
+
+
+    %% INCLUDING CODE %%
+
+        %\verbatiminput{file.ext}
+            %   Includes verbatim text from the file
+
+        \texttt{text}
+            %   Renders text in courier, or code-like, font
+
+        \matlabcode{file.m}
+            %   Includes Matlab code with colors and line numbers
+
+        \lstset{style=bash}
+        \begin{lstlisting}
+        \end{lstlisting}
+            % Inline code rendering
+
+
+    %% INCLUDING FIGURES %%
+
+        % Basic Figure with size scaling
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[scale=1]{file.pdf}
+            \end{figure}
+
+        % Basic Figure with specific height
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[height=5in, width=5in]{file.pdf}
+            \end{figure}
+
+        % Figure with cropping, where the order for trimming is  L, B, R, T
+            \begin{figure}
+               \centering
+               \includegraphics[trim={1cm, 1cm, 1cm, 1cm}, clip]{file.pdf}
+            \end{figure}
+
+        % Side by Side figures: Use the tabular environment
+
+

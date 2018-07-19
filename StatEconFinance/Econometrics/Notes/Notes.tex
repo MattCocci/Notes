@@ -5517,10 +5517,356 @@ the Newey-West estimator.
 
 
 
+\clearpage
+\section{van der Waart}
+
+\subsection{Preliminary Definitions}
+
+\begin{defn}(Experiment)
+$\{P_\theta\}_{\theta\in\Theta}$
+\end{defn}
+
+\begin{defn}(Differentiable in Quadratic Mean)
+An \emph{experiment}
+$\{P_\theta\}_{\theta\in\Theta}$
+is \emph{differentiable in quadratic mean}
+\begin{align*}
+  \int
+  \left[
+    \sqrt{p_{\theta+h}}
+    -
+    \sqrt{p_{\theta}}
+    -
+    \frac{1}{2}
+    h'\dot{\ell}_\theta
+    \sqrt{p_\theta}
+  \right]^2
+  d\mu
+  =
+  o(\lVert h\rVert^2)
+  \qquad
+  h\ra 0
+\end{align*}
+This property essentially says that the experiment or likelihood is
+``nice'' or ``well-behaved.''
+So it's an assumption employed in many theorem statements.
+\end{defn}
+
+
+\begin{defn}
+(Minimax Estimator)
+\begin{align*}
+  \min_T
+  \sup_\theta
+  \E_\theta[\ell(T-\theta)]
+\end{align*}
+for some loss function $\ell(\,\cdot\,)$.
+\end{defn}
+
+
+\begin{defn}
+(Equivariant-in-Law Estimator)
+\end{defn}
+
+
+\begin{defn}(Regular Estimator)
+Estimator $T_n$ is \emph{regular} at $\theta_0$ for
+estimating $\psi(\theta_0)$ if
+\begin{align*}
+  \forall h
+  \qquad
+  \sqrt{n}
+  \left(
+  T_n
+  -
+  \psi\left(
+  \theta_0 + \frac{h}{\sqrt{n}}
+  \right)
+  \right)
+  \quad\underset{\theta_0+h/\sqrt{n}}{\dto}\quad
+  L_{\theta_0}
+\end{align*}
+Notice that $L_{\theta_0}$ is independent of $h$.
+In words, a vanishing small perturbation of the parameter doesn't change
+the limit distribution.
+Shrinkage estimators are generally \emph{not} regular.
+
+For reasons to be seen later, regular estimators are generally called
+\emph{asymptotically equivariant-in-law}.
+This is because regularity (a statement about the asymptotic
+distribution of an estimator) implies that the statistic is matched by
+an equivariant-in-law estimator.
+\end{defn}
+
+
+\clearpage
+\subsection{Estimating Normal Means}
+
+
+In this section, we want to estimate the linear combination $Ah$, given
+\begin{align}
+  X \sim \calN(h,\Sigma)
+  \label{limitobs}
+\end{align}
+
+\begin{defn}(Conventional Estimator)
+The usual \emph{conventional estimator} of $Ah$ is
+\begin{align*}
+  %T =
+  AX
+  \sim \calN(Ah, A\Sigma A')
+\end{align*}
+And as shown below in Theorem~\ref{normalopt}, $AX$ is also in
+``optimal'' in a few different senses.
+\end{defn}
+
+\begin{prop}
+\label{decompequivariant}
+\emph{(Decomposition of Equivariant Estimators in Normal Mean Problem)}
+For any equivariant-in-law estimator $T$ of $Ah$, the null distribution
+of $T-Ah$ can be decomposed
+\begin{align}
+  T-Ah
+  \;
+  \sim
+  \;
+  \calN(0,A\Sigma A') * M
+  \label{eildecomp}
+\end{align}
+for some probability measure $M$.
+Think of $M$ as adding noise to the $\calN(0,A\Sigma A')$ distribution.
+\end{prop}
+
+\begin{thm}
+\label{normalopt}
+\emph{(Optimality of Conventional Estimator)}
+Given Expression~\ref{limitobs},
+some results for the conventional estimator $T=AX$ of $Ah$:
+\begin{enumerate}[label=(\roman*)]
+  \item $AX$ is minimum-variance unbiased for $Ah$
+  \item $AX$ is the best equivariant-in-law estimator of $Ah$,
+    in the sense that it is equivariant-in-law and it is \emph{only}
+    equivariant-in-law estimator for which $M$ is degenerate at $0$ in
+    Decomposition~\ref{eildecomp}
+  \item $AX$ is a minimax estimator for any bowl-shaped loss function.
+    And under some mild regularity conditions on $A$, $X$, and $\ell$,
+    it is the \emph{unique} minimax estimator.
+\end{enumerate}
+\end{thm}
+\begin{proof}
+Each in turn
+\begin{enumerate}[label=(\roman*)]
+  \item Unbiased because $\E[AX]=Ah$.
+  \item Equivariant-in-law because
+    $AX-Ah\sim\calN(0,A\Sigma A')$, a distribution which does not depend
+    upon $h$.
+  \item This follows from Part (ii) and the implied
+    Expression~\ref{eildecomp} decomposition.
+    Since $M$ only adds noise, the fact that $M$ is degenerate at 0 for
+    $AX$, in combination with the bowl-shaped loss function, will
+    deliver the minimax result.
+\end{enumerate}
+\end{proof}
 
 
 
 
+
+\subsection{Efficiency of Estimators}
+
+\begin{comment}
+Setting
+\begin{itemize}
+  \item Experiment $\{P_\theta\}_{\theta\in\Theta}$
+  \item Want to estimate some function of parameters $\psi(\theta)$.
+
+    A special case is $\psi(\theta)=\theta$, the parameter itself.  But
+    we can derive much more general statements for \emph{any} function
+    $\psi(\theta)$ of the parameters.
+
+  \item To estimate $\psi(\theta)$, we will construct estimator $T_n$.
+\end{itemize}
+This question is primarily concerned with whether $T_n$ is a good
+estimator of $\psi(\theta)$.
+
+Complicating issues
+\begin{itemize}
+  \item Estimator $T_n$ might do well \emph{pointwise}, that is, fixing
+    $\theta$ and sending $n\ra\infty$.
+  \item However, this is not a good way to do asymptotics because the
+    estimator's good performance might heavily depend upon the
+    $n\ra\infty$, which is not available in finite samples
+  \item Much better is to characterize the distribution of an estimator
+    in a shrinking neighborhood of $\theta$, i.e.  the distribution of
+    $T_n$ under $\theta+h/\sqrt{n}$ for all $h\in\R^k$.
+
+  \item
+    By seeing how $T_n$ does under $\theta+h/\sqrt{n}$ for different
+    $h$'s, we can see how sensitive the estimator is to asymptotically
+    vanishing perturbations of $\theta$.
+    Good estimators will behave nicely (asymptotically) under all $h$.
+    Bad estimators will be erratic and sensitive (asymptotically) to
+    asymptotically vanishing perturbations of the parameters, suggesting
+    poor performance in finite samples too.
+\end{itemize}
+\end{comment}
+
+%\clearpage
+\begin{thm}
+\label{vdw8.3}
+\emph{(Van Der Waart 8.3)}
+Fix a point $\theta_0\in\Theta$.
+Assume
+\begin{itemize}
+  \item Experiment $\{P_{\theta}\}_{\theta\in\Theta}$ is
+    differentiable in quadratic mean at the point $\theta_0$ with
+    nonsingular Fisher information matrix $I_{\theta_0}$ (hence LAN).
+
+  \item $\psi$ is differentiable at $\theta_0$.
+  \item $T_n$ be a squence of estimators in the sequence of experiments
+    $\{P^n_{\theta_0+h/\sqrt{n}}\}_{h\in\R^k}$ such that
+    \begin{align}
+      \sqrt{n}
+      \left(
+      T_n
+      -
+      \psi\left(
+      \theta_0 + \frac{h}{\sqrt{n}}
+      \right)
+      \right)
+      \quad\underset{\theta_0+h/\sqrt{n}}{\dto}\quad
+      L_{\theta_0,h}
+      \qquad
+      \forall h
+      \label{convergence}
+    \end{align}
+\end{itemize}
+Then there exists a statistic $T$ in the experiment
+$\{\calN(h,I_{\theta_0}^{-1})\}_{h\in\R^k}$ such that
+\begin{align}
+  T - \dot{\psi}_{\theta_0} h
+  \quad
+  \sim
+  \quad
+  L_{\theta_0,h}
+  \qquad
+  \forall h
+  \label{matched}
+\end{align}
+or, equivalently, such that
+\begin{align}
+  \sqrt{n}
+  \left(
+  T_n
+  -
+  \psi\left(
+  \theta_0 + \frac{h}{\sqrt{n}}
+  \right)
+  \right)
+  \quad\underset{\theta_0+h/\sqrt{n}}{\dto}\quad
+  T - \dot{\psi}_{\theta_0} h
+  \qquad
+  \forall h
+  \label{convergence2}
+\end{align}
+Note that the differentiability in quadratic mean ensured the model was
+LAN. That's why the appropriate limit experiment is normal.
+\end{thm}
+
+\begin{rmk}
+Fleshing out the practical implications and meaning of this theorem in
+words
+\begin{itemize}
+  \item By Expression~\ref{convergence}, $T_n$ estimates
+    $\psi(\theta_0+h/\sqrt{n})$.
+  \item For $T_n$ to be a good estimator, it should be maximally
+    concentrated around $\psi(\theta+h/\sqrt{n})$.
+  \item Therefore, the family of distributions $L_{\theta_0,h}$ should
+    be maximally concentrated around 0.
+  \item By Expression~\ref{matched}, the set of distributions
+    $L_{\theta_0,h}$ is equivalent to the set of distributions
+    $T-\dot{\psi}_{\theta_0}h$, where $\dot{\psi}_{\theta_0}h$ is a
+    fixed vector and $T$ is a statistic in limit experiment
+    $N(h,I_{\theta_0}^{-1})$, i.e.
+    $T=T(X)$ for $X\sim \calN(h,I_{\theta_0}^{-1})$.
+  \item
+    Therefore, if we can a statistic $T$ that's maximally concentrated
+    around $\dot{\psi}_{\theta_0}h$, we can characterize the best
+    achievable limit distribution for $T_n$
+\end{itemize}
+\end{rmk}
+
+
+\begin{cor}
+\emph{(Van Der Waart 8.8, Convolution Theorem)}
+If, in addition to the conditions of Theorem~\ref{vdw8.3}, the estimator
+sequence $T_n$ is regular, then
+\begin{enumerate}[label=(\roman*)]
+  \item By the definition of regularity and Theorem~\ref{vdw8.3},  we
+    have
+    \begin{align*}
+      \sqrt{n}
+      \left(
+      T_n
+      -
+      \psi\left(
+      \theta_0 + \frac{h}{\sqrt{n}}
+      \right)
+      \right)
+      \quad\underset{\theta_0+h/\sqrt{n}}{\dto}\quad
+      L_{\theta_0}
+      \sim
+      T - \dot{\psi}_{\theta_0} h
+      \qquad
+      \forall h
+    \end{align*}
+    where $T$ is a statistic in the normal experiment
+    $\{\calN(h,I_{\theta_0}^{-1})\}_{h\in\R^k}$.
+
+  \item Because $L_{\theta_0}$, the statistic $T$ is an
+    equivariant-in-law estimator or $\dot{\psi}_{\theta_0}h$.
+    This is why regular estimators are sometimes called asymptotically
+    equivariant-in-law.
+
+  \item
+    Therefore if we restrict to regular estimators, we restrict to
+    estimators that are matched by equivariant-in-law estimators of
+    $\dot{\psi}_{\theta_0}h$ in the normal limit experiment.
+    Therefore, we can invoke Proposition~\ref{decompequivariant} and
+    Theorem~\ref{normalopt} to say that.
+
+
+
+\end{enumerate}
+\end{cor}
+
+\begin{cor}
+If $\psi(\theta)=\theta$ so that we're trying to estimate the parameter
+itself,
+\end{cor}
+
+
+\begin{defn}(Regular Estimator)
+An estimator sequence $T_n$ is called \emph{regular} or
+\emph{asymptotically equivariant-in-law} at $\theta_0$ for
+estimating $\psi(\theta_0)$ if
+\begin{align*}
+  \sqrt{n}
+  \left(
+  T_n
+  -
+  \psi\left(
+  \theta_0 + \frac{h}{\sqrt{n}}
+  \right)
+  \right)
+  \quad\underset{\theta_0+h/\sqrt{n}}{\dto}\quad
+  L_{\theta_0}
+  \qquad
+  \forall h
+\end{align*}
+i.e. no dependence upon $h$.
+In words, $T_n$ will estimate $\theta_0$ for 
+\end{defn}
 
 
 
