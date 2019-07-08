@@ -1,0 +1,1370 @@
+\documentclass[12pt]{article}
+
+\author{Matthew D. Cocci}
+\title{Title}
+\date{\today}
+
+%% Formatting & Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % most detailed page formatting control
+\usepackage{fullpage} % Simpler than using the geometry package; std effect
+\usepackage{setspace}
+%\onehalfspacing
+\usepackage{microtype}
+
+%% Formatting %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[margin=1in]{geometry}
+    %   Adjust the margins with geometry package
+%\usepackage{pdflscape}
+    %   Allows landscape pages
+%\usepackage{layout}
+    %   Allows plotting of picture of formatting
+\usepackage{version}
+\excludeversion{solutions}
+%\includeversion{solutions}
+
+
+
+%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\lhead{}
+%\rhead{}
+%\chead{}
+%\setlength{\headheight}{15.2pt}
+    %   Make the header bigger to avoid overlap
+
+%\fancyhf{}
+    %   Erase header settings
+
+%\renewcommand{\headrulewidth}{0.3pt}
+    %   Width of the line
+
+%\setlength{\headsep}{0.2in}
+    %   Distance from line to text
+
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{rmk}{Remark}
+\newtheorem*{note}{Note}
+
+% Below supports left-right alignment in matrices so the negative
+% signs don't look bad
+\makeatletter
+\renewcommand*\env@matrix[1][c]{\hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols #1}}
+\makeatother
+
+
+%% Font Choices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+%\usepackage{blindtext}
+\usepackage{courier}
+
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+
+%% Hyperlinks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref}
+\hypersetup{%
+    colorlinks,
+        %   This colors the links themselves, not boxes
+    citecolor=black,
+        %   Everything here and below changes link colors
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+%% Colors %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{color}
+\definecolor{codegreen}{RGB}{28,172,0}
+\definecolor{codelilas}{RGB}{170,55,241}
+
+% David4 color scheme
+\definecolor{d4blue}{RGB}{100,191,255}
+\definecolor{d4gray}{RGB}{175,175,175}
+\definecolor{d4black}{RGB}{85,85,85}
+\definecolor{d4orange}{RGB}{255,150,100}
+
+%% Including Code %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{verbatim}
+    %   For including verbatim code from files, no colors
+\usepackage{listings}
+    %   For including code snippets written directly in this doc
+
+\lstdefinestyle{bash}{%
+  language=bash,%
+  basicstyle=\footnotesize\ttfamily,%
+  showstringspaces=false,%
+  commentstyle=\color{gray},%
+  keywordstyle=\color{blue},%
+  xleftmargin=0.25in,%
+  xrightmargin=0.25in
+}
+\lstdefinestyle{log}{%
+  basicstyle=\scriptsize\ttfamily,%
+  showstringspaces=false,%
+  xleftmargin=0.25in,%
+  xrightmargin=0.25in
+}
+
+
+\lstdefinestyle{matlab}{%
+  language=Matlab,%
+  basicstyle=\footnotesize\ttfamily,%
+  breaklines=true,%
+  morekeywords={matlab2tikz},%
+  keywordstyle=\color{blue},%
+  morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+  identifierstyle=\color{black},%
+  stringstyle=\color{codelilas},%
+  commentstyle=\color{codegreen},%
+  showstringspaces=false,%
+    %   Without this there will be a symbol in
+    %   the places where there is a space
+  %numbers=left,%
+  %numberstyle={\tiny \color{black}},%
+    %   Size of the numbers
+  numbersep=9pt,%
+    %   Defines how far the numbers are from the text
+  emph=[1]{for,end,break,switch,case},emphstyle=[1]\color{blue},%
+    %   Some words to emphasise
+}
+
+\newcommand{\matlabcode}[1]{%
+    \lstset{style=matlab}%
+    \lstinputlisting{#1}
+}
+    %   For including Matlab code from .m file with colors,
+    %   line numbering, etc.
+
+\lstdefinelanguage{Julia}%
+  {morekeywords={abstract,break,case,catch,const,continue,do,else,elseif,%
+      end,export,false,for,function,immutable,import,importall,if,in,%
+      macro,module,otherwise,quote,return,switch,true,try,type,typealias,%
+      using,while},%
+   sensitive=true,%
+   %alsoother={$},%
+   morecomment=[l]\#,%
+   morecomment=[n]{\#=}{=\#},%
+   morestring=[s]{"}{"},%
+   morestring=[m]{'}{'},%
+}[keywords,comments,strings]
+
+\lstdefinestyle{julia}{%
+    language         = Julia,
+    basicstyle       = \scriptsize\ttfamily,
+    keywordstyle     = \bfseries\color{blue},
+    stringstyle      = \color{codegreen},
+    commentstyle     = \color{codegreen},
+    showstringspaces = false,
+    literate         = %
+      {ρ}{{$\rho$}}1
+      {ℓ}{{$\ell$}}1
+      {∑}{{$\Sigma$}}1
+      {Σ}{{$\Sigma$}}1
+      {√}{{$\sqrt{}$}}1
+      {θ}{{$\theta$}}1
+      {ω}{{$\omega$}}1
+      {ɛ}{{$\varepsilon$}}1
+      {φ}{{$\varphi$}}1
+      {σ²}{{$\sigma^2$}}1
+      {Φ}{{$\Phi$}}1
+      {ϕ}{{$\phi$}}1
+      {Dₑ}{{$D_e$}}1
+      {Σ}{{$\Sigma$}}1
+      {γ}{{$\gamma$}}1
+      {δ}{{$\delta$}}1
+      {τ}{{$\tau$}}1
+      {μ}{{$\mu$}}1
+      {β}{{$\beta$}}1
+      {Λ}{{$\Lambda$}}1
+      {λ}{{$\lambda$}}1
+      {r̃}{{$\tilde{\text{r}}$}}1
+      {α}{{$\alpha$}}1
+      {σ}{{$\sigma$}}1
+      {π}{{$\pi$}}1
+      {∈}{{$\in$}}1
+      {∞}{{$\infty$}}1
+}
+
+
+%% Bibliographies %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{natbib}
+    %---For bibliographies
+%\setlength{\bibsep}{3pt} % Set how far apart bibentries are
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{enumitem}
+    %   Has to do with enumeration
+\usepackage{appendix}
+%\usepackage{natbib}
+    %   For bibliographies
+\usepackage{pdfpages}
+    %   For including whole pdf pages as a page in doc
+\usepackage{pgffor}
+    %   For easier looping
+
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\proj}{\operatorname{proj}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BODY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+%\maketitle
+\lstset{style=log}
+
+\section{SQL (Structured Query Language)}
+
+\subsection{Introduction}
+
+
+
+Data Modeling:
+Consists of the following steps.
+\begin{itemize}
+  \item Define \emph{entities}/\emph{concepts} that we want to capture
+    data about, e.g.  persons, employees, customers, producers, etc.
+    There will be a table associated with each entity/concept
+  \item Determine \emph{attributes} of each entity/concept.
+    These will be the columns in the table associated with each
+    entity/concept.
+  \item Determine \emph{relationships} between entities/concepts, e.g.
+    customers \emph{buy from} producers.
+  \item Determine \emph{cardinality}/\emph{multiplicity} of the
+    relationship: 1:1, 1:M, M:M
+\end{itemize}
+Data modeling is typically done with \emph{ER Diagrams}.
+The diagrams have a box for each entity, a line for each relationship,
+and specific notation for the cardinality.
+There are a few choices for that notation.
+\begin{itemize}
+  \item Chen Notation:
+    Use 1:M, M:N, 1:1 for one-to-many, many-to-many, and
+    one-to-one.
+  \item Crow's Foot Notation:
+    Train tracks and crow's foot to represent one and many.
+  \item UML Class Diagram Notation:
+    1.1 and 1.* to represent one and many.
+\end{itemize}
+The process of data modeling is an abstract task distinct from the
+question of how we might collect, store, and represent the data.
+We often store data in \emph{databases}, which are containers (file or
+set of files) to store organized data, a set of related information.
+Our database often consists of \emph{tables}, which are structured list
+of data or a specific type.
+They consist of of \emph{columns} (single fields in a table) and
+\emph{rows} (records in a table).
+
+Relational database model
+\begin{itemize}
+  \item This is one implementation for a given data model
+    that is specifically designed for querying.
+  \item Each entity has a table, attributes of an entity are stored in
+    columns.
+  \item Primary Key:
+    Column or set of columns whose values unique identify every row in a
+    table.
+    Lets us use these to join to another table.
+  \item Foreign Key:
+    One or more columns that can be used together to identify a single
+    row in another table.
+\end{itemize}
+NoSql (Not Only SQL)
+\begin{itemize}
+  \item Relational data model
+  \item Mechanism for storage and retrieval of unstructured
+    data model by means \emph{other than} tabular relations in
+    relational databases.
+\end{itemize}
+
+%Transactional database model:
+%Operational database.
+%Not specifically designed for querying
+
+
+\clearpage
+\subsection{Basic Syntax}
+\begin{itemize}
+  \item Terminate commands with semicolon
+
+  \item Comments:
+    \begin{lstlisting}
+    - - To comment out a single line
+
+    /*
+    To comment out
+    multiple lines
+    */
+    \end{lstlisting}
+
+  \item \texttt{NULL} is special entry.
+    Null values are distinct from just ``empty string.''
+    They really are ``nothing there.''
+
+\end{itemize}
+
+
+\subsection{Select Statements}
+
+Select statements are the core of SQL.
+They are how we retreive data.
+The most basic select statement retrieves specific columns from a table.
+\begin{lstlisting}
+SELECT col1,
+       col2
+FROM tableName;
+\end{lstlisting}
+Can use $*$ as wildcard to retrieve all columns in the table.
+\\
+\\
+At its most complex, we can augment the select statement with many
+modifiers that refine the select statement.
+\begin{lstlisting}
+- - Selects columns to be returned
+SELECT col1, col2
+
+- - Specifies table where columns are
+FROM tableName
+
+- - Row-level filter (prior to any grouping)
+WHERE
+
+- - Group specification if we have an aggregate function in select statement
+GROUP BY
+
+- - Group-level filter
+HAVING
+
+- - Output sort order
+ORDER BY
+\end{lstlisting}
+
+
+
+\clearpage
+\subsubsection{Row-wise Operations}
+
+For numeric data, can use simple math operations in select statement:
+\begin{lstlisting}
+SELECT col1,
+       col2,
+       col1 * col2 AS newName
+FROM tableName;
+\end{lstlisting}
+For string data, can use string functions in select statements
+\begin{itemize}
+  \item
+    Concatenate with \texttt{||}, which is like using + in Python for
+    strings.
+    \begin{lstlisting}
+    SELECT CompanyName,
+           ContactName,
+           Company Name || ',' || ContactName
+    FROM Customers;
+    \end{lstlisting}
+
+  \item
+    Trim with \texttt{TRIM}, \texttt{LTRIM}, \texttt{RTRIM}.
+    This removes leading or trailing whitespace.
+    \begin{lstlisting}
+    SELECT TRIM(CompanyName) AS TrimmedName
+    FROM Customers;
+    \end{lstlisting}
+
+  \item
+    Use \texttt{SUBSTR} return specified number of characters from a
+    particular position of a given string.
+    Arguments are string name, starting position in string, number of
+    characters to be returned.
+    \begin{lstlisting}
+    SELECT first_name, SUBSTR(first_name, 2, 3)
+    FROM employees;
+    \end{lstlisting}
+
+  \item
+    Use \texttt{UPPER}, \texttt{LOWER}, \texttt{UCASE} to change case.
+    \begin{lstlisting}
+    SELECT UPPER(column_name)
+    FROM table_name;
+    \end{lstlisting}
+\end{itemize}
+For strings that are specifically dates and/or times, there are
+additional date-time functions.
+\begin{itemize}
+  \item
+    Standard formats:
+    All are encoded as strings.
+    \begin{itemize}
+      \item \texttt{DATE}: YYYY-MM-DD
+      \item \texttt{DATETIME}: YYYY-MM-DD HH:MI:SS
+      \item \texttt{TIMESTAMP}: YYYY-MM-DD HH:MI:SS
+    \end{itemize}
+
+  \item
+    For converting birthdate to a year, month, day, time etc.:
+    \begin{lstlisting}
+    SELECT Birthdate,
+           STRFTIME('%Y', Birthdate) AS Year,
+           STRFTIME('%m', Birthdate) AS Month,
+           STRFTIME('%d', Birthdate) AS Day
+    FROM Employees
+    \end{lstlisting}
+    Compute current date and derivatives thereof
+    by using \texttt{'now'}.
+    \begin{lstlisting}
+    SELECT DATE('now')
+
+    SELECT STRFTIME('%Y %m %d', 'now')
+    \end{lstlisting}
+\end{itemize}
+Case Statements:
+Mimics if-then-else.
+Produce a new column where each record/row is built from an if
+statement based on the values in the other columns for that row.
+\begin{lstlisting}
+SELECT col1,
+       col2,
+       col3,
+       NewColName
+CASE col1
+  WHEN 'SomeVal1' THEN 'SetToWhen1'
+  WHEN 'SomeVal2' THEN 'SetToWhen2'
+  ELSE                 'SetToOther'
+END NewColName
+FROM TableName;
+\end{lstlisting}
+Alternatively
+\begin{lstlisting}
+SELECT col1,
+       col2,
+       col3,
+       NewColName
+CASE
+  WHEN col1='SomeVal1' THEN 'SetToWhen1'
+  WHEN col1='SomeVal2' THEN 'SetToWhen2'
+  ELSE                      'SetToOther'
+END NewColName
+FROM TableName;
+\end{lstlisting}
+Note, what comes after \texttt{THEN} doesn't always have to be a
+word or a number, can be a field from another column.
+
+
+
+\clearpage
+\subsubsection{Filtering with \texttt{WHERE}}
+
+Filtering reduces the amount of rows that are pulled according based
+on certain rules and logical conditions.
+We do so by adding a \texttt{WHERE} line to the select statement.
+\begin{lstlisting}
+SELECT col1,
+       col2
+FROM tableName
+WHERE logical-condition;
+\end{lstlisting}
+This pulls those rows for which the logical condition is satisfied.
+The logical condition can be built using any of the following
+approaches or keywords.
+\begin{itemize}
+  \item Comparisons:
+    The logical condition might be phrased
+    \begin{lstlisting}
+    colName someOperator someValue
+    \end{lstlisting}
+    Ooperators include:
+    \texttt{=},
+    \texttt{!=},
+    \texttt{>},
+    \texttt{<},
+    \texttt{BETWEEN} (beteween an inclusive range),
+    \texttt{IS NULL}.
+
+  \item \texttt{IN}:
+    Restrict to those rows where a given column is in some set.
+    \begin{lstlisting}
+    SELECT col1,
+            col2
+    FROM tableName
+    WHERE colName IN (val1, val2, val3);
+    \end{lstlisting}
+
+  \item \texttt{OR}:
+    Non-inclusive matching.
+    This is like \texttt{IN} but with precedence.
+    \begin{lstlisting}
+    SELECT col1,
+            col2
+    FROM tableName
+    WHERE colName = val1 OR val2;
+    \end{lstlisting}
+    If there are some rows matching \texttt{val1}, it will return
+    those rows and \emph{will not} retreive rows matching
+    \texttt{val2}.
+    If there are no rows matching \texttt{val1}, it will try to
+    match \texttt{val2} and return rows matching that.
+    So order matters; it specifies precedence.
+
+    Use parentheses when working with \texttt{AND} because of order
+    of operations.
+
+  \item \texttt{AND}:
+    Works like you think.
+    Use parentheses when used with \texttt{OR} to be safe.
+
+  \item \texttt{NOT}:
+    Place in front of condition to return rows not matching that
+    condition, e.g.
+    \begin{lstlisting}
+    SELECT col1,
+            col2
+    FROM tableName
+    WHERE NOT colName = val1;
+    \end{lstlisting}
+
+  \item
+    \texttt{LIKE}:
+    Allows use of wildcards for matching text data.
+    \begin{lstlisting}
+    SELECT col1,
+            col2
+    FROM tableName
+    WHERE colName LIKE '%partofstring';
+    \end{lstlisting}
+    Use \texttt{\%} anywhere in the string to match any number of
+    characters.
+    Use \texttt{\_} to match a single character.
+
+    NOTE: These are slower. Other operators are preferred.
+\end{itemize}
+
+
+
+\subsubsection{%
+  Grouping/Aggregating with \texttt{GROUP BY} and \texttt{HAVING}
+}
+
+\begin{itemize}
+  \item Aggregate Functions:
+    Built in functions used to summarize data.
+    Includes
+    \texttt{AVG()},
+    \texttt{COUNT()},
+    \texttt{MIN()},
+    \texttt{MAX()},
+    \texttt{SUM()}.
+    Not that \texttt{NULL} values are ignored.
+
+    We use a select statement with an \texttt{AS} to give the returned
+    column/info a name:
+    \begin{lstlisting}
+    SELECT AVG(col1) as newName
+    FROM tableName;
+    \end{lstlisting}
+    Note, can also use math expressions in place of a single column:
+    \begin{lstlisting}
+    SELECT AVG(col1*col2) as newName
+    FROM tableName;
+    \end{lstlisting}
+    Use \texttt{DISTINCT} if we just want to use distinct entries of a
+    column (non-duplicates).
+
+  \item Grouping:
+    \begin{lstlisting}
+    SELECT col1,
+           COUNT(col2) as newName
+    FROM tableName
+    GROUP BY col1;
+    \end{lstlisting}
+    \emph{Every} column in select statement must then be present in a
+    \texttt{GROUP BY} clause, except for those columns that are purely
+    arguments to aggregate functions (and so are, by definition,
+    aggregated by group).
+    So it's clear \texttt{GROUP BY} can contain multiple columns.
+
+  \item
+    Filtering after Grouping:
+    \texttt{WHERE} does not work for groups because it filters on rows
+    of the table (i.e. prior to group), not on grouped data (i.e. after
+    grouping).  Instead, use \texttt{HAVING} to filter the grouped data.
+    \begin{lstlisting}
+    SELECT CustomerID,
+           COUNT(*) as orders
+    FROM OrderTable
+    GROUP BY CustomerID
+    HAVING COUNT (*) >=2;
+    \end{lstlisting}
+    This groups by CustomerID, counts the number of orders, and retains
+    only those CustomerID with more than two orders.
+
+    Can use both \texttt{WHERE} and \texttt{HAVING} to filter before
+    grouping, and then filter after grouping.
+    Note: rows eliminated by the \texttt{WHERE} clause will not be
+    included in the group.
+
+\end{itemize}
+
+
+\subsubsection{Sorting with \texttt{ORDER BY}}
+
+Sort returned data by sorting on (potentially multiple) columns.
+We do so by adding lines to a select statement.
+It must always be the last clause in the select statement.
+Note that we can even sort on columns not selected for returning.
+\begin{lstlisting}
+SELECT col1,
+        col2
+FROM tableName
+ORDER BY colX, colY, colZ
+;
+\end{lstlisting}
+Can also add \texttt{ASC} or \texttt{DESC} before a particular
+column name to specify ascending or descending order for the sort.
+
+
+
+
+\clearpage
+\subsection{Joins and Unions}
+
+
+Joins retrieve data from multiple tables in one query.
+Doesn't store joined information or have a phsyical effect;
+join persists only for the duration of the query execution.
+
+\begin{table}[htbp!]
+\scriptsize
+\centering
+\begin{tabular}{|ccc|ccc|c|c|c|c|}
+  \hline
+  \multicolumn{3}{|c|}{Table 1}
+  &
+  \multicolumn{3}{|c|}{Table 2}
+  &
+  \multicolumn{4}{|c|}{Join Type}
+  \\
+  \hline
+  \texttt{id} & \texttt{x1} & $\cdots$ &
+  \texttt{id} & \texttt{y1} & $\cdots$
+  & Inner
+  & Left
+  & Right
+  & Outer
+  \\
+  \hline
+  1 & & &
+  1 & & &
+  $\checkmark$ & $\checkmark$
+  & $\checkmark$
+  & $\checkmark$
+  \\
+  2 & & &
+  2 & & &
+  $\checkmark$ & $\checkmark$
+  & $\checkmark$
+  & $\checkmark$
+  \\
+  3 & & &
+    & & &
+    & $\checkmark$ &
+  & $\checkmark$
+  \\
+  4 & & &
+    & & &
+    & $\checkmark$ &
+  & $\checkmark$
+  \\
+    & & &
+  5 & & &
+    & &
+    $\checkmark$
+  & $\checkmark$
+  \\
+    & & &
+  6 & & &
+    & &
+    $\checkmark$
+  & $\checkmark$
+  \\
+  \hline
+\end{tabular}
+\end{table}
+
+
+\subsubsection{Aliasing and Prequalifying}
+
+Instead of writing out the table names all the times, we can create
+aliases that we use elsewhere in the query.
+\begin{lstlisting}
+SELECT vendor_name,
+       product_name,
+       product_price
+FROM Vendors v, Products p
+WHERE v.vendor_id = p.vendor_id;
+\end{lstlisting}
+When performing joins, we will often ``qualify'' by
+prepending to a given column name either the full table name (e.g.
+\texttt{TableName.}) or that table's alias (e.g. \texttt{T1.}) if we
+defined an alias for that table.
+This is always allowed, and is good practice and/or necessary if two
+tables that we're merging have columns with the same name or if
+we're doing a self join.
+
+
+\subsubsection{Inner Join}
+
+Match on a key (unique identifier in both tables) and throw out any
+unmatched records/rows in either table; the key needs to be in both.
+We specify the columns we want from the two tables, the two tables
+to join, and the key that is used to establish a match.
+Only returns those records for which the key is found in \emph{both}
+tables.
+\begin{lstlisting}
+SELECT Suppliers.CompanyName,
+        ProductName,
+        UnitPrice
+FROM Suppliers INNER JOIN Products
+  ON Suppliers.supplierid = Products.supplierid;
+\end{lstlisting}
+
+
+\subsubsection{Left and Right Joins}
+
+Left Join:
+Returns \emph{all} records from left table and the matched records
+from the right table.
+The key only needs to be in the left table.
+Result is \texttt{NULL} if no match, rather
+than throwing out as for an inner join.
+\begin{lstlisting}
+SELECT C.CompanyName,
+        O.OrderID
+FROM Customers C LEFT JOIN Orders O
+  ON C.CustomerID = O.CustomerID;
+\end{lstlisting}
+Right Join: Similar to left join, just flipped.
+The key only needs to be in the right table.
+Given the abilitity to produce left joins, this type of join is
+redundant since we can always just switch the order of the tables in the
+join statement.
+
+\subsubsection{Full Outer Join}
+
+Return all records when there is a match in either the left
+\emph{or} the right table records. ``Give me everything.''
+The key only needs to be in one of the tables.
+\begin{lstlisting}
+SELECT Customers.CustomerName,
+       Orders.OrderID
+FROM Customers FULL OUTER JOIN Orders
+  ON Customers.CustomerID = Orders.CustomerID;
+\end{lstlisting}
+
+
+
+\subsubsection{Cartesian (Cross Joins)}
+
+Each row from first table joins with all the rows of another table.
+So if Table 1 has $N_1$ rows and Table 2 has $N_2$ rows, result will
+have $N_1\times N_2$ rows.
+Specify all columns that you want from either table, and use
+\texttt{CROSS JOIN} to list the two tables containing those columns.
+Doesn't match on anything; just weirdly mashes together the two
+datasets. Unclear  why you'd ever want to do this.
+\begin{lstlisting}
+SELECT product_name,
+       unit_price,
+       company_name
+FROM suppliers CROSS JOIN products;
+\end{lstlisting}
+
+
+\subsubsection{Self Joins}
+
+Join table to itself. Requires using aliases.
+\begin{lstlisting}
+SELECT A.CustomerName AS CustomerName1,
+       B.CustomerName AS CustomerName2,
+       A.City
+FROM Customers A, Customers B
+WHERE A.CustomerID = B.CustomerID
+  AND A.City = B.City
+ORDER BY A.City;
+\end{lstlisting}
+Alias the single table \texttt{Customers} by \texttt{A} and
+\texttt{B}, effectively treating as two separate tables.
+Not clear what this does or why you'd ever want to do this.
+
+
+\subsubsection{Unions}
+
+Combine the result-set of two or more select statements.
+Essentially just stack one on top of the other.
+Need to ensure the same number of columns and data types in each
+column.
+\begin{lstlisting}
+SELECT colnames
+FROM Table1
+
+UNION
+
+SELECT colnames
+FROM Table2;
+\end{lstlisting}
+
+
+\clearpage
+\subsection{Subqueries, i.e. Nesting Select Statements}
+
+Subqueries are queries embedded in other queries; no limit to amount of
+nesting.
+Allows merging and filtering of entries in one table using
+information in another table.
+Notion of ``query expansion'' where innermost query evaluated and
+work to outer query.
+\begin{lstlisting}
+SELECT customerID,
+        companyName,
+        Region
+FROM CustomerTable
+WHERE customerID IN (
+                      SELECT customerID
+                      FROM OrdersTable
+                      WHERE Freight > 100
+                    )
+;
+\end{lstlisting}
+Another example that does a ``calculated fill'' (calculates and
+fills).
+\begin{lstlisting}
+SELECT customer_name,
+        customer_state
+        (
+        SELECT COUNT (*) AS orders
+        FROM OrdersTable
+        WHERE OrdersTable.customer_id = CustomersTable.customer_id
+        ) AS orders
+FROM CustomersTable
+ORDER BY Customer_name
+;
+\end{lstlisting}
+From \texttt{OrdersTable}, count the number of entries with a
+\texttt{customer\_id} that is also in \texttt{CustomersTable};
+this counts the number of orders for each customer in
+\texttt{CustomersTable}.
+Save the column as \texttt{orders}.
+
+
+
+
+
+
+\clearpage
+\subsection{Creating Tables and Views}
+
+\begin{itemize}
+  \item
+    \texttt{CREATE TABLE}:
+    Specify the table name, the column names,
+    the data types, which column is a primary key, and
+    whether we allow null values.
+    \begin{lstlisting}
+    CREATE TABLE TableName
+    ( Id      char(10)        PRIMARY KEY,
+      Col1    char(250)       NOT NULL,
+      Col2    decimal(8,2)    NOT NULL,
+      Col3    Varchar(750)    NULL );
+    \end{lstlisting}
+
+  \item \texttt{DROP TABLE}:
+    Delete tables that are no longer needed
+    \begin{lstlisting}
+    DROP TABLE TableName;
+    \end{lstlisting}
+
+
+  \item
+    \texttt{INSERT INTO}:
+    To add a row/record into various columns of the table,
+    \begin{lstlisting}
+    INSERT INTO TableName
+    ( '143423',
+      'Matthew',
+      '3.14',
+      NULL );
+    \end{lstlisting}
+    Better is to specify specifically the columns that the data is
+    intended for:
+    \begin{lstlisting}
+    INSERT INTO TableName
+    ( Id,
+      Col1,
+      Col2,
+      Col3 )
+    VALUES
+    ( '143423',
+      'Matthew',
+      '3.14',
+      NULL );
+    \end{lstlisting}
+
+  \item
+    \texttt{UPDATE}:
+    Modify the rows in a table,
+    \begin{lstlisting}
+    UPDATE PhoneBook
+    ( phone,
+      firstname,
+      lastname,
+      address )
+    VALUES
+    ( '+1 610 582 7884',
+      'Matthew',
+      'Cocci',
+      '333 Maple Street' )
+    WHERE firstname = 'Matthew'
+      AND lastname  = 'Cocci';
+    \end{lstlisting}
+
+  \item \texttt{DELETE FROM}:
+    Delete the rows in a table,
+    \begin{lstlisting}
+    DELETE FROM PhoneBook
+    WHERE firstname = 'Matthew'
+      AND lastname  = 'Cocci';
+    \end{lstlisting}
+
+  \item
+    \texttt{CREATE TEMPORARY TABLE}:
+    Retrieve data and create a tempororary table (faster than creating a
+    regular table). It stays around for the duration of the client
+    session, and is then deleted.
+    \begin{lstlisting}
+    CREATE TEMPORARY TABLE NewTempTableName AS
+    (
+      select-statement
+    )
+    \end{lstlisting}
+
+  \item Views:
+    Essentially a stored query, but it will be removed after database
+    connection has ended. You're not actually reading or writing to
+    database; you're just simulating it.
+
+    Basic syntax:
+    \begin{lstlisting}
+    CREATE [TEMP] VIEW [IF NOT EXISTS] ViewName[column_name_list]
+    AS
+    select-statement;
+    \end{lstlisting}
+    \texttt{TEMP} is optional specification of whether a view is
+    temporary or not. \texttt{IF NOT EXISTS} is an optional
+    specification of what to do if the view doesn't exist.
+
+    After creating a view, we can use the view name as a table name in
+    select statements, and proceed as if the view really were a table.
+
+    To drop the view after we're done,
+    \begin{lstlisting}
+    DROP VIEW ViewName;
+    \end{lstlisting}
+
+\end{itemize}
+
+
+
+\subsection{Miscellaneous}
+
+\texttt{LIMIT}:
+To limit the amount of rows pulled to obtain a sample.
+\begin{lstlisting}
+SELECT col1,
+      col2
+FROM tableName
+LIMIT 5
+;
+\end{lstlisting}
+
+
+
+
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% SAMPLE CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    %% VIEW LAYOUT %%
+
+        \layout
+
+    %% LANDSCAPE PAGE %%
+
+        \begin{landscape}
+        \end{landscape}
+
+    %% BIBLIOGRAPHIES %%
+
+        \cite{LabelInSourcesFile}  %Use in text; cites
+        \citep{LabelInSourcesFile} %Use in text; cites in parens
+
+        \nocite{LabelInSourceFile} % Includes in refs w/o specific citation
+        \bibliographystyle{apalike}  % Or some other style
+
+        % To ditch the ``References'' header
+        \begingroup
+        \renewcommand{\section}[2]{}
+        \endgroup
+
+        \bibliography{sources} % where sources.bib has all the citation info
+
+    %% SPACING %%
+
+        \vspace{1in}
+        \hspace{1in}
+
+    %% URLS, EMAIL, AND LOCAL FILES %%
+
+      \url{url}
+      \href{url}{name}
+      \href{mailto:mcocci@raidenlovessusie.com}{name}
+      \href{run:/path/to/file.pdf}{name}
+
+
+    %% INCLUDING PDF PAGE %%
+
+        \includepdf{file.pdf}
+
+
+    %% INCLUDING CODE %%
+
+        %\verbatiminput{file.ext}
+            %   Includes verbatim text from the file
+
+        \texttt{text}
+            %   Renders text in courier, or code-like, font
+
+        \matlabcode{file.m}
+            %   Includes Matlab code with colors and line numbers
+
+        \lstset{style=bash}
+        \begin{lstlisting}
+        \end{lstlisting}
+            % Inline code rendering
+
+
+    %% INCLUDING FIGURES %%
+
+        % Basic Figure with size scaling
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[scale=1]{file.pdf}
+            \end{figure}
+
+        % Basic Figure with specific height
+            \begin{figure}[h!]
+               \centering
+               \includegraphics[height=5in, width=5in]{file.pdf}
+            \end{figure}
+
+        % Figure with cropping, where the order for trimming is  L, B, R, T
+            \begin{figure}
+               \centering
+               \includegraphics[trim={1cm, 1cm, 1cm, 1cm}, clip]{file.pdf}
+            \end{figure}
+
+        % Side by Side figures: Use the tabular environment
+
+
+
