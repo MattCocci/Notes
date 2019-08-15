@@ -564,6 +564,14 @@ so that $\lVert f\rVert$ is an upper bound for the range of $f$.
 \end{defn}
 
 
+\clearpage
+\section{Mathematical Preliminaries}
+
+\subsection{Inner Product Spaces}
+
+
+
+
 \chapter{Warmup with Finite Probability Spaces}
 
 \section{Definition}
@@ -6070,7 +6078,7 @@ Take $\varphi(x)=x^p$ and apply de la Vallee-Poisson.
 
 
 \clearpage
-\chapter{Probability Theory with Random Variables}
+\chapter{Random Variables and Stochastic Processes}
 
 In practice, probability works with real-numbers and probability
 distributions (CDFs, PDFs), not abstract $(\Omega,\sF,P)$.
@@ -6100,7 +6108,9 @@ while taking comfort that there's also this deep measure theoretic
 structure $(\Omega,\sF,P)$, $X$, and $P_X$ floating around in the
 background.
 
-\section{Expectation, Variance, and Covariance}
+\section{Foundation}
+
+\subsection{Expectation, Variance, and Covariance}
 \label{sec:exp}
 
 To motivate CDFs and distributions, we first define the fundamental
@@ -6190,7 +6200,7 @@ We prove each in turn:
 \end{proof}
 
 \clearpage
-\section{Cumulative Distribution Functions}
+\subsection{Cumulative Distribution Functions}
 \label{sec:cdf}
 
 %Next we take up the following problem: You have the measurable space
@@ -6456,7 +6466,7 @@ $(\R^n,\sB(\R)^{\otimes n})$ such that
 
 
 \clearpage
-\section{Distribution of a Random Variable}
+\subsection{Distribution of a Random Variable}
 \label{sec:dist}
 
 Having studied the connection between CDFs and probability measures on
@@ -6671,6 +6681,214 @@ background. In practice, we don't actually worry about it or work with
 it really. But it's there for rigor's sake to justify computations
 that we carry out with the CDF $F_X$.
 
+
+\clearpage
+\section{Conditional Expectation and Probability}
+
+\begin{defn}(Conditional Expectation)
+Let $(\Omega,\sF,P)$ be a probability space and $X\in L^1(\Omega,\sF,P)$
+with $\sG\subseteq\sF$ a sub-$\sigma$-algebra. Define the
+\emph{conditional expectation} $Y=\E[X|\sG]$ as a random variable such
+that
+\begin{align*}
+  \E[\one{A}Y] = \E[\one{A}X]
+  \qquad \forall A\in \sG
+\end{align*}
+If $Z$ is another random variable on $(\Omega,\sF,P)$, then we use the
+shorthand
+\begin{align*}
+  \E[X|Z]
+  \quad\iff\quad
+  \E[X|\sigma(Z)]
+\end{align*}
+with the former being the shorthand notation and the latter expression
+representing the most precise meaning (since the conditional
+expectation is only defined for a $\sigma$-algebra).
+\end{defn}
+
+\begin{prop}
+The conditional expectation \emph{exists} and is \emph{unique} up to
+$P$-a.e.\ equality for any $X\in L^1(\Omega,\sF,P)$.
+\end{prop}
+
+\begin{defn}(Conditional Probability)
+Given probability space $(\Omega,\sF,P)$, event $A\in\sF$, and
+sub-$\sigma$-algebra $\sG\subseteq\sF$, define
+\begin{align*}
+  P[A|\sG] := \E[\one{A}|\sG]
+\end{align*}
+\end{defn}
+
+\begin{prop}\emph{(Properties of the Conditional Expectation)}
+Let $(\Omega,\sF,P)$ be a probability space and
+$X,Y\in L^1(\Omega,\sF,P)$ with $\sG\subseteq\sF$ a
+sub-$\sigma$-algebra. Then
+\begin{enumerate}[label=(\roman*)]
+  \item If $X$ is $\sG$ measurable, then $\E[X|\sG]=X$.
+  \item Tower Property: For any sub-$\sigma$-algebra $\sH\subseteq\sG$,
+    we have
+    \begin{align*}
+      \E\big[
+        \,\E[X|\sG]\,
+        \big|
+        \sH
+      \big]
+      = \E[X|\sH]
+    \end{align*}
+
+  \item For $X$ independent of $\sG$, we have $\E[X|\sG]=\E[X]$.
+
+  \item $X \geq Y$ $P$-a.s. implies that $\E[X|\sG]\geq\E[Y|\sG]$
+    $P$-a.s.
+  \item Conditional Jensen: For a convex function $\varphi:\R\ra \R$ suh
+    such that $\varphi(X)\in L^1$, we have
+    \begin{align*}
+      \E[ \varphi(X) |\sG]
+      \geq \varphi\left(\E[X|\sG]\right)
+      \quad \text{a.s.}
+    \end{align*}
+    For a concave function, the inequality flips.
+
+  \item $\lVert X\rVert_p\geq \lVert\,\E[X|\sG]\,\rVert_p$ (conditional
+    expectation can only decrease in $p$-norm relative to the original
+    $X$).
+\end{enumerate}
+\end{prop}
+\begin{proof}
+We prove each in turn
+\begin{enumerate}[label=(\roman*)]
+  \item
+  \item
+  \item Here, we can apply conditional Jensen since $|\,\cdot\,|^p$ is
+    a convex function so that
+    \begin{align*}
+      \E[\lvert X\rvert^p\,|\,\sG]
+      &\geq
+      \big\lvert\,\E[X|\sG]\,\big\rvert^p
+    \end{align*}
+    Now take the uconditional expectation of each side:
+    \begin{align*}
+      \E\big[
+      \E[\lvert X\rvert^p\,|\,\sG]
+      \big]
+      &\geq
+      \E\big[
+      \lvert\,\E[X|\sG]\,\rvert^p
+      \big] \\
+      \iff\quad
+      \E\left[ \lvert X\rvert^p\right]
+      &\geq
+      \E\big[
+      \lvert\,\E[X|\sG]\,\rvert^p
+      \big]
+    \end{align*}
+    But then raise each side to the power $1/p$ and recongnize that
+    \begin{align*}
+      \E\left[ \lvert X\rvert^p\right]^{\frac{1}{p}}
+      &\geq
+      \E\big[
+      \lvert\,\E[X|\sG]\,\rvert^p
+      \big]^{\frac{1}{p}} \\
+      \iff\quad
+      \lVert X \rVert_p
+      &\geq
+      \lVert \, \E[X|\sG] \,\rVert_p
+    \end{align*}
+\end{enumerate}
+\end{proof}
+
+\begin{defn}
+Let $X$ be a $\bar{\R}$-valued random variable on $(\Omega,\sF,P)$ and
+let $\sG\subseteq \sF$ be a sub-$\sigma$-algebra. Then
+\begin{enumerate}[label=(\roman*)]
+  \item $\E[X^-]<\infty$, define
+    \begin{align*}
+      \E[X|\sG] = \limn \E[X\wedge n|\sG]
+    \end{align*}
+  \item $\E[X^+]<\infty$, define
+    \begin{align*}
+      \E[X|\sG] = \lim_{n\ra-\infty} \E[X\vee n|\sG]
+    \end{align*}
+\end{enumerate}
+\end{defn}
+
+
+\subsection{Markov Transition Dynamics}
+
+
+\begin{defn}(Transition Kernel)
+Let $(\Omega,\sF)$ and $(E,\sE)$ be measurable spaces. A mapping
+\begin{align*}
+  Q:\Omega\times \sE \ra \R_+ \cup\{\infty\}
+\end{align*}
+is a \emph{transition kernel} (or \emph{stochastic kernel}) from
+$(\Omega,\sF)$ into $(E,\sE)$ if
+\begin{enumerate}
+  \item For any fixed $\omega \in \Omega$, the set function
+    $Q(\omega, \cdot):(E,\sE)\ra\R_+\cup\{\infty\}$ defines a valid
+    measure on $(E,\sE)$
+
+    In words, ``I know where I am today---$\omega\in\Omega$. Where might
+    I go tomorrow? What is the distribution?'' Well, that distribution
+    is $Q(\omega,\cdot)$.
+
+  \item For any fixed measurable set $A\in\sE$, the function
+    $Q(\cdot,A)$ is $\sF$-measurable.
+
+    This is like ``I don't know where I am today---I could be anywhere
+    in $\Omega$. But suppose I think that I'll be in $A\in\sE$ tomorrow.
+    What measurable sets in $\sF$ for my position \emph{today} are
+    consistent with being in $A\in\sE$ \emph{tomorrow}?''
+\end{enumerate}
+\end{defn}
+
+\begin{ex}
+Let $Q:\Omega\times E\ra\R_+\cup\{\infty\}$ be a measurable function,
+and let $\mu$ be a measure on $(E,\sE)$. Then
+\begin{align*}
+  Q(\omega,A) = \int_A Q(\omega,x) \; d\mu(x)
+\end{align*}
+defines a transition kernel.
+\end{ex}
+
+\begin{defn}(Finite and Probability Transitional Kernels)
+Much like we had for probability measures, a kernel
+$Q:\Omega\times E\ra\R_+\cup\{\infty\}$ is said to be a
+\emph{finite transition kernel} if $Q(\omega,E)<\infty$ for all
+$\omega\in\Omega$. It is said to be a
+\emph{probability transition kernel} if  $Q(\omega,E)=1$ for all
+$\omega\in\Omega$.
+\end{defn}
+
+\begin{thm}
+Let $Q$ be a transition Kernel from $(\Omega,\sF)$ into $(E,\sE)$.
+Then
+\begin{enumerate}
+  \item For $\sE$-measurable function $f:(E,\sE)\ra\bar{\R}_+$,
+    then the following defines a $\sF$-measurable function
+    $Qf:(\Omega,\sF)\ra\bar{\R}_+$:
+    \begin{align*}
+      Qf(\omega) = \int_E f(e) \; Q(\omega,de)
+    \end{align*}
+
+  \item If $\mu$ is a measure on $(\Omega,\sF)$ than the following is a
+    measure on $(E,\sE)$.
+    \begin{align*}
+      \mu Q(A) = \int_\Omega Q(\omega,A) \;\mu(d\omega)
+      \qquad A\in\sE
+    \end{align*}
+
+  \item Let $\mu$ be a measure on $(\Omega,\sF)$ and $Q$ a transition
+    kernel from $(\Omega,\sF)$ into $(E,\sE)$. Then
+    the following defines a measure on $(\Omega,\sF\otimes \sE)$.
+    \begin{align*}
+      \nu(A\times B) = \int_A Q(\omega,B)\;\mu(d\omega)
+    \end{align*}
+\end{enumerate}
+\end{thm}
+
+
+
 \clearpage
 \section{Independence}
 \label{sec:independence}
@@ -6762,8 +6980,9 @@ $X_m := \max\{\min\{X,m\}, -m\}$.
 For each $m$, the statement should hold. Use Lebesgue's DCT.
 \end{proof}
 
+
 \clearpage
-\section{Borel-Cantelli}
+\subsection{Borel-Cantelli}
 
 \begin{defn}(Limsup and Liminf of Events)
 Given sequence of sets $\{A_n\}\ninf$, define the limsup and liminf of
@@ -6824,8 +7043,9 @@ space $(\Omega,\sF,P)$. Then we have two results:
 \end{itemize}
 \end{lem}
 
+
 \clearpage
-\section{Complex Random Variables}
+\section{Properties of Complex Random Variables}
 
 \begin{prop}
 Let $X\in\C^d$ be a $d$-dimensional complex random variable. Then
@@ -6932,6 +7152,10 @@ We prove each in turn:
 
 \end{enumerate}
 \end{proof}
+
+
+\clearpage
+\section{Moment Generating Function}
 
 
 \clearpage
@@ -7423,135 +7647,6 @@ Write out
 \end{proof}
 
 
-\clearpage
-\section{Conditional Expectation and Probability}
-
-\begin{defn}(Conditional Expectation)
-Let $(\Omega,\sF,P)$ be a probability space and $X\in L^1(\Omega,\sF,P)$
-with $\sG\subseteq\sF$ a sub-$\sigma$-algebra. Define the
-\emph{conditional expectation} $Y=\E[X|\sG]$ as a random variable such
-that
-\begin{align*}
-  \E[\one{A}Y] = \E[\one{A}X]
-  \qquad \forall A\in \sG
-\end{align*}
-If $Z$ is another random variable on $(\Omega,\sF,P)$, then we use the
-shorthand
-\begin{align*}
-  \E[X|Z]
-  \quad\iff\quad
-  \E[X|\sigma(Z)]
-\end{align*}
-with the former being the shorthand notation and the latter expression
-representing the most precise meaning (since the conditional
-expectation is only defined for a $\sigma$-algebra).
-\end{defn}
-
-\begin{prop}
-The conditional expectation \emph{exists} and is \emph{unique} up to
-$P$-a.e.\ equality for any $X\in L^1(\Omega,\sF,P)$.
-\end{prop}
-
-\begin{defn}(Conditional Probability)
-Given probability space $(\Omega,\sF,P)$, event $A\in\sF$, and
-sub-$\sigma$-algebra $\sG\subseteq\sF$, define
-\begin{align*}
-  P[A|\sG] := \E[\one{A}|\sG]
-\end{align*}
-\end{defn}
-
-\begin{prop}\emph{(Properties of the Conditional Expectation)}
-Let $(\Omega,\sF,P)$ be a probability space and
-$X,Y\in L^1(\Omega,\sF,P)$ with $\sG\subseteq\sF$ a
-sub-$\sigma$-algebra. Then
-\begin{enumerate}[label=(\roman*)]
-  \item If $X$ is $\sG$ measurable, then $\E[X|\sG]=X$.
-  \item Tower Property: For any sub-$\sigma$-algebra $\sH\subseteq\sG$,
-    we have
-    \begin{align*}
-      \E\big[
-        \,\E[X|\sG]\,
-        \big|
-        \sH
-      \big]
-      = \E[X|\sH]
-    \end{align*}
-
-  \item For $X$ independent of $\sG$, we have $\E[X|\sG]=\E[X]$.
-
-  \item $X \geq Y$ $P$-a.s. implies that $\E[X|\sG]\geq\E[Y|\sG]$
-    $P$-a.s.
-  \item Conditional Jensen: For a convex function $\varphi:\R\ra \R$ suh
-    such that $\varphi(X)\in L^1$, we have
-    \begin{align*}
-      \E[ \varphi(X) |\sG]
-      \geq \varphi\left(\E[X|\sG]\right)
-      \quad \text{a.s.}
-    \end{align*}
-    For a concave function, the inequality flips.
-
-  \item $\lVert X\rVert_p\geq \lVert\,\E[X|\sG]\,\rVert_p$ (conditional
-    expectation can only decrease in $p$-norm relative to the original
-    $X$).
-\end{enumerate}
-\end{prop}
-\begin{proof}
-We prove each in turn
-\begin{enumerate}[label=(\roman*)]
-  \item
-  \item
-  \item Here, we can apply conditional Jensen since $|\,\cdot\,|^p$ is
-    a convex function so that
-    \begin{align*}
-      \E[\lvert X\rvert^p\,|\,\sG]
-      &\geq
-      \big\lvert\,\E[X|\sG]\,\big\rvert^p
-    \end{align*}
-    Now take the uconditional expectation of each side:
-    \begin{align*}
-      \E\big[
-      \E[\lvert X\rvert^p\,|\,\sG]
-      \big]
-      &\geq
-      \E\big[
-      \lvert\,\E[X|\sG]\,\rvert^p
-      \big] \\
-      \iff\quad
-      \E\left[ \lvert X\rvert^p\right]
-      &\geq
-      \E\big[
-      \lvert\,\E[X|\sG]\,\rvert^p
-      \big]
-    \end{align*}
-    But then raise each side to the power $1/p$ and recongnize that
-    \begin{align*}
-      \E\left[ \lvert X\rvert^p\right]^{\frac{1}{p}}
-      &\geq
-      \E\big[
-      \lvert\,\E[X|\sG]\,\rvert^p
-      \big]^{\frac{1}{p}} \\
-      \iff\quad
-      \lVert X \rVert_p
-      &\geq
-      \lVert \, \E[X|\sG] \,\rVert_p
-    \end{align*}
-\end{enumerate}
-\end{proof}
-
-\begin{defn}
-Let $X$ be a $\bar{\R}$-valued random variable on $(\Omega,\sF,P)$ and
-let $\sG\subseteq \sF$ be a sub-$\sigma$-algebra. Then
-\begin{enumerate}[label=(\roman*)]
-  \item $\E[X^-]<\infty$, define
-    \begin{align*}
-      \E[X|\sG] = \limn \E[X\wedge n|\sG]
-    \end{align*}
-  \item $\E[X^+]<\infty$, define
-    \begin{align*}
-      \E[X|\sG] = \lim_{n\ra-\infty} \E[X\vee n|\sG]
-    \end{align*}
-\end{enumerate}
-\end{defn}
 
 
 \clearpage
@@ -7648,10 +7743,12 @@ out those dummy variables.
 \end{rmk}
 
 
-\clearpage
-\chapter{Particular RVs \& Stochastic Processes}
 
-\section{Point Mass}
+
+\clearpage
+\section{Particular RVs \& Stochastic Processes}
+
+\subsection{Point Mass}
 
 \begin{defn}(Point Mass)
 Suppose we have RV $X\in\R^d$ with $P[X=x]=1$ for some $x\in\R^d$.
@@ -7663,7 +7760,7 @@ Then its characteristic function is given by
 \end{defn}
 
 
-\section{Gamma, Exponential, Poisson}
+\subsection{Gamma, Exponential, Poisson}
 
 \begin{defn}(Gamma RV)
 The Gamma($\alpha,\beta$) RV is that which has density
@@ -7734,9 +7831,9 @@ $N_t\sim\operatorname{Poisson}(\lambda t)$.
 
 
 \clearpage
-\section{Normal or Gaussian}
+\subsection{Normal or Gaussian}
 
-\subsection{Univariate Normal/Gaussian Distribution}
+\subsubsection{Univariate Normal/Gaussian Distribution}
 
 \begin{defn}(Normal RV)
   \label{defn:stdnormal}
@@ -7832,7 +7929,7 @@ Lastly, write out definition of $\varphi_Y(u)$:
 \end{proof}
 
 \clearpage
-\subsection{Multivariate Normal}
+\subsubsection{Multivariate Normal}
 
 \begin{defn}(Multivariate Normal)
 \label{defn:mvn}
@@ -8108,7 +8205,7 @@ This will be used again and again to derive the results presented below.
 \end{rmk}
 
 \clearpage
-\subsection{Gaussian Processes, White Noise, Brownian Motion}
+\subsubsection{Gaussian Processes, White Noise, Brownian Motion}
 
 \begin{defn}
 \label{defn:psd}
@@ -8488,7 +8585,7 @@ We prove each in turn
 
 
 \clearpage
-\section{$\Chi^2$ Distribution}
+\subsection{$\Chi^2$ Distribution}
 
 
 \begin{defn}($\Chi^2$ Rv)
@@ -8624,7 +8721,7 @@ $k$. Then $Z'MZ\sim \Chi^2_k$.
 \end{proof}
 
 \clearpage
-\section{Student's $t$- and F-Distribution and}
+\subsection{Student's $t$- and F-Distribution and}
 
 \begin{defn}($t$-Distribution)
 Let $Z\sim \calN(0,1)$ and $Y\sim \Chi^2_n$ be independent random
@@ -8818,7 +8915,7 @@ Then $Y\sim F_{a,b}$.
 
 
 \clearpage
-\section{Beta Distribution}
+\subsection{Beta Distribution}
 
 One particularly useful random variable is the Beta Distribution, which
 model proportions relatively well, as it only takes values between
@@ -8870,9 +8967,622 @@ Equation \ref{int1} and makes the substitution
 
 
 \clearpage
-\chapter{Martingale Theory}
+\section{Inequalities}
 
-\section{Basics}
+
+\subsection{Probability Bounds}
+
+\href{http://www.stat.cmu.edu/~larry/=stat705/Lecture2.pdf}{Reference}
+
+The crowning theorem of this section is Hoeffding's inequality, which
+bounds the deviation of an average of bounded RVs from their mean by an
+amount that decays exponentially with $n$.
+Hence, we approach the mean with high probability very quickly as
+$n$ gets large.
+
+\begin{thm}\emph{(Gaussian Tail Inequality)}
+For $Z\sim \calN(0,1)$ and any $t>0$
+\begin{align*}
+  P\left[
+    |Z|>t
+  \right]
+  \leq
+  \frac{2e^{-\frac{t^2}{2}}}{t}
+\end{align*}
+Consequently, for $Z_1,\ldots,Z_n\iid\calN(0,1)$,
+\begin{align*}
+  P\left[
+    |\bar{Z}_n|>t
+  \right]
+  \leq
+  \frac{2e^{-\frac{nt^2}{2}}}{\sqrt{n}t}
+  \underset{\text{\emph{(large $n$)}}}
+  \leq
+  e^{-\frac{nt^2}{2}}
+\end{align*}
+\end{thm}
+\begin{rmk}
+This tells us what tail probabilities look like for Gaussian RVs and
+averages.
+They decay very quickly (at an exponential rate) as $t\ra\infty$.
+\end{rmk}
+\begin{proof}
+Start with $P[X>\varepsilon]$ definition in terms of pdf, multiply and
+divide inside integral by $s$, get inequality by replacing denominator
+by $t$, use $s\phi(s)=-\phi'(s)$, compute.
+Then apply symmetry.
+\end{proof}
+
+
+
+\begin{thm}\emph{(Markov's Inequality)}
+Let $X$ be a non-negative RV and suppose $\E[X]$ exists.
+\begin{align*}
+  P\left[
+    X>t
+  \right]
+  \leq
+  \frac{\E[X]}{t}
+\end{align*}
+\end{thm}
+\begin{rmk}
+Gives a bound on a tail probability for a positive RV given the mean
+only.
+Very weak since only decreases at rate $1/t$ as $t$ gets bigger (unlike
+exponential rate for Gaussian RVs), but useful as a stepping stone for
+proving other stronger inequalities.
+\end{rmk}
+\begin{proof}
+%\begin{align*}
+  %\E[X]
+  %=
+  %\int_0^\infty
+  %xp_X(x)\;dx
+  %=
+  %\int_0^t
+  %xp_X(x)\;dx
+  %+
+  %\int_t^\infty
+  %xp_X(x)\;dx
+  %\leq
+%\end{align*}
+Break up expectation into below $t$ and above $t$, drop below $t$, get
+inequality from above $t$, rearrange.
+\end{proof}
+
+
+\begin{cor}\emph{(Chebyshev's Inequality)}
+Suppose $\mu=\E[X]$ and $\sigma^2=\Var(X)$.
+Then
+\begin{align*}
+  P\left[
+    |X-\mu|
+    \geq
+    t
+  \right]
+  &=
+  \frac{\sigma^2}{t^2}
+  \\
+  P\left[
+    |Z|\geq k
+  \right]
+  &\leq
+  \frac{1}{k^2}
+\end{align*}
+\end{cor}
+\begin{rmk}
+Markov uses only the first moment. Chebyshev uses the second moment too
+and thus gets a stronger result, rate $1/t^2$ versus $1/t$ in Markov.
+Deviation of an RV from it's mean is on the order of the standard
+deviation.
+Probability that more than $k$ standard deviations from the mean is
+$1/k^2$.
+\end{rmk}
+\begin{proof}
+Note $P[|X-\mu|\geq t]=P[|X-\mu|^2\geq t^2]$ and then use Markov.
+\end{proof}
+
+
+\begin{lem}
+\emph{(Chernoff's Method)}
+Let $X$ be a RV, not necessarily bounded.
+Let arbitrary $t>0$.
+Then
+\begin{align*}
+  P[X>\varepsilon]
+  \leq
+  \inf_{t\geq 0}
+  e^{-t\varepsilon}
+  \underbrace{%
+    \E[e^{tX}]
+  }_{\text{MGF of $X$}}
+\end{align*}
+\end{lem}
+\begin{rmk}
+Chernoff's Method consists of two parts.
+First raising to a power preserves inqualities.
+Second, introducing an extra parameter $t$ called a ``variational
+parameter'' gives us some extra flexibility and we can choose $t$ later
+or optimize over $t$.
+This is often useful even even though we're only interested in
+properties of $X$ and $t$ is, in a sense, a nuisance parameter.
+\end{rmk}
+\begin{proof}
+$P[X>\varepsilon]=P[e^{tX}>e^{t\varepsilon}]$, then Markov.
+Get bound for all $t>0$, take infimum.
+\end{proof}
+
+
+\begin{lem}
+\emph{(Bounding the MGF)}
+Suppose $X\in[a,b]$ with $\mu=\E[X]$.
+Then
+\begin{align*}
+  \E[e^{tX}]
+  \leq
+  e^{t\mu}
+  e^{\frac{t^2(b-a)^2}{8}}
+\end{align*}
+\end{lem}
+\begin{rmk}
+Given bounded RV with a known mean, this bounds the MGF of that RV.
+Note that we have from Jensen
+$\E[e^{tX}]\geq e^{t\E[X]}$.
+So this lets us string together
+\begin{align*}
+  e^{t\E[X]} \leq \E[e^{tX}]
+  \leq
+  e^{t\mu}
+  e^{\frac{t^2(b-a)^2}{8}}
+\end{align*}
+This puts a cap on the difference.
+\end{rmk}
+\begin{proof}
+Relies on convexity and boundedness.
+Very non-obvious.
+\end{proof}
+
+
+\begin{thm}\emph{(Hoeffding's Inequality)}
+Let $Y_1,\ldots,Y_n$ be iid observations s.t. $\mu=\E[Y_i]$ and
+$Y_i\in [a,b]$.
+Then for any $t>0$,
+\begin{align*}
+  P\left[
+    |\bar{Y}_n-\mu|
+    \geq
+    t
+  \right]
+  \leq
+  2e^{-\frac{2nt^2}{(b-a)^2}}
+\end{align*}
+\end{thm}
+\begin{rmk}
+Hoeffding's inequality is an attempt to get something similar to the
+Gaussian tail inequality for averages, but without assuming Gaussianity.
+Notice the exponential decay, which is very common and the same rate as
+in the Gaussian tail inequality.
+It's also similar to Markov and Chebyshev's inequality but sharper
+because we restricted to bounded RVs and deal with an average.
+\end{rmk}
+\begin{proof}
+Use the lemmas, and minimize over $t$.
+\end{proof}
+
+
+\begin{cor}
+Let $Y_1,\ldots,Y_n$ be independent observations
+with common mean $\mu$ and $P[X_i\in[a,b]]=1$.
+Then with probability at least $1-\delta$,
+\begin{align*}
+  |\bar{Y}_n-\mu|
+  \leq
+  \sqrt{%
+    \frac{(b-a)^2}{2n}
+    \log\left(
+    \frac{2}{\delta}
+    \right)
+  }
+\end{align*}
+\end{cor}
+\begin{rmk}
+Relative to Hoeffding, we don't assume iid, just independent with common
+mean.
+We also don't assume bounded in $[a,b]$ for all realizations, just with
+probability 1.
+\end{rmk}
+\begin{proof}
+Idea: Because bounded RV, all moments exist, hence MGF exists.
+Then get universal bound on MGF.
+\end{proof}
+
+
+
+\begin{thm}
+\emph{(McDiarmid's Bounded Difference Inequality)}
+Suppose $X_1,\ldots,X_n$ independent RVs.
+Suppose also that the function $g(\,\cdot\,)$ for $i=1,\ldots,n$
+satisfies
+\begin{align*}
+  \sup_{x_1,\ldots,x_n,x_i'}
+  \big|
+  g(x_1,\ldots,x_{i-1},x_i,x_{i+1},\ldots,x_n)
+  -
+  g(x_1,\ldots,x_{i-1},x_i',x_{i+1},\ldots,x_n)
+  \big|
+  \leq
+  c_i
+\end{align*}
+Then
+\begin{align*}
+  P\left[
+    g(X_1,\ldots,X_n)
+    -
+    \E[g(X_1,\ldots,X_n)]
+    \geq
+    t
+  \right]
+  \leq
+  \exp\left\{
+    -\frac{2t^2}{\sumin c_i^2}
+  \right\}
+\end{align*}
+\end{thm}
+\begin{rmk}
+The average (the concern of Hoeffding) is a particular function of the
+RVs.
+This theorem generalizes Hoeffding's bound for averages to a bound on
+more general functions.
+Those functions just need to be sufficient smooth in the sense that one
+observation can't influence the function too much.
+We had this by design for averages.
+If we have this for a general function, we can also establish a
+Hoeffding type bound, as this theorem states.
+\end{rmk}
+\begin{proof}
+Similar to Hoeffding proof.
+Want to bound MGF.
+Just need to be clever and define some new RVs, work with them.
+\end{proof}
+
+
+\begin{ex}
+Empirical CDF at each point in the domain is an average of binomial RVs.
+So then at each point, since average of Bernoullis, can apply Hoeffding.
+\end{ex}
+
+
+\subsection{Uniform Probability Bounds}
+
+\href{http://www.stat.cmu.edu/~larry/=stat705/Lecture3.pdf}{Reference}
+
+We want to bound the sup over a whole function, i.e. for some class of
+sets $\calA$, we want to bound
+\begin{align*}
+  P\left[
+    \sup_{A\in \calA}
+    |P_n(A)-P(A)|
+    >\varepsilon
+  \right]
+  \leq
+  c_1\kappa(\calA)e^{-c_2n\varepsilon^2}
+\end{align*}
+where $X_i\sim P$ and
+\begin{align*}
+  P(A)
+  &=
+  P[X\in A]
+  \\
+  P_n(A)
+  &=
+  \frac{1}{n}
+  \sumin
+  \mathbf{1}\{X_i\in A\}
+\end{align*}
+Let $\calA$ be a class of sets in the sample space, i.e.
+$\calA=\{A\subseteq \Omega\}$.
+Let $F=\{x_1,\ldots,x_n\}$ be an arbitrary finite set of elements in
+$\Omega$.
+Then the class $\calA$ \emph{picks out} $G\subseteq F$ if, for some
+$A\in \calA$, we can write $G=F\cap A$.
+Define $S(\calA,F)$ as the number of subsets picked out by $\calA$.
+You might not be able to get \emph{every} subset of $F$ because $\calA$
+is, in some sense, a restriction on the subsets of $F$ we're allowed to
+extract since we have to extract by intersection with an element of
+$\calA$ which is, in general, a proper subset of the power set of
+$\Omega$.
+
+\begin{ex}
+$\Omega=\R^2$, $\calA$ is the set of discs in $\R^2$, $F$ is some set of
+points in $\R^2$ and $G=F\cap A$ for some disc $A$ in $\R^2$.
+\end{ex}
+
+
+\begin{defn}
+$F=\{x_1,\ldots,x_n\}\subseteq \Omega$ is \emph{shattered} if
+$s(\calA,F)=2^n$.
+\end{defn}
+
+
+\begin{defn}(Shatter Coefficient)
+Let $\calF_n$ be the set of all size-$n$ (finite) subsets of $\Omega$.
+Then the \emph{shatter coeffient} is
+\begin{align*}
+  s_n(\calA)
+  &=
+  \sup_{F\in\calF_n}
+  s(\calA,F)
+  \leq
+  2^n
+\end{align*}
+Note that this will only depend upon $n$ and the family $\calA$.
+\end{defn}
+
+
+\begin{thm}\emph{(Vapnik and Chervonenis)}
+Let $\calA$ be a class of sets.
+Then
+\begin{align*}
+  P\left[
+    \sup_{A\in \calA}
+    |P_n(A)-P(A)|
+    >
+    \varepsilon
+  \right]
+  \leq
+  8s_n(A)e^{-\frac{n\varepsilon^2}{32}}
+\end{align*}
+\end{thm}
+\begin{rmk}
+Think of this as an extension of Hoeffding.
+\end{rmk}
+
+\begin{defn}(VC Dimension)
+Often, the shattering coefficient $s_n(\calA)=2^n$ for $n$ small but
+then, there exists a $d$ such that $n>d$ implies
+$s_n(\calA)<2^n$.
+That $d(\calA)$, the largest integer $n$ such that $s_n(\calA)=2^n$, is
+called the \emph{VC}-dimension (after Vapnik and Chervonenis).
+It is the largest $n$ that can be shattered.
+Note, it could be infinite if it is always shattered for all $n$.
+
+It serves as a measure of complexity.
+High VC dimension implies greater complexity.
+\end{defn}
+
+
+\begin{ex}
+Family $\calA=\{[a,b]\subset \R\}$ has VC dimension 2.
+For $n=3$, consider arbitrary three element set $F=(x_1,x_2,x_3)$ with
+distinct elements.
+We cannot pick out every two-element subset of $F$ with only intervals,
+because there will always be a point in the middle and so we can't grab
+the two points on either end.
+
+Can look them up.
+\end{ex}
+
+
+\begin{thm}\emph{(Sauer's Theorem)}
+Suppose $\calA$ has finite VC dimension $d=d(\calA)<\infty$.
+Then for all $n\geq d$,
+\begin{align*}
+  s_n(\calA) \leq (n+1)^d
+\end{align*}
+In words, the shattering coefficient goes from increasing exponentially
+like $2^n$ up to $d$, then to increasing at a polynomial rate.
+There is a phase transition.
+\end{thm}
+
+
+\begin{thm}\emph{(VC Inequality)}
+Let $\calA$ be a class of sets with VC dimension $d<\infty$.
+Then
+\begin{align*}
+  P\left[
+    \sup_{A\in \calA}
+    |P_n(A)-P(A)|
+    >
+    \varepsilon
+  \right]
+  \leq
+  8
+  (n+1)^d
+  e^{-\frac{n\varepsilon^2}{32}}
+\end{align*}
+This is huge because the exponential decay will dominate the polynomial
+term.
+\end{thm}
+\begin{rmk}
+For families $\calA$ with finite VC dimension, we have this uniform
+extension of Hoeffding.
+And we can look up the VC dimension for many classes $\calA$.
+\end{rmk}
+
+
+\begin{cor}
+Suppose $X_1,\ldots,X_n\sim F$ and we construct the empirical CDF
+\begin{align*}
+  F_n(t)=\frac{1}{n}\sumin \mathbf{1}\{X_i\leq t\}
+\end{align*}
+Because $F_n(t)=P_n[(-\infty,t)]$ and $\calA=\{(-\infty,t]\,:\,t\in\R\}$
+has VC dimension $d=1$,
+\begin{align*}
+  P\left[
+    \sup_{t}
+    |F_n(t)-F(t)|
+    >
+    \varepsilon
+  \right]
+  =
+  P\left[
+    \sup_{A\in \calA}
+    |P_n(A)-P(A)|
+    >
+    \varepsilon
+  \right]
+  \leq
+  8
+  (n+1)
+  e^{-\frac{n\varepsilon^2}{32}}
+\end{align*}
+\end{cor}
+
+\begin{thm}\emph{(DKW Bound)}
+For an even tighter bound, there is the Dvoretsky-Kiefer-Wolfowitz bound
+\begin{align*}
+  P\left[
+    \sup_{t}
+    |F_n(t)-F(t)|
+    >
+    \varepsilon
+  \right]
+  \leq
+  2
+  e^{-2n\varepsilon^2}
+\end{align*}
+\end{thm}
+
+
+\subsection{Bounding Expectations}
+
+
+\begin{thm}\emph{(Cauchy-Schwarz)}
+If $X$ and $Y$ have finite variances, then
+\begin{align*}
+  \E[|XY|]
+  \leq
+  \sqrt{\E[X^2]}
+  \cdot
+  \sqrt{\E[Y^2]}
+\end{align*}
+\end{thm}
+
+
+\begin{thm}\emph{(Jensen's Inequality)}
+\begin{itemize}
+  \item For $g$ convex, $\E[g(X)]\geq g(\E[X])$
+  \item For $g$ concave, $\E[g(X)]\leq g(\E[X])$
+\end{itemize}
+\end{thm}
+\begin{proof}
+For any convex function, there's a tangent line that lies entirely below
+any point.
+That gives us an inquality, and the linearity makes compute expectations
+easy.
+\end{proof}
+
+
+\begin{defn}(Kullback-Leibler Divergence between Densities)
+Define
+\begin{align*}
+  D(p,q)
+  =
+  \int
+  p(x)
+  \log\left(
+  \frac{p(x)}{q(x)}
+  \right)
+  \;dx
+\end{align*}
+\end{defn}
+
+\begin{lem}
+KL divergence is nonnegative.
+\end{lem}
+\begin{proof}
+Treat as expectation, apply Jensen.
+\end{proof}
+
+
+\begin{lem}
+\emph{(Exp. Prob bound Implies bound on Expectation)}
+Suppose nonnegative $X_n$ satisfies an exponential tail probability bound
+\begin{align*}
+  P[X_n > \varepsilon]
+  \leq
+  c_1 e^{-c_2n \varepsilon^2}
+\end{align*}
+for $c_2>0$ and $c_1>1/e$.
+Then
+\begin{align*}
+  \E[X_n]
+  \leq
+  \sqrt{%
+  \frac{%
+    (1+\log(c_1))/c_2
+  }{%
+    n
+  }
+  }
+\end{align*}
+\end{lem}
+\begin{proof}
+Work on bounding $\E[X_n^2]$ by splitting up the integral
+into above and below $a=\log(c_1)/(nc_2)$, use probability bound on tail
+to bound expectation of $\E[X_n^2]$, then use Jensen to get bound on
+$\E[X_n]$.
+\end{proof}
+
+
+\begin{thm}
+Suppose we iid RVs $X_1,\ldots,X_n$ with bounded MGF (which could come
+from normality or the fact that the RVs are themselves bounded or have
+thin tails, hence all moments exist and MGF bounded by earlier result)
+\begin{align*}
+  \E[e^{tX_i}]\leq
+  e^{t^2\sigma^2/2}
+\end{align*}
+for all $t>0$ and some $\sigma>0$.
+Then
+\begin{align*}
+  \E\big[
+    \max_{i\in\{1,\ldots,n\}}
+    X_i
+  \big]
+  \leq
+  \sigma \sqrt{2\log n}
+\end{align*}
+\end{thm}
+\begin{rmk}
+Often we're concerned with the max of some collection of RVs.
+It would be nice if we could bound them.
+Without any assumptions, it seems like the max might grow with $n$.
+But with a little more assumptions, namely thin tails, the above
+inequality got a better rate.
+This makes a lot of things work.
+\end{rmk}
+\begin{proof}
+By Jensen, because the exponential is convex
+\begin{align*}
+  \E\left[
+  \exp\left\{
+  t
+    \max_{i\in\{1,\ldots,n\}}
+    X_i
+  \right\}
+  \right]
+  \geq
+  \exp\left\{
+  t
+  \E\bigg[
+    \max_{i\in\{1,\ldots,n\}}
+    X_i
+  \bigg]
+  \right\}
+\end{align*}
+Expectation of max is less than expectation of sum of all observations.
+Then minimize over $t$ to get sharpest bound.
+\end{proof}
+
+
+
+\clearpage
+\chapter{Stochastic Processes}
+
+\section{Martingale Theory}
+
+\subsection{Basics}
 \begin{defn}(Stochastic Process)
 A \emph{stochastic process} on probability space $(\Omega,\sF,P)$ is a
 family of random variables $\{X_\alpha\}_{\alpha\in J}$, where $J$ is an
@@ -9006,7 +9716,7 @@ $(V\circ X)\tinfz$ is a submartingale with decomposition
 
 
 \clearpage
-\section{Stopping Times}
+\subsection{Stopping Times}
 
 \begin{defn}(Stopping Time)
 A \emph{stopping time} $\tau$ with respect to filtration
@@ -9117,8 +9827,9 @@ If you set $\sigma=0$, the constant function, and take expectations, you
 get $\E[X_\tau]=\E[X_0]$ as we had in the previous proposition.
 \end{prop}
 
+
 \clearpage
-\section{Martingale Convergence Theorems}
+\subsection{Martingale Convergence Theorems}
 
 \begin{defn}(Upcrossings)
 Let $\{X_t\}\tinfz$ be a stochastic process. Fix numbers $a<b$. Then
@@ -9210,82 +9921,17 @@ Denote
 Then $X_n\asto X_\infty$ and $X_n\Lqto{1} X\infty$.
 \end{cor}
 
-\clearpage
-\chapter{Markov Transition Dynamics}
 
-\section{Transition Kernels and Conditional Probability}
 
-\begin{defn}(Transition Kernel)
-Let $(\Omega,\sF)$ and $(E,\sE)$ be measurable spaces. A mapping
-\begin{align*}
-  Q:\Omega\times \sE \ra \R_+ \cup\{\infty\}
-\end{align*}
-is a \emph{transition kernel} (or \emph{stochastic kernel}) from
-$(\Omega,\sF)$ into $(E,\sE)$ if
-\begin{enumerate}
-  \item For any fixed $\omega \in \Omega$, the set function
-    $Q(\omega, \cdot):(E,\sE)\ra\R_+\cup\{\infty\}$ defines a valid
-    measure on $(E,\sE)$
 
-    In words, ``I know where I am today---$\omega\in\Omega$. Where might
-    I go tomorrow? What is the distribution?'' Well, that distribution
-    is $Q(\omega,\cdot)$.
 
-  \item For any fixed measurable set $A\in\sE$, the function
-    $Q(\cdot,A)$ is $\sF$-measurable.
 
-    This is like ``I don't know where I am today---I could be anywhere
-    in $\Omega$. But suppose I think that I'll be in $A\in\sE$ tomorrow.
-    What measurable sets in $\sF$ for my position \emph{today} are
-    consistent with being in $A\in\sE$ \emph{tomorrow}?''
-\end{enumerate}
-\end{defn}
 
-\begin{ex}
-Let $Q:\Omega\times E\ra\R_+\cup\{\infty\}$ be a measurable function,
-and let $\mu$ be a measure on $(E,\sE)$. Then
-\begin{align*}
-  Q(\omega,A) = \int_A Q(\omega,x) \; d\mu(x)
-\end{align*}
-defines a transition kernel.
-\end{ex}
 
-\begin{defn}(Finite and Probability Transitional Kernels)
-Much like we had for probability measures, a kernel
-$Q:\Omega\times E\ra\R_+\cup\{\infty\}$ is said to be a
-\emph{finite transition kernel} if $Q(\omega,E)<\infty$ for all
-$\omega\in\Omega$. It is said to be a
-\emph{probability transition kernel} if  $Q(\omega,E)=1$ for all
-$\omega\in\Omega$.
-\end{defn}
 
-\begin{thm}
-Let $Q$ be a transition Kernel from $(\Omega,\sF)$ into $(E,\sE)$.
-Then
-\begin{enumerate}
-  \item For $\sE$-measurable function $f:(E,\sE)\ra\bar{\R}_+$,
-    then the following defines a $\sF$-measurable function
-    $Qf:(\Omega,\sF)\ra\bar{\R}_+$:
-    \begin{align*}
-      Qf(\omega) = \int_E f(e) \; Q(\omega,de)
-    \end{align*}
 
-  \item If $\mu$ is a measure on $(\Omega,\sF)$ than the following is a
-    measure on $(E,\sE)$.
-    \begin{align*}
-      \mu Q(A) = \int_\Omega Q(\omega,A) \;\mu(d\omega)
-      \qquad A\in\sE
-    \end{align*}
 
-  \item Let $\mu$ be a measure on $(\Omega,\sF)$ and $Q$ a transition
-    kernel from $(\Omega,\sF)$ into $(E,\sE)$. Then
-    the following defines a measure on $(\Omega,\sF\otimes \sE)$.
-    \begin{align*}
-      \nu(A\times B) = \int_A Q(\omega,B)\;\mu(d\omega)
-    \end{align*}
-\end{enumerate}
-\end{thm}
-
+\begin{comment}
 \section{Markov Chains}
 
 Some of assumptions to make things more tractable:
@@ -9816,6 +10462,10 @@ So $T^k_i$ is the time until the $k$th transition to state $i$.
 %that run from $[x_i, x_{i+1}]$.  So if we say that $y_t$
 %is in state $i$, we really mean that $y_t$ is in that bucket.
 %There are, of course, $n-1$ equal width buckets.
+
+\end{comment}
+
+
 
 
 \clearpage
@@ -33802,6 +34452,11 @@ $\tilde{B}$, has fewer sources of noise than state variables.
 
 
 \end{document}
+
+
+
+
+
 
 
 
