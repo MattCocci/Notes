@@ -501,12 +501,347 @@
 %\maketitle
 \lstset{style=log}
 
+\tableofcontents
 
-\section{Unix File Structure}
+\clearpage
+\section{Computer Architecture}
 
-There is the root directory \texttt{/} with a single root user who can
-edit everything under this directory.
+\subsection{Overview}
 
+
+Von Neumann or Princeton Architecture:
+Abstract model of a computer that consists of
+\begin{itemize}
+  \item Central Processing Unit
+    \begin{itemize}
+      \item Arithmetic Logic Unit (ALU): Performs simple operations like
+        plus, minus, times, division, and logical operations.
+      \item Control Unit: Coordinates the operation and sequence of data
+        movements between the other parts of the Architecture.
+    \end{itemize}
+  \item Memory:
+    Stores data and programs.
+  \item Input \& Output
+\end{itemize}
+
+
+\subsection{CPU}
+
+CPU \& Cores:
+Each CPU is a collection of processor cores (usually physical).
+
+A single node/server/computer often has multiple CPUs, which we refer to
+as sockets.
+
+
+\clearpage
+\subsection{Memory}
+
+Memory \& Memory Representation
+\begin{itemize}
+  \item Operating system manages memory.
+    It's one of its roles
+  \item Hardware involved in storing information.
+  \item Two flavors of memory.
+    \begin{itemize}
+      \item Random Access Memory (RAM):
+        Temporary memory, quick and easy to acess, used to execute
+        programs. Also called volatile memory.
+      \item Lasting memory, e.g. hard drives.
+        Non-volatile memory storage.
+    \end{itemize}
+  \item RAM
+    \begin{itemize}
+      \item Represent as a sequence of binary memory cells, bits.
+      \item Groupings of several bits together is a word, which is the
+        fundamental unit of data that can be moved between
+        RAM and the processor.
+        Typical sizes are 8, 16, 32, and 64 bit.
+      \item Grouping of bits into words allows for addressing of memory.
+      \item Each word has an address, which is the location of the word
+        in the computer's memory.
+      \item By working with addresses, we can have low-level access to
+        the computer by allowing direct access to the memory.
+        We know where things are.
+      \item One can literally move through the computer's memory from
+        word to word.
+      \item Memory is composed of bits that are organized into words.
+    \end{itemize}
+  \item Hexadecimal uses $0-9$ to represent the first ten digits, then
+    adds on $A,B,C,D,E,F$ for 10, 11, 12, 13, 14, 15.
+  \item One byte is eight bits.
+    A byte has $2^8=2^4\times 2^4 = 16\times 16$ possible
+    configurations/values.
+    Two hexadecimal numbers can encode
+    $16\times 16$ values.
+    Therefore, each value/configuration for a byte can be mapped into a
+    two-digit hexadecimal number.
+  \item The stack is the pile of variables in memory, one after the
+    other.
+    As we create variables, we ``stack'' them on top of each other in
+    memory, i.e. place them next to each other in memory.
+\end{itemize}
+
+
+\clearpage
+\subsection{Input/Output}
+
+Want to discuss input/output abstractions for delivering to or receiving
+output from programs.
+These abstractions let us focus on complying/interfacing with the
+system, without having to worry about how the system ultimately
+represents, outputs, gathers, etc. the text.
+
+Linux Standard Streams
+\begin{itemize}
+  \item A stream is something that can transfer data, including (and
+    especially) text.
+  \item Whenver a command is executed, three standard streams are
+    created:
+    \texttt{stdin},
+    \texttt{stdout},
+    \texttt{stderr}
+
+  \item Standard Input Stream:
+    An abstraction for an infinite input sequence or a file containing
+    infinite text.
+    Takes text input and has the capacity to transfer that information
+    to programs for execution.
+
+    Reading from the standard input stream involves consuming and
+    processing the text there.
+    Note that the collection of pieces of text separated by
+    whitespace are referred to as \emph{tokens}.
+
+  \item Standard Output Stream:
+    An abstraction for an infinite output sequence or a file containing
+    infinite text.
+    Has the capacity to transfer output from programs elsewehere, like
+    other programs via pips or the terminal (where it is sent by
+    default).
+
+  \item Pipes connected standard output of one program to standard input
+    of another.
+
+  \item
+    Java and other programming languages also have standard drawing and
+    audio, much like standard input and ouptut.
+\end{itemize}
+Shells and Terminals
+\begin{itemize}
+  \item Shell
+    \begin{itemize}
+      \item A user interface for interacting with an operating system (via
+        text commands which must conform to a certain standard/syntax) and
+        carrying out low-level machine commands.
+      \item Can use either a CLI (command line interface) or GUI (graphical
+        user interface).
+      \item It is the outermost layer around OS kernel.
+      \item Windows computers use DOS shell prompts to interact with the
+        system. Unix computers use BASH prompts.
+    \end{itemize}
+
+  \item Terminal
+    \begin{itemize}
+      \item An abstraction for providing input to and getting output from a
+        program.
+      \item More speficially, a terminal is a stream of text that sends
+        input and output to two basic ``pipes,'' \texttt{stdin} and
+        \texttt{stdout}.
+      \item Terminals run shells, which is how the commands are carried
+        out.
+      \item
+        The model/sequence is as follows.
+        Type a text command, the terminal sends that text input to
+        \texttt{stdin}.
+        The shell its running transfers the data in \texttt{stdin} to
+        given program which then executes low-level machine commands
+        (like ``do these things'', ``run this program'', ``read this
+        file'', etc.).
+        After completion, the program sends data to the \texttt{stdout}
+        stream, which by default, is directed to the terminal which then
+        displays text.
+        It's a way of working with files that are often nothing more than a
+        stream of text.
+      \item Hence terminals generally display \texttt{stdout} whenever
+        you run a command.
+    \end{itemize}
+
+  \item Command line input:
+    An abstraction for providing arguments (strings) to a program.
+\end{itemize}
+Redirection and Pipes
+\begin{itemize}
+
+  \item \texttt{>} and \texttt{>>}: Lets you redirect \texttt{stdout}
+    (i.e. the text therein) that's produced by a program to any file.
+    The former overwrites, the latter appends.
+
+    Note that we can discard output entirely by sending output to the
+    null device as follows:
+    \lstset{style=bash}
+    \begin{lstlisting}
+    cmd > /dev/null 2>&1
+    \end{lstlisting}
+    where 2 is an alias for \texttt{stderr} and 1 for \texttt{stdout}.
+
+  \item \texttt{<}: Redirects input from file into a program.
+    Not used a lot since many commands take file arguments already.
+
+  \item
+    \texttt{cmd1 | cmd2}:	Pipes standard output from \texttt{cmd1} to
+    standard input of \texttt{cmd2}.
+\end{itemize}
+
+
+\clearpage
+\subsection{High-Performance Computing Clusters}
+
+A cluster is a group of inter-connected computers that work together to
+perform computationally-intensive tasks.
+Each computer is a node, so a cluster is a collection of nodes.
+
+Head Node(s)
+\begin{itemize}
+  \item Server(s) that connects a cluster to an outside network (like
+    the internet or a company's internal network).
+  \item Handles login, script editing, code compilation, job submission.
+  \item Generally don't want to run stuff here.
+\end{itemize}
+Compute Node
+\begin{itemize}
+\item Server used for computing, sometimes managed by a scheduler.
+\item Compute nodes always contain RAM and one or more CPUs (usually
+  two), each with multiple processor cores, on which computation may
+  take place.
+\item CPU (only) nodes stop there
+\item GPU nodes are nodes/servers that, in addition, have GPUs for
+  carrying out computation.
+\end{itemize}
+Schedulers help divide up the resources of a cluster and handle
+submission of jobs to the compute nodes.
+
+Server (host) address is what we use to identify the server we want to
+connect to using ssh
+
+
+\clearpage
+\subsection{Parallel Computing}
+
+\href{https://princetonuniversity.github.io/PUbootcamp/sessions/parallel-programming/Intro_PP_bootcamp_2018.pdf}{Resource here}.
+In contrast to serialization (execution of all computations one after
+the other), can parallelize.
+\\
+\\
+MPI (Message Passing Interface)
+\begin{itemize}
+  \item A standardized interface (like BASH)
+  \item
+    Can run many copies of the same program/task across many nodes (and
+    cores) in a cluster, and MPI will pass messages to coordinate.
+    Distributed memory.
+  \item Multiple implementations:
+    OpenMPI, MPICH, proprietary Intel implemntations, etc.
+  \item Structure of a program
+    \begin{lstlisting}
+    #!include <mpi.h> // Include header file
+
+    // Start of program
+    int main (int argc, char argv*[])
+    {
+
+    // Non-interacting code
+    ..
+
+    // Initialize MPI
+    // Must be called in every MPI program as first call
+    MPI_Init(&argc, &argv);
+
+    // Parallel code
+    ..
+
+    // End MPI environment
+    MPI_Finalize();
+
+    // More non-interacting code
+    ..
+
+    // End of program
+    return 0;
+    }
+
+    \end{lstlisting}
+\end{itemize}
+OpenMP (Open Multi-Processing)
+\begin{itemize}
+  \item Run multiple threads on a single node, with each thread using
+    one core. Shared memory.
+  \item Not at all related to MPI
+  \item Each program starts with a single process that has its own
+    private memory space and can create one or more threads which share
+    the memory of the parent process.
+  \item Structure of a program
+    \begin{lstlisting}
+    #!include <omp.h> // Include header file
+
+    // Start of program
+    int main (int argc, char argv*[])
+    {
+
+    // Non-parallel code
+    ..
+
+    // Indicate that next code block should be executed in parallel
+    #pragma omp parallel
+    {
+      ...
+    }
+
+    // Non-parallel code
+    ..
+
+    // End of program
+    return 0;
+    }
+
+    \end{lstlisting}
+
+  \item This is what Matlab parallelization uses under the hood
+\end{itemize}
+Define
+\begin{align*}
+  \text{(Parallel Efficiency)}
+  =
+  \frac{%
+    \text{(Serial Execution Time)}
+  }{%
+    \text{(Parallel Execution Time per Task)}
+    \times
+    \text{(Number of Tasks)}
+  }
+\end{align*}
+
+
+
+
+
+\clearpage
+\section{UNIX Operating System}
+
+\subsection{Unix File System}
+
+Everything in Unix is essentially a file, and there are two types of
+files:
+\begin{itemize}
+  \item Text: For human use/consumption
+  \item Binary: For computer use/consumption
+\end{itemize}
+
+\subsection{Directory Structure}
+
+Files are organized into a heirarchy under the the root directory
+\texttt{/}, owned/managed by a single root user who can edit everything
+under this directory.
 Under this root directory, we have
 \begin{itemize}
   \item \texttt{/bin}: \emph{Essential} binary executables.
@@ -604,14 +939,99 @@ Under this root directory, we have
 \end{itemize}
 
 
+\clearpage
+\subsection{\texttt{chmod}}
+
+The syntax is roughly
+\begin{lstlisting}
+  chmod <ugo><+-><rwx> path/to/file.txt
+\end{lstlisting}
+Note
+\begin{itemize}
+  \item \texttt{u} is user, \texttt{g} is group, \texttt{o} is other.
+  \item \texttt{+} or \texttt{-} add/remove permissions
+  \item \texttt{r} is read, \texttt{w} is write, and \texttt{x} is
+    write
+\end{itemize}
 
 
 \clearpage
-\section{Installation and Package Management}
+\subsection{BASH}
 
-\subsection{From Source}
+ By default, Linux uses the BASH shell.
 
-Steps
+
+\subsubsection{Environment}
+
+An environment is essentially just the collection of \emph{settings} for
+your particular session.
+For example, when executing commands in a terminal running BASH, these
+settings help tell the shell how to interpret and execute commands
+(e.g.\ what compiler to run, where to look for programs and packages,
+etc.).
+
+It is represented by \emph{environment variables}, which encode those
+settings for a particular shell session.
+\begin{itemize}
+  \item \texttt{\$HOME}:
+    Reserved variable for the home directory;
+    \texttt{~} gets expanded to this.
+  \item \texttt{\$PS1}: Appearance of the command prompt string
+  \item \texttt{\$PATH}:
+    Variable that evaluates to a list of directory names separated by
+    colons and specifying the directories in which the shell looks for
+    commands.
+
+    Can add to this path via
+    \lstset{style=bash}
+    \begin{lstlisting}
+    export PATH=/new/dir/:$PATH
+    \end{lstlisting}
+    Whenever you type a command, the shell looks in those dirs, in
+    order, to determine what executable to run.
+    The command
+    \texttt{which <command>}
+    tells you the precise path of the executable that is being used, if
+    there are multiple (e.g. multiple Python installations).
+
+    Be careful always to \emph{append} or \emph{prepend} when modifying
+    \texttt{\$PATH}. Don't reset entirely.
+\end{itemize}
+
+
+
+
+\clearpage
+\subsection{Utilities}
+
+Utilities are programs or tools that do things.
+We invoke them in Unix via the command line interface, typing commands
+into the terminal, which are then interpreted by the shell and prompt
+the computer to do a thing.
+
+This section will therefore detail those tools/utilities and the text
+commands that invoke/control them.
+
+\subsubsection{\texttt{rsync}}
+
+A powerful utility for transferring many files with the potential to
+resume a broken connect
+
+\subsubsection{\texttt{sed}}
+
+Stream editor that takes a stream of text pulled from a file or
+\texttt{stdout} via a pipe.
+
+
+\subsubsection{\texttt{grep}}
+
+Take a regular expression and return any line in the file that matches
+the expression.
+
+
+\subsubsection{Installation and Package Management}
+
+\paragraph{From Source}
 \begin{itemize}
   \item Download files, usually a zip or tarball. Extract.
 
@@ -647,8 +1067,8 @@ Steps
 \end{itemize}
 
 
-\subsection{APT, DPGK, and Package Management}
-
+\clearpage
+\paragraph{APT, DPGK, and Package Management}
 APT (Advanced Packaging Tool).
 This is a more-user friendly wrapper of Debian's package manager DPGK.
 Comprehensive reference
@@ -868,6 +1288,284 @@ add-apt-repository [repository name]
 \end{itemize}
 
 
+\clearpage
+\subsubsection{Slurm Scheduler}
+
+Scheduling software for high performance computing clusters.
+To run, you need
+\begin{itemize}
+  \item A job to run (python script, R script, Matlab job, compiled
+    executable)
+  \item
+    A SLURM script (often suffixed \texttt{.cmd}, \texttt{.slurm} or
+    \texttt{.sh} by convention but not necessarily)
+\end{itemize}
+Serial jobs use only a single processor, while parallel jobs use more
+than one processor.
+
+\paragraph{Command Line Commands}
+Commands:
+\lstset{style=bash}
+\begin{lstlisting}
+sbatch <slurm_script>         # Submit a job (e.g., sbatch job.slurm)
+squeue                        # Show jobs in the queue
+squeue -u <NetID>             # Show jobs in the queue for a specific user (e.g.,
+squeue -u <NetID> --start     # Report the expected start time for pending jobs
+squeue -j <JobID>             # Show the nodes allocated to a running job
+scancel <JobID>               # Cancel a job (e.g., scancel 2534640)
+scontrol show <JobID>         # See detailed info about a job
+snodes                        # Show properties of the nodes on a cluster
+                              # (e.g., maximum memory)
+sinfo                         # Show how nodes are being used
+sshare/sprio                  # Show the priority assigned to jobs
+smap/sview                    # Graphical display of the queues
+slurmtop                      # Text-based view of cluster nodes
+scontrol show config          # View default parameter settings
+
+sacct -o MaxVMSizeNode,ReqMem -j <JobID>    # View details about finished jobs.
+                                            # Use sacct -e to view list options.
+
+
+# See all jobs with associated priorities
+squeue -o "%.18i %Q %.9q %.8j %.8u %.10a %.2t %.10M %.10L %.6C %R" | more
+
+\end{lstlisting}
+
+
+
+\paragraph{Scripts}
+More or less Bash scripts (using the scripting syntax built into Bash)
+with some extra parameters to help out slurm.
+\lstset{style=bash}
+\begin{lstlisting}
+#!/bin/bash
+#SBATCH --job-name=slurm-test    # create a short name for your job
+#SBATCH --nodes=1                # node count, how many to claim (>1 for multinode jobs)
+                                # If >1, executable must be coded explicitly
+                                # to use MPI
+#SBATCH --ntasks=1               # total no. of tasks across all nodes; 1 per core by default
+                                # Total cores used = nodes * ntasks
+#SBATCH --cpus-per-task=1        # cpu-cores per task (>1 for multicore jobs)
+                                 # If >1, executable must be coded explicitly
+                                 # to use multi-threading (e.g. to use OpenMP)
+#SBATCH --mem-per-cpu=4G         # memory per cpu-core (4G is default)
+#SBATCH --time=00:01:00          # total run time limit (DAYS-HH:MM:SS)
+#SBATCH --mail-type=begin        # send email when job begins
+#SBATCH --mail-type=end          # send email when job ends
+#SBATCH --mail-user=<YourNetID>@princeton.edu
+
+echo 'Hello world!'
+\end{lstlisting}
+Note
+\begin{itemize}
+  \item Make sure your slurm script loads any dependencies or path
+    changes (i.e.\ you need python3, so \texttt{module load anaconda3}).
+
+    Do not put the module load modulename command in your shell's
+    startup script (e.g., \texttt{.bashrc}) as it can lead to difficult
+    to diagnose problems.  Instead, use the module command in your Slurm
+    submission scripts and the module will be loaded when the job is
+    run.
+  \item Make sure you call your executable with its full path or cd to
+    the appropriate directory.
+\end{itemize}
+
+
+\paragraph{Output}
+As a slurm job runs, unless you redirect output, a file named
+\texttt{slurm-jobid.out} will be produced in your home directory.
+It contains the output your program would have written to a terminal, if
+run interactively.
+
+Local scratch (i.e., /tmp) refers to the local disk physically attached
+to each compute node on a cluster. This is the fastest storage available
+to a job while it's running, so it's good to write there while a job is
+working, and then copy the output from that node to another location
+upon completion of the computations, before the job ends, e.g.
+\begin{lstlisting}
+#!/bin/bash
+#SBATCH -N 1
+#SBATCH -c 16
+#SBATCH -t 1:00:00
+
+export ScratchDir=``/tmp/myjob''
+mkdir -p $ScratchDir
+./a.out $ScratchDir
+
+cp -r $ScratchDir /tigress/your_netid/
+\end{lstlisting}
+
+
+\paragraph{Iteractive Testing}
+For interactive testing on compute nodes, can use \texttt{salloc}, which
+takes the same modifiers as follow the \texttt{\#SBATCH} in your SLURM
+script. But it instead sends you in an interactive shell to the compute
+node once the allocation is granted.
+Example
+\begin{lstlisting}
+salloc --nodes=1 --ntasks=1 --time 00:20:00
+\end{lstlisting}
+This asks for an allocation of 1 node, 1 task, and 20 minutes. Once it's
+granted you'll be in a shell where you can run processes directly that
+will be killed after the time elapses.
+
+
+\paragraph{Easy Parallelization via Array Jobs}
+You can write your executable to take as input an argument corresponding
+to some index of an array of parameter values, after which the program
+executes using that parameter value.
+SLURM can be used to execute the program in parallel for each value in
+the array.
+
+
+
+\clearpage
+\subsubsection{Modules}
+
+
+Your environment is configured in a certain way with particular values
+of the environment variables, corresponding to certain settings and
+defaults and dependencies.
+The \texttt{module} utility is useful for times when we want to
+change/configure our environment in a way that makes it easier to use a
+particular software package.
+\begin{itemize}
+  \item \texttt{module avail}:
+    Lists all of the available modules that you can optionally load into
+    your environment.
+  \item \texttt{module load anaconda3}:
+      Loads the module anaconda and configures your local environment.
+
+      Then if you install new Python packages or upgrade old ones, when
+      you reload the anaconda module, these updates and new packages
+      will be there in your local environment.
+
+  \item \texttt{module show <module-name>}:
+      Will show you the steps/commands that are executed to set the
+      environment, i.e. the sequence of environment variable changes or
+      additions.
+
+  \item \texttt{module list}:
+    List out which modules are loaded.
+
+  \item \texttt{module unload <modulename>}:
+    Unload a module
+\end{itemize}
+Do not put the module load modulename command in your shell's startup
+script (e.g., \texttt{.bashrc}) as it can lead to difficult to diagnose
+problems.  Instead, use the module command in your Slurm submission
+scripts and the module will be loaded when the job is run.
+
+
+
+
+\clearpage
+\subsection{Quick List of Useful Commands}
+
+
+\begin{lstlisting}
+    Quick List of Useful Commands and Utilities
+    -------------------------------------------
+    which <command>         # show path of command (e.g., which gcc)
+    env                     # list all environment variables/settings
+    echo $USER              # print contents of shell variable USER
+    ehco $PATH              # print contests of shell variable PATH
+    history                 # Print list list of recent commands (in .bash_history)
+
+
+    # Server Commands
+    hostname                  # get the name of the machine you are on
+    whoami                    # get username of the account
+    date                      # get the current date and time
+    pwd                       # print working directory
+    cat /etc/os-release       # info about operating system
+    lscpu                     # info about the CPUs on head node
+    who                       # list users on the head node
+
+    # Princeton Server Commands
+    snodes                    # info about the compute nodes (7 nodes for myadroit)
+    squeue                    # which jobs are running or waiting to run
+    qos                       # quality of servce (job partitions and limits)
+    slurmtop                  # shows a map of cluster usage
+    checkquota                # view your quota and request more space
+\end{lstlisting}
+
+
+
+\clearpage
+\appendix
+\section{Princeton Clusters}
+
+\begin{lstlisting}
+Nobel
+- Good for interactive work
+- Two nodes, Davisson and Compton
+- No separation into head/login node and compute node
+
+Adroit
+- HPC that's useful for bigger job
+- Batch submission
+
+Perseus, Tiger, Della, Traverse:
+- HPC research clusters with many nodes
+- GPFS networked storage between clusters
+
+
+
+File System for Tiger Cluster. Same as Perseus, Tiger, Della, Traverse
+----------------------------------------------------------------------
+/home/mcocci      Store source code, executables, and backed-up files.
+/scratch/gpfs     Job output & intermediate files here, "volatile files"
+/tigress/mcocci   Insanely large file system for storing final results
+                  (non-volatile files). Connected to all clusters.
+                  Backed up. But slow to get data here, so don't ever
+                  write here directly.
+
+Note that all of these directories are kept on separate disks.
+
+Note that each compute node also has a /scratch directory.
+
+All servers and storage are linked by Omni-Path high speed network.
+
+
+
+File System for Adroit Cluster
+------------------------------
+/home/mcocci      Store source code, executables, and backed-up files.
+/scratch/network  Job output & intermediate files here, "volatile files"
+
+
+
+
+Modules
+-------
+By default, the Princeton server loads old Python when you run
+\texttt{python}.
+To get the newer Anaconda Python implementation, load the modeule
+
+  module load anaconda3
+  conda list
+
+with the last commmand listing all available packages.
+
+
+
+To install packages to a given module,
+
+  module load anaconda3
+  pip install --user <package>
+
+which installs to ~/.local/lib/python<version>/site-packages
+
+
+
+
+
+\end{lstlisting}
+
+
+
+\end{document}
 
 
 
