@@ -1587,1462 +1587,10 @@ Computation
 
 
 
-\clearpage
-\section{Nonparametric Estimation}
 
-%Estimate CDF as a step function, and density from that step function
 
-\subsection{Kernel Density Estimation}
 
-\begin{defn}(Univariate Second Order Kernel)
-A univariate \emph{second order kernel} $K(u)$ is a real-valued
-weighting function $K:\R\ra\R_+$ satisfying:
-\begin{enumerate}[label=(\roman*)]
-  \item (\emph{Density}): $K(u)\geq 0$ and
-    $1=\int_\R K(u)\;du$
-  \item (\emph{Symmetric}): $K(u)=K(-u)$ for all $u\in\R$
-  \item (\emph{Finite Variance}): To calculate second moments from
-    the kernel density estimate, need
-    \begin{align*}
-      \int u^2 K(u)\;du =: k_2 \in (0,\infty)
-    \end{align*}
-\end{enumerate}
-\end{defn}
 
-\begin{defn}(Kernel Density Estimator)
-Suppose we have an iid sample $\{X_n\}\nN$ where each observation has
-density $p(x)$.
-The \emph{kernel density estimator} $\hat{p}(x)$ of density $p$ at point
-$x$ in the support (using kernel $K$ and bandwith $h$) is given by
-\begin{align}
-  \hat{p}(x)
-  =
-  \frac{1}{N}
-  \sumnN
-  \frac{1}{h}
-  K\left(
-  \frac{x-X_n}{h}
-  \right)
-  \label{kernel}
-\end{align}
-Note this estimator is an \emph{average} of iid
-$\frac{1}{h} K\left( \frac{x-X_n}{h} \right)$ terms, which will be
-useful for deriving the mean and variance of this estimator since
-the mean of $\hat{p}(x)$ will be the mean of any individual term, while
-the variance will be $1/N$ times the variance of any individual term.
-\end{defn}
-
-\begin{prop}\emph{(Mean and Variance of Kernel Density Estimator)}
-Suppose we have an iid sample $X_n$ with density function $p(x)$, which
-permits a second order Taylor Expansion so that we can write
-\begin{align}
-  p(x+hu)
-  =
-  p(x)
-  + p'(x) hu
-  + \frac{1}{2}p''(x)h^2u^2
-  + O(h^3)
-  \label{kerneltaylor1}
-\end{align}
-Then the kernel density estimator $\hat{p}(x)$ of density $p$ at point
-$x$ has mean and variance
-\begin{alignat}{3}
-  \E[\hat{p}(x)]
-  &=
-  p(x)
-  +
-  \frac{1}{2}
-  h^2
-  p''(x)
-  \int
-  u^2
-  K(u)
-  \;du
-  + O(h^3)
-  &&=
-  p(x) + O(h^2)
-  \label{kernelmean}
-  \\
-  \Var(\hat{p}(x))
-  &=
-  \frac{1}{Nh}
-  p(x)
-  \int
-  K(u)^2
-  \,
-  du
-  + O(N^{-1})
-  &&=
-  O((Nh)^{-1})
-  \label{kernelvar}
-\end{alignat}
-\end{prop}
-\begin{rmk}
-First notice that $\hat{p}(x)$ is a \emph{biased} estimator of $p(x)$
-with the bias of size $h^2$.
-Second notice that the variance of the estimator goes to zero at rate
-$Nh$ (which we can think of as the ``effective sample size'') rather
-than the usual rate $N$.
-Third notice the bias-variance tradeoff.
-Taking $h\ra 0$ decreases bias in Expression~\ref{kernelmean} but
-blows up the variance in Expression~\ref{kernelvar}.
-To make $\hat{p}(x)$ a consistent estimator, we need to think about
-sending $h\ra 0$ at some appropriate rate as $N$ grows so that both the
-bias and the variance shrink to zero as $N\ra\infty$.
-\end{rmk}
-
-\clearpage
-\begin{proof}
-(\emph{Mean})
-Because the estimator $\hat{p}(x)$ in Definition~\ref{kernel} is an
-average of iid terms, its mean is the mean of any individual term, as
-remarked:
-\begin{align}
-  \E[\hat{p}(x)]
-  =
-  \E\left[
-  \frac{1}{h}
-  K\left(
-  \frac{x-X_n}{h}
-  \right)
-  \right]
-  =
-  \frac{1}{h}
-  \int
-  K\left(
-  \frac{x-v}{h}
-  \right)
-  \;
-  p(v)
-  \;dv
-  \label{kernelmeanstart}
-\end{align}
-Next, change variables to integrate over $u=(v-x)/h$ rather
-than over $v$,\footnote{%
-  This is a standard trick when working with Kernel estimators.
-}
-\begin{align*}
-  \E[\hat{p}(x)]
-  =
-  \int
-  K(-u)
-  \;
-  p(x+hu)
-  \;du
-\end{align*}
-Use the fact that $K$ is symmetric $K(u)=K(-u)$ along with the second
-order Taylor expansion of $p$ about $x$ in
-Expression~\ref{kerneltaylor1} to get:
-\begin{align*}
-  \E[\hat{p}(x)]
-  =
-  \int
-  K(u)
-  \bigg[
-  p(x)
-  + p'(x) hu
-  + \frac{1}{2}p''(x)h^2u^2
-  + O(h^3)
-  \bigg]
-  \;du
-\end{align*}
-Terms with $x$ only are a constant with respect to the variable of
-integration $u$. Moreover, $K(u)$ integrates to one; $uK(u)$ integrates
-to zero ($K$ is symmetric).
-All this implies Eq.~\ref{kernelmean}.
-
-(\emph{Variance})
-Because the estimator $\hat{p}(x)$ in Definition~\ref{kernel} is an
-average of iid terms, its variance is $1/N$ times the variance of any
-individual term:
-\begin{align*}
-  \Var(\hat{p}(x))
-  &=
-  \frac{1}{N}
-  \Var\left(
-  \frac{1}{h}
-  K\left(
-  \frac{x-X_n}{h}
-  \right)
-  \right)
-\end{align*}
-Then by the usual variance formula $\Var(X)=\E[X^2]-\E[X]^2$:
-\begin{align}
-  \Var(\hat{p}(x))
-  &=
-  \frac{1}{N}
-  \bigg\{
-  \underbrace{%
-    \E\left[
-    \frac{1}{h^2}
-    K\left(
-    \frac{x-X_n}{h}
-    \right)^2
-    \right]
-  }_{(i)}
-  -
-  \underbrace{%
-    \E\left[
-    \frac{1}{h}
-    K\left(
-    \frac{x-X_n}{h}
-    \right)
-    \right]^2
-  }_{(ii)}
-  \bigg\}
-  \label{kernelvarstart}
-\end{align}
-First note (ii) equals $\E[\hat{p}(x)]^2$ (by
-Expression~\ref{kernelmeanstart}).
-Then, from Expression~\ref{kernelmean}, we can also write
-\begin{align}
-  (ii)
-  =
-  \E[\hat{p}(x)]^2
-  &=
-  p(x)^2 + O(h^2)
-  \label{kernelvarapprox}
-\end{align}
-That's good enough for (ii).
-Next, we want to compute (i). So start by writing out
-\begin{align*}
-  (i)
-  =
-  \frac{1}{h^2}
-  \E\left[
-  K\left(
-  \frac{x-X_n}{h}
-  \right)^2
-  \right]
-  =
-  \frac{1}{h^2}
-  \int
-  K\left(
-  \frac{x-v}{h}
-  \right)^2
-  p(v)
-  \;
-  dv
-\end{align*}
-Change variables again with $u=(v-x)/h$ and simplify with $K(u)=K(-u)$:
-\begin{align*}
-  (i)
-  =
-  \frac{1}{h}
-  \int
-  K\left( u \right)^2
-  p(x+hu)
-  \;
-  du
-\end{align*}
-Further approximating Expression~\ref{kerneltaylor1} as
-$p(x+hu) = p(x) + O(h)$ and substituting in:
-\begin{align*}
-  (i)
-  =
-  \frac{1}{h}
-  \int
-  K\left( u \right)^2
-  \left[
-  p(x)
-  + O(h)
-  \right]
-  \;
-  du
-  &=
-  p(x)
-  \frac{1}{h}
-  \int
-  K\left( u \right)^2
-  \;
-  du
-  + O(1)
-\end{align*}
-Plugging this for (i) and Expression~\ref{kernelvarapprox} for (ii) into
-Expression~\ref{kernelvarstart}, we can then simplify all the way to
-Expression~\ref{kernelvar}.
-\end{proof}
-
-
-\clearpage
-\begin{prop}\emph{(MSE of $\hat{p}(x)$)}
-Mean square error of estimator $\hat{p}(x)$ is
-\begin{align*}
-  MSE(\hat{p}(x))
-  &=
-  \text{Bias}(\hat{p}(x))^2
-  + \Var(\hat{p}(x))
-  \\
-  &\approx
-  (c_1 h^2)^2
-  +
-  c_2 (Nh)^{-1}
-\end{align*}
-where $c_1$ and $c_2$ are constants implied by the $O(h^2)$
-and $O((Nh)^{-1})$ terms in Expressions~\ref{kernelmean} and
-\ref{kernelvar}. From the full expressions, we see that they equal
-\begin{align*}
-  c_1
-  &= \frac{1}{2}p''(x)\int u^2K(u)\,du
-  \quad\qquad
-  c_2
-  = p(x)\int K(u)^2\,du
-\end{align*}
-\end{prop}
-
-\begin{cor}\emph{(MSE-Optimal $h$)}
-Hence, the MSE minimizing bandwith satisfies is
-\begin{align*}
-  h
-  =
-  \left(
-  \frac{c_2}{4c_1^2}
-  \right)^{1/5}
-  N^{-1/5}
-  \propto
-  N^{-1/5}
-\end{align*}
-The MSE at this optimal bandwidth is therefore
-\begin{align*}
-  MSE(\hat{p}(x))
-  &\propto
-  N^{-4/5}
-\end{align*}
-This is slower than the $N^{-1}$ rate that we have in parameteric
-models.
-\end{cor}
-\begin{proof}
-Simply look at the first order conditions (with respect to $h$) of the
-MSE expression:
-\begin{align*}
-  0
-  &=
-  4c_1^2 h^3
-  -
-  c_2
-  \frac{N}{N^2h^2}
-  \quad\implies\quad
-  h
-  =
-  \left(
-  \frac{c_2}{4c_1^2}
-  \frac{1}{N}
-  \right)^{1/5}
-\end{align*}
-\end{proof}
-
-\begin{defn}(MISE of $\hat{p}(x)$)
-\end{defn}
-MISE definition
-MISE result
-MISE optimal
-
-
-\clearpage
-\subsection{Local Regression}
-
-This section covers nonparametric estimation of the conditional
-expectation function (CEF)
-\begin{align}
-  m(x):=\E[y_n|X_n=x]
-  =
-  \int
-  y
-  \frac{f(x,y)}{f(x)}
-  \;dy
-  \label{CEF}
-\end{align}
-where $X_n$ is some vector of covariates. This is an important object
-because the CEF is the best (i.e. MSE-minimizing) forecaster of $y_n$
-given $X_n$.  Unlike linear regression, nonparametric regression will
-not look for a \emph{linear} approximation to the CEF $m(x)$, but rather
-will try to estimate the nonlinear function $m(x)$ \emph{directly}.
-
-\begin{defn}{(Nadayara-Watson Kernel Regression Estimator)}
-The Nadayara-Watson kernel regression estimator of $m(x)=\E[y_n|X_n=x]$
-replaces the densities $f(x,y),f(x)$ in Expression~\ref{CEF} with kernel
-density estimates $\hat{f}(x,y)$ and $\hat{f}(x)$:
-\begin{align*}
-  \hat{m}(x)
-  &=
-  \int
-  y\frac{\hat{f}(x,y)}{\hat{f}(x)}
-  \;dy
-  =
-  \frac{%
-    \sumnN
-    K\left(
-    \frac{X_n-x}{h}
-    \right)
-    y_n
-  }{%
-    \sumnN
-    K\left( \frac{X_n-x}{h}
-    \right)
-  }
-\end{align*}
-where the final equality came from simplifying, which we now show.
-\end{defn}
-\begin{proof}
-First, start with our kernel density estimates
-\begin{align*}
-  \hat{f}(x)
-  &=
-  \frac{1}{N}
-  \sumnN
-  \frac{1}{h}
-  K\left(
-  \frac{X_n-x}{h}
-  \right)
-  \qquad
-  \hat{f}(x,y)
-  =
-  \frac{1}{N}
-  \sumnN
-  \frac{1}{h^2}
-  K\left(
-  \frac{X_n-x}{h}
-  \right)
-  \tilde{K}\left(
-  \frac{y_n-y}{h}
-  \right)
-\end{align*}
-where $\tilde{K}$ is the kernel for $y$, which potentially differs from
-that for $x$ (it won't really matter).
-Plug these into the integral expression, rewrite the resulting integral
-of the sum as a sum of integrals, and pull out anything with just an $x$
-in it from the integral expression since constant with respect to the
-variable of integration $y$:
-\begin{align*}
-  \hat{m}(x)
-  =
-  \frac{%
-    \sumnN
-    \left[
-    K\left(
-    \frac{X_n-x}{h}
-    \right)
-    \int
-    y
-    \frac{1}{h}
-    \tilde{K}\left(
-    \frac{y_n-y}{h}
-    \right)
-    \;dy
-    \right]
-  }{%
-    \sumnN
-    K\left(
-    \frac{X_n-x}{h}
-    \right)
-  }
-\end{align*}
-Change variables with $u=(y-y_n)/h$, using the fact that
-$\tilde{K}(u)=\tilde{K}(-u)$ to get
-\begin{align*}
-  \hat{m}(x)
-  &=
-  \frac{%
-    \sumnN
-    \left[
-    K\left(
-    \frac{X_n-x}{h}
-    \right)
-    \int
-    (y_n+uh)
-    \tilde{K}(u)
-    \;du
-    \right]
-  }{%
-    \sumnN
-    K\left(
-    \frac{X_n-x}{h}
-    \right)
-  }
-  \\
-  &=
-  \frac{%
-    \sumnN
-    \left[
-    K\left(
-    \frac{X_n-x}{h}
-    \right)
-    \left[
-    y_n
-    \int
-    \tilde{K}(u)
-    \;du
-    +
-    h
-    \int
-    u
-    \tilde{K}(u)
-    \;du
-    \right]
-    \right]
-  }{%
-    \sumnN
-    K\left(
-    \frac{X_n-x}{h}
-    \right)
-  }
-\end{align*}
-Since $\tilde{K}$ is a kernel, the first integral is one, and the second
-integral is zero, and the Nadayara-Watson estimator is obtained.
-\end{proof}
-
-\clearpage
-
-We can also derive estimators of $m(x)$ through local weighted least
-squares, weighting observations $(y_n,X_n)$ with $X_n$ nearby $x$ most
-highly, and downweighting those observations farther away.
-The regression is also ``local'' in the sense that there will be a
-separate regression for each $x$.
-%Whereas parametric linear regression
-%regression imposes a \emph{globally} linear structure on $m(x)$, with
-%common
-
-\begin{defn}(Local Constant Regression Estimator, Nadayara Watson)
-The \emph{local constant regression estimator} of $m(x)=\E[y_n|X_n=x]$
-is
-\begin{align*}
-  \hat{m}(x)
-  =
-  \argmin_{b}
-  \sumnN
-  K\left(
-  \frac{X_n-x}{h}
-  \right)
-  (y_n-b)^2
-\end{align*}
-Note that this is simply weighted least squares regression of $y_n$ on a
-constant $b$, with weights given by the distance of $X_n$ from the point
-$x$ that we're estimating $m(x)$ at.
-Each different point $x$ will have it's own different $\hat{m}(x)$
-corresponding to the $x$-specific optimal $b$ under the $x$-specific
-weights.
-From the FOCs, we get that
-\begin{align*}
-  \hat{m}(x)
-  &=
-  \frac{%
-    \sumnN
-    K\left(
-    \frac{X_n-x}{h}
-    \right)
-    y_n
-  }{%
-    \sumnN
-    K\left( \frac{X_n-x}{h}
-    \right)
-  }
-\end{align*}
-which just so happens to be the same estimator as Nadayara-Watson.
-\end{defn}
-
-\begin{defn}(Local Linear, Local Polynomial Regression)
-The \emph{local polynomial regression estimator} of $m(x)=\E[y_n|X_n=x]$
-is given by \begin{align*}
-  \hat{m}(x)
-  &=
-  \hat{\beta}_0
-  \\
-  \text{where}\quad
-  (\hat{\beta}_0,\ldots,\hat{\beta}_p)
-  &=
-  \argmin_{b_0,\ldots,b_p}
-  \sumnN
-  K\left(
-  \frac{X_n-x}{h}
-  \right)
-  \big(y_n-[b_0+b_1(X_n-x)+\cdots +b_p(X_n-x)^p]\big)^2
-\end{align*}
-The case wehre $p=1$ is called \emph{local linear regression}.
-This is estimator is much better at the boundaries, where the local
-constant regression estimator does poorly.
-\end{defn}
-
-
-\clearpage
-\section{Conditional Moment Restrictions and Optimal Instruments}
-
-We have a conditional moment restriction
-Want unconditional moment condition
-Multiply by instruments
-Choice of instruments
-Optimal choice of instruments
-Coincides with FGLS in linear model case
-
-
-
-
-\clearpage
-\section{Bootstrap}
-
-\subsection{General Procedure}
-
-We have an $M$-estimator $\hat{\theta}$, and we want standard errors.
-To be precise, here's the setup:
-\begin{enumerate}
-  \item (\emph{Population CDF/Distribution}):
-    Data $y_n\sim F_0$, the population CDF/distribution
-  \item (\emph{Drawn/Realized Sample}):
-    We have $\{y_n\}\nN\iid F_0$
-  \item (\emph{Population Quantities}):
-    Associated with the $M$-estimator is population criterion function
-    $Q(\theta)$ and true parameter value $\theta_0$
-    \begin{align*}
-      \theta_0
-      = \argmin_{\theta\in\Theta}
-      Q(\theta)
-      \qquad\text{where}\quad
-      Q(\theta)
-      :=
-      \E_{F_0}[q(y_n,\theta)]
-    \end{align*}
-  \item (\emph{Sample Quantities}):
-    Compute estimtator $\hat{\theta}$ from the sample criterion function
-    $Q_N(\theta)$
-    \begin{align*}
-      \hat{\theta}
-      = \argmin_{\theta\in\Theta}
-      Q_N(\theta)
-      \qquad\text{where}\quad
-      Q_N(\theta)
-      :=
-      \frac{1}{N}
-      \sumnN
-      q(y_n,\theta)
-    \end{align*}
-
-  \item
-    (\emph{Asymptotic Distribution}):
-    Estimate $\hat{\theta}$ has asymptotic distribution
-    \begin{align*}
-      \sqrt{N}(\hat{\theta}-\theta_0)
-      \quad\dto\quad
-      \calN(0,\Sigma_{F_0})
-    \end{align*}
-    The whole point of the bootstrap is that we want $\Sigma_{F_0}$,
-    but we don't know it and can't construct an analytical formula for
-    it (or at least do so easily).
-\end{enumerate}
-Enter bootstrap, which takes as given/fixed the sample from Step 2
-\& uses it to estimate $\Sigma_{F_0}$.
-\begin{enumerate}
-  \item (\emph{Population CDF/Distribution}):
-    Now suppose the \emph{empirical distribution} $F_N$ is our
-    population CDF/distribution, where $F_N$ denotes the distribution
-    that places probability $1/N$ on each observation in our
-    drawn/realized sample $\{y_n\}\nN$ from Step 2 above.
-    In other words, we now take as our population the equal-weighted
-    multinomial distribution whose support is the actually-realized
-    values of the sample.
-
-  \item (\emph{Pseudo-Sample}):
-    We can easily draw pseudo-samples (replications) from that
-    population distribution by sampling with with replacement
-    $\{y_{nm}^*\}\nN\iid F_N$, where $m$ indexes these simulated
-    pseudo-samples.
-    %We will now think about ``estimating'' the parameter from these
-    %pseudo-samples/replications, so we now return to the criterion
-    %functions.
-    %Eventually, we will want to draw many such
-    %pseudo-samples/replications $m=1,\ldots,M$.
-    %But for now, just fix $m$.
-
-  \item (\emph{Population Quantities}):
-    As always, there is a population criterion function $Q^*(\theta)$
-    and ``true'' value $\theta^*_0$ associated with this population
-    distribution
-    \begin{align*}
-      \theta_0^*
-      =
-      \argmin_{\theta\in\Theta}
-      Q^*(\theta)
-      \qquad\text{where}\quad
-      Q^*(\theta)
-      =
-      \E_{F_N}[q(y_{nm}^*,\theta)]
-      =
-      \sumnN
-      \frac{1}{N}
-      q(y_n,\theta)
-    \end{align*}
-    Second expression for $Q^*(\theta)$ from writing out
-    expectation under empirical measure $F_N$.
-
-    \emph{Key Insight}: Notice $Q^*(\theta)=Q_N(\theta)$, hence
-    $\theta_0^*=\hat{\theta}$.
-    In words, the \emph{population} criterion function $Q^*$ of
-    pseudo-samples $\{y_{nm}^*\}\nN$ coincides with the \emph{sample}
-    criterion function $Q_N$ from our original problem.
-    Hence, rather mechanically, $\theta_0^*=\hat{\theta}$.
-
-  \item (\emph{Sample Quantities}):
-    Given  pseudo sample $\{y^*_{nm}\}\nN$, compute the $m$th
-    pseudo-sample estimate $\hat{\theta}_m$ from the sample criterion
-    function $Q_{Nm}^*(\theta)$
-    \begin{align*}
-      \hat{\theta}_m^*
-      = \argmin_{\theta\in\Theta}
-      Q_{Nm}^*(\theta)
-      \qquad\text{where}\quad
-      Q_{Nm}(\theta)
-      :=
-      \frac{1}{N}
-      \sumnN
-      q(y_{nm}^*,\theta)
-    \end{align*}
-
-  \item
-    (\emph{Asymptotic Distribution}):
-    Estimator $\hat{\theta}_m^*$ has some asymptotic distribution
-    \begin{align*}
-      \sqrt{N}(\hat{\theta}_m^*-\theta_0^*)
-      =
-      \sqrt{N}(\hat{\theta}_m^*-\hat{\theta})
-      \quad\dto\quad
-      \calN(0,\Sigma_{F_N})
-    \end{align*}
-    where we used that $\theta_0^*=\hat{\theta}$, as argued in Step 3.
-
-  \item
-    (\emph{Estimate $\Sigma_{F_0}$ by Estimating $\Sigma_{F_N}$}):
-    For large $N$, empirical distribution $F_N$ is close to population
-    distribution $F_0$.\footnote{%
-      In fact, $F_N$ is the best estimator of $F_0$ when we don't have
-      any restrictions on $F_0$.
-    }
-    Therefore, a consistent estimator for $\Sigma_{F_N}$ is also
-    consistent for $\Sigma_{F_0}$. Here's how we construct one such
-    consistent estimator.
-    \begin{enumerate}[label=(\roman*)]
-      \item Draw $M$ pseudo-samples $\{y_{nm}^*\}\nN$ for $m=1,\ldots,M$
-        from empirical distribution $F_N$, with replacement.
-      \item Given the $M$ pseudo-samples, compute $M$ pseudo-estimates
-        $\{\hat{\theta}_m^*\}_{m=1}^M$
-      \item Given pseudo-estimates, compute sample variance
-        \begin{align*}
-          \hat{\Sigma}_{F_N}
-          =\Var_M(\sqrt{N}\big(\hat{\theta}_m^*-\hat{\theta})\big)
-        \end{align*}
-        where $\Var_M(\cdot)$ is the sample variance in a sample of size
-        $M$.
-        %For large $M$, this should be close to $\Sigma_{F_N}$.
-      \item
-        $\hat{\Sigma}_{F_N}$ is a consistent estimator for
-        $\Sigma_{F_N}$, which we argued is a consistent for
-        $\Sigma_{F_0}$.
-        Therefore, $\hat{\Sigma}_{F_N}$ is also a consistent estimator
-        for $\Sigma_{F_0}$.
-    \end{enumerate}
-    Note, in practice, we replace Step (iii) with just directly
-    computing $\Var_M(\hat{\theta}_m^*)$, which estimates
-    $\Sigma_{F_0}/N$ directly, which is the variance for $\hat{\theta}$,
-    rather than the $\sqrt{N}$-normalized quantity.
-\end{enumerate}
-
-\clearpage
-\subsection{Improving on the Asymptotics}
-
-This section considers testing with some statistic $T_N$ constructed
-from a sample of size $N$.
-
-For concreteness, suppose we  consider a test that rejects for large
-values of $T_N$, i.e.  $\varphi_N(T_N)=\mathbf{1}\{T_N> T_N^{cv}\}$,
-where $T_N^{cv}$ is some critical value that could depend upon sample
-size.
-Constructing such a test requires choosing $T_N^{cv}$ to nail the
-$\alpha$-level, i.e. choosing $T_N^{cv}$ to satisfy
-\begin{align*}
-  \alpha \geq \E[\varphi_N(T_N)]
-  = P[T_N> T_N^{cv}]
-  %= 1-P[T\leq T_{cv}]
-  = 1-F_N(T_N^{cv})
-\end{align*}
-where $F_N(x)=P[T_N\leq x]$ is the CDF of the test statistic $T_N$.
-In general, since we don't know the exact finite-sample distribution of
-$T_N$, the function $F_N(x)=P[T_N\leq x]$ is unknown, so the above test
-is infeasible.
-However, there are two approaches for constructing approximate
-asymptotically valid tests, which we now consider.
-\begin{enumerate}
-  \item \emph{Asymptotic Approach}:
-    Supose that we were able to set up the test statistic in such a way
-    that $T_N\dto\calN(0,1)$.
-    Then we can approximate $F_N(x)=P[T_N\leq x]$ with $\Phi(x)$, which
-    will be correct asymptotically by the assumed convergence in
-    distribution.
-
-    We can see this more clearly by writing out the Edgeworth expansion
-    of $F_N(x)=P[T_N\leq x]$, given the assumed convergence in
-    distribution
-    \begin{align}
-      F_N(x)=P[T_N\leq x] =
-      \Phi(x) +
-      \frac{1}{\sqrt{N}}
-      R(x,F_0)
-      +
-      O_p(1/N)
-      \label{FN}
-    \end{align}
-    Clearly as $N\ra\infty$, $\Phi(x)$ dominates, suggesting that
-    $\Phi(x)$ is not a bad approximation.
-
-
-  \item \emph{Bootstrap Approach}:
-    Alternatively, suppose we generate $M$ bootstrap pseudo-samples and
-    recompute the test statistic for each pseudo-sample to get
-    collection $\{T_{Nm}^*\}_{m=1}^M$ of pseudo-test statistics.
-    Then we could approximate $F_N(x)=P[T_N\leq x]$ with
-    \begin{align*}
-      F_N^*(x)
-      =P[T_{Nm}^*\leq x]
-      =
-      \frac{1}{M}
-      \sum_{m=1}^M
-      \mathbf{1}\{
-        T_{Nm}^* \leq x
-      \}
-    \end{align*}
-    In words, just use the bootstrap sample CDF $F_N^*(x)$ of
-    estimates $\{T_{Nm}^*\}_{m=1}^M$.
-    Importantly, by the properties of the bootstrap, it's the case that
-    \begin{align}
-      F_N^*(x)=P[T_N^*\leq x] =
-      \Phi(x) +
-      \frac{1}{\sqrt{N}}
-      R(x,F_N)
-      +
-      O_p(1/N)
-      \label{bootstart}
-    \end{align}
-\end{enumerate}
-To compare these approaches, consider the approximation error.
-First, rearrange Expression~\ref{FN}. Second, subtract the expansion for
-$F_N^*(x)$ from Expression~\ref{FN} for $F_N(x)$.
-This gives
-\begin{alignat}{3}
-  F_N(x)
-  -
-  \Phi(x)
-  &=
-  \frac{1}{\sqrt{N}}
-  R(x,F_0)
-  +
-  O_p(N^{-1})
-  &&=
-  O_P(1/\sqrt{N})
-  \label{phiapprox}
-  \\
-  F_N(x)
-  - F_N^*(x)
-  &=
-  \frac{1}{\sqrt{N}}
-  \big(
-  R(x,F_0)
-  -
-  R(x,F_N)
-  \big)
-  +
-  O_p(N^{-1})
-  &&=
-  O_P(1/N)
-  \label{bootapprox}
-\end{alignat}
-Expression~\ref{phiapprox} followed because $R(x,F_0)$ is some $O_P(1)$
-quantity.
-Expression~\ref{bootapprox} followed because $F_n-F_0$ hence
-$R(x,F_n)-R(x,F_0)$ are $O_p(1/\sqrt{N})$ so that the first term
-in the difference is also $O_p(1/N)$, leaving only $O_p(1/N)$.
-
-Comparing the two approximations, we see that using the bootstrap
-approximation $F_N^*(x)$ improves upon the convergence rate relative to
-the asymptotic approximation $\Phi(x)$.
-
-Note the bootstrap improvement depended \emph{crucially} upon the fact
-that $T_N$ was a \emph{pivotal} statistic, i.e. it's asymptotic
-distribution $\calN(0,1)$ didn't depend upon any unkown parameters that
-must be estimated.
-To see why, suppose instead that $T_N\dto \calN(0,\sigma^2)$, where
-$\sigma^2$ is an unknown parameter that we can consistently estimate
-with $\hat{\sigma}_N$.
-Then
-\begin{alignat*}{3}
-  F_N(x)
-  &=
-  P[T_N\leq x]
-  &&=
-  \Phi\left(
-  \frac{x}{\sigma}
-  \right)
-  +
-  \frac{1}{\sqrt{N}}
-  R(x,F_0)
-  +
-  O_p(1/N)
-  \\
-  F_N^*(x)
-  &=
-  P[T_N^*\leq x]
-  &&=
-  \Phi\left(
-  \frac{x}{\hat{\sigma}_n}
-  \right)
-  +
-  \frac{1}{\sqrt{N}}
-  R(x,F_N)
-  +
-  O_p(1/N)
-\end{alignat*}
-Subtracting the second line from the first gives
-\begin{align*}
-  F_N(x)
-  - F_N^*(x)
-  &=
-  \Phi\left(
-  \frac{x}{\sigma}
-  \right)
-  -
-  \Phi\left(
-  \frac{x}{\hat{\sigma}_n}
-  \right)
-  +
-  \frac{1}{\sqrt{N}}
-  \big(
-  R(x,F_0)
-  - R(x,F_N)
-  \big)
-  +
-  O_p(1/N)
-\end{align*}
-Since $\sigma-\hat{\sigma}_n=O_p(1/\sqrt{N})$, the difference in
-$\Phi(\cdot)$ terms is also $O_p(1/\sqrt{N})$---they don't cancel as
-before. Hence $F_N(x)-F_N^*(x)=O_p(1/\sqrt{N})$ and we get the same rate
-of convergence as the asymptotic approximation.
-
-\clearpage
-\subsection{Bias Reduction}
-
-Sample $\{X_i\}$, from which we want to compute estimates of
-$(\mu,\theta)$ where $\theta=g(\mu)$.
-Given an unbiased estimator $\hat{\mu}$ of $\mu$, a natural estimator of
-$\theta$ is $\hat{\theta}=g(\hat{\mu})$.
-But in general, there will be a bias term if $g(\mu)$ is curved
-(non-linear), i.e.
-\begin{align*}
-  \E[\hat{\theta}]=\E[g(\hat{\mu})] \neq g(\mu)
-  = \theta
-\end{align*}
-We can see this by a second order Taylor expansion of $g(\hat{\mu})$
-about the true value $\mu$, giving
-\begin{align*}
-  \text{Bias}[g(\hat{\mu})]
-  \approx
-  \frac{1}{2}
-  \E[(\hat{\mu}-\mu)g''(\mu)(\hat{\mu}-\mu)]
-\end{align*}
-We can estimate this by employing boostrap if we note that, completely
-analogously,
-\begin{align*}
-  \text{Bias}[g(\hat{\mu}^*)]
-  \approx
-  \frac{1}{2}
-  \E_{F_n}[(\hat{\mu}^*-\hat{\mu})g''(\hat{\mu})(\hat{\mu}^*-\hat{\mu})]
-\end{align*}
-That's a population statement, which we can use to motivate a sample
-estimator of $\text{Bias}[g(\hat{\mu}^*)]$, which we can use to
-approximate $\text{Bias}[g(\hat{\mu})]$.
-In other wrods, we can use bootstrap to adjust our original estimate
-$\hat{\theta}=g(\hat{\mu})$ for bias:
-\begin{align*}
-  \hat{\theta}
-  -
-  \frac{1}{M}\sum_{m=1}^M
-  (\hat{\theta}_m^*-\hat{\theta})
-\end{align*}
-where $\hat{\theta}=g(\hat{\theta})$ is the estimate in our sample, and
-$\hat{\theta}_m^*=g(\hat{\mu}_m^*)$ the estimate in the $m$th bootstrap
-sample.  The average of difference $(\hat{\theta}_m^*-\hat{\theta})$ is
-an estimate of the bias.
-
-
-
-
-
-\clearpage
-\subsection{Residual Bootstrap}
-
-Suppose we have linear model
-\begin{align*}
-  y_n = x_n'\beta + \varepsilon_n
-\end{align*}
-Rather than draw bootstrap samples of $(y_n,x_n)$, we can just sample
-residuals and re-estimate.
-
-\paragraph{Naive Residual Bootstrap}
-Procedure as follows
-\begin{enumerate}
-  \item Estimate $\hat{\beta}$ and use it to estimate residuals
-    $\{\hat{\varepsilon}_n\}\nN$
-  \item Draw pseudo-samples of the residuals
-    $\{\hat{\varepsilon}_{nm}^*\}\nN$ for $m=1,\ldots,M$.
-  \item Construct pseudo-samples $\{y_{nm}^*\}\nN$ of the dependent
-    variable, where $y_{nm}^*=x_n'\hat{\beta}+\hat{\varepsilon}_{nm}^*$
-  \item Given pseudo-samples $\{y_{nm}^*,x_n\}\nN$, recompute estimates
-    $\{\hat{\beta}_m^*\}_{m=1}^M$.
-\end{enumerate}
-Note that this assumes the residuals are \emph{heteroskedastic}. If not,
-this \emph{does not work}, and Wild bootstrap should be used instead.
-
-\paragraph{Wild Bootstrap}
-Procedure as follows
-\begin{enumerate}
-  \item Estimate $\hat{\beta}$ and use it to estimate residuals
-    $\{\hat{\varepsilon}_n\}\nN$
-  \item Construct pseudo-samples $\{y_{nm}^*\}\nN$ of the dependent
-    variable, where
-    \begin{align*}
-      y_{nm}^*=x_n'\hat{\beta}+w_m^*\hat{\varepsilon}_{n}
-      \qquad\text{where}\quad
-      w_m
-      =
-      \begin{cases}
-        -c & \text{with some probability} \\
-        \,\;\;c & \text{with some probability} \\
-      \end{cases}
-    \end{align*}
-    In words, for observation $n$ of pseudo-sample $m$, you are
-    \emph{always} using the $n$th estimated residual
-    $\hat{\varepsilon}_n$ (which solves the worry about
-    heteroscedasticity).
-    But you just flip the sign via $w_m^*$ with some probability.
-  \item Given pseudo-samples $\{y_{nm}^*,x_n\}\nN$, recompute estimates
-    $\{\hat{\beta}_m^*\}_{m=1}^M$.
-\end{enumerate}
-
-\clearpage
-\subsection{Block Bootstrap for Time Series}
-
-
-\clearpage
-\section{Non-Standard Inference}
-
-%Normal case: $\hat{\theta}=\theta_0 + O_P(1/\sqrt{n})=\theta_0+o_P(1)$
-%Weak ID: $\theta_0=O_p(1/\sqrt{n})$ too, so can't consistently estimate
-%$\theta_0$
-
-%Many weak instruments: $\hat{\theta}\pto\theta_0$ but only with
-%$m\ra\infty$, i.e. consistency only achieved by number of instruments
-%going to infinity, which together can obtain identification
-
-Consider a GMM setup with moment conditions
-\begin{align*}
-  0 = \E[g_n(\theta_0)]
-\end{align*}
-Throughout this section, we want to test
-\begin{align*}
-  H_0: \theta=\theta_0
-\end{align*}
-As always, under the assumption that $\theta_0$ is the true value, we
-can Taylor expand the FOCs defining estimator $\hat{\theta}$
-(assuming here that our weighting matrix is a consistent estimator
-$\hat{\Omega}^{-1}$ for the efficient choice $\Omega^{-1}$)
-to get the usual expression
-\begin{align*}
-  \sqrt{n}(\hat{\theta}-\theta_0)
-  =
-  \big(\overline{G}_n'\hat{\Omega}^{-1}_n\overline{G}_n\big)^{-1}
-  \overline{G}_n'\hat{\Omega}^{-1}_n
-  \sqrt{n}\;\overline{g}_n(\theta_0)
-\end{align*}
-where $\overline{G}_n$ and $\hat{\Omega}_n$ are both evaluated at
-$\theta_0$.
-There are two possibilities
-\begin{itemize}
-  \item
-    \emph{Strong Identification}:
-    $\overline{G}_n\pto G$, fixed nonzero matrix
-  \item
-    \emph{Weak Identification}:
-    $\sqrt{n}(\overline{G}-G)=O_p(1)$
-\end{itemize}
-
-Want to test hypothesis about parameters
-
-Start from Taylor-expanded FOC defining $\hat{\theta}$
-
-Potential problem: Weak ID, thing not well defined
-
-Efficient test with strong ID
-- Limit of params is usual normal efficient GMM asymptotic dist
-- Construct wald state from it
-- Goes to chi square
-
-AR test with strong ID
-- It's inefficient, but can think about doing it anyway
-- Gives a stat
-- Test of whether the moment conditions do in fact equal zero
-- We *assume* the model is true and test if some theta0 is the param
-value assuming the truth of that model
-- Differs from J test which tests the truth of the model using
-overidentification
-
-AR test with weak ID
-- Still well defined, still works, can run it
-
-K-test with weak IV
-- Can rewrite the usual wald stat
-- That's another way to write the optimal test under strong ID, so will
-give the same result under strong ID, but also works under weak ID
-- Uncorrelate
-
-\begin{comment}
-NOtes below drawn from NBER summer institute with Stock
-
-- Checking for weak instruments
-  - People do F > 10, but that was for homosked
-  - Choices: F homo, F hetero, effective F
-  - F homo checks the right thing (denom of 2SLS est) but gets std errors wrong
-  - F hetero checks the wrong thing, but gets std errs right
-  - Effective F checks the right thing and gets std errs right
-  - NOTE: F hetero is aka Kleibergen-Paap
-  - If k=1, Frobust = effective F
-  - Key object of interest is lambda = Sigma_pp^(-1/2) pi (i.e. pi stdized by var)
-  - Effective F is a quad form in lambda, normalized to get std errs right
-  - If lambda/Feff large, strong instruments, if lambda small, weak instruments
-  - Use lambda/Feff as a gauge of whether or not you have weak instruments
-- Estimation
-  - No unbiased or asymptotically unbiased IV estimator
-  - If k=1, LIML=TSLS=IV but don't have moments
-  - LIML, k-class, JIVE, Fuller IV estimators lose special properties outside of homo
-- Confidence sets
-  - Can always construct confidence sets by test inversion
-  - Develop tests by looking at implications of a model
-  - In weak instrument case, develop weak ID robust tests by looking at model properties/features that are robust to weak ID, e.g. delta = beta*pi
-  - Anderson Rubin confidence sets based on just that: delta = beta*pi
-  - Just ident: AR CS is UMP (Moreira 2009), robust to weak instruments, & equiv to two-sided t-test if strong. USE AR
-  - Overid case, AR also effectively tests parametric restriction of the model delta=beta*pi in addition to beta=beta0. So not great, wasting df
-  - Moreira (2003)
-    - Want to use t-stat in overid case, but dist of t deps on unknown pi
-    - Conditional critical values to cope
-    - Find suff stat D(b0) for pi under b=b0 => t(b0) dist conf on D(b0) doesn't dep on pi
-    - Can then compute cv(D(b0)), i.e. crit value cond on value of sufficient stat
-- Different tests (aside from Moreira t) work using this same conditioning approach
-- Conditioning approach is general strategy
-- t, K, LR tests. LR good for homo case. Near optimal (Andrews, Moreira, Stock 2006)
-- Hetero case: Number of options that are efficient for strong instruments, but no clear consensus on what is best in the weak instrument case. All have different power properties, and no clear winner.
-- Homo case: Use AR
-
-
-\end{comment}
-
-
-
-\clearpage
-\section{Clustering}
-
-Consider a GMM setup, where we will need convergence in distribution of
-the following object to derive the asymptotic distribution of our GMM
-estimator
-\begin{align*}
-  \sqrt{N}\bar{g}_N(\theta)
-  \quad\dto\quad
-  \calN(0,\Omega)
-\end{align*}
-Normally, the observations are iid in which case the above convergence
-in distribution obtains by the CLT with
-$\Omega=\Var(g_n(\theta_0))=\E[g_n(\theta_0)g_n(\theta_0)']$.\footnote{%
-  Note that the parts that converge in probability are not a problem. A
-  generalized LLN that deals with not-too-strongly correlated data will
-  work just fine. The dependence only affects the above part, where the
-  asymptotic variance needs to be generalized from the usual
-  iid CLT case.
-}
-But now consider non-iid observations, which will ultimately change the
-expression for $\Omega$ and corresponding consistent estimators.
-
-Specifically, suppose instead that the sample $\{g_n(\theta)\}\nN$
-breaks up into clusters of size $N_c$ for $c=1,\ldots,C$ with
-$N=\sum_{c=1}^CN_c$.
-Let also $I_c$ denote the indices for cluster $c$.
-The data is indepenent only \emph{across} clusters, but dependent within
-clusters.
-So to start, write out the population variance of our object of interest
-\begin{align*}
-  \Var\big(\sqrt{N}\bar{g}_N(\theta_0)\big)
-  =
-  \frac{1}{N}
-  \Var\left(
-    \sumnN
-    g_n(\theta_0)
-  \right)
-  =
-  \frac{1}{N}
-  \sum_{c=1}^C
-  \Var\left(
-    \sum_{n\in I_c}
-    g_n(\theta_0)
-  \right)
-\end{align*}
-The second expression just used the definition of $\bar{g}_N(\theta)$.
-The third expression followed by the assumption of independence across
-clusters. Now if define moment condition ``blocks''
-\begin{align*}
-  b_c(\theta)
-  =
-  \sum_{n\in I_c}
-  g_n(\theta)
-\end{align*}
-Use this to rewrite the above variance expression as
-\begin{align*}
-  \Var\big(\sqrt{N}\bar{g}_N(\theta_0)\big)
-  =
-  \frac{1}{N}
-  \sum_{c=1}^C
-  \Var(b_c(\theta))
-  =
-  \frac{1}{N}
-  \sum_{c=1}^C
-  \E[b_c(\theta)b_c(\theta)']
-\end{align*}
-Define the following estimator based on ``blocked'' moment conditions:
-\begin{align*}
-  \hat{\Omega}_{cl}
-  =
-  \frac{1}{N}
-  \sum_{c=1}^C
-  b_c(\theta)b_c(\theta)'
-\end{align*}
-
-
-
-- Start with variance of $\sqrt{n}\bar{g}$
-- Variance of sum is sum of variance of clusters
-
-\clearpage
-Linear model
-\begin{align*}
-  y_{ig}
-  =
-  \beta'x_{ig} + u_{ig}
-  =
-  \beta_1'x_{1,g} + \beta_2'x_{2,ig} + u_{ig}
-\end{align*}
-No longer assume $u_{ig}$ iid.
-Instead, assume $u_{ig}$ correlated within $g$, but no across $i$.
-Also, allow for heteroskedasticity.
-
-Further points
-\begin{enumerate}
-  \item When the issue arises:
-    This kind of correlation in errors can arise naturally (villages,
-    schools, families) or can be \emph{induced} by correlation of RHS
-    regressors within groups (most often perfect correlation when one
-    RHS variable varies only at some group level).
-    Pointed out by Moulton.
-
-  \item
-    Note: We will not worry about the fact that the ``correct'' or
-    ``true'' model might not look like the above.
-    We will thus assume that the model for $y_{ig}$ is, in fact, linear
-    \emph{or} that we are only interested in estimating a linear
-    model (which could be viewed as an approximation to a nonlinear
-    model).
-
-  \item
-    Goal: Valid inference in the presence of clustering.
-
-  \item
-    Estimation approaches:
-    Two solutions for the linear model above.
-    \begin{enumerate}
-      \item (FGLS):
-        Model the correlation structure, estimate by FGLS.
-        Can robustify
-
-      \item (Cluster-Robust SE):
-        Cluster robust standard errors, where we assume \emph{independence}
-        of errors across clusters, but allow for correlation of errors
-        within clusters and general heteroscedasticity (within and across
-        clusters).
-
-        We should view all of this as a generalization of White (1980)
-        robust standard errors
-
-        OLS formula and the asymptotic variance.
-        As always, we can \emph{do} OLS (form the OLS estimator) even in the
-        presence of clusters or misspecification (i.e. the linear regression
-        model isn't exactly correct).
-        It's just inefficient, and we could do better with GLS or with a
-        fully specified model.
-        However, we will just ``do'' OLS henceforth and derive the
-        appropriate standard errors on the point estimate (which are
-        generally larger than what we would get with the correct model), but
-        appropriate
-
-        To get this, we need
-        \begin{enumerate}
-          \item Usual sampling assumption (Fixed $N_g$, $G\ra\infty$):
-            Large number of small clusters (possibly of different sizes).
-            We randomly draw those clusters.
-            There are enough clusters to account for arbitrary correlation
-            within cluster
-
-          \item Alternative sampling assumption,
-            ($N_g\ra\infty$, Fixed $G$):
-            Small number of clusters that we draw many observations from.
-
-            Arises from stratified sampling.
-            Population first stratified into $G$ non-overlapping groups (like
-            states or just cut up into some arbitrary groups to save money)
-            then a large number of observations are taken from each group,
-            or (alternatively) we randomly pick a few groups to sample from,
-            then take a large numbers from those groups.
-            regardless, typically fixed $G$, large $N_g$ analysis.
-        \end{enumerate}
-    \end{enumerate}
-
-
-  \item
-    Approach (ii):
-    Model setup and derivation of asymptotic variance
-
-  \item
-    Approach (i): FGLS
-\end{enumerate}
-Papers
-\begin{itemize}
-  \item Cameron and Miller 2010 is just a shorter version of their
-    ``Practitioner's guide''
-  \item
-\end{itemize}
-
-\clearpage
-Least Squares
-\begin{enumerate}
-  \item
-    Cast into GMM and extremum estimation form
-  \item
-    Standard errors and the matrix in the middle
-    \begin{itemize}
-      \item Time series and long run-variance
-      \item Clustered standard errors
-      \item White standard errors
-      \item Usual homoskedastic errors
-    \end{itemize}
-  \item Inference
-\end{enumerate}
-
-\clearpage
-\section{Simulated Method of Moments}
-
-Model defined by moment condition
-\begin{align*}
-  0 = \E_w\big[\E_\varepsilon[g(W_i,\varepsilon_i,\theta)]\big]
-\end{align*}
-where the integral/expectation
-$\E_\varepsilon[g(W_i,\varepsilon_i,\theta)]$ is tough to compute
-analytically, even though the distribution of errors
-$F_\varepsilon(\varepsilon)$ is known---often $\calN(0,1)$ or
-$U[0,1]$---and $g(W_i,\varepsilon_i,\theta)$ is easy to compute.
-
-
-\clearpage
-\section{Stein's Estimator}
-
-Suppose $Y \sim \calN(\mu,I_d)$.
-The fact that $\Var(Y)=I_d$ is wlog for normal RVs since we can always
-uncorrelate/rotate any normal RV to get one with identity variance.
-This normal setup with unknown mean is very important since that's often
-the situation we face in parameter estimation in the asymptotic limit.
-So this section's results apply to all those cases.
-
-\begin{defn}(Stein's Estimator)
-Stein's estimator for vector $\mu$ is defined
-\begin{align*}
-  \hat{\mu}_{JS,\lambda}
-  =
-  \lambda
-  +
-  \left(
-  1-
-  \frac{d-2}{\lVert Y\rVert^2}
-  \right)
-  (Y-\lambda)
-\end{align*}
-and Stein's ``positive part'' estimator is defined
-\begin{align*}
-  \hat{\mu}_{JS,PP}
-  =
-  \max
-  \left\{
-  1-
-  \frac{d-2}{\lVert Y\rVert^2}
-  ,0
-  \right\}
-  Y
-\end{align*}
-\end{defn}
-
-
-
-\begin{prop}
-Throughout, we consider MSE loss, i.e. risk function
-\begin{align*}
-  R(\hat{\mu},\mu)
-  = MSE(\hat{\mu},\mu)
-  =\E[\lVert\hat{\mu}-\mu\rVert^2]
-\end{align*}
-Multiple parts to this proposition:
-\begin{enumerate}[label=\emph{(\roman*)}]
-  \item $\hat{\mu}_{MLE}=Y$
-  \item $R(\hat{\mu}_{MLE},\mu)=\E[\lVert Y-\mu\rVert^2]=d$
-  \item If $d<3$, then $\hat{\mu}_{MLE}$ is admissable.
-  \item $\hat{\mu}_{MLE}$ is \emph{inadmissable} for $d\geq 3$.
-    In particular $\hat{\mu}_{JS,\lambda}$ (for any $\lambda$) or
-    $\hat{\mu}_{JS,PP}$ has weakly lower risk for all $\mu$ (and
-    strictly lower for at least one value).
-\end{enumerate}
-\end{prop}
-\begin{rmk}
-This is a pretty \emph{crazy} result. The elements of $Y$ are
-\emph{uncorrelated/independent}. They don't provide any information
-about each other. And yet, shrinking all elements based on the
-$L^2$-norm of $Y$ helps produce a better estimator of vector $\mu$.
-
-Moreover, it's not that we're shrinking towards some special value
-like zero---$\hat{\mu}_{JS,\lambda}$ is better for \emph{any} $\lambda$.
-We still get that the estimator dominates MLE.
-
-Of course, one important caveat: This is an only an improvement when we
-consider risk for estimating the \emph{entire vector} $\mu$.
-If we were just trying to estimate a single element, we don't get any
-improvement (since this is effectively just the $d<3$ case).
-The gains only come when estimating/testing the \emph{entire} parameter
-vector.
-
-Finally, one last caveat. All of this also assumes that the possible
-range of $\mu$ is unbounded. If we knew that $\mu$ had to lie in some
-range, we might be able to use that to get a risk improvement.
-\end{rmk}
-
-\begin{defn}(Other Estimator)
-The following also does well for $d\geq 3$:
-\begin{align*}
-  \hat{\mu}
-  =
-  \bar{Y}
-  +
-  \left(
-  1-
-  \frac{d-3}{\lVert Y-\bar{Y}\rVert}
-  (Y-\bar{Y})
-  \right)
-\end{align*}
-where $\bar{Y}$ is the mean across elements.
-\end{defn}
 
 
 
@@ -4561,2561 +3109,6 @@ properties
 \end{defn}
 
 
-\clearpage
-\section{HAC Corrections}
-
-\paragraph{Setup}
-Stationary $\{y_t\}$ with mean $\mu$ and LRV
-\begin{align*}
-  \omega^2
-  =
-  \limT \Var(\sqrt{T}\hat{\mu})
-  =
-  \sum_{j=-\infty}^\infty \gamma(j)
-\end{align*}
-\paragraph{Why we care}
-Want to construct tests and confidence intervals for $\mu$, which we can
-do via the CLT since
-\begin{align*}
-  \sqrt{T}(\hat{\mu}-\mu)
-  \dto \calN(0,\omega^2)
-\end{align*}
-\paragraph{Spectral}
-We have that
-\begin{align*}
-  \omega^2 = 2\pi f(0)
-  \qquad\text{where}\quad
-  f(\lambda)
-  =
-  \frac{1}{2\pi}
-  \sum_{j=-\infty}^\infty
-  \cos(j\lambda)\gamma(j)
-\end{align*}
-Also can define
-\begin{align*}
-  Z_\ell^{\cos}
-  =
-  \frac{\sqrt{2}}{\sqrt{T}}
-  \sumtT
-  \cos\big(2\pi\ell(t-1)/T\big)y_t
-  \quad\qquad
-  Z_\ell^{\sin}
-  =
-  \frac{\sqrt{2}}{\sqrt{T}}
-  \sumtT
-  \sin\big(2\pi\ell(t-1)/T\big)y_t
-\end{align*}
-We have $T$ random variables $\sqrt{T}\hat{\mu}$,
-$\{Z_\ell^{\cos}\}_{\ell=1}^{(T-1)/2}$, and
-$\{Z_\ell^{\sin}\}_{\ell=1}^{(T-1)/2}$
-such that all pairwise correlations go to zero and
-\begin{align*}
-  \E\big[(Z_\ell^{\cos})^2\big]
-  \ra
-  2\pi f(2\pi\ell/T)
-  \quad\qquad
-  \E\big[(Z_\ell^{\sin})^2\big]
-  \ra
-  2\pi f(2\pi\ell/T)
-\end{align*}
-From which we can define the periodogram
-\begin{align*}
-  p_\ell
-  =
-  \frac{1}{2}
-  \big(
-  (Z_\ell^{\cos})^2
-  +(Z_\ell^{\sin})^2
-  \big)
-  \quad\implies\quad
-  \E[p_\ell]
-  \ra
-  2\pi f(2\pi\ell/T)
-\end{align*}
-Can also define
-\begin{align*}
-  Y_\ell
-  =
-  \frac{\sqrt{2}}{\sqrt{T}}
-  \sum_{\ell=1}^T
-  \cos\big(\pi\ell(t-1/2)/T\big)y_t
-  \qquad
-  \ell=1,\ldots,T-1
-\end{align*}
-Note that
-\begin{align*}
-  \E[Y_\ell^2]
-  \pto 2\pi f(\pi\ell/T)
-\end{align*}
-
-
-\paragraph{Consistent Estimators of $\omega^2$}
-There are a few
-\begin{itemize}
-  \item \emph{Periodogram}:
-    Assume $f(\lambda)$ flat over frequencies $[0,2\pi n_T/T]$ for some
-    $n_T$ that depends upon sample size $T$ and satisfies $n_T\ra\infty$ and
-    $n_T/T\ra 0$.
-    Then estimate
-    \begin{align*}
-      \hat{\omega}_{p,n_T}^2=
-      \frac{1}{n_T}\sum_{\ell=1}^{n_T}p_\ell
-      %\quad\pto\quad\omega^2
-    \end{align*}
-
-  \item \emph{Kernel}:
-    For some kernel $k$ and $S_T$ such that $S_T\ra\infty$ and
-    $S_T/T\ra\infty$, define
-    \begin{align*}
-      \hat{\omega}^2_{k,S_T}
-      =
-      \sum_{j=-T+1}^{T-1}
-      k(j/S_T)\hat{\gamma}(j)
-      \approx
-      \sum_{\ell=1}^{(T-1)/2}
-      K_{T,\ell}p_\ell
-      \qquad\text{where}\quad
-      K_{T,\ell}
-      =
-      \frac{2}{T}
-      \sum_{j=-T+1}^{T-1}
-      \cos(2\pi j\ell/T)k(j/S_T)
-    \end{align*}
-    Note that $\sum_{\ell=1}^{(T-1)/2}K_{T,\ell}\ra 1$.
-
-  \item
-    Consistently estimate the parameters of an ARMA for the process,
-    plug in these estimates of the parameters into the analytical
-    formula for the spectrum of an ARMA at frequency zero.
-
-    One way to estimate those parameters is to construct construct
-    Whittle's approximate log-likelihood from the asymptotic normality
-    of the $p_\ell$ coordinates.
-\end{itemize}
-\paragraph{Inconsistent LRV Estimators}
-If we're doing testing, we care about the distribution of
-\begin{align*}
-  t=
-  \frac{\sqrt{T}(\hat{\mu}-\mu)}{\hat{\omega}}
-\end{align*}
-But in general, we can't ignore uncertainty about $\hat{\omega}$ (i.e.
-treate $\hat{\omega}\approx \omega$).
-Rather, $\hat{\omega}$ might not have a nondegenerate distribution.
-For example, if we construct $\hat{\omega}^2$ as the average of the
-first few periodogram ordinates, we need to use only a few periodogram
-coordinates to avoid bias in $\hat{\omega}$.
-But that means we can't quite invoke the CLT.
-
-Better to then think of $\hat{\omega}$ as a RV, in which case $t$ really
-does have a student's $t$ distribution with $2n$ degrees of freedom
-(where $n$ is the number of periodogram coordinates).
-
-Can also construct
-\begin{align*}
-  \hat{\omega}_{Y,q}^2
-  =
-  \frac{1}{q}
-  \sum_{\ell=1}^q Y_\ell^2
-\end{align*}
-
-
-\clearpage
-Outline
-\begin{enumerate}
-  \item
-    Put data into vector, treat data as a function on $\Z$ with
-    period $T$ (the number of observations).
-    Discrete Fourier transform to get the coefficients.
-
-  \item Define basis and Fourier frequencies from that basis.
-    Show that basis is in fact a basis.
-
-  \item Derive Fourier coefficients, which we get from the discrete
-    Fourier transform
-
-  \item Periodogram definition
-  \item Write data vector out in terms of the basis, then switch to sin
-    and cosine notation.
-    Get another orthonormal basis
-  \item Relate periodogram to sample autocvariance function
-  \item Linear interpolation of periodogram
-  \item Convergence of periodogram to population specture
-  \item
-\end{enumerate}
-
-\clearpage
-Two nonparametric estimators:
-\begin{itemize}
-  \item Kernel average of periodogram ordinates about zero, with
-    bandwidth term $\ra\infty$ so that as the sample size grows, you use
-    a smaller fraction of ordinates (but still infinitely many).
-  \item Weighted sum of sample autocovariances
-\end{itemize}
-Some facts about these two representations
-\begin{itemize}
-  \item They are \emph{exactly} equivalent if we match the kernel and
-    the weights appropriately.
-    And those weights will approximately sum to one.
-  \item More usefully, the weights are approximately related to the
-    Fourier transform of the kernel, called the spectral lag window.
-    Sometimes we start with the spectral lag window, and recover the
-    kernel.
-  \item Both estimators are nonnegative. This can be seen most easily in
-    the kernel way of writing things, and then that carries over
-    immediately to the autocovariance way of writing things
-\end{itemize}
-Therefore, we have three representations of the nonparametric estimator
-given kernel $K$
-\begin{align*}
-  \hat{\omega}^2
-  &=
-  b_T
-  \Delta
-  \sum_{\ell \in F_T}
-  K(b_T\lambda_\ell)
-  I_T(\lambda_\ell)
-  =
-  \sum_{k=-(T-1)}^{T-1}
-  w_T(k)
-  \hat{\gamma}(k)
-  \approx
-  \sum_{k=-(T-1)}^{T-1}
-  H(k/b_T)
-  \hat{\gamma}(k)
-\end{align*}
-where
-\begin{align*}
-  w_T(k)
-  =
-  b_T
-  \Delta
-  \sum_{\ell\in F_T}
-  K(b_T\lambda_\ell)
-  e^{-i\lambda_\ell k}
-  \quad\qquad
-  H(c) =
-  \int_{-\infty}^\infty
-  K(s)
-  e^{-ics}
-  \;ds
-\end{align*}
-Let $\Delta = 2\pi/T$ denote the spacing between Fourier frequencies so
-that $\lambda_\ell=\Delta \ell$.
-Then define estimator
-\begin{align*}
-  \hat{\omega}^2
-  &=
-  b_T
-  \Delta
-  \sum_{\ell \in F_T}
-  K(b_T\lambda_\ell)
-  I_T(\lambda_\ell)
-  \qquad\text{where $b_T$ s.t.}\quad
-  \begin{cases}
-    b_T \;\quad\ra\infty \\
-    b_T/T \ra0
-  \end{cases}
-\end{align*}
-Note that the weights sum to one approximately:
-\begin{align*}
-  b_T
-  \Delta
-  \sum_{\ell\in F_T}
-  K(b_T\lambda_\ell)
-  =
-  b_T\Delta
-  \sum_{\ell\in F_T}
-  K\left(
-    b_T\Delta
-    \ell
-  \right)
-  =
-  \frac{1}{u_T}
-  \sum_{\ell=[-(T-1)/2]}^{[T/2]}
-  K(\ell/u_T)
-  \quad
-  \ra
-  \quad
-  \int_{-\infty}^\infty K(s)
-  =1
-\end{align*}
-where $u_T=(b_T\Delta)^{-1}\ra\infty$ since
-$b_T\Delta = 2\pi b_T/T\ra 0$.
-
-To derive a formula for this estimator in terms of $\hat{\gamma}(k)$,
-use the definition of $I_T(\lambda_\ell)$:
-\begin{align*}
-  \hat{\omega}^2
-  &=
-  b_T
-  \Delta
-  \sum_{\ell\in F_T}
-  K(b_T\lambda_\ell)
-  \delta_\ell
-  \overline{\delta}_\ell
-  \\
-  &=
-  b_T
-  \Delta
-  \sum_{\ell\in F_T}
-  \left[
-  K(b_T\lambda_\ell)
-  \left(
-  \frac{1}{\sqrt{T}}
-  \sumtT y_te^{i\lambda_\ell t}
-  \right)
-  \left(
-  \frac{1}{\sqrt{T}}
-  \sumtT y_te^{-i\lambda_\ell t}
-  \right)
-  \right]
-  \\
-  &=
-  b_T
-  \Delta
-  \frac{1}{T}
-  \sum_{\ell\in F_T}
-  \left[
-    K(b_T\lambda_\ell)
-  \left(
-  \sumtT
-  \sum_{s=1}^T
-  y_ty_s
-  e^{-i\lambda_\ell t}
-  e^{i\lambda_\ell s}
-  \right)\right]
-\end{align*}
-Write out all the terms of the sums, grouping as follows:
-\begin{align*}
-  \hat{\omega}^2
-  &=
-  b_T
-  \Delta
-  \frac{1}{T}
-  \sum_{\ell\in F_T}
-  \bigg[
-    K(b_T\lambda_\ell)
-  \bigg(
-  \big[
-    y_1^2e^{-i\lambda_\ell 1}e^{i\lambda_\ell 1}
-    +
-    \cdots
-    +
-    y_T^2e^{-i\lambda_\ell T}e^{i\lambda_\ell T}
-  \big]
-  \\
-  &\quad\qquad\qquad\qquad\qquad\quad
-  +
-  \big[
-    y_2y_1
-    e^{-i\lambda_\ell 2}e^{i\lambda_\ell 1}
-    +
-    \cdots
-    +
-    y_{T}y_{T-1}
-    e^{-i\lambda_\ell T}e^{i\lambda_\ell (T-1)}
-  \big]
-  \\
-  &\quad\qquad\qquad\qquad\qquad\quad
-  +
-  \big[
-    y_1y_2
-    e^{-i\lambda_\ell 1}e^{i\lambda_\ell 2}
-    +
-    \cdots
-    +
-    y_{T-1}y_T
-    e^{-i\lambda_\ell (T-1)}e^{i\lambda_\ell T}
-  \big]
-  \\
-  &\quad\qquad\qquad\qquad\qquad\quad
-  +
-  \big[
-    y_3y_1
-    e^{-i\lambda_\ell 3}e^{i\lambda_\ell 1}
-    +
-    \cdots
-    +
-    y_{T}y_{T-2}
-    e^{-i\lambda_\ell T}e^{i\lambda_\ell (T-2)}
-  \big]
-  \\
-  &\quad\qquad\qquad\qquad\qquad\quad
-  +
-  \big[
-    y_1y_3
-    e^{-i\lambda_\ell 1}e^{i\lambda_\ell 3}
-    +
-    \cdots
-    +
-    y_{T-2}y_T
-    e^{-i\lambda_\ell (T-2)}e^{i\lambda_\ell T}
-  \big]
-  \\
-  &\quad\qquad\qquad\qquad\qquad\quad
-  \;\,\vdots
-  \\
-  &\quad\qquad\qquad\qquad\qquad\quad
-  +
-  \big[
-    y_Ty_1
-    e^{-i\lambda_\ell T}e^{i\lambda_\ell 1}
-  \big]
-  \\
-  &\quad\qquad\qquad\qquad\qquad\quad
-  +
-  \big[
-    y_1y_T
-    e^{-i\lambda_\ell 1}e^{i\lambda_\ell T}
-  \big]
-  \bigg)
-  \bigg]
-\end{align*}
-By writing things out this way, we see that we can regroup to write the
-estimator as:
-\begin{align*}
-  \hat{\omega}^2
-  &=
-  b_T
-  \Delta
-  \frac{1}{T}
-  \sum_{\ell\in F_T}
-  \bigg[
-    K(b_T\lambda_\ell)
-  \bigg(
-  \sum_{t=1}^T
-  y_t^2
-  +
-  \sum_{k=1}^{T-1}
-  \sum_{t=k+1}^T
-  \big[
-  y_ty_{t-k}
-  e^{-i\lambda_\ell k}
-  +
-  y_{t-k}y_{t}
-  e^{i\lambda_\ell k}
-  \big]
-  \bigg)
-  \bigg]
-  \\
-  &=
-  b_T
-  \Delta
-  \frac{1}{T}
-  \sum_{\ell\in F_T}
-  \bigg[
-    K(b_T\lambda_\ell)
-  \bigg(
-  \sum_{k=-(T-1)}^{T-1}
-  \sum_{t=k+1}^T
-  y_ty_{t-k}
-  e^{-i\lambda_\ell k}
-  \bigg)
-  \bigg]
-\end{align*}
-Reorder the sums in the above expression:
-\begin{align*}
-  \hat{\omega}^2
-  &=
-  b_T
-  \Delta
-  \sum_{k=-(T-1)}^{T-1}
-  \sum_{\ell\in F_T}
-  \left[
-    K(b_T\lambda_\ell)
-  e^{-i\lambda_\ell k}
-  \left(
-  \frac{1}{T}
-  \sum_{t=k+1}^T
-  y_ty_{t-k}
-  \right)
-  \right]
-\end{align*}
-Identify $\hat{\gamma}(k)$ as the term in parentheses and define
-$w_T(k)$ to get final expression
-\begin{align*}
-  \hat{\omega}^2
-  &=
-  \sum_{k=-(T-1)}^{T-1}
-  w_T(k)
-  \hat{\gamma}(k)
-  \qquad\text{where}\quad
-  w_T(k)
-  =
-  b_T
-  \Delta
-  \sum_{\ell\in F_T}
-  K(b_T\lambda_\ell)
-  e^{-i\lambda_\ell k}
-  %\sum_{\ell=[-(T-1)/2]}^{[T/2]}
-  %K(b_T\Delta \ell)
-  %e^{-i\Delta \ell k}
-\end{align*}
-To better understand the weight function, we examine the limiting
-behavior of $w_T(k)$.
-But to get a sensible limit, we can't just fix $k$ and take
-$T\ra\infty$.
-Instead, we must examine the limit of $w_T(k_T)$---that is, the limit of
-$w_T$ \emph{along a sequence} of lags $k_T$.
-To see how to choose that sequence, start by writing out the definition
-\begin{align*}
-  w_T(k_T)
-  &=
-  b_T
-  \Delta
-  \sum_{\ell\in F_T}
-  K(b_T\Delta \ell)
-  e^{-i\Delta \ell k_T}
-  =
-  b_T
-  \Delta
-  \sum_{\ell\in F_T}
-  K(b_T\Delta \ell)
-  e^{-i\ell b_T\Delta (k_T/b_T)}
-\end{align*}
-To get a sensible limit, it's clear that we must choose
-$k_T$ so that $k_T/b_T=c+o(1)$,
-for any constant $c$.
-Then
-\begin{align*}
-  w_T(k_T)
-  &=
-  b_T
-  \Delta
-  \sum_{\ell\in F_T}
-  K(b_T\Delta \ell)
-  e^{-ic\ell b_T\Delta}
-  +
-  o_p(1)
-  =
-  \frac{1}{u}
-  \sum_{\ell\in F_T}
-  K(\ell/u)
-  e^{-ic\ell/u}
-  +
-  o(1)
-\end{align*}
-where $u=(b_T\Delta)^{-1}\ra\infty$ since $b_T\Delta=2\pi b_T/T\ra 0$.
-Therefore
-\begin{align*}
-  w_T(k_T)
-  =
-  \frac{1}{u}
-  \sum_{\ell\in F_T}
-  K(\ell/u)
-  e^{-ic\ell/u}
-  +
-  o(1)
-  \quad\ra\quad
-  \int_{-\infty}^\infty
-  K(s)
-  e^{-ics}
-  \;ds
-  =: H(c) = H(k_T/b_T)
-\end{align*}
-Notice that $w_T(k_T)$ converges to $H(c)$ (the spectral lag window),
-which is the Fourier Transform of $K(s)$ (the kernel or spectral
-window).\footnote{%
-  The inverse transform is given by
-  $K(c)=\frac{1}{2\pi}\int_{-\infty}^\infty H(s)e^{-isc}\,ds$
-}
-
-So given $w_T(k_T)\ra H(k_T/b_T)$, we will approximate
-$w_T(k)\approx H(k/b_T)$; therefore,
-\begin{align*}
-  \hat{\omega}^2
-  &=
-  \sum_{k=-(T-1)}^{T-1}
-  w_T(k)
-  \hat{\gamma}(k)
-  \approx
-  \sum_{k=-(T-1)}^{T-1}
-  H(k/b_T)
-  \hat{\gamma}(k)
-\end{align*}
-With a kernel that integrats to unity, then $H(0)=1$.
-And with $k/b_T\ra 0$ for all fixed $k$, all sample autocovariances get
-weight one, so we just add up all sample covariances. Hence,
-$\hat{\omega}^2\ra\omega^2$.
-
-The Bartlett window is $H(x)=(1-|x|)\mathbf{1}\{|x|<1\}$, which gives
-the Newey-West estimator.
-
-
-
-
-\clearpage
-\section{van der Waart}
-
-
-\clearpage
-\subsection{Contiguity}
-
-\begin{prop}
-\label{prop:absconttransfer}
-\emph{(Absolute Continuity \& Eventually Measure-Zero Sets)}
-Suppose $Q<<P$, i.e. $Q$ absolutely continuous w.r.t. $P$.
-Then for any sequence of measurable sets $\{A_n\}\subseteq \sF$,
-\begin{align*}
-  P[A_n] \ra 0
-  \qquad\implies\qquad
-  Q[A_n] \ra 0
-\end{align*}
-This will be the notion of absolute continuity that we generalize to
-define contiguity.
-\end{prop}
-\begin{cor}
-\emph{(Abs. Continuity \& Transferring $o_P$ to $o_Q$)}
-Given sequence of RVs $\{X_n\}\ninf$
-\begin{align*}
-  \begin{rcases}
-    X_n = o_P(1) \\
-    Q<<P \\
-  \end{rcases}
-  \quad\implies\quad
-  X_n=o_Q(1)
-\end{align*}
-\end{cor}
-\begin{proof}
-Note that by the definitions
-\begin{align*}
-  X_n = o_P(1)
-  \quad\iff\quad
-  X_n \pto 0
-  \quad\iff\quad
-  \forall \varepsilon,\quad
-  P[|X_n|>\varepsilon]\ra 0
-\end{align*}
-Letting $A_n=\{|X_n|>\varepsilon\}$, we then have by
-Proposition~\ref{prop:absconttransfer}
-\begin{align*}
-  \forall \varepsilon,\quad
-  Q[|X_n|>\varepsilon] \ra 0
-  \quad\iff\quad
-  X_n \overset{Q}{\ra} 0
-  \quad\iff\quad
-  X_n = o_Q(1)
-\end{align*}
-which is exactly what we want.
-\end{proof}
-
-\begin{defn}(Contiguity)
-Sequence of measures $Q_n$ is \emph{contiguous} to $P_n$, denoted $Q_n
-\vartriangleleft P_n$, if and only if
-\begin{align*}
-  P_n[A_n]\ra 0
-  \quad\implies\quad
-  Q_n[A_n]\ra 0
-\end{align*}
-This generalizes abs. continuity of measures to \emph{sequences} of
-measures.
-It means that, in the limit, the sequence of measures are ``on top of''
-each other and can't be distinguished.
-Contiguity is useful because it lets us transfer convergence in
-probability or distribution under some well-behaved, well-understood,
-baseline sequence of measures $P_n$ to an often messier contiguous
-sequence of measures $Q_n$, which we'd \emph{like} to know more about.
-%The set of contiguous models are often idexed by the rate of approach,
-%i.e. $\theta_0+gT^{-1/2}$ contiguous for \emph{all} $g\in\R$.
-\end{defn}
-
-\begin{thm}
-\emph{(LeCam's 1st Lemma: Establishing Contiguity, Transferring
-Conv. in Prob.)}
-\label{thm:lecams1st}
-The following are equivalent
-\begin{enumerate}[label=\emph{(\roman*)}]
-  \item $Q_n \vartriangleleft P_n$, i.e. $Q_n$ contiguous to $P_n$
-  %\item $\frac{dP_n}{dQ_n}\dto_{Q_n} U$ with $P[U>0]=1$
-  \item $\frac{dQ_n}{dP_n}\underset{P_n}{\dto} L$ with
-    $\E[L]=1$.\footnote{%
-      We are implicitly assuming $Q_n<<P_n$ for all $n$ so
-      $\frac{dQ_n}{dP_n}$ is well-defined.
-    }
-  \item For any sequence of RVs $X_n:\Omega_n\ra\Rk$,
-    $X_n = o_{P_n}(1)$
-    implies
-    $X_n = o_{Q_n}(1)$
-\end{enumerate}
-\end{thm}
-\begin{rmk}
-Often, we use (ii) to establish (i).
-Intuition: Statement (ii) says that the sequence of LRs converge to an
-RV that behaves like a Radon-Nikodym/likelihood-ratio (i.e. $\E[L]=1$,
-so no mass has escaped to infinity); therefore, the experiments are
-``close'' even in the limit.
-\end{rmk}
-
-\begin{thm}
-\label{thm:lecams3rd}
-\emph{(Generalized LeCam's 3rd Lemma: Transferring Conv. in Dist.)}
-%: Deriving Asymptotic
-%Distribution of the Contiguous Model from Baseline Model)}
-Suppose we have sequences of measures $\{P_n\}$ and $\{Q_n\}$ such that
-$Q_n<<P_n$ for all $n$. Suppose also that we have RV $X_n$
-(generally some test, statistic, etc.) and that
-\begin{align*}
-  \left(\frac{dQ_n}{dP_n},X_n\right)
-  \quad\underset{P_n}{\dto}\quad
-  (L,X)
-  \qquad \text{where}\quad
-  \E_X[L]=1
-\end{align*}
-Then by the previous theorem, $Q_n\vartriangleleft P_n$ and,
-additionally
-\begin{align}
-  X_n\;\underset{Q_n}{\dto}\;\tilde{X}
-  \qquad \text{where}\quad
-  P_{\tilde{X}}\big[\tilde{X}\in B\big]
-  = \E_{\tilde{X}}\big[\mathbf{1}\{\tilde{X}\in B\}\big]
-  =\E_X\big[L\cdot \mathbf{1}\{X\in B\}\big]
-  \label{lecams3rd}
-\end{align}
-\end{thm}
-\begin{rmk}
-Given $Q_n\vartriangleleft P_n$, Part (iii) of Lecam's First Lemma
-allows us to transfer convergence in \emph{probability} under $P_n$ to
-$Q_n$.
-Lecam's Third Lemma similarly lets us transfer convergence in
-\emph{distribution}, and also fully specifies the distribution under
-$Q_n$ by Expression~\ref{lecams3rd}.
-\end{rmk}
-
-%\begin{cor}\emph{(Specialized LeCam's Third Lemma)}
-%Suppose that we have
-%\begin{align*}
-  %\left(X_n,\ln \frac{dQ_n}{dP_n}\right)
-  %\dto_{P_n}
-  %\calN\left(
-  %\begin{pmatrix}
-    %\mu \\ -\frac{1}{2}\sigma^2
-  %\end{pmatrix},\;
-  %\begin{pmatrix}
-    %\Sigma & \tau  \\
-    %\tau' & \sigma^2
-  %\end{pmatrix}
-  %\right)
-%\end{align*}
-%The all the conditions of teh above theorem are satisfied, hence
-%$Q_n\vartriangleleft P_n$ and
-%\begin{align*}
-  %X_n
-  %\dto_{Q_n}
-  %\calN(\mu+\tau, \Sigma)
-%\end{align*}
-%Note, asymptotic covariance of $X_n$ is the same under $Q_n$ but mean
-%shifted.
-%\end{cor}
-
-%\begin{ex}
-%Suppose we have
-%\begin{align}
-  %\frac{dQ_n}{dP_n}\dto_{P_n}
-  %e^{\calN(\mu,\sigma^2)}
-  %\label{lanintro}
-%\end{align}
-%Then already, $P_n\vartriangleleft Q_n$ since (ii) is equivalent to (i).
-%Moreover, $Q_n\vartriangleleft P_n$ iff $\mu=-\frac{1}{2}\sigma^2$ since
-%(iii) is equivalent to (i).
-%This is important because Assumption~\ref{lanintro} means that the model
-%is locally asymptotically normal, which is a special concept we will
-%define and study below.
-%\end{ex}
-
-%\begin{proof}
-%(Theorem~\ref{thm:lecams1st})
-%\end{proof}
-
-
-\clearpage
-\subsection{Limits of Experiments}
-
-\begin{comment}
-Asymptotic analysis is useful as a general \emph{framework} or
-\emph{device} with two applications:
-\begin{itemize}
-  \item Finding/deriving approximate distributions, tests,
-    test statistics, confidence regions
-  \item \emph{Given} tests, test statistics, confidence regions,
-    we can evalute their asymptotic optimality, efficiency, or quality,
-    in an asymptotic variance or asymptotic power sense
-\end{itemize}
-This is carried by starting with likelihood/model $p(y_{1:N}|\theta)$ fo
-the sample $y_{1:N}$, taking $N\ra\infty$, and invoking the LLN and CLT
-to get to get the asymptotic distribution of some function $S(y_{1:N})$
-of the data, whether that function is an estimator, a test, a confidence
-region, etc.
-
-The magic lies in the fact that, while the finite sample distribution of
-$y_{1:N}$ is often complicated or intractable, the LLN and CLT
-drastically simplify the asymptotic distribution of $S(y_{1:N})$ into
-something normal. Asymptotic normality of estimators, test statistics,
-and even models (in the limits of experiments literature) are a hallmark
-of asymptotic statistics.
-
-Note that all of this assumes the asymptotic distribution is a good
-approximation of the finite sample distribution.
-There's a priori no reason this should be the case, and asymptotics does
-not explicitly imply bounds on the error or mistake. But can do
-simulation studies to test whether it's a good approximation.
-\end{comment}
-
-
-\begin{defn}(Model/Experiment)
-A \emph{model} or \emph{experiment} is the triple
-$(\Omega,\sF,\{P_\theta\}_{\theta\in  \Theta})$ consisting of a measurable space
-$(\Omega,\sF)$ together with a collection of probability measures for
-that measurable space $\{P_\theta\}_{\theta\in  \Theta}$.
-Often though, we don't even specify the measurable space $(\Omega,\sF)$
-since it's either obvious or unimportant, and we just refer to
-$\{P_\theta\}_{\theta\in  \Theta}$ as the model/experiment. That's where
-all the action is anyway.
-
-In particular, $\{P_\theta\}_{\theta\in  \Theta}$ represents the collection of all
-possible distributions for some RV $X$.
-Fixing $\theta$, $P_\theta$ makes ex ante probability statements about
-the distribution of $X$. Alternatively, given an observation $X$, we can
-do inference about which distribution $P_\theta$ most likely produced
-that particular realization.
-Most generally, $ \Theta$ represents an arbitrary index set.
-However in practice, we often consider distributions $P_\theta$ in some
-\emph{parameteric} family that are absolutely continuous with respect to
-the Lebesgue or counting measure, hence they permit a density or mass
-function of the form $p(x|\theta)$ (i.e. a likelihood) with $\theta$
-representing a parameter vector in Euclidean space (rather than just an
-arbitrary index). But of course, the theory is general.
-\end{defn}
-\begin{rmk}
-From now on, I will use the customary phrase ``experiment'' rather than
-``model.''
-\end{rmk}
-
-\begin{defn}(Sequence of Experiments)
-\label{defn:seqexp}
-A \emph{sequence of experiments} is the sequence
-\begin{align*}
-  \big\{\Omega_n,\sF_n,\{P_{n,\theta}\}_{\theta\in  \Theta}
-  \big\}_{n\in \N}
-\end{align*}
-Each element is a measurable space $(\Omega_n,\sF_n)$ and
-collection of candidate measures $\{P_{n,\theta}\}_{\theta\in  \Theta}$.
-
-Most often, such a sequence arises in thinking about an iid sample
-$\{X_i\}_{i=1}^n$, where each observation $X_i$ has distribution $P_\theta$
-on $(\Omega,\sF)$.
-Then the $n$th element in the sequence of experiments is the
-triplet $(\Omega_n,\sF_n,\{P_{n,\theta}\}_{\theta\in  \Theta})$ where
-$(\Omega_n,\sF_n)$ is the product space and $P_{n,\theta}$ the product
-measure for the sample $\{X_i\}_{i=1}^n$, built from $n$ copies of
-underlying $P_\theta$.
-\end{defn}
-
-\begin{defn}(Likelihood Ratio Process)
-Given experiment $\{P_\theta\}_{\theta\in \Theta}$ and fixed parameter
-$\theta_0\in \Theta$, the \emph{likelihood ratio process with
-base $\theta_0$} is defined as
-\begin{align*}
-  \left(
-  \frac{dP_\theta}{dP_{\theta_0}}(X)
-  \right)_{\theta\in \Theta}
-\end{align*}
-A few things to note
-\begin{itemize}
-  \item If $P_\theta$ and $P_{\theta_0}$ are both
-    abs. continuous with respect to some common measure, then the
-    LR is the ratio of the densities (Radon Nikodym deriv) w.r.t.
-    that common measure.
-
-    For example, if $P_\theta$ is a $\calN(\theta,I_k)$ distribution, then the
-    likelihood ratio is the ratio of the multivariate normal densities
-    for $\calN(\theta,I_k)$ and $\calN(\theta_0,I_k)$ RVs.
-  \item The likelihood ratios have argument $X$ to remind that the LRs
-    are themselves RVs whose distributions depend on the realization of
-    the observation $X$.
-  \item The set $\Theta$ is unrestricted so that the process can
-    generally be infinite-dimensional, though it's often Euclidean space
-    $\R^k$.
-\end{itemize}
-\end{defn}
-
-\clearpage
-\begin{defn}(Equivalent Experiments)
-Experiments $X\sim\{P_\theta\}_{\theta\in\Theta}$ and
-$Y\sim\{Q_\theta\}_{\theta\in\Theta}$ are \emph{equivalent} if,
-for every finite subset $I\subset \Theta$ and every baseline parameter
-value $\theta_0$,
-\begin{align*}
-  \left(
-  \frac{dP_\theta}{dP_{\theta_0}}(X)
-  \right)_{\theta\in I}
-  \quad
-  \underset{\theta_0}{\sim}
-  \quad
-  \left(
-  \frac{dQ_\theta}{dQ_{\theta_0}}(Y)
-  \right)_{\theta\in I}
-\end{align*}
-In words, if the vector of LRs (for fixed base $\theta_0$ and different
-$\theta$'s across elements of the vector) have the same distribution
-distribution (under baseline law $\theta_0$).
-\end{defn}
-
-\begin{prop}
-\emph{(Sufficient Stat $\implies$ Equivalent Experiments)}
-Suppose we observe $X$ in experiment $\{P_\theta\}_{\theta\in\Theta}$,
-and that in this experiment, $S(X)$ is a sufficient statistic for
-$\theta$.
-Define the experiment of observing $S$ in the experiment
-$\{P_\theta\circ S^{-1}\}_{\theta\in\Theta}$.
-
-Then $\{P_\theta\}_{\theta\in\Theta}$ and
-$\{P_\theta\circ S^{-1}\}_{\theta\in\Theta}$ are equivalent experiments.
-\end{prop}
-\begin{proof}
-For simplicity, suppose $P_\theta$ permits density $p_\theta$.
-Because $S(X)$ is sufficient for $\theta$, can factor the density
-$p_\theta(x)=f(x)g_\theta(S(x))$ for some functions $f(x)$ and
-$g_\theta(s)$.
-Then LR satisfies
-\begin{align*}
-  \text{for $X\sim P_{\theta_0}$}\qquad
-  \frac{p_\theta(X)}{p_{\theta_0}(X)}
-  = \frac{f(X)g_\theta(S(X))}{f(X)g_{\theta_0}(S(X))}
-  = \frac{g_\theta(S(X))}{g_{\theta_0}(S(X))}
-  \quad
-  \underset{\theta_0}{\sim}
-  \quad
-  \frac{g_\theta(S)}{g_{\theta_0}(S)}
-  \quad
-  \text{for $S\sim P_{\theta_0}\circ S^{-1}$}\qquad
-\end{align*}
-Because $g_\theta(s)$ is proportional to the density of
-$S\sim P_{\theta_0}\circ S^{-1}$ (by the simple change of variables
-formula), we're done.
-\end{proof}
-
-\begin{ex}(Equivalent Normal Experiments)
-For nonsingular matrix $J$, the following experiments are equivalent
-\begin{align*}
-  X\sim\{\calN(h,J^{-1})\}_{h\in H}
-  \qquad
-  Y\sim\{\calN(Jh,J)\}_{h\in H}
-\end{align*}
-Note that $Y \underset{h}{\sim} JX$ and
-\begin{align}
-  p_h(x)
-  &=
-  \frac{1}{|2\pi J|^{-\frac{k}{2}}}
-  \exp\left\{
-  -
-  \frac{1}{2}
-  (x-h)'J(x-h)
-  \right\}
-  \label{expX}
-  \\
-  p_h(y)
-  &=
-  \frac{1}{|2\pi J|^{\frac{k}{2}}}
-  \exp\left\{
-  -
-  \frac{1}{2}
-  (y-Jh)'J^{-1}(y-Jh)
-  \right\}
-  \label{expY}
-\end{align}
-(\emph{Direct Proof})
-Form the log-likelihood ratios
-\begin{align*}
-  \ln\frac{p_h(X)}{p_{h_0}(X)}
-  &=
-  -
-  \frac{1}{2}
-  \left[
-  - 2 (h-h_0)'JX
-  + h'Jh
-  - h_0'Jh_0
-  \right]
-  \\
-  \ln
-  \frac{p_h(Y)}{p_{h_0}(Y)}
-  &=
-  -
-  \frac{1}{2}
-  \left[
-  - 2 (h-h_0)'Y
-  + h'Jh
-  - h_0'Jh_0
-  \right]
-\end{align*}
-Because $Y\underset{h}{\sim} JX$, clearly these two log-likelihood
-ratios have the same distribution. Hence the experiments are equivalent.
-\\
-\\
-(\emph{Proof by Sufficiency})
-Clearly $X$---the observation itself in the experiment
-$\{\calN(h,J^{-1})\}_{h\in H}$)---is sufficient for $h$.
-Because $J$ is nonsingular, $JX$ is also a sufficient statistic for $h$
-in the experiment $\{\calN(h,J^{-1})\}_{h\in H}$.
-Therefore, by the previous proposition, the experiment
-of observing $X$ in $\{\calN(h,J^{-1})\}_{h\in H}$ is equivalent to
-observing $Y=JX$, which is precisely the experiment
-$\{\calN(Jh,J)\}_{h\in H}$.
-\end{ex}
-
-
-
-\clearpage
-\begin{defn}(Convergence to Limit Experiment)
-\label{defn:limitexp}
-We say that the sequence of experiments
-$\{\Omega_n,\sF_n,\{P_{n,g}\}_{g\in G}\}_{n\in\N}$
-\emph{converges to limit experiment}
-$(\Omega,\sF,\{P_{g}\}_{g\in G})$ if,
-for every possible baseline parameter value $g_0\in G$ and
-every finite subset of indices $I\subseteq  G$,
-\begin{align}
-  \left(
-  \frac{dP_{n,g}}{dP_{n,g_0}}(X_n)
-  \right)_{g\in I}
-  \quad\underset{g_0}{\dto}\quad
-  \left(
-  \frac{dP_{g}}{dP_{g_0}}(X)
-  \right)_{g\in I}
-  \label{limexp}
-\end{align}
-where $X_n$  has distribution in family $\{P_{n,g}\}_{g\in G}$,
-and $X$ has distribution in family $\{P_g\}_{g\in G}$.
-
-In words, Expression~\ref{limexp} says ``Any $|I|$-length random vector
-of LRs (with base $g_0$) in the sequence of experiments converges in
-distribution (under baseline law $g_0$) to some $|I|$-length random
-vector of LRs (with base $g_0$) in the limit experiment. Different
-elements of the vectors correspond to different values of $g$.''
-\end{defn}
-\begin{rmk}
-Note that the limit experiment is generally non-unique, even though the
-joint marginal distributions of any vector
-$\left(\frac{dP_g}{dP_{g_0}}(X)\right)_{g\in I}$ of likelihood ratios
-are unique.
-This non-uniqueness stems from the fact there may be equivalent
-experiments corresponding to any particular limit experiment that we
-choose to work with, as discussed in the previous subsection.
-This won't change any conclusions in the analysis however because they
-are equivalent for our purposes, as the name gives away.
-\end{rmk}
-
-
-\begin{thm}
-\emph{(vdW 9.3: Asymptotic Representation Theorem)}
-\label{thm:limitexp}
-Suppose sequence of experiments
-$\{\Omega_n,\sF_n,\{P_{n,g}\}_{g\in G}\}_{n\in\N}$
-converges to limit experiment
-$(\Omega,\sF,\{P_{g}\}_{g\in G})$.
-Suppose also that for any $g\in G$, sequence of statistics
-$T_n=T_n(X_n)$ where $X_n\sim P_{n,g}$ converges in distribution to
-\emph{some} (generally $g$-specific) RV $T_g$ on some probability space,
-i.e.
-\begin{align*}
-  T_n \quad\underset{g}{\dto}\quad T_g
-  %\qquad\text{where}\quad
-  %X_n \sim P_{n,g}
-  \qquad
-  \forall g
-\end{align*}
-Then we can represent $T_g$ as a (possibly randomized) function of the
-observation $X$ in the limit experiment, i.e.
-for all $g$, limit $T_g = T(X,U)$ where $X\sim P_g$.
-\end{thm}
-\begin{rmk}
-The theorem statement might seem a little pointless since we already
-assumed convergence in distribution $T_n\underset{g}{\dto} T_g$.
-But note the subtlety: We only assumed $T_n$ converges in distribution
-to \emph{some} RV in \emph{some} probability space that we don't
-necessarily care about. This theorem instead guarantees that $T_n$
-converges to an RV $T(X,U){\sim} T_g$ that is a \emph{function} of
-observation $X$ in the \emph{particular} probability space
-$(\Omega,\sF,\{P_g\}_{g\in G})$ that is the limit experiment.
-
-Thus sequence of statistics $T_n(X_n)$ in the experiments
-$\{P_{n,g}\}_{g\in G}$ are \emph{matched} by a statistic $T(X,U)$ in
-limit experiment $\{P_{g}\}_{g\in G}$.
-Practically speaking, we can then study inference in the (typically hard
-and intractable) \emph{sequence} of experiments by studying inference in
-the (often much simpler) \emph{limit} experiment.
-Much like we approximate a sequence of estimators or tests with their
-asymptotic limit, this theorem justifies approximating
-\emph{entire models/experiments} with their asymptotic limit experiment.
-It's just the right generalization that we need.
-\end{rmk}
-
-\begin{comment}
-\begin{proof}
-(\emph{Establish Joint Convergence under $g_0$})
-By assumption, we have \emph{individually}
-\begin{align}
-  \frac{dP_{n,g}}{dP_{n,g_0}}
-  \quad\underset{g_0}{\dto}\quad
-  \frac{dP_{g}}{dP_{g_0}}
-  \qquad\text{and}\qquad
-  T_n
-  \quad\underset{g_0}{\dto}\quad
-  T_{g_0}
-  \label{limitmarginals}
-\end{align}
-We want to establish \emph{joint} convergence of these objects under
-$g_0$, in addition to this (weaker) convergence of the marginals.
-
-To start, by Part (i) of Prohorov's Theorem, since
-$\frac{dP_{n,g}}{dP_{n,g_0}}$ and $T_n$ converge in distribution, both
-are uniformly tight under $g_0$ individually.
-But by the definition of uniform tightness, it's clear that if a finite
-number of RVs are uniformly tight individually, the \emph{joint} vector
-$(\frac{dP_{n,g}}{dP_{n,g_0}},T_n)$ is \emph{also} uniformly tight under
-$g_0$.
-And then, by Part (ii) Prohorov's Theorem, uniform tighness of the
-vector sequence implies that there exists a subsequence that converges
-in distribution under $g_0$, i.e. there exists a set of indices
-$\{n_i\}_{i=1}^\infty$ such that
-\begin{align*}
-  \left(\frac{dP_{n_i,g}}{dP_{n_i,g_0}},T_{n_i}\right)
-  \quad\underset{g_0}{\dto}\quad
-  \left(Y,Z\right)
-\end{align*}
-for some RVs $Y,Z$. But we can pin down those RVs. In particular, since
-the marginals of limiting RV $(Y,Z)$ must match the marginals we already
-know/assumed in Expressions~\ref{limitmarginals}, we can deduce that, in
-fact, the subsequence converges to
-\begin{align}
-  \left(\frac{dP_{n_i,g}}{dP_{n_i,g_0}},T_{n_i}\right)
-  \quad\underset{g_0}{\dto}\quad
-  \left(\frac{dP_g}{dP_{g_0}},T_{g_0}\right)
-  \label{lecams3rdstep}
-\end{align}
-Again, this is just along the subsequence, but we will move to the
-general limit in a bit.
-
-(\emph{Derive Distribution Under $g$})
-Now that we have joint convergence under $g_0$, we want the distribution
-of the statistic under $g$.
-By Proposition~\ref{prop:impcontiguity},
-$P_{n_i,g}\vartriangleleft P_{n_i,g_0}$, i.e. the subsequence of
-measures $\{P_{n_i,g}\}_{i=1}^\infty$ is contiguous to
-$\{P_{n_i,g_0}\}_{i=1}^\infty$.
-Therefore, we can use LeCam's Third Lemma in Theorem~\ref{thm:lecams3rd}
-to get the limiting distribution under $g$.
-In particular, we have
-\begin{align}
-  T_{n_i}\;\underset{g}{\dto}\;\tilde{T}_g
-  \qquad \text{where}\quad
-  P_{g}[\tilde{T}_g\in B]
-  = \E_{g}[\mathbf{1}\{\tilde{T}_g\in B\}]
-  =\E_{g_0}\left[\frac{dP_g}{dP_{g_0}}\cdot \mathbf{1}\{T_{g_0}\in B\}\right]
-  \label{tildeT}
-\end{align}
-This is the limiting distribution of the subsequence
-$\{T_{n_i}\}_{i=1}^\infty$. But because the original sequence $T_n$
-converges in distribution to $T_g$ (for any $g$) by assumption, this
-limit of the subsequence must equal the limit of the sequence, i.e.
-$\tilde{T}_g=T_g$. Hence Expression~\ref{tildeT} also characterizes the
-distribution of the limit $T_g$ of the original sequence $T_n$.
-
-(\emph{Construct Function $T(X,U)$})
-Finally, we can always choose a function $T$ so that
-\begin{align*}
-  \begin{pmatrix}
-    T(X,U) \\ X
-  \end{pmatrix}
-  \sim
-  \begin{pmatrix}
-    T_{g_0} \\ X
-  \end{pmatrix}
-\end{align*}
-Check that this has the correct distribution under $g$ by importance
-sampling.
-\end{proof}
-\end{comment}
-
-
-
-\begin{prop}
-\emph{(Convergence to Limit Exp. $\implies$ Contiguity in Sequence of
-Exp.)}
-\label{prop:impcontiguity}
-Suppose sequence of experiments
-$\{\Omega_n,\sF_n,\{P_{n,g}\}_{g\in G}\}_{n\in\N}$
-converges to limit experiment $(\Omega,\sF,\{P_{g}\}_{g\in G})$
-as in Definition~\ref{defn:limitexp}.
-Then for any $g,g_0\in G$,
-sequence $P_{n,g}$ is contiguous to $P_{n,g_0}$.
-\end{prop}
-\begin{proof}
-By assumption, Expression~\ref{limexp} holds for arbitrary $g,g_0$.
-Since $L:=\frac{dP_g}{dP_{g_0}}$ is a RN derivative between $P_{g}$ and
-$P_{g_0}$ in the limit experiment, we know it has expectation $\E[L]=1$.
-So then, since Part (ii) of Theorem~\ref{thm:lecams1st} is equivalent to
-Part (i), $P_{n,g}\vartriangleleft P_{n,g_0}$.
-\end{proof}
-
-\begin{cor}\emph{(vdW 7.: Distribution Under Contiguous Alternatives)}
-\end{cor}
-
-
-
-
-
-\clearpage
-\subsection{Limits of Exp., Contiguity under Asymptotic Normality}
-
-The leading case for the application and study of limit experiments is,
-not surprisingly, the \emph{normal} case.
-This section studies that special case of the more general ideas
-introduced in the previous subsection.
-
-\begin{comment}
-- Replace $I_\theta$ with $J$
-- Note that we can always rescale
-- Add limiting distribution of log LR ratio
-- Inspect sufficient condition
-\end{comment}
-
-\begin{defn}(Normal Experiments)
-A \emph{normal experiment} consistents of observing a single observation
-$X\sim \calN(h, I_\theta^{-1})$ for some fixed variance matrix
-$I_\theta^{-1}$ and some unknown mean $h$ that we use the observation
-$X$ to do inference about.
-The log likelihood ratio with base $h=0$ of this experiment is
-\begin{align}
-  \log\frac{d\calN(h,I_{\theta}^{-1})}{d\calN(0,I_{\theta}^{-1})}(X)
-  =
-  h'I_\theta X
-  -
-  \frac{1}{2}
-  h'I_{\theta}h
-  \label{normalexp1}
-\end{align}
-Alternatively, an equivalent formulation of a normal experiment (which
-will more closely match the derivations below) consists of observing a
-single observation $Y\sim \calN(I_\theta h, I_\theta)$ for some fixed
-invertible matrix $I_\theta$ and some unkown vector $h$ we want to do
-inference about.\footnote{%
-  It's clear that if $I_\theta$ is invertible, $I_\theta h$ vs. $h$
-  encode the same information about $h$ so there's no real difference.
-  So it's not surprising that these two experiments are equivalent for
-  the purposes of studying inference.
-}
-Then the log-likelihood ratio with base $h=0$ of this experiment is
-\begin{align}
-  \log\frac{d\calN(I_\theta h,I_{\theta})}{d\calN(0,I_{\theta})}(Y)
-  =
-  h' Y
-  -
-  \frac{1}{2}
-  h'I_{\theta}h
-  \label{normalexp2}
-\end{align}
-Either formulation works for the purpose of studying inference about
-$h$. The choice depends merely upon convenience.
-\end{defn}
-\begin{proof}
-The density of a $\calN(h,I_{\theta}^{-1})$ RV, taking $I_\theta$ fixed
-and $h$ as the parameter of interest, is
-\begin{align*}
-  \log p_h(x)
-  =
-  -\frac{1}{2}\log(2\pi|I_\theta^{-1}|^{k})
-  -
-  \frac{1}{2}
-  (x-h)'I_{\theta}(x-h)
-\end{align*}
-Forming the log-likelihood ratio
-$\log [d\calN(h,I_{\theta}^{-1})/d\calN(0,I_{\theta}^{-1})](X)=\log
-p_h(X)/p_0(X)$ gives the log-likelihood ratio presented above.
-
-For the second formulation, the density of a $\calN(I_\theta h,I_{\theta})$
-RV is
-\begin{align*}
-  \log p_h(y)
-  =
-  -\frac{1}{2}\log(2\pi|I_\theta|^{k})
-  -
-  \frac{1}{2}
-  (y-I_\theta h)'I_{\theta}^{-1}(y-I_\theta h)
-\end{align*}
-%\begin{align*}
-  %\log
-  %\frac{p_h(x)}{p_0(x)}
-  %&=
-  %\frac{1}{2}
-  %(x-I_\theta h)'I_{\theta}^{-1}(x-I_\theta h)
-  %-
-  %\frac{1}{2}
-  %x'I_{\theta}^{-1}x
-  %\\
-  %&=
-  %h'x
-  %-
-  %\frac{1}{2}
-  %h I_\theta h
-%\end{align*}
-Forming the log-likelihood ratio
-$\log [d\calN(I_\theta h,I_{\theta})/d\calN(0,I_{\theta})](Y)=\log
-p_h(Y)/p_0(Y)$ gives the log-likelihood ratio presented above.
-\end{proof}
-
-
-\begin{thm}
-\label{thm:limitnormal}
-\emph{(vdW 9.4: Sufficient Condition for Convergence to Normal Limit Exp.)}
-Suppose the likelihood ratio in the sequence of experiments
-$\{P_{n,g}\}_{g\in G}$ with base $g=0\in G\subseteq \R^d$ satisfies, for
-some constant matrix $J$ and sequence of statistics $\Delta_n$,
-\begin{align}
-  \log \frac{dP_{n,g}}{dP_{n,0}}
-  =
-  g'\Delta_n
-  -
-  \frac{1}{2}
-  g' J g
-  +
-  o_{P_{n,0}}(1)
-  \qquad\text{where}\quad
-  \Delta_n
-  \;\underset{g=0}{\dto}\;
-  \calN(0,J)
-  \label{normalsufficient}
-\end{align}
-Then sequence of experiments $\{P_{n,g}\}_{g\in G}$ converges to the
-normal experiment $\{\calN(Jg,J)\}_{g\in G}$, which is also equivalent
-to the normal experiment $\{\calN(g,J^{-1})\}_{g\in G}$.
-\end{thm}
-
-%Lastly, note that experiment
-%$\{\calN(I_{\theta_0}g,I_{\theta_0})\}_{g\in G}$ consists of observing
-%$X\sim \calN(I_{\theta_0}g,I_{\theta_0})$.
-%But because we can always scale, observing $X$ and doing inference about
-%$g$ is equivalent to observing
-%$I_{\theta_0}^{-1}X\sim \calN(g,I_{\theta_0}^{-1})$ and doing inference
-%about $g$.
-%We're just scaling differently.
-%Therefore, $\{P_{n,\theta+r_n^{-1}g}\}_{g\in \R^k}$ equivalently
-%converges to normal experiment
-%$\{\calN(g,I_{\theta_0}^{-1})\}_{g\in G}$.
-%See van der Waart Example 9.2
-
-The above theorem gives a sufficient condition for convergence to a
-normal limit experiment---namely Condition~\ref{normalsufficient}.
-But most parameteric problems aren't strictly asymptotically normal
-right out of the gate. Rather, they are \emph{locally} asymptotically
-normal at any given $\theta_0$, meaning that we need to reparameterize
-(effectively recentering) the problem at $\theta_0$ to get something
-that converges to a normal limit experiment.
-
-
-\begin{defn}
-(vdW 7.14: Local Asymptotic Normality \& Associated Reparameterization)
-Suppose $X_n$ has distribution $P_{n,\theta}$ in some family
-$\{P_{n,\theta}\}_{\theta\in\Theta}$ where $\Theta$ is an open subset of
-$\R^k$.
-Then sequence of experiments $\{P_{n,\theta}\}_{\theta\in \Theta}$ is
-\emph{locally asymptotically normal (LAN) at $\theta_0$} if there exist
-matrices $r_n$, fixed matrix $I_{\theta_0}$, and random vectors
-$\Delta_{n,\theta_0}$ such that for every converging sequence $g_n\ra
-g$, the LRs satisfy
-\begin{align}
-  \log \frac{dP_{n,\theta_0+r_n^{-1}g_n}}{dP_{n,\theta_0}}
-  =
-  g'\Delta_{n,\theta_0}
-  -
-  \frac{1}{2}
-  g' I_{\theta_0} g
-  +
-  o_{P_{n,\theta_0}}(1)
-  \qquad\text{where}\quad
-  \Delta_{n,\theta_0}
-  \;\underset{\theta_0}{\dto}\;
-  \calN(0,I_{\theta_0})
-  \label{LANcond}
-\end{align}
-The word ``locally'' in the phrase LAN emphasizes that the convergence
-to a normal limit exp. obtains \emph{at} $\theta$.
-Many standard models are LAN, as detailed in Proposition.
-
-For LAN models it then makes sense to ``reparameterize'' the problem and
-replace study of the LAN sequence of experiments
-$\{P_{n,\theta}\}_{\theta\in\Theta}$ (viewed as function of parameter
-$\theta\in\Theta$) with study of experiments
-\begin{align*}
-  \{\tilde{P}_{n,g}\}_{g\in G}:=\{P_{n,\theta_0+r_n^{-1}g}\}_{g\in G}
-\end{align*}
-viewed as a function of local parameter $g$ for fixed $\theta_0$.
-Then we can equivalently reformulate Condition~\ref{LANcond} for the
-log-LR of the experiments $\{P_{n,\theta}\}_{\theta\in\Theta}$ into the
-following condition for the log-LR of experiments
-$\{\tilde{P}_{n,g}\}_{g\in G}$
-\begin{align}
-  %\log \frac{dP_{n,\theta_0+r_n^{-1}g_n}}{dP_{n,\theta_0}}
-  %=
-  \log \frac{d\tilde{P}_{n,g_n}}{d\tilde{P}_{n,0}}
-  =
-  g'\Delta_{n,0}
-  -
-  \frac{1}{2}
-  g' I_{\theta_0} g
-  +
-  o_{\tilde{P}_{n,0}}(1)
-  \qquad\text{where}\quad
-  \Delta_{n,0}
-  \;\underset{g=0}{\dto}\;
-  \calN(0,I_{\theta_0})
-  \label{LANcond2}
-\end{align}
-In this reparameterized definition of LAN, it's easy to show how the
-definition of LAN implies convergence to a normal limit experiment as in
-Theorem~\ref{thm:limitnormal}.
-See next corollary.
-
-%Just like small sample behavior of log like from model
-%\begin{align*}
-  %Y \sim \calN(\calI^{1/2}g,I_k)
-%\end{align*}
-\end{defn}
-
-
-\begin{cor}
-\emph{(vdW 9.5: LAN $\implies$ Convergence of Repar. Problem to Normal Limit Exp.)}
-Suppose sequence of models $\{P_{n,\theta}\}_{\theta\in\Theta}$ (where
-$\Theta$ is an open subset of $\R^k$) is LAN with norming matrices $r_n$
-and nonsingular $I_\theta$.
-Then the sequence of models
-$\{P_{n,\theta+r_n^{-1}g}\}_{g\in \R^k}$---now reparameterized in terms
-of local parameter $g$---converges to the normal limit experiment
-$\{\calN(g,I_\theta^{-1})\}_{g\in \R^d}$.
-\end{cor}
-\begin{proof}
-By reparameterizing the model, we got that LAN implies
-Condition~\ref{LANcond2}.
-From there, it's clear that the sequence of experiments satisfies
-Condition~\ref{normalsufficient} if we take $J=I_{\theta_0}$.
-Thus by Theorem~\ref{thm:limitnormal}, the sequence of experiments
-$\{P_{n,\theta+r_n^{-1}g}\}_{g\in \R^k}$ converges to the normal
-experiment $\{\calN(I_{\theta_0}g,I_{\theta_0})\}_{g\in G}$
-\end{proof}
-
-We used the LAN assumption to deliver convergence to a normal limit
-experiment.
-But what kind of assumption ensures that a model is LAN?
-The next theorem gives a sufficient condition for LAN and thus
-convergence to a normal limit experiment.
-
-\begin{thm}
-\emph{(vdW 7.2: Differentiable in Quadratic Mean $\implies$ LAN)}
-Suppose
-\begin{enumerate}[label=\emph{(\roman*)}]
-  \item $\Theta$ is an open subset of $\R^k$
-  \item Model $\{P_\theta\}_{\theta\in\Theta}$ differentiable in
-    quadratic mean:
-    \begin{align}
-      \int
-      \left[
-        \sqrt{p_{\theta+h}}
-        -
-        \sqrt{p_{\theta}}
-        -
-        \frac{1}{2}
-        h'\dot{\ell}_\theta
-        \sqrt{p_\theta}
-      \right]^2
-      d\mu
-      =
-      o(\lVert h\rVert^2)
-      \qquad
-      h\ra 0
-    \end{align}
-    This property essentially says that the experiment or likelihood is
-    ``nice'' or ``well-behaved.''
-    So it's an assumption employed in many theorem statements.
-\end{enumerate}
-Then
-\begin{enumerate}[label=\emph{(\roman*)}]
-  \item $P_\theta\dot{\ell}_{\theta}=0$
-  \item Fisher Information matrix $I_\theta =
-    P_{\theta}\dot{\ell}_\theta\dot{\ell}_\theta'$
-    exists
-  \item For every converging sequence $h_n\ra h$
-    \begin{align*}
-      \ln \prodin
-      \frac{p_{\theta+h_n/\sqrt{n}}}{p_\theta}
-      (X_i)
-      =
-      \frac{1}{\sqrt{n}}
-      \sumin h'\dot{\ell}_\theta(X_i)
-      -
-      \frac{1}{2}
-      h' I_{\theta}
-      h
-      +
-      o_{P_\theta}(1)
-    \end{align*}
-
-  \item
-    If the observations are iid or the joint-likelihood permits a
-    forecast error decomposition so that the first term in the above
-    log-LR expansion $\dto \calN(0,I_{\theta_0})$, then the
-    log-likelihood ratio satisfies Condition~\ref{LANcond} for LAN and
-    the model converges to normal limit experiment
-    $\{\calN(h,I_{\theta}^{-1})\}_{h\in H}$.
-
-\end{enumerate}
-\end{thm}
-
-\begin{cor}
-\emph{(``Sufficiently Regular'' Model $\implies$ LAN)}
-Suppose that the density of some model is sufficiently that the log-LR
-admits a second order Taylor expansion
-\begin{align*}
-  \log
-  \frac{p_{\theta+h}(x_i)}{p_\theta(x_i)}
-  =
-  h' \dot{\ell}_\theta(x_i)
-  +
-  \frac{1}{2}
-  h'\ddot{\ell}_\theta(x_i) h
-  +
-  o(\lVert h \rVert)
-\end{align*}
-Then the joint log-likelihood under $h=g/\sqrt{n}$ is
-\begin{align*}
-  \log
-  \prodin
-  \frac{p_{\theta+g/\sqrt{n}}(x_i)}{p_\theta(x_i)}
-  &=
-  \frac{1}{\sqrt{n}}
-  \sumin
-  g' \dot{\ell}_\theta(x_i)
-  -
-  \frac{1}{2}
-  g'I_{\theta} g
-  +
-  o_{P_\theta}(1)
-  \\
-  &\dto
-  \calN\left(
-  -\frac{1}{2}
-  g'I_\theta g,\;
-  I_\theta^{-1}
-  \right)
-\end{align*}
-\end{cor}
-
-
-\begin{thm}\emph{(van der Waart 7.10: Matching for Studying Optimality)}
-\end{thm}
-
-
-\begin{thm}
-\end{thm}
-
-
-
-\begin{rmk}
-As $N\ra\infty$, an unknown parameter $\theta$ will eventually be known
-with arbitrary precision, and any sensible test of the parameter value
-will reject an incorrect null with probability one.
-So how do we compare tests that, asymptotically, all have the same power
-(i.e. reject for sure)?
-Well, we look at the likelihood ratio (which forms the basis for
-sensible tests) and consider how it behaves when the alternative
-approaches the null at an appropriate rate so that, asymptotically, the
-null and alternative remain tough to distinguish.
-
-We do this be reparameterizing the model/experiment.
-If we do it correctly, then the LR will converge to the LR ratio of a
-single observation Gaussian model/experiment.
-Consider a known $\theta_0$, and define local parameter
-$\sqrt{N}(\theta-\theta_0)$, which implies that we're considering
-$\theta=\theta_0+\frac{g}{\sqrt{N}}$.
-Note that $h$ is the wedge between the (properly scaled) true parameter
-$\theta_0$ and $\theta$.
-For large $N$, the following models/experiments have similar statistical
-properties
-\begin{align*}
-  \{P_{\theta_0+g/\sqrt{N}}\}_{h\in H}
-  \qquad
-  \{\calN(h,\calI_{\theta_0}^{-1})\}_{h\in H}
-\end{align*}
-The log-likelihood ratio of this model has the same distribution as the
-limit distribution of the above LAN model.
-\end{rmk}
-
-
-\begin{thm}\emph{(van der Waart 7.12: MLE)}
-\end{thm}
-
-
-
-
-\clearpage
-\subsection{Efficiency of Estimators}
-
-Setting
-\begin{itemize}
-  \item Experiment $\{P_\theta\}_{\theta\in\Theta}$
-  \item Want to estimate some function of parameters $\psi(\theta)$.
-
-    A special case is $\psi(\theta)=\theta$, the parameter itself.  But
-    we can derive much more general statements for \emph{any} function
-    $\psi(\theta)$ of the parameters.
-
-  \item To estimate $\psi(\theta)$, we will construct estimator $T_n$.
-\end{itemize}
-This question is primarily concerned with whether $T_n$ is a good
-estimator of $\psi(\theta)$.
-
-Complicating issues
-\begin{itemize}
-  \item Estimator $T_n$ might do well \emph{pointwise}, that is, fixing
-    $\theta$ and sending $n\ra\infty$.
-  \item However, this is not a good way to do asymptotics because the
-    estimator's good performance might heavily depend upon the
-    $n\ra\infty$, which is not available in finite samples
-  \item Much better is to characterize the distribution of an estimator
-    in a shrinking neighborhood of $\theta$, i.e.  the distribution of
-    $T_n$ under $\theta+h/\sqrt{n}$ for all $h\in\R^k$.
-
-  \item
-    By seeing how $T_n$ does under $\theta+h/\sqrt{n}$ for different
-    $h$'s, we can see how sensitive the estimator is to asymptotically
-    vanishing perturbations of $\theta$.
-    Good estimators will behave nicely (asymptotically) under all $h$.
-    Bad estimators will be erratic and sensitive (asymptotically) to
-    asymptotically vanishing perturbations of the parameters, suggesting
-    poor performance in finite samples too.
-\end{itemize}
-
-\subsubsection{Estimator Definitions}
-
-\begin{defn}
-(Minimax Estimator)
-\begin{align*}
-  \min_T
-  \sup_\theta
-  \E_\theta[\ell(T-\theta)]
-\end{align*}
-for some loss function $\ell(\,\cdot\,)$.
-\end{defn}
-
-
-\begin{defn}
-(Equivariant-in-Law Estimator)
-\end{defn}
-
-\begin{defn}(Regular Estimator)
-Estimator $T_n$ is \emph{regular} at $\theta_0$ for
-estimating $\psi(\theta_0)$ if
-\begin{align*}
-  \forall h
-  \qquad
-  \sqrt{n}
-  \left(
-  T_n
-  -
-  \psi\left(
-  \theta_0 + \frac{h}{\sqrt{n}}
-  \right)
-  \right)
-  \quad\underset{\theta_0+h/\sqrt{n}}{\dto}\quad
-  L_{\theta_0}
-\end{align*}
-Notice that $L_{\theta_0}$ is independent of $h$.
-In words, a vanishing small perturbation of the parameter doesn't change
-the limit distribution.
-Shrinkage estimators are generally \emph{not} regular.
-
-For reasons to be seen later, regular estimators are generally called
-\emph{asymptotically equivariant-in-law}.
-This is because regularity (a statement about the asymptotic
-distribution of an estimator) implies that the statistic is matched by
-an equivariant-in-law estimator.
-\end{defn}
-
-\subsubsection{Estimating Normal Means}
-
-In this section, we want to estimate the linear combination $Ah$, given
-\begin{align}
-  X \sim \calN(h,\Sigma)
-  \label{limitobs}
-\end{align}
-
-\begin{defn}(Conventional Estimator)
-The usual \emph{conventional estimator} of $Ah$ is
-\begin{align*}
-  %T =
-  AX
-  \sim \calN(Ah, A\Sigma A')
-\end{align*}
-And as shown below in Theorem~\ref{normalopt}, $AX$ is also in
-``optimal'' in a few different senses.
-\end{defn}
-
-\begin{prop}
-\label{decompequivariant}
-\emph{(Decomposition of Equivariant Estimators in Normal Mean Problem)}
-For any equivariant-in-law estimator $T$ of $Ah$, the null distribution
-of $T-Ah$ can be decomposed
-\begin{align}
-  T-Ah
-  \;
-  \sim
-  \;
-  \calN(0,A\Sigma A') * M
-  \label{eildecomp}
-\end{align}
-for some probability measure $M$.
-Think of $M$ as adding noise to the $\calN(0,A\Sigma A')$ distribution.
-\end{prop}
-
-\begin{thm}
-\label{normalopt}
-\emph{(Optimality of Conventional Estimator)}
-Given Expression~\ref{limitobs},
-some results for the conventional estimator $T=AX$ of $Ah$:
-\begin{enumerate}[label=(\roman*)]
-  \item $AX$ is minimum-variance unbiased for $Ah$
-  \item $AX$ is the best equivariant-in-law estimator of $Ah$,
-    in the sense that it is equivariant-in-law and it is \emph{only}
-    equivariant-in-law estimator for which $M$ is degenerate at $0$ in
-    Decomposition~\ref{eildecomp}
-  \item $AX$ is a minimax estimator for any bowl-shaped loss function.
-    And under some mild regularity conditions on $A$, $X$, and $\ell$,
-    it is the \emph{unique} minimax estimator.
-\end{enumerate}
-\end{thm}
-\begin{proof}
-Each in turn
-\begin{enumerate}[label=(\roman*)]
-  \item Unbiased because $\E[AX]=Ah$.
-  \item Equivariant-in-law because
-    $AX-Ah\sim\calN(0,A\Sigma A')$, a distribution which does not depend
-    upon $h$.
-  \item This follows from Part (ii) and the implied
-    Expression~\ref{eildecomp} decomposition.
-    Since $M$ only adds noise, the fact that $M$ is degenerate at 0 for
-    $AX$, in combination with the bowl-shaped loss function, will
-    deliver the minimax result.
-\end{enumerate}
-\end{proof}
-
-
-
-\clearpage
-\subsubsection{Asymptotic Efficiency}
-
-
-\begin{thm}
-\label{vdw8.3}
-\emph{(Van Der Waart 8.3)}
-Fix a point $\theta_0\in\Theta$.
-Assume
-\begin{itemize}
-  \item Experiment $\{P_{\theta}\}_{\theta\in\Theta}$ is
-    differentiable in quadratic mean at the point $\theta_0$ with
-    nonsingular Fisher information matrix $I_{\theta_0}$ (hence LAN).
-
-  \item $\psi$ is differentiable at $\theta_0$.
-  \item $T_n$ be a squence of estimators in the sequence of experiments
-    $\{P^n_{\theta_0+h/\sqrt{n}}\}_{h\in\R^k}$ such that
-    \begin{align}
-      \sqrt{n}
-      \left(
-      T_n
-      -
-      \psi\left(
-      \theta_0 + \frac{h}{\sqrt{n}}
-      \right)
-      \right)
-      \quad\underset{\theta_0+h/\sqrt{n}}{\dto}\quad
-      L_{\theta_0,h}
-      \qquad
-      \forall h
-      \label{convergence}
-    \end{align}
-\end{itemize}
-Then there exists a statistic $T$ in the experiment
-$\{\calN(h,I_{\theta_0}^{-1})\}_{h\in\R^k}$ such that
-\begin{align}
-  T - \dot{\psi}_{\theta_0} h
-  \quad
-  \sim
-  \quad
-  L_{\theta_0,h}
-  \qquad
-  \forall h
-  \label{matched}
-\end{align}
-or, equivalently, such that
-\begin{align}
-  \sqrt{n}
-  \left(
-  T_n
-  -
-  \psi\left(
-  \theta_0 + \frac{h}{\sqrt{n}}
-  \right)
-  \right)
-  \quad\underset{\theta_0+h/\sqrt{n}}{\dto}\quad
-  T - \dot{\psi}_{\theta_0} h
-  \qquad
-  \forall h
-  \label{convergence2}
-\end{align}
-Note that the differentiability in quadratic mean ensured the model was
-LAN. That's why the appropriate limit experiment is normal.
-\end{thm}
-
-\begin{rmk}
-Fleshing out the practical implications and meaning of this theorem in
-words
-\begin{itemize}
-  \item By Expression~\ref{convergence}, $T_n$ estimates
-    $\psi(\theta_0+h/\sqrt{n})$.
-  \item For $T_n$ to be a good estimator, it should be maximally
-    concentrated around $\psi(\theta+h/\sqrt{n})$.
-  \item Therefore, the family of distributions $L_{\theta_0,h}$ should
-    be maximally concentrated around 0.
-  \item By Expression~\ref{matched}, the set of distributions
-    $L_{\theta_0,h}$ is equivalent to the set of distributions
-    $T-\dot{\psi}_{\theta_0}h$, where $\dot{\psi}_{\theta_0}h$ is a
-    fixed vector and $T$ is a statistic in limit experiment
-    $N(h,I_{\theta_0}^{-1})$, i.e.
-    $T=T(X)$ for $X\sim \calN(h,I_{\theta_0}^{-1})$.
-  \item
-    Therefore, if we can a statistic $T$ that's maximally concentrated
-    around $\dot{\psi}_{\theta_0}h$, we can characterize the best
-    achievable limit distribution for $T_n$
-\end{itemize}
-\end{rmk}
-
-
-\begin{cor}
-\emph{(Van Der Waart 8.8, Convolution Theorem)}
-If, in addition to the conditions of Theorem~\ref{vdw8.3}, the estimator
-sequence $T_n$ is regular, then
-\begin{enumerate}[label=(\roman*)]
-  \item By the definition of regularity and Theorem~\ref{vdw8.3},  we
-    have
-    \begin{align*}
-      \sqrt{n}
-      \left(
-      T_n
-      -
-      \psi\left(
-      \theta_0 + \frac{h}{\sqrt{n}}
-      \right)
-      \right)
-      \quad\underset{\theta_0+h/\sqrt{n}}{\dto}\quad
-      L_{\theta_0}
-      \sim
-      T - \dot{\psi}_{\theta_0} h
-      \qquad
-      \forall h
-    \end{align*}
-    where $T$ is a statistic in the normal experiment
-    $\{\calN(h,I_{\theta_0}^{-1})\}_{h\in\R^k}$.
-
-  \item Because $L_{\theta_0}$, the statistic $T$ is an
-    equivariant-in-law estimator or $\dot{\psi}_{\theta_0}h$.
-    This is why regular estimators are sometimes called asymptotically
-    equivariant-in-law.
-
-  \item
-    Therefore if we restrict to regular estimators, we restrict to
-    estimators that are matched by equivariant-in-law estimators of
-    $\dot{\psi}_{\theta_0}h$ in the normal limit experiment.
-    Therefore, we can invoke Proposition~\ref{decompequivariant} and
-    Theorem~\ref{normalopt} to say that.
-
-
-
-\end{enumerate}
-\end{cor}
-
-\begin{cor}
-If $\psi(\theta)=\theta$ so that we're trying to estimate the parameter
-itself,
-\end{cor}
-
-
-\begin{defn}(Regular Estimator)
-An estimator sequence $T_n$ is called \emph{regular} or
-\emph{asymptotically equivariant-in-law} at $\theta_0$ for
-estimating $\psi(\theta_0)$ if
-\begin{align*}
-  \sqrt{n}
-  \left(
-  T_n
-  -
-  \psi\left(
-  \theta_0 + \frac{h}{\sqrt{n}}
-  \right)
-  \right)
-  \quad\underset{\theta_0+h/\sqrt{n}}{\dto}\quad
-  L_{\theta_0}
-  \qquad
-  \forall h
-\end{align*}
-i.e. no dependence upon $h$.
-In words, $T_n$ will estimate $\theta_0$ for
-\end{defn}
-
-
-
-
-\begin{comment}
-\subsection{Local Asymptotic Normality}
-
-
-Standard approach to asymptotics and testing that we often see:
-- Derive the asymptotic distribution of some estimator or test stat.
-  Often because of the CLT, that limiting distribution is normal
-- Construct a test based on that asymptotic limit. The test is
-  constructed to satisfy certain coverage and size restrictions
-- Construct a finite-sample approximation to that test
-- Wave our hands and say that ``this statistic/test/procedure is
-  justified asymptotically''
-
-Now we want to make all of this more formal and general, which is
-possible in the limits of experiments framework
-
-Most generally, our problem is that we're trying to use a finite sample
-of size $n$ to estimate or conduct tests for some parameter I don't
-know, say parameter $g$.\footnote{%
-  It could just as well be $\theta$---$g$ is just a label that will be
-  more convenient as we'll see later.
-}
-Ideally, we'd also like optimal estimators and tests
-
-Now the basic problem can be stated as follows:
-- Given my finite sample $n$, I'm trying to distinguish whether the
-  parameter is actually alternative $g$ or baseline/null value $g_0$
-- Limits of experiments: suppose the of likelihood ratios (between $g$
-  and $g_0$) for this finite sample problem converges to a likelihood
-  ratio (between $g$ and $g_0$) of some other single-observation
-  model/experiment under the null $g_0$.
-- Then this asymptotic limit experiment can be used to give asymptotic
-  justification to tests and test statistics in the sequence of
-  experiments
-- The task of distinguishing between $g$ and $g_0$ at any point $n$
-  along the sequence of experiments can be approximated by the task of
-  distinguishing between $g$ and $g_0$ in the limit experiment.
-- The limit experiment can also be used to establish optimality results.
-  In particular, no test in the sequence of experiments can do better
-  asymptotically that an optimal test in the limit experiment
-
-I want to compare estimation procedures and tests and test statistics
-Asymptotics aren't much help because often, the true parameter can be
-known with precision
-
-Solution: reparameterize the model and see how well a method/procedure
-does in distinguishing between contiguous alternatives indexed by some
-local parameter, since those are the only ones that are asymptotically
-tough.
-
-Thus the problem is now one of inference about the value of some local
-parameter
-
-How do we do inference about this local parameter?
-- NP says look at the likelihood ratio between the baseline law and any
-  contiguous alternative
-- Since we want to consider what happens asymptotically, we thus look at
-  the asymptotic limit of the likelihood ratio.
-- If the asymptotic limit of the likelihood ratio (between the baseline
-  law and some contiguous alternative) looks like the likelihood ratio
-  of some other model (between some baseline and alternative),
-  then we can use what we know about optimal tests in this limit model
-  to study tests in the sequence of experiments
-
-LAN
-- Most parameteric models can be reparameterized so that the likelihood
-  ratio between some baseline law and any contiguous alternative
-  converges to the likelihood ratio of a normal location model.
-- In other words, inference about the local parameter in the original
-  model looks inference about the mean in a normal model with one
-  observation
-- For this to be the case, all we need is that the log LR admits a
-  particular taylor expansion.
-  For smooth parametric models, this is almost always the case
-- Therefore, trying to do inference about the local parameter is often
-  akin to doing inference about the mean
-
-Representation Theorem
-- Every sequence of statistics in the local experiments is matched by
-  a statistic in the limit experiment
-
-ML intuition
-- The following result is not explicitly given by the rep thm, but it is
-  often true
-- Often an MLE in the sequence of experiments is matched by an MLE in
-  the limit experiment.
-- MLE in the limit experiment when LAN: Just X, the obs, itself
-- MLE in sequence of experiments $\hat{g}=\sqrt{n}(\hat{\theta}-\theta)$
-- Thus $\hat{g}$ should converge in distribution to $X$ under any $h$
-- Under $h=0$ where $\theta$ is the true, $X\sim\calN(0,\calI^{-1})$
-- Thus  $\hat{g}=\sqrt{n}(\hat{\theta}-\theta)$ goes to
-  $\calN(0,\calI^{-1})$
-
-All of this is useful because we can study the behavior of statistics
-under contiguous alternatives.
-- LAN implies contiguity
-- Contiguity + LeCam's third lets us get the limit dist of stats under
-  any contiguous alternative, given the limit dist under the baseline
-  law
-
-Definition 7.14 of LAN
-Special case: iid smooth parameteric model
-\end{comment}
-
-
-
-\clearpage
-\section{Newey \& McFadden}
-
-\subsection{Definitions}
-
-\begin{defn}(Asymptotically Normal)
-Estimator $\hat{\theta}$ is \emph{asymptotically normal} if there
-exists an increasing function $\nu(n)$ and $V$ such that
-\begin{align}
-  \nu(n)(\hat{\theta}-\theta_0)
-  \quad\dto\quad
-  \calN(0,V)
-  \label{asymptoticallynormal}
-\end{align}
-$V$ is the \emph{asymptotic variance} of $\hat{\theta}$.
-\end{defn}
-
-\begin{thm}
-\emph{(Standard Confidence Intervals for Asymptotically Normal Estimators)}
-Suppose estimate $\hat{\theta}$ is asymptotically normal as in
-Expression~\ref{asymptoticallynormal}.
-Then, given a consistent estimator $\hat{V}$ of $V$,
-\begin{align*}
-  P[\theta_0\in \calI_{1-\alpha}]
-  \quad&\underset{n\ra\infty}{\ra}\quad 1-\alpha
-  \qquad\text{where}\quad
-  \calI_{1-\alpha}
-  =
-  \bigg[
-    \hat{\theta}
-    -
-    cv_{1-\alpha}
-    \frac{\sqrt{\hat{V}}}{\nu(n)}
-    ,
-    \;\;
-    \hat{\theta}
-    +
-    cv_{1-\alpha}
-    \frac{\sqrt{\hat{V}}}{\nu(n)}
-  \bigg]
-\end{align*}
-where $cv_{1-\alpha} = \Phi^{-1}(1-\alpha)$.
-\end{thm}
-
-
-\begin{defn}($\sqrt{n}$-consistent Estimator)
-Estimator $\hat{\theta}$ is \emph{$\sqrt{n}$-consistent} if
-$\hat{\theta}$ is asymptotically normal with $\nu(n)=\sqrt{n}$.
-\end{defn}
-
-
-\begin{defn}(Extremum Estimator)
-$\hat{\theta}$ is an \emph{extremum estimator} if, for some
-sample objective function $\hat{Q}_n(\theta)$,
-\begin{align*}
-  %\hat{\theta} = \argmax_{\theta\in\Theta} \widehat{Q}_n(\theta)
-  \widehat{Q}_n(\hat{\theta})
-  \geq
-  \sup_{\theta\in\Theta} \widehat{Q}_n(\theta)
-  + o_P(1)
-\end{align*}
-Note that is sometimes useful for proving consistency under weaker
-conditions is equivalently to treat the extremum estimator
-$\hat{\theta}$ as the estimator satisfying
-\begin{align*}
-  %\hat{\theta} = \argmax_{\theta\in\Theta} \widehat{Q}_n(\theta)
-  \widehat{Q}_n(\hat{\theta})
-  - \widehat{Q}_n(\theta_0)
-  \geq
-  \sup_{\theta\in\Theta}
-  [\widehat{Q}_n(\theta) - \widehat{Q}_n(\theta_0)]
-  + o_P(1)
-\end{align*}
-\end{defn}
-
-\begin{defn}(Uniform Convergence in Probability)
-Function $\widehat{Q}_n(\theta)$
-\emph{converges uniformly in probability}
-to $Q_0(\theta)$ if and only if
-\begin{align*}
-  \sup_{\theta\in\Theta}
-  |\widehat{Q}_n(\theta)-Q_0(\theta)|
-  \quad\pto\quad
-  0
-\end{align*}
-Pointwise convergence removes the sup over parameters. This is stronger.
-\end{defn}
-
-
-\begin{defn}(Identification)
-Parameter $\theta_0$ is \emph{quasi-identified} in an extremum estimator
-context (i.e. identified for the purposes of extremum estimation) if it
-uniquely maximizes the population objective function, $Q_0(\theta)$.
-
-Parameter $\theta_0$ is \emph{identified} if there exists no other
-$\bar{\theta}$ such that the distribution of the data is the same
-whether $\bar{\theta}$ or $\theta_0$ is the true value of the parameter.
-
-Note that model identification is a necessary condition for
-quasi-identification, but generally not sufficient, except for MLE.
-\end{defn}
-
-
-\subsection{Estimator Definitions}
-
-
-General note:
-Prefer treating estimators as the maximum of some objective function
-rather than a solution to a FOC because of the possibility of unique
-maximum of the objective function, but multiple roots in the FOC.
-
-
-\begin{defn}(Minimum Distance Estimator)
-A minimum distance estimator is an extremum estimator with sample
-objective function
-\begin{align*}
-  \widehat{Q}_n(\theta)
-  =
-  -
-  \widehat{g}_n(\theta)'
-  \widehat{W}
-  \widehat{g}_n(\theta)
-\end{align*}
-for some positive semidefinite $\widehat{W}$ that satisfies
-$\widehat{W}\pto W$ and some vector-valued function
-$\widehat{g}_n(\theta)$ satisfying $\widehat{g}_n(\theta_0)\pto 0$.
-
-This is a useful framework for analyzing asymptotic normality
-(more so sometimes than the general framework for extremum estimators)
-because once differentiability of $\widehat{g}_n(\theta)$ is a
-sufficient smoothness condition for asymptotic normality of a minimum
-distance estimator.
-On the other hand, we often assume \emph{twice} differentiability of
-$\widehat{Q}_n(\theta)$ to characterize the limiting distribution
-of an extremum estimator (although we sometimes don't need that, even if
-we typically assume it).
-
-Note also that we defined $\widehat{g}_n(\theta)$ as a special case of
-extremum estimators.
-But also the class of extremum estimators defined by a
-twice-differentiable sample objective function $\widehat{Q}_n(\theta)$
-is a special sub-class of mininimum distance estimators if we take
-$\widehat{g}_n(\theta)=\nabla_\theta \widehat{Q}_n(\theta)$.
-\end{defn}
-
-
-\begin{defn}(Classical Minimum Distance Estimator)
-A classical minimum distance estimator is a minimum distance estimator
-with
-\begin{align*}
-  \widehat{g}_n(\theta)
-  =
-  \hat{\pi}-h(\theta)
-\end{align*}
-for some vector of moments $\hat{\pi}\pto\pi_0$, vector-valued function
-$h(\theta)$ that satisfies $\pi_0=h(\theta_0)$, and $\widehat{W}$.
-\end{defn}
-
-
-
-\begin{defn}(GMM and Instrumental Variables Estimators)
-A GMM estimator is a minimum distance estimator with
-\begin{align*}
-  \widehat{g}_n(\theta)
-  =
-  \frac{1}{n}
-  \sumin
-  g(w_i,\theta)
-\end{align*}
-for some vector-valued moment function $g(w,\theta)$ that satisfies
-$\E[g(w,\theta_0)]=0$ and some $\widehat{W}$.
-
-From there, we have
-\begin{itemize}
-  \item Nonlinear Instrumental Variables Estimator:
-    A GMM estimator with $g(w,\theta)=z\rho(w,\theta)$ and some
-    $\widehat{W}$.
-    Because $\widehat{W}$ also ultimately determines the estimator, this
-    is an entire class.
-  \item Linear Instrumental Variables Estimator:
-    A nonlinear instrumental variables estimator with
-    \begin{align*}
-      \rho(w,\theta)=(y-x'\theta)
-      \quad\implies\quad
-      g(w,\theta)= z(y-x'\theta)
-    \end{align*}
-    and some $\widehat{W}$.
-    Again, this is a class of estimators indexed by $\widehat{W}$.
-  \item
-    Two-Stage Least Squares Estimator:
-    This a linear instrumental variables estimator with
-    $\widehat{W}=\frac{1}{n}\sumin z_iz_i$.
-\end{itemize}
-\end{defn}
-
-
-\begin{defn}(MLE Estimator)
-An MLE estimator is an extremum estimator with sample objective function
-\begin{align*}
-  \widehat{Q}_n(\theta)
-  =
-  \frac{1}{n}
-  \sumin
-  \ln f(w_i|\theta)
-\end{align*}
-for some pdf $f(w|\theta_0)$ within the family
-$\{f(w|\theta)\}_{\theta\in\Theta}$.
-
-Alternatively, an MLE estimator is a just-identified GMM estimator with
-the score as moment function.
-This is useful for proving and analyzing asymptotic normality, but not
-consistency.
-\end{defn}
-
-
-\begin{defn}(NLS Estimator)
-An NLS estimator is an extremum estimator with sample objective function
-\begin{align*}
-  \widehat{Q}_n(\theta)
-  =
-  -
-  \frac{1}{n}
-  \sumin
-  [y_i-h(x_i,\theta)]^2
-\end{align*}
-where $\E[y|x]=h(x_i,\theta_0)$.
-
-Alternatively, an NLS estimator is a just-identified GMM estimator with
-the derivative as moment function.
-Similar to MLE, this is useful for proving and analyzing asymptotic
-normality, but not consistency.
-\end{defn}
-
-
-\clearpage
-\subsection{Examples}
-
-
-\begin{defn}(Powell's Censored Least Absolute Deviations Estimator)
-Extremum estimator satisfying
-\begin{align*}
-  \widehat{Q}_n(\theta)
-  &=
-  -\frac{1}{n}
-  \sumin
-  |y_i-\max\{0,x_i'\theta\}|
-  \\
-  \qquad\text{where}\quad
-  y_i
-  &=
-  \max\{0,x_i'\theta+\varepsilon_i\}
-  \qquad\text{where}\quad
-  0 = \med(\varepsilon_i|x_i)
-\end{align*}
-See note on using $\hat{Q}_n(\hat{\theta})-\hat{Q}_n(\theta_0)$, page
-2123.
-\end{defn}
-
-
-\begin{defn}(Probit)
-MLE example for $y\in\{0,1\}$ and $x\in \R^q$ and conditional
-probability
-\begin{align*}
-  f(w|\theta)
-  =
-  \Phi(x'\theta)^y
-  [1-\Phi(x'\theta)]^{1-y}
-\end{align*}
-\end{defn}
-
-
-
-\clearpage
-\subsection{Theorems}
-
-
-\begin{thm}
-Suppose $\hat{\theta}$ is an extremum estimator.
-If there exists a population objective function $Q_0(\theta)$ such that
-\begin{enumerate}[label=\emph{(\roman*)}]
-  \item \emph{(Quasi-Identification)}:
-    $Q_0(\theta)$ is uniquely maximized at $\theta_0$
-  \item \emph{(Compactness)}: $\Theta$ is compact
-  \item \emph{(Continuity)}: $Q_0(\theta)$ is upper semi-continuous,
-    which is weaker than (implied by) continuity.
-  \item \emph{(Unfiorm Convergence of Sample Criterion Function)}:
-    $\widehat{Q}_n(\theta_0)\pto Q_0(\theta_0)$
-    and for all $\varepsilon>0$,
-    with probability approaching 1,
-    $\widehat{Q}_n(\theta)<Q_0(\theta)+\varepsilon$ for all
-    $\theta\in\Theta$.
-
-    This is weaker than (implied by) the alternative assumption
-    that $\widehat{Q}_n(\theta)$ converges uniformly in probability to
-    $Q_0(\theta)$.
-\end{enumerate}
-Then $\hat{\theta}\pto\theta$.
-\end{thm}
-\begin{rmk}
-Conditions (iii) and (iv) are ``The standard regularity conditions'' for
-consistency.
-\end{rmk}
-
-
-
-\clearpage
-\section{Bartik Instrument}
-
-General panel setting
-\begin{itemize}
-  \item $K$ industries
-  \item $T$ time periods
-  \item $L$ locations
-\end{itemize}
-Structural equation
-\begin{align*}
-  y_{\ell t}
-  &=
-  D_{\ell t}
-  \rho
-  +
-  x_{\ell t}\beta_0
-  +
-  \varepsilon_{\ell t}
-  \\
-  (\text{Wage Growth})_{\ell t}
-  &=
-  (\text{Controls + Time \& Location FE})_{\ell t}
-  \rho
-  +
-  (\text{Emp. Growth})_{\ell t}\beta_0
-  +
-  \varepsilon_{\ell t}
-\end{align*}
-Accounting identity that forms the basis of Bartik instrument:
-Employment growth at $(\ell,t)$ is weighted sum of industry growth rates
-(in vector $G_{\ell t}$), where weights (in vector $Z_{\ell t}$) are
-given by industry shares.
-\begin{align*}
-  x_{\ell t}
-  =
-  Z_{\ell t}
-  G_{\ell t}
-  =
-  \sum_{k=1}^K
-  z_{\ell k t} \, g_{\ell k t}
-\end{align*}
-\paragraph{The Bartik Instrument \& Setup}
-Bartik instrument predicts the industry growth rate $x_{\ell t}$
-by fixing industry shares to their initial values at each location
-$\ell$ (stacked in vector $Z_{\ell 0}$) and multiplying by the national
-growth rates $G_t$ for the industries (stacked in vector $G_t$):
-\begin{align*}
-  B_{\ell t}
-  =
-  Z_{\ell 0} G_t
-  =
-  \sum_{k=1}^K
-  Z_{\ell k 0} g_{kt}
-\end{align*}
-Then we have the canonical Bartik 2SLS setup
-\begin{align*}
-  y_{\ell t}
-  &=
-  D_{\ell t}
-  \rho
-  +
-  x_{\ell t}\beta_0
-  +
-  \varepsilon_{\ell t}
-  \\
-  x_{\ell t}
-  &=
-  D_{\ell t}\tau
-  +
-  B_{\ell t}
-  \gamma
-  +
-  \eta_{\ell t}
-\end{align*}
-\paragraph{Two Industries, One Time Period}
-Rewrite the definition of the Bartik instrument in terms of the first
-(wlog) industry share:
-\begin{align*}
-  B_{\ell}
-  &=
-  z_{\ell 1}g_1 + z_{\ell 2} g_2
-  =
-  g_2 + (g_1-g_2)z_{\ell 1}
-\end{align*}
-Substitute that definition into the first stage equation:
-\begin{align*}
-  x_\ell
-  &=
-  \gamma_0
-  +
-  \gamma B_\ell
-  +
-  \eta_\ell
-  =
-  [\gamma_0 + \gamma g_2]
-  +
-  [\gamma(g_1-g_2) z_{\ell 1}]
-  +
-  \eta_\ell
-\end{align*}
-Hence, for estimates of $\beta_0$, using Bartik in the first stage is
-equivalent to using the first (wlog) industry share $z_{\ell 1}$ as an
-instrument.
-Hence all variation in the first stage is coming from variation in the
-industry shares $z_{\ell 1}$ across locations.
-
-\paragraph{Two Industries, Two Time Periods}
-Rewrite the definition of the Bartik instrument:
-\begin{align*}
-  B_{\ell t}
-  &=
-  g_{1 t}
-  z_{\ell 10}
-  +
-  g_{2 t}
-  z_{\ell 20}
-  \\
-  &=
-  g_{2 t}
-  +
-  (g_{1 t} -g_{2 t})
-  z_{\ell 10}
-  \\
-  &=
-  g_{2 t}
-  +
-  \big[
-    (g_{11}-g_{21})
-    +
-    (\Delta g_1 - \Delta g_2)
-    \mathbf{1}\{t=2\}
-  \big]
-  z_{\ell 10}
-  \\
-  &=
-  g_{2 t}
-  +
-  (g_{11}-g_{21})
-  z_{\ell 10}
-  +
-  (\Delta g_1 - \Delta g_2)
-  \mathbf{1}\{t=2\}
-  z_{\ell 10}
-\end{align*}
-Substitute that defintion into the first stage equation (with $t$ and
-$\ell$ FE) and regroup:
-\begin{align*}
-  x_{\ell t}
-  &=
-  \tau_{\ell}
-  +
-  \tau_t
-  +
-  B_{\ell t}\gamma
-  + \eta_{\ell t}
-  \\
-  &=
-  \big[
-  \tau_{\ell}
-  +
-  (g_{11}-g_{21})
-  z_{\ell 10}
-  \gamma
-  \big]
-  +
-  \big[
-  \tau_t
-  +
-  g_{2t}\gamma
-  \big]
-  +
-  z_{\ell 10}
-  (\Delta g_1 - \Delta g_2)
-  \mathbf{1}\{t=2\}
-  \gamma
-  + \eta_{\ell t}
-\end{align*}
-The first term in brackets is a location-specific (time-invariant) effect.
-The second term in brackets is a time-specific (location-invariant)
-effect.
-
-(\emph{Equivalence})
-Hence for estmates of $\beta_0$, using Bartik instrument $B_{\ell t}$ in
-the first stage (that includes $t$ and $\ell$ FE) is equivalent to using
-$z_{\ell 10}\mathbf{1}\{t=2\}$, i.e. inital industry shares interacted
-with time.
-
-(\emph{Diff-in-Diff Connection})
-Notice that if we substitute the second expression above for
-the first stage (i.e. $x_{\ell t}$) into the second stage to obtain the
-reduced form equation, we will have a diff-in-diff setup.
-In multi-period casesk
-
-
-LAST LEFT OFF:
-Understand the use of Bartik as instrument for policies, and
-diff-in-diff connection.
-Move onto rest of the paper.
-Think about practical questions.
-
-
-
-\paragraph{Notes \& Thoughts}
-\begin{itemize}
-  \item Inference; are they equivalent there?
-  \item Strength of the Bartik instrument
-  \item In order to construct the Bartik instrument, needed to take
-    observed $g_{\ell k t}$ and construct/infer $g_{kt}$ by decomposing
-    $g_{\ell kt}$ into this common component and an idiosyncratic
-    component:
-    \begin{align*}
-      g_{\ell kt} = g_{kt} + \tilde{g}_{\ell kt}
-    \end{align*}
-    In principle, several ways to do this, and choice likely matters a
-    lot.
-  \item Bartik instrument is itself a constructed quantity.
-    It's not a thing out in the wild that exists.
-  \item What is the basis for using this as an instrument?
-  \item Bartik is used in a 2SLS setting.
-    But essentially it's 3SLS because we predict the growth rate in a
-    given $(\ell,t)$ whose predicted value we use as an instrument to
-    predict $x_{\ell t}$, whose predicted value we use to estimate
-    $\beta_0$ in an unbiased way.
-  \item This paper shows that we can collapse it to GMM/2SLS so we don't
-    have three stages, just two.
-    Instead, we just specify the instruments.
-  \item When is Bartik a bad instrument?
-  \item Robustness to different industry definitions
-  \item Changes in industries over time
-  \item Variation comes from differences in industry shares across
-    locations.
-    So can use Bartik as an instrument or industry shares.
-\end{itemize}
 
 
 
@@ -7150,219 +3143,8 @@ polynomials), wavelets
 \clearpage
 \section{Statistics 705}
 
-\subsection{Review}
 
 
-\begin{defn}
-Moment generating function
-\begin{align*}
-  M_X(t) = \E[e^{tX}]
-\end{align*}
-Result: If $M_X(t)=M_Y(t)$ for all $t$ in an interval around 0, then
-$X\overset{d}{=}Y$.
-\end{defn}
-
-\begin{thm}
-Useful for proving that the sample mean of iid normal RVs is normal.
-\end{thm}
-\begin{proof}
-Use MGF.
-\end{proof}
-
-
-
-
-
-\subsection{$O_P$ and $o_P$ Notation}
-
-Recall
-\begin{align*}
-  a_n = o(1)
-  \qquad&\iff\qquad
-  \limn
-  a_n
-  = 0
-  \\
-  a_n = O(1)
-  \qquad&\iff\qquad
-  \exists N,C>0
-  \;\;\text{s.t.}\;\;
-  |a_n|\leq C
-  \;\;\forall n>N
-  \\
-  a_n
-  \sim
-  b_n
-  \qquad&\iff\qquad
-  a_n = O(b_n)
-  \quad
-  b_n = O(a_n)
-  \quad
-  \text{Growing at same rate}
-\end{align*}
-Probability that $|Y_n|$ is far from zero goes to zero, i.e.
-distribution piling up at/around zero.
-\begin{align*}
-  Y_n = o_P(1)
-  \qquad&\iff\qquad
-  \forall \varepsilon>0
-  \quad
-  \limn
-  P[|Y_n|>\varepsilon]
-  =0
-\end{align*}
-Should be able to trap most of the mass in some large interval for any
-conception of ``most'' (any $\varepsilon$).
-Mass cannot escape to $\infty$.
-\begin{align*}
-  Y_n = O_P(1)
-  \qquad&\iff\qquad
-  \forall \varepsilon>0
-  \;\;\exists N,C>0
-  \quad\text{s.t.}\quad
-  P[|Y_n|>C]
-  \leq
-  \varepsilon
-  \quad
-  \forall n>N
-\end{align*}
-Less crude than $o_P$. Tells us a little more, specifically about the
-size.
-Little $o_P$ is like $<$, while $O_P$ is like $\leq$.
-
-Suppose we have Bernoulli RVs.
-By Hoeffding
-\begin{align*}
-  P[|\hat{p}_n-p|>\varepsilon]
-  &\leq
-  2e^{-2n\varepsilon^2}
-  \\
-  \limn
-  P[|\hat{p}_n-p|>\varepsilon]
-  &=
-  0
-  \\
-  \implies\quad
-  \hat{p}_n-p
-  &=
-  o_P(1)
-\end{align*}
-By Hoeffding again,
-\begin{align*}
-  P[\sqrt{n}|\hat{p}_n-p|>C]
-  =
-  P[|\hat{p}_n-p|>C/\sqrt{n}]
-  &\leq
-  2e^{-2C^2}
-  <\varepsilon
-\end{align*}
-given $\varepsilon$ by choosing large enough $C$ given that
-$\varepsilon$.
-Hence,
-\begin{align*}
-  \iff\quad
-  \sqrt{n}(\hat{p}_n-p)
-  &=
-  O_p(1)
-  \\
-  \hat{p}_n-p
-  &=
-  O_p(1/\sqrt{n})
-\end{align*}
-i.e. I can trap $\sqrt{n}(\hat{p}_n-p)$ between two constants.
-Equivalently, $\hat{p}$ and $p$ are roughly $1/\sqrt{n}$ apart.
-
-
-
-\clearpage
-\subsection{Convergence}
-
-Notions
-\begin{itemize}
-  \item Almost Sure Convergence to a constant:
-    $P[\limn X_n=c]=1$.
-
-    Note that $\limn X_n$ is a random quantity.
-    This says that this random quantity equals the constant $c$ almost
-    everywhere.
-
-  \item Almost Sure Convergence to another RV:
-    $P[\limn |X_n-X|<\varepsilon]=1$.
-
-  \item
-    Convergence in probability to a constant:
-    $X_n-c=o_P(1)$.
-
-    For $n$ large, the distribution of $X_n$ is getting more and more
-    smushed in and around $c$.
-
-  \item Convergence in quadratic mean (or in $L^2$)
-\end{itemize}
-What implies what
-\begin{itemize}
-  \item
-    Quadratic mean implies convergence in prob:
-    Square difference in convergence in probability statement, use
-    Markov.
-
-    Sometimes easier to show than convergence in probability directly.
-    So sometimes useful for showing convergence in probability.
-
-    Convergence in probability doesn't look at the \emph{values} of the
-    exceptional events where $|X_n-X|>\varepsilon$.
-    It just checks whether this probability is small.
-    So can have that probability going to zero, but the value shooting
-    off to infinity.
-
-    Quadratic mean stronger than prob because computes a moment and
-    moments are really influenced by the values and the tails.
-    It's a statement about the tails.
-    Considers probability of exceptional events \emph{and} values.
-
-  \item Convergence in probability is about the random variables.
-    Convergence in distribution is about probability statements
-    involving random variables.
-    RVs can have similar distributions but very different values.
-
-  \item Moments sensitive to values, more so than convergence in
-    probability.
-    So $X_n\ra c$ does not imply $\E[X_n]\ra c$ because values and tails
-    matter.
-\end{itemize}
-Weak LLN: Assume second moment exists so you can use Chebyshev. Use it.
-Simple proof.
-
-CLT
-\begin{itemize}
-  \item Taylor expansion of individual MGF about zero
-  \item MGF of joint computable from individual MGFs
-  \item MGF converges to normal hence, convergence in distribution
-    obtains
-\end{itemize}
-Berry-Esseen Theorem
-\begin{itemize}
-  \item Suppose $X_1,\ldots,X_n\sim P$
-  \item Suppose $\mu,\sigma^2$ exist
-  \item Assume $\mu_3=\E[|X_i-\mu|^3]<\infty$.
-  \item Then we can bound how far away the true finite-sample CDF is
-    from the normal CDF
-    \begin{align*}
-      \sup_z
-      \left\lvert
-      P\left[
-        \frac{\sqrt{n}(\bar{X}-\mu)}{\sigma}
-        \leq
-        z
-      \right]
-      -
-      \Phi(z)
-      \right\rvert
-      \leq
-      \frac{33}{4}
-      \frac{\mu_3}{\sigma^3\sqrt{n}}
-    \end{align*}
-    Difference is decreasing at rate $1/\sqrt{n}$.
-\end{itemize}
 
 
 
@@ -7372,102 +3154,13 @@ Statistic model is a family/collection of distributions (or densities).
 For a parametric model, this collection is indexed by a
 finite-dimensional vector of parameters varying in some set (the
 parameter space).
+
 Nonparametric: the family of distributions cannot be characterized by a
 finite-dimensional parameter vector.
 
 Statistic: Any function of the observed data alone.
 Cannot depend on unkown parameters.
 
-
-
-\subsubsection{Sufficiency}
-
-Definition:
-$T$ sufficient for $\theta$ if
-\begin{align*}
-  p(x_1,\ldots,x_n|t;\theta)
-  =
-  p(x_1,\ldots,x_n|t)
-\end{align*}
-i.e. joint distribution of the data conditional on the statistic $T$
-does not depend upon $\theta$.
-
-Implication: If I ask you the probability of observing the data, you
-can't do it because you don't know the parameters.
-If I ask you the probability of observing the data conditional on some
-value of the sufficient statistic, you could do that.
-
-Note: There always exists a sufficient statistic, because we can just
-take the data.
-
-Any statistic defines a \emph{partition} of the space of all
-realizations, since multiple datasets will generally be observationally
-equivalently from the statistic's point of view.
-
-There is an equivalence class of statistics in the sense that other
-sufficient statistics may induce the same partition of the data.
-Values of statistic in some sense irrelevant; only partion matters.
-
-Joint distribution of data and sufficient statistic always simplifies to
-zero if the data does not imply a value that agrees with the sufficient
-statistic, and the distribution/density of the data for realizations
-that do agree. (cases: 0, or just distribution/density itself.)
-Then need to deduce the distribution of the sufficient statistic itself.
-
-Factorization Theorem:
-$T(X_{1:N})$ sufficient for $\theta$ if the joint pdf/pmf of $X_{1:N}$
-can be factored
-\begin{align*}
-  p(x_{1:N};\theta)
-  =
-  h(x_{1:N})
-  g(t;\theta)
-\end{align*}
-Constructive because can often just read off the sufficient statistic.
-
-Minimal sufficient statistic if
-\begin{itemize}
-  \item Sufficient
-  \item No redundant information:
-    For any other sufficient statistic $U$, we can write $T=g(U)$ (but
-    not necessarily the other way around), i.e. I can get sufficient
-    stat $T$ from any other sufficient stat.
-\end{itemize}
-Equivalently, $T$ generates the \emph{coarsest} sufficient partition,
-i.e. after we partition the data, the probabilities don't depend upon
-the parameter, and there are as few elements in the partition as
-possible.
-
-Much like how the definition of a sufficient statistic wasn't
-constructive, and we proved the factorization theorem which often turns
-out to be constructive, note that the definition of a minimal sufficient
-statistic wasn't constructive, but we can prove a result that often
-turns out to be constructive for minimal sufficient statistics.
-
-Let $x_{1:N}$ and $y_{1:N}$ be two datasets.
-Form the ratio
-\begin{align*}
-  R(x_{1:N}, y_{1:N};\theta)
-  =
-  \frac{%
-    p(y_{1:N};\theta)
-  }{%
-    p(x_{1:N};\theta)
-  }
-\end{align*}
-Suppose statistic $T$ is such that $R(x_{1:N}, y_{1:N};\theta)$
-does not depend upon $\theta$ if and only if $T(y_{1:N})=T(x_{1:N})$.
-Then $T$ is a MSS.
-
-Constructive because form the ratio for two different datasets and read
-off what you need to choose to make the parameters drop out.
-
-Minimal sufficient \emph{statistic} isn't unique (because can always
-change the values of the statistic), but minimal sufficient
-\emph{partition} is unique.
-
-Sufficiency really means that it's the minimal amount of information
-that you need to compute the \emph{likelihood} function.
 
 
 
@@ -7796,6 +3489,7 @@ Keep straight what are functions, what are numbers.
 Using $\theta_0$ should help?
 
 
+
 \clearpage
 \subsection{Distance Between Distributions}
 
@@ -7914,379 +3608,8 @@ Approaches to constructing
 
 
 
-\clearpage
-\section{Nonparametric Inference}
-
-\href{http://www.stat.cmu.edu/~larry/=stat705/Lecture12.pdf}{Reference}
-
-CDF
-\begin{itemize}
-  \item DKW bound bound for bounded in prob the deviation of the
-    estimator
-  \item From bound, get consistency
-  \item From bound, also get $\sqrt{n}$ convergence rate, which can be
-    shown to be minimax convergence rate.
-  \item From bound, can also get uniform confidence band
-\end{itemize}
-Density estimation
-\begin{itemize}
-  \item Fully nonparametric density estimation useless, will just be
-    spiked at observed data
-  \item Need to put some smoothness restrictions on possible densities
-    we can choose as our estimate
-  \item Suppose we use a kernel estimator.
-    Can derive expression for the risk.
-    Risk-minimizing choice of $h$ balances bias and variance.
-    Risk at optimum is $O(n^{-4/5})$.
-  \item From minimax theory, if we're only willing to impose a weak
-    smoothness restriction on the density we're trying to estimate, the
-    minimax risk has rate $O(n^{-4/5})$, hence kernel estimator achieves
-    minimax rate of convergence.
-\end{itemize}
-Functionals
-\begin{itemize}
-  \item We have a mapping $T$ from the set of all distributions to some
-    point in $\R$, i.e.  $\theta=T(F)$ or $\theta=T(P)$.
-  \item Note that even though we use the notation of parametric models
-    and even refer to $\theta$ as a ``parameter'', we do not want to
-    assume that we are in a parametric world where the distribution is
-    uniquely determined by some parameter.
-  \item Linear functional if it can be written
-    $\int a(x)\;dF(x)$ for some $a(x)$.
-  \item Estimator is \emph{not} parametric or not.
-    Rather it's the \emph{model} that's parametric or not.
-  \item Plug-in estimator of function $\theta=T(F)$ is
-    $\hat{\theta}_n=T(\hat{F}_n)$ where
-    $\hat{F}_n$ is the empirical CDF.
-
-    The plug-in estimator for a linear functional is the average
-    $\frac{1}{n}\sumin a(X_i)$.
-  \item Can get a really nice completely nonparametric confidence
-    interval for the mean.
-\end{itemize}
 
 
-
-\clearpage
-\section{Bootstrap}
-
-\href{http://www.stat.cmu.edu/~larry/=stat705/Lecture13.pdf}{Reference}
-\begin{itemize}
-  \item
-    Empirical distribution puts mass $1/n$ on each observed data point
-  \item We have a parameter that is a statistical functional
-    $\theta=T(P)$ that we estimated with the plug-in estimator
-    $\hat{\theta}=T(P_n)$.
-  \item We want the variance of $\hat{\theta}$, which is itself a
-    functional of $P$, $\Var_P(\hat{\theta}_n)=S_n(P)$.
-
-    If we knew the true distribution $P$, we could draw a sample
-    $\{X_i\}_{i=1}^n$ from $P$, compute $\hat{\theta}_n$.
-    Repeat this many times.
-    Compute the sample variance o the $\hat{\theta}_n$ draws.
-    By the LLN, converges in probability to $S_n(P)$.
-
-    Of course we don't know $P$, but we could in principle take the
-    plug-in estimator of this, $S_n(P_n)$.
-    That is the bootstrap.
-
-  \item
-    Bootstrap se approx (only approx by simulation error) plug-in
-    estimate which is approx (only approx by estimation error) the
-    standard error.
-
-  \item We're drawing a sample of size $n$ from the empirical
-    distribution. That's the mechanics of bootstrap.
-    Larry prefers this to the ``resampling from the data'' language.
-
-  \item See notes for proof reference.
-
-  \item For bootstrap to be valid, we need Hadamard differentiability
-    for the functional. See notes.
-
-  \item Bootstrap is nonparametric and asymptotic.
-
-  \item Jacknife valid only under stronger conditions than the
-    bootstrap needs.
-
-  \item Subsampling:
-    Draw samples of size $m<n$.
-    Valid under weaker conditions than the bootstrap.
-    Politis, Romano, and Wolf.
-
-  \item
-\end{itemize}
-
-
-
-\clearpage
-\section{Bayesian Inference}
-
-\href{http://www.stat.cmu.edu/~larry/=stat705/Lecture14.pdf}{Reference}
-\begin{itemize}
-  \item
-    Flat priors are not generally invariant to transformations and can
-    end up being highly influential, especially in high-dimensional
-    problems.
-  \item
-    Jeffrey's Prior:
-    The square root of the Fisher information.
-    Solves the invariance problem.
-    But in high-dimensional problems, can still result in posteriors
-    with poor performance or features because it can still be very
-    influential for the posterior, even if it's invariant to
-    reparameterization.
-  \item In parametric models with few parameters, as sample size grows,
-    frequentist and Bayesian inference agree.
-    Problems in high dimensional and nonparametric problems
-\end{itemize}
-
-
-\clearpage
-\section{Prediction}
-
-
-\href{http://www.stat.cmu.edu/~larry/=stat705/Lecture15.pdf}{Reference}
-
-Given training data, want to predict new $Y$ given some
-covariates/features $X$.
-
-Two big categories
-\begin{itemize}
-  \item Binary $Y_i\in\{0,1\}$, in which case classification,
-    discrimination, pattern recognition
-
-    We call a map $h(x)$ a classifier, which gives the prediction of $Y$
-    given $X$.
-    Classification loss is $\mathbf{1}\{Y\neq h(X)\}$, and the
-    classification risk $R(h)$ or classifier $h$ is then the probability
-    of missclassification.
-
-  \item Real valued $Y_i\in \R$, called a regression problem.
-    We call $g(x)$ the regression function, which gives the prediction
-    of $Y$ given $X$.
-    The loss is typically squared error loss $(Y-g(X))^2$ which gives
-    rise to mean squared error risk.
-\end{itemize}
-Regression
-\begin{itemize}
-  \item In general, mean squared error minimizing predictor is the
-    conditional expectation function.
-  \item $HY$ is the projection of $Y$ onto the column space of $X$.
-\end{itemize}
-Classification
-\begin{itemize}
-  \item
-    Bayes classifier:
-    Let $m(x)=\E[Y_i|X=x]$ or binary $Y_i$.
-    The Bayes classifier is $h_B(x)=\mathbf{1}\{m(x)\geq 1/2\}$.
-  \item
-    The risk of any other classifier is larger than the risk of the
-    Bayes classifier.
-    That's why it's called the Bayes classifier (I think) because it
-    minimizes Bayes risk for any distribution over covariates $p(x)$;
-    not because of any association with Bayesian inference.
-    Should just be a generalization of the parametric case to infinite
-    dimensional function case.
-    Also suggests that the CEF in a regression problem is a Bayes
-    estimator in function sense?
-  \item
-    Much like how, in a regression context, the CEF is the best
-    predictor of $Y$ given $X$, we just saw that the Bayes estimator is
-    best among all classifiers.
-    However, we don't know the CEF and in estimating it, we might
-    restriction to linear classifiers or some family of classifiers,
-    like how we restriction to linear predictors in a regression
-    problem.
-
-  \item Empirical risk minimization starts with a family of classifiers
-    $\calH=\{h(x)\mapsto \{0,1\}\}$.
-    We define the training error or empirical risk
-    \begin{align*}
-      \hat{R}(h)
-      =
-      \frac{1}{n}
-      \sumin
-      \mathbf{1}\{Y_i\neq h(X_i)\}
-    \end{align*}
-    the sample analog of the population risk, and then select a
-    classifier based on empirical risk minimization
-    \begin{align*}
-      \hat{h}
-      =
-      \argmin_{h\in\calH}
-      \hat{R}(h)
-    \end{align*}
-    Example, linear classifiers:
-    $\calH$ consists of
-    $h_\beta(x)=\mathbf{1}\{\beta'x\geq 0\}$.
-
-  \item
-    Theorem:
-    The risk of the (feasible, sample) empirical risk minimizer
-    in class $\calH$ converges in probability to the true (infeasible,
-    population) risk minimizer in class $\calH$ provided the
-    class $\calH$ has finite VC dimension.
-    See notes.
-
-  \item
-    Suppose we instead recode $Y_i\in\{0,1\}$ as $Y_i\in\{-1,1\}$.
-    Then we can often write classifiers as
-    \begin{align*}
-      h(x) = \sign(f(x))
-    \end{align*}
-    for some continuous function $f(x)$ e.g. $f(x)=x'\beta$.
-    Then the classification loss function can be written
-    \begin{align*}
-      \mathbf{1}\{h(x)\neq Y_i\}
-      &=
-      \mathbf{1}\{\sign(f(x))\neq Y_i\}
-      \\
-      &=
-      \mathbf{1}\{\sign(f(x))\neq \sign(Y_i)\}
-      \\
-      &=
-      \mathbf{1}\{Yf(x)< 0\}
-      \\
-      &=
-      1-\mathbf{1}\{Yf(x)\geq 0\}
-    \end{align*}
-    and then we minimize the empirical risk function
-    \begin{align*}
-      \frac{1}{n}
-      \sum_i
-      \mathbf{1}\{Yf(x)< 0\}
-    \end{align*}
-
-  \item
-    Sometimes minimizing the empirical risk function is tough because
-    it's not smooth.
-    Therefore, we might modify the loss function and use a
-    \emph{surrogate loss function} to choose our estimator, rather than
-    the true one.
-
-  \item
-    Support Vector Machine Example:
-    Recode $Y_i\in\{0,1\}$ as $Y_i\in\{-1,1\}$ as above and suppose we
-    use
-    \begin{align*}
-      h(x) = \sign(f(x))
-    \end{align*}
-    as above.
-    The usual misclassification loss function can be expressed
-    $\mathbf{1}\{Yf(x)<0\}$ as above.
-    However, suppose we instead use surrogate loss function
-    \begin{align*}
-      (1-Y f(X))_+
-      =
-      \max\{1-Y f(X),0\}
-    \end{align*}
-    which is called the hinge function.
-    If the signs disagree, the function is nonzero and contributes to
-    the empirical risk.
-    If the signs agree, this function will generally zero out.
-    The resulting classifier is called a support vector machine.
-
-  \item Plug in classification:
-    The naive approach is to estimate $m(x)$ parametrically or
-    nonparametrically and, instead of the unknown Bayes classifier, use
-    \begin{align*}
-      \hat{h}(x) = \mathbf{1}\{\hat{m}(x)\geq 1/2\}
-    \end{align*}
-    Note that $\hat{m}(x)$ implicitly comes from a parametric or
-    nonparametric family of classifiers.
-    There is naturally some risk-minimizing classifier within this
-    family.
-    We'd like to use the Theorem above to conclude that this
-    feasible/sample plug-in classifier has risk converging to that
-    minimum risk.  However, I don't have a proof of that since I don't
-    know that this plug-in classifier minimizes the empirical risk.
-    I just know that it uses ``some good estimate'' however
-    defined/constructed for $m(x)$.
-    Enter the next theorem.
-
-  \item
-    Theorem:
-    Suppose $m(x)=\E[Y|X=x]$ and let $h_m(x)=\mathbf{1}\{m(x)\geq 1/2\}$
-    be the unknown infeasible Bayes classifier.
-    Let $g(x)$ be any function that I use to form
-    $h_g(x)=\mathbf{1}\{g(x)\geq 1/2\}$.
-    Then we can bound the difference in risk by the
-    integrated difference between $g(x)$ and $m(x)$.
-
-    Corollary:
-    If I have a good estimator $\hat{m}(x)$ of $m(x)$, the risk
-    of the plug-in will converge to the minimal risk of the Bayes
-    classifier.
-\end{itemize}
-
-
-\clearpage
-\section{Model Selection}
-
-\href{http://www.stat.cmu.edu/~larry/=stat705/Lecture16.pdf}{Reference}
-
-\begin{enumerate}[label=(\roman*)]
-  \item AIC and $C_p$:
-    Maximizing the AIC minimizes KL divergence between models and the
-    truth.
-
-    Each model is a set of parametric densities.
-    Models $\calM_1,\ldots,\calM_k$ with densities
-    \begin{align*}
-      \calM_j
-      =
-      \big\{
-        p(y;\theta_j)\;:\;
-        \theta_j \in \Theta_j
-      \big\}
-    \end{align*}
-    There is some true density $f$ which \emph{might not} be among the
-    densities in any of the possible models.
-
-    Given estimate of parameters, we can form the implied density and
-    the KL divergence between the truth and the estimated/implied
-    density.
-    Because true density is constant across models for each KL
-    computation, we just have the mean of the log density that varies
-    across models.
-    Can construct naive estimate and adjust for bias.
-
-    See notes for all the details.
-
-  \item Cross-validation:
-    Split data into training and test set.
-    Estimate using first half, construct the average log likelihood or
-    sample expected loss on the second half using the estimate from the
-    first half.
-    To show that this is good as the sample gets large, use Hoeffding.
-    In particular, these sample averages are close to the mean (the
-    actual expectation) with high probability that decays at a known
-    rate.
-    So then we can play the game ``with probability at least $1-\alpha$,
-    the gap between sample and population criterion function is
-    some constant that decays like $O(\log(k)/n)$.
-
-    Uses essentially no assumptions or approximations.
-
-  \item BIC (aka Schwarz criterion), MDL (Minimum Description Length),
-    Bayesian Model Selection:
-    Same as AIC but with harsher penalty, so chooses simpler models.
-    Many models, each with a prior probability associated.
-    Form posterior probability of each model, choose $j$ to maximize
-    this posterior probability.
-    Write out the log of this posterior probability and do some
-    approximations on the likelihood.
-    This approximations give the BIC criterion.
-    Prior drops out because lower order.
-\end{enumerate}
-Two goals which might motivate model selection
-\begin{enumerate}
-  \item Best prediction, without assuming one model is correct.
-    (i) and (ii) are good for this and are, in fact, motivated by this.
-  \item Assume one model is true, and find that true model
-    (iii) is good for this.
-\end{enumerate}
 
 
 
@@ -8297,52 +3620,6 @@ Two goals which might motivate model selection
 
 
 
-\clearpage
-\section{Multiple Testing}
-
-\href{http://www.stat.cmu.edu/~larry/=stat705/Lecture18.pdf}{Reference}
-
-Several null hypotheses under consideration
-\begin{align*}
-  \calH = \{H_{0,1},\ldots,H_{0,N}\}
-\end{align*}
-Let $I$ denote the indices of those hypotheses that are, in fact, true
-(even if we don't know that).
-This set is fixed no matter the data draw.
-Rejecting any hypothesis in this set constitutes a Type I error.
-
-Let $R$ denote the random set of indices collecting the indices of the
-hypotheses we reject. This is random because the set of hypotheses that
-we reject depends on the data.
-
-We control the \emph{familywise error rate} at level $\alpha$ if
-\begin{align*}
-  P[R \cap I \neq \emptyset]\leq \alpha
-\end{align*}
-Note that $R$ is random, $I$ is fixed.
-In words, this says that the probability that we reject an actually true
-hypothesis (or hypotheses) in the family is less than $\alpha$.
-
-Bonferroni:
-Just divide $\alpha$ by $N$ for each test in the family.
-Problem, can have low power.
-
-False discovery control
-\begin{itemize}
-  \item Define the False Discovery Proportion,
-    which is the share of rejections that are in error:
-    \begin{align*}
-      FDP
-      =
-      \frac{|R\cap I|}{|R|}
-    \end{align*}
-    Again, $R$ is an RV, a mapping from the data into a set of indices
-    corresponding to the rejected hypotheses.
-  \item Suppose we want to choose random $R$ such that the average is
-    $\E[FDP]\leq \alpha$.
-  \item Benjamini-Hochberg method will give you the mapping $R$
-
-\end{itemize}
 
 
 
@@ -8365,538 +3642,1435 @@ False discovery control
 \end{itemize}
 
 
-\clearpage
-\section{Bootstrap}
-
-Setup
-\begin{itemize}
-  \item Sample $\{W_i\}_{i=1}^N$ where $W_i\sim F_0$
-  \item Given sample, construct estimator $\hat{\theta}_N$ and
-    associated standardized statistic
-    \begin{align*}
-      T_N
-      =
-      \sqrt{N}(\hat{\theta}_N-\theta_0)
-      \quad
-      \dto
-      \quad
-      \calN(0,\sigma^2)
-    \end{align*}
-
-  \item Given sample size $N$, standardized statistic $T_N$ has unknown
-    sampling distribution
-    \begin{align*}
-      G_N(\tau,F_0)
-      =
-      P_{F_0}\big[
-        T_N \leq \tau
-      \big]
-    \end{align*}
-    This corresponds to the sampling distribution of $T_N$, i.e. draw
-    many samples from the true, unknown population and compute the
-    statistic $T_N$ across those samples to get its sampling
-    distribution.
-
-  \item
-    The standardized statistic $T_N$ has asymptotic distribution
-    \begin{align*}
-      G_\infty(\tau,F_0)
-      =
-      \lim_{N\ra\infty}
-      P_{F_0}[T_N\leq \tau]
-    \end{align*}
 
 
-  \item There is also the bootstrap distribution of the statistic
-    \begin{align*}
-      G_N(\tau,\hat{F})
-      =
-      P_{\hat{F}}\big[
-        T_N^{(b)} \leq \tau
-      \big]
-    \end{align*}
-    i.e. draw many bootstrap samples from the realized sample, compute
-    the statistic $T_N^{(b)}$ across those bootstrap samples to get its
-    bootstrap distribution.
-
-    Effectively the ``population'' is the discrete uniform distribution
-    over our realized sample, each observation having probability $1/n$,
-    hence sampling with replacement is the appropriate way to sample
-    from this population.
-
-
-  \item
-    Boostrap consistency motivates the following approximation
-    \begin{align*}
-      G_N(\tau,\hat{F})
-      &\approx
-      G_N(\tau,F_0)
-      \\
-      \iff\qquad
-      P_{\hat{F}}\big[
-        T_N^{(b)} \leq \tau
-      \big]
-      &\approx
-      P_{F_0}\big[
-        T_N \leq \tau
-      \big]
-    \end{align*}
-    Note that we approximate the LHS quantities by the empirical CDF
-    even though, in principal, we could characterize the bootstrap
-    distribution exactly.
-\end{itemize}
-\clearpage
-Using bootstrap draws
-$\{\hat{\theta}_N^{(b)}\}_{b=1}^B$ and
-$\{T_N^{(b)}\}_{b=1}^B$, we can do any of the following:
-\begin{itemize}
-  \item
-    Efron's Interval:
-    Let $\hat{q}_{\alpha/2}$ and $\hat{q}_{1-\alpha/2}$ denote the
-    relevant quantiles of $\{\hat{\theta}_N^{(b)}\}_{b=1}^B$.
-    Efron's interval is $[\hat{q}_{\alpha/2},\hat{q}_{1-\alpha/2}]$.
-    We can check its coverage:
-    \begin{align*}
-      P_{F_0}
-      \bigg[
-        \theta_0
-        \in [\hat{q}_{\alpha/2},\hat{q}_{1-\alpha/2}]
-      \bigg]
-      = ?
-    \end{align*}
-    Rewrite
-    \begin{align*}
-      P_{F_0}
-      \bigg[
-        \hat{q}_{\alpha/2}
-        \leq
-        \theta_0
-        \leq
-        \hat{q}_{1-\alpha/2}
-      \bigg]
-      &=
-      P_{F_0}
-      \bigg[
-        \sqrt{N}(\hat{\theta}_N-\hat{q}_{\alpha/2})
-        \geq
-        \sqrt{N}(\hat{\theta}_N-\theta_0)
-        \geq
-        \sqrt{N}(\hat{\theta}_N-\hat{q}_{1-\alpha/2})
-      \bigg]
-      \\
-      &=
-      P_{F_0}
-      \bigg[
-        T_N
-        \in
-        \big[
-        \sqrt{N}(\hat{\theta}_N-\hat{q}_{1-\alpha/2})
-        ,\,
-        \sqrt{N}(\hat{\theta}_N-\hat{q}_{\alpha/2})
-        \big]
-      \bigg]
-      \\
-      \text{Bootstrap consistency}
-      \quad
-      &\approx
-      P_{\hat{F}}
-      \bigg[
-        T_N^{(b)}
-        \in
-        \big[
-        \sqrt{N}(\hat{\theta}_N-\hat{q}_{1-\alpha/2})
-        ,\,
-        \sqrt{N}(\hat{\theta}_N-\hat{q}_{\alpha/2})
-        \big]
-      \bigg]
-      \\
-      &=
-      P_{\hat{F}}
-      \bigg[
-        \sqrt{N}(\hat{\theta}_N-\hat{q}_{1-\alpha/2})
-        \leq
-        T_N^{(b)}
-        \leq
-        \sqrt{N}(\hat{\theta}_N-\hat{q}_{\alpha/2})
-      \bigg]
-      \\
-      &=
-      P_{\hat{F}}
-      \bigg[
-        \sqrt{N}(\hat{\theta}_N-\hat{q}_{1-\alpha/2})
-        \leq
-        \sqrt{N}(\hat{\theta}_N^{(b)}-\hat{\theta}_N)
-        \leq
-        \sqrt{N}(\hat{\theta}_N-\hat{q}_{\alpha/2})
-      \bigg]
-      \\
-      &=
-      P_{\hat{F}}
-      \bigg[
-        \hat{\theta}_N-\hat{q}_{1-\alpha/2}
-        \leq
-        \hat{\theta}_N^{(b)}-\hat{\theta}_N
-        \leq
-        \hat{\theta}_N-\hat{q}_{\alpha/2}
-      \bigg]
-      \\
-      \text{%
-        $\hat{\theta}^{(b)}_N$ symmetric about $\hat{\theta}_N$
-      }
-      \quad
-      &=
-      P_{\hat{F}}
-      \bigg[
-        \hat{\theta}_N-\hat{q}_{1-\alpha/2}
-        \leq
-        \hat{\theta}_N
-        -
-        \hat{\theta}_N^{(b)}
-        \leq
-        \hat{\theta}_N-\hat{q}_{\alpha/2}
-      \bigg]
-      \\
-      &=
-      P_{\hat{F}}
-      \bigg[
-        \hat{q}_{1-\alpha/2}
-        \geq
-        \hat{\theta}_N^{(b)}
-        \geq
-        \hat{q}_{\alpha/2}
-      \bigg]
-      \\
-      \text{By construction}\quad
-      &=
-      1-\alpha
-    \end{align*}
-
-
-
-  \item
-    Modified Efron's interval:
-    Let $\hat{q}_{\alpha/2}$ and $\hat{q}_{1-\alpha/2}$ denote the
-    relevant quantiles of $\{T_N^{(b)}\}_{b=1}^B$.
-    Then by definitions and then bootstrap consistency
-    \begin{align*}
-      1-\alpha
-      =
-      P_{\hat{F}}
-      \bigg[
-        T_N^{(b)}\in [\hat{q}_{\alpha/2},\hat{q}_{1-\alpha/2}]
-      \bigg]
-      \approx
-      P_{F_0}
-      \bigg[
-        T_N\in [\hat{q}_{\alpha/2},\hat{q}_{1-\alpha/2}]
-      \bigg]
-    \end{align*}
-    Writing out more fully
-    \begin{align*}
-      1-\alpha
-      &\approx
-      P_{F_0}
-      \bigg[
-        \hat{q}_{\alpha/2}
-        \leq
-        \sqrt{N}(\hat{\theta}_N-\theta_0)
-        \leq
-        \hat{q}_{1-\alpha/2}
-      \bigg]
-      \\
-      &=
-      P_{F_0}
-      \bigg[
-        \hat{\theta}_N
-        +
-        \frac{%
-          \hat{q}_{1-\alpha/2}
-        }{%
-          \sqrt{N}
-        }
-        \leq
-        \theta_0
-        \leq
-        \hat{\theta}_N
-        +
-        \frac{%
-          \hat{q}_{\alpha/2}
-        }{%
-          \sqrt{N}
-        }
-      \bigg]
-      \\
-      &=
-      P_{F_0}
-      \bigg[
-        \theta_0
-        \in
-        \left[
-        \hat{\theta}_N
-        +
-        \frac{%
-          \hat{q}_{1-\alpha/2}
-        }{%
-          \sqrt{N}
-        }
-        ,\,
-        \hat{\theta}_N
-        +
-        \frac{%
-          \hat{q}_{\alpha/2}
-        }{%
-          \sqrt{N}
-        }
-        \right]
-      \bigg]
-    \end{align*}
-    Notice that the quantiles are reversed from what we might naively
-    expect.
-
-  \item
-    Incorrect Critical Values:
-    Let $\hat{q}_{\alpha/2}$ and $\hat{q}_{1-\alpha/2}$ be the relevant
-    quantiles of $\hat{\theta}_N^{(b)}$.
-    Then a test based on comparing $\hat{\theta}$ to these critical
-    values would be
-    \begin{align*}
-      \varphi(\hat{\theta}_N)
-      =
-      \mathbf{1}\{\hat{\theta}_N\not\in [\hat{q}_{\alpha/2},\hat{q}_{1-\alpha/2}]\}
-    \end{align*}
-    This has null rejection probability of
-    \begin{align*}
-      P_{F_0}\big[
-        \hat{\theta}_N\not\in [\hat{q}_{\alpha/2},\hat{q}_{1-\alpha/2}]
-      \big]
-      &=
-      1-
-      P_{F_0}\big[
-        \hat{\theta}_N\in [\hat{q}_{\alpha/2},\hat{q}_{1-\alpha/2}]
-      \big]
-      \\
-      &=
-      1-
-      P_{F_0}\big[
-        \hat{q}_{\alpha/2}
-        \leq
-        \hat{\theta}_N
-        \leq
-        \hat{q}_{1-\alpha/2}
-      \big]
-      \\
-      &=
-      1-
-      P_{F_0}\big[
-        \sqrt{N}(\hat{q}_{\alpha/2}-\theta_0)
-        \leq
-        \sqrt{N}(\hat{\theta}_N-\theta_0)
-        \leq
-        \sqrt{N}(\hat{q}_{1-\alpha/2}-\theta_0)
-      \big]
-      \\
-      &=
-      1-
-      P_{F_0}\big[
-        \sqrt{N}(\hat{q}_{\alpha/2}-\theta_0)
-        \leq
-        T_N
-        \leq
-        \sqrt{N}(\hat{q}_{1-\alpha/2}-\theta_0)
-      \big]
-      \\
-      \text{Bootstrap consistency}
-      \quad
-      &\approx
-      1-
-      P_{\hat{F}}\big[
-        \sqrt{N}(\hat{q}_{\alpha/2}-\theta_0)
-        \leq
-        T_N^{(b)}
-        \leq
-        \sqrt{N}(\hat{q}_{1-\alpha/2}-\theta_0)
-      \big]
-      \\
-      &=
-      1-
-      P_{\hat{F}}\big[
-        \sqrt{N}(\hat{q}_{\alpha/2}-\theta_0)
-        \leq
-        \sqrt{N}(\hat{\theta}^{(b)}-\hat{\theta})
-        \leq
-        \sqrt{N}(\hat{q}_{1-\alpha/2}-\theta_0)
-      \big]
-      \\
-      &=
-      1-
-      P_{\hat{F}}\big[
-        \hat{q}_{\alpha/2}
-        + \hat{\theta} -\theta_0
-        \leq
-        \hat{\theta}^{(b)}
-        \leq
-        \hat{q}_{1-\alpha/2}
-        + \hat{\theta} -\theta_0
-      \big]
-    \end{align*}
-    In order for the probability on the last line to equal $1-\alpha$
-    (so that rejection rate is $\alpha$),we need
-    $\hat{\theta}-\theta_0=0$, which is not generally true.
-
-
-  \item
-    Correct Critical Values:
-    Let $\hat{q}_{\alpha/2}$ and $\hat{q}_{1-\alpha/2}$ be the relevant
-    quantiles of $T_N^{(b)}$.
-    Then a test based on comparing $T_N$ to these critical
-    values would be
-    \begin{align*}
-      \varphi(T_N)
-      =
-      \mathbf{1}\{T_N\not\in [\hat{q}_{\alpha/2},\hat{q}_{1-\alpha/2}]\}
-    \end{align*}
-    This has null rejection probability of
-    \begin{align*}
-      P_{F_0}\big[
-        T_N\not\in [\hat{q}_{\alpha/2},\hat{q}_{1-\alpha/2}]
-      \big]
-      &=
-      1-
-      P_{F_0}\big[
-        T_N\in [\hat{q}_{\alpha/2},\hat{q}_{1-\alpha/2}]
-      \big]
-      \\
-      \text{Bootstrap consistency}
-      \quad
-      &\approx
-      1-
-      \bigg(
-      P_{\hat{F}}\big[
-        T_N^{(b)}\in [\hat{q}_{\alpha/2},\hat{q}_{1-\alpha/2}]
-      \big]
-      \bigg)
-      \\
-      &=
-      1-
-      \bigg(
-      1-\alpha
-      \bigg)
-      \\
-      &=
-      \alpha
-    \end{align*}
-
-
-
-\end{itemize}
 
 
 \clearpage
-Bootstrap idea:
-\begin{itemize}
-  \item Want $G_N(\tau,F_0)$
-  \item Have estimator $\hat{F}$ that is consistent for true $F_0$.
-  \item Use $G_N(\tau,\hat{F})$ to approximate $G_N(\tau,F_0)$.
-    Mechanics:
-    \begin{itemize}
-      \item Simulate from $\hat{F}$ a total of $B$ bootstrap samples
-        $Z_1^b,\ldots,Z_N^b$ for $b=1,\ldots,B$.
-      \item Compute the statistic $T^b_N$ for $b=1,\ldots,N$.
-        These constitute the draws of $T_N^b$ from the bootstrap
-        distribution $G_N(\tau,\hat{F})$
-      \item Use the empirical distribution function of $T^b_N$ to
-        approximate desired $G_N(\tau,F_0)$.
-    \end{itemize}
-\end{itemize}
-Requires bootstrap consistency to work, i.e.
+\section{Recent Progress on OLS Regression}
+
+Given data $\calD_n = \{Y_i,X_i\}_{i=1}^n$,
+we will compute OLS estimates
 \begin{align*}
-  G_N(\tau,\hat{F})
+  \hat{\theta}
   =
-  P_{\hat{F}}[T_N^b\leq \tau]
-  \quad\ra\quad
-  P_{F_0}[T_N\leq \tau]
+  (\hat{\beta},\hat{\gamma}')'
+  :=
+  \argmin_\theta
+  \frac{1}{n}
+  \sumin
+  (Y_i-X_i'\theta)^2
   =
-  G_N(\tau,F_0)
+  (X'X)^{-1}X'Y
+  =
+  (X'X)^{-1}
+  \sumin
+  X_iY_i
 \end{align*}
-Obtaining the bootstrap distribution
-\begin{itemize}
-  \item Parametric bootstrap:
-    $\hat{F}=F(\cdot,\hat{\theta})$, where $\hat{\theta}$ is a
-    consistent estimator of the parameter in a full-information setting.
-    So we can draw $Z_i^b$ directly from $F(\cdot,\hat{\theta})$ to
-    generate bootstrap draws and samples.
+In causal inference settings, we will have $X_i=(D_i,W_i')'$, where
+$D_i$ is some treatment vector of interest (generally just a binary
+indicator).
+Under various conditions, these estimates will converge to
+\emph{some estimand}.
+The question is what is this estimand?
+Is it what we want?
+And the answer to that question depends in many ways on our setting,
+goals, and assumptions.
+
+We generally run the regression with one of two potential goals in mind.
+\begin{enumerate}
   \item
-    Nonparametric bootstrap:
-    $\hat{F}$ is the empirical distribution function with weight $1/n$
-    on each observation.
+    (\emph{Prediction \& CEF Approx.}):
+    Finding the best linear predictor of $Y_i$ given $X_i$ or, closely
+    related\footnote{%
+      Recall the CEF is the best predictor of $Y_i$ given $X_i$
+      generally in a minimum MSE sense.
+    }
+    and often of greater importance in econometric contexts,
+    the best linear approximation of CEF
+    \begin{align*}
+      \mu(x):=\E[Y_i|X_i=x]
+    \end{align*}
+    To be as general as possible, we allow the CEF to be a
+    \emph{nonlinear} function;
+    therefore, we will not assume that outcomes are generated by a
+    \emph{linear DGP defined by} some parameter vector $\theta$
+    and shock $\varepsilon_i$, e.g.
+    \begin{align}
+      Y_i
+      &=
+      %D_i\beta
+      %+
+      %W_i'\gamma
+      %+
+      %\varepsilon_i
+      %=
+      X_i'\theta
+      +
+      \varepsilon_i
+      \label{regeq}
+    \end{align}
+    Rather, $\theta$ and $\varepsilon_i$ will be
+    \emph{defined from the DGP} using projections---an enormously
+    important distinction.
+
+    Defining $\theta$ as the best linear approximation to generally
+    nonlinear $\mu(x)$ requires care precisely because of the possible
+    nonlinearity in $\mu(x)$.
+    Linear regresion will essentially draw a straight line through the
+    the function $\mu(x)$, weighting a given point $x$ by some
+    distribution for the $X_i$.
+    If the function $\mu(x)$ were truly linear, the distribution we use
+    for weighting doesn't matter for the fit because the slope is
+    constant across the full support of $X_i$ and so we'll estimate the
+    very same slope (on average or in the limit) given any set of
+    weights.
+    But with nonlinear $\mu(x)$, it will matter whether we choose to fit
+    the line weighting by the unconditional superpopulation distribution
+    of $X_i$ or the conditional empirical distribution given by the
+    data matrix $X$.
+    So remember that the estimand depends upon the distribution of $X_i$
+    we use for weighting.
+
+    Our choice of weights and estimand then directly determine the type
+    of inference about $\hat{\theta}$ that we conduct---namely,
+    whether or not we condition on regressors $X$ in our
+    sample when thinking about sampling variability of our
+    estimators---and the center of either the finite-sample or (more
+    typically) the limiting distribution of our estimator.
+    But regardless of whether we condition on the regressors or not,
+    analysis proceeds the same by making sampling assumptions and
+    appealing to large $n$ asymptotics to derive an approximate finite
+    sample distribution for $\hat{\theta}$.
+    But here's more about the two inference perspectives.
+    \begin{enumerate}[label=(\alph*)]
+      \item Conditional Inference Perspective
+        \begin{itemize}
+          \item Regression estimand provides the best linear
+            approximation to CEF over the \emph{conditional}
+            distribution of $X$ in our sample.
+            So if the sample $X$ is quite different from the population,
+            the estimand might have little exernal validity.
+
+          \item Takes sample $X$ as given and hold fixed over repeated
+            samples.
+            Sampling uncertainty driven by variability in outcomes
+            $Y_i$ given $X_i$.
+            And because we condition on $X$, can even allow for
+            arbitrary correlation among regressors.
+
+          \item
+            When deriving the asymptotic distribution, note that the
+            data matrix $X$ and the empirical distribution impled by $X$
+            change with $n$.
+            So we then generally have a \emph{sequence}
+            of estimands, changing with $n$ rather than fixed as in
+            unconditional inference.
+            But we can still derive an asymptotic distribution, albeit
+            using different sampling and regularity conditions.
+
+          \item Typical starting point of regression; perspective
+            that underlies Gauss-Markov.
+
+        \end{itemize}
+
+      \item Unconditional inference
+        \begin{itemize}
+          \item Regression will provide the best linear approximation to
+            the CEF over the \emph{unconditional} distribution of $X_i$
+            in the superpopulation.
+          \item Do not condition on the $X$ observed in the
+            sample.
+            Sampling uncertainty driven by variability in $Y|X=x$
+            for a given $x$ \emph{and} the variability in drawn $X$.
+        \end{itemize}
+    \end{enumerate}
+
   \item
-    Residual bootstrap:
-    Draw errors and reconstitute observations.
-    This implies a $\hat{F}$.
-\end{itemize}
+    (\emph{Causal Inference}):
+    We would like to assign to the regression estimands some
+    \emph{causal} interpretation, i.e. show that they equal some
+    meaningful and interpretable weighted average treatment effect, with
+    treatment effects defined in terms of potential outcomes a la the
+    Rubin Causal Model.
+
+    Sampling variability in estimators may be driven solely by
+    (conditional-on-$W_i$) random assignment, i.e.
+    \emph{design-based uncertainty}, or by \emph{both} design-based
+    uncertainty and sampling-based uncertainty.
+    This will have direct implications for inference.
+\end{enumerate}
+EHW Variance Estimator:
+\begin{align*}
+  %\hat{\theta}
+  %&=
+  %\argmin_\theta
+  %\sumin
+  %(Y_i-X_i'\theta)
+  %=
+  %(X'X)^{-1}X'Y
+  %\\
+  %\hat{\beta}
+  %&=
+  %(\widetilde{D}'\widetilde{D})^{-1}\widetilde{D}'Y
+  %\qquad\text{where}\quad
+  %%\E[D_i|Y(D),W]=W'\delta
+  %\widetilde{D}
+  %=
+  %D-H_WD
+  %\\
+  %\hat{\varepsilon}_i
+  %&=
+  %Y_i-X_i'\hat{\theta}
+  %\\
+  \hat{V}_{EHW}
+  &=
+  n(X'X)^{-1}
+  \left(
+  \sum_i \hat{\varepsilon}^2_i X_iX_i'
+  \right)
+  (X'X)^{-1}
+\end{align*}
+
+
 \clearpage
-Pivotality:
+\subsection{Estimands}
+First let's define some estimands.
+These are all candidates for the limiting $\theta$ for which
+$\hat{\theta}$ is consistent under some set of assumptions and
+regularity conditions.
+For estimands that depend upon the sample and covariate matrix $X$ at
+hand, I add an $n$ subscript to emphasize that the estimand will change
+with $n$, which is useful to remember.
 \begin{itemize}
-  \item Pivotal statistic is a statistic $T_N$ whose distribution
-    $G_N(\tau,F)$ does not depend on $F$ for $F$ in some relevant family
-    of distributions.
-  \item The distribution of the statistic $T_N$ built from $Z_i\sim F_0$
-    is ultimately insensitive to the DGP $F_0$ (within some family).
-  \item Asymptotically pivotal statistic is a statistic $T_N$ whose
-    asymptotic distribution $G_\infty(\tau,F)$ does not depend on $F$
-  \item To understand, note that we can write an Edgeworth expansion in
-    powers of $N^{-1/2}$ for $G_N(\tau,F_0)$,
-    the sampling distribution/CDF of the statistic that we are
-    interested in.
-    The first term is the asymptotic distribution that survives
-    $N\ra\infty$, while all other terms die out.
-    That first term in the expansion is typically a normal distribution
-    with some zero mean and unknown variance.
+  \item (\emph{Unconditional Projection Coefficient}):
+    Assume that our sample $\calD_n$ is drawn from some superpopulation.
+    This estimand is constructed from the joint superpopulation
+    distribution over outcomes and covariates $(Y_i,X_i)$.
+    We use $\E^{sp}$ to denote that teh expectation is taken with
+    respect to that superpopulation distribution.
+    \begin{align*}
+      \theta_{du}
+      &:=
+      \argmin_{\theta}
+      \E^{sp}[(Y_i-X_i'\theta)^2]
+      \\
+      &\hphantom{:}=
+      \argmin_{\theta}
+      \E^{sp}[(\mu(X_i)-X_i'\theta)^2]
+      \qquad
+      \text{LIE}
+      \\
+      &\hphantom{:}=
+      \E^{sp}[X_iX_i']^{-1}
+      \E^{sp}[X_iY_i]
+      =
+      \E^{sp}[X_iX_i']^{-1}
+      \E^{sp}[X_i\mu(X_i)]
+      \qquad
+      \text{Solving FOCs, LIE}
+    \end{align*}
 
-  \item Suppose we mean to approximate unkonwn finite sample distribution
-    $G_N(\tau,F_0)$ with either the asymptotic distribution or the
-    bootstrap distribution.
+  \item
+    (\emph{Conditional on $X$ Projection Coefficient}):
+    Condition on the sample data matrix $X$, define the estimand as the
+    best linear approximation to the CEF for samples with identical $X$.
+    Adding the argument $X$ emphasizes this point.
+    \begin{align*}
+      \theta_{dc,n}(X)
+      &=
+      \argmin_{\theta}
+      \frac{1}{n}
+      \sum_i
+      (\mu(X_i)-X_i'\theta)^2
+      =
+      (X'X)^{-1}X'\mu(X)
+    \end{align*}
 
-  \item The usual asymptotic approximation for $G_N(\tau,F_0)$ uses
-    simply that leading normal term in the Edgeworth expansion.
-    The error commited is all Edgeworth/remainder terms after the first.
 
-  \item The bootstrap approximation for $G_N(\tau,F_0)$ instead
-    approximates with $G_N(\tau,\hat{F})$, which we can also
-    Edgeworth-expand.
-    It too generally has a leading normal term, while all others die
-    out.
-    Therefore, the approximation error committed is the difference of
-    leading normal terms plus the difference in remainders.
+  \item
+    (\emph{Design-Based Superpopulation Estimand}):
+    Assume $X_i=(D_i,W_i')'$.
+    Define the following where the expectation $\E^{D,sp}$ is taken over
+    both the random assignment mechanism for $D_i$ and the joint
+    superpopulation distribution over
+    %potential outcomes, treatment, and covariates
+    $(Y_i(d),D_i,W_i)$.
+    \begin{align*}
+      \theta_{cs}
+      &:=
+      \argmin_{\theta}
+      \E^{D,sp}[(Y_i-X_i'\theta)^2]
+      =
+      \E^{D,sp}[X_iX_i']^{-1}
+      \E^{D,sp}[X_iY_i]
+    \end{align*}
 
-  \item If $T_N$ is asymptotically pivotal then $G_N(\tau,F)$ doesn't
-    depend on $F$, hence the leading terms in the Edgeworth expansions
-    for $G_N(\tau,F_0)$ and $G_N(\tau,\hat{F})$ (which represent the
-    asymptotic distribution) match and cancel out when we consider the
-    approximation error $G_N(\tau,F_0)-G_N(\tau,\hat{F})$.
-    Typically, the remaining terms are lower order than what we have in
-    the normal approximation.
+  \item
+    (\emph{Design-Based Finite Sample Estimand}):
+    Define the following estimand where the conditional expectation
+    $\E^D$ is taken over the random assignment mechanism for $D$
+    alone---no random sampling, potential outcomes are fixed for teh
+    sample at hand---while conditioning on the full set of potential
+    outcomes $Y(D)$ and covariates $W$ in the sample.
+    %$Y_i=Y_i(D_i)$ is the realized outcome that depends upon random $D_i$.
+    \begin{align*}
+      \theta_{cf,n}
+      &:=
+      \argmin_{\theta}
+      \E^D\left[
+        \sum_{i=1}^n
+        (Y_i-X_i'\theta)^2
+        \,\bigg|\,Y(D),W
+      \right]
+      =
+      \E^D
+      \left[
+      {X}_i{X}_i'
+      \,|\,
+      Y(D),W
+      \right]^{-1}
+      \E^D
+      \left[
+      {X}_iY_i
+      \,|\,
+      Y(D),W
+      \right]
+    \end{align*}
 \end{itemize}
-Using the bootstrap distribution:
+Each (generally distinct) estimand definition in turn defines a
+(generally unique) error:
+\begin{align*}
+  \varepsilon_{\ell,i}
+  &:=
+  Y_i-X_i'\theta_{\ell}
+  \qquad
+  \ell\in\{(du), (dc,n), (cs), (cf,n)\}
+\end{align*}
+From there, rearrange and sub into the OLS formula to
+rewrite for asymptotics
+\begin{align*}
+  \sqrt{n}
+  (
+  \hat{\theta}
+  -
+  \theta_{\ell}
+  )
+  =
+  (X'X/n)^{-1}
+  \frac{1}{\sqrt{n}}
+  \sumin
+  X_i
+  \underbrace{%
+    (Y_i-X_i'\theta_{\ell})
+  }_{\varepsilon_{\ell,i}}
+\end{align*}
+With appropriate sampling and regularity assumptions on the terms in the
+sum, we can then derive the limiting distribution.
+
+
+\clearpage
+\subsection{Assumptions for Inference}
+
+\paragraph{Sampling Assumptions}
+These are necessary for characterizing
+\emph{sampling-based uncertainty}, where randomness in our estimators is
+induced by random sampling as opposed to design-based uncertainty
+(although these two kinds of uncertainty can often both be relevant).
+If we assume $n\ra\infty$, the randomness induced by sampling can be
+approximated by a normal law according to some CLT, which we can use for
+inference about regression estimands.
+\begin{enumerate}[label=(\roman*)]
+  \item[S1.]
+    (\emph{Random Sampling}):
+    $(Y_i,X_i)$ iid from superpop.
+
+    This ensures we have external validity for extrapolating from sample
+    to superpopulation.
+
+    Note that this assumption might still be used for
+    conditional inference.
+    It simply says how the $X$ that we condition on were
+    generated---namely, independently and identically distributed.
+    This is a bit stronger than needed (although it makes the
+    asymptotic distributions of estimators easier to derive since we can
+    use the Lindeberg-Levy iid CLT); therefore, the next condition is
+    also presented as a relaxation that is still nonetheless sufficient
+    for asymptotically normal limiting distributions of estimators under
+    conditional inference.
+
+    Similarly, this assumptions might still be used for causal
+    inference on top of the inherent design-based uncertainty that's
+    already there.
+
+  \item[S2.]
+    (\emph{Conditional Sampling}):
+    Conditional on $X$, the $Y_i$ are independent with
+    mean $\mu(X_i)$.
+
+    Relative to S1, the $X_i$ can now be correlated arbitrarily, rather
+    than iid.
+
+\end{enumerate}
+\paragraph{Regularity Assumptions for Sampling Uncertainty}
+\begin{enumerate}
+  \item[R1.] For unconditional inference
+    \begin{enumerate}[label=(\roman*)]
+      \item $\E[X_iX_i']^{-1}$ exists and full rank
+      \item $(Y_i,X_i)$ have finite 4th moments
+    \end{enumerate}
+  \item[R2.] For conditional inference under S1
+    \begin{enumerate}[label=(\roman*)]
+      \item $X_i$ has finite 2nd moment
+      \item $\Var(Y_i|X_i)<\infty$
+    \end{enumerate}
+  \item[R3.] For conditional inference under S2
+    \begin{enumerate}[label=(\roman*)]
+      \item $X'X/n$ and $\calV_{dc,n}$ each converge to some positive
+        definite limits
+      \item $\E[|Y_i-\mu(X_i)|^{2+\eta}|X]$ bounded for some $\eta>0$
+        and
+        $\max_i H_{ii}\ra 0$ or $\max_i \tilde{H}_{ii}\ra 0$
+        for inference on $\theta_{dc}$ or $\beta_{dc}$ respectively.
+        The assumptions ensure that we can invoke the Lindberg-Feller
+        (or really, the Lyapunov) CLT.
+    \end{enumerate}
+\end{enumerate}
+
+\clearpage
+\paragraph{Assignment Mechanism Assumptions}
+These assumptions on the the assignment mechanism are needed to assign
+the regression estimands a causal interpretation and to characterize the
+\emph{design-based uncertainty} inherent in our regression estimators.
+
+Throughout, we restrict to
+\emph{binary treatment},\footnote{%
+  Binary treatment can be relaxed, but it
+  makes proofs easier.
+  Otherwise, instead of a weighted average of $\tau_i$'s, our
+  estimands might be a weighted average of derivatives.
+}
+which implies realized outcomes derived from potential outcomes as
+follows:
+\begin{align*}
+  Y_i = Y_i(D_i)=Y_i(0)+D_i\tau_i
+  .
+\end{align*}
+Assumptions we will employ:
+\begin{enumerate}
+  \item[C1.]
+    (\emph{Random Assignment in Superpopulation}):
+    The propensity score is a linear function of one's own covariates
+    $W_i$ and does not depend upon own or others' potential outcomes:
+    \begin{align*}
+      P[D_i=1|Y_i(1),Y_i(0),W_i]
+      =
+      P[D_i=1|W_i]
+      =
+      \E[D_i|W_i]
+      =W_i'\delta
+    \end{align*}
+  \item[C2.]
+    (\emph{Random Assignment in Finite Population}):
+    Conditional on $Y(D),W$ (the full set of potential outcomes and
+    regressors for all units in sample), $D_i$ independent across
+    $i$ and
+    \begin{align*}
+      P[D_i=1|Y(D),W]
+      =E[D_i|Y(D),W]
+      =E[D_i|W_i]
+      =W_i'\delta
+    \end{align*}
+    By independence, $P[D_i=1|Y(D),W]$ is enough to characterize the
+    \emph{joint} distribution $P[D|Y(D),W]$ of treatment assignments.
+\end{enumerate}
+Note
 \begin{itemize}
-  \item Can compute bootstrap standard errors by taking the variance of
-    the bootstrap draws, then use normal approximation to construct a
-    confidence interval or test.
-  \item Efron's percentile interval computes a $1-\alpha$ confidence
-    level directly from the empirical distribution of bootstrap
-    estimates.
-  \item The percentile-t interval is constructed from bootstrapping the
-    (pivotal) t-statistic. Given the $1-\alpha$ convidence intervals for
-    the t-statistic, we can recover $1-\alpha$ confidence intervals for
-    the parameter of interest. By pivotality and the corresponding
-    asymptotic refinements, we can get an interval with better coverage.
-  \item Can obtain bootstrap critical values.
-    Pitfall for this homework.
+  \item
+    These assumptions ensure that controlling for $W_i$ \emph{linearly}
+    is enough to ensure as good as random assignment, hence OLS will
+    recover a causal estimand.
+  \item
+    If we instead assume that controlling for $W_i$
+    is enough but \emph{only} if controlled for
+    \emph{nonparametrically} (i.e. the unconfoundedness assumption),
+    we should dispense with linear regression altogether and
+    instead use nonparametric regression adjustments or propensity
+    score methods to construct a consistent estimator of some weighted
+    average of causal effects that has a clear interpretation.
+    Otherwise, OLS estimates \emph{some} weighted average of causal
+    effects, with strange, uninterpretable weights.
+  \item
+    If, even worse, it's not even enough to control for covariates, we
+    need to take an IV approach and content ourselves with some
+    weighted average of LATEs.
+\end{itemize}
+\paragraph{Regularity Assumptions for Inference under Strictly Design-Based Uncertainty}
+\begin{itemize}
+  \item $n^{-1}\sumin \lVert W_i\rVert^{4+\eta}$ bounded
+  \item $n^{-1}\sumin \E[Y_i|Y(D),W]^{4+\eta}$ bounded
+  \item $n^{-1}\sumin \E[D_i^{4+\eta}|W_i]$ bounded
+  \item $\E[X'X|W]/n$ coverges to a positive definite limit.
 \end{itemize}
 
 
+\clearpage
+\subsection{Sampling Based Inference}
+
+Results
+\begin{enumerate}
+  \item
+    (\emph{Unconditional Inference, iid Sampling of $(Y_i,X_i)$ from
+    Superpop.}):
+    If our estimand is $\theta_{du}$, under S1 and R1, we can apply
+    Lindeberg-Levy to obtain
+    \begin{align*}
+      \sqrt{n}(\hat{\theta}-\theta_{du})
+      =
+      (X'X/n)^{-1}
+      \frac{1}{\sqrt{n}}
+      \sumin
+      X_i
+      \underbrace{%
+        (Y_i-X_i'\theta_{du})
+      }_{\varepsilon_{du,i}}
+      &
+      \; \dto\;
+      \calN\big(
+        0,\,
+        \underbrace{%
+        \E[X_iX_i']^{-1}
+        \;
+        \E\big[\varepsilon^2_{du,i}\,X_iX_i'\big]
+        \;
+        \E[X_iX_i']^{-1}
+        }_{\calV_{du}}
+      \big)
+    \end{align*}
+    We see from the term in the sum why we need finite fourth moments
+    (for $X$, at least) to apply Lindeberg-Levy.
+
+    Additionally, under further regularity conditions $\hat{V}_{EHW}$ is
+    consistent for $\calV_{du}$.
+
+  \item
+    (\emph{Conditional Inference, iid Sampling of $(Y_i,X_i)$ from
+    Superpopulation}):
+    If our estimand is $\theta_{dc,n}(X)=(X'X)^{-1}X'\mu(X)$,
+    under S1 and R2, we obtain the following limiting distribution of our
+    estimator by the Lindeberg-Levy CLT, which we can apply since the
+    terms of the sum are mean zero and (under S1) iid:
+    \begin{align*}
+      \sqrt{n}(\hat{\theta}-\theta_{dc,n}(X))
+      &=
+      (X'X/n)^{-1}
+      \frac{1}{\sqrt{n}}
+      \sum_i
+      X_i
+      %\underbrace{%
+        (Y_i-\mu(X_i))
+      %}_{\varepsilon_{cf,i}}
+      \; \dto\;
+      \calN\big(
+        0,
+        \underbrace{%
+        \E[X_iX_i']^{-1}
+        \E[\Var(Y_i|X_i)X_iX_i']
+        \E[X_iX_i']^{-1}
+        }_{\calV_{dc}}
+      \big)
+    \end{align*}
+    A note about these asymptotics.
+    The random sampling induces a random sequence of
+    $\calD_n=\{Y_i,X_i\}_{i=1}^n$ and thus a random sequence of
+    estimands, $\theta_{dc,n}(X)$ each built from $\calD_n$.
+    And so $\sqrt{n}(\hat{\theta}-\theta_{dc,n}(X))$ is a difference of two
+    random objects, unlike $\sqrt{n}(\hat{\theta}-\theta_{du})$ where
+    $\theta_{du}$ is a fixed object defined from the superpopulation
+    distribution.
+    But deriving the asymptotic distribution under random sampling
+    assumption S1 is still easy since the terms in the sum are still
+    independent, mean-zero RVs.
+    And then we can see from the term in the sum why we only need R2
+    rather than R1 to apply Lindeberg-Levy.
+
+    We can also relate $\calV_{du}$ and $\calV_{dc}$---both asymptotic
+    variances under random sampling assumption S1.
+    In particular, it can be shown that
+    \begin{align*}
+      \E[\varepsilon^2_{du,i}|X_i]
+      &=
+      \Var(Y_i|X_i) + (\mu(X_i)-X_i'{\theta}_{du})^2
+    \end{align*}
+    Therefore,
+    \begin{align*}
+      \calV_{du}
+      &=
+      \E[X_iX_i']^{-1}
+      \;
+      \E\big[\varepsilon^2_{du,i}\,X_iX_i'\big]
+      \;
+      \E[X_iX_i']^{-1}
+      =
+      \E[X_iX_i']^{-1}
+      \;
+      \E\big[\E[\varepsilon^2_{du,i}|X_i]\,X_iX_i'\big]
+      \;
+      \E[X_iX_i']^{-1}
+      \\
+      &=
+      \E[X_iX_i']^{-1}
+      \;
+      \E\big[\Var(Y_i|X_i)\,X_iX_i'\big]
+      \;
+      \E[X_iX_i']^{-1}
+      +
+      \E[X_iX_i']^{-1}
+      \;
+      \E\big[(\mu(X_i)-X_i'\theta_{du})^2\,X_iX_i'\big]
+      \;
+      \E[X_iX_i']^{-1}
+      \\
+      &=
+      \calV_{dc}
+      +
+      \E[X_iX_i']^{-1}
+      \;
+      \E\big[(\mu(X_i)-X_i'\theta_{du})^2\,X_iX_i'\big]
+      \;
+      \E[X_iX_i']^{-1}
+    \end{align*}
+    Since $\hat{V}_{EHW}$ is consistent for $\calV_{du}$ under random
+    sampling S1, it is clear from the above expression that
+    the variance estimate will be \emph{too large} for conditional
+    inference unless the true (generally nonlinear) regression function
+    $\mu(X_i)$ is, in fact, linear.
+    This suggests using the difference between $\calV_{du}$ and
+    $\calV_{dc}$ as one measure of nonlinearity in $\mu(X_i)$.
+
+  \item
+    (\emph{Conditional Inference, Independent Conditional Sampling of $Y_i|X_i$}):
+    Rather than use S1 which requires the $X_i$ to be iid, we can weaken
+    to conditional sampling S2.
+    In particular, under under S2 and R3,
+    \begin{align*}
+      \sqrt{n}(\hat{\theta}-\theta_{dc,n}(X))
+      &=
+      (X'X/n)^{-1}
+      \frac{1}{\sqrt{n}}
+      \sum_i
+      X_i
+      %\underbrace{%
+        (Y_i-\mu(X_i))
+      %}_{\varepsilon_{cf,i}}
+      \\
+      &\sim
+      \;
+      \calN\big(
+        0,
+        \underbrace{%
+          n(X'X)^{-1}
+          \left(
+          \sum_i
+          \Var(Y_i|X_i)\,X_iX_i'
+          \right)
+          (X'X)^{-1}
+        }_{=:\calV_{dc,n}}
+      \big)
+      +
+      o_p(1)
+    \end{align*}
+    To prove, rewrite in preparation of applying the Lindeberg-Feller
+    CLT:
+    \begin{align*}
+      \sqrt{n}(\hat{\theta}-\theta_{dc,n}(X))
+      %&=
+      %(X'X/n)^{-1/2}
+      %\sumin
+      %(X'X)^{-1/2}
+      %X_i
+      %(Y_i-\mu(X_i))
+      %\\
+      &=
+      \sumin
+      \sqrt{n}
+      (X'X)^{-1}
+      X_i
+      (Y_i-\mu(X_i))
+    \end{align*}
+    We already have independence of the terms in the sum.
+    To apply the Lindeberg-Feller CLT, we must also verify that the sum
+    of the variances of the terms of the sum converge to some limit.
+    Since we're doing conditional-on-$X$ inference, the variances will
+    also be conditional on $X$.
+    \begin{align*}
+      %\sumin
+      %\Var\left(
+      %(X'X)^{-1/2}
+      %X_i
+      %(Y_i-\mu(X_i))
+      %\;\big|\;
+      %X
+      %\right)
+      %&=
+      %(X'X)^{-1/2}
+      %\left(
+      %\sumin
+      %\Var\left(
+      %Y_i
+      %\,|\,
+      %X
+      %\right)
+      %X_i
+      %X_i'
+      %\right)
+      %(X'X)^{-1/2}
+      %\\
+      \sumin
+      \Var\left(
+      \sqrt{n}
+      (X'X)^{-1}
+      X_i
+      (Y_i-\mu(X_i))
+      \;\big|\;
+      X
+      \right)
+      &=
+      n
+      \sumin
+      (X'X)^{-1}
+      \Var\left(
+      Y_i
+      \,\big|\,
+      X
+      \right)
+      X_i
+      X_i'
+      (X'X)^{-1}
+      =
+      \calV_{dc,n}
+    \end{align*}
+    We assume that this converges to some limit.
+    Together with the assumption that $X'X/n$ converges to some limit,
+    a simple sufficient condition for this is that, say,
+    $\Var(Y_i|X_i)<C$ for some constant $C$.
+
+    Together with the other regularity conditions,
+    by Lindeberge-Feller CLT,
+    \begin{align*}
+      \sqrt{n}(\hat{\theta}-\theta_{dc,n}(X))
+      &=
+      (X'X/n)^{-1/2}
+      \sumin
+      (X'X)^{-1/2}
+      X_i
+      (Y_i-\mu(X_i))
+      &\dto
+      \calN\left(
+      0,\,
+      \lim_{n\ra\infty}
+      \calV_{dc,n}
+      \right)
+    \end{align*}
 
 
+\end{enumerate}
+
+
+
+
+\clearpage
+\subsection{Causal Inference}
+
+\begin{enumerate}
+  \item
+    (\emph{Alternative Estimator Expressions}):
+    For proving that some estimand is, in fact, a weighted average of
+    causal effects, it is convenient to define the following expression
+    \begin{align*}
+        \ddot{D}_i
+        &:=
+        D_i-W_i'\delta
+        \\
+        \ddot{X}_i
+        &:=
+        (\ddot{D}_i,W_i')'
+    \end{align*}
+    where, recall, $\delta$ is the parameter vector characterizing the
+    propensity score in Assumptions C1 and C2.
+    This makes $\ddot{D}$ mean zero.
+
+    Recall that we defined the regression estimands
+    \begin{align*}
+      \theta_{cs}
+      =
+      (\beta_{cs},
+      \gamma_{cs}')'
+      &:=
+      \E^{D,sp}[X_iX_i']^{-1}
+      \E^{D,sp}[X_iY_i]
+      \\
+      \theta_{cf,n}
+      =
+      (\beta_{cf,n},
+      \gamma_{cf,n}')'
+      &:=
+      \E^D\left[ {X}_i{X}_i' \,|\, Y(D),W \right]^{-1}
+      \E^D \left[ {X}_iY_i \,|\, Y(D),W \right]
+    \end{align*}
+    Note that we can show
+    \begin{align*}
+      \beta_{cs}
+      &=
+      e_1'
+      \E^{D,sp}[\ddot{X}_i\ddot{X}_i']^{-1}
+      \E^{D,sp}[\ddot{X}_iY_i]
+      \\
+      \gamma_{cs}
+      &=
+      \hphantom{e_1'}
+      \E^{D,sp}[{W}_i{W}_i']^{-1}
+      \E^{D,sp}[{W}_i(Y_i-D_i\beta_{cs})]
+      \\
+      \beta_{cf,n}
+      &=
+      e_1'
+      \E^{D}[\ddot{X}_i\ddot{X}_i'\,|\,Y(D),W]^{-1}
+      \E^{D}[\ddot{X}_iY_i\,|\,Y(D),W]
+      \\
+      \gamma_{cf,n}
+      &=
+      \hphantom{e_1'}
+      \E^{D}[{W}_i{W}_i'\,|\,Y(D),W]^{-1}
+      \E^{D}[{W}_i(Y_i-D_i\beta_{cf,n})\,|\,Y(D),W]
+      \\
+      &=
+      \hphantom{e_1'}
+      (W'W)^{-1}
+      \sumin
+      {W}_i
+      \E^{D}[(Y_i-D_i\beta_{cf,n})\,|\,Y(D),W]
+    \end{align*}
+    Notice that for design-based inference about $\theta_{cf,n}$, only
+    $D_i$ or $\ddot{D}_i$ (or $X_i$ and $\ddot{X}_i$ which contains it)
+    sit in the expectation since covariates and potential outcomes are
+    fixed for the current sample.
+
+
+  \item
+    (\emph{Causal Inference under iid Sampling from Superpopulation}):
+    Suppose that Assumptions S1 and R1 hold.
+    Then, as argued above,
+    \begin{align*}
+      \sqrt{n}(\hat{\theta}-\theta_{du})
+      =
+      (X'X/n)^{-1}
+      \frac{1}{\sqrt{n}}
+      \sumin
+      X_i
+      \underbrace{%
+        (Y_i-X_i'\theta_{du})
+      }_{\varepsilon_{du,i}}
+      &
+      \; \dto\;
+      \calN\big(
+        0,\,
+        \underbrace{%
+        \E[X_iX_i']^{-1}
+        \;
+        \E\big[\varepsilon^2_{du,i}\,X_iX_i'\big]
+        \;
+        \E[X_iX_i']^{-1}
+        }_{\calV_{du}}
+      \big)
+    \end{align*}
+    Additionally under C1, $\E=\E^{D,sp}$ so that
+    \begin{align*}
+      \theta_{cs}=\theta_{du}
+      \qquad
+      \qquad
+      \calV_{cs}=\calV_{du}
+    \end{align*}
+    If we further assume binary treatment, we can obtain the
+    following expression for $\beta_{cs}=\beta_{du}$, which gives the
+    estimand a causal interpretation as a weighted average of causal
+    effects with known weights:
+    \begin{align*}
+      \beta_{cs}
+      =
+      \beta_{du}
+      =
+      \E[\lambda(W_i)\tau(W_i)]
+      \qquad\text{where}\quad
+      \tau(w)
+      &=
+      \E[\tau_i|W_i=w]
+      \\
+      \lambda(w)
+      &=
+      \frac{%
+        \Var(\ddot{D}_i|W_i=w)
+      }{%
+        \E[\Var(\ddot{D}_i|W_i=w)]
+      }
+      =
+      \frac{%
+        \Var({D}_i|W_i=w)
+      }{%
+        \E[\Var({D}_i|W_i=w)]
+      }
+    \end{align*}
+    To prove, use the definition of $\beta_{cs}$, which means computing
+    the following moments under Assumption C1:
+    \begin{align*}
+      \E[\ddot{D}_iY_i]
+      &=
+      \E\big[
+        \ddot{D}_i
+        \big(Y_i(0)+D_i\tau_i\big)
+      \big]
+      =
+      \E\big[
+        \E
+        \big[
+        \ddot{D}_i
+        \big(Y_i(0)+D_i\tau_i\big)
+        \,|\,
+        Y_i(0),Y_i(1),W_i
+        \big]
+      \big]
+      \\
+      &=
+      \E\big[
+        \E
+        \big[
+        \ddot{D}_iY_i(0)
+        \,|\,
+        Y_i(0),Y_i(1),W_i
+        \big]
+      \big]
+      +
+      \E\big[
+        \E
+        \big[
+        \ddot{D}_iD_i\tau_i
+        \,|\,
+        Y_i(0),Y_i(1),W_i
+        \big]
+      \big]
+      \\
+      &=
+      \E\big[
+        \E
+        \big[
+        \ddot{D}_i
+        \,|\,
+        Y_i(0),Y_i(1),W_i
+        \big]
+        \cdot
+        \E
+        \big[
+        Y_i(0)
+        \,|\,
+        Y_i(0),Y_i(1),W_i
+        \big]
+      \big]
+      +
+      \E\big[
+        \E
+        \big[
+        \ddot{D}_i
+        D_i
+        \,|\,
+        Y_i(0),Y_i(1),W_i
+        \big]
+        \cdot
+        \E
+        \big[
+        \tau_i
+        \,|\,
+        Y_i(0),Y_i(1),W_i
+        \big]
+      \big]
+      \\
+      &=
+      \E\big[
+        \E
+        \big[
+        \ddot{D}_i
+        \,|\,
+        W_i
+        \big]
+        \cdot
+        \E
+        \big[
+        Y_i(0)
+        \,|\,
+        W_i
+        \big]
+      \big]
+      +
+      \E\big[
+        \E
+        \big[
+        \ddot{D}_i
+        D_i
+        \,|\,
+        W_i
+        \big]
+        \cdot
+        \E
+        \big[
+        \tau_i
+        \,|\,
+        W_i
+        \big]
+      \big]
+      \\
+      &=
+      \E\big[
+        0
+        \cdot
+        \E
+        \big[
+        Y_i(0)
+        \,|\,
+        W_i
+        \big]
+      \big]
+      +
+      \E\big[
+        \E
+        \big[
+        \ddot{D}_i^2
+        \,|\,
+        W_i
+        \big]
+        \cdot
+        \tau(W_i)
+      \big]
+      \\
+      &=
+      \E\big[
+        \Var
+        \big(
+        \ddot{D}_i
+        \,|\,
+        W_i
+        \big)
+        \cdot
+        \tau(W_i)
+      \big]
+      \\
+      \E[\ddot{X}_i\ddot{X}_i']
+      &=
+      \E
+      \begin{bmatrix}
+        \ddot{D}_i^2
+        &
+        \ddot{D}_iW_i'
+        \\
+        \ddot{D}_iW_i
+        &
+        W_iW_i'
+      \end{bmatrix}
+      =
+      \E
+      \left[
+      \E
+      \left[
+      \begin{matrix}
+        \ddot{D}_i^2
+        &
+        \ddot{D}_iW_i'
+        \\
+        \ddot{D}_iW_i
+        &
+        W_iW_i'
+      \end{matrix}
+      \;
+      \bigg|
+      \;
+      W_i
+      \right]
+      \right]
+      =
+      \begin{pmatrix}
+        \E[\Var(\ddot{D}_i|W_i)]
+        &
+        0
+        \\
+        0
+        &
+        \E[W_iW_i']
+      \end{pmatrix}
+      \\
+      {\theta}_{cs}
+      &=
+      \E[\ddot{X}_i\ddot{X}_i']^{-1}
+      \E[\ddot{X}_i{Y}_i]
+      =
+      \begin{pmatrix}
+        \E[\Var(\ddot{D}_i|W_i)]^{-1}
+        &
+        0
+        \\
+        0
+        &
+        \E[W_iW_i']^{-1}
+      \end{pmatrix}
+      \begin{pmatrix}
+        \E[\ddot{D}_iY_i]
+        \\
+        \E[W_iY_i]
+      \end{pmatrix}
+      \\
+      \beta_{cs}
+      &=
+      \E\left[
+        \frac{%
+          \Var(\ddot{D}_i|W_i)
+        }{%
+          \E[\Var(\ddot{D}_i|W_i)]
+        }
+        \tau(W_i)
+      \right]
+    \end{align*}
+    Finally, notice $\Var(\ddot{D}_i|W)=\Var(D_i|W_i)$.
+
+    A few remarks
+    \begin{itemize}
+      \item With no controls and binary treatment, assignment is truly
+        random and so $\beta_{cs}=\E[\tau_i]$, i.e. no weighting.
+        Moreover, the variance expression reduces to
+        \begin{align*}
+          \calV_{du}
+          &=
+          \frac{S_0^2}{n_0/n}
+          +
+          \frac{S_1^2}{n_1/n}
+          +
+          o_p(1)
+        \end{align*}
+
+      \item If we would like to estimate unweighted $\E[\tau_i]$,
+        we cannot simply do standard OLS regression since it converges
+        to $\beta_{cs}=\E[\lambda(W_i)\tau(W_i)]$, as argued.
+        Instead, we must reweight because of the selection.
+
+
+      \item However, the OLS estimand is optimal in the following sense:
+        Among all weighted average treatment effects
+        $\E[\tilde{\lambda}(W_i)\tau(W_i)]$ where $\tilde{\lambda}(w)$
+        is some weighting function we may choose,
+        under homoskedasticy $\Var(Y_i|D_i,W_i)=\sigma^2$,
+        the OLS estimand with its particular weighting function
+        $\lambda(w)$ derived above has the smallest asymptotic variance
+        among all weighting functions $\tilde{\lambda}(w)$.
+
+        For intuition, notice from the expression for the weights that
+        we upweight those values $w$ such that $\Var(D_i|W_i=w)$ is
+        largest (the denominator just normalizes the weights).
+        This might seem counterintuitive, but note the variance is
+        maximized when binary $D_i$ has probability close to 0.5.
+        Thuse we upweight those values of $w$ for which the proportion
+        of treatment and control is most balanced, i.e. those values of
+        $w$ for which we can most precisely estimate the conditional
+        average treatment effect $\E[\tau_i|W_i=w]$.
+
+        Under homoskedasticity of outcomes, this weighting scheme is a
+        good thing to do because the precision of our estimates for
+        $\E[\tau_i|W_i=w]$ is \emph{solely} determined by the balance
+        between treatment and control, not also the conditional variance
+        of outcomes.
+        Therefore, homoskedasticy is necessary for the estimand to be
+        optimal.
+        Otherwise, under conditional heteroskedasticity, we'd also want
+        to use the conditional variance of outcomes/treatment effects to
+        determine the weights in the estimand because there's no use
+        upweighting a value $w$ with good balance if the conditional
+        heteroskedasticity at that value of $w$ is large.
+        Therefore, with heteroskedasticity, the optimal (minimum
+        asymptotic variance) weighted average treatment effect estimand
+        would take into account both $\Var(D_i|W_i=w)$ and the
+        conditional variance $\Var(Y_i|D_i,W_i)$, while the optimal
+        estimator would accordingly weight the observations, i.e. be a
+        WLS estimator rather than OLS.
+    \end{itemize}
+
+
+  \item
+    (\emph{Causal Inference, Strictly Design Based Uncertainty}):
+    If we consider only design-based uncertainty, we don't need any
+    sampling assumptions, only an assumption on the assignment
+    mechanism.
+    In particular, assuming binary treatment and C2, $\beta_{cf}$ can
+    also be assigned a causal interpretation as a weighted average of
+    casual effects with known weights.
+    After substituting in and working out the expectations,
+    we get an expression that is simply the sample analog of what we had
+    in Result 4 (which is unsurprising since the sample is now the
+    population):
+    \begin{align*}
+      \beta_{cf,n}
+      &:=
+      \sumin
+      \left(
+      \frac{%
+        \sigma^2_D(W_i)
+      }{%
+        \sumjn \sigma^2_D(W_j)
+      }
+      \right)
+      \tau_i
+      \qquad\text{where}\quad
+      \sigma^2_D(W_i)
+      :=
+      \Var(D_i|W_i)
+    \end{align*}
+    Recall that $\tau_i$ is fixed, the only uncertainty is in the
+    assginment vector $D$.
+
+\end{enumerate}
+
+\clearpage
+blah
+
+\clearpage
+For causal inference, it will also be useful to define the following,
+based on recentering $D_i$, for some fixed real vector
+$\delta$,\footnote{%
+  We will discuss this vector later when we get to the causal inference
+  results.
+  But for now, just take $\delta$ as some given fixed vector; the
+  definitions can still be stated.
+}
+For causal inference on the superpopulation taking into account
+uncertainty from both random assignment and sampling, define the
+following estimands constructed from the joint superpopulation
+distribution over $(Y_i,X_i)$.
+Later, we will show $\theta_{cs}=\theta_{du}$ (i.e. these can be
+motivated as OLS estimands) and that these have a causal interpretation.
+\begin{align*}
+    %\ddot{\theta}_{cs}
+    %=
+    (\beta_{cs},\ddot{\gamma}_{cs}')'
+    &:=
+    \E[\ddot{X}_i\ddot{X}_i']^{-1}\E[\ddot{X}_iY_i]
+    \\
+    \gamma_{cs}
+    &:=
+    \E[W_iW_i']^{-1}
+    \E[W_i(Y_i-D_i\beta_{cs})]
+    \\
+    \theta_{cs}
+    &:=
+    (\beta_{cs},\gamma_{cs})
+\end{align*}
+Next, define the following quantities, where again, the expectations in
+the expectation are taken over random assignment only, not sampling.
+Later, we will show $\theta_{cf}=\theta_{df,n}$ (i.e. these can be
+motivated as OLS estimands) and that these have a causal interpretation.
+\begin{align*}
+    %\ddot{\theta}_{cf}
+    %=
+    (\beta_{cf},\ddot{\gamma}_{cf}')'
+    &:=
+    \E\left[
+    \ddot{X}_i\ddot{X}_i'
+    \,|\,
+    Y(D),W
+    \right]^{-1}
+    \E
+    \left[
+    \ddot{X}_iY_i
+    \,|\,
+    Y(D),W
+    \right]
+    \\
+    &\hphantom{:}=
+    \begin{pmatrix}
+      \E[
+      \ddot{D}_i^2
+      \,|\,
+      Y(D),W
+      ]
+      &
+      \E[
+      \ddot{D}_i
+      \,|\,
+      Y(D),W
+      ]
+      W_i'
+      \\
+      \E[
+      \ddot{D}_i
+      \,|\,
+      Y(D),W
+      ]
+      W_i
+      & W_iW_i'
+    \end{pmatrix}^{-1}
+    \begin{pmatrix}
+    \E
+    \left[
+    \ddot{D}_iY_i(D_i)
+    \,|\,
+    Y(D),W
+    \right]
+    \\
+    W_i
+    \E
+    \left[
+    Y_i(D_i)
+    \,|\,
+    Y(D),W
+    \right]
+    \end{pmatrix}
+    \\
+    \gamma_{cf}
+    &:=
+    \left[
+    \sumin
+    W_iW_i'
+    \right]^{-1}
+    \left[
+    \sumin
+    W_i
+    \E\big[
+    (Y_i-D_i\beta_{cf})
+    \,|\,
+    Y(D),W
+    \big]
+    \right]
+    \\
+    &\hphantom{:}=
+    (W'W)^{-1}
+    \left[
+    \sumin
+    W_i
+    \E\big[
+    (Y_i(D_i)-D_i\beta_{cf})
+    \,|\,
+    Y(D),W
+    \big]
+    \right]
+    \\
+    \theta_{cf}
+    &:=
+    (\beta_{cf},\gamma_{cf})
+    \\
+    \varepsilon_{cf,i}
+    &:=
+    Y_i-X_i'\theta_{cf}
+    =
+    Y_i
+    -D_i\beta_{cf}
+    -W_i'\gamma_{cf}
+\end{align*}
+%\begin{align*}
+    %\gamma_{cf}
+    %&:=
+    %(W'W)^{-1}
+    %W'\E[(Y-D\beta_{cf}) \,|\,W,Y(0)]
+    %\\
+    %&=
+    %(W'W)^{-1}
+    %\sumin
+    %W_i\E[(Y_i-D_i\beta_{cf})\,|\,W,Y(0)]
+    %\\
+    %=
+    %(W'W)^{-1}
+    %\sumin
+    %W_i
+    %\big(
+    %Y_i(0)
+    %+
+    %\E[D_i|W,Y(0)]
+    %\cdot(\tau_i-\beta_{cf})
+    %\big)
+%\end{align*}
+
+
+
+\clearpage
+
+\clearpage
+\paragraph{Results}
+\begin{enumerate}
+
+  \item
+
+
+  \item
+    Moreover, note that
+    \begin{itemize}
+      \item ${\beta}_{cs}=\beta_{du}$
+        because $\ddot{D}_i$ is simply a recentering of $D_i$ using
+        a linear function of covariates $W_i$ already in the regression.
+        In other words,
+        the coefficient on $\ddot{D}_i$ in the regression of $Y_i$ on
+        $\ddot{X}_i$ equals the coefficient on $D_i$ in the regression of
+        $Y_i$ on $X_i$.
+      \item $\gamma_{cs}=\gamma_{du}$.
+        This follows because
+        \begin{align*}
+          Y_i = D_i\beta_{du}+W_i'\gamma_{du} + \varepsilon_{du,i}
+        \end{align*}
+        Therefore, regressing $Y_i-D_i\beta_{du}$ on $W_i$ alone will
+        recover the same parameter $\gamma_{du}$ that we get from regressing
+        $Y_i$ on $X_i=(D_i,W_i')'$.
+      \item
+        $\theta_{cs}=(\beta_{cs},\gamma_{cs}')'=(\beta_{du},\gamma_{du}')'=\theta_{du}$
+        by the previous bullet points.
+    \end{itemize}
+
+  \item
+    First note that the definition of
+    $\theta_{cf}=(\beta_{cf},\gamma_{cf}')'$ can be motivated as
+    the regression estimand $\theta_{df,n}$.
+    In particular,
+    \begin{itemize}
+      \item ${\beta}_{cf}=\beta_{df,n}$
+        because $\ddot{D}_i$ is simply a recentering of $D_i$ using
+        a linear function of covariates $W_i$ already in the regression.
+      \item $\gamma_{cf}=\gamma_{df,n}$.
+        This follows because
+        \begin{align*}
+          Y = D\beta_{df,n}+W'\gamma_{df,n} + \varepsilon_{df,n}
+        \end{align*}
+        Therefore, regressing $Y_i-D_i\beta_{df,n}$ on $W_i$ alone will
+        recover the same parameter $\gamma_{df,n}$ that we get from
+        regressing $Y_i$ on $X_i=(D_i,W_i')'$.
+      \item
+        $\theta_{df,n}=(\beta_{df,n},\gamma_{df,n}')'=(\beta_{cf},\gamma_{cf}')'=\theta_{cf}$
+        by the previous bullet points.
+    \end{itemize}
+
+
+\end{enumerate}
+
+
+
+
+
+
+\clearpage
+Ideas
+\begin{itemize}
+  \item Start with inference about the mean under treatment.
+    Can get unbiased estimator for this.
+    For inference, there's the probability that a center treats both, vs
+    treated by different centers.
+
+  \item Rewrite sums from $i=1,\ldots,n$ as sum over clusters or pseudo
+    clusters
+  \item There is an equivalence class of clusters defined by distance.
+    This location will ensure that a given pair is treated.
+    This set of locations will ensure that a given pair is treated.
+  \item Guido when to cluster paper, see what it says about causal
+    inference.
+\end{itemize}
 
 
 
