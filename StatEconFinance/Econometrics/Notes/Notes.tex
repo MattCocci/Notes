@@ -1738,992 +1738,6 @@ Computation
 %Jorda's solution is like iterated vs. direct forecasting.
 
 
-\clearpage
-\section{Extreme Value Theory}
-
-\subsection{Overview}
-
-Given an iid sample $\{X_i\}_{i=1}^n$, our goal in this section is to
-characterize the distrbution of the sample max, $X_{(n)}$.
-There are a few possible approaches.
-
-In theory, if we knew the CDF $F(x)$ of the $X_i$, we could easily
-construct the distribution of the max: $X_{(n)}\sim F(x)^n$.
-Of course, in practice, we often don't know $F(x)$, and estimating
-$\hat{F}(x)$ then constructing $\hat{F}(x)^n$ will be extremely
-sensitive to sampling error.
-In that case, we take our cue from the CLT, which states that
-given \emph{any} starting CDF $F(x)$ (subject to certain regularity
-conditions), the limit of suitably scaled $\bar{X}_n$ converges to a
-nondegenerate mean-zero normal RV (for some some variance).
-
-Analogously, we show in this section that given \emph{any} starting
-CDF $F(x)$ (subject to certain regularity conditions), the limit of
-suitably scaled $X_{(n)}$ converges to a nondegenerate RV with
-distribution in the \emph{extreme value family} (for some EV
-parameter).
-More formally, for some sequence of normalizing constants
-$\{a_n,b_n\}$,\footnote{%
-  We must scale $X_{(n)}$ by normalizing constants $\{a_n,b_n\}$
-  because otherwise, for any CDF $F$, the distribution of
-  $X_{(n)}\sim F(x)^n$ converges to a degenerate distribution with
-  all mass on the max value on the support of $X_i$.
-}
-\begin{align}
-  \frac{X_{(n)}-b_n}{a_n}
-  \quad
-  \dto
-  \quad
-  X\sim G(x)
-\end{align}
-where $G(x)$ is some CDF in the extreme value family.
-We can also equivalently express convergence in distribution as
-pointwise convergence of the sequence of CDFs:
-\begin{align}
-  \boxed{%
-  G(x)
-  =\lim_{n\ra\infty}P\left[\frac{X_{(n)}-b_n}{a_n} \leq x\right]
-  %=\lim_{n\ra\infty}P[X_{(n)} \leq a_nx+b_n]
-  =\lim_{n\ra\infty}F(a_nx+b_n)^n
-  }
-  \label{ev:key}
-\end{align}
-Expression~\ref{ev:key} is thus the key organizing expression for
-this entire section. It implies three important tasks to grapple
-with:
-\begin{enumerate}
-  \item \emph{Existence}:
-    Given $F$, does there exist a sequence of constants
-    $\{a_n,b_n\}$ and a limiting distribution $G(x)$ such that
-    Expression~\ref{ev:key} holds?
-  \item \emph{Characterization of $G(x)$}:
-    As mentioned, we will show that anytime the limit in
-    Expression~\ref{ev:key} in fact exists, the functional form of
-    $G(x)$ is tightly restricted.
-    Specifically, $G(x)$ falls within the EV family for some EV
-    parameter.\footnote{%
-      Again, much like how always
-      $\sqrt{n}(\bar{X}_n-\mu)\dto\calN(0,\sigma^2)$
-      for some $\sigma^2$ provided the CLT holds.
-    }
-  \item
-    \emph{Domain of Attraction}:
-    Given a limiting $G(x)$, we will identify the necessary and
-    sufficient conditions on the original distribution $F(x)$ such
-    that Expression~\ref{ev:key} holds.
-    Thus, each $G(x)$ will have an associated
-    \emph{domain of attraction}, i.e. an associated class of functions
-    for which Expression~\ref{ev:key} holds.
-\end{enumerate}
-Finally, throughout this section, for any nondecreasing $f(y)$,
-$f^{-1}(x)$ denotes the \emph{left-continuous inverse}, i.e. the the
-smallest $y$ such that $f(y)\geq x$. In words, start at the origin and
-increase $y$ until you hit the first $y$ (which you've approached from
-the left) such that $f(y)$ clears $x$.
-%Suppose there exists a sequence of transformations $h_n(\cdot)$ such
-%that $h_n(X_{(n)})$ has a nondegenerate limit distribution.
-%In other words, suppose there exists a nondegenerate limit distribution
-%$G(x)$ such that, for all points $x$ of continuity of $G(x)$, we have
-%\begin{align*}
-  %G(x)
-  %=\lim_{n\ra\infty}P[h_n(X_{(n)}) \leq x]
-  %=\lim_{n\ra\infty}P[X_{(n)} \leq h^{-1}_n(x)]
-%\end{align*}
-%In the simplest case, $h_n(y)=(y-b_n)/a_n$, i.e. a linear transformation
-%in which case the above condition can be restated as
-
-
-\clearpage
-\subsection{Extreme Value (EV) Family of Distributions}
-
-
-\begin{defn}(EV Family of Distributions)
-For EV index, scale, and location parameters
-$(\gamma,\mu,\sigma)\in\R\times \R \times \R_{++}$,
-the \emph{EV family of distributions} for RV $X\sim G(x)$ is defined by
-CDF:
-\begin{align*}
-  G(x)
-  =
-  P[X\leq x]
-  &=
-  \begin{cases}
-    \exp\left(
-    -\left[1+\gamma \left(\frac{x-\mu}{\sigma}\right)\right]^{-1/\gamma}
-    \right)
-    & \gamma\neq 0
-    \\
-    \exp\left(
-    -e^{-\frac{x-\mu}{\sigma}}
-    \right)
-    & \gamma =0
-  \end{cases}
-  \qquad\text{for $x\;$ s.t.}\quad
-  1+\gamma \left(\frac{x-\mu}{\sigma}\right)>0
-\end{align*}
-Ignoring scale and location $(\mu,\sigma)$ (which are just normalizing
-constants), this distribution family depends only upon
-the \emph{EV index} $\gamma$, which controls shape.
-As we will prove, if Expression~\ref{ev:key} holds, then $G(x)$
-\emph{must} be in this class of EV distributions for some
-$(\gamma,\sigma,\mu)$.
-\end{defn}
-
-\begin{defn}(EV Family: Alternative Standardizations)
-The above CDF is for some $X\sim G(x)$, although it is sometimes easier
-to work with standardized quantities, defined as follows with
-corresponding CDFs:
-\begin{alignat*}{5}
-  S :=\frac{X-\mu}{\sigma}
-  \;\sim\;
-  \tilde{G}(s)
-  &=
-  P[S\leq s]
-  %&&=
-  %P\,[X\leq \sigma s+\mu]
-  &&=
-  \begin{cases}
-    \exp\left(
-    -\left[1+\gamma s\right]^{-1/\gamma}
-    \right)
-    & \gamma\neq 0
-    \\
-    \exp\left(
-    -e^{-s}
-    \right)
-    & \gamma =0
-  \end{cases}
-  \\
-  Y :=1+\gamma\left(\frac{X-\mu}{\sigma}\right)
-  \;\sim\;
-  \tilde{G}(y)
-  &=
-  P[Y\leq y]
-  %&&=
-  %P\left[
-    %X\leq \mu+\sigma\left(\frac{y-1}{\gamma}\right)
-  %\right]
-  &&=
-  \exp\left(
-  -y^{-1/\gamma}
-  \right)
-\end{alignat*}
-\end{defn}
-
-\begin{defn}(EV Family: Alternative Parameterizations)
-The above formulations of CDF $G(x)$ (with $\gamma$ unrestricted) is the
-most general. But for different ranges of $\gamma$, the CDF simplifies
-into special cases with their own alternative names, formulations, and
-supports, which we now enumerate.
-For simplicity, rather than work with the CDF of $X\sim G(x)$, I will
-work with the CDFs of standardized quantities $S\sim \tilde{G}(s)$ and
-$Y\sim\tilde{G}(y)$:
-\begin{itemize}
-  \item
-    $(\gamma=0)$
-    \emph{Type I or Gumbel distribution}:
-    Support equals the full real line.
-    \begin{align*}
-      \tilde{G}(s) = \exp\big(-e^{-s}\big)
-      \qquad\text{where}\quad
-      s=\frac{x-\mu}{\sigma} \in \R
-    \end{align*}
-
-  \item
-    $(\gamma>0)$
-    \emph{Type II or Frechet distribution}:
-    This distribution has a lower limit, but a heavy right tail with no
-    upper limit.  Moments greater than $\alpha$ do not exist.
-    \begin{align*}
-      G(y)
-      =
-      \begin{cases}
-        \exp\left(
-        -y^{-\alpha}
-        \right)
-        & y >0
-        \\
-        0 & y\leq 0
-      \end{cases}
-      \qquad\text{where}\quad
-      \begin{cases}
-        \alpha = 1/\gamma \\
-        y = 1+\gamma \left(\frac{x-\mu}{\sigma}\right)>0
-      \end{cases}
-    \end{align*}
-
-  \item
-    $(\gamma<0)$
-    \emph{Type III or Reversed-Weibull distribution}:
-    This distribution has an upper limit.
-    \begin{align*}
-      G(y)
-      =
-      \begin{cases}
-        \exp\left(
-        -(-y)^{\alpha}
-        \right)
-        & y <0
-        \\
-        1 & y\geq 0
-      \end{cases}
-      \qquad\text{where}\quad
-      \begin{cases}
-        \alpha = -1/\gamma \\
-        y = -\left(1+\gamma \left(\frac{x-\mu}{\sigma}\right)\right)<0
-      \end{cases}
-    \end{align*}
-\end{itemize}
-\end{defn}
-
-\begin{defn}
-Let $U$ denote the following left inverse:
-\begin{align*}
-  U(t)
-  =
-  \left[
-  \frac{1}{1-F(\,\cdot\,)}
-  \right]^{-1}
-  =
-  F^{-1}\left(1-\frac{1}{t}\right)
-  %H^{-1}(t)
-  %\qquad\text{where}\quad
-  %H(x)
-  %=
-  %\frac{1}{1-F(x)}
-  \qquad t>1
-\end{align*}
-Hence $U(t)$ returns the $1-1/t$ quantile.
-This is a useful reparameterization for the proofs and also for
-interpretation.
-In particular, $U(t)=F^{-1}(1-1/t)$ equals the level that we expect an
-observation to exceed (on average or in a large sample) once every $t$
-periods/observations.
-\end{defn}
-
-\begin{defn}
-Relatedly, let $D(x)$ denote the left inverse of $G(\cdot)$ evaluated at
-$e^{-1/x}$:
-\begin{align*}
-  D(x):= G^{-1}\left(e^{-1/x}\right)
-  =
-  \mu+\sigma
-  \left(
-  \frac{x^{\gamma}-1}{\gamma}
-  \right)
-\end{align*}
-Note that the first equality is a definition of $D(x)$.
-The second equality is a result that follows from using the functional
-form of the extreme value family CDF. Of course, we will have to prove
-that $G(x)$ does indeed have that functional form, which we do below.
-For now, just take as given.
-\end{defn}
-
-
-\begin{thm}\emph{(Tail Behavior)}
-Let $a(t)\underset{t\ra t_*}{\sim} b(t)$ denote $\lim{t\ra t_*} a(t)/b(t)=1$.
-Then
-\begin{itemize}
-  \item $(\gamma=0)$: $1-G_0(y)\underset{t\ra\infty}{\sim} e^{-y}$
-  \item $(\gamma>0)$: $1-G(y)\underset{t\ra\infty}{\sim} y^{-1/\gamma}$
-\end{itemize}
-\end{thm}
-\begin{proof}
-We prove each in turn:
-\begin{itemize}
-  \item $(\gamma=0$):
-    Take the limit of the ratio of $1-G_0(y)=1-\exp(-e^{-y})$ to $e^{-y}$:
-    \begin{align*}
-      \lim_{y\ra\infty}
-      \frac{1-\exp(-1/e^y)}{1/e^{y}}
-      =
-      \frac{0}{0}
-    \end{align*}
-    So then by L'Hospital:
-    \begin{align*}
-      \lim_{y\ra\infty}
-      \frac{1-\exp(-1/e^y)}{1/e^{y}}
-      =
-      \lim_{y\ra\infty}
-      \frac{\frac{d}{dy}[1-\exp(-e^{-y})]}{\frac{d}{dy}[e^{-y}]}
-      =
-      \lim_{y\ra\infty}
-      \frac{-\exp(-e^{-y})e^{-y}}{-e^{-y}}
-      =
-      \lim_{y\ra\infty}
-      \exp(-e^{-y})
-      = 1
-    \end{align*}
-
-  \item
-    ($\gamma>0$):
-    Take the limit of the ratio of
-    $1-G(y)=1-\exp(-y^{-1/\gamma})$
-    to $y^{-1/\gamma}$:
-    \begin{align*}
-      \lim_{y\ra\infty}
-      \frac{1-\exp(-1/y^{1/\gamma})}{1/y^{1/\gamma}}
-      =
-      \frac{0}{0}
-    \end{align*}
-    So then by L'Hospital:
-    \begin{align*}
-      \lim_{y\ra\infty}
-      \frac{1-\exp(-y^{-1/\gamma})}{y^{-1/\gamma}}
-      =
-      \lim_{y\ra\infty}
-      \frac{%
-        \frac{d}{dy}[1-\exp(-y^{-1/\gamma})]
-      }{%
-        \frac{d}{dy}[y^{-1/\gamma}]
-      }
-      =
-      \lim_{y\ra\infty}
-      \frac{%
-        -\frac{1}{\gamma}
-        \exp(-y^{-1/\gamma})[y^{-1/\gamma-1}]
-      }{%
-        -
-        \frac{1}{\gamma}
-        y^{-1/\gamma-1}
-      }
-      = 1
-    \end{align*}
-\end{itemize}
-\end{proof}
-
-
-\clearpage
-\subsection{Alternative Formulations of Key Limit}
-
-This section develops alternative (but equivalent) ways to write key limit
-relation, Expression~\ref{ev:key}, reproduced here:
-\begin{align}
-  G(x)
-  =\lim_{n\ra\infty}P\left[\frac{X_{(n)}-b_n}{a_n} \leq x\right]
-  =\lim_{n\ra\infty}F(a_nx+b_n)^n
-  \label{ev:key2}
-\end{align}
-for some sequence of constants $\{a_n,b_n\}$ and where $G(x)$ is a
-member of the EV class of distributions for some $(\gamma,\mu,\sigma)$.
-Thus, we know more about the functional form of the limiting
-distribution, which original Expression~\ref{ev:key} was otherwise
-agnostic about.
-
-The purpose of developing alternative-but-equivalent ways of writing the
-key limit relation lies mainly in simplifying the proofs.
-It will often be easier to prove some result that's \emph{equivalent}
-to Expression~\ref{ev:key2}, rather than prove the statement directly.
-Therefore, it's useful to have a list of alternative-but-equivalent
-formulations of Expression~\ref{ev:key2}.
-
-
-%Restatement of key limit relation: By introducing Theorem 1.1.3 into the
-%results of Theorem 1.1.2, you get Theorem 1.1.6
-
-\begin{thm}\emph{(Equivalent Formulations of Key Limit)}
-Suppose Expression~\ref{ev:key2} holds for some sequence of constants
-$\{a_n,b_n\}$ and some EV distribution $G$ characterized by
-$(\gamma,\mu,\sigma)$. Then the following are equivalent:
-\begin{alignat*}{3}
-  %=
-  &&
-  G(x)
-  &=\lim_{n\ra\infty}F(a_nx+b_n)^n
-  \\
-  &&
-  \log G(x) &=\lim_{n\ra\infty}n \log\big(F(a_nx+b_n)\big)
-  \\
-  &&
-  1 &=\lim_{n\ra\infty} \frac{-F(a_nx+b_n)}{1-F(a_nx+b_n)}
-  \\
-  &&
-  \frac{1}{-\log G(x)}
-  &=\lim_{n\ra\infty} \frac{1}{n\big(1-F(a_nx+b_n)\big)}
-  \\
-  &&
-  -\log G(x)
-  &=\lim_{n\ra\infty} n\big(1-F(a_nx+b_n)\big)
-  \\
-  &&
-  D(x)
-  &=
-  \limn
-  \frac{U(nx)-b_n}{a_n}
-\end{alignat*}
-Letting $(a(t),b(t)):=(a_{[t]},b_{[t]})$, we could also write the last
-two slightly more generally as
-\begin{alignat*}{3}
-  &&
-  -\log G(x)
-  &=\limt t\big(1-F(a(t)x+b(t))\big)
-  \\
-  &&
-  D(x)
-  &=
-  \limt
-  \frac{U(tx)-b(t)}{a(t)}
-\end{alignat*}
-\end{thm}
-
-\clearpage
-\subsection{Proof of EV Distribution Limit}
-
-Recall that we want to show that when a limiting distribution exist as
-in Expression~\ref{ev:key}, the CDF has funcitonal form, for some
-$(\gamma,\mu,\sigma)\in \R\times \R \times \R_+$, as follows:
-\begin{align*}
-  G(x)
-  &=
-  \exp\left(
-  -\left[1+\gamma \left(\frac{x-\mu}{\sigma}\right)\right]^{-1/\gamma}
-  \right)
-  \qquad\text{for $x\;$ s.t.}\quad
-  1+\gamma \left(\frac{x-\mu}{\sigma}\right)>0
-\end{align*}
-First a lemma we will need to prove the result, and then the proof
-itself. Advance warning: the proof is rather technical with little in
-the way of intuition.
-
-
-\begin{lem}
-Suppose $\{f_n\}$ is a sequence of nondecreasing functions and $g$ is
-also a nondecreasing function.
-Suppose that
-\begin{align*}
-  \limn f_n(x) = g(x)
-  \qquad
-  \text{$\forall x\in(a,b)$ s.t. $g$ cts at $x$}
-\end{align*}
-Then for left inverses $f^{-1}_n,g^{-1}$, we have
-\begin{align*}
-  \limn f^{-1}_n(y) = g^{-1}(y)
-  \qquad
-  \text{$\forall y\in(g(a),g(b))$ s.t. $g^{-1}$ cts at $y$}
-\end{align*}
-\end{lem}
-
-\begin{proof}
-First, some definitions (one old, several new).
-Supposing that $x=1$ is a continuity point\footnote{%
-  If not, use $U(tx_0)$ for any continuity point $x_0$.
-  It's much messier.
-}
-of $D(x)$ (whose definition is reproduced below), define\footnote{%
-  We will argue below that $A(y)$ and $H'(0)$ (hence $Q(t)$) are
-  well-defined.
-}
-\begin{alignat*}{3}
-  D(x)&:= \limt\frac{U(tx)-b(t)}{a(t)}
-  &
-  \qquad
-  \quad
-  E(x)
-  &:=
-  D(x)-D(1)
-  %D(x)-D(x_0)
-  %= \limt \frac{U(tx)-U(tx_0)}{a(t)}
-  = \limt \frac{U(tx)-U(t)}{a(t)}
-  \qquad
-  \\
-  A(y)
-  &:= \limt \frac{a(ty)}{a(t)}
-  \qquad
-  &
-  H(t)
-  &:= E(e^t)
-  \\
-  %t_0&:=\log x_0
-  &
-  \qquad
-  &
-  Q(t)&:=H(t)/H'(0)
-\end{alignat*}
-Notice $Q(t)$ is built from $H(t)$ is built from $E(x)$.
-%is built from $D(x)$ is built from $U(t)$.
-We will thus proceed in a sequence of steps, characterizing properties
-of $E(x)$, then $H(t)$, then $Q(t)$.
-From the properties of $Q(t)$, we then derive a differential equation
-that $Q(t)$ satisfies, whose solution will prove our result.
-\begin{itemize}
-  \item (Characterize $E(xy)$):
-    Below, we will want to compute the derivative $H'(t)$.
-    The usual definition $\lim_{s\ra0}(H(t+s)-H(t))/s$ involves the term
-    $H(t+s)=E(e^{t+s})=E(e^t e^s)$. Therefore, it will be useful to
-    characterize $E(xy)$ for any $x,y>0$. We will show that
-    \begin{align*}
-      E(xy)&=E(x)A(y)+E(y)
-    \end{align*}
-    Writing out in full, that statement is equivalent to showing that:
-    \begin{align*}
-      \limt
-      \frac{U(txy)-U(t)}{a(t)}
-      &=
-      \left(
-      \limt
-      \frac{U(tx)-U(t)}{a(t)}
-      \right)
-      \left(
-      \limt
-      \frac{a(ty)}{a(t)}
-      \right)
-      +
-      \limt
-      \frac{U(ty)-U(t)}{a(t)}
-    \end{align*}
-    We can show that by starting with the fraction on the LHS, then
-    breaking things up:
-    \begin{align*}
-      \frac{U(txy)-U(t)}{a(t)}
-      =
-      \frac{U(tyx)-U(ty)}{a(ty)}
-      \frac{a(ty)}{a(t)}
-      +
-      \frac{U(ty)-U(t)}{a(t)}
-    \end{align*}
-    Take limits on both sides and $t\ra\infty$, the result follows.
-
-  \clearpage
-  \item (Characterize $H(t)$):
-    First, it's value at zero is given by
-    \begin{alignat*}{3}
-      H(0)
-      &= E(e^{0})=E(1) &&= 0
-    \end{alignat*}
-    Next, we consider derivatives.
-    For any $t$ s.t. that $H'(t)$ exists (and there will be at least
-    one such $t$), the derivative is defined:
-    \begin{align*}
-      H'(t)
-      &=\lim_{s\ra 0} \frac{H(t+s)-H(t)}{s}
-    \end{align*}
-    Using our result about $E(xy)$ and the definition of function
-    $H(t)$, we can write $\forall t,s$:
-    \begin{align}
-      H(t+s)
-      = E(e^{t+s})
-      = E(e^{s}e^t)
-      &=
-      E(e^s)
-      A(e^t)
-      +
-      E(e^t)
-      \notag
-      \\
-      \text{Definition of $H(t)$}
-      \implies\qquad
-      H(t+s)
-      &=
-      H(s)A(e^t)+H(t)
-      \label{H(t+s)}
-      \\
-      \text{Since $H(0)=0$}\qquad
-      \implies\qquad
-      H(t+s)
-      &=
-      (H(s)-H(0))A(e^t)+H(t)
-    \end{align}
-    Let $t_*$ be such that derivative $H'(t_*)$ exists.
-    Then by the above expression for $H(t_*+s)$,
-    \begin{align*}
-      H'(t_*)
-      =
-      \lim_{s\ra 0}
-      \frac{H(t_*+s)-H(t_*)}{s}
-      &=
-      \lim_{s\ra 0}
-      \frac{H(s)-H(0)}{s}A(e^{t_*})
-      =
-      H'(0)A(e^{t_*})
-    \end{align*}
-    The final inequality followed because $H'(t_*)$ exists and
-    $A(e^{t_*})$ is well-defined (since $A(y)$ is
-    well-defined\footnote{%
-      By assumption here, though this could be proved.
-    }).
-    Thus the limit must exist, and that limit is the definition of
-    $H'(0)$, which is a number and is well-defined.
-
-    Now that last line established that $H'(t_*)=H'(0)A(e^{t_*})$ and
-    that $H'(0)$ is well-defined. But more generally, for \emph{any}
-    $t$ (not just $t_*$), the above derived identity lets us write:
-    \begin{align*}
-      \lim_{s\ra 0}
-      \frac{H(t+s)-H(t)}{s}
-      =
-      \lim_{s\ra 0}
-      \frac{H(s)-H(0)}{s}A(e^{t})
-      =
-      H'(0)A(e^{t})
-    \end{align*}
-    Since $H'(0),A(e^t)$ exist and are well-defined for any $t$,
-    the left-most limit exist and is well-defined \emph{for any $t$}.
-    But that leftmost limit is just the definition
-    of $H'(t)$. Therefore, $H'(t)$ exists and is well-defined for
-    \emph{any} $t$, i.e. $H$ is everywhere differentiable and
-    \begin{align}
-      H'(t)=H'(0)A(e^t)
-      \quad\implies\quad
-      A(e^t) = \frac{H'(t)}{H'(0)}
-      = Q'(t)
-      \label{HQ}
-    \end{align}
-    Summarizing, we thus have $H(0)=0$ and $H'(t)=H'(0)A(e^t)$.
-
-  \clearpage
-  \item
-    (Characterizing $Q(t)$):
-    First, values of $Q(t)$,
-    \begin{alignat*}{5}
-      Q(0) &= \frac{H(0)}{H'(0)} &&= \frac{0}{H'(0)} &&= 0
-      \\
-      Q'(0) &=
-      \frac{d}{dt}\left[\frac{H(t)}{H'(0)}\right]_{t=0}
-      &&=
-      \frac{H'(0)}{H'(0)} &&= 1
-    \end{alignat*}
-    Next, we want to derive the differential equation for $Q(t)$.  That
-    involves derivatives of $Q(t)$, which involve terms like
-    $Q(t+s)-Q(t)$ that we now compute, starting with
-    Expression~\ref{H(t+s)}:
-    \begin{align}
-      \text{Expression~\ref{H(t+s)}}\implies\quad
-      H(t+s)-H(t) &= H(s)A(e^t)
-      \notag
-      \\
-      \text{Dividing by $H'(0)$}\qquad\quad\;
-      \frac{H(t+s)-H(t)}{H'(0)} &= \frac{H(s)}{H'(0)}A(e^t)
-      \notag
-      \\
-      \text{Definition of $Q(t)$}\qquad\quad\;\;
-      Q(t+s)-Q(t)&= Q(s)A(e^t)
-      \notag
-      \\
-      \text{Expression~\ref{HQ}}\qquad\quad\;\;\,
-      Q(t+s)-Q(t)&= Q(s)Q'(t)
-      \label{sub1}
-    \end{align}
-    We could have also started with $H(t+s)-H(s)=H(t)A(e^s)$ (which
-    simply swaps $t,s$ values), which would have given
-    \begin{align}
-      Q(t+s)-Q(s)&= Q(t)Q'(s)
-      \label{sub2}
-    \end{align}
-    Combine Expressions~\ref{sub1} and~\ref{sub2} (eliminating
-    $Q(t+s)$), rearrange, and divide by $s>0$:
-    \begin{alignat*}{5}
-      %Q(s)+Q(t)Q'(s)&= Q(t)+Q(s)Q'(t)
-      %\\
-      %\text{Rearrange again, divide by $s$}\qquad\quad\;\;
-      &
-      \qquad
-      Q(t)\frac{Q'(s)-1}{s}
-      &&= \frac{Q(s)}{s}(Q'(t)-1)
-      \\
-      \text{ $Q'(0)=1$ and $Q(0)=0$}\qquad
-      &
-      Q(t)\frac{Q'(s)-Q'(0)}{s}
-      &&= \frac{Q(s)-Q(0)}{s}(Q'(t)-1)
-      \\
-      \text{$s\ra0$}\qquad
-      &
-      \qquad\quad\;\;
-      Q(t)Q''(0)
-      &&= Q'(0)(Q'(t)-1)
-      \\
-      \text{$Q'(0)=1$}\qquad
-      &
-      \qquad\quad\;\;
-      Q(t)Q''(0)
-      &&= Q'(t)-1
-      \\
-      \text{Differentiating}\qquad
-      &
-      \qquad\quad\;\;
-      Q'(t)Q''(0)
-      &&= Q''(t)
-      \\
-      \text{Rearrange}\qquad
-      &
-      \qquad\qquad\quad\;\;
-      Q''(0)
-      &&=
-      \frac{Q''(t)}{Q'(t)}
-    \end{alignat*}
-    Notice that we can rewrite this last expression as differential
-    equation:
-    \begin{align*}
-      (\log Q'(t))'=Q''(0)=:\gamma\in\R
-    \end{align*}
-    where $\gamma$ is just a constant representing the extreme value
-    parameter, \emph{defined} to equal the value
-    of the second derivative of $Q(t)$ at zero.
-    (Thus $Q'(0)=0$ and $Q''(0)=\gamma$.)
-    It's value depends upon the particular properties of our underlying
-    functions.
-
-  \item
-    (Solve Differential Equation):
-    Given the above diffeq, integrate from zero to $t$:
-    \begin{align*}
-      \int_0^t (\log Q'(s))'\;ds
-      &= \int_0^t \gamma \;ds
-      \\
-      \text{Using $Q'(0)=1$ so $\log Q'(0)=0$}
-      \qquad\qquad\qquad\qquad
-      Q'(t)
-      &= e^{\gamma t}
-      \\
-      \text{Integrate again}
-      \qquad\qquad\quad
-      \int_0^t Q'(s)\;ds
-      &= \int_0^t e^{\gamma s}\;ds
-      \\
-      \text{Using $Q(0)=0$}
-      \qquad\qquad\qquad\qquad
-      Q(t)
-      &= \frac{e^{\gamma t}-1}{\gamma}
-    \end{align*}
-    Unpack the definition of $Q(t)$ to rewrite this in terms of $H(t)$
-    and $D(x)$:
-    \begin{align*}
-      \frac{e^{\gamma t}-1}{\gamma}
-      = Q(t)
-      = \frac{H(t)}{H'(0)}
-      = \frac{E(e^t)}{H'(0)}
-      &= \frac{D(e^t)-D(1)}{H'(0)}
-      \\
-      \text{Letting $t=\log(x)$}\qquad
-      \frac{x^{\gamma}-1}{\gamma}
-      &= \frac{D(x)-D(1)}{H'(0)}
-      \\
-      D(x)
-      &=
-      D(1)+H'(0)\left(\frac{x^{\gamma}-1}{\gamma}\right)
-      \\
-      \implies\quad
-      D^{-1}(y)
-      &=
-      \left[
-      1+\gamma\left(\frac{y-D(1)}{H'(0)}\right)
-      \right]^{1/\gamma}
-    \end{align*}
-    Recall that $D(x)=G^{-1}(e^{-1/x})$.
-    Then $D^{-1}(y)=-1/\log(G(y))$.
-    Equating that with the expression for $D^{-1}(y)$ above,
-    \begin{align*}
-      -\frac{1}{\log G(y)}
-      &=
-      \left[
-      1+\gamma\left(\frac{y-D(1)}{H'(0)}\right)
-      \right]^{1/\gamma}
-      \\
-      \implies\quad
-      G(y)
-      &=
-      \exp\left(
-      -\left[
-      1+\gamma\left(\frac{y-D(1)}{H'(0)}\right)
-      \right]^{-1/\gamma}
-      \right)
-    \end{align*}
-    The constants $D(1)$ and $H'(0)$ are the scale and location
-    parameters.
-
-
-
-\end{itemize}
-
-
-\end{proof}
-
-
-
-\clearpage
-\subsection{Domains of Attraction}
-
-Necessary \& Sufficient Conditions on $F$ to Have Limit $G$
-
-
-\clearpage
-\subsection{$k$ Largest Order Statistics}
-
-Throughout this subsection, we suppose that there exist sequence of
-constants $\{a_n,b_n\}$ such that Expression~\ref{ev:key} holds for some
-CDF $G(x)$ in the EV family with parameters $(\gamma,\mu,\sigma)$, i.e.
-\begin{align}
-  G(x)
-  =\lim_{n\ra\infty}P\left[\frac{X_{(n)}-b_n}{a_n} \leq x\right]
-  \label{ev:key3}
-\end{align}
-Now, rather than just deriving the distribution of $X_{(n)}$ only, we
-here derive the joint and marginal distributions of the $k>1$
-largest order statistics $\big(X_{(n-k+1)},\ldots,X_{(n)})$, with $k$
-fixed for all $n$.
-Note that throughout, the normalizing constants $\{a_n,b_n\}$ and
-parameters $(\gamma,\mu,\sigma)$ are exactly \emph{the same} as those
-(explicit or implicit) in Expression~\ref{ev:key3}.
-
-\begin{thm}\emph{(Marginal Distributions of $k$ Largest Order Statistics)}
-The limiting distribution for the normalized $r$th order statistic where
-$r\in\{n-k+1,\ldots,n\}$ satisfies
-\begin{align*}
-  \limn
-  P\left[
-    \frac{X_{(r)}-b_n}{a_n}
-    \leq
-    x
-  \right]
-  = G_{r}(x)
-  &=
-  \exp\left(
-    -\tau(x)
-  \right)
-  \sum_{s=0}^{r-1}
-  \frac{\tau(x)^s}{s!}
-  \quad\text{where}\;
-  \tau(x)
-  =
-  \left[
-    1+\gamma\left(\frac{x-\mu}{\sigma}\right)
-  \right]^{-1/\gamma}
-\end{align*}
-for all $x$ such that
-$1+\gamma\left(\frac{x-\mu}{\sigma}\right)>0$.
-\end{thm}
-\begin{rmk}
-Note that this is the marginal CDF for the $r$th order statistic
-\emph{only}.
-The joint distribution of the $k$ largest is more complicated and
-cannot simply be constructed by multiplying the densities of the $k$
-largest order statistics (since those order statistics aren't
-independent). Hence the theorem below.
-\end{rmk}
-
-\begin{thm}\emph{(Joint Distribution of $k$ Largest Order Statistics)}
-The joint density of the normalized $k$ largest order statistics
-\begin{align*}
-  \begin{pmatrix}
-    \frac{X_{(n-k+1)}-b_n}{a_n}
-    & \cdots &
-    \frac{X_{(n)}-b_n}{a_n}
-  \end{pmatrix}
-\end{align*}
-is given by the following expression:
-\begin{align*}
-  f(x_{n-k+1},\ldots,x_n)
-  &=
-  \begin{cases}
-  \exp\left(
-    -
-    \left[
-      1+\gamma\left(\frac{x_{n-k+1}-\mu}{\sigma}\right)
-    \right]^{-1/\gamma}
-  \right)
-  \times
-  \prod_{r=1}^k
-  \frac{1}{\sigma}
-  \left[
-    1+\gamma\left(\frac{x_{r}-\mu}{\sigma}\right)
-  \right]^{-\frac{1}{\gamma}-1}
-  & \gamma\neq 0
-  \\
-  \exp\left(
-    -
-    e^{%
-      -\frac{x_{n-k+1}-\mu}{\sigma}
-    }
-  \right)
-  \times
-  \prod_{r=1}^k
-  \frac{1}{\sigma}
-  e^{
-    - \frac{x_{r}-\mu}{\sigma}
-  }
-  & \gamma= 0
-  \end{cases}
-\end{align*}
-for all $(x_{n-k+1},\ldots,x_n)$ s.t.\
-$x_{n-k+1}\leq \ldots\leq x_n$
-and s.t.\
-$1+\gamma\left(\frac{x_r-\mu}{\sigma}\right)>0$
-for all $r=1,\ldots,k$.
-\end{thm}
-\begin{rmk}
-Note that this is the CDF for the $r$th order statistic \emph{only}.
-The joint distribution of the $k$ largest is more complicated and
-cannot simply be constructed by multiplying the densities of the $k$
-largest order statistics (since those order statistics aren't
-independent). Hence the theorem below.
-\end{rmk}
-
-
-
-
-\clearpage
-\subsection{Examples}
-
-Normal
-
-
-\clearpage
-
-
-
-\clearpage
-
-\begin{comment}
-\clearpage
-\begin{lem}
-The following limit statements are equivalent
-\begin{align*}
-  \frac{1}{-\log G(x)}
-  &=\lim_{n\ra\infty} \frac{1}{n\big(1-F(a_nx+b_n)\big)}
-  \quad\iff\quad
-  D(x)
-  =
-  \limn
-  \frac{U(nx)-b_n}{a_n}
-\end{align*}
-\end{lem}
-\begin{proof}
-Write out the second limit statement using the defintion of $D(x)$ and
-$U(t)$:
-\begin{align*}
-  G^{-1}(e^{-1/x})
-  =
-  \limn
-  \frac{H^{-1}(nx)-b_n}{a_n}
-\end{align*}
-Compute the inverse functions of the LHS and RHS
-\begin{align*}
-  y = G^{-1}(e^{-1/x})
-  \quad&\implies\quad
-  x = \frac{1}{-\log G(y)}
-  \\
-  y= \frac{H^{-1}(nx)-b_n}{a_n}
-  \quad&\implies\quad
-  x
-  = \frac{1}{n}H(a_ny+b_n)
-  = \frac{1}{n(1-F(a_ny+b_n)}
-\end{align*}
-Therefore, by the Lemma
-\begin{align*}
-  D(x)
-  =
-  \limn
-  \frac{U(nx)-b_n}{a_n}
-  \quad\implies\quad
-  \frac{1}{-\log G(y)}
-  =
-  \limn
-  \frac{1}{n(1-F(a_ny+b_n)}
-\end{align*}
-which is the first limit statement.
-\end{proof}
-\end{comment}
-
-
 
 
 
@@ -3148,21 +2162,6 @@ polynomials), wavelets
 
 
 
-\subsection{Inference}
-
-Statistic model is a family/collection of distributions (or densities).
-For a parametric model, this collection is indexed by a
-finite-dimensional vector of parameters varying in some set (the
-parameter space).
-
-Nonparametric: the family of distributions cannot be characterized by a
-finite-dimensional parameter vector.
-
-Statistic: Any function of the observed data alone.
-Cannot depend on unkown parameters.
-
-
-
 
 \subsection{Likelihood Function}
 
@@ -3268,229 +2267,12 @@ A few approaches
   \item MLE
   \item Bayesian estimators
 \end{itemize}
-Ways to evaluate estimators
-\begin{itemize}
-  \item Bias and variance.
-
-    Result: if bias and variance go to zero, then $\hat{\theta}_n$ is
-    consistent.
-
-  \item MSE
-
-    Has bias-variance decomposition.
-    Simple proof.
-
-    For many parametric estimators, most estimators have MSE that are
-    $O(1/\sqrt{n})$.
-
-  \item Minimax theory
-  \item Large sample theory
-\end{itemize}
-An estimator $W$ is Uniform Minimum Variance Unbiased (UMVUE) for
-$\tau(\theta)$ if
-\begin{enumerate}
-  \item $\E_\theta[W]=\tau(\theta)$ for all $\theta$
-  \item If $\E_\theta[W']=\tau(\theta)$ for all $\theta$, then
-    $\Var_\theta(W)\leq \Var_\theta(W')$ for all $\theta$.
-\end{enumerate}
-Cramer-Rao bound bounds the variance of any unbiased estimator.
-
-Rao-Blackwell:
-Let $W$ be an unbiased estimator of $\tau(\theta)$ and $T$ a sufficient
-statistic.
-Then $\phi(T)=\E[W|T]$ is UMVUE for $\tau(\theta)$.
 
 
 
-\subsubsection{Bayes Estimator}
-
-This is separate from Bayesian inference. It's just an algorithm to get
-an estimator.
-
-A Bayes estimator is one that can be expressed as a function of some
-posterior.
-Not that we're doing Bayesian inference.
-But given a prior, posterior well-defined, can define just some
-functional, like the mean or the mode to get an estimator.
-
-
-\subsubsection{Minimax Theory}
-
-
-\href{http://www.stat.cmu.edu/~larry/=stat705/Lecture8.pdf}{Reference}
-
-
-Define loss function. Examples are in reference notes.
-Loss is a random variable.
-
-Given an estimator, risk is expected value of the loss.
-In general, this is a function of $\theta$.
-Some ways to reduce to one single number.
-\begin{itemize}
-  \item Maximum risk, taken over $\theta$
-  \item Bayes risk:
-    Expected risk, using prior to compute expectation.
-
-    Posterior risk:
-    Expected loss, using posterior to compute expectation.
-
-    Result:
-    Can also write Bayes risk as posterior risk integrated against the
-    marginal data density.
-
-    Why we care:
-    The first definition is useful for theory.
-    The second definition of Bayes risk is easier for calculation.
-\end{itemize}
-If we're searching for an estimator, we can form estimators off of the
-above-defined principles.
-\begin{itemize}
-  \item Minimax estimator: Minimizes the maximum risk.
-  \item Bayes Estimator: Minimizes Bayes risk for some prior over
-    $\theta$.
-\end{itemize}
-Even if we can't directly compute the minimax estimator, we often want
-to characterize or bound \emph{minimax risk} because it's a measure of
-how hard an estimation problem is.
-
-It's also interesting to ask the rate at which minimax risk goes to
-zero.
-In parametric problems, often $1/n$. In nonparametric, often a little
-slower.
-
-Goals:
-Determine minimax risk and find an estimator that achieves this risk.
-
-Finding the minimizer of Bayes risk often easy.
-Finding the minimax estimator often tough.
-But can use Bayes estimator (and free choice of prior) to compute
-minimax estimator.
-
-Result:
-If an estimator minimizes posterior risk, then we minimize Bayes risk.
-See this from the way we write Bayes risk as the integral of posterior
-risk.
-
-Result:
-Under $L^2$ loss, the Bayes estimator is the posterior mean.
-(Proof: write out the posterior risk, minimize.)
-Under LAD loss, Bayes estimator is the median.
-Under zero-one loss, Bayes estimator is the mode.
-
-
-Punchline:
-Bayes estimators with constant risk function are minimax.
-
-
-Lemma:
-Suppose an estimator $\hat{\theta}$ is the Bayes estimator for some
-prior.
-If that prior is such that the classical risk is less than the Bayes
-risk (under that prior) for all $\theta$, then $\hat{\theta}$ is minimax
-and $\pi$ is called a \emph{least favorable prior}.
-
-Proof:
-Can derive a contradiction otherwise.
-If $\hat{\theta}$ weren't minimax, then there's another estimator with
-maximum risk less than the $\hat{\theta}$ by definition of
-$\hat{\theta}$ not being minimax.
-Next, Bayes risk is an average, so we know that the Bayes risk of this
-knew estimator is less than its maximum risk.
-Finally, this would imply Bayes risk of the new estimator is lower.
-Can't have that.
-
-Result:
-Suppose an estimator $\hat{\theta}$ is the Bayes estimator for some
-prior.
-If risk is constant, then $\hat{\theta}$ is also minimax.
-To show, use Lemma.
-
-
-Definition:
-Function $\ell(x)$ bowl shaped if sets $\{x\;:\;\ell(x)\leq c\}$ are
-convex and symmetrix about the origin.
-
-
-Definition:
-Loss function bowl-shaped if
-$L(\theta,\hat{\theta})=\ell(\theta-\hat{\theta})$ for some bowl-shaped
-function $\ell$.
-
-Result:
-Suppose $X\sim \calN(\theta,\Sigma)$.
-If the loss-function is bowl-shaped, $X$ is the unique minimax estimator
-of $\theta$.
-
-Note:
-Minimax risk depends crucially on how the parameter space is restricted.
-
-
-Finding a minimax estimator:
-General strategy is to find an upper and lower bound, get them close
-together, sandwich.
-\begin{itemize}
-  \item The maximum risk of any arbitrary estimator is bigger than the
-    minimax risk.
-
-  \item Pick any prior $\pi$, get teh Bayes estimator, and compute the
-    Bayes risk of that estimator.
-    This is a lower bound on the minimax risk.
-
-    How to show:
-    Minimum of maximum risk bigger than minimum of average risk (with
-    average taken under that prior). And minimum of average risk is
-    achieved by the Bayes estimator.
-\end{itemize}
-Property than $\bar{X}_n$ is minimax under normality and squared error
-loss:
-\begin{itemize}
-  \item Risk of this estimator (under $L^2$) is MSE, i.e. bias squared
-    plus variance, hence $1/n$.
-    That gives an upper bound on minimax risk.
-  \item Take a normal prior.
-    Posterior also normal with known form.
-    Bayes estimator is posterior mean.
-    Bayes risk of posterior mean can be computed easily since, under
-    $L^2$ loss, it's the MSE.
-  \item Minimax risk then sandwiched in between $1/n$.
-    Hence that must be minimax risk.
-  \item Because $\bar{X}-n$ has minimax risk $1/n$, it is the minimax
-    risk.
-\end{itemize}
-Result: MLE approximately minimax under weak regularity conditions.
-\begin{itemize}
-  \item LeCam
-  \item Under squared error loss, recall risk is MSE, variance plus bias
-    squared.
-  \item For MLE, bias typically of order $O(n^{-2})$ and variance
-    $O(n^{-1})$ hence variance dominates bias.
-  \item Therefore risk/MSE of MLE in large samples approximately just
-    the variance of the MLE estimator.
-  \item Because MLE has asymptotically lowest variance, it has lower
-    risk than any other estimator.
-    Hence asymptotically minimax
-  \item Assumes $\theta$ fixed and $n$ increasing
-\end{itemize}
-Hodges: Pointwise vs. uniform
-\begin{itemize}
-  \item Shrinkage estimator where estimator is $\bar{X}_n$ for
-    sufficiently large $\bar{X}_n$ and zero for small numbers,
-    where boundaries for defining ``small'' going to zero at rate
-    $1/n^{1/4}$.
-  \item If truth nonzero, behaves just like $\bar{X}_n$.
-  \item If truth is zero, does better.
-  \item Seems to do better.
-  \item But maximum risk for any $n$ way worse than $\bar{X}_n$, unlike
-    $\bar{X}_n$ which has flat risk.
-  \item So pay attention to uniform asymptotics
-\end{itemize}
-ISSUES:
-Keep straight what are functions, what are numbers.
-Using $\theta_0$ should help?
 
 
 
-\clearpage
 \subsection{Distance Between Distributions}
 
 Let $P,Q$ be two distributions with densities $p,q$.
@@ -3513,102 +2295,6 @@ Properties
 \end{itemize}
 
 
-\subsection{Large-Sample Properties of Estimators}
-
-Consistency
-\begin{itemize}
-  \item Can sometimes show directly from LLN
-  \item Can sometimes show convergence in quadratic mean, which implies
-    convergence in probability.
-
-    Convergence in quadratic mean is literally just that the MSE of the
-    estimator goes to zero.
-    We know that MSE is bias squared plus variance.
-    If bias and variance go to zero, MSE goes to zero, hence convergence
-    in quadratic mean, hence convergence in probability.
-\end{itemize}
-Influence function:
-Common way to write asymptotically normal estimators.
-
-
-Any well-behaved (linearly? regular) estimator satisfies
-\begin{align*}
-  \tilde{\theta}
-  =
-  \theta
-  +
-  \frac{1}{n}
-  \sumin
-  \psi(X_i)
-  +
-  o_P(n^{-1/2})
-\end{align*}
-The MLE is also of that form, and it has the smallest variance.
-All of this assumes correct specification.
-
-
-
-\subsection{Hypothesis Testing}
-
-Size $\alpha$ test: Null rejection rate exactly $\alpha$
-
-Level $\alpha$ test: Null rejection rate exactly $\leq \alpha$
-
-Neyman Pearson: Simple null, simple alternative.
-Gives most powerful test.
-
-Uniformly most powerful test: Power function lies weakly above the power
-function of any other test for all alternative values
-$\theta\in\Theta_1$.
-
-Likelihood ratio test:
-\begin{itemize}
-  \item Maximize likelihood under null and over whole parameter set,
-    take ratio. Reject if larger/smaller than certain cutoff that's
-    chosen to ensure the test is level $\alpha$ for all
-    $\theta\in\Theta_0$.
-  \item Can find critical value directly, numerically, or by large
-    sample approximation.
-    In principle could consider each $\theta\in\Theta_0$, get $c$ that
-    works for that $\theta$, then choose among
-    $\{c(\theta)\}_{\theta\in\Theta_0}$ to pick a cutoff that gaurantees
-    correct level for all $\theta\in\Theta_0$.
-\end{itemize}
-
-p-value: Smallest $\alpha$ at which we do not reject.
-Also probability that you observe something at least as extreme under
-the null.
-Under the null, the p-value (which is a RV since it's a function of the
-data) is uniform $[0,1]$.
-
-
-Confidence set is a random set.
-Approaches to constructing
-\begin{itemize}
-  \item Probability inequalities:
-    Tough because often very conservative and often involve unknown
-    constants.
-
-    Example: Use Hoeffding for means to ensure the probability that
-    you're far is $\leq \alpha$. Solve for $\varepsilon$.
-    Useful when the object is mean.
-
-    Can also do this to get a confidence band since sometimes we have a
-    bound on the sup of the distance between an estimated function and
-    the truth.
-
-  \item Inverting a test:
-    Even if we don't really want to perform a test, suppose we can
-    construct one. Collect all possible values of $\theta_0$ that fail
-    to reject.
-
-  \item Pivots
-  \item Large sample approximations
-\end{itemize}
-
-
-
-
 
 
 
@@ -3628,6 +2314,7 @@ Approaches to constructing
 \clearpage
 \section{Notation}
 
+To standardize
 \begin{itemize}
   \item $N$ and $T$ for total number of observations.
   \item No bold
@@ -3650,11 +2337,9 @@ Approaches to constructing
 \section{Recent Progress on OLS Regression}
 
 Given data $\calD_n = \{Y_i,X_i\}_{i=1}^n$,
-we will compute OLS estimates
+we can always compute OLS estimates
 \begin{align*}
   \hat{\theta}
-  =
-  (\hat{\beta},\hat{\gamma}')'
   :=
   \argmin_\theta
   \frac{1}{n}
@@ -3667,10 +2352,11 @@ we will compute OLS estimates
   \sumin
   X_iY_i
 \end{align*}
-In causal inference settings, we will have $X_i=(D_i,W_i')'$, where
-$D_i$ is some treatment vector of interest (generally just a binary
-indicator).
-Under various conditions, these estimates will converge to
+In the particular setting of causal inference, we suppose that
+$X_i=(D_i,W_i')'$, where $D_i$ is some treatment variable of interest
+(generally just a binary indicator) in which case we write
+$\hat{\theta}= (\hat{\beta},\hat{\gamma}')'$.
+Under regularity conditions, these estimates will converge to
 \emph{some estimand}.
 The question is what is this estimand?
 Is it what we want?
@@ -3686,8 +2372,9 @@ We generally run the regression with one of two potential goals in mind.
       Recall the CEF is the best predictor of $Y_i$ given $X_i$
       generally in a minimum MSE sense.
     }
-    and often of greater importance in econometric contexts,
-    the best linear approximation of CEF
+    and often of greater importance for econometric, modeling, and
+    inference purposes, the best linear approximation of the CEF,
+    defined
     \begin{align*}
       \mu(x):=\E[Y_i|X_i=x]
     \end{align*}
@@ -3730,7 +2417,7 @@ We generally run the regression with one of two potential goals in mind.
     of $X_i$ or the conditional empirical distribution given by the
     data matrix $X$.
     So remember that the estimand depends upon the distribution of $X_i$
-    we use for weighting.
+    that we use for weighting.
 
     Our choice of weights and estimand then directly determine the type
     of inference about $\hat{\theta}$ that we conduct---namely,
@@ -3739,7 +2426,7 @@ We generally run the regression with one of two potential goals in mind.
     estimators---and the center of either the finite-sample or (more
     typically) the limiting distribution of our estimator.
     But regardless of whether we condition on the regressors or not,
-    analysis proceeds the same by making sampling assumptions and
+    analysis proceeds the same way, by making sampling assumptions and
     appealing to large $n$ asymptotics to derive an approximate finite
     sample distribution for $\hat{\theta}$.
     But here's more about the two inference perspectives.
@@ -3747,8 +2434,8 @@ We generally run the regression with one of two potential goals in mind.
       \item Conditional Inference Perspective
         \begin{itemize}
           \item Regression estimand provides the best linear
-            approximation to CEF over the \emph{conditional}
-            distribution of $X$ in our sample.
+            approximation to CEF \emph{conditional} on the distribution
+            of $X$ in our sample.
             So if the sample $X$ is quite different from the population,
             the estimand might have little exernal validity.
 
@@ -3756,16 +2443,17 @@ We generally run the regression with one of two potential goals in mind.
             samples.
             Sampling uncertainty driven by variability in outcomes
             $Y_i$ given $X_i$.
-            And because we condition on $X$, can even allow for
-            arbitrary correlation among regressors.
+            Because we condition on $X$, can even allow for arbitrary
+            correlation among regressors across units.
 
           \item
             When deriving the asymptotic distribution, note that the
             data matrix $X$ and the empirical distribution impled by $X$
             change with $n$.
             So we then generally have a \emph{sequence}
-            of estimands, changing with $n$ rather than fixed as in
-            unconditional inference.
+            of estimands, changing with $n$ rather than some fixed
+            estimand defined off the (unchanging) superpopulation
+            distribution, as in unconditional inference.
             But we can still derive an asymptotic distribution, albeit
             using different sampling and regularity conditions.
 
@@ -3776,7 +2464,7 @@ We generally run the regression with one of two potential goals in mind.
 
       \item Unconditional inference
         \begin{itemize}
-          \item Regression will provide the best linear approximation to
+          \item Regression will deliver the best linear approximation to
             the CEF over the \emph{unconditional} distribution of $X_i$
             in the superpopulation.
           \item Do not condition on the $X$ observed in the
@@ -3801,6 +2489,7 @@ We generally run the regression with one of two potential goals in mind.
     This will have direct implications for inference.
 \end{enumerate}
 EHW Variance Estimator:
+Define
 \begin{align*}
   %\hat{\theta}
   %&=
@@ -3831,6 +2520,9 @@ EHW Variance Estimator:
   \right)
   (X'X)^{-1}
 \end{align*}
+We will consider under which assumptions this is too large, too small,
+or just right.
+
 
 
 \clearpage
@@ -3839,14 +2531,16 @@ First let's define some estimands.
 These are all candidates for the limiting $\theta$ for which
 $\hat{\theta}$ is consistent under some set of assumptions and
 regularity conditions.
-For estimands that depend upon the sample and covariate matrix $X$ at
-hand, I add an $n$ subscript to emphasize that the estimand will change
-with $n$, which is useful to remember.
+For estimands constructed from the sample $\{Y_i,X_i\}_{i=1}^n$ and
+corresonding covariate matrix $X$ at hand, I add an $n$ subscript to
+emphasize that the estimand will change with $n$ if we take an
+asymptotic perspective, which is useful to remember.
 \begin{itemize}
-  \item (\emph{Unconditional Projection Coefficient}):
+  \item (\emph{Descriptive, Unconditional Estimand}):
     Assume that our sample $\calD_n$ is drawn from some superpopulation.
-    This estimand is constructed from the joint superpopulation
-    distribution over outcomes and covariates $(Y_i,X_i)$.
+    Then we can define an estimand constructed from the joint
+    superpopulation distribution over outcomes and covariates
+    $(Y,X)$.
     We use $\E^{sp}$ to denote that teh expectation is taken with
     respect to that superpopulation distribution.
     \begin{align*}
@@ -3870,11 +2564,20 @@ with $n$, which is useful to remember.
       \qquad
       \text{Solving FOCs, LIE}
     \end{align*}
+    The subscript $du$ indicates that this is a \emph{descriptive},
+    \emph{unconditional} estimand.
+    Descriptive because we do not assign it a causal interpretation;
+    rather, it simply captures one measure of association between
+    outcomes $Y$ and covariates $X$.
+    Unconditional because it is defined using the superpopulation
+    distribution, not the sample at hand.
+
 
   \item
-    (\emph{Conditional on $X$ Projection Coefficient}):
-    Condition on the sample data matrix $X$, define the estimand as the
-    best linear approximation to the CEF for samples with identical $X$.
+    (\emph{Descriptive, Conditional on $X$ Estimand}):
+    Condition on the sample data matrix $X$, define the following
+    estimand as the best linear approximation to the CEF for samples
+    with identical $X$.
     Adding the argument $X$ emphasizes this point.
     \begin{align*}
       \theta_{dc,n}(X)
@@ -3886,10 +2589,12 @@ with $n$, which is useful to remember.
       =
       (X'X)^{-1}X'\mu(X)
     \end{align*}
+    The subscript $dc$ indicates again that this is a \emph{descriptive}
+    (non-causal), \emph{conditional} on $X$ estimand.
 
 
   \item
-    (\emph{Design-Based Superpopulation Estimand}):
+    (\emph{Causal, Superpopulation Estimand}):
     Assume $X_i=(D_i,W_i')'$.
     Define the following where the expectation $\E^{D,sp}$ is taken over
     both the random assignment mechanism for $D_i$ and the joint
@@ -3898,6 +2603,8 @@ with $n$, which is useful to remember.
     $(Y_i(d),D_i,W_i)$.
     \begin{align*}
       \theta_{cs}
+      =
+      (\beta_{cs},\gamma_{cs}')'
       &:=
       \argmin_{\theta}
       \E^{D,sp}[(Y_i-X_i'\theta)^2]
@@ -3905,12 +2612,16 @@ with $n$, which is useful to remember.
       \E^{D,sp}[X_iX_i']^{-1}
       \E^{D,sp}[X_iY_i]
     \end{align*}
+    This is a causal estimand because we will make assumptions on the
+    assignment mechanism for $D_i$ which will allow us to assign a
+    causal interpretation to $\beta_{cs}$.
 
+  \clearpage
   \item
     (\emph{Design-Based Finite Sample Estimand}):
     Define the following estimand where the conditional expectation
     $\E^D$ is taken over the random assignment mechanism for $D$
-    alone---no random sampling, potential outcomes are fixed for teh
+    alone---no random sampling, potential outcomes are fixed for the
     sample at hand---while conditioning on the full set of potential
     outcomes $Y(D)$ and covariates $W$ in the sample.
     %$Y_i=Y_i(D_i)$ is the realized outcome that depends upon random $D_i$.
@@ -3947,8 +2658,8 @@ Each (generally distinct) estimand definition in turn defines a
   \qquad
   \ell\in\{(du), (dc,n), (cs), (cf,n)\}
 \end{align*}
-From there, rearrange and sub into the OLS formula to
-rewrite for asymptotics
+From there, we can rearrange and sub into the OLS formula to rewrite the
+estimator in preparation for asymptotic analysis:
 \begin{align*}
   \sqrt{n}
   (
@@ -3965,8 +2676,8 @@ rewrite for asymptotics
     (Y_i-X_i'\theta_{\ell})
   }_{\varepsilon_{\ell,i}}
 \end{align*}
-With appropriate sampling and regularity assumptions on the terms in the
-sum, we can then derive the limiting distribution.
+Under different sampling and regularity assumptions on the terms in the
+sum, we can then derive corresponding limiting distributions.
 
 
 \clearpage
@@ -3975,11 +2686,12 @@ sum, we can then derive the limiting distribution.
 \paragraph{Sampling Assumptions}
 These are necessary for characterizing
 \emph{sampling-based uncertainty}, where randomness in our estimators is
-induced by random sampling as opposed to design-based uncertainty
+induced by random sampling, as opposed to design-based uncertainty
 (although these two kinds of uncertainty can often both be relevant).
 If we assume $n\ra\infty$, the randomness induced by sampling can be
 approximated by a normal law according to some CLT, which we can use for
 inference about regression estimands.
+The assumptions will help ensure that we can apply some CLT.
 \begin{enumerate}[label=(\roman*)]
   \item[S1.]
     (\emph{Random Sampling}):
@@ -3991,7 +2703,8 @@ inference about regression estimands.
     Note that this assumption might still be used for
     conditional inference.
     It simply says how the $X$ that we condition on were
-    generated---namely, independently and identically distributed.
+    generated---namely, independently and identically distributed across
+    units.
     This is a bit stronger than needed (although it makes the
     asymptotic distributions of estimators easier to derive since we can
     use the Lindeberg-Levy iid CLT); therefore, the next condition is
@@ -4008,13 +2721,14 @@ inference about regression estimands.
     Conditional on $X$, the $Y_i$ are independent with
     mean $\mu(X_i)$.
 
-    Relative to S1, the $X_i$ can now be correlated arbitrarily, rather
-    than iid.
+    Relative to S1, the $X_i$ can now be correlated arbitrarily across
+    units, rather than iid.
 
 \end{enumerate}
-\paragraph{Regularity Assumptions for Sampling Uncertainty}
+\paragraph{Regularity Assumptions to Apply CLTs under Sampling}
 \begin{enumerate}
   \item[R1.] For unconditional inference
+    (which only makes sense under S1)
     \begin{enumerate}[label=(\roman*)]
       \item $\E[X_iX_i']^{-1}$ exists and full rank
       \item $(Y_i,X_i)$ have finite 4th moments
