@@ -1,0 +1,1089 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usepackage{cmbright}
+%\usetheme{metropolis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis with Sidebar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[handout]{beamer}
+%\documentclass{beamer}
+\usepackage{cmbright}
+
+\useoutertheme[right, width=0.20\paperwidth]{sidebar}
+\usecolortheme{metropolis}
+\useinnertheme[sectionpage=none]{metropolis}
+\usefonttheme{metropolis}
+
+\makeatletter
+\beamer@headheight=1.75\baselineskip     %controls the height of the headline, default is 2.5
+\makeatother
+
+%\setbeamertemplate{sidebar canvas right}{}
+%\setbeamertemplate{sidebar right}{BOB}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Simple Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usetheme{Boadilla}
+%\usepackage{lmodern}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sidebar Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass[serif]{beamer}  % For serif latex font
+%\usepackage{pxfonts}
+%\usepackage{eulervm}
+%\usepackage{mathpazo}
+
+%\usetheme{Goettingen}
+%\usecolortheme{lily}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Common Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[]{ECO-466/FIN-521: Precept, Week 3 \\ Matt Cocci}
+\author[]{}
+\date{\today}
+
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+%\setbeamertemplate{section in toc}[square unnumbered]
+%\setbeamertemplate{subsection in toc}[square unnumbered]
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% For easier looping
+\usepackage{pgffor}
+
+\usepackage{pdfpages}
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\proj}{\operatorname{proj}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Rnk}{\mathbb{R}^{n\times k}}
+\newcommand{\Rkk}{\mathbb{R}^{k\times k}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Presentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Outline}
+\tableofcontents[hideallsubsections]
+%\tableofcontents
+\end{frame}
+
+
+
+\section{Exercise 2}
+
+\begin{frame}[shrink]{Questions}
+Issues
+\begin{itemize}
+  \item $\kappa$
+  \item Prediction error
+  \item Kalman filter in non-Gaussian case
+  \item Kalman filter and optimal linear prediction
+\end{itemize}
+\end{frame}
+
+
+
+\section{Exercise 3}
+
+\begin{frame}[shrink]{Problem 1}
+One tough part. We have a result for statistic
+\begin{align*}
+  \frac{\iota'\iota}{\iota' A^{-1}\iota}
+\end{align*}
+Want to translate that into a result for
+\begin{align*}
+  \frac{L'L}{L'A^{-1}L}
+\end{align*}
+What to do?
+Notice that we'd like to replace $L$ with $\iota$.
+How can we get from $L$ to $\iota$ with some matrix algebra?
+
+Think about orthogonal rotation matrices (the set of orthogonal matrices
+with determinant 1, not -1).
+Orthogonal matrices satisfy
+\begin{align*}
+  UU' = U'U = I_n
+  \quad\implies\quad
+  U^{-1}=U'
+\end{align*}
+In matrix algebra, these are useful ways to replace $I_n$ with
+``multiply and divide by a matrix.''
+\end{frame}
+
+
+\begin{frame}[shrink]{Orthogonal Rotation Matrices}
+Given vectors $x,y\in \R^n$ with equal Euclidean norm
+\begin{align*}
+  \lVert x \rVert =
+  \lVert y \rVert
+\end{align*}
+We want an orthogonal matrix $U$ (i.e. $UU'=U'U=I_n$ and $U'=U^{-1}$)
+such that
+\begin{align*}
+  Ux = y
+\end{align*}
+i.e.\ an orthogonal matrix that can rotate $x$ to get $y$.
+
+To start, construct orthogonal matrices with the first column chosen in
+a special way and the remaining columns chosen to give an orthogonal
+matrix:
+\begin{align*}
+  G &=
+  \begin{pmatrix}
+    \frac{x}{\lVert x\rVert}
+    & g_2 & \cdots & g_n
+  \end{pmatrix}
+  \\
+  H &=
+  \begin{pmatrix}
+    \frac{y}{\lVert y\rVert}
+    & h_2 & \cdots & h_n
+  \end{pmatrix}
+\end{align*}
+Then choose $U=HG'$ in which case
+\begin{align*}
+  Ux = HG'x
+  = H
+  \begin{pmatrix}
+    \frac{x'x}{\lVert x\rVert}
+    \\
+    g_2'x \\
+    \vdots \\
+    g_n'x \\
+  \end{pmatrix}
+  =
+  H
+  \begin{pmatrix}
+    \lVert x\rVert
+    \\
+    0 \\
+    \vdots \\
+    0 \\
+  \end{pmatrix}
+  =
+  H
+  \begin{pmatrix}
+    \lVert y\rVert
+    \\
+    0 \\
+    \vdots \\
+    0 \\
+  \end{pmatrix}
+  = y
+\end{align*}
+Entries zero by orthogonality.
+\end{frame}
+
+
+
+\section{Projections and the Kalman Filter}
+
+\begin{frame}[shrink]{Projections}
+
+Recall:
+Given a set of conditioning variables $X_t$, the function that minimizes
+the the MSE is the conditional expectation function (generally
+nonlinear):
+\begin{align*}
+  \E[Y_{t}|X_t]
+  =
+  \argmin_{h(X_t)} \E[(Y_{t}-h(X_t))^2]
+\end{align*}
+Can restrict to linear functions of $X_t$, in which case the linear
+function that minimizes the MSE is called the linear projection of
+$Y_{t}$ onto $X_t$:
+\begin{align*}
+  \hat{P}(Y_{t}|X_t)
+  =
+  X_t'\beta_*
+  \qquad
+  \beta_*
+  =
+  \argmin_{\beta} \E[(Y_{t}-X_t'\beta)^2]
+\end{align*}
+Easy to see that $\beta$ must satisfy the following condition, which
+says that the prediction/forecast error is uncorrelated with the
+conditioning variables $X_t$:
+\begin{align*}
+  0 &= \E[(Y_{t}-X_t'\beta)X_t]
+  \implies\quad
+  \beta
+  =
+  \E[X_tX_t']^{-1}
+  \E[X_tY_{t}]
+\end{align*}
+Most of the time, we include a constant in the information set $X_t$. So
+let
+\begin{align*}
+  \hat{\E}[Y_{t}|X_t] = \hat{P}(Y_{t}|1,X_t)
+\end{align*}
+\end{frame}
+
+
+\begin{frame}[shrink]{Projections}
+
+Everything on the previous slide applies if $X_t$ includes lagged values
+of $Y_t$ so that we're doing a forecasting exercise.
+Hence
+\begin{enumerate}
+  \item
+    The \alert{MSE-optimal} predictor of $Y_t$ given $X_t$ is the
+    \alert{CEF} $\E[Y_t|X_t]$.
+  \item The CEF function is \alert{generally nonlinear}.
+  \item We can \alert{restrict} ourselves to linear forecasting
+    functions.
+  \item The MSE-optimal \alert{linear} predictor is the
+    \alert{projection} of $Y_t$ onto $X_t$.
+\end{enumerate}
+\end{frame}
+
+
+\begin{frame}[shrink]{Projections: Gaussian Link}
+Suppose $Y_{t}$ and $X_t$ are jointly Gaussian.
+\begin{enumerate}
+  \item The optimal forecast of $Y_{t}$ given $X_t$ will be the
+    conditional expectation of $Y_{t}$ given $X_t$, as always.
+  \item Because of the special structure of Gaussian RV's, the
+    conditional expectation of $Y_{t}$ given $X_t$ is a linear
+    function of $X_t$ \alert{already}.
+  \item So if we restricted ourselves to optimally predicting $Y_{t}$
+    using a linear function of $X_t$, we haven't imposed a restriction
+    at all. The linear forecast rule will coincide with the optimal.
+\end{enumerate}
+It is for this reason that the Kalman formulas, derived assuming joint
+normality, coincide with the formulas for ``optimal linear prediction.''
+
+Reference: Hamilton Chapter 4
+\end{frame}
+
+
+\begin{frame}[shrink]{Kalman Filter With and Without Normality}
+
+We derived the Kalman filter assuming
+\begin{align*}
+  \begin{pmatrix}
+    \xi_t \\
+    y_t
+  \end{pmatrix}
+  \;\bigg|
+  y_{1:t-1},x_t
+  \sim
+  \calN\left(
+  \;\cdot\;,\;\cdot\;
+  \right)
+\end{align*}
+In this interpretation, we compute
+\begin{align*}
+  \xi_{t|k}
+  &= \E[\xi_t|y_{1:k}]
+  \\
+  P_{t|k}
+  &= \Var(\xi_t|y_{1:k})
+\end{align*}
+Hamilton instead casts the Kalman filter as ``An algorithm for
+generating linear least squares forecasts of the state vector.''
+In this interpretation, $(\xi_t,y_t)$ need not be Gaussian, and
+\begin{align*}
+  \hat{\xi}_{t|k}
+  &=
+  \hat{\E}[\xi_{t}|Y_{1:k}]
+  \\
+  P_{t|k}
+  &=
+  \E[(\xi_t-\hat{\xi}_{t|k})(\xi_t-\hat{\xi}_{t|k})]
+\end{align*}
+where the latter object is the MSE.
+
+In both cases, the formulas are the same.
+\end{frame}
+
+
+\begin{frame}[shrink]{Revisiting Question 5(b)}
+We didn't assume normality.
+We wanted
+\begin{align*}
+  \text{gdo}_{t|t} - \text{gdo}_t
+\end{align*}
+This the forecast error.
+By construction, it's uncorrelated with the conditioning set since
+$\text{gdo}_{t|t}$ is the projection.
+Hence we can write
+\begin{align*}
+  \text{gdo}_t
+  -
+  \text{gdo}_{t|t}
+  =
+  \eta_t
+  \qquad
+  \E[\eta_t^2]=P_{t|t}
+\end{align*}
+where
+\begin{align*}
+  P_{t|t}
+  =
+  \E[(\text{gdo}_t - \text{gdo}_{t|t})^2|Y_{1:t}]
+\end{align*}
+We could evaluate the gains in precision by comparing $P_{t|t}$ to the
+forecast errors of the other estimators.
+By assuming $t$ large, we can use the value that $P_{t|t}$ converges to.
+\end{frame}
+
+
+\begin{frame}[shrink]{Revisiting Question 5(b)}
+See solutions for further discussion.
+\begin{itemize}
+  \item Comparing the different estimators.
+  \item Convergence
+\end{itemize}
+\end{frame}
+
+
+\section{HAC and HAR Estimation}
+
+\subsection{Overview}
+
+\begin{frame}[shrink]{Overview of HAC and HAR}
+
+Goal: Estimating $\Omega$ in
+$\frac{1}{\sqrt{T}}\sumtT g_t \dto \calN(0,\Omega)$.
+
+HAC: To construct a \alert{consistent} estimator $\hat{\Omega}$ of
+$\Omega$.
+\begin{itemize}
+  \item Naive sample counterpart:
+    $\sum_{j=-k}^k \hat{\lambda}_j$
+
+    \alert{Issue}: Sometimes negative.
+
+  \item \alert{Newey-West}:
+    $\sum_{j=-k}^k w_j \hat{\lambda}_j$
+
+    \alert{Improvement}: Weights ensure nonnegative.
+
+  \item
+    \alert{Parametric}:
+    Assume process for $g_t$. Gives $\lambda_j$ in closed form as
+    a function of parameters, estimate parameters, plug into parametric
+    form for $\hat{\lambda}_j$'s.
+
+  \item
+    \alert{Spectral}:
+    Take Fourier transform of autocovariance function to get spectral
+    density, which has a tight link with the ACGF.
+    Take Fourier transform of the data and use the transformed data to
+    estimate the spectral density, i.e. ``work in the frequency
+    domain.'' Then map back to an estimate for the ACGF and $\Omega$.
+\end{itemize}
+HAR: State of the art now.
+Acknowledge the difficulty of consistently estimating $V$, e.g.
+do inference on the $t$-stat that allows for sampling variability in
+\alert{both} numerator and denominator.
+\end{frame}
+
+
+\subsection{Prewhitening}
+
+\begin{frame}[shrink]{Prewhitening}
+Suppose we have a process
+\begin{align*}
+  x_t &= \mu + u_t \\
+  u_t &= c(L)\varepsilon_t
+  \qquad \varepsilon_t\sim (0,\sigma^2)
+\end{align*}
+Motivation:
+\begin{itemize}
+  \item $u_t$ very persistent, so $c(L)$ doesn't decay quickly.
+    Hence need large truncation parameter (lots of sample
+    autocovariances) for Newey-West to work.
+  \item Don't know the parametric structure of the $u_t$; don't want to
+    assume much.
+\end{itemize}
+\alert{Prewhitening} addresses both concerns and is a nice review of
+what we've done in the class so far.
+Idea:
+\begin{itemize}
+  \item Fit simple parametric model $u_t$ to clean the errors of most of
+    the autocorrelation. This estimated model produces its own
+    potentially (likely) autocorrelated residuals $v_t$.
+  \item Use nonparametric Newey-West on these residuals with a
+    smaller truncation parameter.
+  \item Combine the two steps to get our estimator
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[shrink]{Prewhitening}
+Process:
+\begin{align*}
+  x_t &= \mu + u_t \\
+  u_t &= c(L)\varepsilon_t
+  \qquad \varepsilon_t\sim (0,\sigma^2)
+\end{align*}
+Suppose we can capture much of the persistence in $u_t$ by fitting an AR
+model. That is, assume that
+\begin{align*}
+  u_t
+  &= (1-\rho L)^{-1}d(L)\varepsilon_t
+  = \rho u_{t-1} + \underbrace{d(L)\varepsilon_t}_{v_t}
+\end{align*}
+for some $\rho$ and $d(L)$ that decays much more quickly than $c(L)$.
+Newey West would work better on that process because we wouldn't need
+many terms in the weighted sum of autocovariances.
+\end{frame}
+
+
+\begin{frame}[shrink]{Prewhitening}
+
+To construct the LR variance of $u_t$ (our object of interst), recall
+that the long-run variance of $\{u_t\}$ is the ACGF evaluated at 1:
+\begin{align*}
+  \Omega
+  =
+  \sum_{j=-\infty}^\infty \lambda_j
+  =
+  \lambda(1)
+\end{align*}
+Recall also that ACGFs of filtered processes are simple:
+\begin{align*}
+  \lambda_v(z)
+  &= d(z)d(z^{-1})\lambda_\varepsilon(z)
+  = d(z)d(z^{-1})\sigma^2
+  \\
+  \lambda_u(z)
+  &=
+  (1-\rho z)^{-1}(1-\rho z^{-1})^{-1}
+  \lambda_v(z)
+  %\\
+  %&=
+  %(1-\rho z)^{-1}(1-\rho z^{-1})^{-1}
+  %d(z)d(z^{-1})\sigma^2
+\end{align*}
+This suggests estimating $\Omega=\lambda_u(1)$ as follows.
+\begin{itemize}
+  \item Estimate $\mu$ and get residuals $\hat{u}_t$
+  \item Estimate an AR(1) with residuals to get $\hat{\rho}$ and
+    $\hat{v}_t$.
+  \item Estimate $\Omega_v=\lambda_v(1)$ nonparametrically with
+    Newey-West.
+  \item Compute
+    $\hat{\Omega}_u = (1-\hat{\rho})^{-2}\hat{\Omega}_v$
+\end{itemize}
+\end{frame}
+%Outline broadly
+%- Go through Time series Stuff watson didn't get to
+
+
+\subsection{HAR}
+
+\begin{frame}[shrink]{HAR}
+Have weights for $\{w_{it}\}$ for $i=1,\ldots,q$.
+Given series of interest $\{x_t\}$ with LR variance matrix, construct
+weighted averages
+\begin{align*}
+  \bar{y}_{i,1:T}
+  =
+  \frac{1}{T}
+  \sumtT
+  w_{it} x_t
+\end{align*}
+Possible to show
+\begin{align*}
+  \sqrt{T}
+  \begin{pmatrix}
+    (\bar{x}_{1:T}-\mu)
+    \\
+    \bar{y}_{1,1:T} \\
+    \vdots \\
+    \bar{y}_{q,1:T} \\
+  \end{pmatrix}
+  \quad
+  \dto\quad
+  \begin{pmatrix}
+    X \\ Y_1 \\ \vdots \\ Y_q
+  \end{pmatrix}
+  \sim \calN(0,\Omega I_{q+1})
+\end{align*}
+Construct
+\begin{align*}
+  \frac{%
+    (\bar{x}_{1:T}-\mu)
+  }{%
+    \sqrt{%
+      \frac{1}{q}
+      \sum_{i=1}^q
+      (\bar{y}_{i,1:T})^2
+    }
+  }
+  =
+  \frac{%
+    \sqrt{T}(\bar{x}_{1:T}-\mu)
+  }{%
+    \sqrt{%
+      \frac{1}{q}
+      \sum_{i=1}^q
+      (\sqrt{T}\bar{y}_{i,1:T})^2
+    }
+  }
+  \quad\dto\quad
+  \frac{%
+    X
+  }{%
+    \sqrt{%
+      \frac{1}{q}
+      \sum_{i=1}^q
+      Y_i^2
+    }
+  }
+  \sim
+  t_q
+\end{align*}
+
+\end{frame}
+
+
+\begin{frame}[shrink]{Example Weights}
+Example weights that deliver the joint convergence on the previous
+slide:
+\begin{align*}
+  w_{1t}
+  &=
+  \begin{cases}
+    1 & t \leq T/2 \\
+    -1 & t > T/2 \\
+  \end{cases}
+  \qquad
+  w_{2t}
+  =
+  \begin{cases}
+    1 & t \leq T/4 \\
+    -1 & t\in (T/4/,T/2] \\
+    1 & t\in (T/2, 3T/4] \\
+    -1 & t > 3T/4
+  \end{cases}
+  \quad \cdots
+\end{align*}
+To prove that they work, consider the first weighted average:
+\begin{align*}
+  \bar{y}_{1,1:T}
+  &=
+  \frac{1}{T}
+  \sum_{t=1}^{T/2}
+  x_t
+  -
+  \frac{1}{T}
+  \sum_{t=\frac{T}{2}+1}^{T}
+  x_t
+  =
+  \frac{1}{T}
+  \sum_{t=1}^{T/2}
+  (x_t-\mu)
+  -
+  \frac{1}{T}
+  \sum_{t=\frac{T}{2}+1}^{T}
+  (x_t-\mu)
+\end{align*}
+Inflate by $\sqrt{T}$:
+\begin{align*}
+  \sqrt{T}\bar{y}_{i,1:T}
+  &=
+  \frac{1}{\sqrt{2}}
+  \frac{1}{\sqrt{T/2}}
+  \sum_{t=1}^{T/2}
+  (x_t-\mu)
+  -
+  \frac{1}{\sqrt{2}}
+  \frac{1}{\sqrt{T/2}}
+  \sum_{t=\frac{T}{2}+1}^{T}
+  (x_t-\mu)
+  \\
+  &\dto
+  \frac{1}{\sqrt{2}}
+  \sqrt{\Omega}Z_1
+  -
+  \frac{1}{\sqrt{2}}
+  \sqrt{\Omega}Z_2
+  \qquad
+  Z_i \iid\calN(0,1)
+  \\
+  &
+  \sim
+  \frac{1}{\sqrt{2}}
+  \sqrt{\Omega}
+  (
+  \sqrt{2}
+  Z
+  )
+  \sim \calN(0,\Omega)
+\end{align*}
+The same sort of calculations work for the other sets of weights
+$\{w_{it}\}$.
+\end{frame}
+
+
+\begin{frame}[shrink]{Example Weights}
+
+Note
+\begin{itemize}
+  \item The previous weights are periodic.
+  \item If we interpolate, they would look like sines or cosines
+  \item Hence we might expect sine and cosine weights to work.
+  \item The sine and cosine weights also have a deeper connection to
+    spectral analysis.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[shrink]{Spectral Analysis Motivation}
+Main ideas:
+\begin{itemize}
+  \item \alert{Fourier Analysis}:
+    Can represent a periodic function as the sum of sines and cosines of
+    different frequences. Just need to choose the weights right.
+  \item Stationary time series are periodic, but with noise.
+  \item Can represent a stationary time series as a sum of sines and
+    cosines of different frequencies, with weights chosen correctly.
+    Because series is stochastic, weights have to be
+    probabilistic.
+  \item Note that time series often have variability at different
+    frequencies.
+    Stock price example:
+    \begin{itemize}
+      \item Daily volatility
+      \item Yearly variability from Christmas
+      \item Business cycle variability
+      \item Long term trends like changes in savings behavior
+    \end{itemize}
+    All of these contribute to fluctuations in the realized series. We
+    might like to ``decompose'' a series into contributions from
+    different frequencies so that we might ``turn off'' business cycle
+    variability or daily variability, or understand how much these
+    contribute to the variability that we observe for the series.
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[shrink]{Cosine Weights}
+We compute the following, for $i=1,\ldots,q$:
+\begin{align*}
+  \bar{y}_{i:1:T} = \frac{1}{T}\sumtT \underbrace{w_{it}x_t}_{y_{it}}
+  \qquad
+  w_{it}
+  =
+  \sqrt{2}
+  \cos\left(
+  \pi i
+  \left(
+  \frac{t-1/2}{T}
+  \right)
+  \right)
+\end{align*}
+Two views of these objects
+\begin{itemize}
+  \item Average:
+    This is still just an average of terms, $y_{it}$. So a CLT will
+    hold under certain conditions, just like for the weights above.
+  \item Inner Product:
+    Inner product of the $T\times 1$ vector of weights $w_{it}$ and the
+    original series $x_{1:T}$.
+    Thus we're \alert{projecting} $x_{1:T}$ onto different frequencies.
+    The $i$th set of weights will produce a new series $\{y_{it}\}$ that
+    captures fluctations at $i$th frequency.
+\end{itemize}
+\end{frame}
+
+
+\end{document}
+
+
+
+
+\section{GLS}
+
+
+\begin{frame}[shrink]{GLS}
+Just look at the $\beta$ expansion.
+
+Example
+\begin{align*}
+  y_t &= \mu + u_t \\
+  u_t &= \rho u_{t-1} + \varepsilon_t
+  \qquad
+  \varepsilon_t \iid(0,\sigma^2)
+  \quad |\rho|<1
+\end{align*}
+Naive $\bar{y}$ vs. $\hat{\mu}_{GLS}$ estimator.
+\end{frame}
+
+
+\begin{frame}[shrink]
+Example, stock returns.
+Suppose we look at average stock returns over the next $h$ periods.
+\begin{align*}
+  \frac{1}{h}\sum_{\ell=1}^h r_{t+\ell}
+  =
+  x_t \beta + u_t
+\end{align*}
+Under the null $\beta=0$,
+\begin{align*}
+  \frac{1}{h}\sum_{\ell=1}^h r_{t+\ell}
+  =
+  u_t
+\end{align*}
+\end{frame}
+
+
+
+Come up with little GLS example to show minimum variance unbiased not
+the same as asymptotic variance.
+
+
+GLS vs. OLS
+- betahat = beta + , and do analysis on this to determine unbiasedness &
+consistency
+- optimality vs. correct
+
+Question 4
+- Why instrument?
+
+
+
+
+
+Asymptotics
+- Device
+- Propose stats, derive dist
+- Optimality?
+- HAC and hetero to robustify
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Bayes estimation and Bayes Estimation
+
+
+- Checking lag polynomial for stationarity works because
+  - In companion form, the eigenvalues matter
+  - The eigenvalues are reciprocals of what's in the lag polynomial
+- Side tip
+  - Eigenvalue decomposition
+    - Can always do it with a covariance matrix
+    - PCA
+  - Singular value decomposition
+    - Always exist
+  - Useful for terms where need easy inverses, iterations, multiplying the same thing against transposes of itself like projection matrix
+
+
+
+
+
+
+
+
+
+% Sample code
+\pause to add breaks
+\textcolor{red}{text to show}.
+\vspace{20pt}
+
+\usebeamercolor{dull text}
+\alert<+>{Words that you want to alert}
+

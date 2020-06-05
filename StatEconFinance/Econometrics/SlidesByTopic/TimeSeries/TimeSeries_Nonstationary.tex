@@ -1,0 +1,1612 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usepackage{cmbright}
+%\usetheme{metropolis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis with Sidebar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[aspectratio=169, handout]{beamer}
+%\documentclass[aspectratio=169]{beamer}
+%\documentclass{beamer}
+\usepackage{cmbright}
+\usepackage{comment}
+
+\useoutertheme[right, width=0.20\paperwidth]{sidebar}
+\usecolortheme{metropolis}
+\useinnertheme[sectionpage=none]{metropolis}
+\usefonttheme{metropolis}
+
+\makeatletter
+\beamer@headheight=1.75\baselineskip     %controls the height of the headline, default is 2.5
+\makeatother
+
+\usepackage{etoolbox}
+\patchcmd\insertverticalnavigation{\dohead}{\vskip-35pt\dohead}{}{}
+
+%\setbeamertemplate{sidebar canvas right}{}
+%\setbeamertemplate{sidebar right}{BOB}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Simple Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usetheme{Boadilla}
+%\usepackage{lmodern}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sidebar Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass[serif]{beamer}  % For serif latex font
+%\usepackage{pxfonts}
+%\usepackage{eulervm}
+%\usepackage{mathpazo}
+
+%\usetheme{Goettingen}
+%\usecolortheme{lily}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Common Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[]{Time Series, Non-Stationarity \\ Matt Cocci}
+\author[]{}
+\date{\today}
+
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+%\setbeamertemplate{section in toc}[square unnumbered]
+%\setbeamertemplate{subsection in toc}[square unnumbered]
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% For easier looping
+\usepackage{pgffor}
+
+\usepackage{pdfpages}
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\proj}{\operatorname{proj}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Rnk}{\mathbb{R}^{n\times k}}
+\newcommand{\Rkk}{\mathbb{R}^{k\times k}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Presentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Outline}
+%\tableofcontents[hideallsubsections]
+\tableofcontents
+\end{frame}
+
+
+\section{Non-Stationary Processes}
+
+\subsection{Motivation}
+
+{\footnotesize
+\begin{frame}{Time Series Analysis: Roadmap}
+\tableofcontents[currentsection, hideothersubsections]
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Motivation: Types of Non-Stationarity}
+
+There are two main sources of non-stationarity:
+\begin{itemize}
+  \item
+    \alert{Breaks} in the \alert{DGP}, e.g. parameter values, the
+    model, etc.
+
+    \pause
+    \alert{Example}: In the 1980s, monetary policy and the volatility of
+    output and inflation in the US seemed to change, likely due to
+    changes in monetary policy and the nature of economic shocks.
+    So models, estimates, behavior of economic variables pre-1980s
+    generally not a reliable guide for today.
+\pause
+
+  \item
+    \alert{Trends}:
+    The DGP stays the same, but that DGP implies trending variables.
+
+    This is rather garden-variety non-stationarity.
+    Really just an estimation and inference problem on the DGP, not a
+    modeling or DGP-instability problem.
+\end{itemize}
+\pause
+Here, we will deal with \alert{trends}.
+There is also a literature (large, interesting, and useful) on the
+former types of non-stationarity.
+But not really relevant for us.
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Motivation: Types of Trends}
+If we observe a \alert{trending series} $\{y_t\}$ like GDP,
+two possible sources for that trend:
+\begin{itemize}
+  \item \alert{Deterministic Linear Time Trend}
+    \begin{itemize}
+      {\scriptsize
+      \item $\{y_t\}$ is a deterministic linear time trend, plus a
+        stationarity process.
+        Such processes are called \alert{trend stationary}.
+      \pause
+      \item Shocks have \alert{temporary effect}.
+        Process bounces around the trend line, but always tending back
+        towards it.
+      \item Long-run forecasts exhibit convergence back to the
+        trend line.
+      }
+    \end{itemize}
+  \pause
+  \item \alert{Stochastic ``Trend''}
+    \begin{itemize}
+      {\scriptsize
+      \item Not really a trend in the way we usually think of them
+        (hence the quotes)
+
+      \item Instead, it's really just a unit root in the process, i.e.
+        only the difference $\Delta y_t$ is stationary
+      \item Shocks have \alert{permanent effect}.
+        No sense in which it will die out and we will return to some
+        linear trend line.
+      \pause
+      \item Process is a \alert{martingale}, so long-run forecasts
+        are the \alert{current value}
+      }
+    \end{itemize}
+\end{itemize}
+\pause
+We develop theory that incorporates \alert{both} sources of trends in
+the process, since both can be at play.
+Disentangling the two is important, as we now discuss.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Motivation: Importance}
+Many words written about figuring out whether the trend in
+a process represents purely a \alert{deterministic} trend, or also a
+\alert{stochastic trend}.
+Why does this matter?
+\begin{itemize}
+  \item \alert{Forecasting}:
+    Does GDP grow at 3\% per year with transitory deviations around
+    steady state growth rate (a determistic trend story),
+    or was the Great Recession a
+    \alert{permanent} negative shock to the level of GDP (a
+    stochastic trend story)?
+
+    Matters \alert{a lot} for forecasting and modeling.
+
+  \pause
+  \item \alert{Inference}:
+    Suppose I run the regression
+    \begin{align*}
+      y_t = x_t \beta + u_t
+    \end{align*}
+    If $x_t$ \alert{trend stationary} (i.e. deterministic trend only, no
+    stochastic trend), then OLS estimator \alert{asymptotically normal}.
+
+    \pause
+    If $x_t$ has a \alert{stochastic trend} as well, generally
+    \alert{nonstandard} limiting distribution.
+    This is well-known \alert{spurious regression} problem.
+\end{itemize}
+\end{frame}
+}
+
+%{\footnotesize
+%\begin{frame}{Cointegration}
+%Recall: No cointegrated $I(1)$ system $\{y_t\}$ can be represented as a
+%finite-order VAR for $\Delta y_t$.
+
+%Suppose that we can write the cointegrated system in levels as
+%\begin{align*}
+  %y_t &= c + \delta \cdot t + \Phi(L)^{-1}\varepsilon_t
+  %\\
+  %y_t &= \Phi(L)c + \Phi(L)\delta \cdot t
+  %+ \Phi_1y_{t-1} + \cdots \Phi_p y_{t-p}
+  %+ \varepsilon_t
+%\end{align*}
+%Equivalently
+%\begin{align*}
+%\end{align*}
+%\end{frame}
+%}
+
+
+{\footnotesize
+\begin{frame}{Plan of Attack}
+To incorporate trends (of both types), we need to develop an econometric
+model and methods for representing and working with trending processes.
+
+Our approach will be as follows:
+\begin{itemize}
+  \item Define a $I(0)$ process, which is essentially just a stationary
+    and ergodic linear process with one extra condition to ensure
+    non-degeneracy.
+  \pause
+  \item Define an $I(1)$ process, whose difference is an $I(0)$, and
+    which will serve as our model for trending processes.
+  \pause
+  \item Show that any $I(1)$ process can be decomposed into sum of
+    \begin{itemize}
+      {\footnotesize
+      \item Deterministc linear trend
+      \item Stochastic trend
+      \item Stationary process
+      }
+    \end{itemize}
+    This is the \alert{Beveridge-Nelson Decomposition}
+  \pause
+  \item Discuss \alert{cointegration}, a concept relevant for vector
+    $I(1)$ processes
+\end{itemize}
+\end{frame}
+}
+
+\subsection{I(0) and I(1) Processes}
+
+{\footnotesize
+\begin{frame}{I(0) System}
+  \alert{(Linear) Vector $I(0)$ Process or System}
+\begin{enumerate}
+  \item Starts with an $n$-dim VMA process (hence a linear process)
+    \begin{align*}
+      \delta + \Psi(L)\varepsilon_t
+      = \delta + \sum_{s=0}^\infty \Psi_s\varepsilon_{t-s}
+      \qquad
+      \varepsilon_t
+      \iid (0,\Omega)
+    \end{align*}
+    with $\Omega$ a positive definite matrix and $\Psi_0=I_n$, which is
+    just a normalization since $\Omega$ and the scale of the
+    coefficients $\Psi_s$ not separately identified.
+
+  \pause
+  \item \alert{One summability}, which is a bit stronger than absolute
+    summability
+    \begin{align*}
+      \sum_{s=0}^\infty
+      s\;|\psi_{s,j\ell}|
+      < \infty
+      \qquad
+      \forall j,\ell=1,\ldots,n
+    \end{align*}
+    Implies \alert{stationary} and \alert{ergodic} by the filtering
+    theorem and IID white noise.
+
+  \pause
+  \item $\psi(1)\neq 0$, i.e. not all zero.
+    Think of this as a non-degeneracy condition.
+\end{enumerate}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{I(1) System}
+Vector process $\{y_t\}$ is called a \alert{Vector $I(1)$ System}
+if $\Delta y_t$ is a Vector I(0) process, in which case we may write
+\begin{align*}
+  \Delta y_t = \delta + \Psi(L)\varepsilon_t
+  %= \delta + u_t
+  %\qquad\text{where}\quad
+  %u_t = \Psi(L)\varepsilon_t
+  %y_t = y_{t-1} + \delta + \Psi(L)\varepsilon_t
+\end{align*}
+where $\Delta y_t$ satisfies the conditions on the previous slide.
+
+\pause
+Then we may write, in levels,
+\begin{align*}
+  y_t
+  %= y_0 + \delta \cdot t + u_1 + \cdots u_t
+  %= y_0 + \delta \cdot t + \sum_{s=1}^t u_s
+  = y_0 + \delta \cdot t + \sum_{s=1}^t \Psi(L)\varepsilon_s
+\end{align*}
+\pause
+Notice that each of $\{\varepsilon_1,\ldots,\varepsilon_t\}$ will show
+up multiple times in the final sum.
+If we try to exploit this by \alert{collecting coefficients} and
+rewriting, we stumble upon the Beveridge-Nelson decomposition.
+\end{frame}
+}
+
+
+\subsection{Beveridge-Nelson}
+
+{\footnotesize
+\begin{frame}{Beveridge-Nelson Decomposition of $I(1)$ Processes}
+First, it's possible to rewrite the filter $\Psi(L)$ as
+\begin{align*}
+  \Psi(L)
+  &=
+  \Psi_0 + \Psi_1L + \Psi_2L^2
+  + \cdots
+  =
+  \sum_{s=0}^\infty
+  \Psi_s L^s
+  \\
+  &=
+  \Psi(1)
+  +
+  (1-L)\alpha(L)
+  \qquad\text{where}\quad
+  \alpha(L)
+  =
+  \sum_{j=0}^\infty
+  \underbrace{-(\Psi_{j+1}+\Psi_{j+2}+\cdots)}_{\alpha_j}
+  L^j
+\end{align*}
+We'd get to this by carrying out the ``collect terms''
+approach on the previous slide.
+
+\pause
+As a result of this rewriting of $\Psi(L)$, we can rewrite $\{y_t\}$ as
+\begin{align*}
+  y_t
+  &= y_0 + \delta \cdot t + \sum_{s=1}^t \Psi(L)\varepsilon_s
+  \\
+  &= y_0 + \delta \cdot t
+  + \sum_{s=1}^t
+  \big[
+    \Psi(1)
+    + (1-L)\alpha(L)
+  \big]
+  \varepsilon_s
+  \\
+  \text{Telescoping}
+  \quad
+  &=
+  y_0
+  + \delta \cdot t
+  +
+  \Psi(1)
+  \sum_{s=1}^t
+  \varepsilon_t
+  +
+  \underbrace{%
+    \alpha(L)
+    \varepsilon_t
+  }_{\eta_t}
+  -
+  \underbrace{%
+    \alpha(L)
+    \varepsilon_{0}
+  }_{\eta_0}
+\end{align*}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Beveridge-Nelson Decomposition of $I(1)$ Processes}
+Hence if $\{y_t\}$ is $I(1)$, then
+\begin{align*}
+  y_t
+  &= y_0 + \delta \cdot t + \sum_{s=1}^t \Psi(L)\varepsilon_s
+  \\
+  &=
+  \delta \cdot t
+  +
+  \Psi(1)
+  \sum_{s=1}^t
+  \varepsilon_s
+  +
+  \eta_t
+  +
+  (y_0-\eta_0)
+  \qquad \text{where}\quad
+  \eta_t
+  =
+  \alpha(L)
+  \varepsilon_t
+\end{align*}
+\pause
+Notice,
+\begin{itemize}
+  \item $\delta\cdot t$ is a \alert{deterministic linear trend}
+  \pause
+  \item $\Psi(1)\sum_{s=1}^t \varepsilon_t$ is a \alert{random walk}
+    scaled by $\Psi(1)$, i.e. a pure unit-root process, also called a
+    \alert{stochastic trend}
+  \pause
+  \item $\eta_t$ is filtered iid white-noise, and so
+    stationarity and ergodic
+  \pause
+  \item $y_0-\eta_0$ is an initial condition that will disappear if we
+    start taking averages and set the number of observations to
+    $\infty$, and so it's asymptotically negligible.
+\end{itemize}
+\end{frame}
+}
+
+{\scriptsize
+\begin{frame}{Beveridge-Nelson Decomposition and Trends}
+So given an $I(1)$ process
+\begin{align*}
+  y_t
+  &=
+  \delta \cdot t
+  +
+  \Psi(1)
+  \sum_{s=1}^t
+  \varepsilon_t
+  +
+  \eta_t
+  +
+  (y_0-\eta_0)
+  \qquad\text{where}\quad
+  \eta_t
+  =
+  \alpha(L)
+  \varepsilon_t
+\end{align*}
+We see the non-stationarity arises from two sources:
+\begin{itemize}
+  \pause
+  \item $\delta\cdot t$, \alert{Deterministic Trend}:
+    Marches up at a constant rate with $t$.
+    Stationary/ergodic analysis \& inference after
+    removing a consistently estimable constant trend.
+
+  \pause
+  \item $\Psi(1)\sum_{s=1}^t\varepsilon_s$, \alert{Stochastic Trend}
+    (random walk, unit root, whatever you prefer).
+    A shock $\varepsilon_t$ is \alert{permanent} and forever alters the
+    level of $y_t$ thereafter; does not die out.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Beveridge-Nelson Decomposition and Obvious Questions}
+So given an $I(1)$ process
+\begin{align*}
+  y_t
+  &=
+  \delta \cdot t
+  +
+  \Psi(1)
+  \sum_{s=1}^t
+  \varepsilon_t
+  +
+  \eta_t
+  +
+  (y_0-\eta_0)
+  \qquad\text{where}\quad
+  \eta_t
+  =
+  \alpha(L)
+  \varepsilon_t
+\end{align*}
+Questions we can motivate from this representation
+\begin{itemize}
+  \item Dickey Fuller: Test the Null of $\Psi(L)\neq 0$ (i.e. $\exists$
+    stochastic trend) vs. no stochastic trend $\Psi(L)=0$.
+
+  \pause
+  \item Differencing:
+    What happens if we difference and work with $\Delta y_t$?
+
+  \pause
+  \item
+    Cointegration:
+    Can we find \alert{cointegrating vectors} that kill the stochastic
+    trend, i.e. $a$ such that
+    \begin{align*}
+      a'y_t
+      &=
+      a'\delta \cdot t
+      +
+      \underbrace{%
+        a'\Psi(1)
+        \sum_{s=1}^t
+        \varepsilon_t
+      }_{=0}
+      +
+      a'\eta_t
+      +
+      a'(y_0-\eta_0)
+    \end{align*}
+    Often $a$ kills the deterministic trend too.
+    Might lead to easier inference.
+\end{itemize}
+\end{frame}
+}
+
+
+
+\subsection{Cointegration}
+
+
+\subsubsection{Definition}
+
+{\footnotesize
+\begin{frame}{Cointegration: Definition}
+
+An $n$-dimensional $I(1)$ process/system
+\begin{align*}
+  y_t
+  &=
+  \delta \cdot t
+  +
+  \Psi(1)
+  \sum_{s=1}^t
+  \varepsilon_t
+  +
+  \eta_t
+  +
+  (y_0-\eta_0)
+  \qquad\text{where}\quad
+  \eta_t
+  =
+  \alpha(L)\varepsilon_t
+\end{align*}
+is \alert{cointegrated} with $n$-dimensional cointegrating vector
+$a\neq 0$ if $a'y_t$ is trend stationary (i.e.\ deterministic trend plus
+stationary process, no stochastic trend) and there exists a choice of
+$y_0$ such that $y_0-\eta_0=0$.
+\pause
+
+The \alert{cointegration rank} is the number of linearly independent
+cointegrating vectors. Knowing that cointegrating vectors, by
+definition, make $a'\Psi(1)=0$, we have
+\begin{align*}
+  (\text{Cointegration Rank})
+  =
+  n - \rank(\Psi(1))
+\end{align*}
+The \alert{cointegrating space} is the space spanned by the
+cointegrating vectors.
+\pause
+
+Note: We will assume by default that any cointegrating vector also kills
+the deterministic trend too, i.e. $\delta$ is in the column space of
+$\Psi(1)$.
+Use \alert{stochastic cointegration} if a cointegrating vector
+eliminates the stochastic trend but not necessarily the determistic
+trend.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Cointegration: Discussion}
+\begin{itemize}
+  \item \alert{Why}:
+    Empirically, this seems to be a relevant feature of the data, and we
+    need to work out the correct ways to do estimation, inference, and
+    forecasting in this setting.
+    Given how \alert{non-standard} things tend to become under
+    non-stationarity, we'll need specific tools.
+
+  \item Although cointegration is just a \alert{rank condition} on
+    $\Psi(1)$, we don't know the parameters of the process $\{y_t\}$.
+
+  \item We might be tempted just to \alert{difference}, estimate a model
+    for $\Delta y_t$, and try to translate those estimates into
+    estimates for the system $\{y_t\}$ in levels.
+    As we'll see, this doesn't work.
+
+  \item As written above, cointegration is a condition on $\Psi(1)$,
+    which is the VMA filter evaluated at one.
+    But we often estimate VARs.
+    So how to restate the definition of cointegration as a condition for
+    VARs?
+
+  %\pause
+  %\item
+    %If we can take linear combinations of variables and get
+    %stationary objects, maybe that's enough for our inferential or
+    %forecasting purposes.
+\end{itemize}
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Cointegration: Why Not Just Use $\Delta y_t$?}
+Suppose we have an $I(1)$ process/system:
+\begin{align*}
+  y_t
+  &=
+  \delta \cdot t
+  +
+  \Psi(1)
+  \sum_{s=1}^t
+  \varepsilon_t
+  +
+  \eta_t
+  +
+  (y_0-\eta_0)
+  \qquad\text{where}\quad
+  \eta_t
+  =
+  \alpha(L)\varepsilon_t
+  \\
+  \iff\qquad
+  \Delta y_t
+  &= \delta + \Psi(L)\varepsilon_t
+  \qquad\text{where}\quad
+  \varepsilon_t
+  \iid (0,\Omega)
+\end{align*}
+where the last line was our starting point before
+Beveridge-Nelson.
+
+\pause
+\alert{Result}:
+The long run covariance matrix of $\Delta y_t$ is
+\begin{align*}
+  \Psi(1)\Omega\Psi(1)
+  \qquad \text{where}\quad
+  \text{$\Omega$ full by assumption}
+\end{align*}
+Recalling that $y_t$ cointegrated iff $\Psi(1)$ not full rank, we have
+can equivalently say $y_t$ \alert{cointegrated} iff
+\alert{LR variance rank deficient}, i.e. $\det(\Psi(1))=0$,
+
+\pause
+\alert{Result}:
+No cointegrated system $y_t$ can be represented by a finite-order order
+VAR for $\Delta y_t$.
+Suppose by contradiction we could (supposing $\delta=0$ throughout), i.e.
+\begin{align*}
+  \Phi(L) \Delta y_t = \varepsilon_t
+  \quad\implies\quad
+  \Psi(L) = \Phi(L)^{-1}
+  \quad\implies\quad
+  \det(\Psi(1)) = \det(\Phi(1)^{-1}) = \det(\Phi(1))^{-1} \neq 0
+\end{align*}
+But this violates the assumption that $y_t$ cointegrated by previous
+result.
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Cointegration: How to Deal with It}
+We just saw that if $y_t$ cointegrated, there is no finite order VAR
+representation for $\Delta y_t$.
+In other words, we cannot estimate a finite order VAR for $\Delta y_t$,
+and then use that to characterize the dynamics and properties of
+$\{y_t\}$, which we need to do for forecasting and inference.
+
+\pause
+So to estimate the dynamics of an arbitrary $I(1)$ system that exhibits
+\alert{cointegration}, we need \alert{estimable} representations of the
+cointegrated system.
+
+\pause
+Will derive the following alternative but equivalent representations,
+most of them easily derived from the Beveridge-Nelson decomposition of
+that $I(1)$ system (which, recall, always exists):
+\begin{itemize}
+  \item Common Trend Representation
+  \item Triangular Representation
+  \item VAR representation of $y_t$, in levels
+  \item VECM representation
+\end{itemize}
+\end{frame}
+}
+
+\subsubsection{Common Trend Representation}
+
+{\footnotesize
+\begin{frame}{Common Trend Representation}
+Starting from $n$-dimensional $I(1)$ process/system
+\begin{align*}
+  y_t
+  &=
+  \delta \cdot t
+  +
+  \Psi(1)
+  \underbrace{
+  \sum_{s=1}^t
+  \varepsilon_t
+  }_{:=w_t}
+  +
+  \eta_t
+  +
+  (y_0-\eta_0)
+  \qquad\text{where}\quad
+  \eta_t
+  =
+  \alpha(L)\varepsilon_t
+\end{align*}
+\pause
+Suppose cointegration rank is $h=n-\rank(\Psi(1))$.
+From linear algebra, there exists a non-singular $n\times n$
+matrix $G$ and a $n\times (n-h)$ matrix $F$ of full column rank such
+that
+\begin{align*}
+  \underset{(n\times n)}{\Psi(1)}
+  \underset{(n\times n)}{G\vphantom{\Psi(1)}}
+  =
+  \begin{pmatrix}
+    \underset{n\times (n-h)}{F\vphantom{\Psi(1)}}
+    &
+    \underset{n\times h}{0\vphantom{\Psi(1)}}
+  \end{pmatrix}
+\end{align*}
+\pause
+Use this to rewrite the $I(1)$ process
+\begin{align*}
+  y_t
+  &=
+  \delta \cdot t
+  +
+  \Psi(1)GG^{-1}
+  w_t
+  +
+  \eta_t
+  +
+  (y_0-\eta_0)
+  \\
+  &=
+  \delta \cdot t
+  +
+  \begin{pmatrix}
+    F & 0
+  \end{pmatrix}
+  G^{-1}
+  w_t
+  +
+  \eta_t
+  +
+  (y_0-\eta_0)
+  \\
+  &=
+  \delta \cdot t
+  +
+  F\tilde{w}_t
+  +
+  \eta_t
+  +
+  (y_0-\eta_0)
+  \qquad \text{where}\quad
+  \underset{(n-h)\times 1}{\tilde{w}_t} :=
+  \begin{pmatrix}
+    I_{n-h} & 0_{(n-h)\times h}
+  \end{pmatrix}
+  G^{-1}w_t
+\end{align*}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Common Trend Representation}
+Starting from $n$-dimensional $I(1)$ process/system
+\begin{align*}
+  y_t
+  &=
+  \delta \cdot t
+  +
+  \Psi(1)
+  \underbrace{
+  \sum_{s=1}^t
+  \varepsilon_t
+  }_{:=w_t}
+  +
+  \eta_t
+  +
+  (y_0-\eta_0)
+  \qquad\text{where}\quad
+  \eta_t
+  =
+  \alpha(L)\varepsilon_t
+\end{align*}
+\pause
+Use this to rewrite the $I(1)$ process
+\begin{align*}
+  y_t
+  &=
+  \delta \cdot t
+  +
+  F\tilde{w}_t
+  +
+  \eta_t
+  +
+  (y_0-\eta_0)
+  \qquad \text{where}\quad
+  \underset{(n-h)\times 1}{\tilde{w}_t} :=
+  \begin{pmatrix}
+    I_{n-h} & 0_{(n-h)\times h}
+  \end{pmatrix}
+  G^{-1}w_t
+\end{align*}
+\pause
+Thus when the cointegrating rank is $h$ (i.e. $h$ linearly independent
+cointegrating vectors),
+the system $y_t$ is \alert{driven by $n-h$ common stochastic trends},
+which can be obtained by linearly transforming the original stochastic
+trend component:
+\begin{align*}
+  w_t
+  =
+  \sum_{s=1}^t \varepsilon_t
+  \quad\implies\quad
+  \tilde{w}_t
+  &=
+  \begin{pmatrix}
+    I_{n-h} & 0_{(n-h)\times h}
+  \end{pmatrix}
+  G^{-1}w_t
+  =
+  \begin{pmatrix}
+    I_{n-h} & 0_{(n-h)\times h}
+  \end{pmatrix}
+  \sum_{s=1}^t
+  G^{-1}
+  \varepsilon_t
+\end{align*}
+Gives nice intuition.
+\end{frame}
+}
+
+\subsubsection{Triangular Representation}
+
+{\footnotesize
+\begin{frame}{Triangular Representation}
+Starting from $n$-dimensional $I(1)$ process/system
+\begin{align*}
+  y_t
+  &=
+  \delta \cdot t
+  +
+  \Psi(1)
+  \sum_{s=1}^t
+  \varepsilon_t
+  +
+  \eta_t
+  +
+  (y_0-\eta_0)
+  \qquad\text{where}\quad
+  \eta_t
+  =
+  \alpha(L)\varepsilon_t
+\end{align*}
+If cointegration rank is $h$, i.e. $\rank(\Psi(1))=n-h$,
+can find $h$ linearly independent cointegrating
+vectors $a_1,\ldots,a_h$ s.t.\
+(possibly after reording the elements of $y_t$)
+\begin{align*}
+  A' =
+  \begin{pmatrix}
+    a_1& \ldots & a_h
+  \end{pmatrix}'
+  =
+  \begin{pmatrix}
+    \underset{h\times h}{I_h} &
+    \underset{(n-h)\times h}{-\Gamma}
+  \end{pmatrix}'
+\end{align*}
+
+Partition $y_t$ comformably to match the block-structure of $A$, then
+multiply both sides of the Beveridge-Nelson respresentation by $A'$,
+rearrange, supposing as usual that the cointegrating vectors also kill
+the determinstic trend:
+\begin{align*}
+  y_{t1}
+  - \Gamma y_{t2}
+  &=
+  \underbrace{%
+    A'\delta \cdot t
+  }_{=0}
+  +
+  \underbrace{%
+    A'\Psi(1)
+  }_{=0}
+  \sum_{s=1}^t
+  \varepsilon_t
+  +
+  \underbrace{%
+    A'\eta_t
+  }_{z_t^*}
+  +
+  \underbrace{%
+    A'(y_0-\eta_0)
+  }_{\mu}
+  \\
+  \iff\qquad
+  y_{t1}
+  &=
+  \Gamma' y_{t2}
+  +
+  \mu
+  +
+  z_t^*
+\end{align*}
+Since $\eta_t$ jointly stationary, $z_t^*=\eta_t$ is also.
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Triangular Representation}
+So, for an $I(1)$ process satisfying, as usual,
+\begin{align*}
+  \Delta y_t = \delta + \Psi(L)\varepsilon_t
+\end{align*}
+and with corresponding Beveridge-Nelson decomposition
+\begin{align*}
+  y_t
+  &=
+  \delta \cdot t
+  +
+  \Psi(1)
+  \sum_{s=1}^t
+  \varepsilon_t
+  +
+  \eta_t
+  +
+  (y_0-\eta_0)
+  \qquad\text{where}\quad
+  \eta_t
+  =
+  \alpha(L)\varepsilon_t
+\end{align*}
+\pause
+in which $\rank(\Psi(1))=n-h$ so that the system has cointegration rank
+of $h$, we can write the system in its
+\alert{triangular representation}, which is the $n$-equation system
+consisting of the $h$-equation \alert{cointegrating regression} which
+captures the long run relationship between $y_{t1}$ and $y_{t2}$
+\begin{align}
+  y_{t1}
+  &=
+  \Gamma' y_{t2}
+  +
+  \mu
+  +
+  z_t^*
+  \label{triangular1}
+\end{align}
+\pause
+as well as the following for $y_{t2}$, which is not cointegrated, by
+the ordering of the variables and the assumption on how we constructed
+$A$:
+\begin{align}
+  y_{t2}
+  =
+  B'\Delta y_t
+  &=
+  B'
+  \big(
+  \delta + \Psi(L)\varepsilon_t
+  \big)
+  \qquad\text{where}\quad
+  B'
+  =
+  \begin{pmatrix}
+    0_{(n-h)\times h} & I_{n-h}
+  \end{pmatrix}
+  \label{triangular2}
+\end{align}
+We therefore estimate Equations~\ref{triangular1} and \ref{triangular2}.
+\end{frame}
+}
+
+
+\subsubsection{VAR Representation}
+
+{\footnotesize
+\begin{frame}{VAR Representation: Motivation}
+Suppose we have an $I(1)$ process which can always be written, as usual,
+\begin{align*}
+  \Delta y_t = \delta + \Psi(L)\varepsilon_t
+\end{align*}
+Although, as argued above, we can never represent a cointegrated system
+$y_t$ as a VAR in first differences $\Delta y_t$, sometimes, it's
+possible that cointegrated system $y_t$ admits a VAR
+representation \alert{in levels} $y_t$.
+In other words, we can sometimes write
+\begin{align*}
+  y_t
+  &=
+  \alpha^* + \delta^* t
+  + \Phi_1 y_{t-1}
+  + \cdots
+  + \Phi_p y_{t-p}
+  + \varepsilon_t
+  \\
+  \iff\qquad
+  \Phi(L)y_t
+  &=
+  \alpha^* + \delta^* t
+  + \varepsilon_t
+\end{align*}
+for some $\alpha^*$, $\delta^*$, and $\Phi(L)$ such that $y_t$
+cointegrated.
+
+All of our cointegration analysis up to now has involved conditions on
+$\Psi(L)$, or rather $\Psi(1)$.
+We now derive sufficient and necessary conditions on $\Phi(L)$ that
+imply $y_t$ is a cointegrated system.
+
+\alert{Goal}:
+Conditions on $\Phi(L)$ such that $y_t$ with VAR representation above is
+a cointegrated system with cointegration order $h$.
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{VAR Representation: Relating $\Psi(L)$ and $\Phi(L)$}
+Supposing that we can write $I(1)$ system, which always has
+representation the following (by assumption of being $I(1)$)
+\begin{align}
+  \Delta y_t = \delta + \Psi(L)\varepsilon_t
+  \label{var1}
+\end{align}
+as a VAR($p$) in levels (which is an additional restrictive assumption)
+\begin{align}
+  \Phi(L)y_t
+  &=
+  \alpha^* + \delta^* t
+  + \varepsilon_t
+  \label{var2}
+\end{align}
+we can relate $\Psi(L)$ and $\Phi(L)$.
+In particular, if $y_t$ satisfies both (\ref{var1}) and (\ref{var2}),
+then
+\begin{align*}
+  \implies\quad
+  (1-L)\Phi(L)^{-1}\Phi(L)y_t
+  &=
+  (1-L)\Phi(L)^{-1}
+  \big[
+  \alpha^* + \delta^* t
+  + \varepsilon_t
+  \big]
+  \\
+  \Delta y_t
+  &=
+  \Phi(L)^{-1}\delta^*
+  + \Phi(L)^{-1}(1-L)\varepsilon_t
+\end{align*}
+Match terms in this latter VAR form to the canonical VMA form in
+Expression~\ref{var1} and we get the following relationship between
+$\Psi(L)$ and $\Phi(L)$:
+\begin{align*}
+  %\delta &= \Phi(L)^{-1}\delta^*
+  %\\
+  \Psi(L)
+  &=
+  \Phi(L)^{-1}(1-L)
+  %\qquad\iff\qquad
+  %\Phi(L)\Psi(L)
+  %=
+  %(1-L)
+  %\\
+  %\iff\qquad
+  %\Phi(L)\Psi(L)\varepsilon_t
+  %&=
+  %(1-L)\varepsilon_t
+\end{align*}
+By definition, $y_t$ is cointegrated of order $h$ if $\Psi(1)$ is
+one-summable and has $\rank(\Psi(1))=n-h$.
+The question is now ``What conditions \alert{on $\Phi(L)$}
+imply that the system $y_t$ is cointegrated of order $h$, i.e. that
+$\Psi(1)$ one-summable with $\rank(\Psi(1))=n-h$?''
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{VAR Representation: Condition on $\Phi(1)$}
+Suppose we have a VAR($p$) process
+\begin{align*}
+  \Phi(L)y_t
+  &=
+  \alpha^* + \delta^* t
+  + \varepsilon_t
+\end{align*}
+for some $\alpha^*$, $\delta^*$, and $p$th order lag polynomial
+$\Phi(L)$.
+
+If and only if $\Phi(L)$ can be factored as
+\begin{align*}
+  \Phi(L) = U(L)M(L)V(L)
+\end{align*}
+where
+\begin{align*}
+  M(L)
+  =
+  \begin{pmatrix}
+    (1-L) I_{n-h}
+    & 0_{(n-h)\times h}
+    \\
+    0_{h\times (n-h)}
+    & I_h
+  \end{pmatrix}
+\end{align*}
+and $U(L)$ and $V(L)$ are some $n\times n$ matrix lag polynomials with
+all roots outside the unit circle, then $I(1)$ system $y_t$ is a
+\alert{cointegrated} system with \alert{cointegration rank $h$}.
+
+``Proof'': By this factorization of $\Phi(L)$ and the fact that $U(z)$
+and $V(z)$ have roots outside the unit circle (implying $U(1)$ and
+$V(1)$ nonsingular),
+\begin{align*}
+  \rank(\Phi(1))=\rank(U(1)M(1)V(1)) = \rank(M(1)) = h
+\end{align*}
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{VAR Representation: Implications of Condition on $\Phi(1)$}
+By basic linear algebra, when $\rank(\Phi(1))=h$, there exist two
+$n\times h$ matrices of full column rank $B$ and $A$ such that
+\begin{align*}
+  \Phi(1) = BA'
+\end{align*}
+in which case
+\begin{align*}
+  \Phi(L)\Psi(L) = (1-L)
+  \quad\implies\quad
+  \Phi(1)\Psi(1) = 0
+  \quad\iff\quad
+  BA'\Psi(1) = 0
+  \quad\implies\quad
+  A'\Psi(1) = 0
+\end{align*}
+where the last implication followed because $B$ full column rank,
+implying that the columns of $A$ are cointegrating vectors.
+\end{frame}
+}
+
+
+\subsubsection{VECM Representation}
+
+{\scriptsize
+\begin{frame}{VECM Representation}
+Start by assuming the VAR representation.
+\begin{align*}
+  y_t
+  &=
+  \alpha^* + \delta^* t
+  + \Phi_1 y_{t-1}
+  + \Phi_2 y_{t-2}
+  + \cdots
+  + \Phi_{p-1} y_{t-p+1}
+  + \Phi_p y_{t-p}
+  + \varepsilon_t
+  \\
+  &=
+  \alpha^* + \delta^* t
+  + \Phi_1 y_{t-1}
+  + \Phi_2 y_{t-2}
+  + \cdots
+  + \Phi_{p-1} y_{t-p+1}
+  - \Phi_p [\Delta y_{t-p+1}-y_{t-p+1}]
+  + \varepsilon_t
+\end{align*}
+Keep doing this, moving forward to earlier lags until you eventually get
+\begin{align*}
+  y_t
+  &=
+  \alpha^* + \delta^* t
+  + (\Phi_1 + \cdots + \Phi_p)y_{t-1}
+  + \zeta_1 \Delta y_{t-1}
+  + \cdots
+  + \zeta_{p-1} \Delta y_{t-p+1}
+  + \varepsilon_t
+  \\
+  \qquad\text{where}\quad
+  \zeta_s
+  &=
+  -(\Phi_{s+1}+\Phi_{s+2}+\cdots + \Phi_p)
+\end{align*}
+Subtract $y_{t-1}$ from both sides and identify the resulting term in
+front of $y_{t-1}$ as $-\Phi(1)$:
+\begin{align*}
+  \Delta  y_t
+  %&=
+  %\alpha^* + \delta^* t
+  %+ (\Phi_1 + \cdots + \Phi_p-I_n)y_{t-1}
+  %+ \sum_{i=1}^{p-1}
+    %\zeta_i \Delta y_{t-i}
+  %+ \varepsilon_t
+  %\\
+  &=
+  \alpha^* + \delta^* t
+  - \Phi(1)y_{t-1}
+  + \sum_{i=1}^{p-1}
+    \zeta_i \Delta y_{t-i}
+  + \varepsilon_t
+\end{align*}
+From what we know from the VAR representation $\Phi(1)=BA'$ for $A$ and
+$B$ of full column rank and columns of $A$ representing cointegrating
+vectors.
+This lets us rewrite into the final
+\alert{vector error correction model} (VECM) form
+\begin{align*}
+  \Delta  y_t
+  &=
+  \alpha^* + \delta^* t
+  - BA'y_{t-1}
+  + \sum_{i=1}^{p-1}
+    \zeta_i \Delta y_{t-i}
+  + \varepsilon_t
+\end{align*}
+
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}
+\begin{align*}
+  &=
+  \alpha^* + \delta^* t
+  + \Phi_1 y_{t-1}
+  + \Phi_2 y_{t-2}
+  + \cdots
+  + (\Phi_{p-1}+\Phi_p) y_{t-p+1}
+  - \Phi_p \Delta y_{t-p+1}
+  + \varepsilon_t
+  \\
+  &=
+  \alpha^* + \delta^* t
+  + \Phi_1 y_{t-1}
+  + \Phi_2 y_{t-2}
+  + \cdots
+  - (\Phi_{p-1}+\Phi_p) [\Delta y_{t-p+2}-y_{t-p+2}]
+  - \Phi_p \Delta y_{t-p+1}
+  + \varepsilon_t
+  \\
+  &\;\;\vdots
+  \\
+  &=
+  \alpha^* + \delta^* t
+  + \Phi_1 y_{t-1}
+  - (\Phi_2 + \cdots + \Phi_p) [\Delta y_{t-1} - y_{t-1}]
+  - \cdots
+  - (\Phi_{p-1}+\Phi_p) [\Delta y_{t-p+2}-y_{t-p+2}]
+  - \Phi_p \Delta y_{t-p+1}
+  + \varepsilon_t
+  \\
+  &=
+  \alpha^* + \delta^* t
+  + (\Phi_1 + \cdots + \Phi_p)y_{t-1}
+  - (\Phi_2 + \cdots + \Phi_p) \Delta y_{t-1}
+  - \cdots
+  - (\Phi_{p-1}+\Phi_p) [\Delta y_{t-p+2}-y_{t-p+2}]
+  - \Phi_p \Delta y_{t-p+1}
+  + \varepsilon_t
+\end{align*}
+Therefore
+\begin{align*}
+  \Delta y_t
+  &=
+  \alpha^* + \delta^* t
+  + (\Phi_1 + \cdots + \Phi_p-1)y_{t-1}
+  - (\Phi_2 + \cdots + \Phi_p) \Delta y_{t-1}
+  - \cdots
+  - (\Phi_{p-1}+\Phi_p) [\Delta y_{t-p+2}-y_{t-p+2}]
+  - \Phi_p \Delta y_{t-p+1}
+  + \varepsilon_t
+  \\
+  &=
+  \alpha^* + \delta^* t
+  - \Phi(1)y_{t-1}
+  - (\Phi_2 + \cdots + \Phi_p) \Delta y_{t-1}
+  - \cdots
+  - (\Phi_{p-1}+\Phi_p) [\Delta y_{t-p+2}-y_{t-p+2}]
+  - \Phi_p \Delta y_{t-p+1}
+  + \varepsilon_t
+  \\
+\end{align*}
+
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}
+\end{frame}
+}
+
+\end{document}
+
+
+
+
+
+
+% Sample code
+\pause to add breaks
+\textcolor{red}{text to show}.
+\vspace{20pt}
+
+\usebeamercolor{dull text}
+\alert<+>{Words that you want to alert}
+

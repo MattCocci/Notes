@@ -1,0 +1,3882 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usepackage{cmbright}
+%\usetheme{metropolis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis with Sidebar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[aspectratio=169, handout]{beamer}
+%\documentclass[aspectratio=169]{beamer}
+%\documentclass{beamer}
+\usepackage{cmbright}
+\usepackage{comment}
+
+\useoutertheme[right, width=0.20\paperwidth]{sidebar}
+\usecolortheme{metropolis}
+\useinnertheme[sectionpage=none]{metropolis}
+\usefonttheme{metropolis}
+
+\makeatletter
+\beamer@headheight=1.75\baselineskip     %controls the height of the headline, default is 2.5
+\makeatother
+
+\usepackage{etoolbox}
+\patchcmd\insertverticalnavigation{\dohead}{\vskip-35pt\dohead}{}{}
+
+%\setbeamertemplate{sidebar canvas right}{}
+%\setbeamertemplate{sidebar right}{BOB}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Simple Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usetheme{Boadilla}
+%\usepackage{lmodern}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sidebar Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass[serif]{beamer}  % For serif latex font
+%\usepackage{pxfonts}
+%\usepackage{eulervm}
+%\usepackage{mathpazo}
+
+%\usetheme{Goettingen}
+%\usecolortheme{lily}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Common Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[]{Time Series, Stationarity \\ Matt Cocci}
+\author[]{}
+\date{\today}
+
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+%\setbeamertemplate{section in toc}[square unnumbered]
+%\setbeamertemplate{subsection in toc}[square unnumbered]
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% For easier looping
+\usepackage{pgffor}
+
+\usepackage{pdfpages}
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\proj}{\operatorname{proj}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Rnk}{\mathbb{R}^{n\times k}}
+\newcommand{\Rkk}{\mathbb{R}^{k\times k}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Presentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Outline}
+\tableofcontents[hideallsubsections]
+%\tableofcontents
+\end{frame}
+
+
+\section{Introduction}
+
+{\footnotesize
+\begin{frame}{Time Series Analysis}
+We will study \alert{discrete-time stochastic processes}, written
+\begin{align*}
+  \{y_t\}_{t=-\infty}^\infty
+\end{align*}
+Big division in time series analysis (esp.\ from a frequentist
+perspective):
+\begin{itemize}
+  {\footnotesize
+  \item \alert{Stationary and Ergodic Processes}:
+    Simple limit theorems applicable \alert{directly} to the process
+    \emph{as is}, which enables inference.
+
+  \pause
+  \item \alert{Non-stationarity} (which implies non-ergodic) Processes:
+    \alert{Additional work} and choices to carry out valid inference.
+    Two options:
+    \begin{enumerate}
+      {\footnotesize
+      \item \alert{Transform} to get stationarity, e.g.
+        \alert{differencing}, find
+        \alert{cointegrating vectors}
+      \item Get better limit theorems, like
+        \alert{functional CLT}. See Hayashi
+      }
+    \end{enumerate}
+  }
+  \pause
+\end{itemize}
+\pause
+(But if you are a Bayesian, there was arguably never any division at
+all.)
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Aside: Stochastic Processes Generally (Picture)}
+A \alert{stochastic process} $\{X_t\}_{t\in T}$ is a family of random
+variables with an ordered index set $T$ where, for each $t\in T$,
+\begin{align*}
+  X_t: (\Omega,\mathscr{F},\mathbb{P})\mapsto (G,\mathscr{G})
+\end{align*}
+is a random element mapping from probability space
+$(\Omega,\mathscr{F},\mathbb{P})$ into measurable space
+$(G,\mathscr{G})$ called the \emph{state space}, often
+$(G,\sG)=(\R^d,\sB(\R^d))$, i.e. Euclidean
+space with the Borel $\sigma$-algebra, in which $X_t$ is a random
+vector.
+
+If index set $T$ is some subset of $\Z$, then
+$\{X_t\}_{t\in T}$ is a \alert{discrete time} stochastic process.  If
+$T$ is some interval subset of $\R$, $\{X_t\}_{t\in T}$ as a
+\alert{continuous time} stochastic process.
+
+So a stochastic process $\{X_t\}_{t\in T}$ really depends on two
+arguments, $\omega\in\Omega$ and $t\in T$, which we may emphasize by
+using alternative notation for $X_t$ of $X_t(\omega)$.
+\begin{itemize}
+  \item Fixing $t\in T$, can study distribution of random
+    $X_t(\omega)$ across realizations of $\omega$.
+  \item Fixing $\omega\in\Omega$, can study $X_t(\omega)$ as a
+    \alert{function} of $t\in T$.
+
+    Treats entire process $\{X_t\}_{t\in T}$ as a
+    \alert{function-valued} random element.
+    Entire path---i.e. $\{X_t\}_{t\in T}$ as a function of
+    $t$---corresponds to a single realization corresponding to a single
+    $\omega\in\Omega$.
+    Stationarity \& ergodicity assumptions are need to overcome the fact
+    that there's just a single realized path revealed sequentially over
+    time (not all at once).
+\end{itemize}
+\end{frame}
+}
+
+
+%\begin{frame}[shrink]
+%Picture to Have in Mind for Linear Time Series
+%- Sample draw looks like an entire path
+%- A data series looks like a slice
+%- A forecast is standing at a point, looking forward.
+%- Dynamics specify that
+%- The conditional mean, the conditional variance
+%- The unconditional mean and variance are an average over many paths
+%- A persistent process makes it.
+%\end{frame}
+
+
+\subsection{Stationarity and Ergodicity}
+
+
+{\footnotesize
+\begin{frame}{Time Series Analysis under Stationarity and Ergodicity}
+
+Important definitions that permit limit theorems and inference:
+\begin{enumerate}
+  {\scriptsize
+  \item \alert{Stationarity}: {Homogeneity} of process over time.
+
+    Ensures that observed dynamics reflect random and representative
+    realizations from the distribution,
+    \alert{not breaks} or \alert{structural changes} in the dynamics of
+    the variables.
+
+    \pause
+    Example: Most macro models of the US only use data after 1980s.
+
+  \pause
+  \item \alert{Ergodicity}:
+    Far-apart-enough blocks of the series are independent.
+
+    So you don't have any outlier/shock that doesn't
+    average out eventually.
+  }
+\end{enumerate}
+\alert{Goal}: Simple and practical \alert{sufficient conditions} for
+these properties where you don't always have to check measure-theoretic
+definitions.
+
+\pause
+\alert{Approach}: {Restrict} from the set of all stochastic processes to
+\alert{linear processes} (e.g. ARs, MAs, etc), which is \alert{class} of
+processes
+\begin{itemize}
+  {\scriptsize
+  \item Rich and general enough to ``span'' set of all cov.\
+    stationary processes (Wold's Thm)
+  \item With easy to characterize sufficient conditions for stationarity
+    and ergodicity, expressed in terms lag polynomial coefficients and
+    autocovariances.
+  }
+\end{itemize}
+\end{frame}
+}
+
+
+
+
+{\footnotesize
+\begin{frame}{Stationarity}
+A discrete-time stochastic process $\{y_t\}$ is \alert{stationary} or
+\alert{strongly stationary} if, for any finite set of times,
+\begin{align*}
+  t_1,\ldots,t_n
+\end{align*}
+we have
+\begin{align*}
+  (y_{t_1},\ldots,y_{t_n})
+  \quad
+  \sim
+  \quad
+  (y_{s+t_1},\ldots,y_{s+t_n})
+  \qquad
+  \forall s
+\end{align*}
+i.e. the unconditional distribution is \alert{invariant} to shifts of
+the indices.
+
+\pause
+A discrete-time stochastic process $\{y_t\}$ is
+\alert{Covariance Stationary}
+(a.k.a.\ Weakly Stationary, 2nd-Order Stationary) if
+\begin{itemize}
+  \item $\E[y_t]=\mu$ for some $\mu$ that does not depend upon $t$
+  \item $\gamma_k:=\Cov(y_t,y_{t-k})$ depends only upon $k$, not $t$.
+  \pause
+  \item This is an assumption on the first two moments of the
+    \alert{DGP}, but not a \alert{parametric}/\alert{modeling}
+    assumption in the sense that this specifies a likelihood.
+  \item Implied by strong stationarity, not equivalent.
+\end{itemize}
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Stationarity: Autocovariances of Stationary Process}
+Given covariance stationary process, can define
+\alert{Autocovariance Function} (ACF)
+and \alert{Autocovariance Generating Function} (ACGF) which are,
+respectively,
+\begin{align*}
+  \gamma(k)
+  := \gamma_k
+  = \Cov(y_t,y_{t-k})
+  \qquad\quad
+  \lambda(z)
+  =
+  \sum_{k=-\infty}^\infty \gamma_k z^k
+\end{align*}
+\pause
+Latter is useful summary and of primary importance for
+heteroskedasticity and autocorrelation robust (HAR/HAC) inference, e.g.
+Newey-West type standard errors.
+\\
+Note: $\gamma(k)$ is $R_y(s)$ in Chris' notes.
+
+\pause
+If $\{y_t\}$ \alert{Gaussian}, cov.\ stationarity means DGP
+fully pinned down.
+Otherwise, DGP restricted, but not totally pinned down, and so study of
+cov.\ stationary discrete time SPs is study of
+``What can we say given homogeneity assumptions on only 1st and 2nd
+moments?'' Turns out: A Lot. See slides below.
+
+\pause
+An important condition for some limit theorems will be absolutely
+summability of autocovariances of a process, i.e.
+\begin{align*}
+  \sum_{k=-\infty}^\infty
+  |\gamma_k|<\infty
+\end{align*}
+Not implied by second order stationarity or stationarity.
+%Formalizes ``fast decay'' of dependence.
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Ergodicity}
+Formally, a (scalar) stationary process $\{y_t\}$ is also
+\alert{ergodic} if, for any two bounded functions $f:\R^k\ra \R$ and
+$g:\R^\ell \ra \R$, we have
+\begin{align*}
+  \lim_{n\ra\infty}
+  \big|
+  \E[
+    f(y_t,\ldots,y_{t+k})
+    g(y_{t+n},\ldots,y_{t+n+\ell})
+  ]
+  \big|
+  =
+  \big|
+  \E[
+    f(y_t,\ldots,y_{t+k})
+  \big|
+  \cdot
+  \E[
+    g(y_{t+n},\ldots,y_{t+n+\ell})
+  ]
+  \big|
+\end{align*}
+Note
+\begin{itemize}
+  \item Recall that $X$ and $Y$ independent implies $\E[XY]=\E[X]\E[Y]$.
+    Condition similar.
+  \pause
+  \item Loosely, ``Far-enough-apart blocks of a process are
+    independent.''
+  \pause
+  \item Gives enough ``independence'' to derive limit theorems.
+\end{itemize}
+\end{frame}
+}
+
+
+\subsection{Wold's Theorem}
+
+
+%\subsection{Motivation}
+
+{\footnotesize
+\begin{frame}{Wold's Theorem: Motivation}
+Until we get to non-stationary processes, we are in the business of
+studying \alert{stationary} or \alert{covariance stationary processes}
+since
+\begin{enumerate}
+  \item This is a reasonable assumption to make in many cases,
+    and also probably necessary if we want to justify \& estimate models
+    with fixed parameters.
+  \item As we'll see, these processes are ``regular'' enough to permit
+    simple limit theorems and inference, as we'll see
+\end{enumerate}
+\pause
+But you'll also notice that we really only write down \alert{a few}
+kinds of processes/representations by specifying linear difference
+equations:
+\begin{itemize}
+  \item AR($p$) Model/DGP
+    \begin{align*}
+      y_t &= \phi_1 y_t + \cdots + \phi_p y_{t-p} + \varepsilon_t
+    \end{align*}
+
+  \item MA($q$) Model/DGP
+    \begin{align*}
+      y_t
+      &=
+      \varepsilon_t
+      +
+      \theta_1 \varepsilon_{t-1}
+      + \cdots + \theta_p \varepsilon_{t-q}
+    \end{align*}
+
+  \item ARMA processes
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Wold's Theorem: Motivation}
+Given that we've been dealing mostly with AR, MA, ARMA processes,
+we can ask the following two questions, which correspond to different
+directions of inquiry:
+\begin{itemize}
+  \item
+    Under what \alert{conditions on parameters} are these models
+    stationary, ergodic?
+    \pause
+
+    Loosely called ``stability''/``invertibility''
+    conditions that we study either by
+    \begin{enumerate}
+      {\footnotesize
+      \item Solving forward or backward the linear difference equations
+      \item Studying roots of associated filters/lag polynomials
+      }
+    \end{enumerate}
+
+  \pause
+  \item
+    If we're willing to make the assumption of second order stationarity
+    and work within that broad class
+    (of which AR, MA, ARMA processes above are only a \alert{subclass}),
+    are we being too restrictive?
+
+    \pause
+    Answer: Wold's Theorem, not really restrictive at all.
+    \begin{itemize}
+      {\footnotesize
+      \item Given \alert{any} second order stationary process, there is
+        an MA($\infty$) (i.e. linear process) representation of that
+        processes
+      \item Under stability/invertibility conditions that ensure
+        stationarity, AR and ARMA models can be recast into MA($\infty$)
+        form
+      }
+    \end{itemize}
+\end{itemize}
+\end{frame}
+}
+
+
+
+%{\footnotesize
+%\begin{frame}{Wold's Theorem: Overview}
+%Rough Wold's Theorem
+%\begin{itemize}
+  %\item
+%\end{itemize}
+
+%The other direction
+%If MA(infty) rep, then stationary
+%If AR(rep), conditions to ensure stationarity, implies
+%\end{frame}
+%}
+
+
+%\subsection{White Noise}
+
+{\footnotesize
+\begin{frame}{White Noise}
+A vector process $\{\varepsilon_t\}$ is \alert{white noise} if
+\begin{itemize}
+  \item Covariance stationary (jointly, not just element-wise)
+  \item $\E[\varepsilon_t]=0$ for
+  \item $\E[\varepsilon_t^2] = \Sigma$ positive definite, not
+    generally diagonal.
+    Scalar case, instead use $\sigma^2$
+  \item No serial correlation, $\E[\varepsilon_t\varepsilon_{t-j}']=0$
+\end{itemize}
+\pause
+Note: Not necessarily iid, but could be and sometimes taken to be in
+theorems. So watch out for whether we assume that the process is
+\begin{itemize}
+  \item IID
+  \item Independent and identical up to first and second moments
+  \item Uncorrelated and identical up to first moments all of which are
+    different.
+\end{itemize}
+Basic building block within the class of linear processes.
+\end{frame}
+}
+
+
+%\subsection{Statement}
+
+{\footnotesize
+\begin{frame}{Wold's Theorem: First Statement}
+Given a \alert{covariance stationary} process $\{x_t\}$ we can
+always represent as an MA($\infty$), i.e.
+non-forward-looking filtered white noise,
+\begin{align*}
+  x_t
+  &=
+  \sum_{s=0}^\infty \psi_s\varepsilon_{t-s}
+  \qquad\text{where}\quad
+  \varepsilon_t
+  \sim (0,\sigma^2)
+  \qquad
+  \sum_{i=0}^\infty
+  |\psi_i|
+  <\infty
+\end{align*}
+Formal statement on next slide.
+\end{frame}
+}
+
+{\scriptsize
+\begin{frame}{Wold's Theorem: Formal Statement}
+If a stochastic process $\{x_t\}$ is \alert{cov.\ stationary},
+\alert{$\exists$} \alert{unique} (almost everywhere) \alert{MA($\infty$)}
+\alert{representation}, i.e. can represent process as
+\begin{align*}
+  \sum_{s=0}^n \psi_s\varepsilon_{t-s}
+  \quad\underset{n\ra\infty}{\msto}\quad
+  x_t
+\end{align*}
+where
+\begin{itemize}
+  \item $\{\psi_i\}_{i=0}^\infty$ is an absolutely summable
+    sequence.
+
+  \pause
+  \item $\{\varepsilon_t\}$ white noise: uncorrelated mean zero and variance
+    $\sigma^2$ (not necessarily iid)
+
+  \pause
+  \item Shocks $\{\varepsilon_t\}$ constructed from
+    current \& lagged values of $\{x_t\}$, e.g. can write
+    \begin{align*}
+      %\varepsilon_t = \tilde{x}_t - c_1\tilde{x}_{t-1} -
+      %c_2\tilde{x}_{t-2}-\cdots
+      \varepsilon_t = {x}_t - c_1{x}_{t-1} -
+      c_2{x}_{t-2}-\cdots
+      =
+      x_t -
+      \sum_{s=1}^\infty
+      c_s x_{t-s}
+    \end{align*}
+    for all $t$ and some \alert{fixed} coefficients $c_i$.
+    \pause
+
+    This restricts the shocks to be \alert{fundamental}, a.k.a.
+    \alert{innovations}.
+    This restriction is important for the \alert{uniqueness} of the
+    representation since there generally exist other observationally
+    equivalent representations (from a second order perspective),
+    but those representations will necessarily be
+    non-fundamental.
+    More on this later.
+
+
+
+  \pause
+  \item
+    $\sum_{s=1}^\infty c_s x_{t-s}$
+    %\begin{align*}
+      %\sum_{s=1}^\infty
+      %c_s x_{t-s}
+      %=
+      %c_1{x}_{t-1}
+      %+ c_2{x}_{t-2}
+      %+ \cdots
+    %\end{align*}
+    is \alert{best linear predictor} of $x_t$ based on lagged
+    values $x_{t-1},x_{t-2},\cdots$.
+\end{itemize}
+
+%\item The second order properties of $\{\tilde{x}_t\}$ are identical
+%to the second order properties of the original $\{x_t\}$.
+
+%(Naturally, a similar statement holds replacing $x$ with
+%$\tilde{x}$.)
+
+\end{frame}
+}
+
+
+
+{\footnotesize
+\begin{frame}{Wold's Theorem: Practical Implications}
+
+\begin{itemize}
+  {\footnotesize
+  \item
+    Set of all MA($\infty$) infinity processes is called the set of
+    \alert{linear processes}. Includes MA plus stationary AR
+    and ARMA models, since stationarity $\implies$
+    MA($\infty$) rep, which we can get by inverting, e.g.
+    \begin{align*}
+      y_t &= \Phi_1 y_{t-1} + \cdots + \Phi_py_{t-p} + \varepsilon_t
+    \end{align*}
+    can be rewritten
+    \begin{align*}
+      (I_n- \Phi_1 L - \cdots - \Phi_pL^p)y_t &=  \varepsilon_t
+      \quad\iff\quad
+      \Phi(L)y_t =  \varepsilon_t
+      \quad\iff\quad
+      y_t =  \Phi(L)^{-1}\varepsilon_t
+    \end{align*}
+    Next section discusses precisely those conditions we need for this
+    invertibility.
+
+    Similarly, for an ARMA model
+    \begin{align*}
+      \Phi(L)y_t = \Theta(L)\varepsilon_t
+      \quad\implies\quad
+      y_t = \Phi(L)^{-1}\Theta(L)\varepsilon_t
+    \end{align*}
+
+
+
+  \pause
+  \item So restriction to linear processes (processes with MA($\infty$)
+    representation) \alert{not all that restrictive} (i.e. wlog) if
+    we're considering cov.\ stationary processes.
+
+  \pause
+  \item Moreover, we have a \alert{canonical representation} for all
+    covariance stationarity processes in the MA($\infty$) process, for
+    which we can develop results and limit theorems.
+
+  }
+\end{itemize}
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Wold's Theorem: Practical Implications}
+
+\begin{itemize}
+  \item
+    Although we can't really work with $\infty$ many lags,
+    rep useful for two reasons:
+    \begin{itemize}
+      {\scriptsize
+      \item Often assume a given cov.\ stationary process has a
+        simpler parametrization, e.g.  AR($p$), MA($q$), ARMA($p$,$q$)
+        for finite $p$ and $q$.
+        MA($\infty$) Nests \alert{all} those.
+
+      \item AR, MA, ARMA processes \alert{dense} in set of
+        cov.\ stationary processes because absolute summability implies
+        \alert{quick decay} in coefficients and dependence.
+        So can always closely approximate with enough lags.
+      }
+    \end{itemize}
+\end{itemize}
+\end{frame}
+}
+
+
+
+
+\section{Filtering Perspective}
+
+{\footnotesize
+\begin{frame}{Time Series Analysis: Roadmap}
+\tableofcontents[currentsection, hideothersubsections]
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Filtering Perspective: Motivation}
+
+When given an AR($p$) model
+\begin{align*}
+  y_t &= \phi_1 y_{t-1} + \cdots + \phi_p y_{t-p} + \varepsilon_t
+\end{align*}
+or an MA($q$) model
+\begin{align*}
+  y_t
+  &=
+  \varepsilon_t
+  +
+  \theta_1 \varepsilon_{t-1}
+  + \cdots + \theta_p \varepsilon_{t-q}
+\end{align*}
+Can attempt to study such models as \alert{Linear Difference Equations}:
+\begin{itemize}
+  {\scriptsize
+  \item ``Solve'' linear difference eq.\ backwards or forwards,
+    use recursive substitution
+  \item Discrete analogue of solving ODEs
+  \item Write $y_t$ at any given $t$ as a function of (current,
+    past, and/or future) shocks, time indices, and a boundary
+    condition.
+  \pause
+  \item Restriction to ``stationary,'' ``stable,'' ``finite'' solutions
+    places restrictions on model \alert{parameters} and determines
+    whether we can solve forward or backwards.
+  \pause
+  \item Not super useful from a theoretical point of view because
+    initial conditions necessarily \alert{die out} if stationary.
+  \item This suggests that all the action is really in the
+    coefficients, so can we study those more directly?
+  }
+\end{itemize}
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Filtering Perspective: Motivation}
+By Wold's Theorem, can study covariance stationary processes (including
+any stationary ARMA model) via canonical representation as
+\alert{filtered white noise}, i.e. \alert{linear processes}:
+\begin{align*}
+  y_t = \mu + \sum_{s=0}^\infty \psi_s \varepsilon_{t-s}
+\end{align*}
+Note
+\begin{itemize}
+  {\scriptsize
+  \item \alert{All} differences between models/DGPs for stationary
+    processes arise in how we \alert{filter}.
+  \pause
+  \item White noise $\varepsilon_t$ is a simple \alert{random}
+    object; filters simple \alert{deterministic, algebraic}
+    objects.
+  \item State sufficient conditions on filters (lag polynomials) for
+    \alert{stationarity, ergodicity}.
+  \pause
+  \item Discuss \alert{inverting} filters (lag polynomials) so that we
+    can move seamlessly between different representations (e.g. AR vs.
+    MA vs.  ARMA)
+  \item More or less equivalent to studying the linear difference
+    equations \alert{under assumption} that the coefficients are such
+    that the resulting process is \alert{stationary}.
+
+    But filtering approach a little nicer.
+
+  \pause
+  \item Under \alert{nonstationarity}, differences arise, which we'll
+    cover later.
+  }
+\end{itemize}
+\end{frame}
+}
+
+
+
+%{\scriptsize
+%\begin{frame}{Filtering Perspective: Motivation}
+%Now that we're comfortable with lag operators, their inverses, their
+%implications for and relation to stationarity, can say even more about
+%why they are useful.
+
+%Lag polynomials encourage a \alert{filtering} perspective of linear time
+%series:
+%Create output process $\{y_t\}$ by applying a linear filter to input
+%process $\{x_t\}$.
+%%Taking inverses is crucial to reap the benefits of that
+%%perspective.
+%\begin{itemize}
+  %\item MA process creates $\{y_t\}$ by filtering white
+    %noise
+    %\begin{align*}
+      %\{\varepsilon_t\} &\ra \{y_t\}
+      %\quad\text{s.t.}\quad
+      %y_t
+      %=
+      %\theta(L)\varepsilon_t
+    %\end{align*}
+
+  %\pause
+  %\item
+    %Can filter one time series process to get another:
+    %\begin{align*}
+      %x_t &= \theta_x(L)\varepsilon_t
+      %\\
+      %y_t &= \theta_y(L)x_t
+      %= \theta_y(L)\theta_x(L)\varepsilon_t
+      %= \tilde{\theta}_y(L)\varepsilon_t
+    %\end{align*}
+
+  %\pause
+  %\item
+%\end{itemize}
+%Filtering is a \alert{unifying} theme that simplifies analysis.
+%If we understand the input process and the filter, then we understand
+%the output process.
+%\end{frame}
+%}
+
+
+
+
+%{\footnotesize
+%\begin{frame}{Filtering Perspective: Studying Linear Processes}
+
+%Formally, \alert{linear processes} are discrete-time stochastic
+%processes that can be written as (generally two-sided) filtered white
+%noise
+%\begin{align*}
+  %y_t = \mu + \sum_{s=-\infty}^\infty \psi_s \varepsilon_{t-s}
+%\end{align*}
+%\pause
+%but we will mostly focus on one-sided filtered white noise, i.e.
+%processes that can be written as an MA($\infty$) process
+%By Wold's Theorem, this is a big enough class of processes.
+
+%Plan of Attack:
+%Study \alert{filters}, a class of linear operators defined on the class
+%of covariance stationariy processes.
+
+%FIX: Better definition here
+%\end{frame}
+%}
+
+
+\subsection{Definitions}
+
+
+{\footnotesize
+\begin{frame}{Filters}
+
+\alert{Filtering} means taking \alert{weighted average} of (possibly
+infinitely many) successive values of an input process $\{x_t\}$ to
+produce a new process $\{y_t\}$
+\begin{align*}
+  \text{Input}\; \{x_t\}
+  \quad\ra\quad
+  \text{Apply Filter}
+  \quad\ra\quad
+  \text{Output}\; \{y_t\}
+\end{align*}
+\pause
+Example: MA($\infty$) takes white noise $\{\varepsilon_t\}$ where
+$\varepsilon_t\sim (0,\sigma^2)$ and filters it to create
+\begin{align*}
+  y_t = \mu + \sum_{s=0}^\infty \psi_s \varepsilon_{t-s}
+\end{align*}
+\pause
+Example: ARMA model, by inverting, we get back to filtered white noise.
+\begin{align*}
+  \phi(L)y_t &= \theta(L)\varepsilon_t
+  \quad\implies\quad
+  y_t = \phi(L)^{-1}\theta(L)\varepsilon_t
+\end{align*}
+\end{frame}
+}
+
+
+
+{\scriptsize
+\begin{frame}{Filters}
+\begin{itemize}
+  \item \alert{Definition}: (Linear) \alert{map/operator} that maps a
+    given stochastic process (input) $\{x_t\}$ into another stochastic
+    process (output) $\{y_t\}$, which we write as
+    \begin{align*}
+      a(L) = a_0 + a_1 L^1 + a_{-1}L^{-1} + a_2 L^2 + a_{-2}L^{-2} +
+      \ldots
+    \end{align*}
+    Generally infinite and two-sided, as written above, but we will
+    mostly focus on one-sided filters, some of which are finite.
+
+    \pause
+  \item The filter is map/operator on stochastic processes, and is fully
+    characterized by numerical \alert{sequence of coefficients}
+    $\{a_i\}_{i=-\infty}^\infty$.
+
+  \item Restrictions on filters and existence of inverses are expressed
+    entirely in terms of \alert{restrictions/conditions} on the numerical
+    sequence of coefficients.
+
+  \pause
+  \item If a filter has only finitely many nonzero terms in positive
+    powers of $L$, e.g.
+    \begin{align*}
+      a(L) =
+      a_0 + a_1 L^1 + a_2 L^2
+      + \cdots
+      + a_pL^p
+    \end{align*}
+    then it is often referred to as a \alert{lag polynomial}.
+    \pause
+    Sometimes I will be sloppy and use ``lag polynomial'' and ``filter''
+    interchangeably, and also use ``lag polynomial'' to refer to the
+    associated algebraic polynomial
+    \begin{align*}
+      a(z) =
+      a_0 + a_1 z^1 + a_2 z^2
+      + \cdots
+      + a_pz^p
+      \qquad z\in \C
+    \end{align*}
+
+\end{itemize}
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Filters: Absolute Summability}
+\alert{Absolutely Summable Filter}
+\begin{itemize}
+  \item Definition: Sum of the absolute value of coefficients equals a
+    finite number
+    \begin{align*}
+      \sum_{i=-\infty}^\infty |a_i|
+      =
+      \lim_{n\ra \infty}
+      \sum_{i=-n}^n |a_i|
+      < \infty
+    \end{align*}
+    Remembering that an infinite sum is defined as the limit of a set of
+    partial sums previews how we'll formalize processes that depend upon
+    infinitely many lags.
+
+  \pause
+  \item $\lim_{i\ra \pm \infty} |a_i| =0$ necessary but not sufficient
+    for absolute summability.
+
+  \pause
+  \item Absolutely summable filters very important because they always
+    map any covariance stationary processes into a covariance stationary
+    process. See Filtering Theorem in upcoming slides.
+
+    %Simple way to generate cov stationary processes
+
+  \item Important condition assumed in many limit theorems.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Filters: One-Summability}
+
+\alert{One-Summability} of a one-sided filter:
+\begin{align*}
+  \sum_{j=0}^\infty j \cdot |a_j|
+  =
+  \lim_{n\ra \infty}
+  \sum_{j=0}^n j \cdot |a_j|
+  < \infty
+\end{align*}
+This condition is \alert{stronger} than absolutely summability.
+
+\pause
+It is useful for proving results for \alert{non-stationary processes},
+which we will take up in a different set of slides.
+\end{frame}
+}
+
+
+
+{\footnotesize
+\begin{frame}{Filters: Examples}
+$p$th Degree (one-sided) filter
+\begin{itemize}
+  \item Filter with only $p$ nonzero terms
+    \begin{align*}
+      a(L) = 1 + a_1 L + \cdots + a_p L^p
+    \end{align*}
+
+  \item Automatically absolutely summable and one-summable
+  \item More interesting is whether its inverse is also absolutely
+    summable
+\end{itemize}
+\pause
+Identity Filter: $a(L) = 1$
+\begin{itemize}
+  \item Maps any sequence into itself.
+  \pause
+  \item Important for defining inverses of filters
+\end{itemize}
+\end{frame}
+}
+
+
+\subsection{Filtering and MA Theorems}
+
+{\scriptsize
+\begin{frame}{Filtering Theorem}
+
+Suppose we have
+\begin{itemize}
+  \item Input \alert{cov.\ stationary} process
+    $\{x_t\}_{t=-\infty}^\infty$ extending into infinite past and future
+
+  \item Absolutely summable filter $a(L)$
+\end{itemize}
+\pause
+Then
+\begin{itemize}
+  \item For each $t$, the following partial sums converge in mean square
+    (implies convergence in probability) to some well-defined limiting
+    random variable, which we denote by $y_t$
+    \begin{align*}
+      \sum_{s=-n}^n a_s x_{t-s}
+      \qquad
+      \underset{n\ra\infty}{\msto}
+      \qquad
+      y_t
+    \end{align*}
+    \pause
+    and the resulting process $\{y_t\}_{t=-\infty}^\infty$ is covariance
+    stationary.
+    \pause
+    Write this as
+    \pause
+    \begin{align*}
+      y_t = \sum_{s=-\infty}^\infty a_s x_{t-s}
+    \end{align*}
+
+  \item If autocovariances of $\{x_t\}$ absolutely summable, so are
+    autocovariances of $\{y_t\}$.
+\end{itemize}
+\pause
+\alert{Punchline}: Absolutely summable filters are maps from ``set of
+covariance stationary processes'' back into that same set.
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Filtering Theorem Corollary: MA($\infty$) Theorem}
+
+Conditions
+\vspace{-8pt}
+\begin{itemize}
+  \item[(i)]
+    \alert{White noise} $\{\varepsilon_t\}$, which plays the role of
+    $\{x_t\}$ in previous filtering theorem
+    \begin{itemize}
+      {\scriptsize
+      \item Covariance stationary with $\E[\varepsilon_t]=0$ and
+        $\E[\varepsilon_t^2] = \sigma^2$
+      \vspace{-3pt}
+      \item No serial correlation
+      }
+    \end{itemize}
+  \item[(ii)] \alert{Square summable} Filter $\psi(L)$
+    %with $\psi_0=1$
+    %(which is  normalization since $\sigma^2$ and scale
+    %of coefficients not separately identified).
+
+  \item[(iii)] $\psi(L)$ additionally \alert{absolutely summable}, which
+    is stronger than (ii)
+
+  \item[(iv)] $\{\varepsilon_t\}$ is (i) and iid, which is stronger than
+    just ``uncorr.\ \& same first two moments''
+\end{itemize}
+\pause
+Then
+\vspace{-10pt}
+\begin{itemize}
+  \item
+    %(MA($\infty$) Limit):
+    Under (i) \& (ii), $\exists$ a well-defined
+    ``mean-$\mu$, cov.\ stationary process'' $\{y_t\}$
+    called an \alert{MA($\infty$)},
+    \vspace{-15pt}
+    \begin{align*}
+      \lim_{n\ra\infty}
+      \mu + \sum_{s=-n}^n \psi_s \varepsilon_{t-s}
+      \quad\msto\quad
+      y_t
+    \end{align*}
+    \pause
+
+  \item
+    Under (i) and (iii), the autocovariances of $\{y_t\}$ are given by
+    \vspace{-10pt}
+    \begin{align*}
+      \gamma_j
+      = \sigma^2(\psi_j\psi_0 + \psi_{j+1}\psi_1 + \psi_{j+2}\psi_2 +\cdots)
+      = \sigma^2\sum_{k=0}^\infty \psi_{j+k}\psi_k
+    \end{align*}
+    \pause
+    Because autocovs of $\{\varepsilon_t\}$ abs.\ summable, so
+    are those of $\{y_t\}$ by filtering theorem.
+    \pause
+
+  \item
+    %(Regularity):
+    Under (iii) and (iv), process $\{y_t\}$ is strictly stationary and
+    ergodic.
+
+\end{itemize}
+%- Page 368 for the nice serious theory
+\end{frame}
+}
+
+
+%{\footnotesize
+%\begin{frame}{Filtering Theorem: Discussion}
+%Filtering Theorem suggests/recommends
+%\begin{itemize}
+  %\item Filtering perspective of time series.
+  %\item Decomposing the application of a $p$th order filter/lag
+    %polynomial into the successive application of $p$ first order lag
+    %polynomials to successively stationary processes.
+  %\item See how far we can get by filtering plain white noise, which we
+    %know is stationary. (Wold's Theorem: Very far)
+  %\item Show how we can represent any stationary AR, MA, ARMA as
+    %filtered white noise.
+  %\item Develop limit theorems for filtering white noise.
+%\end{itemize}
+%\end{frame}
+%}
+
+
+
+
+\subsection{Product of Filters}
+
+{\scriptsize
+\begin{frame}{Product of Filters}
+Convolution of two sequences
+\begin{itemize}
+  \item Suppose we have two sequences $\{a_i\}_{i=0}^\infty$ and
+    $\{b_i\}_{i=0}^\infty$ which imply two filters
+    in positive powers of $L$
+    \begin{align*}
+      a(L) &= a_0 + a_1 L + a_2 L^2 + \cdots
+      \qquad
+      b(L) = b_0 + b_1 L + b_2 L^2 + \cdots
+    \end{align*}
+
+  \pause
+  \item The \alert{convolution} of these two sequences is a sequence
+    $\{d_i\}_{i=0}^\infty$ where the $d_i$ are defined exactly as one
+    would expect by multiplying out $a(L)$ and $b(L)$ like polynomials,
+    collecting terms multiplying each power of $L$, and reading them off
+    to determine the $d_i$.
+    This gives
+    \begin{align*}
+      d_0 &= a_0b_0 \\
+      d_1 &= a_0 b_1 + a_1 b_0 \\
+      d_2 &= a_0 b_2 + a_1 b_1 + a_2 b_0 \\
+      &\;\vdots
+    \end{align*}
+    \pause
+    which implies associated filter
+    \begin{align*}
+      d(L) = d_0 + d_1 L + d_2 L^2 + \cdots
+    \end{align*}
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Product of Filters}
+We need to define the operation of multiplication on filters, and
+establish its properties.
+\begin{itemize}
+  \item
+    \alert{A Definition}:
+    Let $d(L)$ denote the filter constructed from the sequence
+    $\{d_i\}_{i=0}^\infty$ that equals the convolution of associated
+    sequences $\{a_i\}_{i=0}^\infty$ and $\{b_i\}_{i=0}^\infty$
+    associated with filters $a(L)$ and $b(L)$.
+    \pause
+
+    Define the \alert{product} of $a(L)$ and $b(L)$ as this $d(L)$.
+    and write this as
+    \begin{align*}
+      d(L) = a(L) b(L)
+    \end{align*}
+    \pause
+
+  \item
+    \alert{A Result}:
+    Suppose $a(L)$ and $b(L)$ absolutely summable and
+    $\{x_t\}_{t-\infty}^\infty$ covariance stationary.
+    Then $d(L)$ is also absolutely summable and
+    \begin{align*}
+      a(L)b(L)x_t = d(L) x_t
+    \end{align*}
+    which is also covariance stationary by the Filtering Theorem.
+
+\end{itemize}
+\end{frame}
+}
+
+
+\subsection{Inverses of Filters}
+
+{\footnotesize
+\begin{frame}{Inverse(s) of a Filter}
+
+To really make use of the filtering perspective, we need to be able to
+\alert{invert} filters.
+\pause
+
+\alert{Definition}:
+Given a (generally two-sided) filter $a(L)$, an \alert{inverse} is any
+filter $b(L)$ satisfying
+\begin{align}
+  a(L) b(L) = 1
+\end{align}
+where RHS represents \alert{identity filter}.
+\pause
+This is the \alert{rigorous} definition of the inverse, rather
+than the rather heuristic definition built on the geometric series
+intuition previously in precept.
+
+\pause
+\alert{Note}:
+\begin{itemize}
+  \item Inverses are commutative, even in the multivariate case
+  \pause
+  \item I used the phrase ``an inverse'' rather than ``the inverse''
+    because there might be multiple.
+    See the next slide.
+  \pause
+\end{itemize}
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Inverse(s) of a Filter: One-Sided}
+Suppose we have a (one-sided) filter in positive powers of $L$:
+\begin{align*}
+  a(L) = a_0 + a_1 L^1 + a_2 L^2 + \cdots
+\end{align*}
+Provided $a_0\neq 0$, there \alert{always} exists an inverse in
+\alert{positive} powers of $L$, which we denote by $a(L)^{-1}_+$
+where
+\begin{align*}
+  a(L)^{-1}_+ = b_0 + b_1 L + b_2 L^2 + \cdots
+\end{align*}
+\pause
+satisfying
+\begin{align}
+  a(L)a(L)^{-1}_+
+  =
+  \quad
+  1
+  \quad
+  =
+  \quad
+  1\cdot L^0 + 0 \cdot L^1 + 0 \cdot L^2 + \cdots
+  \label{inversecond}
+\end{align}
+\pause
+Given how we defined the product of filters,
+Expression~\ref{inversecond} implies a \alert{set of restrictions} that
+we can solve to characterize the coefficients $\{b_i\}_{i=0}^\infty$ of
+$a(L)^{-1}_+$:
+\begin{align*}
+  1 &= a_0 b_0
+  \\
+  0 &= a_0 b_1 + a_1 b_0
+  \\
+  0 &= a_0 b_2 + a_1 b_1 + a_2 b_0
+  \\
+  &\;\;\vdots
+\end{align*}
+\pause
+We can similarly define an inverse in \alert{negative} powers of $L$,
+which we denote by $a(L)_-^{-1}$.
+\end{frame}
+}
+
+
+
+
+{\scriptsize
+\begin{frame}{Inverse of a One-Sided Filter: In Negative Powers}
+Alternatively, provided $a_0\neq 0$, there also \alert{always} exists a
+inverse in \alert{negative} powers of $L$, which we denote by
+$a(L)^{-1}_+$ where
+\begin{align*}
+  a(L)^{-1}_- = b_0 + b_1 L^{-1} + b_2 L^{-2} + \cdots
+\end{align*}
+satisfying
+\begin{align}
+  a(L)a(L)^{-1}_- = 1
+  = 1\cdot L^0 + 0 \cdot L^1 + 0 \cdot L^{-1} + 0 \cdot L^2 + 0 \cdot
+  L^{-2} + \cdots
+  \label{inversecond2}
+\end{align}
+Given how we defined the product of filters,
+Expression~\ref{inversecond2} implies a \alert{set of restrictions} that
+we can solve to characterize the coefficients $\{b_i\}_{i=0}^\infty$ of
+$a(L)^{-1}_-$:
+\begin{align*}
+  a(L)
+  a(L)^{-1}_-
+  &=
+  \big(
+   a_0 + a_1 L^1 + a_2 L^2 + \cdots
+  \big)
+  \big(
+  b_0 + b_1 L^{-1} + b_2 L^{-2} + \cdots
+  \big)
+  \\
+  &=
+  (a_0b_0 + a_1 b_1 + \cdots) \cdot L^0
+  \\
+  &
+  \quad
+  +
+  (a_1 b_0 + a_2b_1 + a_3 b_2 + \cdots) \cdot L^1
+  \\
+  &
+  \quad
+  +
+  (a_0 b_1 + a_1b_2 + a_2 b_3 + \cdots) \cdot L^{-1}
+  \\
+  &
+  \quad
+  +
+  (a_2 b_0 + a_3b_1 + a_4 b_2 + \cdots) \cdot L^{2}
+  \\
+  &
+  \quad
+  +
+  (a_0 b_2 + a_1b_3 + a_2 b_4 + \cdots) \cdot L^{-2}
+  \\
+  &
+  \quad
+  +\cdots
+\end{align*}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Inverse(s) of a Filter}
+\begin{itemize}
+  \item If we wish to invert a two-sided filter, the inverse must
+    generally also be a two-sided filter.
+
+  \pause
+  \item We saw that we can generally define inverses in \alert{both}
+    positive and negative powers of $L$.
+    But when applied to a covariance stationary process, each inverse
+    \alert{need not} converge in mean square to a well-defined limit.
+
+  \item
+    This is the criterion we use to determine whether we take an inverse
+    in \alert{positive} or \alert{negative} powers of $L$:
+    Which inverse will lead to \alert{convergence} (of the resulting sum
+    to a well-defined limit)?
+
+  \pause
+  \item Often, we don't distinguish $a(L)^{-1}_+$ and $a(L)^{-1}_-$ and
+    we just simply write $a(L)^{-1}$, which is to be understood as
+    ``whichever of the inverses that ensures convergence of the
+    resulting generally infinite sum to some well-defined limiting
+    process.''
+
+  \pause
+  \item Generally, given a lag polynomial in positive powers of $L$, we
+    want an inverse \alert{also in positive powers} of $L$.
+    The next slide gives a condition for whether that inverse is
+    absolutely summable and hence leads to convergence partial sums when
+    applied to a covariance stationary process.
+\end{itemize}
+\end{frame}
+}
+
+
+
+
+{\scriptsize
+\begin{frame}{Inverse(s) of Filters: Stability Conds.\ for Inverting $p$th Order}
+Suppose our filter is a \alert{$p$th degree lag polynomial}:
+\begin{align*}
+  \phi(L)
+  =
+  1-\phi_1 L - \cdots - \phi_p L^p
+\end{align*}
+\pause
+Denote the inverse in positive powers of $L$ as
+\begin{align*}
+  \phi(L)^{-1} = \psi(L) = \psi_0 + \psi_1 L + \psi_2 L^2 + \cdots
+\end{align*}
+\pause
+If all \alert{roots} of the associated polynomial
+\begin{align*}
+  \phi(z)
+  =
+  1-\phi_1 z - \cdots - \phi_p z^p
+\end{align*}
+are \alert{outside the unit circle} (roots can be complex),
+then
+\begin{itemize}
+  \item $\exists A>0$ and $b\in(0,1)$ such that $|\psi_j| < A b^j$ for
+    all $j$.
+    Hence, coefficients \alert{abs.\ summable} because declining at
+    geometric rate.
+
+  \pause
+  \item Hence when we apply the ``inverse in positive powers
+    of $L$'' to any cov.\ stationary process, we will get
+    \alert{another cov.\ stationary process} by the Filtering
+    Theorem.
+\end{itemize}
+\pause
+This is the crucial stationarity condition for VAR/AR models.
+See below.
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Inverse(s) of Filters: Stability Conds.\ for Inverting $p$th Order}
+Suppose our filter is a \alert{$p$th degree lag polynomial}:
+\begin{align*}
+  \phi(L)
+  =
+  1-\phi_1 L - \cdots - \phi_p L^p
+\end{align*}
+Our stability condition was the roots of the following polynomial are
+all \alert{outside the unit circle}:
+\begin{align*}
+  \phi(z)
+  =
+  1-\phi_1 z - \cdots - \phi_p z^p
+\end{align*}
+\pause
+An equivalent stability condition is that the roots of the following
+alternative polynomial are all \alert{inside the unit circle}:
+\begin{align*}
+  g(w)
+  =
+  w^p-\phi_1 w^{p-1} - \cdots - \phi_p
+\end{align*}
+\pause
+Proof:
+Simply rewrite
+\begin{align*}
+  g(w)
+  =
+  w^p[1-\phi_1 w^{-1} - \cdots - \phi_p w^{-p}]
+  =
+  (1/w)^{-p}[1-\phi_1 (1/w)^{1} - \cdots - \phi_p (1/w)^{p}]
+\end{align*}
+Take $w^{-1}=z$.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Inverse(s) of Filters: Stability Conds.\ for Inverting $p$th Order}
+Suppose that we have a $p$th degree \alert{multivariate} lag polynomial:
+\begin{align*}
+  \Phi(L) = I_n - \Phi_1 L - \Phi_2 L^2 - \cdots - \Phi_p L^p
+\end{align*}
+for $\Phi_p\neq 0$ and where $\Phi_i$ are $n\times n$ matrices.
+
+\pause
+Then the (equivalent) stability conditions are
+\begin{itemize}
+  \item The roots of the following equation all lie outside the unit
+    circle
+    \begin{align*}
+      |I_n - \Phi_1 z - \cdots \Phi_p z| = 0
+    \end{align*}
+
+  \item The roots of the following equation all lie inside the unit
+    circle
+    \begin{align*}
+      |I_nz^p - \Phi_1 z^{p-1} - \cdots \Phi_p| = 0
+    \end{align*}
+\end{itemize}
+\end{frame}
+}
+
+
+
+{\scriptsize
+\begin{frame}{Inverse(s) of First-Order Lag Polynomial}
+Suppose we would like to invert
+\begin{align*}
+  a(L) = (1-\phi L)
+\end{align*}
+Previously, I motivated the inverse of $(1-\phi L)$ by noting the
+following geometric series result:
+\begin{align*}
+  \sum_{i=0}^\infty
+  x^i
+  &=
+  1 + x + x^2 + x^3 + \cdots
+  =
+  \frac{1}{1-x}
+  \qquad
+  \text{If $|x|<1$}
+\end{align*}
+\pause
+Taking our cue from this result, we defined the inverses in positive
+and negative powers of $L$:
+%\begin{align*}
+  %(1-\phi L)^{-1}
+  %&=
+  %1 + \phi L + \phi^2 L^2 + \cdots
+%\end{align*}
+\begin{align*}
+  (1-\phi L)^{-1}
+  &=
+  1 + \phi L + \phi^2 L^2 + \cdots
+  \qquad
+  \qquad
+  \qquad
+  \qquad
+  \quad
+  |\phi|<1
+  \\
+  (1-\phi L)^{-1}
+  %&=
+  %(\phi L[\phi^{-1} L^{-1}-1])^{-1}
+  %\qquad
+  %\qquad
+  %\qquad
+  %\qquad
+  %\quad
+  %\,
+  %|\phi|>1
+  %\\
+  &=
+  -(\phi L)^{-1}(1-\phi^{-1} L^{-1})^{-1}
+  \qquad
+  \qquad
+  \qquad
+  \quad
+  \,
+  |\phi|>1
+  \\
+  &=
+  -
+  \phi^{-1}L^{-1}
+  (1+ \phi^{-1}L^{-1} + \phi^{-2}L^{-2} + \cdots)
+  \\
+  &=
+  -
+  \phi^{-1}L^{-1} - \phi^{-2}L^{-2} - \phi^{-3}L^{-3} - \cdots
+\end{align*}
+\pause
+But this is \alert{exactly} what you get from
+the more rigorous definition presented above,
+solving the associated system
+implied by the definitions of an inverse and the product of filters.
+
+If $\phi=1$, this is a so called \alert{unit root}. We cannot
+take advantage of the geometric series formula.
+But we can take the ``solve the system'' approach above to get an
+inverse in positive powers of $L$, it just won't be convergent when
+applied to a covariance stationary process.
+\end{frame}
+}
+
+
+
+%{\footnotesize
+%\begin{frame}{Inverses of Lag Polynomials}
+%Example: Simple AR(1)
+%\begin{align*}
+  %y_t
+  %&= \rho y_{t-1} + \varepsilon_t
+  %\\
+  %(1-\rho L) y_t
+  %&= \varepsilon_t
+  %\\
+  %y_t
+  %&= (1-\rho L)^{-1}\varepsilon_t
+%\end{align*}
+%If $|\rho|<1$, then we invert in \alert{positive} powers of $L$:
+%\begin{align*}
+  %y_t
+  %&=
+  %\big[
+    %1 + \rho L + \rho^2L^2 + \cdots
+  %\big]
+  %\varepsilon_t
+  %\\
+  %&=
+  %\varepsilon_t
+  %+ \rho \varepsilon_{t-1}
+  %+ \rho^2 \varepsilon_{t-2}
+  %+ \cdots
+%\end{align*}
+%If $|\rho|>1$, then we invert in \alert{negative} powers of $L$:
+%\begin{align*}
+  %y_t
+  %&=
+  %\big[
+    %\rho^{-1}L^{-1}
+    %+ \rho^{-2}L^{-2}
+    %+ \rho^{-3}L^{-3}
+    %+ \cdots
+  %\big]
+  %\varepsilon_t
+  %\\
+  %&=
+  %\frac{1}{\rho}\varepsilon_{t+1}
+  %+ \frac{1}{\rho^2}\varepsilon_{t+2}
+  %+ \frac{1}{\rho^3}\varepsilon_{t+3}
+  %+ \cdots
+%\end{align*}
+%\end{frame}
+%}
+
+
+
+{\footnotesize
+\begin{frame}{Inverse(s) of Lag Polynomials: Higher Order Order}
+How can we invert multi-order lag polynomials?
+\begin{align*}
+  a(L)
+  &=
+  (1-a_1L - a_2L^2 - \cdots - a_3L^p)
+  %\\
+  %a(L)^{-1}
+  %&=
+  %(1-a_1L - a_2L^2 - \cdots - a_pL^p)^{-1}
+\end{align*}
+\pause
+\alert{Factor} the higher-order polynomial into a product of first-order
+polynomials:
+\begin{align*}
+  a(L)
+  &=
+  (1-b_1L)
+  \cdots
+  (1-b_pL)
+  \\
+  a(L)^{-1}
+  &=
+  (1-b_1L)^{-1}
+  \cdots
+  (1-b_pL)^{-1}
+\end{align*}
+\pause
+Note
+\begin{itemize}
+  \item Can invert each first order polynomial individually, the
+    multiply inverses together.
+
+  \pause
+  \item Whether you use the inverse in \alert{positive} or
+    \alert{negative} powers of $L$ for each individual first order
+    polynomial depends upon which gives mean square convergence.
+
+  \pause
+  \item Generally, the total inverse $a(L)^{-1}$ has positive and
+    negative powers of $L$, unless each degree-one polynomial in the
+    factored form of $a(L)$ is invertible in only positive powers of
+    $L$.
+\end{itemize}
+
+
+%general, an expression of the form
+%\begin{align*}
+  %a(L)^{-1}
+  %&=
+  %c_0 + c_1 L + c_{-1}L^{-1} + c_2 L^2 + c_{-2} L^{-2} + \cdots
+%\end{align*}
+\end{frame}
+}
+
+
+\subsubsection{Examples}
+
+{\scriptsize
+\begin{frame}{Inverse(s) of Lag Polynomials: Examples}
+Example I:
+\begin{align*}
+  x_t
+  &=
+  \frac{3}{4}x_{t-1} - \frac{1}{8}x_{t-2}
+  +
+  \varepsilon_t
+\end{align*}
+\pause
+Form lag polynomial:
+\begin{align*}
+  \phi(z)
+  &=
+  1 - \frac{3}{4}z + \frac{1}{8}z^2
+\end{align*}
+\pause
+Factor
+\begin{align*}
+  \phi(z)
+  &=
+  \left(
+    1-\frac{1}{2}z
+  \right)
+  \left(
+    1-\frac{1}{4}z
+  \right)
+\end{align*}
+\pause
+Roots outside the unit circle, so can invert each in positive powers of
+$L$ to get inverses with absolutely summable coefficients, multiply
+together to get a product that's still absolutely summable:
+\begin{align*}
+  \phi(L)^{-1}
+  &=
+  \left(
+    1-\frac{1}{2}L
+  \right)^{-1}
+  \left(
+  1-\frac{1}{4}L
+  \right)^{-1}
+  \\
+  &=
+  \left(
+    1
+    +\frac{1}{2}L
+    +\frac{1}{4}L^2
+    +\frac{1}{8}L^8
+    +\cdots
+  \right)
+  \left(
+    1
+    +\frac{1}{4}L
+    +\frac{1}{16}L^2
+    +\cdots
+  \right)
+  \\
+  &=
+  1
+  +
+  \left[
+    \frac{1}{2}
+    +
+    \frac{1}{4}
+  \right]
+  L
+  +
+  \left[
+    \frac{1}{4}
+    +
+    \frac{1}{8}
+    +
+    \frac{1}{2}
+    \cdot
+    \frac{1}{4}
+  \right]
+  L^2
+  +
+  \cdots
+\end{align*}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Inverse(s) of Lag Polynomials: Examples}
+Example II:
+\begin{align*}
+  x_t
+  &= 0.5x_{t-1} + 0.5x_{t-2} + \varepsilon_t
+\end{align*}
+Form the lag polynomial
+\begin{align*}
+  \phi(z)
+  &= 1 - 0.5z -0.5z^2
+\end{align*}
+\pause
+Factor
+\begin{align*}
+  \phi(z)
+  &= (1-z)(1+0.5z)
+\end{align*}
+Notice there is a unit root.
+
+\pause
+Of course, you can always invert certain pieces, if not the whole thing:
+\begin{align*}
+  \phi(L)x_t
+  =
+  (1-L)(1+0.5L)
+  x_t
+  &=
+  \varepsilon_t
+  \\
+  (1-L)x_t &= (1+0.5L)^{-1}\varepsilon_t
+  \\
+  x_t &= x_{t-1} + (1+0.5L)^{-1}\varepsilon_t
+\end{align*}
+\alert{General Note}:
+You quickly check for unit roots in lag polynomials by summing the
+coefficients. Equivalently, make sure $\phi(1)\neq 0$.
+\end{frame}
+}
+
+
+
+
+
+\section{Properties of Linear Processes}
+
+{\footnotesize
+\begin{frame}{Time Series Analysis: Roadmap}
+\tableofcontents[currentsection, hideothersubsections]
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Properties of Linear Processes}
+
+We are now in a good position study linear time series processes.
+Not all of the topics below make direct use of filters, but many do, and
+to quite elegant and clean effect.
+
+Topics:
+\begin{itemize}
+  \item Computing autocovariances for stationary processes
+  \pause
+  \item Computing \alert{ACGF}s, which are closely related to filters
+  \pause
+  \item Observational equivalence problem in MA models, i.e.\
+    \alert{multiple} filter and white noise combinations that deliver
+    the \alert{same} autocovariance properties.
+  \item Fundamental MA representations, i.e.\ whether the MA lag
+    polynomial is \alert{invertible in positive powers} of $L$
+  \pause
+  \item AR stationarity conditions, i.e.\ whether AR lag polynomial
+    \alert{invertible in positive powers} of $L$
+  \pause
+  \item \alert{Limit theorems} and the \alert{long-run variance}, with
+    easier sufficient conditions expressed in terms of filters.
+\end{itemize}
+\end{frame}
+}
+
+
+%{\footnotesize
+%\begin{frame}{Lag Polynomials}
+%Special cases and perspectives
+%\begin{itemize}
+  %\item AR($p$) model:
+    %$\varepsilon_t$ written in terms of current and lagged $y_t$.
+    %\begin{align*}
+      %\phi(L)y_t = \varepsilon_t
+    %\end{align*}
+
+
+  %\item MA($q$) model:
+    %$y_t$ written in terms of current and lagged $\varepsilon_t$
+    %\begin{align*}
+      %y_t = \theta(L)\varepsilon_t
+    %\end{align*}
+
+  %\item
+    %ARMA model can be rewritten as an AR or MA model, provided
+    %\alert{inverses} of the lag polynomials are well-defined
+    %\begin{align*}
+      %\phi(L)
+      %y_t
+      %&=
+      %\theta(L)
+      %\varepsilon_{t}
+      %\\
+      %\theta(L)^{-1}
+      %\phi(L)
+      %y_t
+      %&=
+      %\varepsilon_{t}
+      %\\
+      %y_t
+      %&=
+      %\phi(L)^{-1}
+      %\theta(L)
+      %\varepsilon_{t}
+    %\end{align*}
+    %Note that final expression is generally an \alert{MA($\infty$)}.
+    %This is a very useful \alert{canonical} representation of any linear
+    %time series process (provided the inverses exist and are
+    %well-defined, which we discuss below).
+%\end{itemize}
+%\end{frame}
+%}
+
+
+
+\subsection{Computing Autocovariances}
+
+
+{\scriptsize
+\begin{frame}{Computing Autocovariances: MA(2)}
+Model
+\begin{align*}
+  y_t = \varepsilon_t + 0.5 \varepsilon_{t-1}
+  \qquad
+  \varepsilon_t\sim(0,\sigma^2_\varepsilon)
+\end{align*}
+First the variance
+\begin{align*}
+  \Var(y_t)
+  &= \Var(\varepsilon_t + 0.5 \varepsilon_{t-1})
+  = \Var(\varepsilon_t) + 0.5^2 \Var(\varepsilon_{t-1})
+  = (1+0.5^2) \sigma^2_\varepsilon
+  = 1.25 \sigma^2_\varepsilon
+\end{align*}
+\pause
+Then the first order covariance:
+\begin{align*}
+  \Cov(y_{t-1},y_{t})
+  &=
+  \Cov(\varepsilon_{t-1} + 0.5 \varepsilon_{t-2}, \varepsilon_t + 0.5 \varepsilon_{t-1})
+  \\
+  &=
+  \Cov(\varepsilon_{t-1}, \varepsilon_t)
+  + 0.5 \Cov(\varepsilon_{t-1}, \varepsilon_{t-1})
+  + \Cov(0.5 \varepsilon_{t-2}, \varepsilon_t)
+  + \Cov(0.5 \varepsilon_{t-2}, 0.5\varepsilon_{t-1})
+  \\
+  &=
+  0
+  + 0.5 \Var(\varepsilon_{t-1})
+  + 0
+  + 0
+  \\
+  &=
+  0.5 \sigma^2_\varepsilon
+\end{align*}
+Higher order autocovariances all zero, which is a nice feature of $MA(q)$
+processes: autocovariances die out after $q$.
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Computing Autocovariances: MA(2)}
+Similarly, suppose
+\begin{align*}
+  y_t = \eta_t + 2\eta_{t-1}
+  \qquad
+  \varepsilon_t\sim(0,0.25\sigma^2_\varepsilon)
+\end{align*}
+\pause
+Then get the following:
+\begin{align*}
+  \Var(y_t)
+  &= (1+2^2) 0.25\sigma^2_\varepsilon
+  = 1.25\sigma^2_\varepsilon
+  \\
+  \Cov(y_{t-1},y_{t})
+  &=
+  2 \cdot 0.25 \cdot \sigma^2_\varepsilon
+  = 0.5 \sigma^2_\varepsilon
+\end{align*}
+\pause
+Suggests an observational equivalence problem in MA models, and will
+connect to notion of ``fundamentalness'' and Wold's Theorem.
+See slides below.
+\end{frame}
+}
+
+
+
+{\scriptsize
+\begin{frame}{Computing Autocovariances: Stationary AR(1)}
+Suppose we have the following process
+\begin{align*}
+  y_t = \rho y_{t-1} + \varepsilon_t
+  \qquad
+  \varepsilon_t\sim(0,\sigma^2_\varepsilon)
+\end{align*}
+Under the assumption that the parameters of the model are such that
+$\{y_t\}$ is a stationary process (more on stationarity of AR models
+below), we can compute variance and autocovariances by recursive
+substitution:
+\begin{align*}
+  \Var(y_t)
+  &=
+  \Var(\rho y_{t-1} + \varepsilon_t)
+  = \rho^2 \Var(y_{t-1}) + \Var(\varepsilon_t)
+  = \rho^2 \Var(y_{t}) + \Var(\varepsilon_t)
+  = \frac{\sigma^2_\varepsilon}{1-\rho^2}
+\end{align*}
+\pause
+Covariances
+\begin{align*}
+  \Cov(y_{t-1},y_{t})
+  &=
+  \Cov(y_{t-1},\rho y_{t-1} + \varepsilon_t)
+  =
+  \rho\Cov(y_{t-1},y_{t-1})
+  +
+  \Cov(y_{t-1},\varepsilon_t)
+  =
+  \rho\Var(y_{t-1})
+  +
+  0
+  =
+  \rho
+  \frac{\sigma^2_\varepsilon}{1-\rho^2}
+  \\
+  \Cov(y_{t-k},y_{t})
+  &=
+  \rho^k
+  \frac{\sigma^2_\varepsilon}{1-\rho^2}
+\end{align*}
+\pause
+Of course, what are those assumptions?
+\begin{itemize}
+  \item \alert{Linear difference approach}:
+    Recursive substitution, $\rho$ such that past shocks die out.
+  \item \alert{Filtering approach}:
+    Whatever leads to abs.\ summable inverse of the lag
+    polynomial.
+\end{itemize}
+See more on AR stationary below
+%Often useful rewrite processes by recursive substitution
+%\begin{align*}
+  %y_t
+  %= \rho y_{t-1} + \varepsilon_t
+  %= \rho \big( \rho y_{t-2} + \varepsilon_{t-1}\big) + \varepsilon_t
+  %=
+  %\cdots
+  %=
+  %\sum_{s=0}^K
+  %\rho^{s}
+  %\varepsilon_{t-s}
+%\end{align*}
+%Taking $K\ra\infty$, get MA($\infty$) rep of an AR(1) model
+%that we get by inverting lag polynomials.
+\end{frame}
+}
+
+
+
+
+{\scriptsize
+\begin{frame}{Computing Autocovariances: Stationary AR(2)}
+Suppose that
+\begin{align*}
+  y_t = \phi_1 y_{t-1} + \phi_2 y_{t-2} + \varepsilon_t
+  \qquad
+  \varepsilon_t\sim (0,\sigma^2_\varepsilon)
+\end{align*}
+Suppose $\phi_1,\phi_2$ such that the process is stationary.
+Can again use recursive substitution:
+\begin{align*}
+  \Var(y_t)
+  &= \Var(\phi_1 y_{t-1} + \phi_2 y_{t-2} + \varepsilon_t)
+  \\
+  &=
+  \Var(\phi_1 y_{t-1} + \phi_2 y_{t-2}) + \Var(\varepsilon_t)
+  \\
+  &=
+  \Var(\phi_1 y_{t-1})
+  +
+  \Var(\phi_2 y_{t-2})
+  +
+  2\Cov(\phi_1 y_{t-1}, \phi_2 y_{t-2})
+  + \sigma^2_\varepsilon
+  \\
+  &=
+  (\phi_1^2 + \phi_2^2) \Var(y_{t})
+  + 2\phi_1\phi_2  \Cov(y_{t}, y_{t-1})
+  + \sigma^2_\varepsilon
+\end{align*}
+\pause
+First order covariance
+\begin{align*}
+  \Cov(y_{t-1},y_t)
+  &=
+  \Cov(y_{t-1},\phi_1 y_{t-1} + \phi_2 y_{t-2} + \varepsilon_t)
+  \\
+  &=
+  \phi_1 \Cov(y_{t-1},y_{t-1})
+  +
+  \phi_2 \Cov(y_{t-1},y_{t-2})
+  +
+  \Cov(y_{t-1},\varepsilon_t)
+  \\
+  &=
+  \phi_1 \Var(y_{t})
+  +
+  \phi_2 \Cov(y_{t},y_{t-1})
+\end{align*}
+\pause
+\alert{Two equations in two unknowns} $\Var(y_t)$ and
+$\Cov(y_t,y_{t-1})$ that we can solve.
+
+\alert{Higher order autocovariances} will be functions of these
+unknowns, e.g.
+\begin{align*}
+  \Cov(y_{t-2},y_t)
+  &=
+  \Cov(y_{t-2},\phi_1 y_{t-1} + \phi_2 y_{t-2} + \varepsilon_t)
+  %=
+  %\phi_1 \Cov(y_{t-2},y_{t-1})
+  %+
+  %\phi_2 \Cov(y_{t-2},y_{t-2})
+  %+
+  %\Cov(y_{t-2},\varepsilon_t)
+  =
+  \phi_1 \Cov(y_{t-1},y_{t})
+  +
+  \phi_2 \Var(y_{t})
+\end{align*}
+\end{frame}
+}
+
+
+
+
+%\begin{frame}[shrink]{ARMA Practice}
+%Suppose we have process $\{y_t\}$ that is the sum of an AR(1) and white
+%noise
+%\begin{align*}
+  %y_t &= x_t + u_t\\
+  %x_t &=\phi x_{t-1} + \varepsilon_t
+%\end{align*}
+%$\varepsilon_t\perp u_t$.
+%Want to show can write an observationally equivalent ARMA(1,1) process
+%\begin{align*}
+  %(1-\phi L)X_t &= (1-\theta L)e_t
+%\end{align*}
+%First, write $x_t$ out of the original process:
+%\begin{align*}
+  %(1-\phi L)y_t &= \varepsilon_t + (1-\phi L)u_t
+%\end{align*}
+%From there, match autocovariances of
+%\begin{align*}
+  %\varepsilon_t+u_t-\phi u_{t-1}
+  %\quad\text{and}\quad
+  %e_t - \theta e_{t-1}
+%\end{align*}
+%\end{frame}
+
+
+%\begin{frame}[shrink]{ARMA Practice}
+%Compute
+%\begin{align*}
+  %\Var(\varepsilon_t+u_t-\phi u_{t-1})
+  %&=
+  %\sigma^2_\varepsilon
+  %+
+  %(1+\phi^2)
+  %\sigma^2_u
+  %\\
+  %\Cov(
+    %\varepsilon_t+u_t-\phi u_{t-1}
+    %,
+    %\varepsilon_{t-1}+u_{t-1}-\phi u_{t-2}
+  %)
+  %&=
+  %-\phi \sigma^2_u
+%\end{align*}
+%and
+%\begin{align*}
+  %\Var(e_t - \theta e_{t-1})
+  %&=
+  %\sigma^2_e
+  %(1+\theta^2)
+  %\\
+  %\Cov(
+    %e_t - \theta e_{t-1},
+    %e_{t-1} - \theta e_{t-2}
+  %)
+  %&=
+  %-
+  %\theta
+  %\sigma^2_e
+%\end{align*}
+%Given $(\sigma^2_\varepsilon,\sigma^2_u,\phi)$, choose
+%$(\sigma^2_e,\theta)$ to match
+%\begin{align*}
+  %\sigma^2_\varepsilon
+  %+
+  %(1+\phi^2)
+  %\sigma^2_u
+  %&=
+  %\sigma^2_e
+  %(1+\theta^2)
+  %\\
+  %-\phi \sigma^2_u
+  %&=
+  %-
+  %\theta
+  %\sigma^2_e
+%\end{align*}
+%Need to check for existence of a solution to this system.
+%\end{frame}
+
+
+%\begin{frame}[shrink]{ARMA Practice}
+
+%Rewrite
+%\begin{align*}
+  %\sigma^2_\varepsilon
+  %+
+  %(1+\phi^2)
+  %\sigma^2_u
+  %&=
+  %\sigma^2_e
+  %(1+\theta^2)
+  %\\
+  %\phi \sigma^2_u
+  %&=
+  %\theta
+  %\sigma^2_e
+%\end{align*}
+%Then
+%\begin{align*}
+  %\sigma^2_\varepsilon
+  %+
+  %(1+\phi^2)
+  %\sigma^2_u
+  %&=
+  %\left(
+    %\frac{\sigma^4_e+\phi^2 \sigma^4_u}{\sigma^2_e}
+  %\right)
+%\end{align*}
+%Then
+%\begin{align*}
+  %\frac{1+\theta^2}{\theta}
+  %&=
+  %\frac{\sigma^2_\varepsilon}{\phi \sigma^2_u}
+  %+
+  %\frac{1+\phi^2}{\phi\sigma^2_u}
+%\end{align*}
+%Suppose don't observe $x_t$ or $u_t$.
+%How to forecast $y_{T+4}$
+
+%Now suppose you did observe $x_t$ and $u_t$.
+
+%\end{frame}
+
+
+\subsubsection{Aside: Companion form of AR and VAR Models}
+
+{\scriptsize
+\begin{frame}{Companion Form of AR($p$)}
+Suppose we have an AR($p$):
+\begin{align*}
+  y_t &= \phi_1 y_{t-1} + \cdots + \phi_p y_{t-p} + \varepsilon_t
+\end{align*}
+Can compute autocovs by recursive substitution, or
+rewrite in \alert{companion form} as a VAR($1$):
+\begin{align*}
+  \underbrace{%
+  \begin{pmatrix}
+    y_t \\ y_{t-1} \\ \vdots \\ y_{t-p+1}
+  \end{pmatrix}
+  }_{Y_t}
+  &=
+  \underbrace{%
+  \begin{pmatrix}
+    \begin{matrix}
+      \phi_1 & \cdots & \phi_p
+    \end{matrix}
+    \\
+    \begin{matrix}
+      I_{p-1} & 0_{(p-1)\times 1}
+    \end{matrix}
+  \end{pmatrix}
+  }_{\Phi}
+  \underbrace{%
+  \begin{pmatrix}
+    y_{t-1} \\ y_{t-2} \\ \vdots \\ y_{t-p}
+  \end{pmatrix}
+  }_{Y_{t-1}}
+  +
+  \underbrace{%
+  \begin{pmatrix}
+    \varepsilon_{t} \\ 0 \\ \vdots \\ 0
+  \end{pmatrix}
+  }_{u_t}
+  \\
+  \\
+  \qquad\text{where}\quad
+  u_t &\sim
+  \bigg(0,
+  \underbrace{
+  \begin{pmatrix}
+    \sigma^2 & 0_{1\times (p-1)}\\
+    0_{(p-1)\times 1} & 0_{(p-1)\times (p-1)}\\
+  \end{pmatrix}
+  }_{\Sigma}
+  \bigg)
+\end{align*}
+\pause
+Can do a similar stacking and write any VAR($p$) as a VAR($1$) for some
+expanded state vector of dimension $n\times p$.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Companion Form of AR($p$): Computing Autocovariances}
+Suppose we have an AR($p$) $\{y_t\}$ that we stack into a VAR(1) as
+above.
+Can compute $\Var(Y_t)$ all at once, same way that we compute
+$\Var(y_t)$ for an AR(1) process:
+\begin{align*}
+  \Var({Y}_t)
+  &=
+  \Var(\Phi {Y}_{t-1}+ {u}_t)
+  =
+  \Phi \Var({Y}_{t-1})\Phi'
+  +
+  \Var(u_t)
+  =
+  \Phi \Var({Y}_{t})\Phi'
+  +
+  \Sigma
+  \\
+  \implies\quad
+  \vc(\Var({Y}_t))
+  &=
+  [I-(\Phi\otimes\Phi)]^{-1}
+  \vc(\Sigma)
+\end{align*}
+Because $\Var(Y_t)$ is a matrix and $Y_t$ has both $y_t$ and lags of
+$y_t$ in it, we get $\Var(y_t)$ and first $p-1$ autocovariances all at
+once.
+\end{frame}
+}
+
+
+
+
+
+%{\scriptsize
+%\begin{frame}{Examples: Higher Order Autocovs}
+%\alert{Want}:
+%$\Cov(X_t,X_{t-5})$
+%for DGP
+%\begin{align*}
+  %X_t
+  %&=
+  %2 + 1.3 X_{t-1} - 0.5 X_{t-2} + \varepsilon_t
+  %\qquad
+  %\varepsilon_t \iid (0,4)
+%\end{align*}
+%Two approaches:
+%\begin{itemize}
+  %\item Set up equations systematically as in AR(2) example, solve
+  %\item Write into VAR(1) companion form, augmenting state vector, use
+    %general formulas:
+    %\begin{align*}
+      %\underbrace{%
+        %\begin{pmatrix}
+          %X_t \\
+          %X_{t-1} \\
+          %X_{t-2} \\
+          %X_{t-3} \\
+          %X_{t-4} \\
+          %X_{t-5}
+        %\end{pmatrix}
+      %}_{\tilde{X}_{t}}
+      %&=
+      %\underbrace{%
+        %\begin{pmatrix}
+          %2 \\
+          %0 \\
+          %0 \\
+          %0 \\
+          %0 \\
+          %0 \\
+        %\end{pmatrix}
+      %}_{C}
+      %+
+      %\underbrace{%
+        %\begin{pmatrix}
+          %1.3 & -0.5 & 0 & 0 & 0 & 0 \\
+          %1 & 0 & 0 & 0 & 0 & 0 \\
+          %0 & 1 & 0 & 0 & 0 & 0 \\
+          %0 & 0 & 1 & 0 & 0 & 0 \\
+          %0 & 0 & 0 & 1 & 0 & 0 \\
+          %0 & 0 & 0 & 0 & 1 & 0 \\
+        %\end{pmatrix}
+      %}_{\Phi}
+      %\underbrace{%
+        %\begin{pmatrix}
+          %X_{t-1} \\
+          %X_{t-2} \\
+          %X_{t-3} \\
+          %X_{t-4} \\
+          %X_{t-5} \\
+          %X_{t-6} \\
+        %\end{pmatrix}
+      %}_{\tilde{X}_{t-1}}
+      %+
+      %\underbrace{%
+        %\begin{pmatrix}
+          %\varepsilon_t \\
+          %0 \\
+          %0 \\
+          %0 \\
+          %0 \\
+          %0 \\
+        %\end{pmatrix}
+      %}_{\tilde{\varepsilon_t}}
+    %\end{align*}
+    %From there, similar to what we saw in class,
+    %\begin{align*}
+      %\Var(\tilde{X}_t)
+      %&=
+      %\Var(C + \Phi \tilde{X}_{t-1}+ \tilde{\varepsilon}_t)
+      %=
+      %\Phi \Var(\tilde{X}_{t-1})\Phi'
+      %+
+      %\Var(\tilde{\varepsilon}_t)
+      %=
+      %\Phi \Var(\tilde{X}_{t})\Phi'
+      %+ \Sigma
+      %\\
+      %\implies\quad
+      %\vc(\Var(\tilde{X}_t))
+      %&=
+      %[I-(\Phi\otimes\Phi)]^{-1}
+      %\vc(\Sigma)
+    %\end{align*}
+%\end{itemize}
+%\end{frame}
+%}
+
+\subsection{Revisiting the ACGF}
+
+{\footnotesize
+\begin{frame}{Filtering Perspective and ACGFs: Result}
+Suppose
+\begin{itemize}
+  \item Input series $\{x_t\}$ has ACGF
+    $\lambda_x(z)=\sum_{k=-\infty}^\infty \gamma_{k,x} z^j$
+  \item Output series $\{y_t\}$ is constructed by filtering $\{x_t\}$
+    with an abs.\ summable $h(L)$:
+    \begin{align*}
+      y_t = h(L)x_t
+    \end{align*}
+\end{itemize}
+\pause
+Then the ACGF of $\{y_t\}$ is
+\begin{align*}
+  \lambda_y(z)
+  = \sum_{k=-\infty}^\infty \gamma_{k,y} z^j
+  = h(z)h(z^{-1})\lambda_x(z)
+\end{align*}
+\pause
+\alert{Punchline}:
+Write $\{y_t\}$ as filtered white noise or the filtering of another
+process with known ACGF (might need to take inverses and verify
+existence of the inverses) to get there.
+Then easily deduce the ACGF of $y_t$ and thus its covariance properties.
+Especially useful for limit theorems.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Filtering Perspective and ACGFs: Examples}
+The ACGF of white noise process $\{\varepsilon_t\}$ is simply
+\begin{align*}
+  \lambda_\varepsilon(z) = \sigma^2
+\end{align*}
+\pause
+MA($\infty$) process is just white noise filtered by $\psi(L)$.
+Hence ACGF of
+\begin{align*}
+  \lambda_y(z) = \sigma^2 \psi(z)\psi(z^{-1})
+\end{align*}
+\pause
+ARMA model with invertible AR component:
+\begin{align*}
+  \phi(L)y_t
+  &=
+  \theta(L)\varepsilon_t
+  \qquad\iff\qquad
+  y_t
+  =
+  \phi(L)^{-1}\theta(L)\varepsilon_t
+\end{align*}
+\pause
+Hence ACGF given by
+\begin{align*}
+  \lambda_y(z)
+  =
+  \sigma^2
+  \phi(z)^{-1}\theta(z)
+  \phi(z^{-1})^{-1}\theta(z^{-1})
+\end{align*}
+\end{frame}
+}
+
+
+\subsection{Observationally Equivalent MA Processes}
+
+{\scriptsize
+\begin{frame}{Obs.\ Equivalence in MA Models}
+In this section, start with MA($\infty$) model (for greatest generality,
+although also applies to finite-order as we'll see):
+\begin{align}
+  y_t = \Theta(L)\varepsilon_t
+  \qquad
+  \varepsilon_t\sim (0,\sigma^2)
+\end{align}
+where the $\varepsilon_t$ are uncorrelated with mean and variance
+$(0,\sigma^2)$, possibly also iid, depending upon our assumptions.
+
+\pause
+Two interpretations of this expression:
+\begin{itemize}
+  \item \alert{Wold's Theorem Interpretation}:
+    Given a covariance stationary $\{y_t\}$, there exists a $\Theta(L)$
+    and $\sigma^2$ such that the RHS (an infinite sum and random
+    variable) converges in mean square to $y_t$ for each $t$.
+
+  \item \alert{DGP Interpretation}:
+    Given $\sigma^2$ and $\Theta(L)$, above expression
+    specifies/characterizes DGP for $\{y_t\}$, which
+    is necessarily covariance stationary, as we can see from the
+    expression.
+\end{itemize}
+Either way, the process is covariance stationary.
+
+\pause
+\alert{Problem}:
+Consider the DGP interpretation.
+There are multiple $\sigma^2$ and $\Theta(L)$ combinations that might
+deliver \alert{identical} covariance properties.
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Obs.\ Equivalence in MA Models: Example}
+Consider the following two MA(1) DGPs:
+\begin{align*}
+  y_t &= \varepsilon_t + 0.5 \varepsilon_{t-1}
+  \qquad
+  \varepsilon_t\sim(0,\sigma^2_\varepsilon)
+  \\
+  \tilde{y}_t &= \eta_t + 2\eta_{t-1}
+  \qquad
+  \;\;
+  \varepsilon_t\sim(0,0.25\sigma^2_\varepsilon)
+\end{align*}
+Can easily verify that the models generate \alert{identical}
+autocov.\ properties.
+So from a \alert{second order perspective}, processes $\{y_t\}$ and
+$\{\tilde{y}_t\}$ are \alert{observationally equivalent}.
+
+\pause
+Easiest way to verify this is \alert{rewrite} the above processes
+explicitly as \alert{filtered white noise}
+\begin{align*}
+  y_t &= \theta(L)\varepsilon_t
+  \quad\text{where}\quad
+  \begin{cases}
+    \theta(z) = 1+0.5z \\
+    \Var(\varepsilon_t) = \sigma^2_\varepsilon
+  \end{cases}
+  \qquad
+  \tilde{y}_t = \tilde{\theta}(L)\eta_t
+  \quad\text{where}\quad
+  \begin{cases}
+    \tilde{\theta}(z) = 1+2z \\
+    \Var(\eta_t) = 0.25 \sigma^2_\varepsilon
+  \end{cases}
+\end{align*}
+\pause
+Then use our knowledge about ACGFs:
+\begin{align*}
+  \lambda_y(z)
+  &=
+  \theta(z)\theta(z^{-1})\sigma^2_\varepsilon
+  =
+  (1+0.5z)(1+0.5z^{-1})
+  \sigma^2_\varepsilon
+  \\
+  \lambda_{\tilde{y}}(z)
+  &=
+  \tilde{\theta}(z)\tilde{\theta}(z^{-1})\cdot 0.25\sigma^2_\varepsilon
+  =
+  (1+2z)(1+2z^{-1})\cdot 0.25\sigma^2_\varepsilon
+  \\
+  &=
+  (2z)(0.5z^{-1}+1)(2z^{-1})(0.5z+1)\cdot 0.25\sigma^2_\varepsilon
+  \\
+  &=
+  (1+0.5z^{-1})(1+0.5z)\sigma^2_\varepsilon
+\end{align*}
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Obs.\ Equivalence in MA Models: General Strategy}
+Given an MA process
+\begin{align*}
+  y_t = \theta(L)\varepsilon_t
+  \qquad
+  \varepsilon_t
+  \iid
+  (0,\sigma^2)
+\end{align*}
+Easy to characterize the set of observationally equivalent models using
+ACGF.
+\pause
+\begin{itemize}
+  \item Factor original lag polynomial $\theta(z)$
+    \begin{align*}
+      \theta(z) = (1-\gamma_1 z)\cdots(1-\gamma_q z)
+    \end{align*}
+  \pause
+  \item
+    \alert{Flip root} (or more than one root) to get new lag polynomial
+    $\tilde{\theta}(z)$
+    for new process $\{\tilde{y}\}$
+    \begin{align*}
+      \tilde{\theta}(z) = (1-\gamma_1^{-1} z)\cdots(1-\gamma_q z)
+    \end{align*}
+  \pause
+  \item
+    Choose $\tilde{\sigma}^2$ for white noise driving $\{\tilde{y}_t\}$
+    in order to match ACGFs
+    \begin{align*}
+      \lambda_y(z)
+      &= \sigma^2\theta(z)\theta(z^{-1})
+      \\
+      &=
+      \sigma^2
+      (1-\gamma_1 z)\cdots(1-\gamma_q z)
+      (1-\gamma_1 z^{-1})\cdots(1-\gamma_q z^{-1})
+      \\
+      &=
+      \sigma^2
+      \gamma_1 z \gamma_1z^{-1}
+      (1-\gamma_1^{-1} z)\cdots(1-\gamma_q z)
+      (1-\gamma_1^{-1} z^{-1})\cdots(1-\gamma_q z^{-1})
+      \\
+      &=
+      [\sigma^2 \gamma_1^2]
+      \tilde{\theta}(z)\tilde{\theta}(z^{-1})
+      =
+      \lambda_{\tilde{y}}(z)
+    \end{align*}
+\end{itemize}
+\pause
+Much easier (especially for higher order processes)
+than computing and matching covariances directly.
+Just work with ACGF since all in there already.
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Obs.\ Equivalence in MA Models: Discussion}
+
+Comments
+\begin{itemize}
+  \item \alert{Takeaway}: Given an MA process, there are other
+    observationally equivalent MA processes that generate
+    \alert{identical} autocovariance structure
+
+  %\item
+    %This is intuitve from the form of the MA model:
+    %\begin{align*}
+      %y_t = \theta(L)\varepsilon_t
+    %\end{align*}
+    %Since we don't observe the $\varepsilon_t$, looks like we an
+    %multiply and dividing through the shocks by any any number
+    %\begin{align*}
+    %\end{align*}
+
+  \item \alert{Relating Obs. Equivalent Models}:
+    All of these models are related by \alert{flipping roots} and
+    suitably adjusting the size of the white noise to maintain the
+    covariances.
+
+  \pause
+  \item
+    \alert{Fundamentalness}:
+    How do we choose among observationally equivalent models?
+    There is a \alert{unique} model with all roots outside the unit
+    circle.
+    Pick that one.
+\end{itemize}
+\end{frame}
+}
+
+
+\subsection{Fundamentalness}
+
+{\footnotesize
+\begin{frame}{Fundamentalness}
+As discussed, any MA($\infty$) model
+\begin{align*}
+  y_t = \theta(L)\varepsilon_t
+  \qquad
+  \varepsilon_t\sim(0,\sigma^2)
+\end{align*}
+is generally \alert{observationally equivalent} to a whole set of models
+with different $\tilde{\theta}(L)$ and $\tilde{\sigma}^2$ from a second
+order autocovariance perspective.
+
+\pause
+Definition:
+Within a class of observationally equivalent models,
+the MA model whose lag polynomial $\theta(L)$ has
+\alert{roots outside the unit circle} is the \alert{fundamental}
+representation, and the white-noise shocks of that model are the
+\alert{fundamental shocks}.
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Fundamentalness: Example}
+
+Recall our example of observationally equivalent MA models:
+\begin{align*}
+  y_t &= \theta(L)\varepsilon_t
+  \quad\text{where}\quad
+  \begin{cases}
+    \theta(z) = 1+0.5z \\
+    \Var(\varepsilon_t) = \sigma^2_\varepsilon
+  \end{cases}
+  \quad
+  \tilde{y}_t = \tilde{\theta}(L)\eta_t
+  \quad\text{where}\quad
+  \begin{cases}
+    \tilde{\theta}(z) = 1+2z \\
+    \Var(\eta_t) = 0.25 \sigma^2_\varepsilon
+  \end{cases}
+\end{align*}
+Notice the lag polynomials of the different models have different
+implications for the associated white noise shocks of their respective
+model.
+\pause
+\begin{itemize}
+  \item Model for $y_t$ invertible in \alert{positive} powers of $L$
+    (i.e. only inverse in positive powers converges for $y_t$
+    stationary),
+    so $\varepsilon_t$ can be expressed in terms of
+    \alert{current and lagged} $y_t$:
+    \begin{align*}
+      \varepsilon_t
+      &=
+      (1+0.5L)^{-1}y_t
+      =
+      y_t-0.5 y_{t-1} + 0.5^2 y_{t-2} + \cdots
+    \end{align*}
+    Rearrange to get associated $AR(\infty)$,
+    which can be approximated by a finite-order $AR(p)$ for large enough
+    $p$, and the which we can use for forecasting.
+
+
+  \pause
+  \item Model for $\tilde{y}_t$ invertible in \alert{negative} powers of
+    $L$ (i.e. only inverse in negative powers converges for $y_t$
+    stationary):
+    \begin{align*}
+      \eta_t
+      &=
+      (1+2L)^{-1}y_t
+      =
+      0.5 \tilde{y}_{t+1} - 0.25 \tilde{y}_{t+2} + \cdots
+    \end{align*}
+    Does not imply a VAR representation, cannot be used for forecasting.
+
+\end{itemize}
+\pause
+The first model is the \alert{fundamental representation}.
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Fundamentalness as Stability Condition}
+Suppose we have an MA($q$) process
+\begin{align}
+  y_t = \theta(L)\varepsilon_t
+  \qquad
+  \varepsilon_t
+  \sim (0,\sigma^2)
+  \label{fundamental}
+\end{align}
+Suppose that $\theta(L)$ has \alert{roots} that are
+\alert{all outside the unit circle}.
+Then
+\begin{itemize}
+  \item Expression~\ref{fundamental} is the \alert{fundamental}
+    representation of the process (or really, of the second order
+    covariance properties implied by the model and possessed by all
+    members of its equivalence class).
+
+  \pause
+  \item By the \alert{stability condition} we saw previously for
+    inverting finite-order lag polynomials, this means that there exists
+    an absolutely summable inverse $\theta(L)^{-1}$ in positive powers
+    of $L$, hence, we can write
+    \begin{align*}
+      \varepsilon_t = \theta(L)^{-1}y_t
+      = y_t - c_1 y_{t-1} - c_2 y_{t-2} - \cdots
+    \end{align*}
+    i.e. $\varepsilon_t$ can be rewritten in terms of current and lagged
+    values of $y_t$.
+\end{itemize}
+\alert{Corollary}:
+Essentially by construction, white noise shocks of any AR or VAR model
+\begin{align*}
+  (1-\Phi_1L-\cdots-\Phi_pL^p)y_t
+  =\varepsilon_t
+\end{align*}
+are fundamental.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Fundamentalness and Wold's Theorem}
+\begin{itemize}
+  \item Wold's Theorem guarantees that there exists a unique
+    MA($\infty$) representation of any covariance stationary process in
+    which the white noise shocks are \alert{fundamental} (constructed
+    from current and lagged $y_t$).
+
+  \pause
+  \item
+    Fundamental shocks are therefore \alert{innovations}, i.e.\ forecast
+    errors:
+    \begin{align*}
+      y_t - \hat{y}_t
+    \end{align*}
+    where $\hat{y}_t$ is the best linear predictor/forecast of $y_t$
+    using lagged $y_t$.
+
+
+  \pause
+  \item If the process can be represented as a VAR or AR model, the
+    shocks are automatically fundamental.
+
+  \pause
+  \item If the process can be represented as an MA($q$) model, we have
+    the stability condition to check whether the representation \&
+    shocks are fundamental.
+
+  \pause
+  \item We also saw how we can flip roots to get to the observationally
+    equivalent fundamental MA model, if need be.
+\end{itemize}
+\end{frame}
+}
+
+
+
+\subsection{Stationarity of VAR and AR Models}
+
+
+%\section{Initial Conditions}
+
+%{\footnotesize
+%\begin{frame}{Initial Conditions}
+%\end{frame}
+%}
+
+{\scriptsize
+\begin{frame}{Stationarity of VAR Models}
+Suppose that we have a VAR($p$) model:
+\begin{align*}
+  \Phi(L)y_t
+  &=
+  (I_n-\Phi_1 L - \cdots - \Phi_p L^p) y_t
+  =
+  \varepsilon_t
+  \qquad\text{where}\quad
+  \varepsilon_t\sim (0,\Sigma)
+  \\
+  \iff\qquad
+  y_t
+  &=
+  \Phi_1 y_{t-1} - \cdots - \Phi_p y_{t-p} + \varepsilon_t
+\end{align*}
+Recall the equivalent stability conditions:
+\begin{itemize}
+  \item The roots of the following equation all lie outside the unit
+    circle
+    \begin{align*}
+      |I_n - \Phi_1 z - \cdots \Phi_p z| = 0
+    \end{align*}
+
+  \item The roots of the following equation all lie inside the unit
+    circle
+    \begin{align*}
+      |I_nw^p - \Phi_1 w^{p-1} - \cdots \Phi_p| = 0
+    \end{align*}
+\end{itemize}
+\pause
+Process $y_t$ is \alert{stationary} if these equivalent
+stability conditions satisfied because then
+\begin{itemize}
+  \item The inverse of $\Phi(L)$ in positive powers of $L$ is absolutely
+    summable.
+  \pause
+  \item Hence when applied to cov.\ stationary white noise
+    process $\{\varepsilon_t\}$, resulting process
+    \begin{align*}
+      y_t = \Phi(L)^{-1}\varepsilon_t
+    \end{align*}
+    is also \alert{covariance stationary} by Filtering Theorem,
+    i.e.  $y_t$ is also covariance stationary.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Stationarity of AR Models}
+For AR($p$) Models, the stability/stationarity conditions become
+\begin{itemize}
+  \item The roots of the following equation all lie outside the unit
+    circle
+    \begin{align*}
+      1 - \phi_1 z - \cdots \phi_p z = 0
+    \end{align*}
+  \item The roots of the following equation all lie inside the unit
+    circle
+    \begin{align*}
+      w^p - \phi_1 w^{p-1} - \cdots \phi_p = 0
+    \end{align*}
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{%
+    Stationarity of VAR and AR Models: Linear Diff.\ Eq.\ Intuition
+}
+
+The stability/stationarity conditions given above were motivated from
+the \alert{filtering} perspective.
+
+
+Can also study VAR and AR models from the
+\alert{linear difference equation} perspective.
+This gives some additional nice intuition and tools for studying
+stability/stationarity.
+\end{frame}
+}
+
+
+
+{\scriptsize
+\begin{frame}{%
+    Stationarity of AR Models: Linear Diff.\ Eq.\ Intuition
+}
+
+Suppose we have an AR($p$), which we know can be written in
+\alert{companion form} as a VAR(1):
+\begin{align*}
+  \underbrace{%
+  \begin{pmatrix}
+    y_t \\ y_{t-1} \\ \vdots \\ y_{t-p+1}
+  \end{pmatrix}
+  }_{Y_t}
+  &=
+  \underbrace{%
+  \begin{pmatrix}
+    \begin{matrix}
+      \phi_1 & \cdots & \phi_p
+    \end{matrix}
+    \\
+    \begin{matrix}
+      I_{p-1} & 0_{(p-1)\times 1}
+    \end{matrix}
+  \end{pmatrix}
+  \vphantom{%
+    \begin{pmatrix}
+      y_{t-1} \\ y_{t-2} \\ \vdots \\ y_{t-p}
+    \end{pmatrix}
+  }
+  }_{\Phi}
+  \underbrace{%
+  \begin{pmatrix}
+    y_{t-1} \\ y_{t-2} \\ \vdots \\ y_{t-p}
+  \end{pmatrix}
+  }_{Y_{t-1}}
+  +
+  \underbrace{%
+  \begin{pmatrix}
+    \varepsilon_{t} \\ 0 \\ \vdots \\ 0
+  \end{pmatrix}
+  }_{u_t}
+  %\qquad\text{where}\quad
+  %u_t \sim
+  %\bigg(0,
+  %\underbrace{
+  %\begin{pmatrix}
+    %\sigma^2 & 0_{1\times (p-1)}\\
+    %0_{(p-1)\times 1} & 0_{(p-1)\times (p-1)}\\
+  %\end{pmatrix}
+  %}_{\Sigma}
+  %\bigg)
+\end{align*}
+Diagonalize $\Phi=P\Lambda P^{-1}$ where columns of $P$ are eigenvectors
+of $\Phi$ and $\Lambda$ is a diagonal matrix with elements equal to the
+\alert{eigenvalues} of $\Phi$.
+Can then rewrite the system as
+\begin{align*}
+  P^{-1}{Y}_t &= \Lambda P^{-1}Y_{t-1} + P^{-1}u_t
+  \qquad\implies\qquad
+  \tilde{Y}_t
+  = \Lambda \tilde{Y}_{t-1} + \tilde{u}_t
+  =
+  \Lambda^s \tilde{Y}_{t-s}
+  +
+  \sum_{i=1}^s
+  \Lambda^{i-1} \tilde{u}_{t-i+1}
+\end{align*}
+System for $\tilde{Y}_t$ very simple, given $\Lambda$
+diagonal.
+And in particular,
+\begin{align*}
+  \text{Elementwise $|\diag(\Lambda)|<1$}
+  \quad\implies\quad
+  \text{$\tilde{Y}_t$ stationary}
+\end{align*}
+Because the elements of $Y_t$ are just a linear combination of the
+elements of $\tilde{Y}_t$, this gives
+\begin{align*}
+  \text{Elementwise $|\diag(\Lambda)|<1$}
+  \quad\implies\quad
+  \text{$\tilde{Y}_t$ stationary}
+  \quad\implies\quad
+  \text{$Y_t$ stationary}
+  \quad\implies\quad
+  \text{$y_t$ stationary}
+\end{align*}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{%
+  Stationarity of AR Models: Linear Diff.\ Eq.\ Intuition
+}
+
+So we saw that the key \alert{stationary condition} of AR($p$) process
+$y_t$ was
+\begin{align*}
+  \text{Elementwise $|\diag(\Lambda)|<1$}
+\end{align*}
+\pause
+Recalling what $\Lambda$ represents, this condition states that
+\alert{eigenvalues of the companion matrix $\Phi$} are all
+\alert{less than one} in absolute value.
+
+\pause
+To get those eigenvalues, we inspect, as usual, the
+\alert{characteristic equation}
+\begin{align*}
+  0
+  &= \det(\Phi-\lambda I_p)
+  \\
+  &=
+  \det\left(
+    \begin{pmatrix}
+      \begin{matrix}
+        \phi_1 & \cdots & \phi_p
+      \end{matrix}
+      \\
+      \begin{matrix}
+        I_{p-1} & 0_{(p-1)\times 1}
+      \end{matrix}
+    \end{pmatrix}
+    -
+    \lambda I_p
+  \right)
+  %\\
+  %&=
+  %\det
+  %\begin{pmatrix}
+    %\phi_1 - \lambda & \phi_2 & \phi_3 & \cdots & \phi_p \\
+    %1 & -\lambda & 0 & \cdots & 0 \\
+    %0 & 1 & -\lambda & \cdots & 0 \\
+    %\vdots & \vdots & \vdots & \ddots & \vdots \\
+    %0 & 0 & 0 & \cdots & -\lambda
+  %\end{pmatrix}
+\end{align*}
+This characteristic equation will yield precisely the already-presented
+stability/invertibility conditions for an AR model that we saw
+previously, but that were motivated from the filtering perspective.
+So we get the \alert{same answer} from both the filtering and linear
+difference perspectives.
+
+\pause
+A similar derivation exists for VAR models as well.
+\end{frame}
+}
+
+
+\subsubsection{Initial Conditions}
+
+{\scriptsize
+\begin{frame}{Initial Conditions: Under Stationarity}
+
+Suppose we have an AR($p$) model for the observed data $\{y_t\}_{t=0}^T$
+and assume Gaussian errors:
+\begin{align*}
+  y_t &= \phi_1 y_t + \cdots + \phi_p y_{t-p} + \varepsilon_t
+  \qquad
+  \varepsilon_t\iid\calN(0,\sigma^2)
+\end{align*}
+%which can be weritten in companion form as a VAR(1):
+%\begin{align*}
+  %Y_t = \Phi Y_{t-1} + u_t
+%\end{align*}
+Can explicitly characterize the joint likelihood
+\begin{align*}
+  p(y_T,\ldots,y_0|\phi_1,\ldots,\phi_p,\sigma^2)
+\end{align*}
+\pause
+which can be factored, \alert{regardless of stationarity}, because of
+the AR($p$) assumption (which is a \alert{Markov} assumption on the
+stochastic process $\{y_t\}$) as follows
+\begin{align}
+  &p(y_T,\ldots,y_0|\phi_1,\ldots,\phi_p,\sigma^2)
+  \notag
+  \\
+  &=
+  \left[
+  \prod_{t=p}^T
+  p(y_t|y_{t-1},\ldots,y_{t-p};\phi_1,\ldots,\phi_p,\sigma^2)
+  \right]
+  p(y_{p-1},\ldots,y_0|\phi_1,\ldots,\phi_p,\sigma^2)
+  \label{fulllik}
+\end{align}
+\pause
+If, further, the parameters are such that $\{y_t\}$ is
+\alert{stationary} (i.e. we satisfy the stability conditions presented
+above), then we can derive the joint unconditional distribution (mean
+and variance, because Gaussian) of $(y_{p-1},\ldots,y_{0})$.
+Therefore, given that we observe
+$\{y_t\}_{t=0}^T$, we can compute
+$p(y_{p-1},\ldots,y_{0};\phi_1,\ldots,\phi_p,\sigma^2)$ and use the full
+likelihood in Expression~\ref{fulllik} as our likelihood.
+\end{frame}
+}
+
+{\scriptsize
+\begin{frame}{Initial Conditions: Under Stationarity}
+
+
+If the parameters are such that stochastic process $\{y_t\}$ is
+\alert{nonstationarity}
+\begin{itemize}
+  \item We can still factor the likelihood as before since that just
+    related on the AR($p$) assumption (Markov after including $p$ lags).
+  \pause
+  \item But we cannot derive the implied unconditional distribution as
+    before.
+  \pause
+  \item
+    We instead \alert{condition} on the initial values
+    $(y_{p-1},\ldots,y_0)$ and maximizes the conditional likelihood
+    \begin{align}
+      \prod_{t=p}^T
+      p(y_t|y_{t-1},\ldots,y_{t-p};\phi_1,\ldots,\phi_p,\sigma^2)
+      \label{partiallik}
+    \end{align}
+    Notice we dropped the initial condition term.
+\end{itemize}
+\end{frame}
+}
+
+\subsection{Some Limit Theorems}
+
+%{\footnotesize
+%\begin{frame}
+  %Linear processes
+  %- Important class of cov stationary process
+  %- Heuristically: two-sided moving ave of (i.e. filtered) white noise
+  %%- Two-sided moving averages of the form y_t = mu + sum two sided,
+  %coefficients absolutely summable, with white noise as the filtered
+  %object
+  %- Mostly focus on one-sided, i.e. extending into current and past
+  %only, not future
+  %- Includes MA(infty) as special case
+%\end{frame}
+%}
+
+
+{\footnotesize
+\begin{frame}{Ergodic Theorem: A LLN under Dependence}
+Suppose that $\{X_t\}$ is a \alert{stationary and ergodic} (vector)
+process corresponding to some underlying probability space
+$(\Omega,\sF,P)$, with mean $\E[X_t]=\mu<\infty$.
+Then
+\begin{align*}
+  \frac{1}{T}\sumtT X_t
+  \quad
+  \asto
+  \quad
+  \E[X_t]
+  =\int_\Omega X_t(\omega) \; dP(\omega)
+\end{align*}
+In words, the ``time average'' over the $T$ periods
+(for a fixed/realized $\omega\in\Omega$ associated with a full path
+$n\mapsto X_t(\omega)$)
+converges to the ``ensemble average'' over states $\omega\in\Omega$
+(for any fixed time $n$).
+
+\pause
+Unlike the usual iid LLT, the elements of the sequence $\{X_t\}$ can
+be \alert{correlated} rather than iid---so long as they are
+\alert{stationary} and \alert{ergodic} (which disallows \emph{arbitrary}
+correlation but permits some)---and the resulting time average will
+converge to the cross-sectional (unconditional) average.
+
+\pause
+But to apply this theorem, we need to be able to verify that $\{X_t\}$
+is \alert{ergodic}.
+This is slightly technical.
+It would be easier if we could instead check conditions on
+\alert{autocovariances}, which is precisely what the next theorem delivers.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{LLN for Covariance-Stationary Process}
+Let $\{X_t\}$ be a covariance stationary process
+with mean $\E[X_t]=\mu<\infty$ and autocovariances
+$\{\gamma_k\}_{k=-\infty}^\infty$.
+Two results:
+\begin{enumerate}
+  \item
+    \alert{Consistency for Mean}:
+    \begin{align*}
+      \lim_{k\ra \infty} \gamma_k=0
+      \qquad\implies\qquad
+      \frac{1}{T}
+      \sum_{t=1}^T
+      X_t
+      \msto \mu
+      \qquad\implies\qquad
+      \frac{1}{T}
+      \sum_{t=1}^T
+      X_t
+      \pto
+      \mu
+    \end{align*}
+
+  \item
+    \alert{Finite Long Run Variance}:
+    Absolutely summable autocovariances $\{\gamma_k\}_{k=-\infty}^\infty$
+    implies
+    \begin{align*}
+      \lim_{T\ra \infty}
+      \Var(\sqrt{T}X_t)
+      =
+      \sum_{k=-\infty}^\infty
+      \gamma_k
+      < \infty
+    \end{align*}
+
+
+\end{enumerate}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{A Central Limit Theorem for Linear Processes}
+Suppose we have a \alert{linear process} $\{y_t\}$ (i.e. fixed mean plus
+a stationary MA($\infty$) process)
+with iid white noise and absolutely summable autocovariances (so that
+the process is stationariy and ergodic):
+\begin{align*}
+  y_t
+  = \mu + \psi(L)\varepsilon_t
+  = \mu + \sum_{j=0}^\infty \psi_j \varepsilon_{t-j}
+  \qquad\text{where}\quad
+  \varepsilon_t
+  \iid
+  (0,\sigma^2)
+  \quad
+  \sum_{j=0}^\infty |\psi_j|<\infty
+\end{align*}
+\pause
+Then we have a CLT
+\begin{align*}
+  \sqrt{T}(\bar{y}-\mu)
+  \quad\dto\quad
+  \calN(0,\sigma^2\psi(1)^2)
+\end{align*}
+\pause
+Note that we sometimes assume a condition on the filter that's slightly
+stronger than absolute summability:
+\begin{align*}
+  \sum_{j=0}^\infty j^2 \psi_j^2<\infty
+\end{align*}
+This latter condition (stronger than absolute summability) delivers an
+identical limiting distribution as above, but the proof is slightly
+easier.
+%The latter condition on the coefficients $\{\psi_j\}$ ensures that the
+%influence of past shocks decays ``fast enough.''
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{A Central Limit Theorem for Linear Processes, Restated}
+We can also relate the asymptotic variance term to the ACGF.
+Notice that the ACGF of $\{y_t\}$ satisfies
+\begin{align*}
+  \lambda(z)
+  &= \sigma^2 \psi(z) \psi(z^{-1})
+  \quad\implies\quad
+  \lambda(1)
+  =
+  \sigma^2\psi(1)^2
+  =
+  \text{Avar}(\sqrt{T}(\overline{y}-\mu))
+\end{align*}
+\pause
+Recall also the definition of the ACGF
+\begin{align*}
+  \lambda(z)
+  =
+  \sum_{k=-\infty}^\infty \gamma_k z^k
+\end{align*}
+\pause
+Therefore, we can use the ACGF and its definition to restate the above
+CLT as
+\begin{align*}
+  \sqrt{T}(\bar{y}-\mu)
+  \quad\dto\quad
+  \calN\bigg(
+    0,
+    \underbrace{%
+    \sum_{k=-\infty}^\infty \gamma_k
+    }_{=\lambda(1)=\sigma^2\psi(1)^2}
+  \bigg)
+\end{align*}
+i.e the asymptotic variance is the sum of all autocovariances.
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Another Stationary \& Ergodic CLT, Slightly Weaker}
+Previous CLT assumed $\{y_t\}$ not only stationarity and
+ergodic, but also a \alert{linear process}.
+If we want to weaken even further,
+define the information set up to time $s$:
+\begin{align*}
+  \calI_s=(y_s,y_{s-1},\ldots)
+\end{align*}
+Also define the \alert{revision} in the conditional mean of $y_t$ after
+moving from information set $\calI_{t-j-1}$ to $\calI_{t-j}$.
+These can be interpreted as ``shocks'' that lead to revisions.
+\begin{align*}
+  r_{tj} := \E[y_t|\calI_{t-j}] - \E[y_t|\calI_{t-j-1}]
+\end{align*}
+Note that this definition implies that we can write
+$y_t$ as its conditional mean given information $\calI_{t-j}$ up to time
+$t-j$, plus all the subsequent revisions in the conditional mean
+(forecast) between time $t-j$ and $t$ via simple telescoping sums:
+\begin{align*}
+  y_t =
+  (r_{t0} + r_{t1} + \cdots + r_{t,j-1})
+  +
+  \E[y_t|\calI_{t-j}]
+  =
+  \E[y_t|\calI_{t-j}]
+  +
+  \sum_{i=0}^{j-1}
+  r_{ti}
+\end{align*}
+\end{frame}
+}
+
+{\scriptsize
+\begin{frame}{Another Stationary \& Ergodic CLT, Slightly Weaker}
+Then suppose we assume the following conditions on the process $\{y_t\}$:
+\vspace{-8pt}
+\begin{itemize}
+  \item[(i)] $\{y_t\}$ stationary \& ergodic
+  \item[(ii)] $\E[y_t^2]<\infty$
+  \item[(iii)]
+    Increasingly long-ago realizations of the process
+    (encoded in the information sets $\calI_{t-j}$ with $j\ra\infty$)
+    don't affect the conditional mean:
+    \begin{align*}
+      \E[y_t|\calI_{t-j}]
+      =
+      \E[y_0|\calI_{-j}]
+      \quad\underset{j\ra\infty}{\msto}\quad0
+    \end{align*}
+    Convergence ``in mean square'' because, ex ante,
+    conditional expectations are random.
+
+  \item[(iv)] $\sum_{j=0}^\infty \E[r_{tj}^2]^{1/2}<\infty$
+\end{itemize}
+\vspace{-8pt}
+Then
+\vspace{-8pt}
+\begin{itemize}
+  \item $\E[y_t]=0$, which is clear from (iii)
+  \item The autocovariances are absolutely summable
+  \item By (iii) and the previous slide, the following holds in the
+    sense of mean square convergence of the RHS to $y_t$, for any $t$:
+    $y_t = \sum_{j=0}^\infty r_{tj}$
+  \item
+    Then
+    \begin{align*}
+      \frac{1}{\sqrt{T}}
+      \sumtT
+      y_t
+      =
+      \dto
+      \calN\bigg(
+        0,
+        \underbrace{%
+        \sum_{k=-\infty}^\infty \gamma_k
+        }_{=\lambda(1)=\sigma^2\psi(1)^2}
+      \bigg)
+    \end{align*}
+\end{itemize}
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{CLTs for Stationary and Ergodic Processes: Comments}
+\begin{itemize}
+  \item If the data is iid, $\gamma_k=0$ for all $k\neq 0$.
+    Recalling that $\gamma_0=\Var(y_t)$, the above CLTs \alert{reduce}
+    to the familiar \alert{Lindeberg-Levy} CLT for iid observations.
+
+  \pause
+  \item Useful in \alert{regression} contexts where we have time series
+    data and estimate
+    \begin{align*}
+      \sqrt{T}(\hat{\beta}-\beta)
+      =
+      \left[
+        \frac{1}{T}
+        \sumtT
+        x_tx_t'
+      \right]
+      \left[
+        \frac{1}{\sqrt{T}}
+        \sumtT
+        x_t\varepsilon_t
+      \right]
+    \end{align*}
+    If $x_t\varepsilon_t$ stationary and ergodic, can CLT to second
+    bracketed term to derive asymptotic normal distribution with
+    standard errors that correctly \alert{account for autocorrelation}.
+
+  \pause
+  \item You might correctly guess that there are lots of \alert{issues}
+    estimating the infinite sum $\sum_{k=-\infty}^\infty \gamma_k$.
+    Time series econometrics has dealt with many methods for estimating
+    this important component of conducting inference under
+    autocorrelation.
+
+  \pause
+  \item \alert{Newey-West} is the most well-known, but also not the
+    cutting edge or recommended in practice.
+    Consult a friendly econometrician for advice.
+
+  \pause
+  \item This doesn't begin to cover that vast literature, but you now
+    have a sense of what the econometrics problem is here.
+    We need to estimate a mean (or regression coefficient or parameter
+    that can be written as some scaled mean of iid observations, i.e.
+    most estimators of interest) in the presence of non-iid,
+    autocorrelated observations.
+    To adjust our standard errors appropriately, we need to account for
+    autocovariances.
+\end{itemize}
+\end{frame}
+}
+
+
+\subsection{Lag Polynomials and Constants}
+
+{\scriptsize
+\begin{frame}{Lag Polynomials and Constants}
+
+Throughout, I've omitted constants and all stationary processes
+presented here have been mean-zero.
+How to easily represent a stationary process with non-zero
+mean?
+
+Define a zero mean process, shift the zero mean process by a constant.
+\begin{align*}
+  \phi(L)u_t &=
+  \theta(L)\varepsilon_t
+  \\
+  x_t
+  &= \mu_x + u_t
+\end{align*}
+Can then deduce dynamics of the shifted process.
+Example:
+\begin{align*}
+  u_t
+  &=
+  \phi_1 u_{t-1}
+  +
+  \cdots
+  +
+  \phi_p u_{t-p}
+  + \varepsilon_t
+  \\
+  x_t
+  &= \mu_x + u_t
+  \\
+  &= \mu_x
+  +
+  \left(
+  \phi_1 u_{t-1}
+  +
+  \cdots
+  +
+  \phi_p u_{t-p}
+  + \varepsilon_t
+  \right)
+  \\
+  &=
+  \mu_x
+  +
+  \phi_1 (x_{t-1}-\mu_x)
+  +
+  \cdots
+  +
+  \phi_p (x_{t-p}-\mu_x)
+  + \varepsilon_t
+  \\
+  &=
+  (1-\phi_1-\cdots-\phi_p)\mu_x
+  + \phi_1 x_{t-1}
+  + \cdots
+  + \phi_p x_{t-p}
+  + \varepsilon_t
+  \\
+  &=
+  \phi(1)\mu_x
+  + \phi_1 x_{t-1}
+  + \cdots
+  + \phi_p x_{t-p}
+  + \varepsilon_t
+\end{align*}
+Notice that the coefficients on the lags are \alert{identical}.
+There is also a constant term that we have identified as $\phi(1)\mu_x$.
+\end{frame}
+}
+
+
+
+{\scriptsize
+\begin{frame}{Lag Polynomials Ignore Constants}
+
+Does a constant change the lag polynomial, its
+roots, stationarity properties, etc.?
+
+From the previous slide,
+\begin{align*}
+  \phi(L)x_t
+  =
+  \phi(1)\mu_x + \varepsilon_t
+\end{align*}
+Can take out the mean
+\begin{align*}
+  \phi(L)(x_t-\mu_x+\mu_x)
+  &=
+  \phi(1)\mu_x + \varepsilon_t
+  \\
+  \phi(L)(x_t-\mu_x)+\phi(L)\mu_x
+  &=
+  \phi(1)\mu_x + \varepsilon_t
+  \\
+  \phi(L)(x_t-\mu_x)+\phi(1)\mu_x
+  &=
+  \phi(1)\mu_x + \varepsilon_t
+  \qquad
+  \text{$Lc=c$ for any $c$}
+  \\
+  \phi(L)(x_t-\mu_x)
+  &=
+  \varepsilon_t
+  \\
+  \phi(L)\tilde{x}_t
+  &=
+  \varepsilon_t
+\end{align*}
+Observations:
+\begin{itemize}
+  \item $\tilde{x}_t=x_t-\mu_x$ is zero mean.
+  \item $\phi(z)$ governs stationarity of zero-mean
+    $\tilde{x}_t$.
+  \item If $\tilde{x}_t$ stationary, adding a \alert{constant}
+    to get $\tilde{x}_t+\mu_x=x_t$ yields stationary process $x_t$.
+  \item Conclusion: Use the same lag polynomial.
+    Nothing really changes.
+\end{itemize}
+\end{frame}
+}
+
+
+
+
+\end{document}
+
+
+
+
+
+
+% Sample code
+\pause to add breaks
+\textcolor{red}{text to show}.
+\vspace{20pt}
+
+\usebeamercolor{dull text}
+\alert<+>{Words that you want to alert}
+

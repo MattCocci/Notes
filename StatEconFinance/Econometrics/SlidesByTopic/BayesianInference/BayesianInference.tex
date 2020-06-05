@@ -1,0 +1,1619 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usepackage{cmbright}
+%\usetheme{metropolis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis with Sidebar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[aspectratio=169, handout]{beamer}
+%\documentclass{beamer}
+\usepackage{cmbright}
+\usepackage{comment}
+
+\useoutertheme[right, width=0.20\paperwidth]{sidebar}
+\usecolortheme{metropolis}
+\useinnertheme[sectionpage=none]{metropolis}
+\usefonttheme{metropolis}
+
+\makeatletter
+\beamer@headheight=1.75\baselineskip     %controls the height of the headline, default is 2.5
+\makeatother
+
+\usepackage{etoolbox}
+\patchcmd\insertverticalnavigation{\dohead}{\vskip-35pt\dohead}{}{}
+
+%\setbeamertemplate{sidebar canvas right}{}
+%\setbeamertemplate{sidebar right}{BOB}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Simple Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usetheme{Boadilla}
+%\usepackage{lmodern}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sidebar Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass[serif]{beamer}  % For serif latex font
+%\usepackage{pxfonts}
+%\usepackage{eulervm}
+%\usepackage{mathpazo}
+
+%\usetheme{Goettingen}
+%\usecolortheme{lily}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Common Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[]{Bayesian Inference \\ Matt Cocci}
+\author[]{}
+\date{\today}
+
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+%\setbeamertemplate{section in toc}[square unnumbered]
+%\setbeamertemplate{subsection in toc}[square unnumbered]
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% For easier looping
+\usepackage{pgffor}
+
+\usepackage{pdfpages}
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\proj}{\operatorname{proj}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Rnk}{\mathbb{R}^{n\times k}}
+\newcommand{\Rkk}{\mathbb{R}^{k\times k}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Presentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Outline}
+\tableofcontents[hideallsubsections]
+%\tableofcontents
+\end{frame}
+
+
+
+
+\section{Bayesian Remarks}
+
+
+{\scriptsize
+\begin{frame}{Bayesian Objects}
+
+\alert{Prior} and \alert{Likelihood}
+\begin{align*}
+  p(\theta)
+  \qquad\quad
+  p(y|\theta)
+\end{align*}
+\alert{Posterior}
+\begin{align*}
+  p(\theta|y)
+  =
+  \frac{p(y|\theta)p(\theta)}{p(y)}
+  =
+  \frac{p(y|\theta)p(\theta)}{\int p(y,\theta)\,d\theta}
+  =
+  \frac{p(y|\theta)p(\theta)}{\int p(y|\theta)p(\theta)\,d\theta}
+  \propto
+  p(y|\theta)p(\theta)
+\end{align*}
+\alert{Marginal Data Density} or \alert{Prior Predictive Distribution}:
+Can compute function before observing the data.
+Is a number after observing the data.
+\begin{align*}
+  p(y)
+  =
+  \int
+  p(y,\theta)
+  \;
+  d\theta
+  =
+  \int
+  p(y,\theta)
+  \;
+  d\theta
+  =
+  \int
+  p(y|\theta)
+  p(\theta)
+  \;
+  d\theta
+\end{align*}
+Useful for model discrimination, where we $m,m'$ index possible models.
+Treat them as parameters.
+\begin{align*}
+  \underbrace{%
+    \frac{p(m|y)}{p(m'|y)}
+  }_{\text{Posterior Odds Ratio}}
+  =
+  \underbrace{%
+    \frac{p_m(y)}{p_{m'}(y)}
+  }_{\text{Likelihood Ratio or Bayes Factor}}
+  \times
+  \underbrace{%
+    \frac{p(m)}{p(m')}
+  }_{\text{Prior Odds}}
+\end{align*}
+\alert{Posterior Predictive Density}:
+Distribution for new dataset or observation
+\begin{align*}
+  p(\tilde{y}|y)
+  =
+  \int
+  p(\tilde{y},\theta|y)
+  \;
+  d\theta
+  =
+  \int
+  p(\tilde{y}|\theta,y)
+  p(\theta|y)
+  \;
+  d\theta
+  =
+  \int
+  p(\tilde{y}|\theta)
+  p(\theta|y)
+  \;
+  d\theta
+\end{align*}
+
+\end{frame}
+}
+
+
+
+
+
+{\scriptsize
+\begin{frame}{Priors}
+
+Flat Priors
+\begin{itemize}
+  \item Definition: $p(\theta)\propto 1$
+  \item Generally not invariant to transformations, so
+    $p(\theta)\propto 1$ does not mean $p(\ln \theta)\propto 1$.
+    We can deduce the transformed prior by the usual change of variables
+    formula.
+  \item
+    ``Uninformative'' but does not mean ``not influential.''
+    A flat prior is not neutral stance, despite how it sounds.
+    It might determine the region of the parameter space just as much as
+    a non-flat prior.
+
+  \item
+    \alert{Jeffrey's prior}:
+    A prior that's invariant to reparametrizations.
+    It's equal to the Fisher information matrix.
+    %If you reparametrize, you still get the fisher information matrix.
+\end{itemize}
+\alert{Improper Prior}
+\begin{itemize}
+  \item Does not integrate to 1
+  \item Flat priors for parameters with support on $\R$ are always going
+    to be improper.
+  \item Can still result in proper posteriors, but proper posterior not
+    guaranted, as it is with proper priors.
+\end{itemize}
+\end{frame}
+}
+
+
+
+{\footnotesize
+\begin{frame}{Jeffrey's Invariance Principle}
+
+Should yield the same prior if we reparametrize.
+
+Proof on page 63
+
+Page 75 and 76: Flat prior on mu and sigma, normal model, conditional
+posterior of mu, marginal posterior of sigma, marginal posterior of mu,
+sampling from joint posterior, sampling from joint posterior
+
+Page 78: Normal data with conjugate inverse chi2 prior, page 82
+
+Page 85: The good stuff
+\end{frame}
+}
+
+
+
+
+
+
+
+
+\section{Bernstein von-Mises}
+
+{\footnotesize
+\begin{frame}{Bernstein von-Mises: Setting}
+
+\alert{Frequentist} (repeated sampling) perspective on posterior
+density function $p(\theta|y_{1:n})$:
+\begin{itemize}
+  \item The Bayesian perspective fixes (conditions on) $y_{1:n}$ so that the
+    only remaining uncertainty lies in $\theta$.
+
+  \item But if we \emph{wish} to study the frequentist properties of the
+    posterior under repeated samples of $y_{1:n}$, nothing stops us from
+    doing so.
+
+  \item
+    From a frequentist (i.e. repeated sampling) perspective, for any fixed
+    $n$, the posterior density function $p(\theta|y_{1:n})$ is
+    \alert{random} with some sampling distribution, as it depends upon the
+    randomly drawn $y_{1:n}$.
+
+  \item
+    As an estimator is simply a \alert{mapping} from the data
+    $y_{1:n}$ into some number, vector, function, etc. with some
+    induced \alert{sampling distribution}, so too does a frequentist
+    think of the \alert{posterior density function} as a mapping from
+    the data $y_{1:n}$ into some density function with some induced
+    sampling distribution.
+
+  \item
+    No surprise, the finite $n$ sampling distribution of
+    the random function $p(\theta|y_{1:n})$ is tough to characterize in
+    closed form for any fixed $n$.
+    Therefore, no surprise, we appeal to \alert{asymptotics} that we
+    then use to approximate the finite $n$ case.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Bernstein von-Mises: Setting}
+\alert{Asymptotic} perspective on the random mapping $p(\theta|y_{1:n})$
+\begin{itemize}
+  \item
+    Asymptotics as $n\ra\infty$ with growing sample $y_{1:n}$ gives rise
+    to (random) sequence of \alert{MLEs}
+    $\{\hat{\theta}_n\}_{n=1}^\infty$ with limiting normal distribution
+    \begin{align*}
+      \sqrt{n}(\hat{\theta}_n-\theta_0)
+      \quad\dto\quad
+      \calN(0,I_{\theta_0}^{-1})
+    \end{align*}
+    and (random) sequence of \alert{posterior distributions}
+    \begin{align*}
+      \{
+      p(\theta|y_{1:n})
+      \}_{n=1}^\infty
+      \qquad\text{where}\quad
+      p(\theta|y_{1:n})
+      \propto
+      f(y_{1:n}|\theta)\cdot \pi(\theta)
+    \end{align*}
+    whose limit we would like to characterize to answer the question
+    ``What limiting function does random $p(\theta|y_{1:n})$ approach,
+    with high probability?''
+
+  \item The complication for the asymptotics is that the random element
+    is not a scalar or vector statistic (like an OLS coefficient), but
+    an entire density function $p(\theta|y_{1:n})$.
+    How can we neatly characterize the asymptotic probability limit of
+    this function?
+
+  \item
+    By suitably \alert{reparameterizing} the posterior density function,
+    can obtain \alert{convergence in probability}
+    of the (reparameterized) random function $p(\theta|y_{1:n})$ to some
+    limiting function.
+\end{itemize}
+\end{frame}
+}
+
+
+
+
+{\scriptsize
+\begin{frame}{Bernstein von-Mises: Reparameterizing}
+We're studying the random sequence $\{p(\theta|y_{1:n})\}_{n=1}^\infty$
+of posteriors, which is a random sequence of mappings:
+\begin{align*}
+  \theta\mapsto
+  p(\theta|y_{1:n})
+  %\propto
+  %f(y_{1:n}|\theta)\cdot \pi(\theta)
+\end{align*}
+Because the likelihood (a key component of the posterior),
+for any fixed $n$, has its peak at the associated MLE
+$\hat{\theta}_n$, it's useful to ``\alert{recenter}'' the argument of
+each posterior/mapping in the sequence about the MLE corresponding to
+realized $y_{1:n}$ and instead to study the mappings
+\begin{align*}
+  u
+  \mapsto
+  p(\hat{\theta}_n+n^{-1/2}u\,|\,y_{1:n})
+  %\propto
+  %f(y_{1:n}|\hat{\theta}+n^{-1/2})\cdot \pi(\hat{\theta}+n^{-1/2})
+\end{align*}
+Because we can always compute the MLE from the data, we've
+simply \alert{reparameterized} without limiting ourselves in any way.
+For any fixed $n$ and realized dataset $y_{1:n}$ with associated MLE
+$\hat{\theta}_n$, any $\theta$ in the support of the posterior
+corresponds to some $u$ which we can determine from relationship
+$\theta=\hat{\theta}_n+n^{-1/2}u$.
+
+\alert{Punchline}:
+The argument/parameter of each posterior density function is now $u$.
+Different values of $u$ correspond directly to different associated
+values of $\theta=\hat{\theta}_n+n^{-1/2}u$.
+
+This reparametrization is useful because we know a lot about the
+asymptotic behavior of the MLE $\hat{\theta}_n$.
+By ``recentering'' around the MLE, we can use the
+asymptotic behavior/convergence of this object to deduce asymptotic
+properties about the mapping.
+\end{frame}
+}
+
+
+
+{\scriptsize
+\begin{frame}{Bernstein von-Mises: Pointwise Convergence}
+We thus have random sequence of (reparameterized) posteriors
+\begin{align*}
+  \big\{p(\hat{\theta}_n+n^{-1/2}u\,|\,y_{1:n})\big\}_{n=1}^\infty
+  \qquad \text{where}\quad
+  p(\theta\,|\,y_{1:n})
+  \propto
+  f(y_{1:n}\,|\,\theta)
+  \pi(\theta)
+\end{align*}
+For any given $n$ and $u$, consider random mapping
+\begin{align*}
+  p\big(\hat{\theta}_n+n^{-1/2}u\,|\,y_{1:n}\big)
+  \propto
+  \frac{%
+    p\big(\hat{\theta}_n+n^{-1/2}u\,|\,y_{1:n}\big)
+  }{%
+    f\big(y_{1:n}\,|\,\hat{\theta}_n\big)
+  }
+  =
+  \frac{%
+    f\big(y_{1:n}\,|\,\hat{\theta}_n+n^{-1/2}u\big)
+    \pi(\hat{\theta}_n+n^{-1/2}u)
+  }{%
+    f\big(y_{1:n}\,|\,\hat{\theta}_n\big)
+  }
+\end{align*}
+Notice for any $n$, the denominator $f(y_{1:n}|\hat{\theta})$ does
+\alert{not} depend upon $u$.
+Therefore, this normalization is harmless for studying the \alert{shape}
+of the numerator (and hence the reparameterized posterior), which is a
+mapping that varies with $u$.
+The shape will be unchanged, but it's a useful normalization for
+analysis.
+
+In particular, take logs of the rightmost expression, Taylor
+expand the (numerator's) resulting log-likelihood in $u$, send
+$n\ra\infty$, and the use the CMT to show that
+\begin{align*}
+  \frac{%
+    f\big(y_{1:n}\,|\,\hat{\theta}_n+n^{-1/2}u\big)
+    \pi(\hat{\theta}_n+n^{-1/2}u)
+  }{%
+    f\big(y_{1:n}\,|\,\hat{\theta}_n\big)
+  }
+  \quad
+  \pto
+  \quad
+  \exp\left\{
+    -\frac{1}{2}u'I_{\theta_0}u
+  \right\}
+  \pi(\theta_0)
+\end{align*}
+In other words, pointwise for any fixed $u$
+\begin{align*}
+  \underset{n\ra\infty}{\text{plim}}
+  \;
+  p\big(\hat{\theta}_n+n^{-1/2}u\,|\,y_{1:n}\big)
+  \quad
+  \propto
+  \quad
+  e^{%
+    -\frac{1}{2}u'I_{\theta_0}u
+  }
+  \pi(\theta_0)
+  \quad
+  \propto
+  \quad
+  e^{%
+    -\frac{1}{2}u'I_{\theta_0}u
+  }
+  \quad
+  \propto
+  \quad
+  \phi\big(u;\,0,\,I_{\theta_0}^{-1}\big)
+\end{align*}
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Bernstein-von Mises: Full Statement}
+On the previous slide, we argued that, pointwise for any $u$,
+\begin{align*}
+  \underset{n\ra\infty}{\text{plim}}
+  \;
+  p\big(\hat{\theta}_n+n^{-1/2}u\,|\,y_{1:n}\big)
+  \quad
+  \propto
+  \quad
+  \phi\big(u;\,0,\,I_{\theta_0}^{-1}\big)
+\end{align*}
+i.e. the reparameterized (random) posterior density function evaluated
+at $u$ is close to a $\calN(0,I_{\theta_0}^{-1})$ density function
+evaluated at $u$ with high probability.
+
+\alert{Full Bernstein-von Mises}:
+Can strengthen from pointwise convergence to the following stronger
+notion of convergence:
+\begin{align*}
+  \int_{-\infty}^\infty
+  \left\lvert
+  \frac{%
+    f\big(y_{1:n}\,|\,\hat{\theta}_n+n^{-1/2}u\big)
+    \pi(\hat{\theta}_n+n^{-1/2}u)
+  }{%
+    f\big(y_{1:n}\,|\,\hat{\theta}_n\big)
+  }
+  -
+  \exp\left\{
+    -\frac{1}{2}u'I_{\theta_0}u
+  \right\}
+  \pi(\theta_0)
+  \right\rvert
+  du
+  \quad
+  \pto
+  \quad
+  0
+\end{align*}
+For large enough $n$, the \alert{whole} reparameterized
+posterior density function in $u$ (not just the function at a particular
+$u$) will be close the $\calN(0,I_{\theta_0}^{-1})$ density function
+with high probability.
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Bernstein-von Mises: Implications for Shape of Posterior}
+
+%For large enough $n$, the \alert{whole} reparameterized
+%posterior density function in $u$ (not just the function at a particular
+%$u$) will be close the $\calN(0,I_{\theta_0}^{-1})$ density function
+%with high probability.
+
+Recall that we reparameterized according to
+\begin{align*}
+  \theta=\hat{\theta}_n+n^{-1/2}u
+  \quad\implies\quad
+  u=n^{1/2}(\theta-\hat{\theta}_n)
+\end{align*}
+\alert{Full Bernstein-von Mises}:
+Therefore, the above stronger statement is equivalent to the statement
+that the whole posterior density function in
+$u=n^{1/2}(\theta-\hat{\theta}_n)$ will be close the
+$\calN(0,I_{\theta_0}^{-1})$ density function with high probability.
+Hence, for any large $n$, we can approximate the posterior distribution
+of $u=n^{1/2}(\theta-\hat{\theta}_n)$ with
+\begin{align*}
+  n^{1/2}(\theta-\hat{\theta}_n)
+  \,|\,y_{1:n}
+  \;&\overset{a}{\sim}\;
+  \calN(0,I_{\theta_0}^{-1})
+  \quad\iff\qquad
+  \theta
+  \,|\,y_{1:n}
+  \;\overset{a}{\sim}\;
+  \calN(\hat{\theta}_n,n^{-1}I_{\theta_0}^{-1})
+\end{align*}
+Note that the above statement is a \alert{frequentist} statement about
+the approximate functional form of the posterior density function in
+large samples.
+The dogmatic frequentist does \emph{not} need to assert that $\theta$
+\emph{should} be viewed as a random variable or that one \emph{should}
+do Bayesian analysis.
+Instead, the dogmatic frequentist just says that when a Bayesian
+\alert{computes} his posterior, for large $n$, that Bayesian's posterior
+distribution will approximately have the above normal density shape.
+
+This is of interest for two reasons.
+First, it tells frequentists what Bayesians are doing, from a
+frequentist perspective.
+Second, it comforts them with some assurances about what exactly a
+Bayesian is report. See the next slide.
+
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Bernstein-von Mises: Implications for Inference}
+We saw that for large $n$, the posterior distribution, across repeated
+samples, approximately satisfies
+\begin{align*}
+  p(\theta \,|\,y_{1:n})
+  \;\overset{a}{\sim}\;
+  \calN(\hat{\theta}_n,n^{-1}I_{\theta_0}^{-1})
+\end{align*}
+This assures frequentists that
+\begin{itemize}
+  \item If a Bayesian maximizes and reports the \alert{posterior mode},
+    he will aproximately get the \alert{MLE} (at least eventually).
+
+  \item HPD credible sets for $\theta$ formed from a Bayesian posterior
+    will eventually approximate HPD sets for $\theta$ formed from the
+    above normal distribution.
+    And because the sampling distribution for the MLE approximately
+    satisfies
+    \begin{align*}
+      \hat{\theta}_n
+      &\overset{a}{\sim}
+      \calN(\theta_0,n^{-1}I_{\theta_0}^{-1})
+    \end{align*}
+    Frequentist \alert{confidence regions} centered at $\hat{\theta}_n$
+    eventually approximately \alert{coincide} with the
+    \alert{HPD credible sets}.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Bernstein-von Mises: Final Comments}
+This deep (surprising) result/equivalence arises from the Fisher
+information matrix equality.
+
+In particular, we have equality between
+\begin{itemize}
+    {\footnotesize
+    \item Minus the second derivative of the log-likelihood at
+      $\theta_0$, which
+      \begin{itemize}
+        {\scriptsize
+        \item
+          Describes the \alert{shape} of likelihood (that determines
+          and eventually dominates the shape of the Bayesian posterior)
+        \item Is the middle term in the \alert{quadratic form} of the
+          \alert{Taylor expansion} that characterizes the approximate log
+          posterior.
+          The quadratic form implies that this posterior density function
+          is approximately a \alert{Gaussian} density function.
+        }
+      \end{itemize}
+    \item The variance of the scores evaluated at $\theta_0$, which
+      \begin{itemize}
+        {\scriptsize
+        \item Describes a property of the frequentist
+          \alert{sampling distribution}
+        \item Determines the variance of the MLE in a \alert{CLT} that
+          arises from repeated sampling and delivers \alert{Gaussianity}
+        }
+      \end{itemize}
+    }
+\end{itemize}
+\end{frame}
+}
+
+
+
+
+\section{Examples}
+
+
+
+\subsection{Hierarchical Normal Model}
+
+
+
+
+{\footnotesize
+\begin{frame}{Hierarchical Normal Model}
+
+We will illustrate the Gibbs sampler for the
+\alert{hierarchical normal model},
+also called ``one-way normal random effects model with known data
+variance.''
+
+Likelihood
+\begin{itemize}
+  \item $N$ total observations
+  \item Falling into $G$ possible \alert{groups}
+
+  \item $y_{ng}$ denotes the $n$th observation within group $G$, which
+    has a total of $N_g$ observations in the group.
+
+
+  \item
+    Observations in each group have a normal distribution with a
+    group-specific mean parameter:
+    \begin{align*}
+      y_{ng} \,|\, \mu_g &\iid \calN(\mu_g, \sigma^2), \qquad n = 1, \ldots, N_g
+    \end{align*}
+    There is \alert{within-group} variance $\sigma^2$ about that common
+    mean, with $\sigma^2$ common to all groups.
+
+\end{itemize}
+\end{frame}
+}
+
+
+
+{\footnotesize
+\begin{frame}{Conjugate Prior}
+Prior for the unknown $\mu_g$ parameters:
+\begin{align*}
+   \mu_g\,|\,\mu_0,\tau &\iid \calN(\mu_0, \tau^2), \qquad g = 1, \ldots, G
+\end{align*}
+Note
+\begin{itemize}
+  \item $\mu_0$ is the ``grand mean''
+  \item $\tau^2$ is \emph{between group} variance, which controls
+    between-group sharing of information and ultimately the amount of
+    shrinkage back to $\mu_0$.
+\end{itemize}
+Assume also the following prior for the remaining parameters
+\begin{align*}
+  p(\mu_0,\sigma^2,\tau^2)
+  \propto \tau
+\end{align*}
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Aside: Gamma Distribution}
+$W\sim \text{Gamma}(\alpha,\beta)$ if
+\begin{align*}
+  f(w)
+  =
+  \frac{\beta^\alpha}{\Gamma(\alpha)}
+  w^{\alpha-1}
+  e^{-\beta w}
+\end{align*}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Posterior}
+Letting $\mu:=(\mu_1,\ldots,\mu_G)$, can write out the full posterior
+\begin{align*}
+  p(\mu,&\mu_0,\sigma^2, \tau^2|y)
+  \\
+  &\propto
+  p(y|\mu,\mu_0, \sigma^2,  \tau^2)
+  \cdot p(\mu,\mu_0, \sigma^2,  \tau^2)
+  \\
+  &=
+  p(y|\mu,\mu_0, \sigma^2,  \tau^2)
+  \cdot p(\mu|\mu_0, \sigma^2,  \tau^2)
+  \cdot p(\mu_0, \sigma^2,  \tau^2)
+  \\
+  &=
+  p(y|\mu, \sigma^2)
+  \cdot p(\mu|\mu_0, \tau^2)
+  \cdot p(\mu_0, \sigma^2,  \tau^2)
+  \\
+  &=
+  \left(
+  \prod_{g=1}^G
+  \prod_{n=1}^{N_g}
+  p(y_{ng}|\mu,\sigma^2)
+  \right)
+  \left(
+  \prod_{g=1}^G
+  p(\mu_g|\mu_0,\tau^2)
+  \right)
+  \cdot \tau
+  \\
+  &=
+  \left(
+  \prod_{g=1}^G
+  \prod_{n=1}^{N_g}
+  \frac{1}{\sqrt{2\pi\sigma^2}}
+  \exp\left\{
+    -
+    \frac{1}{2\sigma^2}
+    (y_{ng}-\mu_g)^2
+  \right\}
+  \right)
+  \left(
+  \prod_{g=1}^G
+  \frac{1}{\sqrt{2\pi\tau^2}}
+  \exp\left\{
+    -
+    \frac{1}{2\tau^2}
+    (\mu_g-\mu_0)^2
+  \right\}
+  \right)
+  \cdot \tau
+  \\
+  &\propto
+  (\sigma^{-2})^{\frac{N}{2}}
+  \exp\left\{
+    -
+    \frac{1}{2\sigma^2}
+    \sum_{g=1}^G
+    \sum_{n=1}^{N_g}
+    (y_{ng}-\mu_g)^2
+  \right\}
+  \left(
+  (\tau^{-2})^{\frac{G}{2}-\frac{1}{2}}
+  \exp\left\{
+    -
+    \frac{1}{2\tau^2}
+    \sum_{g=1}^G
+    (\mu_g-\mu_0)^2
+  \right\}
+  \right)
+\end{align*}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Posterior}
+In general tough to draw from the posterior
+\begin{align*}
+  p(\mu,&\mu_0,\sigma^2, \tau^2|y)
+  \\
+  &\propto
+  (\sigma^{-2})^{\frac{N}{2}}
+  \exp\left\{
+    -
+    \frac{1}{2\sigma^2}
+    \sum_{g=1}^G
+    \sum_{n=1}^{N_g}
+    (y_{ng}-\mu_g)^2
+  \right\}
+  (\tau^{-2})^{\frac{G}{2}-\frac{1}{2}}
+  \exp\left\{
+    -
+    \frac{1}{2\tau^2}
+    \sum_{g=1}^G
+    (\mu_g-\mu_0)^2
+  \right\}
+\end{align*}
+But lots of things look standard.
+
+Answer: \alert{Condition}.
+Note that once we condition on a parameter, it can be absorbed into the
+proportionality constant like any other constant.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Posterior}
+By conditioning (and dropping constants that we condition on), we get
+\begin{align*}
+  p(\mu_g|\mu_{-g},\mu_0,\sigma^2, \tau^2,y)
+  &\propto
+  \exp\left\{
+    -
+    \frac{1}{2\sigma^2}
+    \sum_{n=1}^{N_g}
+    (y_{ng}-\mu_g)^2
+  \right\}
+  \exp\left\{
+    -
+    \frac{1}{2\tau^2}
+    (\mu_g-\mu_0)^2
+  \right\}
+  \\
+  p(\mu_0|\mu,\sigma^2, \tau^2,y)
+  &\propto
+  \exp\left\{
+    -
+    \frac{1}{2\tau^2}
+    \sum_{g=1}^G
+    (\mu_g-\mu_0)^2
+  \right\}
+  \\
+  p(\sigma^2|\mu,\mu_0,\tau^2,y)
+  &\propto
+  (\sigma^{-2})^{\frac{N}{2}}
+  \exp\left\{
+    -
+    \frac{1}{2\sigma^2}
+    \sum_{g=1}^G
+    \sum_{n=1}^{N_g}
+    (y_{ng}-\mu_g)^2
+  \right\}
+  \\
+  p(\tau^2|\mu,\mu_0,\sigma^2,y)
+  &\propto
+  (\tau^{-2})^{\frac{G}{2}-\frac{1}{2}}
+  \exp\left\{
+    -
+    \frac{1}{2\tau^2}
+    \sum_{g=1}^G
+    (\mu_g-\mu_0)^2
+  \right\}
+\end{align*}
+We now show that these are proportional to standard densities, one at a
+time.
+\end{frame}
+}
+
+{\scriptsize
+\begin{frame}{Posterior}
+First, start with $\tau^2$:
+\begin{align*}
+  p(\tau^2|\mu,\mu_0,\sigma^2,y)
+  &\propto
+  (\tau^{-2})^{\frac{G}{2}-\frac{1}{2}}
+  \exp\left\{
+    -
+    \frac{1}{2\tau^2}
+    \sum_{g=1}^G
+    (\mu_g-\mu_0)^2
+  \right\}
+  \\
+  &\propto
+  (\tau^{-2})^{\frac{G+1}{2}-1}
+  \exp\left\{
+    -
+    \left(
+    \frac{1}{2}
+    \sum_{g=1}^G
+    (\mu_g-\mu_0)^2
+    \right)
+    \tau^{-2}
+  \right\}
+  \\
+  \implies\quad
+  p(1/\tau^2|\mu,\mu_0,\sigma^2,y)
+  &\propto
+  \text{Gamma}\left(
+  \frac{G+1}{2}
+  ,\;
+    \left(
+    \frac{1}{2}
+    \sum_{g=1}^G
+    (\mu_g-\mu_0)^2
+    \right)
+  \right)
+\end{align*}
+Next, we can similarly simplify
+\begin{align*}
+  p(\sigma^2|\mu,\mu_0,\tau^2,y)
+  &\propto
+  (\sigma^{-2})^{\frac{N}{2}}
+  \exp\left\{
+    -
+    \frac{1}{2\sigma^2}
+    \sum_{g=1}^G
+    \sum_{n=1}^{N_g}
+    (y_{ng}-\mu_g)^2
+  \right\}
+  \\
+  &\propto
+  (\sigma^{-2})^{\frac{N+2}{2}-1}
+  \exp\left\{
+    -
+    \left(
+    \frac{1}{2}
+    \sum_{g=1}^G
+    \sum_{n=1}^{N_g}
+    (y_{ng}-\mu_g)^2
+    \right)
+    \sigma^{-2}
+  \right\}
+  \\
+  \implies\quad
+  p(1/\sigma^2|\mu,\mu_0,\tau^2,y)
+  &\propto
+  \text{Gamma}
+  \left(
+  \frac{N+2}{2},
+  \;
+    \left(
+    \frac{1}{2}
+    \sum_{g=1}^G
+    \sum_{n=1}^{N_g}
+    (y_{ng}-\mu_g)^2
+    \right)
+  \right)
+\end{align*}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Posterior}
+Next, simplify the following posterior by completing the square:
+\begin{align*}
+  p(\mu_0|\mu,\sigma^2, \tau^2,y)
+  &\propto
+  \exp\left\{
+    -
+    \frac{1}{2\tau^2}
+    \sum_{g=1}^G
+    (\mu_g-\mu_0)^2
+  \right\}
+  \\
+  &\propto
+  \exp\left\{
+    -
+    \frac{1}{2\tau^2}
+    \sum_{g=1}^G
+    (\mu_g^2-2\mu_g\mu_0+ \mu_0^2)
+  \right\}
+  \\
+  &\propto
+  \exp\left\{
+    -
+    \frac{1}{2\tau^2/G}
+    \left(-2\mu_0\frac{1}{G}\sum_{g=1}^G\mu_g + \mu_0^2\right)
+    -
+    \frac{1}{2\tau^2}
+    \sum_{g=1}^G\mu_g^2
+  \right\}
+  \\
+  &\propto
+  \exp\left\{
+    -
+    \frac{1}{2\tau^2/G}
+    \left(\bar{\mu}^2-2\mu_0\frac{1}{G}\bar{\mu} + \mu_0^2\right)
+  \right\}
+  \\
+  &\propto
+  \calN\left(
+    \bar{\mu},\tau^2/G
+  \right)
+\end{align*}
+where
+\begin{align*}
+  \bar{\mu}
+  &=
+  \frac{1}{G}
+  \sum_{g=1}^G
+  \mu_g
+\end{align*}
+
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Posterior}
+Lastly, take
+\begin{align*}
+  p(\mu_g|\mu_{-g},\mu_0,\sigma^2, \tau^2,y)
+  &\propto
+  \exp\left\{
+    -
+    \frac{1}{2\sigma^2}
+    \sum_{n=1}^{N_g}
+    (y_{ng}-\mu_g)^2
+  \right\}
+  \exp\left\{
+    -
+    \frac{1}{2\tau^2}
+    (\mu_g-\mu_0)^2
+  \right\}
+\end{align*}
+We can again complete the square and derive
+\begin{align*}
+    p(\mu_g | \mu_{-g}, \mu_0, \sigma^2, \tau^2, y)
+    &\propto \calN\left(\frac{
+      \frac{N_g}{\sigma^2} \bar{y}_g
+      + \frac{1}{\tau^2}\mu_0}{\frac{N_g}{\sigma^2} + \frac{1}{\tau^2}},
+      \; \frac{1}{ \frac{N_g}{\sigma^2} + \frac{1}{\tau^2}} \right),
+\end{align*}
+where
+\begin{align*}
+  \bar{y}_g = \frac{1}{N_g} \sum^{N_g}_{i=1} y_{ij},
+  %\qquad
+  %\hat{\mu} =
+    %\frac{%
+      %\sum^G_{j=1} \frac{1}{(\sigma^2/N_g)+\tau^2} \bar{y}_g
+    %}{%
+      %\sum^G_{j=1} \frac{1}{(\sigma^2/N_g)+\tau^2}
+    %}
+   %\qquad
+   %V_\mu =
+   %\frac{1}{\sum^G_{j=1}
+	 %\frac{1}{(\sigma^2/N_g) + \tau^2}}
+\end{align*}
+Notice that the mean is some weighted average between the data mean
+$\bar{y}_g$ and the grand mean $\mu_0$.
+\end{frame}
+}
+
+{\scriptsize
+\begin{frame}{Drawing from Posterior via Gibbs Sampling}
+Collecting
+\vspace{-10pt}
+\begin{align}
+  p(\mu_0|\mu,\sigma^2, \tau^2,y)
+  &\propto
+  \calN\left(
+    \frac{1}{G}
+    \sum_{g=1}^G
+    \mu_g
+    ,\;
+    \frac{\tau^2}{G}
+  \right)
+  \label{mu0}
+  \\
+  p(1/\tau^2|\mu,\mu_0,\sigma^2,y)
+  &\propto
+  \text{Gamma}\left(
+  \frac{G+1}{2}
+  ,\;
+    \left(
+    \frac{1}{2}
+    \sum_{g=1}^G
+    (\mu_g-\mu_0)^2
+    \right)
+  \right)
+  \label{tau2}
+  \\
+  p(1/\sigma^2|\mu,\mu_0,\tau^2,y)
+  &\propto
+  \text{Gamma}
+  \left(
+  \frac{N+2}{2},
+  \;
+    \left(
+    \frac{1}{2}
+    \sum_{g=1}^G
+    \sum_{n=1}^{N_g}
+    (y_{ng}-\mu_g)^2
+    \right)
+  \right)
+  \label{sigma2}
+  \\
+    p(\mu_g | \mu_{-g}, \mu_0, \sigma^2, \tau^2, y)
+    &\propto \calN\left(\frac{
+      \frac{N_g}{\sigma^2} \bar{y}_g
+      + \frac{1}{\tau^2}\mu_0}{\frac{N_g}{\sigma^2} + \frac{1}{\tau^2}},
+      \; \frac{1}{ \frac{N_g}{\sigma^2} + \frac{1}{\tau^2}} \right),
+  \label{mug}
+\end{align}
+Gibbs Sample proceeds as follows for the
+\begin{enumerate}
+\vspace{-7pt}
+  \item Pick some initial $\mu_0^{(0)}$,
+    $(\tau^2)^{(0)}$,
+    $(\sigma^2)^{(0)}$,
+    $\mu_1^{(0)},\ldots,\mu_G^{(0)}$
+
+  \item
+    Draw $\mu_0^{(j+1)}$ from Expression~\ref{mu0},
+    given $\mu_1^{(j)},\ldots,\mu_G^{(j)}$
+    and $(1/\tau^2)^{(j)}$.
+
+  \item
+    Draw $(1/\tau^2)^{(j+1)}$ from (\ref{tau2}),
+    given $\mu_1^{(j)},\ldots,\mu_G^{(j)}$, $\mu_0^{(j+1)}$,
+    take inverse to get $(\tau^2)^{(j+1)}$.
+
+  \item
+    Draw $(1/\sigma^2)^{(j+1)}$ from (\ref{sigma2})
+    given $\mu_1^{(j)},\ldots,\mu_G^{(j)}$,
+    take inverse to get $(\sigma^2)^{(j+1)}$.
+
+  \item
+    Draw $\mu_g$ from (\ref{mug})
+    given $(\sigma^2)^{(j+1)},\mu_0^{(j+1)},(\tau^2)^{(j+1)}$
+    for each $g=1,\ldots,G$.
+  \item Return to step 2 and repeat
+\end{enumerate}
+\end{frame}
+}
+
+%\section{Others}
+
+%{\footnotesize
+%\begin{frame}
+%Suppose $Y\sim \text{Binom}(n,q)$ where $n$ denotes number of trials and
+%$q$ is sucess probability.
+%\begin{align*}
+  %P[Y=k]
+  %&=
+  %\begin{pmatrix}
+    %n \\ k
+  %\end{pmatrix}
+  %q^k (1-q)^{n-k}
+%\end{align*}
+%Suppose $Y\sim \text{Beta}(\alpha,\beta)$.
+%\begin{align*}
+  %f(y)
+  %&=
+  %\frac{1}{B(\alpha,\beta)}
+  %x^{\alpha-1}(1-x)^{\beta-1}
+  %\\
+  %B(\alpha,\beta)
+  %&=
+  %\frac{\Gamma(\alpha)\Gamma(\beta)}{\Gamma(\alpha+\beta)}
+  %\\
+  %\Gamma(n)
+  %&=
+  %(n-1)!
+%\end{align*}
+%\end{frame}
+%}
+
+
+%{\footnotesize
+%\begin{frame}
+%Suppose we have a binomial model for outcomes for some unknown parameter
+%$q$
+%\begin{align*}
+  %p(Y=k|q)
+  %&=
+  %\begin{pmatrix}
+    %n \\ k
+  %\end{pmatrix}
+  %q^k (1-q)^{n-k}
+%\end{align*}
+%Can compute prior predictive distribution under a flat prior
+%\begin{align*}
+  %p(Y=k)
+  %&=
+  %\int_0^1
+  %p(Y=k|q)p(q)
+  %\;dq
+  %\\
+%\end{align*}
+%\end{frame}
+%}
+
+
+%{\footnotesize
+%\begin{frame}{Markov Model Example}
+%\end{frame}
+%}
+
+
+
+
+
+
+
+
+
+
+\end{document}
+
+
+
+\section{Normal Model}
+
+
+{\footnotesize
+\begin{frame}
+Likelihood
+\begin{align*}
+  y_i
+  \;|\;
+  \mu,\sigma^2
+  &\iid
+  \calN(\mu,\sigma^2)
+  \\
+  p(y_i|\mu,\sigma^2)
+  &=
+  \frac{1}{\sqrt{2\pi\sigma^2}}
+  \exp\left\{
+    -\frac{1}{2\sigma^2}
+    (y_i-\mu)^2
+  \right\}
+  \\
+  p(y|\mu,\sigma^2)
+  &=
+  \frac{1}{(2\pi\sigma^2)^{\frac{n}{2}}}
+  \exp\left\{
+    -\frac{1}{2\sigma^2}
+    \sumin
+    (y_i-\mu)^2
+  \right\}
+  \\
+  &=
+  \frac{1}{(2\pi\sigma^2)^{\frac{n}{2}}}
+  \exp\left\{
+    -\frac{1}{2\sigma^2}
+    \sumin
+    (y_i^2-2\mu y_i+\mu^2)
+  \right\}
+  %\\
+  %&=
+  %\frac{1}{(2\pi\sigma^2)^{\frac{n}{2}}}
+  %\exp\left\{
+    %-\frac{1}{2\sigma^2}
+    %\sumin
+    %(y_i^2-2\mu y_i+\mu^2)
+  %\right\}
+\end{align*}
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}
+Conjugate prior
+\begin{align*}
+  \mu|\sigma^2
+  &\sim
+  \calN(\mu_0,\sigma^2/\kappa_0)
+  \\
+  p(\mu|\sigma^2)
+  &\sim
+  \frac{1}{\sqrt{2\pi\sigma^2/\kappa_0}}
+  \exp\left\{
+    -\frac{1}{2\sigma^2/\kappa_0}
+    (\mu-\mu_0)^2
+  \right\}
+  \\
+  1/\sigma^2
+  &\sim
+\end{align*}
+\end{frame}
+}
+
+
+
+\section{Normal Linear Model}
+
+{\footnotesize
+\begin{frame}
+Likelihood
+\begin{align*}
+  y
+  \;|\;
+  \beta,\sigma^2,X
+  \calN(X\beta,\Sigma^2 I_n)
+\end{align*}
+Noninformative prior
+\begin{align*}
+  p(\beta,\sigma^2|X)\propto \sigma^{-2}
+\end{align*}
+Posterior
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Preliminaries}
+Normal density
+\begin{align*}
+  f(x)
+  &=
+  \frac{1}{\sqrt{2\pi\sigma^2}}
+  \exp\left\{
+    -
+    \frac{1}{2\sigma^2}
+    (x-\mu)^2
+  \right\}
+\end{align*}
+
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}
+Normal likelihood
+
+Conjugate prior
+
+Joint posterior, factoring
+
+Alternative
+
+Lasso
+\end{frame}
+}
+
+
+
+
+
+
+
+
+
+
+
+% Sample code
+\pause to add breaks
+\textcolor{red}{text to show}.
+\vspace{20pt}
+
+\usebeamercolor{dull text}
+\alert<+>{Words that you want to alert}
+

@@ -1,0 +1,1468 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usepackage{cmbright}
+%\usetheme{metropolis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis with Sidebar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[aspectratio=169, handout]{beamer}
+%\documentclass{beamer}
+\usepackage{cmbright}
+\usepackage{comment}
+
+\useoutertheme[right, width=0.20\paperwidth]{sidebar}
+\usecolortheme{metropolis}
+\useinnertheme[sectionpage=none]{metropolis}
+\usefonttheme{metropolis}
+
+\makeatletter
+\beamer@headheight=1.75\baselineskip     %controls the height of the headline, default is 2.5
+\makeatother
+
+\usepackage{etoolbox}
+\patchcmd\insertverticalnavigation{\dohead}{\vskip-35pt\dohead}{}{}
+
+%\setbeamertemplate{sidebar canvas right}{}
+%\setbeamertemplate{sidebar right}{BOB}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Simple Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usetheme{Boadilla}
+%\usepackage{lmodern}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sidebar Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass[serif]{beamer}  % For serif latex font
+%\usepackage{pxfonts}
+%\usepackage{eulervm}
+%\usepackage{mathpazo}
+
+%\usetheme{Goettingen}
+%\usecolortheme{lily}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Common Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[]{Model Comparison \\ Matt Cocci}
+\author[]{}
+\date{\today}
+
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{section in toc}[sections numbered]
+%\setbeamertemplate{section in toc}[square unnumbered]
+%\setbeamertemplate{section in toc}[square unnumbered]
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% For easier looping
+\usepackage{pgffor}
+
+\usepackage{pdfpages}
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\proj}{\operatorname{proj}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Rnk}{\mathbb{R}^{n\times k}}
+\newcommand{\Rkk}{\mathbb{R}^{k\times k}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Presentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Outline}
+%\tableofcontents[hideallsections]
+\tableofcontents
+\end{frame}
+
+
+
+
+{\scriptsize
+\begin{frame}{Model Comparison Tools}
+Model comparison tools
+\begin{itemize}
+  \item Full Bayesian Approach
+  \item BIC/Schwarz Criterion
+  \item AIC
+  \item Cross Validation
+  \item Likelihood Ratio
+\end{itemize}
+Features and considerations of different tests
+\begin{itemize}
+  \item Motivation, where they come from
+  \item Degree of approximation we use to derive them
+  \item What they penalize
+  \item Whether models need to be nested or not
+  \item Frequentist properties as $n\ra\infty$
+\end{itemize}
+Drawing heavily on notes from Larry Wasserstein (link
+\href{http://stat.cmu.edu/~larry/=stat705/Lecture16.pdf}{here}).
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Bayesian Objects}
+
+\alert{Prior} and \alert{Likelihood}
+\begin{align*}
+  p(\theta)
+  \qquad\quad
+  p(x|\theta)
+\end{align*}
+\alert{Posterior}
+\begin{align*}
+  p(\theta|x)
+  =
+  \frac{p(x|\theta)p(\theta)}{p(x)}
+  =
+  \frac{p(x|\theta)p(\theta)}{\int p(x,\theta)\,d\theta}
+  =
+  \frac{p(x|\theta)p(\theta)}{\int p(x|\theta)p(\theta)\,d\theta}
+  \propto
+  p(x|\theta)p(\theta)
+\end{align*}
+\alert{Marginal Data Density} or \alert{Prior Predictive Distribution}:
+Can compute function before observing the data.
+Is a number after observing the data.
+\begin{align*}
+  p(x)
+  =
+  \int
+  p(x,\theta)
+  \;
+  d\theta
+  =
+  \int
+  p(x,\theta)
+  \;
+  d\theta
+  =
+  \int
+  p(x|\theta)
+  p(\theta)
+  \;
+  d\theta
+\end{align*}
+Useful for model discrimination, where we $m,m'$ index possible models.
+Treat them as parameters.
+\begin{align*}
+  \underbrace{%
+    \frac{p(m|x)}{p(m'|x)}
+  }_{\text{Posterior Odds Ratio}}
+  =
+  \underbrace{%
+    \frac{p_m(x)}{p_{m'}(x)}
+  }_{\text{Likelihood Ratio or Bayes Factor}}
+  \times
+  \underbrace{%
+    \frac{p(m)}{p(m')}
+  }_{\text{Prior Odds}}
+\end{align*}
+\alert{Posterior Predictive Density}:
+Distribution for new dataset or observation
+\begin{align*}
+  p(\tilde{x}|x)
+  =
+  \int
+  p(\tilde{x},\theta|x)
+  \;
+  d\theta
+  =
+  \int
+  p(\tilde{x}|\theta,x)
+  p(\theta|x)
+  \;
+  d\theta
+  =
+  \int
+  p(\tilde{x}|\theta)
+  p(\theta|x)
+  \;
+  d\theta
+\end{align*}
+
+\end{frame}
+}
+
+
+
+\section{Fully Bayesian}
+
+{\scriptsize
+\begin{frame}{Full Bayesian Model Comparison: Creating a Super-Model}
+Suppose we have a set of $M$ different models, all with different
+likelihoods and associated parameters, for the same set of data $x$:
+\begin{align*}
+  p_m(x|\theta_m)
+  \qquad
+  m=1,\ldots,M
+\end{align*}
+To do \alert{model comparison} (inference about the ``correct'' model
+for the data $x$), can define a \alert{meta-} or \alert{super-model} as
+follows:
+\begin{align*}
+  p(x|\gamma,\theta_1,\cdots,\theta_M)
+  :=
+  p_\gamma(x|\theta_\gamma)
+\end{align*}
+where $\gamma$ is an unknown \alert{parameter} indexing models.
+The model is now defined by the super-model likelihood given above
+and parameters $(\gamma,\theta_1,\ldots,\theta_M)$.
+
+Proceed in the usual way with this super-model.
+Set a prior, compute posterior:
+\begin{align*}
+  p(\gamma,\theta_1,\cdots,\theta_M|x)
+  =
+  \frac{%
+    p(x|\gamma,\theta_1,\cdots,\theta_M)
+    \cdot
+    p(\gamma,\theta_1,\cdots,\theta_M)
+  }{%
+    p(x)
+  }
+\end{align*}
+Common prior specification looks like
+\begin{align*}
+  p(\gamma,\theta_1,\cdots,\theta_M)
+  =
+  p(\gamma)
+  \cdot
+  p(\theta_1)
+  \cdots
+  p(\theta_M)
+\end{align*}
+Then $p(\gamma)$ returns the prior probability on model
+$\gamma\in\{1,\ldots,M\}$, and $p(\theta_m)$ is a prior for the
+parameters of model $m$.
+It's common to specify all of these pieces independently, as shown.
+\end{frame}
+}
+
+
+
+
+{\scriptsize
+\begin{frame}{Fully Bayesian Model Comp.: Posterior Probs.\ over Models}
+
+Can compute posterior probabilities over models in the usual way by
+integrating out.
+\begin{align*}
+  p(\gamma|x)
+  &=
+  \int
+  \cdots
+  \int
+  p(\gamma,\theta_1,\cdots,\theta_M|x)
+  \;d\theta_1\;\cdots d\theta_M
+\end{align*}
+Assuming a prior independent over all pieces, as described above:
+\begin{align*}
+  p(\gamma|x)
+  &=
+  \frac{%
+    \int
+    \cdots
+    \int
+    p(x|\gamma,\theta_1,\cdots,\theta_M)
+    \cdot
+    p(\gamma)
+    \cdot
+    p(\theta_1)
+    \cdots
+    p(\theta_M)
+    \;d\theta_1\;\cdots d\theta_M
+  }{%
+    p(x)
+  }
+  \\
+  &=
+  \frac{%
+    p(\gamma)
+    \int
+    \cdots
+    \int
+    p_\gamma(x|\theta_\gamma)
+    \cdot
+    p(\theta_1)
+    \cdots
+    p(\theta_M)
+    \;d\theta_1\;\cdots d\theta_M
+  }{%
+    p(x)
+  }
+  \\
+  &=
+  \frac{%
+    p(\gamma)
+    \int
+    p_\gamma(x|\theta_\gamma)
+    \cdot
+    p(\theta_\gamma)
+    \;d\theta_\gamma
+  }{%
+    p(x)
+  }
+  \\
+  &=
+  \frac{%
+    p(\gamma)
+    p_\gamma(x)
+  }{%
+    p(x)
+  }
+\end{align*}
+$p_\gamma(x)$ is the \alert{marginal data density} (m.d.d.) or
+\alert{marginal likelihood} for model $\gamma$ (what we would have
+computed considering model $\gamma$ on its own), while $p(x)$ is m.d.d.\
+for super-model.
+
+Model selection thus works by considering the marginal data density of
+each model \alert{individually}, together with prior probabilities over
+the different competing models.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Fully Bayesian Model Comp.: Posterior Probs.\ over Models}
+Given the marginal posterior over models
+\begin{align*}
+  p(\gamma|x)
+  &=
+  \frac{%
+    p(\gamma)
+    p_\gamma(x)
+  }{%
+    p(x)
+  }
+  \\
+  \qquad\text{where}\quad
+  p_\gamma(x)
+  &=
+  \int
+  p_\gamma(x|\theta_\gamma)
+  \cdot
+  p(\theta_\gamma)
+  \;d\theta_\gamma
+\end{align*}
+Often makes sense to form \alert{odds-ratios} between any two models,
+which gives an expresion with a few named objects:
+\begin{align*}
+  \underbrace{%
+    \frac{%
+      p(\gamma|x)
+    }{%
+      p(\gamma'|x)
+    }
+  }_{\text{Posterior Odds Ratio}}
+  &=
+  \underbrace{%
+  \frac{%
+    p_\gamma(x)
+  }{%
+    p_{\gamma'}(x)
+  }
+  }_{\text{LR or Bayes Factor}}
+  \times
+  \underbrace{%
+  \frac{%
+    p(\gamma)
+  }{%
+    p(\gamma')
+  }
+  }_{\text{Prior Odds}}
+\end{align*}
+\end{frame}
+}
+
+
+
+
+{\footnotesize
+\begin{frame}{Computing Marginal Data Density}
+Suppose we wish to compute the \alert{marginal data density}
+for a given model.
+(Ignore competing models, so drop subscripting by models and the
+supermodel.)
+By definition:
+\begin{align*}
+  p(x)
+  =
+  \int p(x,\theta)\;d\theta
+  =
+  \int p(x|\theta)\cdot p(\theta)\;d\theta
+\end{align*}
+Generally infeasible analytically, but possible \alert{numerically}.
+Especially easy once we have draws from the posterior from an MCMC
+algorithm.
+
+Consider the following result, which rewrites the expectation which
+is computed by integrating against the posterior density $p(\theta|x)$
+($x$ fixed), where $g(\theta)$ is
+any density function, and $C$ is some (any) constant that's there simply
+because we might have some numerical instability and playing around with
+the constant $C$ can sometimes help solve that.
+\begin{align*}
+  \E_{\theta|x}\left[
+    \frac{C g(\theta)}{p(\theta,x)}
+  \right]
+  &=
+  \int
+  \frac{C g(\theta)}{p(\theta,x)}
+  \,
+  p(\theta|x)\;d\theta
+  =
+  C
+  \int
+  \frac{g(\theta)}{p(\theta|x)p(x)}
+  \,
+  p(\theta|x)\;d\theta
+  =
+  \frac{C}{p(x)}
+  \int
+  g(\theta)
+  \;d\theta
+  =
+  \frac{C}{p(x)}
+\end{align*}
+\alert{Result}:
+We have an \alert{expectation} taken over the \alert{posterior}
+which \alert{estimates} some transformation of the
+\alert{marginal data density}.
+\end{frame}
+}
+
+
+
+{\footnotesize
+\begin{frame}{Computing Marginal Data Density}
+Recall the previous result:
+\begin{align*}
+  \E_{\theta|x}\left[
+    \frac{C g(\theta)}{p(\theta,x)}
+  \right]
+  =
+  \frac{C}{p(x)}
+  \qquad \text{where}\quad
+  p(\theta,x)
+  =p(\theta|x)p(\theta)
+\end{align*}
+If we have many draws from the posterior
+\begin{align*}
+  \{\theta^{(b)}\}_{b=1}^B
+  \sim
+  p(\theta|x)
+\end{align*}
+Then we can numerically approximate
+\begin{align*}
+  \frac{1}{B}
+  \sum_{b=1}^B
+  \frac{C g(\theta^{(b)})}{p(\theta^{(b)}|x)p(\theta^{(b)})}
+  \approx
+  \E_{\theta|x}\left[
+    \frac{C g(\theta)}{p(\theta,x)}
+  \right]
+  =
+  \frac{C}{p(x)}
+\end{align*}
+from which we can recover an estimate of $p(x)$.
+
+In the denominator on the LHS, note that we're simply evaluating the
+likelihood and the prior at each draw.
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Computing Marginal Data Density: Choice of $g(\theta)$}
+In theory, any density works for $g(\theta)$, but we might have
+numerical stability issues.
+Similar to what we saw for importance sampling, it's helpful to have
+$g(\theta)$ that closely approximate $p(\theta,x)$.
+Therefore, a common choice (originally proposed by \alert{Geweke}) is to
+choose
+\begin{align*}
+  g(\theta)
+  \sim
+  \calN\left(
+  \hat{\theta}_{mode},
+  -
+  \left(
+  \frac{\partial^2 \ln p(\hat{\theta}_{mode},x)}{\partial\theta\,\partial\theta'}
+  \right)^{-1}
+  \right)
+\end{align*}
+where $\hat{\theta}_{mode}$ is the posterior mode.
+The choice of constant $C$ is another degree of freedom that you can
+play around with to help ensure numerical stability when you compute the
+marginal data density.
+\end{frame}
+}
+
+
+
+
+
+\section{BIC/Schwarz Criterion}
+
+
+{\footnotesize
+\begin{frame}{BIC: Statement}
+We can select models on the basis of the
+\alert{Bayesian Information Criterion} (\alert{BIC}):
+\begin{align*}
+  BIC = \ln(n)k - 2\ln(\hat{L})
+\end{align*}
+where
+\begin{itemize}
+  \item $k$ number of estimated parameters
+  \item $\hat{L}$ the maximized likelihood value of the model
+  \item $n$ is the number of observations.
+\end{itemize}
+We will see that this emerges as an \alert{approximation} to
+\alert{fully Bayesian model comparison} that we already saw, which is
+rooted in comparing marginal data densities.
+\end{frame}
+}
+
+
+\subsection{Aside: Laplace's Method}
+
+
+{\scriptsize
+\begin{frame}{Aside: Laplace's Method}
+\alert{Goal}: To compute integral of the form
+\begin{align*}
+  C
+  :=
+  \int_a^b e^{Mf(x)}\;dx
+\end{align*}
+where
+\begin{itemize}
+  \item $f(x)$ is twice-differentiable
+    with unique global max at $x_0\in[a,b]$,
+    $f''(x_0)<0$
+  \item $M$ is a large number.
+    (Formally, the approximation is based on $M\ra\infty$)
+  \item Endpoints are possibly infinite
+\end{itemize}
+\alert{Intuition}:
+Rewrite integrand
+\begin{align*}
+  e^{Mf(x)}
+  =
+  e^{M[f(x_0)+(f(x)-f(x_0)]}
+  =
+  e^{Mf(x_0)}
+  e^{M[(f(x)-f(x_0)]}
+\end{align*}
+Because $x_0$ is the max, $f(x)-f(x_0)<0$ and, if we send $M\ra\infty$,
+the second exponential in the final expression is driven to zero.
+
+\alert{Conclusion}:
+Only $x$ in a small neighborhood of $x_0$ contribute to the value of the
+integral, since the integrand at $x$ far away from $x_0$ will be driven
+to zero exponentially fast.
+Therefore, replacing $f(x)$ with a Taylor series expansion about
+$f(x_0)$ yields a decent approximation because, as we get further from
+$x_0$ and the Taylor approximation deteriorates, the exponential will
+drive that approximation error to zero for us.
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Aside: Laplace's Method}
+Given $f(x)$ with maximum at $x_0$, want to compute
+\begin{align*}
+  C = \int_a^b e^{M f(x)}\;dx
+\end{align*}
+Taylor expand about the maximum $x_0$:
+\begin{align*}
+  f(x)
+  &=
+  f(x_0)
+  +
+  f'(x_0)
+  (x-x_0)
+  +
+  \frac{1}{2}
+  f''(x_0)
+  (x-x_0)^2
+  +
+  R(x,x_0)
+  \qquad \text{where}\quad
+  R(x,x_0)
+  =O((x-x_0)^3)
+  \\
+  &=
+  f(x_0)
+  -
+  \frac{1}{2}
+  \big|f''(x_0)\big|
+  \cdot
+  (x-x_0)^2
+  +
+  R(x,x_0)
+\end{align*}
+Sub in and rewrite
+\begin{align*}
+  C
+  &\approx
+  \int_a^b
+  e^{%
+    M
+    [
+    f(x_0)
+    -
+    \frac{1}{2}
+    |f''(x_0)|
+    (x-x_0)^2
+    ]
+  }
+  \;dx
+  \\
+  &=
+  e^{%
+    M
+    f(x_0)
+  }
+  \int_a^b
+  e^{%
+    -
+    \frac{M|f''(x_0)|}{2}
+    (x-x_0)^2
+  }
+  \;dx
+  \\
+  &=
+  e^{%
+    M
+    f(x_0)
+  }
+  \sqrt{2\pi(M|f''(x_0)|)^{-1}}
+  \int_{-\infty}^\infty
+  \frac{1}{\sqrt{2\pi(M|f''(x_0)|)^{-1}}}
+  e^{%
+    -
+    \frac{M|f''(x_0)|}{2}
+    (x-x_0)^2
+  }
+  \;dx
+  %\\
+  %&=
+  %e^{%
+    %M
+    %f(x_0)
+  %}
+  %\sqrt{2\pi}(1/Mf''(x_0))^{1/2}
+  %\int_{-\infty}^\infty
+  %\phi(x;x_0, 1/Mf''(x_0))
+  %\;dx
+\end{align*}
+We enlarged the bounds of integration  from $[a,b]$ to
+$(-\infty,\infty)$ because fast decay away from the max ensures that the
+contribution from regions outside of $[a,b]$ will be small.
+\end{frame}
+}
+
+
+
+
+
+{\footnotesize
+\begin{frame}{Aside: Laplace's Method}
+Given
+\begin{itemize}
+  \item $f(x)$ is a twice-differentiable function
+    with unique global max at $x_0$,
+    $f''(x_0)<0$
+  \item $M$ is a large number
+    (Formally, the approximation is based on $M\ra\infty$)
+  \item Endpoints are possibly infinite
+\end{itemize}
+\alert{Result}:
+From the previous slide, because the final integral is a normal density
+that integrates to one, we have the approximation
+\begin{align*}
+  \int_a^b e^{Mf(x)}\;dx
+  \approx
+  e^{%
+    M
+    f(x_0)
+  }
+  \sqrt{%
+  \frac{%
+    2\pi
+  }{%
+    M|f''(x_0)|
+  }
+  }
+\end{align*}
+Laplace's Method is sometimes also stated as the following, which can
+be proved in a similar way if the integrand includes an additional
+positive function $h(x)$:
+\begin{align*}
+  \int_a^b h(x)e^{Mf(x)}\;dx
+  \approx
+  h(x_0)
+  e^{%
+    M
+    f(x_0)
+  }
+  \sqrt{%
+  \frac{%
+    2\pi
+  }{%
+    M|f''(x_0)|
+  }
+  }
+\end{align*}
+\end{frame}
+}
+
+
+\subsection{Derivation}
+
+
+{\footnotesize
+\begin{frame}{BIC: Approximating the Marginal Data Density}
+It will be useful here to write the full likelihood out explicitly as
+\begin{align*}
+  p(x|\theta)
+  =
+  \prodin p(x_i|\theta)
+  =
+  \exp\left\{
+  \sumin \ln p(x_i|\theta)
+  \right\}
+\end{align*}
+In Bayesian model comparison, recall that what matters is the
+\alert{marginal data density}.
+For a single model, this quantity is defined
+\begin{align*}
+  p(x_{1:n})
+  = \int p(x|\theta)p(\theta)\;d\theta
+  = \int \left[\prodin p(x_i|\theta)\right]p(\theta)\;d\theta
+\end{align*}
+The BIC is an approximation to this quantity.
+Specifically, rewrite
+\begin{align*}
+  p(x)
+  =
+  \int
+  e^{%
+    \sumin \ln p(x_i|\theta)
+  }
+  p(\theta)\;d\theta
+\end{align*}
+The exponent has a maximum at the MLE $\hat{\theta}$.
+Therefore, a \alert{Taylor expansion} of the integral about
+$\hat{\theta}$ and by Laplace method arguments for large $n$, we get
+\begin{align*}
+  p(x)
+  =
+  \int
+  e^{%
+    \sumin \ln p(x_i|\theta)
+  }
+  p(\theta)\;d\theta
+  \approx
+  p(\hat{\theta})
+  e^{%
+    \sumin \ln p(x_i|\hat{\theta})
+  }
+  \left(
+  (2\pi/n)^{k/2} |\calI(\hat{\theta})|^{-1/2}
+  \right)
+\end{align*}
+$\calI(\hat{\theta})$ is the average Fisher information matrix
+(shows up because of second order Taylor expansion), $k$ is the
+number of parameters, and $n$ is the sample size.
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{BIC: Simplifying to Standard Criterion}
+For large $n$ we have the following approximation to the marginal
+likelihood by Laplace's method:
+\begin{align*}
+  p(x)
+  =
+  \int
+  p(x|\theta)
+  p(\theta)\;d\theta
+  \approx
+  p(\hat{\theta})
+  p(x|\hat{\theta})
+  \left(
+  (2\pi/n)^{k/2} |\calI(\hat{\theta})|^{-1/2}
+  \right)
+\end{align*}
+This was already a large $n$ approximation. And for large $n$, we know
+that the MLE $\hat{\theta}\pto \theta_0$.
+Therefore, $I(\hat{\theta})$ and $p(\hat{\theta})$ will converge to
+fixed probability limits that do not depend upon the model, and so we
+can drop them for the purpose of model comparison:
+\begin{align*}
+  p(x)
+  \propto
+  e^{%
+    \sumin \ln p(x_i|\hat{\theta})
+  }
+  \cdot
+  n^{-k/2}
+  =
+  \hat{L}
+  \cdot
+  n^{-k/2}
+\end{align*}
+where $\hat{L}$ denote the maximized value of the likelihood.
+$p(x|\hat{\theta})$
+
+Now take logs, multiply by -2 (a convention), and drop constants that do
+not depend upon the model to get the standard BIC criterion:
+\begin{align*}
+  BIC
+  =
+  k
+  \ln(n)
+  -
+  2\ln(\hat{L})
+\end{align*}
+\end{frame}
+}
+
+
+\subsection{Comparison to Fully Bayesian Analysis}
+
+{\footnotesize
+\begin{frame}{BIC: Using for Fully Bayesian Analysis}
+On previous slide, saw that BIC comes from approximating the m.d.d.
+In particular,
+\begin{align*}
+  p(x)
+  &\propto
+  \hat{L}
+  \cdot
+  n^{-k/2}
+  \\
+  BIC
+  &=
+  k
+  \ln(n)
+  -
+  2\ln(\hat{L})
+\end{align*}
+Therefore,
+\begin{align*}
+  p(x)
+  &\propto
+  e^{-\frac{BIC}{2}}
+\end{align*}
+With this approximation, we can also do
+\alert{fully Bayesian model comparison}.
+Specifically, this is enough to form odds ratios between models:
+\begin{align*}
+  \frac{p(\gamma|x)}{p(\gamma'|x)}
+  =
+  \frac{p_\gamma(x)}{p_{\gamma'}(x)}
+  \times
+  \frac{p(\gamma)}{p(\gamma)}
+  =
+  \frac{e^{-\frac{BIC_\gamma}{2}}}{e^{-\frac{BIC_{\gamma'}}{2}}}
+  \times
+  \frac{p(\gamma)}{p(\gamma)}
+\end{align*}
+Therefore, model selection using the BIC is approximately the same as
+model selection using a fully Bayesian approach (and equal prior
+probabilities across models).
+We've just made some approximations along the way.
+
+Note:
+Models \alert{need not} be nested.
+\end{frame}
+}
+
+
+
+\section{AIC}
+
+{\footnotesize
+\begin{frame}{AIC: Overview}
+
+$BIC = k\ln(n) - 2\ln(\hat{L})$
+\begin{itemize}
+  \item \alert{Motivation}: An approximation to the
+    \alert{marginal data density}, which is the basis for proper
+    Bayesian model comparison.
+  \item \alert{Assumes} the \alert{true} model is in the considered set
+  \item Harsher penalty for large models, especially as $n$
+    grows. Favors simplicity.
+\end{itemize}
+$AIC = 2k - 2\ln (\hat{L})$
+\begin{itemize}
+  \item \alert{Motivation}: Choosing the model that is \alert{closest}
+    (in terms of KL divergence) to the \alert{true, unknown DGP}.
+  \item \alert{No claim} that the \alert{true} model lies in the
+    considered set. Looking for ``closest''
+  \item Similarly to \alert{cross-validation}, another model selection
+    scheme that also happens to work under weaker conditions, is
+    easier to implement given current computing power, and doesn't rely
+    on approximations like AIC.
+\end{itemize}
+In both, models \alert{need not} be nested, unlike LR test.
+\end{frame}
+}
+
+
+
+\subsection{KL Divergence}
+
+{\footnotesize
+\begin{frame}{Aside: KL Divergence}
+
+Definition
+\begin{align*}
+  D(p,q)
+  &=
+  \int
+  \log\left(
+  \frac{p(x)}{q(x)}
+  \right)
+  p(x)
+  \,dx
+  =
+  \E_p\left[
+    \log\left(
+    \frac{p(x)}{q(x)}
+    \right)
+  \right]
+\end{align*}
+Comments
+\begin{itemize}
+  \item Non-negative, so it's a \alert{distance} measure between
+    \alert{distributions}.
+
+    Proof: Apply Jensen to expectation
+
+  \item Not a proper metric because not symmetric; order matters
+\end{itemize}
+Applications
+\begin{itemize}
+  \item AIC:
+    Select model with smallest KL divergence relative to true, unkown
+    DGP.
+  \item MLE:
+    If model \alert{misspecified}, i.e. DGP is
+    $p(x)\not\in\{p(x|\theta)\}_{\theta\in\Theta}$ then
+    \begin{align*}
+      \underset{n\ra\infty}{\text{plim}}
+      \;
+      p(x|\hat{\theta}_{MLE})
+      =
+      \argmin_{p(x|\theta)}
+      K(p(x),p(x|\theta))
+    \end{align*}
+    Lends interpretation to MLE in the presence of model
+    misspecification.
+\end{itemize}
+\end{frame}
+}
+
+
+
+\subsection{Derivation}
+
+{\footnotesize
+\begin{frame}{Informal Justification: Setup}
+
+Suppose we have iid observations $\{y_i\}_{i=1}^n$ and consider $M$
+\alert{competing models}
+\begin{align*}
+  p_m(y|\theta_m)
+  \qquad
+  m=1,\ldots,M
+\end{align*}
+where $p_m(y|\theta_m)$ is the likelihood for a \alert{single}
+observation.
+Associated with each model is an MLE and an associated maximum
+likelihood density function
+\begin{align*}
+  \hat{\theta}_m
+  \qquad
+  \quad
+  p_m(y|\hat{\theta}_m)
+\end{align*}
+Suppose that the \alert{true DGP} is $p(y)$, which \alert{need not} fall
+within the set of considered models.
+Thus we're allowing for possible \alert{misspecification}.
+
+\alert{Goal}:
+We want a criterion that selects the model with the smallest KL
+divergence from the true DGP.
+The KL divergence between DGP $p(y)$ and the model $m$ maximum
+likelihood density $p_m(y|\theta_m)$ is
+\begin{align*}
+  D(p(y),p_m(y|\hat{\theta}_m))
+  &=
+  \int
+  \log\left(
+  \frac{p(y)}{p_m(y|\hat{\theta}_m)}
+  \right)
+  p(y)
+  \;
+  dy
+  \\
+  &=
+  \int
+  \log(p(y))
+  p(y)
+  \;
+  dy
+  -
+  \int
+  \log(p_m(y|\hat{\theta}_m))
+  p(y)
+  \;
+  dy
+\end{align*}
+Notice that the first term is \alert{the same} across different models.
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Informal Justification: Getting to AIC}
+We will choose the model that minimizes the KL divergence.
+From the previous slide, this is equivalent to choosing the model $m$
+that maximizes
+\begin{align*}
+  K_m
+  &=
+  \int
+  \log(p_m(y|\hat{\theta}_m))
+  p(y)
+  \;
+  dy
+\end{align*}
+Of course, we don't know the DGP $p(y)$ so we can't compute $p(y)$.
+But our data $\{y_i\}_{i=1}^n$ were drawn from $p(y)$, so we might think
+to estimate the above quantity by
+\begin{align*}
+  \frac{1}{n}
+  \sum_{i=1}^n
+  \log(p_m(y_i|\hat{\theta}_m))
+\end{align*}
+i.e. the maximized joint log likelihood divided by $n$.
+But turns out this generally biased.
+Akaike showed bias is approximately $k_m/n$, where $k$ is the number
+of parameters in model $m$.
+Therefore, we use the bias-corrected version of the above estimate
+of $K_m$:
+\begin{align*}
+  \hat{K}_m
+  =
+  \frac{1}{n}
+  \sum_{i=1}^n
+  \log(p_m(y_i|\hat{\theta}_m))
+  -
+  \frac{k_m}{n}
+\end{align*}
+Thus model selection based on the above criterion equivalent
+to selection based on
+\begin{align*}
+  AIC_m
+  =
+  -
+  2n
+  \hat{K}_m
+  =
+  2k_m
+  - 2\ln(\hat{L}_m)
+\end{align*}
+$k_m$ is number of parameters in $m$; $\hat{L}_m$ is
+maximized value of joint log-likelihood for $m$.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Deriving the Bias}
+
+Let $\theta_0$ be the pseudo-true value.
+
+Let
+\begin{align*}
+  Z_n
+  &=
+  \sqrt{n}(\hat{\theta}-\theta_0)
+  \quad\dto\quad
+  \calN(0,J^{-1}VJ^{-1})
+  \\
+  V
+  &=
+  \Var(s(Y,\theta_0))
+  \\
+  J
+  &=
+  -\E[H(Y,\theta_0)]
+\end{align*}
+where variance and exp is under true dgp.
+
+Define
+\begin{align*}
+  S_n = \frac{1}{n}\sumin s(Y_i,\theta_0)
+  \quad\dto\quad
+  \calN(0,V)
+\end{align*}
+As a result
+\begin{align*}
+  JZ_n
+  \overset{a}{\sim}
+  \sqrt{n}S_n
+\end{align*}
+Taylor series expansion of KL divergence term.
+
+Taylor series exapnsion of estimate of KL div.
+
+Look at the difference to grok the bias.
+\end{frame}
+}
+
+
+
+
+
+
+{\footnotesize
+\begin{frame}{AIC: Summary}
+AIC for a particular model is given by
+\begin{align*}
+  AIC = 2k - 2\ln(\hat{L})
+\end{align*}
+where
+\begin{itemize}
+  \item $k$ is number of estimated parameters
+  \item $\hat{L}$ the maximized likelihood value for the model
+\end{itemize}
+\end{frame}
+}
+
+
+
+\section{Cross Validation}
+
+{\footnotesize
+\begin{frame}{Cross Validation}
+
+\end{frame}
+}
+
+
+
+
+
+
+
+\end{document}
+
+
+
+
+
+
+
+% Sample code
+\pause to add breaks
+\textcolor{red}{text to show}.
+\vspace{20pt}
+
+\usebeamercolor{dull text}
+\alert<+>{Words that you want to alert}
+

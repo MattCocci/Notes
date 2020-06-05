@@ -1,0 +1,1733 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usepackage{cmbright}
+%\usetheme{metropolis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis with Sidebar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[aspectratio=169, handout]{beamer}
+%\documentclass[aspectratio=169]{beamer}
+%\documentclass{beamer}
+\usepackage{cmbright}
+\usepackage{comment}
+
+\useoutertheme[right, width=0.20\paperwidth]{sidebar}
+\usecolortheme{metropolis}
+\useinnertheme[sectionpage=none]{metropolis}
+\usefonttheme{metropolis}
+
+\makeatletter
+\beamer@headheight=1.75\baselineskip     %controls the height of the headline, default is 2.5
+\makeatother
+
+\usepackage{etoolbox}
+\patchcmd\insertverticalnavigation{\dohead}{\vskip-35pt\dohead}{}{}
+
+%\setbeamertemplate{sidebar canvas right}{}
+%\setbeamertemplate{sidebar right}{BOB}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Simple Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usetheme{Boadilla}
+%\usepackage{lmodern}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sidebar Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass[serif]{beamer}  % For serif latex font
+%\usepackage{pxfonts}
+%\usepackage{eulervm}
+%\usepackage{mathpazo}
+
+%\usetheme{Goettingen}
+%\usecolortheme{lily}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Common Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[]{Linear Panel Data Models \\ Matt Cocci}
+\author[]{}
+\date{April 15, 2020}
+
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+%\setbeamertemplate{section in toc}[square unnumbered]
+%\setbeamertemplate{subsection in toc}[square unnumbered]
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% For easier looping
+\usepackage{pgffor}
+
+\usepackage{pdfpages}
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\proj}{\operatorname{proj}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Rnk}{\mathbb{R}^{n\times k}}
+\newcommand{\Rkk}{\mathbb{R}^{k\times k}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Presentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Outline}
+\tableofcontents[hideallsubsections]
+%\tableofcontents
+\end{frame}
+
+
+\section{Motivation}
+
+
+\subsection{OLS Recap}
+
+{\footnotesize
+\begin{frame}{OLS: Recap}
+\alert{Recall}:
+Two interpretations, justifications, motivations of regression equation
+\vspace{-5pt}
+\begin{align*}
+  Y_i
+  =
+  X_i'\beta
+  +
+  \varepsilon_i
+\end{align*}
+\vspace{-25pt}
+\pause
+\begin{enumerate}
+  {\footnotesize
+  \item \alert{CEF Summary View}:
+    Not making a statement about the DGP; rather, $\beta$ is a summary
+    measure of (generally nonlinear) CEF $\E[Y|X]$ for observed data.
+    Residual defined given $\beta$, uncorrelated with $X_i$ by
+    construction.
+
+  \item \alert{Model View}:
+    Regression equation is DGP for outcomes, with $\beta$ representing
+    primitive structural parameter: the marginal effect if we could
+    manipulate $X_i$.
+    Concern is whether $\varepsilon_i$ and $X_i$ correlated;
+    need exogeneity $\E[\varepsilon_i|X_i]$ for
+    OLS estimand (which summarizes CEF for observed outcomes) to recover
+    $\beta$ capturing ceteris paribus, common-to-all-people marginal
+    effects.
+  }
+\end{enumerate}
+\pause
+Linear panel data models are in the spirit of Perspective 2.
+So I will focus on that, starting from the exogeneity assumption
+like $\E[\varepsilon_i|X_i]=0$ to get to zero-correlation moment
+conditions
+$\E[\varepsilon_iX_i]=0$
+used for estimation.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{OLS: Recap}
+So for OLS under Perspective 2, steps are
+\begin{enumerate}
+  \item Write down a \alert{statement}/\alert{restriction} for the
+    (conditional) DGP
+    \begin{align*}
+      Y_i
+      =
+      X_i'\beta
+      +
+      \varepsilon_i
+      \qquad
+      \E[\varepsilon_i|X_i]=0
+    \end{align*}
+    where $\beta$ is marginal effect.
+    So I can think about manipulating $X_i$ and rest assured that
+    $\beta$ will characterize the marginal effect because changes in
+    $X_i$ are not associated with some confounding term present in
+    $\varepsilon_i$ in the DGP.
+    By exogeneity $\E[\varepsilon_i|X_i]=0$.
+    This is an unverifiable modeling assumption.
+
+  \item
+    Derive \alert{moment condition} (in terms of observed data from these
+    assumptions)
+    that can be exploited for estimation of $\beta$.
+    \begin{align*}
+      \E[\varepsilon_i|X_i]=0
+      \quad\implies\quad
+      \E[\varepsilon_iX_i]
+      =\E[(Y_i-X_i'\beta)X_i]
+      =0
+    \end{align*}
+\end{enumerate}
+We will proceed in exactly the same way for panel data analysis, but
+with some additional complications and one intermediate step that's
+necessary to deal with the \alert{unobserved heterogeneity} allowed in
+the model.
+\end{frame}
+}
+
+
+
+\subsection{How to Think about Linear Panel Data Models}
+
+{\scriptsize
+\begin{frame}{Linear Panel Data Models: Steps to Estimation}
+We observe $\{y_{it},x_{it}\}_{i=1,t=1}^{N,T}$.
+In analogy to OLS case, estimation steps are
+\begin{enumerate}
+  \item Write down the following expression:
+    \begin{align}
+      y_{it}
+      =
+      x_{it}'\beta
+      + \alpha_i
+      + \varepsilon_{it}
+      \qquad
+      i = 1,\ldots,N
+      \quad t = 1,\ldots,T \label{panelmodel}
+    \end{align}
+    Together with ``conditional mean zero'' assumption on
+    $\varepsilon_{it}$,
+    this is
+    \alert{specification} or \alert{restriction} of DGP that
+    still allows for particular type of
+    \alert{unobserved heterogeneity} in $\alpha_i$.
+
+  \pause
+  \item[2'.]
+    \alert{Random Effects Approach}:
+    Unobserved heterogeneity uncorrelated with $x_{it}$
+    \pause
+    \begin{itemize}
+      {\scriptsize
+      \item Hence regressing $y_{it}$ on $x_{it}$ is consistent
+      \pause
+      \item But fix standard errors because $\alpha_i$ induces
+        correlation in errors $u_i=\alpha_i+\varepsilon_{it}$.
+      }
+    \end{itemize}
+
+
+  \pause
+  \item \alert{Fixed Effect Approach}:
+    Since unobserved heterogeneity can be correlated with $x_{it}$,
+    \begin{enumerate}
+      {\scriptsize
+      \item[(i)]
+        \alert{Transform} the data, using assumptions embodied in
+        Step 1 to get expressions or restrictions in terms of
+        \alert{observables only} (i.e. deduce expressions without
+        $\alpha_i$).
+        \pause
+      \item[(ii)]
+        Consider moment conditions that exploit these additional
+        expressions/restrictions,
+        and what further assumptions on the errors may be
+        necessary for those moment conditions to be valid.
+      }
+    \pause
+    \end{enumerate}
+
+\end{enumerate}
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{%
+    Model as Specification of Unobserved Heterogeneity
+}
+
+Expanding upon Point 1 from previous slide,
+when we write down
+\begin{align}
+  y_{it}
+  =
+  x_{it}'\beta
+  + \alpha_i
+  + \varepsilon_{it}
+  \label{panelmodel0}
+\end{align}
+we typically implicitly assume (at minimum)
+that the errors satisfy
+\begin{align}
+  \E[\varepsilon_{it}|x_{it},\alpha_i]=0
+  \quad\implies\quad
+  \E[y_{it}|x_{it},\alpha_i] = x_{it}'\beta + \alpha_i
+  \label{panelcausal}
+\end{align}
+So think of Expression~\ref{panelmodel0} as a \alert{model} for outcomes
+that \alert{restricts} the nature of unobserved \alert{heterogeneity}
+(across units) as follows:
+\begin{itemize}
+  \pause
+  {\scriptsize
+  \item Manifests as a \alert{time-invariant} shift in the \alert{level}
+    of outcomes.
+  \pause
+  \item \alert{No heterogeneity} in \alert{marginal effects} of
+    $X_{it}$.
+    Common to all units, and equal to $\beta$.
+    As a result, $\beta$ is typically the parameter of interest
+    %(although not necessarily)
+    %(although we could, in principle, be interested in other features of
+    %the model the individual $\alpha_i$'s, their distribution, the
+    %variance of $\varepsilon_{it}$, etc.)
+
+  %\pause
+  %\item
+    %\alert{If we knew} $\alpha_i$, could estimate $\beta$ by regressing
+    %$y_{it}-\alpha_i$ on $x_{it}$.
+
+  \pause
+  \item Without knowing $\alpha_i$, no obvious way to immediately
+    estimate using $\{y_{it},x_{it}\}$.
+
+  \item But Expression~\ref{panelmodel0} is restrictive enough (under
+    further assumptions on the errors) to say something about $\beta$.
+  }
+\end{itemize}
+\pause
+Note:
+Typically assume \alert{stronger} conditions than
+Expression~\ref{panelcausal} (in the sense of a larger conditioning
+set) to enable estimation.
+More on this later.
+Just note some kind of ``conditional mean zero''
+assumption will be used, which implies
+Expression~\ref{panelcausal}.
+\end{frame}
+}
+
+
+\subsection{OVB in FE Models}
+
+
+{\footnotesize
+\begin{frame}[shrink]{OVB from Non-Constant OV}
+Recall
+\begin{itemize}
+  \item FE control for effect of (roughly) \alert{fixed} intangible
+    things about the entity.
+  \item Problem when there is an omitted variable that
+    \begin{enumerate}
+      \item \alert{Changes} (not-fixed) over time
+      \item Is correlated with the outcome
+      \item Is correlated with some regressor
+    \end{enumerate}
+\end{itemize}
+Steps for thinking about this, if you get stuck:
+\begin{itemize}
+  \item Focus on (i) and (ii) first (i.e. think about important
+    non-constant determinants of the outcome).
+    Use economic intuition
+  \item Check whether that thing is adequately controlled for in your
+    regression
+  \item If yes, worry less
+  \item If no, see if there's a regressor that could ``pick up the
+    effect'', leading to a biased coefficient estimate
+\end{itemize}
+\end{frame}
+}
+
+
+
+{\footnotesize
+\begin{frame}{OVB from Non-Constant OV: Examples}
+\begin{itemize}
+  \item Traffic fatality rate, with State FE
+    \begin{itemize}
+      {\footnotesize
+      \item What are some important determinants of traffic fatalitites
+        that could change over time?
+      \item Any correlated with coefficient of interest, beer tax?
+
+        Ex.: Road quality \& state budget.
+      }
+    \end{itemize}
+
+  \item Health outcomes for individuals, with city/health-system FE
+    \begin{itemize}
+      {\footnotesize
+      \item What are some important determinants of health outcomes that
+        can change over time?
+
+        %Example: Population boom, leading to congestion and
+        %overcrowding.
+
+        Extreme example: Flint, MI.
+      }
+    \end{itemize}
+  \item Business lending, with State FE
+    \begin{itemize}
+      {\footnotesize
+      \item What are some important determinants of business lending
+        that can change over time?
+
+        %Example:
+        %Regulations.
+      }
+    \end{itemize}
+\end{itemize}
+\end{frame}
+}
+
+
+
+\section{FE Approach in Non-Dynamic Setting}
+
+{\scriptsize
+\begin{frame}{FE Approach in Non-Dynamic Setting}
+Suppose that outcomes are determined by
+\begin{align}
+  y_{it}
+  =
+  x_{it}'\beta
+  + \alpha_i
+  + \varepsilon_{it}
+  \label{panelmodel1}
+\end{align}
+together with some appropriate mean zero assumption on the error.
+Then
+\begin{enumerate}
+  \item Regressing $y_{it}$ on $x_{it}$ (\alert{ignoring $\alpha_i$})
+    generally inconsistent unless $x_{it}\perp \alpha_i$
+    Rare.
+
+  \pause
+  \item If we \alert{knew $\alpha_i$}
+    and $\E[\varepsilon_{it}|\alpha_i,x_{it}]=0$,
+    regress $y_{it}-\alpha_i$ on
+    $x_{it}$.
+    Infeasible.
+
+  \pause
+
+  \item \alert{Difference} to get
+    the following implication of Model~\ref{panelmodel1}:
+    \begin{align*}
+      \Delta y_{it} = \Delta x_{it}'\beta + \Delta \varepsilon_{it}
+    \end{align*}
+    Equation must hold whenever Model~\ref{panelmodel1} holds.
+    Under suitable assumptions on $\varepsilon_{it}$, can estimate
+    $\beta$ in this transformed equation by regression or GMM.
+
+  \pause
+
+  \item \alert{Demean} to get
+    the following implication of Model~\ref{panelmodel1}:
+    \begin{align*}
+      y_{it} - \overline{y}_i
+      =
+      (x_{it}-\overline{x}_i)'\beta
+      + (\varepsilon_{it}-\overline{\varepsilon}_i)
+    \end{align*}
+    Again, this is an equation that must hold whenever
+    Expression~\ref{panelmodel1} holds.
+    Under suitable assumptions on $\varepsilon_{it}$, can estimate
+    $\beta$ in this transformed equation by regression or GMM.
+\end{enumerate}
+\pause
+We have derived two implications (3 and 4) of Model~\ref{panelmodel1}
+that can be used for estimation of $\beta$, even in the presence of
+unobserved heterogeneity.
+\end{frame}
+}
+
+\subsection{Demeaning Approach}
+
+
+{\scriptsize
+\begin{frame}{Demeaning Approach}
+Suppose that outcomes are determined by
+\begin{align}
+  y_{it}
+  &=
+  x_{it}'\beta
+  + \alpha_i
+  + \varepsilon_{it}
+  \quad\implies\quad
+  y_{it} - \overline{y}_i
+  =
+  (x_{it}-\overline{x}_i)'\beta
+  + (\varepsilon_{it}-\overline{\varepsilon}_i)
+\end{align}
+When is regressing $y_{it}-\overline{y}_i$ on $x_{it}-\overline{x}_i$
+\alert{consistent} for $\beta$?
+\pause
+As usual for regression, we'd need
+\begin{align}
+  \E[
+  (x_{it} - \overline{x}_i)
+  (\varepsilon_{it}-\overline{\varepsilon}_i)
+  ]
+  = 0
+  \label{consistencycond_demean}
+\end{align}
+These are moment conditions that define a particular method of moments
+estimator for $\beta$.
+
+Might assume straight away that Expression~\ref{consistencycond_demean}
+holds.
+But that's a bit artificial and tough to motivate.
+So instead, we might assume
+\begin{align}
+  \E[\varepsilon_{it}x_{is}]
+  =
+  0
+  \qquad
+  \forall t,s
+  \label{strictexogeneity_zerocorr}
+\end{align}
+By LIE, that is implied by \alert{strict exogeneity}:
+\begin{align}
+  \forall t,s
+  \quad
+  \E[\varepsilon_{is}|x_{i1},\ldots,x_{iT}]
+  &= 0
+  \quad\implies\quad
+  \E[\varepsilon_{is}|x_{is}]=0
+  \;\text{and Expressions~\ref{strictexogeneity_zerocorr} and ~\ref{consistencycond_demean}}\;
+  %\begin{cases}
+    %\\
+    %\E[(x_{it}-\overline{x}_i)(\varepsilon_{it}-\overline{\varepsilon}_i)]=0
+    %%\\
+    %%\E[(x_{it}-{x}_{i,t-1})(\varepsilon_{it}-{\varepsilon}_{i,t-1})]=0
+  %\end{cases}
+  \label{strictexogeneity}
+\end{align}
+\pause
+By LIE, this last assumption is also implied by the often stated
+assumption
+\begin{align*}
+  \E[\varepsilon_{is}|\alpha_i,x_{i1},\ldots,x_{iT}]
+  = 0
+\end{align*}
+Anything from Expr.~\ref{consistencycond_demean} on down delivers
+consistency.
+Different ways to get there, with this last assumption giving
+$y_{it}=x_{it}'\beta+\alpha_i+\varepsilon_{it}$ a near-causal (i.e. CEF)
+interpretation.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Demeaning Approach: Summary}
+Summarizing, if we suppose outcomes are generated according to
+\begin{align*}
+  y_{it}
+  &=
+  x_{it}'\beta
+  + \alpha_i
+  + \varepsilon_{it}
+  \qquad\text{where}\quad
+  \E[\varepsilon_{is}|\alpha_i,x_{i1},\ldots,x_{iT}]
+  = 0
+\end{align*}
+Then we can deduce all of the following
+\begin{align*}
+  \E[y_{it}|\alpha_i,x_{it}]
+  &=
+  x_{it}'\beta + \alpha_i
+  \\
+  0 &= \E[\varepsilon_{is}|x_{i1},\ldots,x_{iT}]
+  \\
+  0
+  &=
+  \E[\varepsilon_{is}|x_{is}]
+  \\
+  0
+  &=
+  \E[
+  (x_{it} - \overline{x}_i)
+  (\varepsilon_{it}-\overline{\varepsilon}_i)
+  ]
+\end{align*}
+And so we have an interpretation of $\beta$ as capturing the (common)
+marginal effect of covariates, which we can consistently estimate by
+regressing
+$y_{it}-\overline{y}_i$
+on
+$x_{it}-\overline{x}_i$.
+
+In practice, we often estimate by regression.
+See the next slide.
+\end{frame}
+}
+
+
+\begin{frame}[shrink]{Demeaning Approach: Interpretation}
+General Points
+\begin{itemize}
+  \item FE Interpretation for Regression Function
+    \begin{itemize}
+      \item Different intercepts
+      \item Slopes forced to be the same
+    \end{itemize}
+  \item Intuition for $\beta$ Estimate with FE
+    \begin{itemize}
+      \item Compute $\beta$ within/for each $i$
+      \item (Roughly) average those estimates across $i$
+    \end{itemize}
+  \item Why you sometimes hear ``identification from'' or ``estimating
+    within'' entity $i$
+  \item Picture, for why FE can reverse the sign on $\beta$
+\end{itemize}
+\end{frame}
+
+
+
+\subsubsection{Dummy Variable Approach}
+
+{\footnotesize
+\begin{frame}{Demeaning Approach: Estimation}
+If we regress $y_{it}$ on
+\begin{itemize}
+  \item $x_{it}$
+  \item Full set of unit-specific dummies
+\end{itemize}
+By FWL, equivalent to
+\begin{itemize}
+  \item Demean $y_{it}$ and $x_{it}$
+  \item Regress
+    $y_{it}-\overline{y}_i$
+    on
+    $x_{it}-\overline{x}_i$.
+\end{itemize}
+%See this by writing
+%\begin{align*}
+  %y_{it} = \sum
+%\end{align*}
+Note:
+When we do such dummy-variable-for-each-unit regressions
+\begin{itemize}
+  \item Not quite saying that we're observing $\alpha_i$ and
+    ``including'' that on RHS.
+  \item Rather, we're doing the transformation/demeaning proposed on the
+    last slide, which is the right thing to do under the assumptions of
+    the model and errors.
+\end{itemize}
+\end{frame}
+}
+
+
+\subsubsection{In Stata}
+
+
+{\footnotesize
+\begin{frame}{Demeaning Approach: In Stata}
+\begin{enumerate}
+  \item \texttt{xtset id year}, then \texttt{xtreg y x, fe}
+    \begin{itemize}
+      {\footnotesize
+      \item Sets \texttt{id} as unit identifier, \texttt{year} as time
+        identifier
+      \item \texttt{xtreg, fe} runs a regression with FE for each
+        value of \texttt{id}
+      \pause
+      \item Estimation by demeaning, then running regression with
+        demeaned data
+      \item Suppresses FE dummies
+      \item Lower $R^2$ because it's explanatory power for deviations
+        from mean.
+      }
+    \end{itemize}
+
+  \pause
+
+  \item \texttt{reg y x i.id}
+    \begin{itemize}
+      {\footnotesize
+      \item Use \texttt{i.id} to include a full set of dummies
+      %\item Estimates generally agree with \texttt{xtreg, fe} estimates
+      \item Infeasible if many FE because too many dummies, covariate
+        matrix too big
+      \pause
+      \item Artificially high $R^2$, given that you haven't really
+        ``explained'' all that much
+      \pause
+      \item If any covariates are colinear with the entity FE you create
+        with \texttt{i.id}, might drop the FE rather than the covariate.
+        Not ideal.
+
+        Better: \texttt{xtreg} will drop the covariate,
+        effectively showing you which variables do not vary at the
+        entity level
+      }
+    \end{itemize}
+
+  \pause
+  \item
+    \texttt{areg}:
+    Like 2, but suppress FE dummies.
+\end{enumerate}
+\end{frame}
+}
+
+
+
+{\footnotesize
+\begin{frame}{Other Useful Stata Commands for Panel Data}
+Panel data commands
+\begin{itemize}
+  \item \texttt{xtset ivar tvar}
+  \item \texttt{xtsum}
+  \item \texttt{xtreg, fe}
+\end{itemize}
+Stata's special syntax that can be used in \texttt{reg} commands or
+\texttt{testparm} commands.
+\begin{itemize}
+  \item \alert{\texttt{i.var}}:
+    Treat \texttt{var} as categorical.
+    Create/include dummies for all values of \texttt{var}
+  \item \alert{\texttt{var1\#var2}}:
+    Include all interaction terms,
+    assuming {\texttt{var1}} and {\texttt{var2}} categorical
+  \item \alert{\texttt{var1\#c.var2}}:
+    Include all interaction terms, assuming \texttt{var1} categorical
+    and \texttt{var2} continuous
+  \item \alert{\texttt{var1\#\#var2}}:
+    Assumes both \texttt{var1} and \texttt{var2} categorical,
+    and includes \texttt{var1} dummies, \texttt{var2} dummies, and their
+    interaction terms
+\end{itemize}
+\end{frame}
+}
+
+
+\subsection{Differencing Approach}
+
+
+{\footnotesize
+\begin{frame}{Differencing Approach}
+Again, we suppose outcomes are determined by
+\begin{align}
+  y_{it}
+  &=
+  x_{it}'\beta
+  + \alpha_i
+  + \varepsilon_{it}
+  \\
+  y_{it}-y_{i,t-1}
+  &=
+  (x_{it}-x_{i,t-1})'\beta
+  + (\varepsilon_{it}-\varepsilon_{i,t-1})
+\end{align}
+When is regressing
+$y_{it}-y_{i,t-1}$
+on
+$x_{it}-x_{i,t-1}$
+consistent for
+$\beta$?
+\pause
+We know from the usual regression assumptions that we must have
+\begin{align}
+  \E[(x_{it}-{x}_{i,t-1})(\varepsilon_{it}-{\varepsilon}_{i,t-1})]=0
+  \label{consistencycond_diff}
+\end{align}
+This last expression specifies moment conditions associated with a
+valid method of moments estimator that consistently estimates
+$\beta$.
+
+\pause
+Might assume straight away that Expression~\ref{consistencycond_diff}
+holds.
+But again that's a bit artificial and tough to motivate.
+Therefore, we often instead assume the more intuitive
+\alert{strict exogeneity} condition
+\begin{align}
+  \forall t,s
+  \quad
+  \E[\varepsilon_{is}|x_{i1},\ldots,x_{iT}]
+  &= 0
+  \quad\implies\quad
+  \begin{cases}
+    \E[\varepsilon_{is}|x_{is}]=0
+    \\
+    \E[(x_{it}-{x}_{i,t-1})(\varepsilon_{it}-{\varepsilon}_{i,t-1})]=0
+  \end{cases}
+  %\label{strictexogeneity}
+\end{align}
+\end{frame}
+}
+
+
+\subsection{Summary of Non-Dynamic Case}
+
+{\scriptsize
+\begin{frame}{%
+    Summary of Non-Dynamic Case
+}
+Summarizing, if we suppose outcomes are generated according to
+\begin{align*}
+  y_{it}
+  &=
+  x_{it}'\beta
+  + \alpha_i
+  + \varepsilon_{it}
+  \qquad\text{where}\quad
+  \E[\varepsilon_{is}|\alpha_i,x_{i1},\ldots,x_{iT}]
+  = 0
+\end{align*}
+Then we can deduce all of the following
+\begin{alignat*}{3}
+  \E[y_{it}|\alpha_i,x_{it}]
+  &=
+  x_{it}'\beta + \alpha_i
+  \qquad
+  &0
+  &=
+  \E[
+  (x_{it} - \overline{x}_i)
+  (\varepsilon_{it}-\overline{\varepsilon}_i)
+  ]
+  \\
+  0 &= \E[\varepsilon_{is}|x_{i1},\ldots,x_{iT}]
+  \qquad
+  &0
+  &=
+  \E[(x_{it}-{x}_{i,t-1})(\varepsilon_{it}-{\varepsilon}_{i,t-1})]
+  \\
+  0
+  &=
+  \E[\varepsilon_{is}|x_{is}]
+\end{alignat*}
+And so we have an interpretation of $\beta$ as capturing the (common)
+marginal effect of covariates, which we can consistently estimate by
+\begin{itemize}
+  \item Regressing
+    $y_{it}-\overline{y}_i$
+    on
+    $x_{it}-\overline{x}_i$.
+  \item
+    $y_{it}-y_{i,t-1}$
+    on
+    $x_{it}-x_{i,t-1}$
+
+  \item Using both sets of moment conditions in a GMM context.
+
+  \item Still other moment conditions we could generate from the strict
+    exogeneity assumption.
+    See subsequent slides for a discussion of optimal moment selection.
+\end{itemize}
+In practice, if we assume strict exogeneity (as we do above), typically
+do the demeaning approach.
+But strict exogeneity not appropriate for all scenarios.
+\end{frame}
+}
+
+
+
+
+\section{FE Approach, Dynamic Setting}
+
+\subsection{Failure of Strict Exogeneity}
+
+{\footnotesize
+\begin{frame}{Strict Exogeneity Condition}
+We saw that the strict exogeneity condition
+\begin{align*}
+  \forall t,s
+  \quad
+  \E[\varepsilon_{is}|x_{i1},\ldots,x_{iT}]
+  &= 0
+\end{align*}
+was a simple sufficient condition that delivered
+consistency under either the demeaning or differencing approaches
+to estimation of non-dynamic linear panel model
+\begin{align}
+  y_{it}
+  &=
+  x_{it}'\beta
+  + \alpha_i
+  + \varepsilon_{it}
+  \label{panelmodel2}
+\end{align}
+But strict exogeneity condition \alert{cannot} hold if $x_{it}$ includes
+lags of the dependent variable $y_{it}$, since $\varepsilon_{is}$ helped
+\emph{determine} $y_{is}$ which will be in $x_{it}$ for some $t$.
+
+Implication:
+\begin{itemize}
+  \item Said another way, ``strict exogeneity'' does not provide valid
+    or sensible moment conditions for consistent estimation for $\beta$
+    when working with dynamic linear panel data models.
+  \item We should look for alternative implications of
+    Model~\ref{panelmodel2} that can be used to generate valid moment
+    conditions that can be used to consistently estimate $\beta$.
+\end{itemize}
+\end{frame}
+}
+
+
+\subsection{Dynamic Linear Panel Data Model}
+
+{\footnotesize
+\begin{frame}{Dynamic Linear Panel Data Model}
+Throughout, we consider the following
+\alert{dynamic linear panel data model}
+\begin{align*}
+  y_{it}
+  =
+  \rho y_{i,t-1}
+  + \beta x_{it}
+  + \gamma x_{i,t-1}
+  + \alpha_i
+  + \varepsilon_{it}
+  \qquad
+  i = 1,\ldots,N
+  \quad
+  t = 2,\ldots,T
+\end{align*}
+$t$ starts at $t=2$ because we lose one observation
+for including one lag on the RHS.
+
+As before, all unobserved heterogeneity is summarized in a
+unit-specific, time-invariant term $\alpha_i$:
+\begin{itemize}
+  \item Not so restrictive that we can't say anything about the marginal
+    effect of covariates as summarized by $\beta$.
+  \item But requires working with transformations of the data that
+    eliminate \alert{unobserved} $\alpha_i$ so that we can form moment
+    conditions in terms of things we \alert{observe}.
+\end{itemize}
+To eliminate unobserved $\alpha_i$, \alert{differencing} is the only
+sensible approach, because if we demeaned, we'd never be able to place
+reasonable conditions on the $\varepsilon_{it}$ that permit valid moment
+conditions for estimation, due to the presence of lagged $y$ on the RHS.
+\end{frame}
+}
+
+
+\subsection{Estimation via GMM}
+
+{\footnotesize
+\begin{frame}{Dynamic Linear Panel Data Model}
+Given dynamic linear panel data model, written
+\begin{align}
+  y_{it}
+  =
+  \rho y_{i,t-1}
+  + \beta x_{it}
+  + \gamma x_{i,t-1}
+  + \alpha_i
+  + \varepsilon_{it}
+  \qquad
+  i = 1,\ldots,N
+  \quad
+  t = 2,\ldots,T
+  \label{dynamic}
+\end{align}
+this implies the following expression/restriction:
+\begin{align}
+  \Delta y_{it}
+  =
+  \rho \Delta y_{i,t-1}
+  + \beta \Delta x_{it}
+  + \gamma \Delta x_{i,t-1}
+  + \Delta \varepsilon_{it}
+  \qquad
+  i = 1,\ldots,N
+  \quad
+  t = 3,\ldots,T
+  \label{dynamic_diffed}
+\end{align}
+where $t$ starts at $t=3$ because we lost another observation due to the
+differencing.
+This gives us a transformation independent of $\alpha_i$.
+
+But regressing LHS variable $\Delta y_{it}$ on the RHS variables will
+not deliver consistent estimates (as in the non-dynamic case) because
+$\Delta \varepsilon_{it}$ correlated with $\Delta y_{i,t-1}$.
+In other words (remembering that OLS is just IV with all RHS variables
+as instruments), the RHS variables are not all valid instruments for
+$\Delta \varepsilon_{it}$ as in the non-dynamic case.
+
+But we can estimate the parameters of Model~\ref{dynamic} if we can find
+instruments that are uncorrelated with $\Delta \varepsilon_{it}$.
+Then, given those instruments, we can estimate the parameters
+of Equation~\ref{dynamic_diffed} via IV.
+Then we're done because estimand $\beta$ in
+Expression~\ref{dynamic_diffed} is precisely $\beta$ in
+Expression~\ref{dynamic} as we deduced.
+\end{frame}
+}
+
+
+%Because $\varepsilon_{it}$ helps determine $y_{it}$ according to
+%Equation~\ref{dynamic}, we see that $\Delta
+%\varepsilon_{it}=\varepsilon_{it}-\varepsilon_{i,t-1}$ is
+%correlated with RHS variable $\Delta y_{i,t-1}=y_{i,t-1}-y_{i,t-2}$.
+%Thus, the strict exogeneity assumption (previously employed in the
+%\emph{non-dynamic} linear panel data model case)
+%\emph{cannot} hold, by construction.
+%It's surely violated, implying that we cannot consistently estimate
+%$\rho$. The estimate would certaintly be contaminated by OVB.
+%And even though we're interested in $\beta$, inconsistent estimation of
+%$\rho$ will spill over and induce inconsistent estimation of
+%$\beta$.\footnote{%
+  %Because this is a linear model, we might have hoped that that
+  %inconsistent estimation of $\rho$ would ``average out'' or fail to
+  %effect estimation of $\beta$.
+  %But that would only be true if $\Delta y_{i,t-1}$ and
+  %$\Delta x_{i,t-1}$ were proper
+  %control variables for the coefficient on $\Delta x_{it}$, i.e.
+  %if $\E[\Delta \varepsilon_{it}|\Delta x_{it}, \Delta x_{i,t-1}, \Delta y_{i,t-1}]
+  %=\E[\Delta \varepsilon_{it}| \Delta x_{i,t-1},\Delta y_{i,t-1}]$
+  %But this seems tough to reason about directly.
+  %So better to take the standard approach and think of the relationship
+  %between the level of the errors $\varepsilon_{it}$ and the level of
+  %the RHS variables, then deduce implications for the changes.
+%}
+%Therefore, we need to figure out how to use the transformed data and the
+%original to construct moment conditions that permit consistent
+%estimation of $\beta$.
+
+
+
+%This model
+%We therefore instead take an GMM/IV approach to estimation.
+%Rearrange
+%\begin{align}
+  %\Delta \varepsilon_{it}
+  %=
+  %\Delta y_{it}
+  %- \rho \Delta y_{i,t-1}
+  %- \beta \Delta x_{it}
+  %- \gamma \Delta x_{i,t-1}
+  %\qquad
+  %i = 1,\ldots,N
+  %\quad
+  %t = 3,\ldots,T
+  %\label{dynamic_diffed_re}
+%\end{align}
+%The RHS of Expresion~\ref{dynamic_diffed_re} is written entirely in
+%terms of observables and unknown parameters, and we can think about
+%independence/zero-correlation assumptions between the errors and
+%observables that can be used to form moment conditions.
+
+
+{\footnotesize
+\begin{frame}{Dynamic Linear Panel Data Model}
+Our goal is to estimate $\beta$ in Equation~\ref{dynamic_diffed} (which
+involves only observables) by IV/GMM, i.e. by finding instruments that
+are uncorrelated with $\Delta \varepsilon_{it}$.
+Then, we can estimate the parameters of Model~\ref{dynamic} (via deduced
+implication \ref{dynamic_diffed} of that model) by IV using moment
+condition
+\begin{align*}
+  0 &= \E[\Delta \varepsilon_{it}\cdot z_{it}]
+  =
+  \E\big[
+    \big(
+      \Delta y_{it}
+      - \rho \Delta y_{i,t-1}
+      - \beta \Delta x_{it}
+      - \gamma \Delta x_{i,t-1}
+    \big)
+    z_{it}
+  \big]
+  \qquad
+  i = 1,\ldots,N
+  \quad
+  t = 3,\ldots,T
+\end{align*}
+There are two different sets of assumptions on the errors that we might
+(neither of which is ex ante preferred to the other), as we see on the
+next slide.
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Dynamic Linear Panel Data Model}
+\begin{enumerate}
+  \item
+    ($x_{is}$ Strictly Exogenous):
+    First, we might assume that
+    \begin{align*}
+      \E[\varepsilon_{it}x_{is}] = 0
+      \qquad t=2,\ldots,T
+      \quad   s=1,\ldots,T
+    \end{align*}
+    Implies no feedback.
+    So rather than \emph{all} RHS variables (including the lagged
+    dependent variable) being strictly exogenous, only the $x$'s are.
+    This implies
+    \begin{align*}
+      \E[\Delta \varepsilon_{it} \cdot x_{is}]
+      = 0
+      \qquad  t=3,\ldots,T
+      \quad   s=1,\ldots,T
+    \end{align*}
+    Can use as moment conditions;
+    enough to estimate all parameters.
+
+  \item
+    (Predetermined):
+    Alternatively, we might assume only that $x$ is predetermined
+    \begin{align*}
+      0 &= \E[\varepsilon_{it} x_{is}]
+      \qquad t=2,\ldots,T
+      \quad  s=1,\ldots,t
+      \\
+      0 &= \E[\varepsilon_{it} y_{is}]
+      \qquad t=2,\ldots,T
+      \quad  s=1,\ldots,t-1
+    \end{align*}
+    which allows $\varepsilon_{it}$ to be correlated with $x_{i,t+1}$
+    onwards, and $\varepsilon_{it}$ to be correlated with $y_{it}$
+    and $y_{i,t+1}$ onwards (also as we'd expect, given dynamics).
+    But rules out serially correlated errors.
+    Implies
+    \begin{align*}
+      \E[\Delta \varepsilon_{it} \cdot x_{is}]
+      &= 0
+      \qquad  t=3,\ldots,T
+      \quad   s=1,\ldots,t-1
+      \\
+      \E[\Delta \varepsilon_{it} \cdot y_{is}]
+      &= 0
+      \qquad  t=3,\ldots,T
+      \quad   s=1,\ldots,t-2
+    \end{align*}
+    which can be used as moment conditions.
+    Enough to estimate all parameters.
+\end{enumerate}
+\end{frame}
+}
+
+
+
+
+\section{Random Effects}
+
+
+
+{\footnotesize
+\begin{frame}{Random Effects: Model Assumptions}
+Suppose that outcomes are determined by
+\begin{align}
+  y_{it}
+  = x_{it}'\beta
+  + \alpha_i
+  + \varepsilon_{it}
+\end{align}
+On top of some assumption about the errors $\varepsilon_{it}$ being mean
+zero and independent of $\alpha_i$ and $x_{it}$, further assume
+\begin{enumerate}
+  \item $\alpha_i\perp x_{it}$: Statement about the joint
+    distribution of $\alpha_i$ (the time-invariant unobserved
+    heterogeneity component) and $x_{it}$ in the population.
+
+  \item $\E[\alpha_i|x_{it}]=0$, a harmless normalization (after
+    assuming 1) if we include a constant in the model
+\end{enumerate}
+\pause
+\alert{Implication}:
+Can consistently estimate $\beta$ by simply regressing $y_{it}$ on
+$x_{it}$, treating $\alpha_i$ as part of the error term because,
+under Expression~\ref{panelcausal} and RE assumptions 1 and 2
+\begin{align*}
+  \E[\alpha_i + \varepsilon_{it}|x_{it}]
+  =
+  \E\big[\E[\alpha_i + \varepsilon_{it}|x_{it},\alpha_i]\, \big|\,x_{it}]\big]
+  =
+  \E\big[\alpha_i + 0\,\big|\,x_{it}\big]
+  =
+  0
+\end{align*}
+\pause
+\alert{Complication}:
+Time-invariant, unit-specific component $\alpha_i$ in the error term of
+the regression.
+Induces correlation in errors (hence outcomes)
+across $t$ within $i$.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Comparison to FE: Correlation between $\alpha_i$ and $x_{it}$}
+
+\begin{enumerate}
+  \item Endogeneity/selection in a model with time-invariant,
+    unit-specific effects (and no heterogeneity in marginal effects)
+    would manifest \alert{precisely} as correlation between $\alpha_i$
+    and $x_{it}$, which induces OVB if we simply regress $y_{it}$ on
+    $x_{it}$.
+  \item
+    Example: In the schooling example, ``High ability individuals are
+    not more likely to have higher school.''
+  \item
+    Hence random effects more common in the statistics literature, than
+    in the econometric literature
+\end{enumerate}
+\end{frame}
+}
+
+{\scriptsize
+\begin{frame}{Comparison to FE}
+Both start from the same model for outcomes (consider only the
+non-dynamic case):
+\begin{align*}
+  y_{it}
+  = x_{it}'\beta
+  + \alpha_i
+  + \varepsilon_{it}
+  \qquad
+  \E[\varepsilon_{it}|\alpha_i,x_{it}]=0
+\end{align*}
+\pause
+Random Effects
+\begin{itemize}
+  \item Rules out correlation between $\alpha_i$ and $x_{it}$
+  \item Estimate $\beta$ by regressing $y_{it}$ on $x_{it}$
+  \item Treat $\alpha_i$ as part of error and either
+    \begin{itemize}
+      {\footnotesize
+      \item Make standard errors robust to associated within-$i$
+        correlation
+      \item Specify a distribution for the $\alpha_i$ and do GLS, which
+        leads to efficient estimation of $\beta$ if RE model correct and
+        your assumed distribution of the $\alpha_i$ is correct (but not
+        robust).
+      }
+    \end{itemize}
+\end{itemize}
+Fixed Effects
+\begin{itemize}
+  \item Allows correlation between $\alpha_i$ and $x_{it}$
+  \pause
+  \item Transform data, ``throwing out'' some level information, and
+    form moment conditions with transformed data.
+  \pause
+  \item If true model is RE, inefficient estimation of $\beta$, but
+    robust to violations of RE assumption
+\end{itemize}
+\end{frame}
+}
+
+
+
+
+
+
+
+
+\subsection{Hausman Test}
+
+
+{\footnotesize
+\begin{frame}{Hausman Test}
+Suppose we have $H_0$ and $H_1$ that posit different DGPs for the data.
+Further suppose we have two estimators such that
+\begin{table}[htbp!]
+\centering
+\begin{tabular}{l|ll}
+  Estimator & $H_0$ True & $H_1$ True \\\hline\hline
+  $b_1$,``True believer'' & Consistent & Inconsistent \\
+   & Efficient &
+  \\\hline
+  $b_0$, ``Robust'' & Consistent & Consistent \\
+  & Inefficient
+\end{tabular}
+\end{table}
+Under $H_0$, both consistent and can form statistic
+\begin{align*}
+  (b_1-b_0)(\Var(b_0)-\Var(b_1))^{-1}(b_1-b_0)
+\end{align*}
+\alert{Leading Example}:
+Testing $H_0$, the RE model/assumptions (i.e. whether $\alpha_i\perp
+x_i$), with FE playing the role of the ``robust'' estimator and the RE
+estimator playing the role of the ``true believer'' estimator.
+FE estimator consistent under FE or RE DGP, RE efficient and
+consistent only under RE DGP
+\end{frame}
+}
+
+\end{document}
+
+
+\section{Fixed Effects}
+
+
+\begin{frame}[shrink]{Fixed Effect Regressions}
+Most general canonical form from S\&W Chapter 10:
+\begin{align*}
+  Y_{it}
+  =
+  \underbrace{%
+    \alpha_i
+  }_{\text{Entity FE}}
+  +
+  \underbrace{%
+    \gamma_t
+  }_{\text{Time FE}}
+  +
+  \underbrace{%
+    \bsX_{it}'
+    \beta
+  }_{\text{Covariates}}
+  +
+  u_{it}
+\end{align*}
+Note
+\begin{itemize}
+  \item We're interested in $\beta$
+  \item $\alpha_i$ and $\gamma_t$ are there to help control for a
+    specific type of \alert{unobserved heterogeneity} that might
+    otherwise bias our estimate of $\beta$
+  \item FE estimator presented in class (and implemented by
+    \texttt{xtreg}) doesn't actually estimate $\alpha_i$ and $\gamma_t$.
+    Rather, it \alert{differences out} the FE, which is fine, because we
+    don't care about them per se. Just $\beta$.
+
+  \item Can think of $\alpha_i$ and $\gamma_t$ as
+    \alert{different intercepts} for each entity and time, respectively,
+    with $\alpha_i$ and $\gamma_t$ as compact notation that implicitly
+    represents dummy variables for each entity and time period, resp.
+
+  \item
+    Of course, don't estimate such a regression that includes dummy
+    variables for each $i$ and $t$.
+    Rather use \texttt{xtreg} to estimate by differencing the FE out.
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[shrink]{Fixed Effect Regressions}
+Most general canonical form
+\begin{align*}
+  Y_{it}
+  =
+  \underbrace{%
+    \alpha_i
+  }_{\text{Entity FE}}
+  +
+  \underbrace{%
+    \gamma_t
+  }_{\text{Time FE}}
+  +
+  \underbrace{%
+    \bsX_{it}'
+    \beta
+  }_{\text{Covariates}}
+  +
+  u_{it}
+\end{align*}
+Why not write?
+\begin{align*}
+  Y_{it}
+  =
+  \delta_{it}
+  +
+  \underbrace{%
+    \bsX_{it}'
+    \beta
+  }_{\text{Covariates}}
+  +
+  u_{it}
+\end{align*}
+What observations are $\alpha_i$, $\gamma_t$, and $\delta_{it}$
+estimated from?
+\begin{itemize}
+  \item $\alpha_i$ is an effect for each $i$, estimated across $t$
+  \item $\gamma_t$ is an effect for each $t$, estimated across $i$
+  \item $\delta_{it}$ is an effect for each $i,t$. But there's only one
+    observation per $it$.
+    That FE would just be $Y_{it}$ (if your regression command doesn't
+    crash/complain).
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[shrink]{FE Interpretation}
+Common FE and what they capture
+\begin{itemize}
+  \item Data on individuals, include state FE
+    \begin{itemize}
+      \item Tangibles
+        \begin{itemize}
+          \item Geographic attributes of location
+          \item State min wage or regulations
+        \end{itemize}
+      \item Intangibles
+        \begin{itemize}
+          \item California sunshine
+          \item Minnesota nice
+          \item NJ corruption
+        \end{itemize}
+    \end{itemize}
+  \item Data on businesses, include country FE
+    \begin{itemize}
+      \item Legal system, country history
+    \end{itemize}
+  \item Emergency room visit outcomes, include city FE
+    \begin{itemize}
+      \item Street layout, how quickly the ambulence gets there
+      \item Quality of the health system
+    \end{itemize}
+\end{itemize}
+Implications for attributes that vary only by $i$.
+
+Ex.: Stock \& Watson 10.7.
+\end{frame}
+
+
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\clearpage
+\paragraph{Linear Panel Data Model}
+Note that Expression~\ref{panelcausal} is a \emph{minimal}
+condition for any of this panel data stuff to be a worthwhile and
+interesting endeavor from an economic or causal inference point of view.
+But we will need \emph{supplemental} assumptions in order to
+consistently \emph{estimate} $\beta$.
+Said another way, Expression~\ref{panelcausal} might actually be
+true, in which case (i) and (ii) still apply.
+But we will need to place \emph{even more} assumptions on the
+DGP to estimate and use this model in practice.
+We will see this in action many times.
+
+For example, note that if we observed $\alpha_i$,
+Assumption~\ref{panelcausal} implies that we could immediately and
+consistently estimate $\beta$ by regressing $y_{it}-\alpha_i$ on
+$x_{it}$.
+But we don't.
+So how are we going to get around that?
+
+But for identification and estimation, we will generally work with moment
+conditions that like look like ``correlation equals zero'' rather than
+the stronger ``conditional mean equals zero'' as in
+Expression~\ref{panelcausal}.
+This is directly analogous to how, in standard linear regression,
+we need only ``residuals uncorrelated with regressors'' for
+identification of the regression vector and consistent estimation.
+But that is implied by the stronger statement that ``residuals
+conditionally mean zero,'' which says that the CEF is linear in the
+regressors and therefore lends a specifically causal/economic
+interpretation (that we often have in mind anyway).
+
+
+
+
+
+
+
+
+
+
+
+
+
+% Sample code
+\pause to add breaks
+\textcolor{red}{text to show}.
+\vspace{20pt}
+
+\usebeamercolor{dull text}
+\alert<+>{Words that you want to alert}
+

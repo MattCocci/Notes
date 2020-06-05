@@ -1,0 +1,2154 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usepackage{cmbright}
+%\usetheme{metropolis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis with Sidebar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[aspectratio=169, handout]{beamer}
+%\documentclass{beamer}
+\usepackage{cmbright}
+\usepackage{comment}
+
+\useoutertheme[right, width=0.20\paperwidth]{sidebar}
+\usecolortheme{metropolis}
+\useinnertheme[sectionpage=none]{metropolis}
+\usefonttheme{metropolis}
+
+\makeatletter
+\beamer@headheight=1.75\baselineskip     %controls the height of the headline, default is 2.5
+\makeatother
+
+\usepackage{etoolbox}
+\patchcmd\insertverticalnavigation{\dohead}{\vskip-35pt\dohead}{}{}
+
+%\setbeamertemplate{sidebar canvas right}{}
+%\setbeamertemplate{sidebar right}{BOB}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Simple Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usetheme{Boadilla}
+%\usepackage{lmodern}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sidebar Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass[serif]{beamer}  % For serif latex font
+%\usepackage{pxfonts}
+%\usepackage{eulervm}
+%\usepackage{mathpazo}
+
+%\usetheme{Goettingen}
+%\usecolortheme{lily}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Common Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[]{Regression \\ Matt Cocci}
+\author[]{}
+\date{\today}
+
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+%\setbeamertemplate{section in toc}[square unnumbered]
+%\setbeamertemplate{subsection in toc}[square unnumbered]
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% For easier looping
+\usepackage{pgffor}
+
+\usepackage{pdfpages}
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\proj}{\operatorname{proj}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Rnk}{\mathbb{R}^{n\times k}}
+\newcommand{\Rkk}{\mathbb{R}^{k\times k}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Presentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Outline}
+\tableofcontents[hideallsubsections]
+%\tableofcontents
+\end{frame}
+
+
+\section{Perspective}
+
+\subsection{The Procedure}
+
+
+{\scriptsize
+\begin{frame}{OLS Estimation Procedure}
+We observe outcomes and covariates for $n$ different units
+\begin{align*}
+  \{Y_i,X_i\}_{i=1}^n
+\end{align*}
+We can always \alert{estimate} an OLS coefficient, i.e.
+do the OLS \alert{estimation procedure}:
+\begin{align*}
+  \hat{\beta}
+  &=
+  \argmin_b
+  \frac{1}{n}
+  \sum_{i=1}^n
+  (Y_i-X_i'b)^2
+  =
+  (X'X)^{-1}X'Y
+\end{align*}
+In this view, OLS is just a \alert{procedure} that maps data
+$\{Y_i,X_i\}_{i=1}^n$ into some vector $\hat{\beta}$.
+
+This prompts the following questions about the \alert{OLS estimator}
+that results from this \alert{estimation procedure}:
+\begin{itemize}
+  \item
+    \alert{What estimand} is this estimator meant to recover?
+
+  \item \alert{What assumptions} justify doing this procedure?
+
+  \item \alert{Why} do this in particular?
+    Is there a better estimation procedure, given our estimand?
+\end{itemize}
+All of these questions relate to the close relationship between OLS and
+the \alert{conditional expectation function} (\alert{CEF}).
+But there are many particulars that we need to be precise about.
+\end{frame}
+}
+
+
+\subsection{The CEF}
+
+{\footnotesize
+\begin{frame}{The Conditional Expectation Function (CEF)}
+Suppose that the data $\{Y_i,X_i\}_{i=1}^n$ are drawn iid according to
+\alert{some DGP}, that we will place \alert{no restrictions} on at all
+at this point, e.g. no linearity of any sort yet.
+
+That DGP implies a contour plot of $Y$ against $X$, along with a
+(generally nonlinear) conditional expectation function
+through the countours,
+\begin{align*}
+  m(x) = \E[Y_i|X_i=x]
+\end{align*}
+This function $m(x)$ connects the mean of $Y_i$ at each particular value
+$x$ of $X_i$ in the contour plot.
+
+For several reasons, this is something that we might be interested in.
+\end{frame}
+}
+
+
+
+\subsection{Regression Equations}
+
+{\scriptsize
+\begin{frame}{Regression Equations}
+A \alert{regression equation} relates $(Y_i,X_i)$, for
+some vector $\beta$ and error term $e_i$:
+\begin{align*}
+  Y_i = X_i'\beta + e_i
+\end{align*}
+Two perspectives on $\beta$ and the regression equation above:
+\vspace{-5pt}
+\begin{enumerate}
+  \item
+    \alert{$\beta$ as CEF Summary, Regression Eq.\ as Definition}:
+    Both $(Y_i,X_i)$ are realized jointly as the outcome of some DGP,
+    which implies a CEF, which defines $\beta$.
+    Two cases:
+    \begin{itemize}
+      {\scriptsize
+      \item CEF $\E[Y_i|X_i]$ \alert{linear} in $X_i$.
+        Then $\beta$ \alert{fully characterizes} the CEF.
+        It is the slope of the straight line we drew on the contour
+        plot.
+
+      \item CEF $\E[Y_i|X_i]$ \alert{nonlinear} in $X_i$,
+        \alert{define} $\beta$ as vector characterizing best linear
+        \alert{approx}.\ to nonlinear CEF.
+        It is the slope of the line through the nonlinear CEF.
+      }
+    \end{itemize}
+    Given CEF-summarizing $\beta$, to complete the reg.\ eq.,
+    \alert{define} $e_i$ as the residual; it has certain
+    properties implied by the definition of $\beta$.
+    OLS estimator automatically consistent for the
+    CEF-summarizing $\beta$, a purely statistical \& \alert{non-causal}
+    estimand.
+
+  \item
+    \alert{$\beta$ as Marginal Effect, Regression Equation as Model}:
+    Each unit is endowed first with $e_i$, then $X_i$ is
+    realized, perhaps after selection based on the value of
+    $e_i$.
+    In this view, $\beta$ reps.\ marginal effect if we could
+    \alert{manipulate} $X_i$; it is explicitly a \alert{causal}
+    estimand.
+    This $\beta$ does not necessarily represent the probability limit of
+    the OLS estimator, but the marginal effect we \alert{wish} to
+    estimate, but might be unable due to confounding factors.
+\end{enumerate}
+%Which case we're in determines how we \alert{interpret} the regression
+%equation---specifically $\beta$ and $\varepsilon_i$ in the regression
+%equation.
+\end{frame}
+}
+
+
+
+
+\section{CEF Summary View}
+
+
+{\footnotesize
+\begin{frame}{CEF Summary View: Estimand $\beta=\beta_{{proj}}$}
+
+We now consider the CEF summary view of the regression parameter.
+
+In particular, we take the contour plot of $(Y,X)$ as given (which
+implies a CEF), commit to doing OLS, and ask how the regression vector
+$\beta$ relates to the CEF and contour plot.
+It is purely descriptive.
+
+We do not know the DGP and do not posit the regression equation as
+a model for outcomes in which $\beta$ as a structural parameter
+(marginal effect) of interest.
+\end{frame}
+}
+
+
+
+\subsection{Estimand and Residuals, in General}
+
+{\scriptsize
+\begin{frame}{CEF Summary View: Estimand $\beta=\beta_{{proj}}$, in General}
+
+Suppose we don't assume anything at all about the DGP/CEF---no
+linearity, no model, nothing.
+We then define the following OLS estimand:
+\begin{align*}
+  \beta_\text{proj}
+  &:=
+  \argmin_b
+  \E[(Y_i-X_i'b)^2]
+  \qquad
+  =
+  \E[X_iX_i']^{-1}\E[X_iY_i]
+  \\
+  &
+  =
+  \argmin_b
+  \E[(\E[Y_i|X_i]-X_i'b)^2]
+  =
+  \E[X_iX_i']^{-1}\E[X_i\E[Y_i|X_i]]
+\end{align*}
+In words, in the population, this estimand $\beta_{\text{proj}}$ is the
+\alert{best linear predictor} of $Y_i$ given $X_i$, or, equivalently,
+the
+\alert{best linear approximation to the CEF} (where ``best'' is measured
+by MSE) \alert{regardless} of whether the DGP truly exhibits a linear
+CEF.
+
+This is the OLS estimand because OLS minimizes the sample sum of squared
+residuals (the sample counterpart of this population objective
+function), and the OLS estimation procedure defines an estimator that is
+\alert{consistent} for this $\beta$, i.e. $\beta$ as defined above is
+the OLS estimand, no matter the DGP:
+\begin{align*}
+  \hat{\beta}
+  &=
+  \argmin_b
+  \frac{1}{n}
+  \sum_{i=1}^n
+  (Y_i-X_i'b)^2
+  =
+  (X'X)^{-1}X'Y
+  =
+  \left[
+    \frac{1}{n}
+    \sumiN
+    X_iX_i'
+  \right]
+  \left[
+    \frac{1}{n}
+    \sumiN
+    X_iY_i
+  \right]
+  \;
+  \pto
+  \;
+  \E[X_iX_i']^{-1}\E[X_iY_i]
+  =
+  \beta_\text{proj}
+\end{align*}
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{CEF Summary View: Residuals, in General}
+Given $\beta_{\text{proj}}$ as defined on th previous slide, we can
+define the \alert{residuals}
+\begin{align*}
+  u_i
+  &:=
+  Y_i-X_i'
+  \beta_\text{proj}
+  =
+  Y_i-X_i'
+  \E[X_iX_i']^{-1}\E[X_iY_i]
+\end{align*}
+which are such that
+\begin{align*}
+  \E[u_iX_i]=0
+\end{align*}
+i.e. \alert{uncorrelated} with covariates.
+This condition is \alert{automatically satisified}, by
+construction/definition of $\beta_{\text{proj}}$, which we can show
+using the definition.
+
+This allows us to write the following \alert{regression equation}
+\begin{align*}
+  Y_i
+  &=
+  X_i'
+  \beta_\text{proj}
+  +
+  u_i
+  \qquad
+  \qquad\text{where}\quad
+  \E[u_iX_i]=0
+\end{align*}
+where we understand that
+$\beta_\text{proj}$
+represents the vector equal to the definition above, and $u_i$ is the
+residual defined given that
+$\beta_\text{proj}$.
+But note
+$\beta_\text{proj}$.
+does \alert{not} fully characterize the CEF
+$\E[Y_i|X_i]$ (which is generally nonlinear), but rather
+characterizes a line through the CEF.
+\end{frame}
+}
+
+\subsection{Estimand and Residuals, Linear CEF}
+
+
+{\footnotesize
+\begin{frame}{CEF Summary View: Estimand \& Residuals under Linear CEF}
+
+Suppose that the DGP for $\{Y,X\}$ is such that, in fact, the CEF is
+\alert{linear}.
+That is, $\exists$ a $\beta_{CEF}$
+\alert{fully characterizing} the CEF,
+\begin{align}
+  \E[Y_i|X_i]
+  =
+  X_i'\beta_{CEF}
+  \label{linearCEF}
+\end{align}
+Then
+\begin{itemize}
+  \item
+    Expression~\ref{linearCEF} is equivalent to writing
+    \begin{align*}
+      Y_i
+      =
+      X_i'\beta_{CEF}
+      +
+      e_i
+      \qquad\text{where}\quad
+      \E[e_i|X_i]=0
+    \end{align*}
+    In other words,
+    there exists $e_i=Y_i-\E[Y_i|X_i]$ such that
+    $\E[e_i|X_i]=0$.
+    %This is \alert{exogeneity} of errors.
+
+  \item The parameter $\beta_{CEF}$ fully characterizing the CEF equals
+    projection coefficient $\beta_{proj}$ defined previously:
+    \begin{align*}
+      \beta_{proj}
+      =
+      \E[X_iX_i']^{-1}
+      \E[X_iY_i]
+      =
+      \E[X_iX_i']^{-1}
+      \E[X_i\E[Y_i|X_i]]
+      =
+      \E[X_iX_i']^{-1}
+      \E[X_i(X_i'\beta_{CEF})]
+      =
+      \beta_{CEF}
+    \end{align*}
+
+  \item
+    The error $e_i=Y_i-\E[Y_i|X_i]$ as defined here equals
+    the the projection residual $u_i$ defined previously.
+    This follows immediately from $\beta_{CEF}=\beta_{\text{proj}}$.
+\end{itemize}
+\end{frame}
+}
+
+
+
+\subsection{Leaving Out Regressors}
+
+{\footnotesize
+\begin{frame}{CEF Summary View: Effect of Leaving out Regressors}
+Of particular importance is the question of how regression estimates for
+certain covariates change when we include or omit other variables from
+the regression.
+\begin{itemize}
+  \item This question can be fully answered first in the projection
+    setting.
+
+  \item There is no real sense in which the resulting change in
+    coefficients is good or bad (``bias'' or not) because it's purely
+    the mechanical change that arises from changing the projection.
+
+  \item When we move to the model view, such changes can reflect
+    undesired ``omitted variable bias.'' But again, in the projection
+    setting, these changes are not necessarily ``bias,'' just the
+    mechanical workings of projections.
+\end{itemize}
+We work out these results here, and will refer to them later.
+\end{frame}
+}
+
+{\scriptsize
+\begin{frame}{CEF Summary View: Effect of Leaving out Regressors}
+Suppose we regress $Y_i$ on both set of covariates $X_i$ (which includes
+a constant) and set of covariates $W_i$, represented by the
+following regression equation written in terms of projection coefficient
+$\beta=(\beta_1',\beta_2')'$ and corresponding projection residual
+$u_i$:
+\begin{align}
+  Y_i
+  &=
+  X_i'\beta_{\text{long}}
+  +
+  W_i'\delta
+  +
+  u_i
+  \qquad
+  \E[u_i (X_i',W_i')']
+  = 0
+  \label{reglong}
+\end{align}
+Alternatively, suppose we regress $Y_i$ on $X_i$ alone, which we
+represent by the following regression equation and residual:
+\begin{align*}
+  Y_i
+  &=
+  X_i\beta_{\text{short}}
+  +
+  v_i
+  \qquad
+  \E[v_i X_i]=0
+\end{align*}
+Note that both regression equations are \alert{identities} in the
+projection view.
+The coefficients and residuals are defined such that they hold, so we
+may use them as identities.
+
+Hence, by definition of $\beta_{\text{short}}$ as projection
+coefficient (for $Y_i$ on $X_i$) \& projection identity \ref{reglong},
+\begin{align*}
+  \beta_{\text{short}}
+  &=
+  \E[X_iX_i']^{-1}
+  \E[X_iY_i]
+  \\
+  &=
+  \E[X_iX_i']^{-1}
+  \E\big[
+  X_i
+  \big(
+  X_i'\beta_{\text{long}}
+  +
+  W_i'\delta
+  +
+  u_i
+  \big)
+  ]
+  \\
+  &=
+  \beta_{\text{long}}
+  +
+  \E[X_iX_i']^{-1}
+  \E\big[
+  X_i
+  W_i'
+  ]
+  \delta
+\end{align*}
+In words, relative to the coefficient $\beta_{\text{long}}$ in the
+``\alert{long}'' regression,
+the ``\alert{short}'' regression coefficient $\beta_{\text{short}}$
+picks up an extra term/adjustment for leaving out $W_i$.
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{CEF Summary View: Effect of Leaving out Regressors}
+If $X_i=(1,\tilde{X}_i)$ where $\tilde{X}_i$ is a scalar variable and
+$W_i$ is also a scalar variable, this becomes
+\begin{align*}
+  \beta_{\text{short},1}
+  &=
+  \beta_{\text{long},1}
+  +
+  \frac{\Cov(\tilde{X}_i,W_i)}{\Var(\tilde{X}_i)}
+  \delta
+\end{align*}
+In words, the \alert{short} regression's coefficient
+$\beta_{\text{short},1}$ for
+$\tilde{X}_i$ equals the \alert{long} regression's coefficient
+$\beta_{\text{long},1}$
+for $\tilde{X}_i$ plus the coefficient that you get from
+regressing $W_i$ on $\tilde{X}_i$, times $\delta$ (the long
+regression's coefficient on $W_i$).
+
+This is sometimes summarized as
+\begin{align*}
+  {\beta}_{short,1}
+  =
+  {\beta}_{long,1}
+  +
+  {\gamma}_{ooi}
+  {\delta}
+\end{align*}
+where $\gamma_{ooi}$ is the coefficient from the ``omitted on included''
+(OOI) regression of $W_i$ on $\tilde{X}_i$.
+\end{frame}
+}
+
+
+\subsection{Additional Interpretations of OLS Estimand}
+
+{\footnotesize
+\begin{frame}{OLS Estimand with Heterogeneous Treatment Effects}
+Suppose we have a DGP with \alert{heterogeneous treatment effects}:
+\begin{align*}
+  Y_i = c + D_i\tau_i + \varepsilon_i
+  \qquad
+  \E[\varepsilon_i|D_i]=0
+\end{align*}
+By FWL, we can premultiply by the annihilator matrix corresponding to
+the constant (equivalently, demean the variables):
+\begin{align*}
+  M_c Y_i
+  &= M_cD_i\tau_i + M_c\varepsilon_i
+  \\
+  \tilde{Y}_i
+  &= \tilde{D}_i\tau_i + \tilde{\varepsilon}_i
+\end{align*}
+By FWL, OLS estimator (and therefore limit/estimand) from regressing
+$\tilde{Y}_i$ on $\tilde{D}_i$ coincides with original OLS estimator
+from regressing $Y_i$ on a constant and $D_i$.
+So
+\begin{align*}
+  e_2'
+  \E[X_iX_i']^{-1}
+  \E[X_iY_i]
+  &=
+  \E[\tilde{D}_i^2]^{-1}
+  \E[\tilde{D}_i\tilde{Y}_i]
+  \\
+  &=
+  \E[\tilde{D}_i^2]^{-1}
+  \E[\tilde{D}_i(\tilde{D}_i\tau_i + \tilde{\varepsilon}_i)]
+  \\
+  &=
+  \E[\tilde{D}_i^2]^{-1}
+  \E[\tilde{D}_i^2\tau_i]
+  \\
+  \text{Random assignment}
+  \quad
+  &=
+  \E[\tilde{D}_i^2]^{-1}
+  \E[\tilde{D}_i^2]\E[\tau_i]
+  =
+  \E[\tau_i]
+\end{align*}
+Therefore, under random assignment, the OLS estimand will converge to an
+average of \alert{heterogeneous} (non-constant across units) treatment
+effects.
+
+This was an example of how OLS can recover something useful even if
+the DGP is not a common linear CEF for all units.
+The OLS estimand/limit might still have a meaningful interpretation.
+\end{frame}
+}
+
+
+\subsection{Interpretation}
+
+
+{\scriptsize
+\begin{frame}{CEF Summary View: Interpretation}
+CEF summary view offers an essentially ``assumption free'' perspective
+on regression, if we are precise about what we get from doing the OLS
+estimation procedure.
+
+In particular, \alert{without} assuming a DGP with a linear CEF,
+we defined a constant $\beta_\text{proj}$ vector from the DGP for
+$(Y,X)$ and wrote a regression equation
+\begin{align*}
+  Y_i =
+  X_i'
+  \beta_\text{proj}
+  + u_i
+  \qquad
+  \text{where}
+  \quad
+  \begin{cases}
+    \beta_\text{proj}
+    = \E[X_i'X_i]^{-1}\E[X_iY_i]
+    \\
+    0 = \E[u_iX_i]
+  \end{cases}
+\end{align*}
+The above regression equation and error assumption amounts to saying
+\begin{itemize}
+  \item I don't want to assume the OLS estimand
+    represents some structural parameter.
+
+  \item But am nonethless interested in the generally nonlinear CEF
+    $\E[Y_i|X_i]$ of \alert{observed data}
+
+  \item So I'll do OLS because it delivers the parameter vector
+    $\beta_\text{proj}$ characterizing the
+    \alert{best linear predictor} of $Y_i$ given $X_i$ or the
+    \alert{best linear approximation} of $\E[Y_i|X_i]$.
+    I do inference about $\beta_\text{proj}$ with
+    heterosked.-robust s.e.'s, which are even robust to nonlinearty of
+    the CEF as the asymptotics rely on $\E[u_i X_i]=0$, not
+    $\E[u_i|X_i]=0$.
+
+  \item Sometimes, \alert{additionally}, the CEF is \alert{linear} and
+    $\beta_{\text{proj}}=\beta_{\text{CEF}}$ fully characterizes it.
+
+  \item Sometimes, \alert{additionally}, the observed CEF has a
+    structural, economic intepretion, and so I can tack that on at the
+    end. But never automatically, see subsequent slides.
+\end{itemize}
+\end{frame}
+}
+
+
+
+{\footnotesize
+\begin{frame}{CEF Summary View: Interpretation}
+
+Even if the CEF is linear
+\begin{align}
+  Y_i
+  =
+  X_i'\beta_{\text{proj}}
+  +
+  u_i
+  =
+  X_i'\beta_{CEF}
+  +
+  e_i
+  \qquad\text{where}\quad
+  \E[u_i|X_i]=
+  \E[e_i|X_i]=0
+  \label{linearCEF2}
+\end{align}
+we \alert{cannot} generally interpret the OLS estimand
+$\beta_{\text{proj}}=\beta_{\text{CEF}}$ as a summary of
+\alert{marginal effects},
+i.e. how outcomes \alert{would} change if I could take an individual and
+\alert{manipulate}/\alert{push} that individual into other values of the
+covariate $X_i$.
+
+We think of Expression~\ref{linearCEF2} as merely stating ``If I connect
+the conditional means at all possible values $x$ of $X_i$, I will get a
+straight line with slope $\beta_{CEF}$.''
+This is a statement about the \alert{averages across individuals} at
+different values of $X$, not a statement about
+\alert{hypothetical outcomes within individuals} that would obtain at
+different levels of the covariate.
+
+For that, we need more disussion and assumptions, which the next
+perspective, the ``Model View'' is all about.
+\end{frame}
+}
+
+
+
+\section{Model View}
+
+%- Linear CEF
+%- Exogeneity
+%- Threats to exogeneity
+
+{\footnotesize
+\begin{frame}{Model View}
+
+Now consider the model view of regression, in which
+\begin{align*}
+  Y_i = X_i'\beta_{\text{ME}} + \varepsilon_i
+\end{align*}
+serves as a model where
+\begin{itemize}
+  \item Each unit is endowed with $\varepsilon_i$, and then $X_i$ is
+    determined in some way, possibly after \alert{selection} based on
+    the value of $\varepsilon_i$, and then the outcome is determined
+    according to the relationship above.
+  \item $\beta_{\text{ME}}$ represents a \alert{structural parameter} or
+    marginal effect of interest that we wish to estimate.
+    It is \alert{not} necessarily the probability limit of the OLS
+    estimator, unless certain conditions on $X_i$ and $\varepsilon_i$
+    are satisfied.
+    Said another way, generally
+    \begin{align*}
+      \beta_{\text{proj}}
+      \neq
+      \beta_{\text{ME}}
+      \qquad
+      u_i \neq \varepsilon_i
+    \end{align*}
+    $\beta_{\text{proj}}$ characterizes a line through the contour plot
+    of observed data, while $\beta_{\text{ME}}$ is a description of
+    unobserved counterfactuals.
+\end{itemize}
+Already know $\hat{\beta}\pto \beta_{\text{proj}}$
+\alert{by definition} of $\beta_{\text{proj}}$, and so question is
+when $\beta_{\text{proj}}=\beta_{\text{ME}}$.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Regression Models and Causality}
+It's useful to contrast this model with other approaches to causality.
+\begin{itemize}
+  \item The regression model above posits \alert{constant} treatment
+    effects for all units, as summarized by $\beta_{ME}$.
+    This implies a linear CEF, for which OLS estimation is uniquely
+    well-suited as an estimation approach for recovering causal effects.
+
+  \item But causal inference is probability better handled within a
+    fully-delineated \alert{potential outcomes} (Rubin causal model)
+    framework combined with a assumption on the assignment mechanism.
+    This need not imply constant treatment effects, and CEFs are
+    generally nonlinear.
+    Regression is \alert{only sometimes} a suitable estimation approach
+    as it only sometimes produces estimands that can be lent an
+    interpretation like ATE's or ATET's under heterogeneity.
+\end{itemize}
+\end{frame}
+}
+
+
+
+\subsection{Error Exogeneity}
+
+
+{\footnotesize
+\begin{frame}{Model View: Error Exogeneity}
+
+\alert{Theorem}:
+Suppose that given $(X_i,\varepsilon_i)$, outcomes $Y_i$ are determined
+according to the following regression equation
+\begin{align}
+  Y_i = X_i'\beta_{\text{ME}} + \varepsilon_i
+  \label{model}
+\end{align}
+for some $\beta_{\text{ME}}$ identical to all units.
+A sufficient condition for the OLS estimand $\beta_{\text{proj}}$ to
+recover this $\beta_{\text{ME}}$, i.e. to have
+$\beta_{\text{proj}}=\beta_{\text{ME}}$ (and $u_i=\varepsilon_i)$, is
+\alert{error exogeneity},
+\begin{align*}
+  \E[\varepsilon_i|X_i] = 0
+\end{align*}
+``Unobserved determinants $\varepsilon_i$ of outcomes
+\alert{mean independent} of observed covariates.''
+
+\alert{Proof}:
+Because Expression~\ref{model} describes the DGP and the generation of
+outcomes $Y_i$ given $X_i$, exogeneity ensures that
+\begin{align*}
+  \E[Y_i|X_i]
+  = \E[X_i'\beta_{\text{ME}} + \varepsilon_i\,|\,X_i]
+  = X_i'\beta_{\text{ME}}
+\end{align*}
+In other words, the CEF is linear with slope $\beta_{\text{ME}}$.
+Hence the OLS estimand, which recovers the slope of any linear CEF, will
+recover $\beta_{\text{ME}}$.
+\end{frame}
+}
+
+
+
+
+{\footnotesize
+\begin{frame}{Model View: Error Exogeneity}
+Comments
+\begin{itemize}
+  \item If we include a constant, the mean zero assumption is without
+    loss of generality. All the content is in the mean
+    \alert{independence} aspect not the mean \alert{zero} aspect.
+
+  \item This is not full independence of $\varepsilon_i$ and $X_i$.
+    That would be homoskedasticity. This is, again, merely \alert{mean}
+    independence.
+
+  \item Rules out selection/endogeneity,
+    simultaneity, etc. See the next slide.
+
+  \item Exogeneity $0=\E[\varepsilon_i|X_i]$ is an \alert{assumption},
+    that is \alert{not} testable based on observed data.
+    Generally \emph{cannot} know if satisfied.
+    Must think through \alert{ex ante}.
+
+  \item \alert{Definitely Read}: Chapters 6 in Stock \& Watson on
+    OVB, Chapter 9 in Stock \& Watson on Exogenous Regressors.
+
+  \item Failure of exogeneity is usually a problem for
+    \alert{economic interpretation} of regression estimands.
+    It is not necessarily a problem for \alert{prediction}.
+    For example, with OVB, it's sometimes good that an observed
+    covariate proxies for unobserved things.
+\end{itemize}
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Model View: Exogeneity and Ceteris Paribus}
+  \alert{Goal}: Ceteris Paribus Comparisons
+\begin{itemize}
+  \item In economics, want \alert{ceteris paribus}
+    comparisons, i.e. to know how outcome $Y$ changes in response to a
+    change in some $X$ that affects outcomes, holding all else constant.
+  \item Without a model, we cannot know this exactly.
+    But with data, can compare \alert{average} outcomes $Y$ at
+    different levels of some covariate $X$, i.e. compute
+    \begin{align*}
+      \E[Y|X=x] - \E[Y|X=x']
+    \end{align*}
+    To lend such comparisons and this computed difference an
+    \alert{economically meaningful} (\alert{ceteris paribus})
+    interpretation, need to ensure that \alert{nothing} else is going
+    on, on average.
+    If satisfied, then differences in average outcomes can then
+    reasonably be called ``the effect of $X$'' or ``average effect of
+    $X$.''
+\end{itemize}
+Within Model~\ref{model},
+if exogeneity $0=\E[\varepsilon_i|X_i]$ is satisfied,
+\begin{itemize}
+  \item
+    The CEF of observed data satisfies
+    $\E[Y_i|X_i]=X_i'\beta_{\text{ME}}$ and so $\beta_{\text{ME}}$
+    fully characterizes all ceteris paribus comparisons.
+
+  \item
+    Exogeneity ensures precisely that
+    ``nothing else is going on, on average.''
+    Differences in average outcomes across covariate levels are due, on
+    average, entirely to the covariates.
+\end{itemize}
+\end{frame}
+}
+
+
+
+\subsection{OVB}
+
+{\footnotesize
+\begin{frame}{Model View: OVB Setup}
+Suppose outcomes are determined according to the following model
+\begin{align}
+  Y_i
+  &=
+  X_i'\beta_{\text{long},ME}
+  +
+  (W_i-\E[W_i'])'\delta_{ME}
+  +
+  \eta_i
+  \qquad\text{where}\quad
+  \E[\eta_i|X_i,W_i]
+  = 0
+  \label{model2}
+\end{align}
+But we regress $Y_i$ on $X_i$ alone,
+which can be summarized by
+\begin{align*}
+  Y_i
+  &=
+  X_i'\beta_{\text{short}}
+  +
+  u_i
+\end{align*}
+where $\beta_{\text{short}}$ is the projection estimand recovered by
+OLS, $u_i$ the projection residual.
+
+Recall what we worked out in the projection case, adapted to the
+present situtation (in which the long regression projection coefficients
+coincide with the marginal effects in the model equation):
+\begin{align*}
+  \beta_{\text{short}}
+  &=
+  \beta_{\text{long},ME}
+  +
+  \E[X_iX_i']^{-1}
+  \E\big[
+  X_i
+  (W_i-\E[W_i])'
+  ]
+  \delta_{ME}
+\end{align*}
+Using this result, we can build the definition/result of OVB.
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Model View: OVB Setup}
+\alert{Definition}:
+The estimand $\beta_{\text{short}}$ does \alert{not} suffer from
+\alert{OVB} and
+$\beta_{\text{short}}=\beta_{\text{long},ME}$
+if \alert{either} of the following conditions is satisfied:
+\begin{enumerate}
+  \item $\delta_{ME}=0$, i.e.  $W_i$ \alert{does not affect} outcomes.
+
+    %In this case, the short regression coincides with the full model,
+    %and so $\eta_i=u_i$.
+
+  \item
+    $\Cov(X_i,W_i)=0$, i.e.
+    $X_i$ and $W_i$ \alert{uncorrelated}.
+    then
+    \begin{align*}
+      0
+      =
+      \Cov(X_i,W_i)
+      =
+      \E[X_i(W_i-\E[W_i])']
+    \end{align*}
+    which then immediately implies
+    $\beta_{\text{short}}=\beta_{\text{long},ME}$.
+\end{enumerate}
+If both conditions are violated, estimand
+$\beta_{\text{short}}$ suffers from OVB and
+$\beta_{\text{short}}\neq \beta_{\text{long},ME}$
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Model View: OVB \& the Short Regression}
+Given that outcomes are determined according to
+\begin{align*}
+  Y_i
+  &=
+  X_i'\beta_{\text{long},ME}
+  +
+  (W_i-\E[W_i'])'\delta_{ME}
+  +
+  \eta_i
+  \qquad\text{where}\quad
+  \E[\eta_i|X_i,W_i]
+  = 0
+\end{align*}
+Suppose we rewrite as
+\begin{align*}
+  Y_i
+  &=
+  X_i'\beta_{\text{long},ME}
+  +
+  \varepsilon_i
+  \qquad\text{where}\quad
+  \varepsilon_i
+  =
+  (W_i-\E[W_i'])'\delta_{ME}
+  +
+  \eta_i
+\end{align*}
+Notice how OVB wrecks exogeneity in the short regression of $Y_i$ on
+$X_i$ alone:
+\begin{align*}
+  \E[\varepsilon_i|X_i]
+  &=
+  \E\big[
+    \eta_i
+    +
+    (W_i-\E[W_i'])'\delta_{ME}
+    \,\big|\,
+    X_i
+  \big]
+  \\
+  &=
+  \E\big[
+    \E[\eta_i|X_i,W_i]
+    \,\big|\,
+    X_i
+  \big]
+  +
+  \E\big[
+    W_i-\E[W_i']
+    \,\big|\,
+    X_i
+  \big]'
+  \delta_{ME}
+  \\
+  &=
+  0
+  +
+  \E\big[
+    W_i-\E[W_i']
+    \,\big|\,
+    X_i
+  \big]'
+  \delta_{ME}
+\end{align*}
+Because $\delta_{ME}\neq$ and because $X_i$ and $W_i$ are correlated
+(both by assumption of OVB)
+we see that this last term is generally nonzero, hence exogeneity in the
+short regression of $Y_i$ on $X_i$ alone is violated.
+
+Whereas if there is (a little stronger than) no OVB---$\delta_{ME}=0$ or
+$X_i\perp W_i$ (slightly stronger than just uncorrelated)---exogeneity
+in the short regression would hold by the same sort of calculation.
+%\begin{align*}
+  %\E[\varepsilon_i|X_i]
+  %&=
+  %\E\big[
+    %\eta_i
+    %+
+    %\big(
+    %W_i-\E[W_i]
+    %-
+    %X_i'
+    %\E[X_iX_i']^{-1}
+    %\E[X_i(W_i-\E[W_i])]
+    %\big)'
+    %\delta_{ME}
+    %\,\big|\,
+    %X_i
+  %\big]
+  %\\
+  %&=
+  %\E\big[
+    %\E[\eta_i|X_i,W_i]
+    %\,\big|\,
+    %X_i
+  %\big]
+  %+
+  %\E\big[
+    %W_i-\E[W_i]
+    %\,\big|\,
+    %X_i
+  %\big]'
+  %\delta_{ME}
+  %-
+  %X_i'
+  %\E[X_iX_i']^{-1}
+  %\E[X_i(W_i-\E[W_i])]'
+  %\delta_{ME}
+  %\\
+  %&=
+  %0
+  %+
+  %\big(
+  %\E[W_i|X_i]-\E[W_i]
+  %\big)'
+  %\delta_{ME}
+  %-
+  %X_i'
+  %\E[X_iX_i']^{-1}
+  %\E[X_i(W_i-\E[W_i])]'
+  %\delta_{ME}
+  %\\
+  %&=
+  %\big(
+  %\E[W_i-\E[W_i]|X_i]
+  %-
+  %X_i'
+  %\E[X_iX_i']^{-1}
+  %\E[X_i(W_i-\E[W_i])]
+  %\big)'
+  %\delta_{ME}
+%\end{align*}
+%In general, this last line is nonzero, because $\delta_{ME}j\neq 0$
+%(by assumption of OVB) and the term in parentheses is literally the CEF
+%of $W_i-\E[W_i]$ given $X_i$ minus the best linear (in $X_i$)
+%approximation to that CEF.
+%That would only equal zero if the CEF of $W_i-\E[W_i]$ is perfectly
+%linear in $X_i$, in which case $X_i$ is a perfect proxy for $W_i$.
+%In cases where $W_i$ contains additional info not accounted for
+%by $X_i$, we generally don't have exogeneity of $v_i$ in the short
+%reg.
+\end{frame}
+}
+
+
+
+
+
+\subsection{Simultaneity/Endogeneity}
+
+\begin{frame}{Model View: Violations of Error Exogeneity, Simultaneity}
+Couples reasonably choose both the number of kids and their work
+situation \alert{jointly}, so can think of running regression either way
+\begin{align}
+  (\text{Hours Worked})_i
+  &=
+  \beta_0
+  +
+  \beta_1
+  (\text{More Kids})_i
+  +
+  u_i
+  \label{eq1}
+  \\
+  (\text{More Kids})_i
+  &=
+  \gamma_0
+  +
+  \gamma_1
+  (\text{Hours Worked})_i
+  +
+  v_i
+  \label{eq2}
+\end{align}
+Notice how this wrecks exogeneity assumption
+$\E[u_i|(\text{More Kids})]=0$ in the first regression.
+\begin{itemize}
+  \item Suppose $u_i>>0$.
+  \item This $\uparrow$ $\text{(Hours Worked)}_i$ by Equation~\ref{eq1}
+  \item This $\downarrow$ $\text{(More Kids)}_i$ by Equation~\ref{eq2}
+    if $\gamma_1<0$
+  \item \alert{Result}: $\Cov(u_i,\text{(More Kids)}_i)\neq 0$
+\end{itemize}
+\emph{Not} an issue of omitted variables, but rather that we can
+plausibly write Eq.~\ref{eq2} as well.
+\end{frame}
+
+
+{\footnotesize
+\begin{frame}{Model View: Violations of Error Exogeneity, Simultaneity}
+\begin{itemize}
+  \item OVB as we've encountered/discussed isn't the \alert{only} thing
+    that wrecks exogeneity.  See Chapter 9 S\&W
+  \item Make sure RHS variables are not \alert{endogenous},
+    \alert{choice variables}, \alert{outcomes}, etc.
+    that are determined jointly with the LHS variable.
+  \item Want RHS vars \alert{fixed} before $Y$ determined
+    \begin{itemize}
+      \item Why demographics are good.
+        Often est. at birth
+      \item In wage-on-schooling regs, we look at later-in-life
+        wages, given schooling that was fixed before working
+    \end{itemize}
+  \item \alert{Practical Check} of good $X$'s that don't suffer from
+    this problem:
+    If you flip $Y$ and $X$, the resulting regression should be stupidly
+    non-causal
+    \begin{itemize}
+      \item Test scores don't cause prior schooling
+      \item Earnings don't cause gender
+    \end{itemize}
+  \item ``OVB'' has often been the right answer to many questions
+    because it wrecks exogeneity.
+    Beware other slightly different failures of exogeneity.
+\end{itemize}
+\end{frame}
+}
+
+
+
+
+
+
+
+
+
+
+\section{Estimation}
+
+{\footnotesize
+\begin{frame}{Estimation: CEF Summary View}
+For the CEF summary view, OLS is the \alert{only} estimation option in
+town because we're really just saying ``Suppose I do OLS; what do I
+get?''
+We haven't made any substantive modeling assumptions that might be used
+to generate additional estimation equations/approaches.
+
+The only thing we're assuming is that we \alert{want} the estimand that
+OLS is consistent for.
+That estimand is \alert{defined} by the residuals being uncorrelated
+with the regressors:
+\begin{align*}
+  0
+  =
+  \E[(Y_i-X_i\beta_{\text{proj}})X_i]
+  =
+  \E[u_iX_i]
+\end{align*}
+That uniquely defines the projection, and hence the OLS estimator and
+estimand.
+It's a GMM moment condition that we can use for estimation.
+
+Note this is weaker than $\E[u_i|X_i]=0$, which would imply linearity of
+the CEF.
+The difference between the two assumptions can be seen in a scatterplot
+assuming a nonlinear CEF.
+It is for this reason that OLS generates an estimator that
+\alert{does not rely on} linearity of the CEF.
+
+%This is sometimes called \alert{predetermined regressors}, which is
+%weaker than exogeneity, $\E[u_i|X_i]=0$ (a stronger assumption,
+%not automatically satisfied).
+
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Estimation: Model View}
+Suppose we assume a linear CEF
+\begin{align}
+  \E[Y_i|X_i]
+  =
+  X_i'\beta_{CEF}
+\end{align}
+which we argued is equivalent to error exogeneity
+\begin{align}
+  0
+  =\E[\varepsilon_i|X_i]
+  =\E[(Y_i-X_i'\beta_{CEF})|X_i]
+  \label{exog}
+\end{align}
+This naturally implies the usual \alert{moment conditions} (the OLS
+normal equations) that we use to identify $\beta_{CEF}$
+\begin{align}
+  0
+  =\E[(Y_i-X_i'\beta_{CEF})X_i]
+  \label{olsnormal}
+\end{align}
+But Equation~\ref{exog} suggests that we might use other moment
+conditions:
+\begin{align*}
+  0
+  =\E[(Y_i-X_i'\beta_{CEF})g(X_i)]
+\end{align*}
+for different functions $g(\,\cdot\,)$ to estimate $\beta_{CEF}$.
+So why just use moment condition \ref{olsnormal} for estimation?
+Is there a better choice of moment conditions for estimation
+of $\beta_{CEF}$?
+
+A result due to Chamberlain:
+The \alert{optimal} choice (in a minimum asymptotic variance sense) of
+moments is to do GLS, i.e. $g(X_i)=X_i/\sigma(X_i)^2$
+\end{frame}
+}
+
+
+
+
+
+
+
+
+
+\section{Nonlinear Specifications}
+
+\subsection{Motivation}
+
+
+{\scriptsize
+\begin{frame}{Nonlinearities in the Regression Function}
+Recall that we're interested in the CEF
+\begin{align*}
+  m(x) = \E[Y_i|X_i=x]
+\end{align*}
+which is a generally nonlinear function of covariates.
+We'd like $\E[\varepsilon_i|X_i]=0$ so that there exists a $\beta_{CEF}$
+fully characterizing the CEF, and we'd like no OVB so that we can
+interpret $\beta_{CEF}$ as capturing ceteris paribus effect of $X_i$.
+This is generally easier to swallow if we include transformations of
+regressors, e.g.
+\begin{itemize}
+  {\scriptsize 
+  \item $(\text{Age})^2$
+  \item $\log(\text{Income})$
+  \item $\sin\left(\left(\frac{(\text{Wage})-\pi}{2\pi}\right)^2\right)$
+  \item $(\text{Age})\times\log(\text{Income})$
+  }
+\end{itemize}
+which allow us to capture nonlinearities in the CEF.
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Nonlinearities in the Regression Function}
+Including nonlinear regressors is motivated by the fact that, if $m(x)$
+continuous with a single scalar regressor, can write
+\begin{align*}
+  m(x)
+  =
+  m(x_0)
+  + m'(x_0)(x-x_0)
+  + \frac{1}{2}m''(x_0)(x-x_0)^2
+  +
+  \underbrace{%
+    O((x-x_0)^3)
+  }_{\text{(*)}}
+\end{align*}
+Here $(*)$ means
+``Some extra terms whose contribution is smaller than the product of
+$(x-x_0)^3$ and a constant, so we'll ignore.''
+
+Thus even if the CEF is highly nonlinear in \alert{regressors}, it may
+be linear in \alert{parameters} once we include transformations of the
+regressors, and linearity in regressors is all that we would need for
+OLS to have the nice interpretations as measuring ceteris paribus
+effects.
+\end{frame}
+}
+
+
+
+\subsection{Interpretation}
+
+
+{\footnotesize
+\begin{frame}{Interpreting Regressions with Nonlinearities}
+Distinction between
+\begin{itemize}
+  \item \alert{Transformed Covariate} included in reg:
+    \begin{align*}
+      X_{ki}=\log(\text{Income})
+    \end{align*}
+    $\beta_{ki}$ is response to change in $X_{ki}=\log(\text{Income})$
+
+  \item Corresponding \alert{Underlying Covariate/Concept}:
+    \begin{align*}
+      \tilde{X}_{ki} = (\text{Income})
+    \end{align*}
+    We want the response to this.
+\end{itemize}
+How to get response to $\tilde{X}_{ki}$:
+\begin{itemize}
+  \item
+    Since $X_{ki}=f_k(\tilde{X}_{ki})$, replace
+    $X_{ki}$ in reg. with $f_k(\tilde{X}_{ki})$
+  \item Differentiate w.r.t. $\tilde{X}_{ki}$ to get
+    \alert{marginal effect}
+\end{itemize}
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Simple Example}
+Simple example
+\begin{align*}
+  Y_i = \beta_0 + \beta_1 X_{i} + u_i
+\end{align*}
+\vspace{-5pt}
+Can get
+\begin{itemize}
+  {\scriptsize
+  \item \alert{Response to Marginal Change}
+    \vspace{-5pt}
+    \begin{align*}
+      \frac{\partial Y_i}{\partial X_i}
+      = \beta_1
+    \end{align*}
+  \item \alert{Response to Unit Change}
+    \vspace{-5pt}
+    \begin{align*}
+      Y_i &= \beta_0 + \beta_1 X_{i} + u_i \\
+      \tilde{Y}_i &= \beta_0 + \beta_1 (X_{i}+1) + u_i
+      \\
+      \implies\quad
+      \Delta Y_i
+      &=
+      \tilde{Y}_i-Y_i
+      =
+      \beta_1
+    \end{align*}
+  \item \alert{(Generally) Approximate Response to Unit Change}
+    \vspace{-5pt}
+    \begin{align*}
+      \Delta Y_i
+      \approx
+      \frac{\partial Y_i}{\partial X_i}
+      \underbrace{%
+        \Delta X_i
+      }_{\text{Set}\; =1}
+    \end{align*}
+  }
+\end{itemize}
+Sometimes convenient to think about \alert{percent} changes
+\begin{align*}
+  (\text{Percent Change})
+  =
+  100\cdot \frac{\Delta Z}{Z}
+\end{align*}
+\end{frame}
+}
+
+
+\begin{frame}[shrink]{Nonlinear Specifications}
+From Stock \& Watson page 276
+\begin{table}
+\footnotesize
+\begin{tabular}{c|l|l}
+   & Specification & Interpretation \\\hline\hline
+  0 & $\,\;\quad Y_i = \beta_0 + \beta_1 X_i\quad \;\;\,+u_i$
+  & Unit change in $X$ $\Rightarrow$ $\beta_1$ unit change in $Y$
+  \\
+  I & $\,\;\quad Y_i = \beta_0 + \beta_1\ln(X_i)+u_i$
+  & 1\% change in $X$ $\;\,\Rightarrow$ $0.01\beta_1$ unit change in $Y$
+  \\
+  II & $\ln(Y_i) = \beta_0 + \beta_1 X_i\;\;\quad+u_i$ & Unit change in $X$ $\Rightarrow$ $100\beta_1\%$ change in $Y$
+  \\
+  III & $\ln(Y_i) = \beta_0 + \beta_1 \ln(X_i)+u_i$
+  & 1\% change in $X$ $\;\;\Rightarrow$ $\beta_1\%$ change in $Y$
+\end{tabular}
+\end{table}
+Derivations
+\end{frame}
+
+
+
+\section{Regression Formulas}
+
+{\scriptsize
+\begin{frame}{OLS and $R^2$ Formulas}
+Univariate Formulas
+\begin{align*}
+  \hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}
+  \qquad
+  \hat{\beta}_1=\frac{\sumin (x_i-\bar{x})(y_i-\bar{y})}{\sumin  (x_i-\bar{x})^2}
+\end{align*}
+Matrix formulas
+\begin{align*}
+  \hat{\beta}
+  &= (X'X)^{-1}X'y
+  =
+  \left(\sumin X'_iX_i\right)^{-1}
+  \left(\sumin X_i'y_i\right)
+\end{align*}
+Sums of squared things
+\begin{align*}
+  TSS &= \sumin (Y_i-\bar{Y})^2
+  =
+  RSS + ESS
+  \\
+  RSS &= \sumin (Y_i-\hat{Y}_i)^2 = \sumin \hat{u}_i\\
+  ESS &= \sumin (\hat{Y}_i-\bar{Y})^2
+\end{align*}
+Note ESS called MSS in Stata.
+\begin{align*}
+  R^2
+  = \frac{ESS}{TSS}
+  = 1-\frac{RSS}{TSS}
+\end{align*}
+\end{frame}
+}
+
+
+
+\section{Testing}
+
+{\scriptsize
+\begin{frame}{Testing: Overview}
+All tests based on \alert{normality} either because
+\vspace{-5pt}
+\begin{itemize}
+  \item \alert{Assume} normal errors
+  \item \alert{Approximate} normality (in large samples) from
+    \alert{CLT}
+\end{itemize}
+Two key quantities objects (since normal distributions fully pinned down
+by the following):
+\vspace{-5pt}
+\begin{itemize}
+  \item \alert{Mean}:
+    Will always be (at least approximately) the true $\beta$
+  \item \alert{Variance}:
+    It matters whether we assume
+    \begin{itemize}
+      {\scriptsize
+      \item Homoskedasticity
+      \item Heteroskedasticity
+      \item Clustering
+      }
+    \end{itemize}
+\end{itemize}
+Testing
+\vspace{-5pt}
+\begin{itemize}
+  \item \alert{Test Stat + Critical Value}
+    \begin{itemize}
+      {\scriptsize
+      \item $t$-stat, for testing scalar quantities
+      \item $F$-stat, for multiple testing
+      }
+    \end{itemize}
+  \item \alert{Confidence Interval/Ellipses}
+  \item \alert{p-value}
+\end{itemize}
+\end{frame}
+}
+
+
+
+
+\begin{frame}{Testing: Asymptotic Distribution for OLS}
+I will focus on both \alert{approximate} testing built from the
+\alert{asymptotic} (normal) distribution of the OLS estimator, then
+proceed to \alert{exact} testing built on the \alert{assumption} of
+normal errors.
+
+Recall,
+\begin{align*}
+  \sqrt{n}
+  (\hat{\beta}-\beta)
+  \quad\dto\quad
+  \calN\left(
+  0
+  ,\;
+  \E\left[
+  X_iX_i'
+  \right]^{-1}
+  \E
+  \left[
+  u_i^2
+  X_iX_i'
+  \right]
+  \E\left[
+  X_iX_i'
+  \right]^{-1}
+  \right)
+\end{align*}
+which implies the following approximate distribution
+\begin{align*}
+  \hat{\beta}
+  &\overset{a}{\sim}
+  \calN(\beta,V/n)
+  \\
+  \qquad\text{where}\quad
+  V/n
+  &=
+  \frac{1}{n}
+  \E\left[
+  X_iX_i'
+  \right]^{-1}
+  \E
+  \left[
+  u_i^2
+  X_iX_i'
+  \right]
+  \E\left[
+  X_iX_i'
+  \right]^{-1}
+\end{align*}
+The variance has \alert{not} imposed homoskedasticity.
+It has simply used iid sampling.
+\end{frame}
+
+
+{\footnotesize
+\begin{frame}{Testing: Estimators of Asymptotic Variance}
+To use the asymptotic distribution, we need to form an \alert{estimator}
+of the asymptotic variance.
+Two options, depending on what we're willing to assume:
+\begin{enumerate}
+  \item \alert{Heteroskedasticity-robust}:
+    Replace $\E$ with $\frac{1}{n}\sumin$ to get estimator of variance.
+    \begin{align*}
+      \widehat{V}/n
+      &=
+      \frac{1}{n}
+      \left(
+      \frac{1}{n}
+      \sumin X_iX_i'
+      \right)^{-1}
+      \left(
+      \frac{1}{n}
+      \sumin \hat{u}_i^2
+      X_iX_i'
+      \right)
+      \left(
+      \frac{1}{n}
+      \sumin
+      X_iX_i'
+      \right)^{-1}
+      \\
+      &=
+      \left(
+      X'X
+      \right)^{-1}
+      \left(
+      \sumin \hat{u}_i^2 X_iX_i'
+      \right)
+      \left(
+      X'X
+      \right)^{-1}
+    \end{align*}
+  \item \alert{Homoskedasticity}:
+    Assuming $\Var(u_i|X_i)=\E[u_i^2|X_i]=\sigma^2$,
+    variance reduces to
+    \begin{align*}
+      V/n
+      &=
+      \frac{1}{n}
+      \sigma^2
+      \E\left[
+      X_iX_i'
+      \right]^{-1}
+    \end{align*}
+    which we can estimate with
+    \begin{align*}
+      \widehat{V}/n
+      &=
+      \frac{1}{n}
+      \hat{\sigma}^2
+      \left(
+      \frac{1}{n}
+      \sumin
+      X_iX_i'
+      \right)^{-1}
+      =
+      \hat{\sigma}^2
+      (X'X)^{-1}
+      \quad\text{where}\quad
+      \hat{\sigma}^2
+      =
+      \frac{1}{n-k}
+      \sumin \hat{u}_i^2
+    \end{align*}
+\end{enumerate}
+\end{frame}
+}
+
+
+
+
+{\scriptsize
+\begin{frame}{Testing: Test Statistics}
+Under general heteroskedasticity,
+\begin{align*}
+  \hat{\beta}
+  &\overset{a}{\sim}
+  \calN(\beta,V/n)
+  \qquad\text{where}\quad
+  V/n
+  =
+  \frac{1}{n}
+  \E\left[
+  X_iX_i'
+  \right]^{-1}
+  \E
+  \left[
+  u_i^2
+  X_iX_i'
+  \right]
+  \E\left[
+  X_iX_i'
+  \right]^{-1}
+\end{align*}
+Using our heteroskedasticity-robust variance estimator $\hat{V}/n$ from
+the previous slide, we cn compute the following test statistics:
+\begin{itemize}
+  \item \alert{$t$-stat} for testing single regressor
+    \begin{align*}
+      t =
+      \left\lvert\frac{\hat{\beta}_j -\beta_0}{\hat{\sigma}_{\beta_j}}\right\rvert
+      &\overset{a}{\sim}
+      \calN(0,1)
+    \end{align*}
+  \item
+    \alert{Wald} and $F$-stats for (generally) multiple linear
+    restrictions:
+    \begin{itemize}
+      {\scriptsize
+      \item
+        Wald stat for test of $H_0:R\beta=r$:
+        \begin{align*}
+          \widehat{W}
+          &=
+          (R\hat{\beta}-r)'
+          (R[\widehat{V}/n]R')^{-1}
+          (R\hat{\beta}-r)
+          \quad
+          \overset{a}{\sim}
+          \quad
+          \Chi_q^2
+        \end{align*}
+      \item $F$-stat for test of $H_0:R\beta=r$:
+        $
+          \widehat{F}
+          =
+          \frac{\widehat{W}}{q}
+          \,
+          \overset{a}{\sim}
+          \,
+          \frac{1}{q}
+          \Chi_q^2
+        $
+      \item
+        If $H_0:R\hat{\beta}=r$ is the special case of a test whether a
+        single coefficient is zero,
+        $\widehat{W} = \widehat{F} = t^2$
+        where $\hat{W}$, $\hat{F}$, $t^2$ are the statistics
+        \alert{for the particular test} that the given coefficient
+        equals zero.
+      }
+    \end{itemize}
+\end{itemize}
+\end{frame}
+}
+
+
+
+{\scriptsize
+\begin{frame}{Testing: Test Statistics under Homoskedasticity}
+Under homoskedasticity,
+\vspace{-5pt}
+\begin{itemize}
+  %\item The asymptotic distribution simplifies to
+    %\begin{align*}
+      %\hat{\beta}
+      %&\overset{a}{\sim}
+      %\calN(\beta,V/n)
+      %\qquad\text{where}\quad
+      %V/n
+      %=
+      %\frac{1}{n}
+      %\sigma^2
+      %\E\left[
+      %X_iX_i'
+      %\right]^{-1}
+    %\end{align*}
+    %and we use variance estimator
+    %\begin{align*}
+      %\widehat{V}/n
+      %&=
+      %\frac{1}{n}
+      %\hat{\sigma}^2
+      %\left(
+      %\frac{1}{n}
+      %\sumin
+      %X_iX_i'
+      %\right)^{-1}
+      %=
+      %\hat{\sigma}^2
+      %(X'X)^{-1}
+      %\quad\text{where}\quad
+      %\hat{\sigma}^2
+      %=
+      %\frac{1}{n-k}
+      %\sumin \hat{u}_i^2
+    %\end{align*}
+
+  \item
+    The form of the statistics is the same as the last slide, except we
+    use the homosked.\ estimator $\hat{V}/n$, rather than the
+    heterosked.\ robust estimator for $\hat{V}/n$.
+
+  \item
+    Let $\widetilde{t}, \widetilde{W}, \widetilde{F}$ denote the
+    corresponding statistics, computed with the estimator that assumes
+    homoskedasticity.
+
+  \item
+    Also we get the \alert{additional result},
+    \begin{align}
+      \widetilde{F}
+      = \frac{(RSS_*-RSS)/q}{RSS/(n-k)}
+      = \frac{(R^2-R^2_*)/q}{(1-R^2)/(n-k)}
+      \label{homosked}
+    \end{align}
+    where $*$ denotes ``value when imposing the null/constraint.''
+    $k=$ total number of regressors, including the constant.
+
+  \item
+    If we test the null that \alert{all} coefficients are the constant
+    equal zero, then
+    \begin{align*}
+      \hat{Y}_{i,*} &= \bar{Y}
+      \qquad
+      R^2_* = 0
+      \qquad
+      RSS_* = TSS=TSS_*
+      \qquad
+      q = k-1
+    \end{align*}
+    Then we can simplify Expression~\ref{homosked}:
+    \begin{align*}
+      \tilde{F}
+      = \frac{R^2/(k-1)}{(1-R^2)/(n-k)}
+      =
+      \frac{n-k}{k-1}
+      \frac{R^2}{1-R^2}
+      =
+      \frac{ESS}{RSS}
+      \frac{n-k}{k-1}
+    \end{align*}
+    Thus we've related ``the $\tilde{F}$ statistic for the test that all
+    coefficients except the constant are zero'' to $R^2$, under
+    homoskedasticity.
+\end{itemize}
+\end{frame}
+}
+
+
+
+\begin{frame}[shrink]{Testing: Stata Output}
+Every regression in Stata reports an $F$-statistic in the upper
+righthand corner of the regression table.
+\begin{itemize}
+  \item The \alert{implicit test} being done is whether all coefficients
+    (\emph{except} the constant) jointly equal zero.
+  \item The $F$ statistic in the upper-righthand corner has
+    \alert{arguments}/\alert{label}
+    \begin{align*}
+      \text{\texttt{F(k-1,n-k)}}
+    \end{align*}
+    $k$ is the \emph{total} number of regressors including the constant.
+  \item
+    The \alert{value} reported is the statistic constructed using
+    whatever standard errors you specify.
+    And so
+    %\vspace{-20pt}
+    \begin{itemize}
+      \item Heteroskedasticity-robust: $\hat{F}$ value is reported
+        %if you type \texttt{, robust}
+      \item Homoskedasticity: $\widetilde{F}$ value is reported
+        %if you don't type \texttt{, robust}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+
+\end{document}
+
+
+{\footnotesize
+\begin{frame}
+PS8 solutions from ECO-518, 2019 have proof that GLS has lowest
+variance.
+\end{frame}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+% Sample code
+\pause to add breaks
+\textcolor{red}{text to show}.
+\vspace{20pt}
+
+\usebeamercolor{dull text}
+\alert<+>{Words that you want to alert}
+

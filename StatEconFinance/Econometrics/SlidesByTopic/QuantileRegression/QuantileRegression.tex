@@ -1,0 +1,1221 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usepackage{cmbright}
+%\usetheme{metropolis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis with Sidebar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[aspectratio=169, handout]{beamer}
+%\documentclass[aspectratio=169]{beamer}
+%\documentclass{beamer}
+\usepackage{cmbright}
+
+\useoutertheme[right, width=0.20\paperwidth]{sidebar}
+\usecolortheme{metropolis}
+\useinnertheme[sectionpage=none]{metropolis}
+\usefonttheme{metropolis}
+
+\makeatletter
+\beamer@headheight=1.75\baselineskip     %controls the height of the headline, default is 2.5
+\makeatother
+
+%\setbeamertemplate{sidebar canvas right}{}
+%\setbeamertemplate{sidebar right}{BOB}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Simple Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usetheme{Boadilla}
+%\usepackage{lmodern}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sidebar Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass[serif]{beamer}  % For serif latex font
+%\usepackage{pxfonts}
+%\usepackage{eulervm}
+%\usepackage{mathpazo}
+
+%\usetheme{Goettingen}
+%\usecolortheme{lily}
+
+\usepackage{amssymb}% http://ctan.org/pkg/amssymb
+\usepackage{pifont}% http://ctan.org/pkg/pifont
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Common Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[]{Quantile Regression \\ Matt Cocci}
+\author[]{}
+\date{\today}
+
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{section in toc}[sections numbered]
+%\setbeamertemplate{section in toc}[square unnumbered]
+%\setbeamertemplate{section in toc}[square unnumbered]
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% For easier looping
+\usepackage{pgffor}
+
+\usepackage{pdfpages}
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\proj}{\operatorname{proj}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\widehat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsphi}{\boldsymbol{\phi}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\widehat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\widehat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\widehat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatphi}{\boldsymbol{\widehat{\phi}}}
+\newcommand{\bshatmu}{\boldsymbol{\widehat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\widehat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\widehat{\Sigma}}}
+\newcommand{\bstildephi}{\boldsymbol{\tilde{\phi}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarphi}{\boldsymbol{\overline{\phi}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\widehat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\widehat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\widehat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Rnk}{\mathbb{R}^{n\times k}}
+\newcommand{\Rkk}{\mathbb{R}^{k\times k}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Presentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Outline}
+\tableofcontents[hideallsubsections]
+%\tableofcontents
+\end{frame}
+
+
+\section{The Linear Conditional Quantile Restriction}
+
+{\scriptsize
+\begin{frame}{The Linear Conditional Quantile Restriction}
+
+OLS
+\vspace{-7pt}
+\begin{itemize}
+  \item If \alert{CEF} is in fact \alert{linear},
+  \vspace{-7pt}
+    \begin{align*}
+      \E[Y_i|X_i] = X_i'\beta
+    \end{align*}
+    for some $\beta$, OLS is the sensible/``right'' thing to do.
+  \item If CEF \alert{nonlinear}, we have the
+    \alert{best linear approximation}
+\end{itemize}
+\vspace{-3pt}
+\pause
+Quantile regression
+\vspace{-7pt}
+\begin{itemize}
+  \item If \alert{conditional quantiles} are in fact \alert{linear}
+    \begin{align*}
+      Q_\tau(Y|X) = X'\beta_\tau
+    \end{align*}
+    for some $\beta_\tau$ for each $\tau\in(0,1)$, quantile regression
+    (i.e. minimizing the quantile regression objective function)
+    is the sensible/``right'' thing to do.
+
+    \pause
+  \item If conditional quantiles $Q_\tau(Y|X)$ \alert{nonlinear}, the
+    interpretation not as easy.
+    $\hat{\beta}_\tau$ gives a \alert{weighted} best linear
+    approximation to the true conditional quantiles $Q_\tau(Y|X)$, with
+    the weights depending upon unknown quantities.
+
+  \pause
+  \item So we're mostly \alert{relying on the assumption} of linear
+    conditional quantiles, which can be restrictive.
+    Although in a \alert{saturated} model (dummies for each value of the
+    covariates), this isn't really restrictive.
+\end{itemize}
+\pause
+\vspace{-5pt}
+\alert{Question}:
+What kinds of models give rise to linear conditional quantiles?
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{The Linear Conditional Quantile Restriction: Compatible DGPs}
+
+From regression analysis, we know that if outcomes are generated
+according to conditional DGP/model
+\begin{align*}
+  Y_i= X_i'\beta_{ME} + \varepsilon_i
+  \qquad\text{where}\quad
+  \E[\varepsilon_i|X_i] = 0
+\end{align*}
+in which $\beta_{ME}$ is the marginal effect (common to all units) that
+summarizes how outcomes change if we could manipulate $X_i$, and
+exogeneity of the errors $0=\E[\varepsilon_i|X_i]$ is satisfied, then
+observed outcomes $(Y_i,X_i)$ exhibit a linear CEF:
+\begin{align*}
+  \E[Y_i|X_i] = X_i'\beta_{ME}
+\end{align*}
+Similarly, we might ask what conditional DGPs/models do and do not give
+rise to linear conditional quantiles
+\begin{align*}
+  Q_\tau(Y|X) = X'\beta_\tau?
+\end{align*}
+\end{frame}
+}
+
+{\scriptsize
+\begin{frame}{The Linear Conditional Quantile Restriction: Compatible DGPs}
+Models that \alert{do}.
+Can also analytically derive $\beta_\tau$ in these models.
+\begin{itemize}
+  \item
+    \alert{Random Coefficients Model}:
+    \begin{align*}
+      Y = X'\beta(U)
+      \qquad
+      U\perp X,
+    \end{align*}
+    where $U$ is a scalar RV and $u\mapsto X'\beta(u)$ strictly
+    increasing with probability 1.
+
+  \pause
+  \item \alert{Location-Scale Model}:
+    \begin{align*}
+      Y = X'\beta + (X'\delta)\varepsilon
+      \qquad
+      \varepsilon\perp X,
+      \quad
+      P[X'\delta>0]=1
+    \end{align*}
+\end{itemize}
+\pause
+Model that does not quite
+\begin{itemize}
+  \item
+    Suppose we have
+    \begin{align*}
+      Y = \alpha + \beta X + \varepsilon
+      \qquad\text{where}\quad
+      \varepsilon\perp X
+    \end{align*}
+    hence $\varepsilon$ homoskedastic.
+    Then
+    \begin{align*}
+      Q_\tau(Y|X)=\alpha_\tau + \beta X
+    \end{align*}
+\end{itemize}
+\end{frame}
+}
+
+
+
+{\footnotesize
+\begin{frame}{Linear Conditional Quantiles: Example I}
+Random Coefficients Model:
+$Y = X'\beta(U)$
+\begin{itemize}
+  \item Writing out $Y$ in conditional quantile function:
+    \begin{align*}
+      Q_\tau(Y|X)
+      =
+      Q_\tau(X'\beta(U)\,|\,X)
+    \end{align*}
+
+  \pause
+  \item By assumption, $h(u)= X'\beta(u)$ is a strictly increasing
+    function with probability 1.
+    Therefore,
+    \begin{align*}
+      Q_\tau(X'\beta(U)\,|\,X)
+      =
+      Q_\tau(h(U)\,|\,X)
+      =
+      h\big(
+      Q_\tau(U|X)
+      \big)
+      =
+      X'\beta(Q_\tau(U|X))
+    \end{align*}
+
+  \pause
+  \item
+    Therefore, we have
+    \begin{align*}
+      Q_\tau(Y|X)
+      =
+      X'
+      \underbrace{%
+        \beta(Q_\tau(U|X))
+      }_{\beta_\tau}
+    \end{align*}
+
+  \pause
+  \item
+    Natural interpretation:
+    $\beta_\tau$ coefficient is just the $\tau$th quantile of
+    generated $\beta(U)$'s.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Linear Conditional Quantiles: Example II}
+Location Scale Model:
+$Y = X'\beta + (X'\delta)\varepsilon$.
+\begin{itemize}
+  \item
+    Writing out $Y$ in conditional quantile function:
+    \begin{align*}
+      Q_\tau(Y|X)
+      =
+      Q_\tau(X'\beta + (X'\delta)\varepsilon\,|\,X)
+    \end{align*}
+
+  \pause
+  \item
+    When we condition on $X$, $X'\beta$ is a constant, hence
+    \begin{align*}
+      Q_\tau(Y|X)
+      &=
+      Q_\tau(X'\beta + (X'\delta)\varepsilon\,|\,X)
+      =
+      X'\beta + Q_\tau((X'\delta)\varepsilon\,|\,X)
+    \end{align*}
+
+  \pause
+  \item
+    Because $P[X'\delta > 0]=1$, the function $h(u)=(X'\delta)u$ is
+    strictly increasing.
+    Hence,
+    \begin{align*}
+      Q_\tau( (X'\delta)\varepsilon\,|\,X)
+      =
+      Q_\tau(h(\varepsilon)\,|\,X)
+      =
+      h\big(
+      Q_\tau(\varepsilon\,|\,X)
+      \big)
+      =
+      (X'\delta)
+      Q_\tau(\varepsilon\,|\,X)
+    \end{align*}
+
+  \pause
+  \item
+    Therefore, we have
+    \begin{align*}
+      Q_\tau(Y|X)
+      &=
+      X'\beta
+      +
+      (X'\delta)
+      Q_\tau(\varepsilon\,|\,X)
+      \\
+      &=
+      X'
+      \underbrace{%
+        \big(
+        \beta
+        +
+        \delta
+        Q_\tau(\varepsilon\,|\,X)
+        \big)
+      }_{\beta_\tau}
+    \end{align*}
+\end{itemize}
+\end{frame}
+}
+
+
+\section{Asymptotic Distribution}
+
+\begin{frame}{Asymptotic Distribution}
+For iid data, assume the estimator
+\begin{align*}
+  \hat{\theta}
+  =
+  \argmax_{\theta\in\Theta}
+  \frac{1}{N}
+  \sumiN
+  m(Z_i,\theta)
+\end{align*}
+is consistent for $\theta_0\in \text{Int}(\Theta)$.
+Assume also
+\begin{itemize}
+  \item
+    $|m(z,\theta)-m(z,\tilde{\theta})|\leq b(z)\lVert
+    \theta-\tilde{\theta}\rVert$
+    for all $z,\theta,\tilde{\theta}$ where
+    $b(\,\cdot\,)\geq 0$
+    satisfies $\E[b(Z_i)^2]<\infty$
+  \item $\theta\mapsto m(z,\theta)$ is differentiable at $\theta_0$ with
+    prob. 1.
+  \item $\theta\mapsto \E[m(Z_i,\theta)]$ is twice differentiable at
+    $\theta_0$ with nonsingular Hessian matrix $H$.
+\end{itemize}
+Then
+\begin{align*}
+  \sqrt{N}(\hat{\theta}-\theta_0)
+  \quad\dto\quad
+  N(0,H^{-1}\Sigma H^{-1})
+  \quad
+  \Sigma
+  =
+  \E
+  \left[
+    \frac{\partial m(Z_i,\theta_0)}{\partial \theta}
+    \frac{\partial m(Z_i,\theta_0)}{\partial \theta'}
+  \right]
+\end{align*}
+\end{frame}
+
+
+
+\begin{frame}{Asymptotic Distribution}
+Estimator
+\begin{align*}
+  \hat{\beta}_\tau
+  &=
+  \argmin_b
+  \frac{1}{N}
+  \sumiN
+  \rho_\tau(Y_i-X_i'b)
+  \\
+  \rho_\tau(u)
+  &=
+  (\tau-{1}\{u\leq 0\})u
+  =
+  \begin{cases}
+    (1-\tau)|u| & u \leq 0 \\
+    \tau|u| & u > 0
+  \end{cases}
+\end{align*}
+Note
+\begin{align*}
+  \E[m(Z_i,\theta)]
+  &=
+  \E\left[
+    \rho_\tau(Y_i-X_i'b)
+  \right]
+  \\
+  &=
+  \E\left[
+    (\tau-{1}\{Y_i\leq X_i'b\})(Y_i-X_i'b)
+  \right]
+\end{align*}
+\end{frame}
+
+
+{\footnotesize
+\begin{frame}{Asymptotic Distribution}
+Note
+\begin{align*}
+  \E[m(Z,\theta)]
+  &=
+  \E\left[
+    (\tau-{1}\{Y\leq X'b\})(Y-X'b)
+  \right]
+\end{align*}
+Differentiate, ignoring kink at $Y=X'b$:
+\begin{align*}
+  \frac{\partial}{\partial \theta}
+  m(Z,\theta)
+  &=
+  \frac{\partial}{\partial \beta}
+  (\tau-{1}\{Y\leq X'b\})(Y-X'b)
+  \\
+  &=
+  -
+  (\tau-{1}\{Y\leq X'b\})X
+  \\
+  &=
+  ({1}\{Y\leq X'b\}-\tau)X
+\end{align*}
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Asymptotic Distribution}
+To compute the expected second derivative, start with
+\begin{align*}
+  \frac{\partial}{\partial\theta}
+  \E[m(Z,\theta)]
+  &=
+  \E\left[
+    \frac{\partial}{\partial\theta}
+    m(Z,\theta)
+  \right]
+  \\
+  &=
+  \E\left[
+  \frac{\partial}{\partial\theta'}
+  ({1}\{Y\leq X'b\}-\tau)X
+  \right]
+  \\
+  \text{LIE}\quad
+  &=
+  \E\left[
+    \E\big[
+    ({1}\{Y\leq X'b\}-\tau)X
+    \;|\;X
+    \big]
+  \right]
+  \\
+  &=
+  \E\left[
+    \big(
+      \E\big[
+      {1}\{Y\leq X'b\}
+      \;|\;X
+      \big]
+      -\tau
+    \big)X
+  \right]
+  \\
+  &=
+  \E\left[
+    \big(
+      P[Y\leq X'b |X]
+      -\tau
+    \big)X
+  \right]
+  \\
+  &=
+  \E\left[
+    \big(
+      F_{Y|X}(X'b)
+      -\tau
+    \big)X
+  \right]
+\end{align*}
+Second derivative:
+\begin{align*}
+  \frac{\partial^2}{\partial \theta\partial\theta'}
+  \E[m(Z,\theta)]
+  &=
+  \E\left[
+    \frac{\partial^2}{\partial \theta\partial\theta'}
+    m(Z,\theta)
+  \right]
+  =
+  \E\left[
+    f_{Y|X}(X'b)
+    XX'
+  \right]
+\end{align*}
+
+\end{frame}
+}
+
+
+\section{Quantile IV}
+
+\subsection{Motivation \& Roadmap}
+
+{\scriptsize
+\begin{frame}{Quantile IV: Motivation}
+In non-IV quantile regression, we adopt the model for outcomes
+\begin{align*}
+  Y = X'\beta_\tau + u
+  \qquad\text{where}\quad
+  P[u \leq 0|X]&=\tau
+\end{align*}
+which impliies that the \alert{observed} conditional-on-$X$ quantile
+function satisfies
+\begin{align*}
+  Q_\tau(Y|X)=X'\beta_\tau
+  %\qquad\iff\qquad
+  %\\
+  %P[Y\leq X'\beta_\tau |X]&=\tau
+  %\\
+  %F_{Y|X}(X'\beta_\tau)=\tau
+  %\\
+  %Q_\tau(Y|X)=X'\beta_\tau
+\end{align*}
+Similar to OLS, the above lines are a few things all at once.
+\begin{itemize}
+  \item The model defines $\beta_\tau$, which is like a
+    \alert{marginal effect} that says how the $\tau$th quantile of
+    outcome $Y$ varies, if we could manipulate $X$.
+
+  \item The assumption $P[u \leq 0|X]=\tau$ is like the exogeneity
+    assumption in regression and ensures that differences in observed
+    qunatiles for the oucome variable (across different values of the
+    covariate) are, in fact, due to differences only in $X$, not
+    unobserved $u$.
+    There is no confounding (an assumption we will relax in quantile
+    IV).
+
+  \item
+    This exogeneity-like \alert{assumption}/\alert{restriction} on the
+    joint distribution (DGP) for the observed data $(Y,X)$ provides
+    moment conditions we can exploit to identify and estimate that same
+    $\beta_\tau$.
+    ``Minimizing the quantile regression objective function'' is
+    precisely the exploitation of that restriction for estimation
+    purposes.
+
+\end{itemize}
+\end{frame}
+}
+
+{\scriptsize
+\begin{frame}{Quantile IV: Motivation}
+In Quantile IV
+\begin{itemize}
+  \item Worry that the assumption
+    $P[u\leq 0|X]=\tau$ (``no other things going on'') fails because of
+    selection.
+    Thus differences in \alert{observed} conditional quantiles
+    $Q_\tau(Y|X=x)$ at different values of $x$ (which we can estimate)
+    are \alert{not} comparisons where ``everything but $X$ held
+    constant.''
+    So usual quantile regression estimates not the parameters we want
+    (i.e.  those reflecting ceteris paribus comparisons).
+
+  \item But we might have an \alert{instrument} $Z$ that's ``as good as
+    randomly assigned'' and which pushes around $X$.
+    We can use this to generate ceteris paribus comparisons.
+
+  \item
+    In particular,
+    use the instrument ``as good as randomly assigned''
+    property to generate some alternative conditional quantile
+    restrictions
+    \begin{align}
+      Q_\tau(g(Y,X)|Z)=\text{something}
+      \label{qivrestriction}
+    \end{align}
+    for some function $g$ and some expression for ``something'' that we will
+    pin down in the next few slides,
+    which we can exploit to estimate ``structural'' parameters
+    reflecting ceteris paribus comparisons.
+\end{itemize}
+The next few slides will pursue a conditional quantile restriction like
+Expression~\ref{qivrestriction} to estimate ``structural'' parameters
+reflecting ceteris paribus comparisons.
+\end{frame}
+}
+
+
+
+{\footnotesize
+\begin{frame}{Quantile IV: Roadmap}
+The next few slides will proceed through the following main steps
+\begin{itemize}
+  \item Define \alert{structural} quantile function that can be used to
+    construct counterfactuals and make ceteris paribus comparisons
+  \item Relate \alert{observed} data $(Y,X)$ to the \alert{structural}
+    quantile function of interest, which is an \alert{identification}
+    step.
+  \item
+    Given identification result and ``as good as randomly assigned''
+    instrument, deduce a \alert{restriction} on the data that can be
+    exploited for \alert{estimation}
+\end{itemize}
+Note that this is probably much more than you need to know for the
+purposes of this course.
+But for those of you who are interested or would like additional details
+to go along with Bo's slides, I have included this material.
+This also gives a taste of how identification arguments work in more
+advanced causal inference settings.
+\end{frame}
+}
+
+
+\subsection{Model and Structural Quantile Function}
+
+{\scriptsize
+\begin{frame}{Quantile IV: Model \& Structural Quantile Function}
+\alert{Model}:
+Suppose that outcomes are generated according to
+\begin{align*}
+  Y = h(X,\varepsilon)
+  %\quad\iff\quad
+  %Q_\tau(Y|X)=
+\end{align*}
+with $X$ and $\varepsilon$ possibly correlated, and $h(x,e)$ strictly
+increasing in the second argument.
+
+\vspace{-5pt}
+
+Example:
+$(Y,X,\varepsilon)=(\text{Wages}, \text{Education},\text{Ability})$
+
+\vspace{-5pt}
+Define for fixed $x$, define the
+\alert{structural quantile function}, which
+is the $\tau$th quantile that we \alert{would observe} if we could
+\alert{reassign everyone} to education level $x$, look at resulting
+\alert{counterfactual} distribution of wages (with
+randomness/differences only arising from differences in unobserved
+ability $\varepsilon$), and pick out the $\tau$th quantile:
+\begin{align*}
+  S_\tau(x) = Q_\tau(h(x,\varepsilon))
+  \qquad
+  \forall x
+\end{align*}
+From this, can compute valid ceteris paribus comparisons/differences,
+$S_\tau(x)-S_\tau(x')$,
+which reflect differences purely in the covariate $X$, not unobserved
+confounders like $\varepsilon$.
+
+\vspace{-5pt}
+Above model looks slightly different from what Bo had in the slide.
+But essentially, his slides just wrote down immediately a \alert{linear}
+structural quantile function
+\begin{align*}
+  S_\tau(x)
+  = Q_\tau(h(x,\varepsilon))
+  = x'\beta_\tau
+  \qquad \iff\qquad
+  Y_i = X_i'\beta_\tau + u_i
+  \quad\text{where}\quad
+  P[u_i\leq |Z_i]\leq \tau
+\end{align*}
+I will proceed at first without that (since we don't need it for many
+claims and results), then reintroduce it at the end.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}[shrink]{Aside: Notation}
+
+I will use $X$ to refer to the \alert{observed} covariate (a random
+object), and $x$ to refer to a fixed (often counterfactual) value of
+that covariate.
+
+$Q_\tau(\,\cdot\,)$ is the $\tau$th quantile operator which can be
+applied (like the expectation operator $\E[\,\cdot\,]$) to any RV,
+$Y$, $X$, $\varepsilon$.
+It must be inferred from context what the random object is
+whose $\tau$th quantile we want, e.g.
+\begin{itemize}
+  \item For fixed $x$, the only source of randomness in
+    $h(x,\varepsilon)$ is $\varepsilon$, hence
+    $Q_\tau(h(x,\varepsilon))$ gets the $\tau$th quantile of the RV
+    $h(x,\varepsilon)$, $x$ fixed and $\varepsilon$ random.
+  \item
+    $Q_\tau(Y)=Q_\tau(h(X,\varepsilon))$ gets the $\tau$th quantile of
+    the RV $Y$ or equivalently $h(X,\varepsilon)$, with $X$ and
+    $\varepsilon$ both random implying that $h(X,\varepsilon)$ is an RV
+    with some $\tau$th quantile.
+\end{itemize}
+\end{frame}
+}
+
+
+
+{\scriptsize
+\begin{frame}{Quantile IV: The Identification Problem}
+Previously:
+We defined the \alert{structural} quantile function for fixed $x$
+\begin{align*}
+  S_\tau(x) = Q_\tau(h(x,\varepsilon))
+  \qquad
+  \forall x
+\end{align*}
+As remarked, comparing $S_\tau(x)$ across (fixed) values of $x$ reflects
+true ceteris paribus comparisons of outcomes.
+
+Can also consider the \alert{observed} conditional quantile function
+\begin{align*}
+  Q_\tau(Y|X)
+  =
+  Q_\tau(h(X,\varepsilon)|X)
+\end{align*}
+This is the $\tau$th quantile if we look at the \alert{actual} (not
+counterfactual) distribution of wages at covariate level $X$.
+As remarked, because of selection, generally
+\begin{align*}
+  Q_\tau(Y|X=x)
+  \quad
+  =
+  \quad
+  Q_\tau(h(X,\varepsilon)|X=x)
+  \quad
+  \neq
+  \quad
+  Q_\tau(h(x,\varepsilon))
+  \quad
+  =
+  \quad
+  S_\tau(x)
+\end{align*}
+RHS of $\neq$ sign involves counterfactual distributions with everyone
+at $x$; LHS involves realized distributions looking at those individuals
+with realized status $X$ (generally after selection into that status).
+So naive comparisons across values of $X$ generally invalid.
+
+But the observed data bear \alert{some} relationship to the structural
+quantile function.
+The next slide clarifies that relationship, which we ultimately need to
+identify the structural quantile function.
+\end{frame}
+}
+
+
+%\begin{frame}[shrink]{Quantile IV: Picture}
+%To emphasize that
+%\begin{align*}
+  %Q_\tau(Y|X=x)
+  %=
+  %Q_\tau(h(X,\varepsilon)|X=x)
+  %\neq
+  %S_\tau(x) = Q_\tau(h(x,\varepsilon))
+%\end{align*}
+%%Picture to have in mind
+%%\begin{figure}
+  %%\includegraphics[angle=270, origin=c, scale=0.15, trim={40cm, 5cm, 30cm, 0cm}, clip]{./picture.jpg}
+%%\end{figure}
+%\end{frame}
+
+
+%{\scriptsize
+%\begin{frame}{Quantile IV: Identification of $S_\tau(x)$}
+
+%Suppose that $h(x,e)$ is strictly increasing in $e$ for any fixed $x$.
+
+%\alert{Claim}:
+%Identification of estimand $S_\tau(x)$ depends solely on whether
+%we can identify distribution of unobs.\ heterogeneity,
+%$Q_\tau(\varepsilon)$.
+%Can then ``back out'' structural quantile function because we'd
+%know how to adjust for these differences to get ceteris paribus
+%comparisons.
+
+%Proof:
+%By monotonicity of $h(x,e)$ in $e$, for any fixed $x$, we have
+%\begin{align*}
+  %S_\tau(x)
+  %= Q_\tau(h(x,\varepsilon))
+  %= h(x,Q_\tau(\varepsilon))
+%\end{align*}
+%In words, using our running example,
+%\begin{itemize}
+  %{\scriptsize
+  %\item $Q_\tau(h(x,\varepsilon))$:
+    %The $\tau$th quantile of wages that we \alert{would} observe if
+    %we counterfactually reassign everyone to education level $x$.
+    %Difference in wages then solely reflect differences in ability
+    %$\varepsilon$.
+  %\item
+    %$h(x,e)$ increasing in $e$ for each fixed $x$:
+    %Suppose wages are increasing in ability for any level of
+    %education. The high ability folks always earn more at each level of
+    %education $x$, no matter the counterfactual level $x$ assigned to
+    %everyone.
+  %\item
+    %$Q_\tau(h(x,\varepsilon)) = h(x,Q_\tau(\varepsilon))$:
+    %To find out the $\tau$th quantile of wages if everyone has education
+    %level $x$ (i.e. $Q_\tau(h(x,\varepsilon))$), we just need to find
+    %the ability of the guy who's always at at the $\tau$th quantile of
+    %ability (i.e. $Q_\tau(\varepsilon)$), plug in.
+  %}
+%\end{itemize}
+%\end{frame}
+%}
+
+\subsection{Identification}
+
+{\scriptsize
+\begin{frame}{Quantile IV: The Identification Argument}
+\alert{Key Assumptions}:
+\begin{itemize}
+  \item Recall $h(x,e)$ is increasing in $e$ for any value of $x$.
+  \item $Z$ as good as randomly assigned, i.e. $Z\perp \varepsilon$
+\end{itemize}
+
+Given that $h(x,e)$ monotonic in $e$,
+consider the following events (in a probability sense)
+\begin{align*}
+  \{\varepsilon\leq Q_\tau(\varepsilon)\}
+  \quad&\iff\quad
+  \{h(X,\varepsilon)\leq h(X,Q_\tau(\varepsilon))\}
+  \\
+  \text{Property of quantiles under monotonic transf.}
+  \quad&\iff\quad
+  \{h(X,\varepsilon)\leq Q_\tau(h(X,\varepsilon))\}
+  \\
+  \text{Definitions for outcomes and SQF}
+  \quad&\iff\quad
+  \{Y\leq S_\tau(X)\}
+  \\
+  \quad&\iff\quad
+  \{Y-S_\tau(X)\leq 0\}
+\end{align*}
+Based on this last result and the fact that $Z$ is an instrument,
+$Z\perp \varepsilon$, we have
+\begin{align*}
+  P[Y-S_\tau(X)\leq 0\,|\,Z]
+  \overset{(\dagger)}{=}
+  P[\varepsilon \leq Q_\tau(\varepsilon)\,|\,Z]
+  \overset{(*)}=
+  P[\varepsilon \leq Q_\tau(\varepsilon)]
+  =
+  \tau
+\end{align*}
+Equality $(\dagger)$ made use of the monotonicity assumption in the
+model for outcomes, and equality $(*)$ made use of the fact that $Z$ is
+an instrument uncorrelated with unobserved heterogeneity.
+
+This is an identification result on which we can build an estimation
+approach.
+\end{frame}
+}
+
+
+\subsection{Estimation}
+
+{\footnotesize
+\begin{frame}{Quantile IV: Estimation}
+We have from the identification step
+\begin{align*}
+  \tau
+  &=
+  P[Y-S_\tau(X)\leq 0\,|\,Z]
+  \\
+  \qquad\iff\qquad
+  0
+  &=
+  Q_\tau(Y-S_\tau(X)|Z)
+\end{align*}
+Suppose further that we have a linear structural quantile function
+\begin{align*}
+  S_\tau(x)
+  =
+  Q_\tau(h(x,\varepsilon))
+  = x'\beta_\tau
+  \qquad
+  \forall x
+\end{align*}
+Then we can restate the identification result as
+\begin{align}
+  \tau
+  &=
+  P[Y-X'\beta_\tau \leq 0\,|\,Z]
+  \notag
+  \\
+  \qquad\iff\qquad
+  0&=
+  Q_\tau(Y-X'\beta_\tau|Z)
+  \label{toest}
+  \\
+  \qquad\iff\qquad
+  Y &= X'\beta_\tau + u
+  \quad\text{where}\quad
+  P[u\leq 0|Z]=0
+  \notag
+\end{align}
+where the final expression is what Bo had on his slides.
+
+Note that Expression~\ref{toest} is a restriction that can be exploited
+for estimation of $\beta_\tau$.
+Simply choose $\beta_\tau$ as the vector that gives the \emph{smallest}
+coefficients when running a quantile regression of $Y-X'\beta_\tau$ on
+$Z$.
+\end{frame}
+}
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% Sample code
+\pause to add breaks
+\textcolor{red}{text to show}.
+\vspace{20pt}
+
+\usebeamercolor{dull text}
+\alert<+>{Words that you want to alert}
+

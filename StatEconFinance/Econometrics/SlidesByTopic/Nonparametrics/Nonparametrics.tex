@@ -1,0 +1,1335 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usepackage{cmbright}
+%\usetheme{metropolis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis with Sidebar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[aspectratio=169, handout]{beamer}
+%\documentclass[aspectratio=169]{beamer}
+%\documentclass{beamer}
+\usepackage{cmbright}
+
+\useoutertheme[right, width=0.20\paperwidth]{sidebar}
+\usecolortheme{metropolis}
+\useinnertheme[sectionpage=none]{metropolis}
+\usefonttheme{metropolis}
+
+\makeatletter
+\beamer@headheight=1.75\baselineskip     %controls the height of the headline, default is 2.5
+\makeatother
+
+%\setbeamertemplate{sidebar canvas right}{}
+%\setbeamertemplate{sidebar right}{BOB}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Simple Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usetheme{Boadilla}
+%\usepackage{lmodern}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sidebar Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass[serif]{beamer}  % For serif latex font
+%\usepackage{pxfonts}
+%\usepackage{eulervm}
+%\usepackage{mathpazo}
+
+%\usetheme{Goettingen}
+%\usecolortheme{lily}
+
+\usepackage{amssymb}% http://ctan.org/pkg/amssymb
+\usepackage{pifont}% http://ctan.org/pkg/pifont
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Common Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[]{Nonparametrics \\ Matt Cocci}
+\author[]{}
+\date{\today}
+
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+%\setbeamertemplate{section in toc}[square unnumbered]
+%\setbeamertemplate{subsection in toc}[square unnumbered]
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% For easier looping
+\usepackage{pgffor}
+
+\usepackage{pdfpages}
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\proj}{\operatorname{proj}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\widehat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsphi}{\boldsymbol{\phi}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\widehat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\widehat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\widehat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatphi}{\boldsymbol{\widehat{\phi}}}
+\newcommand{\bshatmu}{\boldsymbol{\widehat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\widehat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\widehat{\Sigma}}}
+\newcommand{\bstildephi}{\boldsymbol{\tilde{\phi}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarphi}{\boldsymbol{\overline{\phi}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\widehat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\widehat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\widehat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Rnk}{\mathbb{R}^{n\times k}}
+\newcommand{\Rkk}{\mathbb{R}^{k\times k}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Presentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Outline}
+\tableofcontents[hideallsubsections]
+%\tableofcontents
+\end{frame}
+
+
+
+
+\section{Nonparametric Regression}
+
+
+{\scriptsize
+\begin{frame}{Nonparametric Regression}
+
+To estimate $m(x) = \E[Y|X=x]$,
+\vspace{-3pt}
+\pause
+\begin{itemize}
+  \item
+    \alert{Series regression}:
+    Global approximation by $p$th degree polynomial,
+    with coefficients/polynomial \alert{common} for all $x$, estimated
+    by OLS
+    \begin{align*}
+      \widehat{m}(x)
+      &=
+      \widehat{b}_0
+      +
+      \widehat{b}_1
+      x
+      +
+      \cdots+
+      \widehat{b}_p
+      x^p
+      \\
+      \widehat{b}
+      &=
+      \argmin_b
+      \sumiN
+      (Y_i-b_0-b_1X_i-\cdots-b_pX_i^p)^2
+    \end{align*}
+    \pause
+
+  \item
+    \alert{Local Polynomial Regression}:
+    Local approximation by $p$th degree polynomial, with
+    coefficients/polynomial \alert{specific} to each $x$ (hence
+    ``local''), estimated by WLS:
+    \begin{align*}
+      \widehat{m}(x)
+      &=
+      \widehat{b}_0(x)
+      +
+      \widehat{b}_1(x)
+      x
+      +
+      \cdots+
+      \widehat{b}_p(x)
+      x^p
+      \\
+      \widehat{b}(x)
+      &=
+      \argmin_b
+      \sumiN
+      K\left(
+      \frac{X_i-x}{h}
+      \right)
+      (Y_i-b_0-b_1X_i-\cdots-b_pX_i^p)^2
+    \end{align*}
+
+  \pause
+  \item
+    \alert{Kernel Regression}:
+    Special case of local polynomial regression, in which $p=0$ so that
+    we simply approximate locally with a constant.
+    %Fit a constant locally; implies
+    %\begin{align*}
+      %\widehat{m}(x)
+      %&=
+      %\frac{%
+        %\sumiN
+        %K\left(
+        %\frac{X_i-x}{h}
+        %\right)
+        %Y_i
+      %}{%
+        %\sum_{j=1}^N
+        %K\left(
+        %\frac{X_j-x}{h}
+        %\right)
+      %}
+    %\end{align*}
+
+  \pause
+  \item Could imagine \alert{other bases}, not just polynomials.
+\end{itemize}
+\end{frame}
+}
+
+
+\subsection{Linear Smoothers}
+
+{\footnotesize
+\begin{frame}{Linear Smoothers}
+
+$\hat{m}(x)$ is a \alert{linear smoother}
+if it can be written, for some set of weights $\{w_i(x)\}$ that sum to 1
+(for each $x$, when summing across $i$), as
+\begin{align*}
+  \widehat{m}(x)
+  =
+  \sumiN
+  w_i(x)
+  Y_i
+  =
+  w(x)'Y
+\end{align*}
+\pause
+Note
+\begin{itemize}
+  \item
+    \alert{Linear in $Y$} at any given/fixed $x$.
+    Weights $w(x)$ \alert{nonlinear} in $x$, giving rise to a
+    nonlinear/wiggly CEF estimate.
+
+  \pause
+  \item \alert{All} estimators on previous last slide are linear
+    smoothers.
+    Reasoning:
+    \begin{itemize}
+      {\scriptsize
+      \item Either globally or locally (at each fixed $x$),
+        \alert{OLS} or \alert{WLS} to get parameters
+      \item OLS/WLS estimates are \alert{linear} in $Y_i$, as always.
+      \item Estimator $\widehat{m}(x)$ is \alert{linear in parameter
+        ests} (that are linear in $Y_i$'s).
+        %Hence linear in $Y_i$ all around.
+      }
+    \end{itemize}
+
+  \pause
+  \item
+    Implies nice, simple formulas for
+    \alert{cross-validation}/\alert{leave-one-out}, which we use to
+    select order of polynomial approximations.
+\end{itemize}
+\end{frame}
+}
+
+%\begin{frame}[shrink]{Linear Smoothers: Sum of Weights}
+%For the estimators considered here, the weights sum to 1, and the
+%Cross-Validation formula used that.
+%What does that mean? Is that desirable?
+
+%Suppose we have data $\{Y_i\}$ and compute estimate
+%\begin{align*}
+  %\hat{m}(x)
+  %=
+  %\sum_{i=1}^N
+  %w_i(x) Y_i
+%\end{align*}
+%Suppose we renormalize the data $\{aY_i+b\}$
+%\begin{align*}
+  %\hat{m_*}(x)
+  %&=
+  %\sum_{i=1}^N
+  %w_i(x) (aY_i+b)
+  %\\
+  %&=
+  %a\sumiN
+  %w_i(x)
+  %Y_i
+  %+
+  %b
+  %\\
+  %&=
+  %a
+  %\hat{m}(x)
+  %+
+  %b
+%\end{align*}
+%First, notice that $\hat{m}(x)$ being a linear smoother means rescaling
+%the data by $a$ rescales the estimate in the usual way.  Therefore, the
+%estimate doesn't depend upon units.
+
+%Second, notice that the weights summing to one means that if we recenter
+%the data, the estimate changes in the usual way. This is a nice property
+%to have.
+%\end{frame}
+
+
+
+\subsection{Series Regression}
+
+
+{\footnotesize
+\begin{frame}{Series Reg: Motivation}
+Think of the following as a smooth differentiable function of $x$:
+\begin{align*}
+  m(x)
+  =
+  \E[Y|X=x]
+\end{align*}
+\pause
+\alert{Taylor series expansion} of function about $x_0$:
+\begin{align*}
+  m(x)
+  =
+  m(x_0)
+  +
+  \frac{m'(x_0)}{1!}
+  (x-x_0)
+  +
+  \frac{m''(x_0)}{2!}
+  (x-x_0)^2
+  +
+  \cdots
+\end{align*}
+\pause
+Ideas:
+\begin{itemize}
+  \item Since we don't know $m^{(k)}(x_0)$, just call it $b_k$ and use
+    the $N$ observations to \alert{estimate}.
+
+  %\pause
+  %\item
+    %Choice of $x_0$ 
+    %Often set $x_0=0$, but may be useful to set to the sample mean
+    %of $X$ to keep $(x-x_0)^k$ smaller.
+
+  \pause
+  \item Can also imagine using a different \alert{basis} for function
+    estimation, which might help with the fact that these polynomials
+    are nearly colinear.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Series Regression: Linear Smoother}
+Recall estimator definition
+\begin{align*}
+  \widehat{b}
+  &=
+  \argmin_b
+  \sumiN
+  (Y_i-b_0-b_1X_i-\cdots-b_pX_i^p)^2
+  \\
+  \widehat{m}(x)
+  &=
+  \widehat{b}_0
+  +
+  \widehat{b}_1
+  x
+  +
+  \cdots+
+  \widehat{b}_p
+  x^p
+\end{align*}
+\pause
+Define $Z_i=(1,X_i,X_i^2,\ldots,X_i^p)'$
+and $z(x) = (1,x,x^2,\ldots,x^p)'$.
+Write as
+\begin{align*}
+  \widehat{b}
+  &=
+  \argmin_b
+  \sumiN
+  (Y_i-Z_i'b)^2
+  \qquad
+  \widehat{m}(x)
+  =
+  z(x)'\widehat{b}
+\end{align*}
+\pause
+This is just regression, hence solution to FOC is
+\begin{align*}
+  \widehat{b}
+  &=
+  \left[
+  \sumiN
+  Z_iZ_i'
+  \right]^{-1}
+  \left[
+  \sumiN
+  Z_iY_i
+  \right]
+  =
+  \sumiN
+  \left(
+  \frac{%
+    Z_i
+  }{%
+    \sum_{j=1}^N
+    Z_jZ_j'
+  }
+  \right)
+  Y_i
+\end{align*}
+\pause
+For some $x$ (which implies corresponding $z(x)$)
+\begin{align*}
+  \widehat{m}(x)
+  =
+  z(x)'
+  \widehat{b}
+  =
+  \sumiN
+  \left(
+  \frac{%
+    z(x)Z_i
+  }{%
+    \sum_{j=1}^N
+    Z_jZ_j'
+  }
+  \right)
+  Y_i
+\end{align*}
+\end{frame}
+}
+
+
+
+
+\subsection{Kernel Regression}
+
+
+{\footnotesize
+\begin{frame}{Kernel Regression}
+We had the kernel regression formula
+\begin{align*}
+  \widehat{m}(x)
+  &=
+  \frac{%
+    \sumiN
+    K\left(
+    \frac{X_i-x}{h}
+    \right)
+    Y_i
+  }{%
+    \sum_{j=1}^N
+    K\left(
+    \frac{X_j-x}{h}
+    \right)
+  }
+\end{align*}
+Motivations for this:
+\begin{enumerate}
+  \item Given nonparametric estimate of \alert{conditional density}
+    $f(y|x)$, simple \alert{plugin} estimate of the
+    \alert{conditional expectation}.
+  \item Local polynomial regression of degree zero, i.e.
+    \alert{fit constant locally} (at each $x$).
+\end{enumerate}
+\end{frame}
+}
+
+
+
+{\scriptsize
+\begin{frame}{Kernel Regression: Derivation I}
+Definition of CEF that we want to estimate:
+\vspace{-4pt}
+\begin{align*}
+  m(x)
+  =
+  \E[Y_i|X_i=x]
+  &=
+  \int y \, f(y|x)\;dy
+  =
+  \int y \, \frac{f(y,x)}{f(x)}\;dy
+  =
+  \frac{%
+    \int y  \,f(y,x)\;dy
+  }{%
+    f(x)
+  }
+\end{align*}
+\vspace{-4pt}
+\pause
+First, estimate the densities, assuming a product kernel to
+estimate the joint density:
+\begin{align*}
+  \widehat{f}(x)
+  &=
+  \frac{1}{Nh}
+  \sumin
+  K\left(
+  \frac{X_i-x}{h}
+  \right)
+  \qquad
+  \widehat{f}(y,x)
+  =
+  \frac{1}{Nh^2}
+  \sumiN
+  K\left(
+  \frac{Y_i-y}{h}
+  \right)
+  K\left(
+  \frac{X_i-x}{h}
+  \right)
+\end{align*}
+\pause
+Compute numerator by plugging in, changing variables, using
+properties of kernel functions:
+\vspace{-4pt}
+\begin{align*}
+  \int y \hat{f}(y,x)\;dy
+  &=
+  \int
+  y
+  \left[
+  \frac{1}{Nh^2}
+  \sumiN
+  K\left(
+  \frac{Y_i-y}{h}
+  \right)
+  K\left(
+  \frac{X_i-x}{h}
+  \right)
+  \right]
+  dy
+  \\
+  &=
+  \frac{1}{Nh^2}
+  \sumiN
+  K\left(
+  \frac{X_i-x}{h}
+  \right)
+  \left[
+  \int
+  y
+  K\left(
+  \frac{Y_i-y}{h}
+  \right)
+  \;dy
+  \right]
+  \\
+  u=(Y_i-y)/h
+  \quad
+  &=
+  \frac{1}{Nh}
+  \sumiN
+  K\left(
+  \frac{X_i-x}{h}
+  \right)
+  \left[
+  \int
+  (Y_i-hu)
+  K\left(
+  u
+  \right)
+  \;du
+  \right]
+  %\\
+  %&=
+  %\frac{1}{Nh}
+  %\sumiN
+  %K\left(
+  %\frac{X_i-x}{h}
+  %\right)
+  %\left[
+  %Y_i\int K(u)\;du
+  %-
+  %h
+  %\int
+  %u
+  %K\left(
+  %u
+  %\right)
+  %\;du
+  %\right]
+  \\
+  &=
+  \frac{1}{Nh}
+  \sumiN
+  K\left(
+  \frac{X_i-x}{h}
+  \right)
+  Y_i
+\end{align*}
+\vspace{-3pt}
+Then get plugin estimator $\hat{m}(x)=\int y
+\hat{f}(y,x)\,dy/\hat{f}(x)$.
+\end{frame}
+}
+
+
+\subsection{Local Polynomial Regression}
+
+{\footnotesize
+\begin{frame}{Kernel Reg is Local Polynomial Reg, Order 0}
+Alternatively, we can derive the kernel regression estimator as a local
+polynomial regression (of order 0) estimator:
+\begin{align*}
+  \widehat{b}(x)
+  &=
+  \argmin_b
+  \sumiN
+  K\left(
+  \frac{X_i-x}{h}
+  \right)
+  (Y_i-b)^2
+  \\
+  \widehat{m}(x)
+  &=
+  \widehat{b}(x)
+\end{align*}
+indexing by $x$ to emphasize that this estimator is \alert{local}, i.e.
+different $b$ for each $x$.
+
+\pause
+First order condition
+\begin{align*}
+  0
+  &=
+  -2
+  \sumiN
+  K\left(
+  \frac{X_i-x}{h}
+  \right)
+  (Y_i-\widehat{b}(x))
+\end{align*}
+\pause
+Solve
+\begin{align*}
+  \widehat{b}(x)
+  &=
+  \frac{%
+    \sumiN
+    K\left(
+    \frac{X_i-x}{h}
+    \right)
+    Y_i
+  }{%
+    \sum_{j=1}^N
+    K\left(
+    \frac{X_j-x}{h}
+    \right)
+  }
+\end{align*}
+\pause
+Very clearly a linear smoother.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Local Polynomial Regression}
+For any fixed $x$, define
+\begin{align*}
+  \widehat{b}(x)
+  &=
+  \argmin_b
+  \sumiN
+  K\left(
+  \frac{X_i-x}{h}
+  \right)
+  (Y_i-b_0-b_1X_i-\cdots-b_pX_i^p)^2
+  \\
+  \widehat{m}(x)
+  &=
+  \widehat{b}_0(x)
+  +
+  \widehat{b}_1(x)
+  x
+  +
+  \cdots+
+  \widehat{b}_p(x)
+  x^p
+\end{align*}
+\pause
+Define $Z_i=(1,X_i,X_i^2,\ldots,X_i^p)'$
+and $z(x) = (1,x,x^2,\ldots,x^p)'$.
+Write as
+\begin{align*}
+  \widehat{b}(x)
+  &=
+  \argmin_b
+  \sumiN
+  K\left(
+  \frac{X_i-x}{h}
+  \right)
+  (Y_i-Z_i'b)^2
+  \qquad
+  \widehat{m}(x)
+  =
+  z(x)'\widehat{b}
+\end{align*}
+\pause
+First order condition
+\begin{align*}
+  0
+  &=
+  -2
+  \sumiN
+  K\left(
+  \frac{X_i-x}{h}
+  \right)
+  (Y_i-Z_i'\widehat{b}(x))
+  Z_i
+\end{align*}
+\pause
+Solve
+\begin{align*}
+  \widehat{b}(x)
+  &=
+  \left[
+  \sumiN
+  K\left(
+  \frac{X_i-x}{h}
+  \right)
+  Z_iZ_i'
+  \right]^{-1}
+  \left[
+  \sumiN
+  K\left(
+  \frac{X_i-x}{h}
+  \right)
+  Z_iY_i
+  \right]
+\end{align*}
+Notice this is a WLS estimator.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Local Polynomial Regression is a Linear Smoother}
+Collecting
+\begin{align*}
+  \widehat{b}(x)
+  &=
+  \argmin_b
+  \sumiN
+  K\left(
+  \frac{X_i-x}{h}
+  \right)
+  (Y_i-b_0-b_1X_i-\cdots-b_pX_i^p)^2
+  \\
+  \implies\quad
+  \widehat{b}(x)
+  &=
+  \left[
+  \sumiN
+  K\left(
+  \frac{X_i-x}{h}
+  \right)
+  Z_iZ_i'
+  \right]^{-1}
+  \left[
+  \sumiN
+  K\left(
+  \frac{X_i-x}{h}
+  \right)
+  Z_iY_i
+  \right]
+  \\
+  \widehat{m}(x)
+  &=
+  \widehat{b}_0(x)
+  +
+  \widehat{b}_1(x)
+  x
+  +
+  \cdots+
+  \widehat{b}_p(x)
+  x^p
+  \\
+  &=
+  z(x)'\widehat{b}(x)
+  \\
+  &=
+  \sumiN
+  \left[
+  z(x)'
+  \left(
+  \sum_{j=1}^N
+  K\left(
+  \frac{X_j-x}{h}
+  \right)
+  Z_jZ_j'
+  \right)^{-1}
+  K\left(
+  \frac{X_i-x}{h}
+  \right)
+  Z_i
+  \right]
+  Y_i
+\end{align*}
+And if we want to switch our definition to using the polynomials
+\begin{align*}
+  1,\quad
+  X_i-x,\quad
+  \cdots,
+  (X_i-x)^p
+\end{align*}
+solution is immediate, just redefine $Z_i$'s and $z(x)$.
+\end{frame}
+}
+
+
+
+\subsection{Cross-Validation}
+
+{\scriptsize
+\begin{frame}{Cross-Validation Formula, Linear Smoothers}
+Cross-validation criterion
+\begin{align*}
+  CV
+  &=
+  \frac{1}{N}
+  \sumiN
+  (Y_i-\widehat{m}_{-i}(X_i))^2
+  =
+  \frac{1}{N}
+  \sumiN
+  \left(
+    \frac{%
+      Y_i-\widehat{m}(X_i)
+    }{%
+      1-w_i(X_i)
+    }
+  \right)^2
+\end{align*}
+\pause
+Derivation
+\begin{itemize}
+  \item \alert{Key}:
+    Linearity of estimators in $Y_i$ and weights summing to 1,
+    $\sumiN w_i(x)=1$
+  \pause
+  \item Leave one out estimator just leaves out, rescales so
+    weights sum to 1 again:
+    \begin{align*}
+      \hat{m}_{-i}(X_i)
+      \quad
+      &=
+      \quad
+      \frac{%
+        \sum_{j\neq i}w_j(X_i)Y_j
+      }{%
+        1-w_i(X_i)
+      }
+      \quad
+      =
+      \quad
+      \frac{%
+        \sum_{j=1}^N w_j(X_i)Y_j
+        -w_i(X_i)Y_i
+      }{%
+        1-w_i(X_i)
+      }
+      \quad
+      =
+      \quad
+      \frac{%
+        \hat{m}(X_i)-w_i(X_i)Y_i
+      }{%
+        1-w_i(X_i)
+      }
+    \end{align*}
+\end{itemize}
+\pause
+Use these results to simplify:
+\begin{align*}
+  Y_i-\widehat{m}_{-i}(X_i)
+  =
+  Y_i-
+  \frac{%
+    \hat{m}(X_i)-w_i(X_i)Y_i
+  }{%
+    1-w_i(X_i)
+  }
+  =
+  \frac{%
+    Y_i - \hat{m}(X_i)
+  }{%
+    1-w_i(X_i)
+  }
+\end{align*}
+\pause
+\alert{Punchline}:
+Easy to compute cross-validation criterion
+for a given model (of some order $p$ that we are trying to choose)
+\vspace{-7pt}
+\begin{itemize}
+  {\scriptsize
+  \item Estimate $\hat{m}(x)$, which also immediately implies
+    weights $w_i(X_i)$.
+
+  \pause
+  \item Rather than $N$ reestimations $\widehat{m}_{-i}$, one for
+    each $i$, simply compute  the criterion using $\widehat{m}(X_i)$
+    and $w_i(X_i)$ that we already had from the full-sample estimation.
+  }
+\end{itemize}
+\end{frame}
+}
+
+
+
+
+
+
+\section{Confidence Bands}
+
+\begin{frame}[shrink]{Confidence Bands}
+Suppose simple normal homoskedastic case:
+\begin{align*}
+  Y_i
+  &=
+  m(X_i)
+  + \varepsilon_i
+  \qquad
+  \varepsilon_i|X_i\iid\calN(0,\sigma^2)
+\end{align*}
+Estimator and properties
+\begin{align*}
+  \hat{m}(x)
+  &=
+  \sum_{i=1}^N
+  w_i(x) Y_i
+  \\
+  \implies\quad
+  \bar{m}(x)
+  =
+  \E[\hat{m}(x)|X_i=x]
+  &=
+  \sum_{i=1}^N
+  w_i(x) \E[Y|X_i=x]
+  =
+  \sum_{i=1}^N
+  w_i(x) m(x)
+  \\
+  \Var(\hat{m}(x)|X_i=x)
+  &=
+  \sigma^2
+  \sum_{i=1}^N
+  w_i(x)^2
+  =
+  \sigma^2
+  \lVert w_i(x)\rVert
+\end{align*}
+Confidence band for $\bar{m}(x)$, assuming $\sigma^2$ known:
+\begin{align*}
+  I(x)
+  &=
+  \hat{m}(x)
+  \pm
+  c\sigma \lVert w_i(x)\rVert
+\end{align*}
+Need to choose $c$ to guarantee coverage.
+\end{frame}
+
+
+
+\begin{frame}[shrink]{Confidence Bands}
+Confidence band for $\bar{m}(x)$, assuming $\sigma^2$ known:
+\begin{align*}
+  I(x)
+  &=
+  \hat{m}(x)
+  \pm
+  c\sigma \lVert w_i(x)\rVert
+\end{align*}
+A point $x\in [a,b]$ is outside the band if
+\begin{align*}
+  \frac{|\hat{m}(x)-\bar{m}(x)|}{\sigma\lVert w_i(x)\rVert}
+  > c
+\end{align*}
+Therefore, we want to choose $c$ such that
+\begin{align*}
+  \alpha =
+  P\left[
+  \max_{x\in [a,b]}
+  \frac{|\hat{m}(x)-\bar{m}(x)|}{\sigma\lVert w_i(x)\rVert}
+  > c
+  \right]
+\end{align*}
+Using the expressions
+\begin{align*}
+  \hat{m}(x)-\bar{m}(x)
+  &=
+  \sumiN
+  w_i(x)
+  Y_i
+  -
+  \sumiN
+  w_i(x)
+  m(x)
+  \\
+  &=
+  \sumiN
+  w_i(x)
+  (Y_i-m(x))
+  \\
+  &=
+  \sumiN w_i(x) \varepsilon_i
+\end{align*}
+where $\varepsilon|X_i\sim \calN(0,\sigma^2)$.
+\end{frame}
+
+\begin{frame}[shrink]{Confidence Bands}
+Therefore, we want to choose $c$ such that
+\begin{align*}
+  \alpha
+  &=
+  P\left[
+  \max_{x\in [a,b]}
+  \frac{\sumiN w_i(x) \varepsilon_i}{\sigma\lVert w_i(x)\rVert}
+  > c
+  \right]
+  \\
+  &=
+  P\left[
+  \max_{x\in [a,b]}
+  \sumiN
+  \frac{w_i(x)}{\lVert w_i(x)\rVert}
+  Z_i
+  > c
+  \right]
+\end{align*}
+This is called a Gaussian process, which is a well-studied process from
+which we can obtain the approximation
+\begin{align*}
+  \alpha
+  =
+  P\left[
+  \max_{x\in [a,b]}
+  \sumiN
+  \frac{w_i(x)}{\lVert w_i(x)\rVert}
+  Z_i
+  > c
+  \right]
+  =
+  2(1-\Phi(c))
+  +
+  \frac{\kappa_0}{\pi}
+  e^{-c^2/2}
+\end{align*}
+Solve for $c$.
+
+From there,
+\begin{itemize}
+  \item Can generalize to homoskedasticity
+  \item Can weaken from exact normality to approximate normality via
+    asymptotic convergence of your nonparametric regression estimator.
+\end{itemize}
+\end{frame}
+
+
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+% Sample code
+\pause to add breaks
+\textcolor{red}{text to show}.
+\vspace{20pt}
+
+\usebeamercolor{dull text}
+\alert<+>{Words that you want to alert}
+

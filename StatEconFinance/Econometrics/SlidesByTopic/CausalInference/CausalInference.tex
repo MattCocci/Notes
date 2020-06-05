@@ -1,0 +1,1793 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usepackage{cmbright}
+%\usetheme{metropolis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis with Sidebar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[aspectratio=169, handout]{beamer}
+%\documentclass{beamer}
+\usepackage{cmbright}
+\usepackage{comment}
+
+\useoutertheme[right, width=0.20\paperwidth]{sidebar}
+\usecolortheme{metropolis}
+\useinnertheme[sectionpage=none]{metropolis}
+\usefonttheme{metropolis}
+
+\makeatletter
+\beamer@headheight=1.75\baselineskip     %controls the height of the headline, default is 2.5
+\makeatother
+
+\usepackage{etoolbox}
+\patchcmd\insertverticalnavigation{\dohead}{\vskip-35pt\dohead}{}{}
+
+%\setbeamertemplate{sidebar canvas right}{}
+%\setbeamertemplate{sidebar right}{BOB}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Simple Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usetheme{Boadilla}
+%\usepackage{lmodern}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sidebar Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass[serif]{beamer}  % For serif latex font
+%\usepackage{pxfonts}
+%\usepackage{eulervm}
+%\usepackage{mathpazo}
+
+%\usetheme{Goettingen}
+%\usecolortheme{lily}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Common Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[]{Causal Inference \\ Matt Cocci}
+\author[]{}
+\date{\today}
+
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+%\setbeamertemplate{section in toc}[square unnumbered]
+%\setbeamertemplate{subsection in toc}[square unnumbered]
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% For easier looping
+\usepackage{pgffor}
+
+\usepackage{pdfpages}
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\proj}{\operatorname{proj}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Rnk}{\mathbb{R}^{n\times k}}
+\newcommand{\Rkk}{\mathbb{R}^{k\times k}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Presentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Outline}
+\tableofcontents[hideallsubsections]
+%\tableofcontents
+\end{frame}
+
+\section{Ingredients to Causal Inference}
+
+
+{\footnotesize
+\begin{frame}{Ingredients in Causal Inference}
+\begin{enumerate}
+  \item \alert{Potential Outcomes}:
+    Outcomes that \alert{would} obtain under alternative treatment.
+  \pause
+  \item Define \alert{estimands} of interest, written in terms of
+    potential outcomes.
+  \pause
+  \item \alert{Assignment Mechanism}:
+    How treatment is assigned.
+    \pause
+    \begin{itemize}
+      {\scriptsize
+      \item This is the ``replacement'' for a structural model.
+      \item But really is a ``model'' for how treatment assigned
+      }
+    \end{itemize}
+  \pause
+  \item \alert{Identification} of estimands
+    \begin{itemize}
+      {\scriptsize
+      \item Establish a \alert{correspondence} between
+        statistics/quantities written in terms of \alert{potential}
+        outcomes and statistics/quantities in terms of
+        \alert{observed} outcomes.
+    \pause
+      \item Particular assignment mechanism assumed dictates
+        \alert{what} we can identify.
+      }
+    \end{itemize}
+    \pause
+  \item \alert{Estimation}
+    \begin{itemize}
+      {\scriptsize
+      \item Often immediate and obvious approaches given identification
+        result
+      }
+    \end{itemize}
+  \pause
+  \item \alert{Inference}:
+    Estimates can diverge from estimand for two reasons:
+    \pause
+    \begin{itemize}
+      {\scriptsize
+      \item Design-based uncertainty (always present), underlies
+        randomization inference.
+      \item Sampling uncertainty (not \alert{necessarily} present in practice,
+        but is in this class).
+      }
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+}
+
+
+
+\section{Potential Outcomes}
+
+{\footnotesize
+\begin{frame}{Outcomes: Potential and Observed}
+\alert{Potential Outcomes}
+\begin{itemize}
+  \item Under \alert{binary} treatment $D_i\in\{0,1\}$, this is a pair
+    $(Y_i(0),Y_i(1))$ or $(Y_0,Y_1)$ giving the outcome under control
+    status versus treatment, respectively
+  \pause
+  \item Under \alert{multivalued} treatment, this is a set
+    $\{Y_i(d)\}_{d\in \calD}$,
+    sometimes called a \alert{structural (potential) outcome function}
+  \pause
+  \item \alert{Stable Unit Treatment Value Assumption (SUTVA)}:
+    Implicit in the above notation for potential outcomes, we assume
+    potential outcomes for a given unit only depends upon treatment status
+    \alert{for that unit}, not other units.
+    \alert{No spillovers}.
+\end{itemize}
+\alert{Observed Outcomes}
+\begin{itemize}
+  \item Letting $D$ denote treatment status, we then observe
+    \begin{align*}
+      Y
+      = Y(D)
+      =
+      Y(0)(1-D)
+      +
+      Y(1)D
+    \end{align*}
+  \item Inherently a \alert{missing data problem} in that we only
+    observe one potential outcome, $Y(0)$ or $Y(1)$.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Heterogeneous Treatment Effects}
+If our primitives are pairs of potential outcomes
+\begin{align*}
+  (Y_i(1),Y_i(0))
+\end{align*}
+no reason to think that we should have constant treatment effects.
+Generally, \alert{heterogeneous treatment effects}:
+\begin{align*}
+  Y_i(1)-Y_i(0)=\tau_i\neq \tau_j \qquad
+  j\neq i
+\end{align*}
+Where does that leave us with \alert{regression}?
+\end{frame}
+}
+
+
+\subsection{Regression as Model vs. Procedure}
+
+{\footnotesize
+\begin{frame}{Regression as Model vs. Procedure in Causal Inference}
+From undergrad econometrics and linear panel data models, we're used to
+thinking of \alert{regression as a model} for \alert{observed} outcomes:
+\begin{align*}
+  Y_i = \alpha + \beta D_i + \varepsilon_i
+  %\qquad
+  %\E[\varepsilon_i|X_i]=0
+\end{align*}
+\vspace{-10pt}
+In words
+\begin{itemize}
+  \item Observed outcome $Y_i$ is determined by $D_i$ and a shock
+    $\varepsilon_i$.
+    \pause
+  \item Constant treatment effect, $\beta$
+    \pause
+  \item Assumptions on $\varepsilon_i$ (e.g.
+    $\E[\varepsilon_i|D_i]=0$) lends somewhat ``causal'' interpretation.
+\end{itemize}
+\pause
+\alert{Not} the right way to think about regression in causal inference.
+
+\pause
+Rather think of \alert{regression as estimation procedure}, one of many,
+that may or may not recover the estimand of interest.
+\vspace{-5pt}
+\begin{itemize}
+  \item Can always ``do regression''
+  \pause
+  \item OLS estimator converges to some well-defined limit,
+    $\E[X_iX_i']^{-1}\E[X_iY_i]$
+  \pause
+  \item Under assumed assignment mechanism, which induces a distribution
+    for the observed outcomes, what is this limit?
+    Does it recover my target estimand.
+\end{itemize}
+\end{frame}
+}
+
+
+%{\footnotesize
+%\begin{frame}{Potential Outcomes and Regression Models}
+%Bo motivation in terms of errors, implies heterogeneous treatment effect
+
+%Go the other way and just start with heterogeneous treatment effects
+
+%Go the other way from hetero treat effects to reg. Interp: There
+%%is beta_i and eps_i. Reg says well defined beta and error. Indep of
+%D and PO implies that error is uncorr
+%\end{frame}
+%}
+
+%{\footnotesize
+%\begin{frame}{Regression as Model vs. Estimation Strategy}
+    %- Diff in diff in PO notation
+      %- Usual diff and diff, constant treatment effect
+        %- Recent papers on diff and diff, heterogeneous treatment
+%\end{frame}
+%}
+
+
+
+
+\section{Estimands}
+
+
+{\footnotesize
+\begin{frame}{Quantities of Interest}
+Given potential outcomes, can define the \alert{estimands} of interest,
+which are objects written in terms of those potential outcomes, e.g.
+\begin{align*}
+  \alpha_{ATE}&=\E[Y_1-Y_0] \\
+  \alpha_{CATE}(x)&=\E[Y_1-Y_0|X=x] \\
+  \alpha_{ATET}&=\E[Y_1-Y_0|D=1] \\
+  \alpha_{CATET}(x)&=\E[Y_1-Y_0|D=1,X=x]
+\end{align*}
+Note
+\begin{itemize}
+  \item Expectations taken over the population dist.\ from which
+    we draw our sample.
+  \pause
+  \item These are \alert{definitions} written in terms of potential
+    outcomes.
+  \pause
+  \item These are \alert{targets} that we wish to estimate using
+    observed data.
+  \item First task is \alert{identification}, connecting these to
+    moments of \alert{actually observed} data $(Y,D,X)$.
+    %In practice,
+    %this means writing these $\alpha$'s as a function of simple
+    %population moments involving $(Y,D,X)$.
+  %\item Given identification, then consider \alert{estimation} which is
+    %often just forming the sample analogs of the population moments that
+    %identify the $\alpha$'s.
+\end{itemize}
+\end{frame}
+}
+
+
+\section{Assignment Mechanism}
+
+{\footnotesize
+\begin{frame}{Assignment Mechanism: Motivation}
+Our estimands are things like
+\begin{align*}
+  \alpha_{ATE}&=\E[Y_i(1)-Y_i(0)]
+\end{align*}
+But we never observe $Y_i(1)-Y_i(0)$ for any individual.
+\begin{itemize}
+  \item Called the \alert{missing data problem} of causal inference.
+  \pause
+  \item To estimate, need \alert{assumptions}
+  \item \alert{Assignment mechanism} is one prescription to overcoming
+    this problem.
+    See next slide for comparison to ``modeling'' approach.
+\end{itemize}
+\end{frame}
+}
+
+{\scriptsize
+\begin{frame}{Assignment Mechanism: Motivation}
+\begin{itemize}
+  \item \alert{Modeling/Parametric Assumptions}
+    \begin{itemize}
+      {\scriptsize
+      \item Impose assumptions on the DGP that let us deduce missing
+        observation, e.g.  constant treatment effect.
+        \begin{align*}
+          Y(1)=Y(0)+c
+        \end{align*}
+
+      \item First half of course:
+        \alert{Generative parametric model} for observed outcomes.
+        Potential outcomes implicit, parameters fully characterize.
+      \item Macro: Whole DSGE Model
+      \item Linear Panel Data Models:
+        Slightly restrictive generative model for observed outcomes, in
+        which all unobserved heterogeneity is captured in single
+        time-invariant effect, marginal effect $\beta$ common.
+      }
+    \end{itemize}
+
+  \item \alert{Assumptions on Assignment Mechanism}
+    \begin{itemize}
+      {\scriptsize
+      \item ``Replacement'' for model
+      \item \alert{Induces} a distribution for observed outcomes
+        $Y=Y_1D + Y_0(1-D)$
+      \item Lets you jump from moments of \alert{observed outcomes} to
+        moments of \alert{unobserved potential outcomes}
+      \item Given assumptions on the assignment mechanism, can
+        estimate average effects
+      }
+    \end{itemize}
+\end{itemize}
+\end{frame}
+}
+
+
+
+{\scriptsize
+\begin{frame}{Assignment Mechanism}
+Assignment Mechanism
+\begin{itemize}
+  \item \alert{Definition}: How treatment is assigned, given potential
+    outcomes and/or covariates.
+
+    \alert{Formally}, a probability distribution over assignment for all
+    units; the ex ante probabilities according to which we randomly
+    assign units to treatment or control.
+    Assignment probabilities generally depend upon potential outcomes
+    (because of selection) unless we rule that out by design or by
+    assumption.
+  \item Known or set by researcher (RCTs) or assumed (unconfoundedness).
+\end{itemize}
+In class, three assignment mechanisms considered
+\begin{itemize}
+  \item \alert{Random Assignment}:
+    $(Y_1,Y_0)\perp D$
+  \item \alert{Selection on Observables}:
+    $(Y_1,Y_0)\perp D | X$.
+
+    Implies the following result, which underpins propensity
+    score methods
+    \begin{align*}
+      (Y_1,Y_0)\perp D \;|\; p(X)
+    \end{align*}
+
+  \item
+    \alert{Selection on Unobservables}:
+    Unobserved characteristics influence selection into treatment, so we
+    have an instrument where we assume
+    \begin{align*}
+      (Y_1,Y_0,D_1,D_0)\perp Z
+    \end{align*}
+\end{itemize}
+\end{frame}
+}
+
+
+
+\section{Identification}
+
+{\footnotesize
+\begin{frame}{Identification: Motivation}
+Now consider identification, one of the major tasks of causal inference,
+in which we identify the estimands of interest (written in terms of
+unobserved potential outcomes) with observed data.
+
+This relies on the nature of the assignment mechanism, and so we break
+things up by assignment mechanism.
+\end{frame}
+}
+
+\subsection{Random Assignment}
+
+\subsubsection{No Covariates}
+
+{\scriptsize
+\begin{frame}{Identification Under Random Assignment}
+\begin{itemize}
+  \item We have definition
+    \begin{align*}
+      \alpha_{ATE}
+      &:=
+      \E[Y_1-Y_0]
+      =\E[Y_1]-\E[Y_0]
+    \end{align*}
+  \pause
+  \item Under random assignment $(Y_1,Y_0)\perp D$,
+    \begin{align*}
+      \E[Y_d]
+      &=
+      \E[Y_d|D=d]
+      \qquad
+      d\in\{0,1\}
+    \end{align*}
+
+  \pause
+  \item To jump from population moments involving
+    \alert{unobserved} $(Y_1,Y_0)$ to population
+    moments involving \alert{observed} $Y$, note
+    \begin{align*}
+      Y = DY_1 + (1-D)Y_0
+    \end{align*}
+    This implies
+    \begin{align*}
+      \E[Y_d]
+      &=
+      \E[Y_d|D=d]
+      =
+      \E[Y|D=d]
+      d\in\{0,1\}
+      %\\
+      %\E[Y_0]
+      %&=
+      %\E[Y_0|D=0]
+      %=
+      %\E[Y|D=0]
+    \end{align*}
+
+  \pause
+  \item
+    Put it all together
+    \begin{align*}
+      \alpha_{ATE}
+      &:=
+      \E[Y_1-Y_0]
+      =
+      \E[Y|D=1]
+      -
+      \E[Y|D=0]
+    \end{align*}
+\end{itemize}
+Similar steps show $\alpha_{ATE}=\alpha_{ATET}$.
+\end{frame}
+}
+
+\subsubsection{With Covariates}
+
+
+{\footnotesize
+\begin{frame}{Using Covariates}
+Under random assignment, it's enough to simply calculate the difference
+in average outcomes between treated and control groups.
+This consistently estimates the ATE.
+
+However, even under random assignment, it may be useful to run a
+regression including covariates that are predictive of potential
+outcomes and treatment effects.
+\begin{itemize}
+  \item This generally reduces the variance of our estimates.
+  \item This may also help us avoid misleading conclusions if the share
+    of treatment vs.\ control is highly unbalanced (by simple bad luck
+    during the randomization) across these covariate groups.
+    See Assignment 3, Problem 4.
+\end{itemize}
+But to justify running such a regression, we need an identification
+result that says the regression estimand in a regression that includes
+both a dummy for treatment and covariates is, in fact, the ATE.
+The next slides provide that.
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Using Covariates}
+Data $\{Y_i,D_i,X_i\}$ where $X_i$ is a scalar covariate.
+Define covariates and corresponding population projection coefficients
+\begin{align*}
+  W_i =
+  \begin{pmatrix}
+    D_i \\
+    1 \\
+    X_i
+  \end{pmatrix}
+  \qquad
+  \beta
+  :=
+  \begin{pmatrix}
+    \alpha \\
+    c \\
+    \gamma
+  \end{pmatrix}
+  :=
+  \E[W_iW_i']^{-1}
+  \E[W_iY_i]
+\end{align*}
+\pause
+We know that the OLS estimator will be consistent
+for the above population projection coefficients,
+\begin{align*}
+  \hat{\beta}
+  =
+  (W'W)^{-1}W'Y
+  =
+  \left[
+    \frac{1}{N}
+    \sumiN
+    W_iW_i'
+  \right]^{-1}
+  \left[
+    \frac{1}{N}
+    \sumiN
+    W_iY_i
+  \right]
+  \quad\pto\quad
+  \E[W_iW_i']^{-1}
+  \E[W_iY_i]
+\end{align*}
+\pause
+\alert{Goal}:
+Show that under random assignment,
+the pop.\ projection coeff.\ $\alpha$ equals $\alpha_{ATE}$.  Then
+$\hat{\alpha}\pto \alpha=\alpha_{ATE}$.
+
+\pause
+\alert{Note}:
+Did \alert{not} assume a linear CEF or constant treatment effects.
+Only assumption is random assignment.
+Regression is the estimation \alert{procedure} not the \alert{model}.
+%Nothing above assumed a linear model model for the CEF.
+%The parameters are defined as population projection coefficients,
+%regardless of whether the CEF is actually linear or not.
+%We want to show what the coefficient $\alpha$ actually represents, under
+%random assignment, namely the object of interest, $\alpha_{ATE}$.
+\end{frame}
+}
+
+
+
+
+{\scriptsize
+\begin{frame}{Using Covariates}
+\begin{align*}
+  W_i =
+  \begin{pmatrix}
+    D_i &
+    1 &
+    X
+  \end{pmatrix}'
+  \qquad
+  \beta
+  :=
+  \begin{pmatrix}
+    \alpha &
+    c &
+    \gamma
+  \end{pmatrix}'
+  :=
+  \E[W_iW_i']^{-1}
+  \E[W_iY_i]
+\end{align*}
+Construct $\E[W_iW_i']$, using random treatment assignment, $D_i\perp
+X_i$ and $\E[D_i^2]=\E[D_i]$:
+\pause
+\begin{align*}
+  \E[W_iW_i']
+  &=
+  \E
+  \begin{pmatrix}
+    D_i^2  & D_i & D_i X_i \\
+    D_i   &  1   & X_i     \\
+    D_iX_i & X_i & X_i^2
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    \E[D_i^2 ] & \E[D_i] & \alert{\E[D_i X_i]} \\
+    \E[D_i   ] & \E[1  ] & \E[X_i    ] \\
+    \alert{\E[D_iX_i]} & \E[X_i] & \E[X_i^2]
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    \E[D_i ]     & \E[D_i] & \alert{\E[D_i] \E[X_i]} \\
+    \E[D_i   ]     & 1       & \E[X_i] \\
+    \alert{\E[D_i]\E[X_i]} & \E[X_i] & \E[X_i^2]
+  \end{pmatrix}
+\end{align*}
+\pause
+To compute the inverse (or at least the part of the inverse relevant
+for determining $\alpha$), recall the matrix block inversion formula
+\begin{align*}
+  \begin{pmatrix}
+    A & B \\
+    C & D
+  \end{pmatrix}^{-1}
+  &=
+  \begin{pmatrix}
+    (A-BD^{-1}C)^{-1}
+    & - (A-BD^{-1}C)^{-1} BD^{-1}
+    \\
+    - & -
+  \end{pmatrix}
+\end{align*}
+Compute
+\begin{align*}
+  BD^{-1}
+  &=
+  \begin{pmatrix}
+    \E[D_i] & \E[D_i] \E[X_i]
+  \end{pmatrix}
+  \begin{pmatrix}
+    1       & \E[X_i] \\
+    \E[X_i] & \E[X_i^2]
+  \end{pmatrix}^{-1}
+  %\\
+  %&=
+  %\frac{\E[D_i]}{\E[X_i^2]-\E[X_i]^2}
+  %\begin{pmatrix}
+    %1 & \E[X_i]
+  %\end{pmatrix}
+  %\begin{pmatrix}
+    %\E[X_i^2] & -\E[X_i] \\
+    %-\E[X_i]  & 1
+  %\end{pmatrix}
+  %\\
+  %&=
+  =
+  \E[D_i]
+  \begin{pmatrix}
+    1 & 0 \\
+  \end{pmatrix}
+  =
+  P[D_i=1]
+  \begin{pmatrix}
+    1 & 0 \\
+  \end{pmatrix}
+  \\
+  (A-BD^{-1}C)^{-1}
+  &=
+  \left(
+  \E[D_i]
+  -
+  \E[D_i]
+  \begin{pmatrix}
+    1 & 0 \\
+  \end{pmatrix}
+  \begin{pmatrix}
+    \E[D_i] \\ \E[D_i] \E[X_i]
+  \end{pmatrix}
+  \right)
+  %=
+  %\left(
+  %\E[D_i]
+  %-
+  %\E[D_i]^2
+  %\right)^{-1}
+  %= \frac{1}{\E[D_i](1-\E[D_i])}
+  =
+  \frac{1}{P[D_i=1](1-P[D_i=1])}
+\end{align*}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Using Covariates}
+Put the results together to compute $\alpha$:
+\begin{align*}
+  \begin{pmatrix}
+    \alpha \\
+    c \\
+    \gamma
+  \end{pmatrix}
+  =
+  \E[W_iW_i']^{-1}
+  \E[W_iY_i]
+  &=
+  \begin{pmatrix}
+    \frac{1}{P[D_i=1](1-P[D_i=1])}
+    &
+    - \frac{1}{(1-P[D_i=1])}
+    & 0
+    \\
+    - & - & - \\
+    - & - & - \\
+  \end{pmatrix}^{-1}
+  \begin{pmatrix}
+    \E[Y_iD_i] \\
+    \E[Y_i] \\
+    \E[Y_iX_i]
+  \end{pmatrix}
+  \\
+  \implies\quad
+  \alpha
+  &=
+  \frac{\E[Y_iD_i]}{P[D_i=1](1-P[D_i=1])}
+  - \frac{\E[Y_i]}{(1-P[D_i=1])}
+\end{align*}
+Almost there. Expand
+\begin{align*}
+  \E[Y_iD_i]
+  &=
+  \E[Y_iD_i|D_i=1]
+  P[D_i=1]
+  +
+  \E[Y_iD_i|D_i=0]
+  (1-P[D_i=1])
+  \\
+  &=
+  \E[Y_i|D_i=1]
+  P[D_i=1]
+  \\
+  \E[Y_i]
+  &=
+  \E[Y_i|D_i=1]
+  P[D_i=1]
+  +
+  \E[Y_i|D_i=0]
+  (1-P[D_i=1])
+  \\
+  &=
+  \E[Y_i|D_i=1]
+  P[D_i=1]
+  +
+  \E[Y_i|D_i=0]
+  (1-P[D_i=1])
+\end{align*}
+Substituting in and simplifying,
+\begin{align*}
+  \alpha
+  &=
+  \frac{%
+    \E[Y_i|D_i=1]
+    P[D_i=1]
+  }{P[D_i=1](1-P[D_i=1])}
+  -
+  \frac{%
+    \E[Y_i|D_i=1]
+    P[D_i=1]
+    +
+    \E[Y_i|D_i=0]
+    (1-P[D_i=1])
+  }{1-P[D_i=1]}
+  \\
+  &=
+  \E[Y_i|D_i=1]
+  -
+  \E[Y_i|D_i=0]
+  \\
+  &=
+  \alpha_{ATE}
+\end{align*}
+where the last equality was shown above.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Using Covariates}
+\alert{Punchline}:
+Even without assuming linearity, OLS estimator is consistent for some
+population projection coefficient $\alpha$, that we just showed equals
+$\alpha_{ATE}$ under random assignment.
+
+\pause
+If $X_i$ predictive of outcome, this can help improve precision of
+estimates.
+\pause
+
+Many results of the form ``If I do a regression in a context of
+\alert{heterogeneous treatment effects}, then under this
+particular assignment mechanism, the OLS estimator consistently
+estimates \alert{this particular estimand}.''
+
+Examples:
+\begin{itemize}
+  \item IV: You get LATE
+  \item Recent papers in event-study literature:
+    You get weighted average of 2x2 treatment and control contrasts.
+\end{itemize}
+\end{frame}
+}
+
+
+
+\subsection{Selection on Observables}
+
+\subsubsection{CATE}
+
+{\scriptsize
+\begin{frame}{Identification of CATE}
+Assumptions:
+\vspace{-7pt}
+\begin{enumerate}
+  {\footnotesize
+  \item Selection on observables: $(Y_1,Y_0)\perp D | X$
+  \item $P[D=1|X]\in (0,1)$ with probability 1.
+
+    \alert{Key Point}:
+    ``With probability 1'' because $X$ is random, hence this is an RV.
+  }
+\end{enumerate}
+\vspace{-7pt}
+Explicit Steps
+\vspace{-7pt}
+\begin{itemize}
+  {\footnotesize
+  \pause
+  \item
+    Start with the definition
+    \begin{align*}
+      \alpha_{CATE}(X)
+      &:=
+      \E[Y_1-Y_0|X]
+      =
+      \E[Y_1|X]
+      -
+      \E[Y_0|X]
+    \end{align*}
+\vspace{-7pt}
+  \pause
+\vspace{-7pt}
+  \item
+    Selection on observables,
+    \begin{align*}
+      \E[Y_1|X]
+      &=
+      \E[Y_1|X,D=1]
+      \qquad
+      \E[Y_0|X]
+      =
+      \E[Y_0|X,D=0]
+    \end{align*}
+  \pause
+\vspace{-7pt}
+  \item Jump from \alert{unobserved} $(Y_1,Y_0)$ to \alert{observed}
+    $Y=DY_1 + (1-D)Y_0$,
+    \begin{align*}
+      \E[Y_d|X]
+      &=
+      \E[Y_d|X,D=d]
+      =
+      \E[Y|X,D=d]
+      \qquad
+      d\in\{0,1\}
+      %\qquad
+      %\E[Y_0|X]
+      %=
+      %\E[Y_0|X,D=0]
+      %=
+      %\E[Y|X,D=0]
+    \end{align*}
+\vspace{-7pt}
+  \pause
+\vspace{-7pt}
+  \item Overlap: See next slide.
+    Ensures that difference makes sense.
+  \pause
+  \item By the above results,
+    \begin{align*}
+      \E[Y|X,D=1]
+      -
+      \E[Y|X,D=0]
+      &=
+      \E[Y_1|X,D=0]
+      -
+      \E[Y_0|X,D=0]
+      =
+      \E[Y_1|X]
+      -
+      \E[Y_0|X]
+      =
+      \alpha_{CATE}(X)
+    \end{align*}
+  }
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Identification of CATE: Overlap}
+Overlap condition $P[D=1|X]\in (0,1)$:
+\begin{itemize}
+  \item Both $\E[Y_d|X]$ and $\E[Y_d|X,D=d]$ are well-defined
+    at any set of covariate values $X$ in the support of $X$, since we
+    can always imagine the outcome under treatment or not.
+    So the following always makes sense:
+    \begin{align*}
+      \E[Y_1|X,D=0]
+      -
+      \E[Y_0|X,D=0]
+    \end{align*}
+
+
+  \item
+    However, $\E[Y|X,D=0]$ might not always be defined at every $X$ in
+    the full support of $X$.
+    Recall $Y$ is the \alert{observed} value.
+    And for high $X$, maybe we'd \emph{never} observe $D=0$.
+
+    Example: High ability students never skip college.
+
+    So the following doesn't always make sense
+    \begin{align*}
+      \E[Y|X,D=0]
+      -
+      \E[Y|X,D=0]
+    \end{align*}
+
+  \item Overlap $P[D=1|X]\in (0,1)$ ensures that for every $X$ in the
+    support, we have some treated and untreated with probability 1.
+\end{itemize}
+\end{frame}
+}
+
+
+\subsubsection{ATE}
+
+{\footnotesize
+\begin{frame}{Identification of ATE}
+Given
+\begin{align*}
+  \alpha_{CATE}(X)
+  &:=
+  \E[Y_1-Y_0|X]
+  \\
+  \text{Identification}
+  \quad
+  &=
+  \E[Y|X,D=1]
+  -
+  \E[Y|X,D=0]
+\end{align*}
+\pause
+Under same set of assumptions, have identification of
+\begin{align*}
+  \alpha_{ATE}
+  &:=
+  \E[Y_1-Y_0]
+  =
+  \E[\E[Y_1-Y_0|X]]
+  \\
+  &=
+  \int
+  \E[Y_1-Y_0|X]
+  \;dP(X)
+  \\
+  &=
+  \int
+  \big\{
+  \E[Y|X,D=1]
+  -
+  \E[Y|X,D=0]
+  \big\}
+  \;dP(X)
+\end{align*}
+\pause
+Notice
+\begin{itemize}
+  \item Identification at each $X$ carries over to identification of the
+    average \emph{over} $X$
+  \item Don't need any \emph{additional} assumptions to identify
+    $\alpha_{ATE}$ relative to $\alpha_{CATE}$.
+  \pause
+  \item We do, however, need \emph{all} of the assumptions that allow
+    identification of $\alpha_{CATE}$ to identify $\alpha_{ATE}$ because
+    selection is only random \emph{conditional} on observables.
+    %So we need to \emph{condition} on $X$ to correctly compute
+    %$\alpha_{ATE}$, hence the same identification conditions are
+    %required.
+\end{itemize}
+\end{frame}
+}
+
+
+
+\subsubsection{ATET}
+
+{\scriptsize
+\begin{frame}{Identification of ATET}
+Weaker assumptions identify ATET
+\vspace{-10pt}
+\begin{enumerate}
+  {\footnotesize
+  \item $Y_0\perp D|X$
+  \item $P[D=1|X]< 1$ with prob 1,
+    equiv.\ to $P[D=0|X]=1-P[D=1|X]\in (0,1]$
+  \item $P[D=1]>0$
+  }
+\end{enumerate}
+\vspace{-7pt}
+\pause
+Explicit Steps
+\begin{itemize}
+\vspace{-7pt}
+  \item Start with the definition, and use LIE
+    \begin{align*}
+      \alpha_{ATET}
+      &:=
+      \E[Y_1-Y_0|D=1]
+      =
+      \int
+      \E[Y_1-Y_0|X,D=1]
+      dP(X|D=1)
+    \end{align*}
+
+  \pause
+  \item
+    $P[D=1]>0$ ensures $P[X|D=1]$ is well-defined over some set of $X$
+    (Bayes' Rule).
+    %\begin{align*}
+      %P[X=x|D=1]
+      %=
+      %\frac{P[D=1|X=x]P[X=x]}{P[D=1]}
+    %\end{align*}
+    %Only well-defined if $P[D=1]>0$.
+
+    %Heurically, $P[D=1]>0$ ensures that we observe some treated
+    %individuals and thus ensures there are some values of $X$ with
+    %treated individuals.
+
+    %Note: Because of selection, conditional dist.\ $P[X=x|D=1]$
+    %generally differs from unconditional dist.\ $P[X=x]$.
+
+  \pause
+  \item
+    Because $P[D=0|X]>0$ with probability 1,
+    we will observe \alert{untreated} individuals at a given $X$, hence,
+    the conditional expectation inside the integral is well-defined.
+
+  \pause
+  \item Above definition of ATET is in terms of potential outcomes.
+    To jump from \alert{unobserved} $(Y_1,Y_0)$ to \alert{observed},
+    by $Y = DY_1 + (1-D)Y_0$,
+    \begin{align*}
+      \E[Y|X,D=d]
+      &=
+      \E[Y_1|X,D=d]
+      %\\
+      %\E[Y|X,D=0]
+      %&=
+      %\E[Y_0|X,D=0]
+      \qquad
+      d\in\{0,1\}
+    \end{align*}
+    %Note that because of selection, the support of $\E[Y|X,D=0]$ and
+    %$\E[Y|X,D=1]$ could differ. We'll handle that below.
+
+  \pause
+  \item Next, independence $Y_0\perp D|X$ implies
+    \begin{align*}
+      \E[Y|X,D=0]
+      &=
+      \E[Y_0|X,D=0]
+      =
+      \E[Y_0|X,D=1]
+    \end{align*}
+
+\end{itemize}
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Identification of ATET}
+Putting everything together on the previous slide, we have that under
+the assumption stated, we can identify
+\begin{align*}
+  \alpha_{ATET}
+  &:=
+  \E[Y_1-Y_0|D=1]
+  =
+  \int
+  \E[Y_1-Y_0|X,D=1]
+  dP(X|D=1)
+\end{align*}
+with
+\begin{align*}
+  \alpha_{ATET}
+  &=
+  \int
+  \big(
+  \E[Y|X,D=1]
+  -
+  \E[Y|X,D=0]
+  \big)
+  dP(X|D=1)
+\end{align*}
+
+\end{frame}
+}
+
+
+
+
+\subsubsection{ATE: Weighting}
+
+{\footnotesize
+\begin{frame}{Identification of ATE: Weighting}
+Want to show
+\begin{align*}
+  \alpha_{ATE}
+  &:=
+  \E[Y_1-Y_0]
+  &&=
+  \E\left[
+    Y
+    \frac{D-p(X)}{p(X)(1-p(X))}
+  \right]
+  \\
+  \alpha_{ATET}
+  &:=
+  \E[Y_1-Y_0|D=1]
+  &&=
+  \frac{1}{P[D=1]}
+  \E\left[
+    Y
+    \frac{D-p(X)}{(1-p(X))}
+  \right]
+\end{align*}
+To prove, start from
+\begin{align*}
+  \E\left[
+    Y
+    \frac{D-p(X)}{p(X)(1-p(X))}
+    \bigg|
+    \,X
+  \right]
+  &=
+  \sum_{d\in \{0,1\}}
+  \E\left[
+    Y
+    \frac{D-p(X)}{p(X)(1-p(X))}
+    \bigg|
+    \,X,D=d
+  \right]
+  P[D=d|X]
+  \\
+  &=
+  \E\left[
+    Y
+    \big|
+    \,X,D=1
+  \right]
+  -
+  \E\left[
+    Y
+    \big|
+    \,X,D=0
+  \right]
+\end{align*}
+For ATE, simply take outer expectation,
+\begin{align*}
+  \E\left[
+  \E\left[
+    Y
+    \frac{D-p(X)}{p(X)(1-p(X))}
+    \bigg|
+    \,X
+  \right]
+  \right]
+  &=
+  \E\left[
+  \E\left[
+    Y
+    \big|
+    \,X,D=1
+  \right]
+  |D=1
+  \right]
+  \\
+  &\quad
+  -
+  \E\left[
+  \E\left[
+    Y
+    \big|
+    \,X,D=0
+  \right]
+  |D=0
+  \right]
+  \\
+  \E\left[
+    Y
+    \frac{D-p(X)}{p(X)(1-p(X))}
+  \right]
+  &=
+  \E\left[
+    Y_1-Y_0
+  \right]
+  =
+  \alpha_{ATE}
+\end{align*}
+where the last equality was from identification earlier.
+\end{frame}
+}
+
+
+\subsubsection{ATET: Weighting}
+
+{\footnotesize
+\begin{frame}{Identification of ATET: Weighting}
+Want to show
+\begin{align*}
+  \alpha_{ATET}
+  &:=
+  \E[Y_1-Y_0|D=1]
+  &&=
+  \frac{1}{P[D=1]}
+  \E\left[
+    Y
+    \frac{D-p(X)}{(1-p(X))}
+  \right]
+\end{align*}
+Recall
+\begin{align*}
+  \E\left[
+    Y
+    \frac{D-p(X)}{p(X)(1-p(X))}
+    \bigg|
+    \,X
+  \right]
+  =
+  \E\left[
+    Y
+    \big|
+    \,X,D=1
+  \right]
+  -
+  \E\left[
+    Y
+    \big|
+    \,X,D=0
+  \right]
+\end{align*}
+For ATET, integrate with respect to $dP(X|D=1)$.
+\begin{align*}
+  &
+  \int
+  \E\left[
+    Y
+    \frac{D-p(X)}{p(X)(1-p(X))}
+    \bigg|
+    \,X
+  \right]
+  dP(X|D=1)
+  \\
+  &=
+  \int
+  \big\{
+  \E\left[
+    Y
+    \big|
+    \,X,D=1
+  \right]
+  -
+  \E\left[
+    Y
+    \big|
+    \,X,D=0
+  \right]
+  \big\}
+  dP(X|D=1)
+  =
+  \alpha_{ATET}
+\end{align*}
+where the last equality ($=\alpha_{ATET}$) followed from earlier
+identification results.
+
+To finish, need to show LHS integral equals expression above.
+Replace measures with densities:
+\begin{align*}
+  dP(X|D=1)
+  =
+  f(X|D=1)
+  dX
+  =
+  \frac{P(D=1|X)f(X)}{P[D=1]}
+  dX
+  =
+  \frac{p(X)}{P[D=1]}
+  dP(X)
+\end{align*}
+So then
+\begin{align*}
+  \int
+  \E\left[
+    Y
+    \frac{D-p(X)}{p(X)(1-p(X))}
+    \bigg|
+    \,X
+  \right]
+  dP(X|D=1)
+  =
+  \frac{1}{P[D=1]}
+  \int
+  \E\left[
+    Y
+    \frac{D-p(X)}{(1-p(X))}
+    \bigg|
+    \,X
+  \right]
+  dP(X)
+  =
+  \frac{1}{P[D=1]}
+  \E\left[
+    Y
+    \frac{D-p(X)}{(1-p(X))}
+  \right]
+\end{align*}
+\end{frame}
+}
+
+
+\subsection{Summary}
+
+{\footnotesize
+\begin{frame}{Summary}
+The above slides were concerned with \alert{identification}: relating
+the definitions of $\alpha_{ATE}$, $\alpha_{CATE}$, etc.---all of which
+were phrased in terms of moments involving \alert{unobservable}
+potential outcomes $(Y_1,Y_0)$---to moments of \alert{observable} data
+$Y$.
+
+Given identification, estimation is straightforward:
+Just form sample analogs of the identification results to estimate the
+average treatment effect of interest.
+\end{frame}
+}
+
+
+\section{Estimation}
+
+{\footnotesize
+\begin{frame}{Estimation}
+
+We have definitions of estimands in terms of potential outcomes, e.g.
+\begin{align*}
+  \alpha_{ATE} = \E[Y_1]-\E[Y_0]
+\end{align*}
+We have identification results connecting quantities in these estimands
+(written in terms of unobserved potential outcomes) to quantities
+involving observed data:
+\begin{align*}
+  \E[Y_1] &= \E[Y|D=1] \\
+  \E[Y_0] &= \E[Y|D=0]
+\end{align*}
+We then simply estimate by constructing sample analogs of the population
+quantities:
+\begin{align*}
+  \widehat{\alpha}_{ATE}
+  &= \widehat{\E}[Y_1]-\widehat{\E}[Y_0]
+  \\
+  \widehat{\E}[Y_1] &= \widehat{\E}[Y|D=1] \\
+  \widehat{\E}[Y_0] &= \widehat{\E}[Y|D=0]
+\end{align*}
+This suggests nonparametric approaches to estimation, since many
+estimands involve CEFs, which need not be linear, or quantiles of
+distributions which we don't want (need) to assume a parametric form
+for.
+\end{frame}
+}
+
+
+
+\section{Inference}
+
+
+\subsection{Sources of Randomness}
+
+%{\footnotesize
+%\begin{frame}{Types of Uncertainty}
+%Two Main Types and Considerations
+%Note
+%\begin{itemize}
+  %\item We often do OLS, but the type of uncertainty we allow for
+    %affects \alert{standard errors} and hence our inference
+  %\item Often both types of uncertainty play a role
+%\end{itemize}
+%We will study these in the context of causal inference.
+%\end{frame}
+%}
+
+
+{\footnotesize
+\begin{frame}{Inference \& Sources of Randomness}
+Two sources of randomness when doing causal inference:
+\begin{itemize}
+  \item \alert{Design}-Based Uncertainty:
+    \alert{Assignment} was random and we don't observe the full set of
+    potential outcomes, though we're generally interested in the
+    difference of average outcomes if \alert{everyone} assigned to
+    treatment or not.
+
+    Fisher randomization inference considers exclusively this.
+
+  \item \alert{Sampling} Uncertainty:
+    Often we only observe a subset of the population of interest and
+    we would like to extrapolate from the sample to the population.
+    We need \alert{sampling assumptions} (e.g iid sampling, clustered
+    sampling) to ensure correct inference.
+\end{itemize}
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Inference \& Sources of Randomness}
+Example:
+Suppose Princeton randomly assigns all students to treatment or control
+in some experiment.
+\begin{itemize}
+  \item If the University grants us access to outcomes for \alert{all}
+    students (the entire population), there is no sampling uncertainty.
+    But we still have not observed all potential outcomes
+    because of the fundamental ``missing data problem'' of causal
+    inference, so there is still design-based uncertainty.
+  \item If Princeton gave us access only to outcomes for a random subset
+    of students, we would additionally have sampling uncertainty.
+\end{itemize}
+This makes a difference for standard errors and inference.
+See recent paper by Abadie et al. on Sampling vs. Design-Based
+Uncertainty.
+
+Very useful distinction for aggregate panel data, e.g. where the
+units are US states, and we have all states, so there's no sense in
+which we have a ``random sample'' of states.
+But can still think about design-based uncertainty in when states
+adopted a policy.
+\end{frame}
+}
+
+
+\subsection{Fisher Randomization Tests}
+
+{\footnotesize
+\begin{frame}{Fisher Randomization Tests}
+We saw Fisher Randomization tests in the first half of the course.
+\begin{itemize}
+  \item Suppose treatment is randomly assigned.
+  \item Under the sharp null of no treatment effect $Y_i(0)=Y_i(1)=Y_i$,
+    I have observed all potential outcomes.
+    Therefore, I can rerandomize (reassign $D_i$) many times, compute
+    the average treatment effect after each relabeling, and plot the
+    distribution of ATEs.
+    This is the distribution of the ATE under the randomization
+    distribution for treatment, under the null of no treatment effect.
+  \item I can compare the observed ATE in the original sample to this
+    distribution to see if it's extreme.
+\end{itemize}
+Note
+\begin{itemize}
+  \item This tests the null under the presence of design-based
+    uncertainty alone.
+  \item Only randomness taken into account is the randomness due to
+    assignment of units to treatment or control.
+  \item Sample implicitly taken as the full population.
+\end{itemize}
+\end{frame}
+}
+
+
+
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+% Sample code
+\pause to add breaks
+\textcolor{red}{text to show}.
+\vspace{20pt}
+
+\usebeamercolor{dull text}
+\alert<+>{Words that you want to alert}
+

@@ -1,0 +1,1170 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usepackage{cmbright}
+%\usetheme{metropolis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis with Sidebar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[aspectratio=169, handout]{beamer}
+%\documentclass[aspectratio=169]{beamer}
+%\documentclass{beamer}
+\usepackage{cmbright}
+\usepackage{comment}
+
+\useoutertheme[right, width=0.20\paperwidth]{sidebar}
+\usecolortheme{metropolis}
+\useinnertheme[sectionpage=none]{metropolis}
+\usefonttheme{metropolis}
+
+\makeatletter
+\beamer@headheight=1.75\baselineskip     %controls the height of the headline, default is 2.5
+\makeatother
+
+\usepackage{etoolbox}
+\patchcmd\insertverticalnavigation{\dohead}{\vskip-35pt\dohead}{}{}
+
+%\setbeamertemplate{sidebar canvas right}{}
+%\setbeamertemplate{sidebar right}{BOB}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Simple Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usetheme{Boadilla}
+%\usepackage{lmodern}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sidebar Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass[serif]{beamer}  % For serif latex font
+%\usepackage{pxfonts}
+%\usepackage{eulervm}
+%\usepackage{mathpazo}
+
+%\usetheme{Goettingen}
+%\usecolortheme{lily}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Common Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[]{Time Series, VARs \\ Matt Cocci}
+\author[]{}
+\date{\today}
+
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+%\setbeamertemplate{section in toc}[square unnumbered]
+%\setbeamertemplate{subsection in toc}[square unnumbered]
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% For easier looping
+\usepackage{pgffor}
+
+\usepackage{pdfpages}
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\proj}{\operatorname{proj}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Rnk}{\mathbb{R}^{n\times k}}
+\newcommand{\Rkk}{\mathbb{R}^{k\times k}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Presentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Outline}
+%\tableofcontents[hideallsubsections]
+\tableofcontents
+\end{frame}
+
+
+\section{SVARs}
+
+
+\subsection{Motivation}
+
+{\scriptsize
+\begin{frame}{Impulse Responses to True Structural Shocks}
+
+Suppose we observe some vector of endogenous outcomes $y_t$.
+High on the wishlist is a fully- and correctly-specified macro model
+not subject to the Lucas Critique that writes observed (endogenous)
+outcomes $y_t$ in terms of parameters $\theta$ and a vector of current
+and lagged exogenous shocks $z_t$ (e.g. TFP, monetary policy shocks,
+etc.)
+\begin{align*}
+  y_t = f(\theta,z_t,z_{t-1},\ldots)
+\end{align*}
+from which we can deduce $y_t$ dynamics implied by the combination of
+the $z_t$ dynamics/distribution and the structural mapping $f$.
+
+In general, the mapping $f$ is unknown (an \alert{identification} issue)
+and nonlinear, which is not really a problem (if the shocks $z_t$ are
+small), since we can linearize and write, for some $\Theta(L)$,
+\begin{align*}
+  y_t=\Theta(L)z_t
+\end{align*}
+In a fully- \& correctly-specified macro model, shocks $z_t$ are truly
+exogenous, hence $\Var(z_t)$ diagonal (or the model can be rewritten to
+make it so).
+This is a \alert{truly structural model}.
+
+\alert{Goal}:
+Want \alert{impulse responses} of endogenous outcomes $y_t$ to
+(at least one of) the \alert{structural shocks} in $z_t$.
+These are the \alert{estimands} of interest for
+understanding the economy and policy analysis.
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Approaches to Identification of Structural IRFs}
+Any true model/DGP has a representation as
+\begin{align*}
+  y_t=\Theta(L)z_t
+\end{align*}
+$\Theta(L)$ fully encodes the impulse responses of $y_t$ to the
+structural shocks $z_t$.
+
+Identification of impulse responses:
+\begin{itemize}
+  \item If we \alert{observe} the exogenous structural shocks $z_t$,
+    just regress each $y_{t+s}$ on $z_t$ (for $s\geq 0$) to estimate the
+    elements of $\Theta(L)$, i.e.  to get impulse responses.
+
+  \item If we observe some \alert{noisy measure} of $z_t$, but worry
+    about possible confounding factors, try to find an instrument and
+    use IV methods to estimate elements of $\Theta(L)$.
+
+    This is the \alert{external instruments} approach.
+
+  \item Alternatively, there is the \alert{SVAR approach},
+    which estimates a reduced form VAR($p$)
+    \begin{align*}
+      (I_n-B(L))y_t = \varepsilon_t
+      \qquad\text{where}\quad
+      \varepsilon_t
+      \sim (0,\Sigma)
+    \end{align*}
+    and uses assumptions to identify $\Theta(L)$ from
+    estimates of reduced form $B(L)$ and $\varepsilon_t$.
+
+    This is the oldest approach, but it's actually nested by the IV
+    approach since the SVAR approach can be interpretated as ``make
+    strong enough assumptions such that certain linear combinations of
+    the $\varepsilon_t$ act as instruments.''
+
+  \item There are still other approach, e.g. heteroskedasticity-based
+    identification.
+
+\end{itemize}
+\end{frame}
+}
+
+\subsection{SVAR Identification}
+
+{\scriptsize
+\begin{frame}{SVAR Identification: The Reduced Form}
+Identification of structural IRFs in the SVAR approach starts with the
+\alert{reduced form}, which is always the same.
+Simply take the vector of endogenous aggregates $y_t$ and estimate the
+\alert{reduced form} VAR Representation, which implies an associated
+reduced form VMA as well:
+\begin{align*}
+  (I-B(L))y_t
+  &= \varepsilon_t
+  \quad
+  \;\;\;\qquad\text{where}\quad
+  \Var(\varepsilon_t)=\Sigma
+  \\
+  y_t
+  &
+  = C(L)\varepsilon_t
+\end{align*}
+Naturally, this implies $C(L) = (I-B(L))^{-1}$.
+Note:
+\begin{itemize}
+  \item This is \alert{always} something we can do, without any
+    assumptions.
+  \item But the reduced form $\varepsilon_t$ are \alert{not} immediately
+    related to the structural shocks $z_t$.
+    First, why should they be, since you're just estimating a VAR($p$)
+    and not the full, correctly-specified model?
+    Second and most obviously, \alert{$\Sigma$ non-diagonal}, whereas.
+    true structural economic shocks are, by definition, uncorrelated.
+
+  \item So the tricky part is to connect the parameters of this model to
+    the parameters of or impulse responses of the structural model,
+    which is where assumptions enter.
+
+  \item Generally only have estimates $\hat{B}(L)$, $\hat{C}(L)$,
+    $\hat{\Sigma}$, $\hat{\varepsilon}_t$, but \alert{difficulty} with SVARs is
+    \alert{identification}, i.e. \alert{mapping} observed/estimated
+    parameters and shocks to structural shocks and IRFs not subject to
+    the Lucas Critique. So I treat these quantities as known to keep the
+    focus squarely on identification.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{SVAR Identification: Relating Reduced Form \& Structural}
+Recall, any true model/DGP has a \alert{structural VMA} representation as
+\begin{align*}
+  y_t=\Theta(L)z_t
+\end{align*}
+If we further assume that $\Theta(L)$ is invertible such that the
+associated $A(L)=\Theta(L)^{-1}$ has finite order $p$ (so that the
+dynamics of $y_t$ as driven by the structural shocks can be
+summarized/well-approximated by a VAR$(p)$), then we have
+the following VAR($p$) representation of the structural model
+\begin{align*}
+  \Phi(L)y_t=z_t
+\end{align*}
+Again, given the $y_t$, we can always estimate the \alert{reduced form}
+VAR($p$)
+\begin{align*}
+  (I-B(L))y_t = \varepsilon_t
+\end{align*}
+Because $y_t$ is, in fact, generated by the true structural model above,
+the reduced form objects $B(L)$ and $\varepsilon_t$ are \alert{defined
+off of} (constructed from) the structural DGP,
+much like how a regression vector is always the ``best linear approx to
+the generally nonlinear CEF''.
+
+\alert{Implication}: Naturally, the $\varepsilon_t$ and $z_t$ are related.
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{SVAR Identification: Relating Reduced Form \& Structural}
+Just like the exogenous $z_t$ induce dynamics and a distribution for the
+endogenous $y_t$ (via the true structural model/mapping), so too will
+they induce a distribution for the $\varepsilon_t:=(I-B(L))y_t$ defined
+in some reduced form VAR, i.e.
+\begin{align*}
+  \varepsilon_t = g(z_t)
+\end{align*}
+for unknown, generally nonlinear function $g(\,\cdot\,)$ which we
+can approximate by linearizing
+\begin{align*}
+  \varepsilon_t = G'z_t
+\end{align*}
+Thus we may write
+\begin{align*}
+  (I-B(L))y_t = \varepsilon_t = G'z_t
+\end{align*}
+The tricky part, \alert{identification}, i.e. establishing a mapping
+from reduced form back to $z_t$ or the structural impulse responses.
+\end{frame}
+}
+
+{\scriptsize
+\begin{frame}{SVAR Identification: Relating Reduced Form \& Structural}
+
+Summarizing, we have the following ingredients in the SVAR approach
+\begin{itemize}
+  \item \alert{Structural model}
+    \begin{align*}
+      y_t = \Theta(L)z_t
+      \qquad\iff\qquad
+      \Phi(L)y_t = z_t
+    \end{align*}
+    with \alert{structural impulse responses} of interest encoded in
+    $\Theta(L)$.
+
+  \item Reduced form satisfying (at least approximately)
+    \begin{align*}
+      (I-B(L))y_t = \varepsilon_t = G'z_t
+    \end{align*}
+\end{itemize}
+We're going to have to make some argument to go from $B(L)$ and
+$\varepsilon_t$ either to $z_t$ or to the structural impulses responses
+encoded in $\Theta(L)$.
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{SVAR Identification: Difficulties}
+Dimension Mismatch
+\begin{itemize}
+  \item The true set of structural shocks $z_t$ driving $y_t$ and
+    $\varepsilon_t$ is generally \alert{longer} than the dimension of
+    $y_t$ and hence $\varepsilon_t$.
+    For example, any reasonable macro model has \alert{several}
+    exogenous shocks that induce the behavior of observed output and
+    inflation, not two.
+
+  \item
+    So in general, it's not immediate that we can identify the elements
+    of $z_t$ (or impulse responses to them) from the small number of
+    $\varepsilon_t$.
+    If we're interested in the first structural shock $e_1'z_t$, we need
+    to make an argument that some linear transformation of the reduced
+    form shocks yields the desired shock, e.g. for some vector $a$,
+    \begin{align*}
+      a'\varepsilon_t = e_1'z_t
+    \end{align*}
+\end{itemize}
+Inverting $G'$ problem
+\begin{itemize}
+  \item Even if $\dim(\varepsilon_t)=\dim(z_t)$,
+    there are \alert{many} invertible mappings $G'$ that satisfy
+    \begin{align*}
+      \varepsilon_t = G'z_t
+    \end{align*}
+
+  \item Because we do not observe the $z_t$, we cannot ``solve'' for
+    $G'$, even if we can characterize the variance of
+    \begin{align*}
+      \Var(\varepsilon_t) = \Var(G'z_t) = G'G
+    \end{align*}
+\end{itemize}
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{SVAR Identification: Difficulties}
+``What the hell are you estimating?'' Problem
+\begin{itemize}
+  \item Can \alert{always} estimate reduced form or use
+    Cholesky orthogonalization (see below).
+    But not at all clear what the estimated IRFs really show unless they
+    are well-motivated.
+    Otherwise, they are some particular, useless transformation
+    of the data.
+
+  \item
+    Providing solid Chris Sims reasoning for
+    identification of shocks and IRFs via the SVAR approach
+    means having a clear idea in your head of an
+    \alert{underlying macro model} and
+    \alert{underlying exogenous shocks}, e.g.
+    ``I want to see how output responds to monetary policy shocks, which
+    are those that lower inflation and output, raise interest rates,
+    etc.''
+
+  \item
+    Then provide some \alert{justification} that the reduced form shocks
+    $\{\varepsilon_t\}$ are enough to recover one or more of the
+    exogenous shocks in $z_t$ of interest---e.g. ``For some $W$,
+    \begin{align*}
+      \zeta_t = (W')^{-1}\varepsilon_t
+    \end{align*}
+    yields a vector $\zeta_t$ such that the first element $e_1'\zeta_t$
+    is precisely the monetary policy shock in $z_t$, as it raises
+    interest rates, depresses output, etc.''
+
+  \item
+    Aligns with what we've stressed before: ``Think about the
+    \alert{DGP} and understand what your estimator actually estimates,
+    i.e. what is the \alert{estimand} that will be consistently
+    estimated by this statistical procedure?'' Then argue that this
+    estimand can be mapped into meaningful features/summaries of the
+    true DGP.
+
+\end{itemize}
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{SVAR Identification: Difficulties}
+
+Final Note:
+\begin{itemize}
+  \item This is \alert{tough}, and it's the source of disagreement
+    around conclusions from any given SVAR study.
+
+  \item People might have different models in their head, might have
+    different ideas of how to interpret the reduced form and map back
+    into exogenous shocks, etc.
+
+  \item Alternative identification approaches might be compared to the
+    SVAR approach to see if conclusions are robust.
+\end{itemize}
+\end{frame}
+}
+
+
+%So right away, the reduced form is not \alert{structural} as the implied
+%shocks $\varepsilon_t$ are not independent exogenous drivers of the
+%endogenous outcome variables $y_t$.
+%So we cannot reliably do \alert{cetris paribus} counterfactuals because
+%we cannot think about ``shocking'' one variable holding everything else
+%constant because the model's shocks are correlated.
+%The Lucas Critique is biting here.
+
+
+{\footnotesize
+\begin{frame}{Structural VARs: ``Structural'' Models}
+
+As remarked, convincing arguments for identification of
+true \alert{structural shocks} and IRFs via SVARs is \alert{tough} and
+requires strong assumptions.
+But if we succeed, we have a representation, as discussed,
+\begin{align*}
+  \Phi(L)y_t = z_t
+  \qquad \text{where}\quad
+  z_t
+\end{align*}
+where the shocks $z_t$ are uncorrelated by definition of the term
+\alert{structural}, and possibly of dimension longer than $y_t$.
+
+
+
+But suppose we know that there are $n$ structural shocks
+
+But there's also a sense in which we can always estimate
+\alert{``structural'' shocks} shocks (heavy emphasis on the quotation
+marks).
+In particular, \alert{truly structural} exogenous shocks in the deep
+Lucas Critique-free sense are, by definition, independent and
+orthogonal/uncorrelated.
+So we can define \alert{``structural'' shocks} as any set of shocks that
+are uncorrelated.
+
+
+
+In other words, we might
+suppose that there exists a known, invertible mapping $W$ such that
+\begin{align*}
+  \varepsilon_t = W'\zeta_t
+\end{align*}
+If we knew the mapping $W$, we can infer $\zeta_t$ from the
+$\varepsilon_t$ (or really the $\hat{\varepsilon}_t$) and compute
+impulse responses to $\zeta_t$ shocks using the estimated $B(L)$ or
+$C(L)$.
+
+Now in practice, this is a \alert{big ask}.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}
+We ultimately seek a ``\alert{structural}'' model for the dynamics of
+the outcome variables $y_t$.
+In this VAR context, ``structural'' means a VAR with
+\alert{orthogonal shocks}, precisely so that we can have the desired
+\alert{ceteris paribus} interpretation that we might use for
+counterfactual policy analysis.
+
+This model is ``structural'' purely in a statistical sense (i.e.
+orthogonal shocks).
+
+A (rather strong) assumption 
+
+VAR and VMA representations, which
+we denote by
+\begin{align*}
+  A(L)y_t &= \zeta_t
+  \quad
+  \quad
+  \qquad\text{where}\quad
+  \Var(\zeta_t) = I_n
+  \\
+  y_t &= A(L)^{-1}\zeta_t
+\end{align*}
+where the order of $A(L)$ matches matches that of $I-B(L)$.
+This is ``structural'' in the sense that the shocks have a
+\alert{ceteris paribus} interpretation, i.e. $\Var(\zeta_t)$ is
+\alert{diagonal} (the fact that it's additionally \emph{identity} is a
+harmless normalization).
+
+Relate representations by simple lag polynomial algebra.
+\end{frame}
+}
+
+\subsection{Relating Reduced-Form VAR and SVAR}
+
+{\scriptsize
+\begin{frame}{Structural VARs: Relating Structural and Reduced-Form Reps}
+Structural VAR and SVAR representations:
+\begin{align*}
+  (I-B(L))y_t
+  &= \varepsilon_t
+  \;\;\;\qquad\text{where}\quad
+  \Var(\varepsilon_t)=\Sigma
+  \\
+  A(L)y_t &= \zeta_t
+  \;\;\;\qquad\text{where}\quad
+  \Var(\zeta_t)=I_n
+\end{align*}
+\pause
+Since $I-B(L)$ and $A(L)$ have the same order and describe the same
+system $y_t$, there must necessarily be a mapping between the
+$\varepsilon_t$ and $\zeta_t$.
+Thus, can write, for some invertible $W$,
+\begin{align*}
+  \varepsilon_t
+  =
+  W'\zeta_t
+  \quad\implies\quad
+  \Sigma = \Var(\varepsilon_t) = \Var(W'\zeta_t) = W'W
+\end{align*}
+In general, there are many such matrices $W$ satisfying the above
+restriction.
+The Cholesky decomposition gives one such matrix, but not unique.
+So many possible ``structural'' models.
+
+\pause
+Using the above expressions, we find alternative representations
+\begin{align*}
+  \big[I-B(L)\big]y_t = W'\zeta_t
+  \;&\implies\;
+  (W')^{-1}\big[I-B(L)\big]y_t = \zeta_t
+  \\
+  \;&\iff\;
+  \big[I_n-(W')^{-1}B(L)(W')\big](W')^{-1}y_t = \zeta_t
+  \\
+  \;&\iff\;
+  (W')^{-1}y_t = (W')^{-1}B(L)y_t + \zeta_t
+\end{align*}
+One way to say this more succinctly is that the polynomials are related
+\begin{align*}
+  \;\implies\;
+  A(L) = (W')^{-1}(I-B(L))
+  %\;\implies\;
+  %A(L)^{-1} = C(L)W'
+\end{align*}
+which also implies a restriction on reduced form VMA polynomial $C(L)$.
+\end{frame}
+}
+
+{\scriptsize
+\begin{frame}{Structural VARs: Orthogonalization}
+Again, there are many such matrices $W$ such that can deliver
+\begin{align*}
+  \varepsilon_t = W'\zeta_t
+  \qquad\text{where}\quad
+  \Sigma = \Var(\varepsilon_t) = \Var(W'\zeta_t) = W'W
+\end{align*}
+This is equivalent to finding $W$ such that
+\begin{align*}
+  (W')^{-1}\varepsilon_t = \zeta_t
+  \qquad\text{where}\quad
+  \Var((W')^{-1}\varepsilon_t)
+  =
+  (W')^{-1} \Sigma W^{-1}
+  =
+  \Var(\zeta_t)
+  =
+  I_n
+\end{align*}
+i.e. finding $W$ that \alert{orthogonalizes} $\varepsilon_t$.
+\pause
+
+\alert{Implication}: Exploring the space of all possible
+orthogonalization is equivalent to exploring the space of all
+``structural'' models.
+But don't read too much economics into this,
+since ``structural'' models was defined to mean precisely ``ortgonal
+shocks'' not something deep unless you provide further (Chris Sims'
+style) economic reasoning.
+Otherwise, just a tautology.
+
+\pause
+\alert{Sign Restrictions Literature}:
+Trace out the set of all orthogonalizing transformations (i.e.
+$(W')^{-1}$) such that the resulting IRFs satisfying some
+economically-motivated sign restriction(s).
+For each such orthogonalizing transformation (i.e. each $W$ satisfying
+the sign restrictions), there is an implied ``structural'' VAR and set
+of impulse responses.
+Can see if you can learn everything from this restricted set.
+\end{frame}
+}
+
+
+\subsection{Under Cholesky}
+
+{\scriptsize
+\begin{frame}{Structural VARs: Under Cholesky Orthogonalization}
+Again, the only condition we've placed on $W$ so far is that
+$W'W=\Sigma$.
+
+If, further, we assume that $W$ was obtained by the Cholesky
+decomposition, then $W$ and $W^{-1}$ upper triangular and
+$W'$ and $(W')^{-1}$ lower triangular.
+
+\pause
+With $W$ \alert{upper triangular},
+the reduced form shocks look like
+\begin{align*}
+  \varepsilon_t &=
+  W'\zeta_t
+  =
+  \begin{pmatrix}
+  \zeta_{1} + \zeta_2 + \cdots + \zeta_n \\
+  \hphantom{\zeta_{1} + \; } \zeta_{2} + \cdots + \zeta_n \\
+  \vdots \\
+  \\
+  \hphantom{\zeta_{1} + \zeta_{2} + \cdots + }\zeta_n \\
+  \end{pmatrix}
+\end{align*}
+\end{frame}
+}
+
+{\scriptsize
+\begin{frame}{Structural VARs: Under Cholesky Orthogonalization}
+Moreover, under upper diagonal $W$, representations
+\begin{align*}
+  (W')^{-1}y_t = (W')^{-1} B(L)y_t +\zeta_t
+\end{align*}
+notice that
+\begin{align*}
+  (W')^{-1}y_t
+  =
+  \begin{pmatrix}
+    (W')^{-1}_{11} & 0 & \cdots & 0 \\
+    (W')^{-1}_{21} & (W')^{-1}_{22} & \cdots & 0 \\
+    \vdots & \vdots & \ddots & \vdots \\
+    (W')^{-1}_{n1} & (W')^{-1}_{n2} & \cdots & (W')^{-1}_{nn} \\
+  \end{pmatrix}
+  y_t
+  =
+  \begin{pmatrix}
+    (W')^{-1}_{11}y_{t1}
+    \;\;\;
+    \hphantom{%
+      (W')^{-1}_{n2}y_{t2} + \cdots +
+      (W')^{-1}_{nn}y_{tn}
+    }
+    \\
+    (W')^{-1}_{21}y_{t1} + (W')^{-1}_{22}y_{t2}
+    \;
+    \hphantom{%
+      + \cdots +
+      (W')^{-1}_{nn}y_{tn}
+    }
+    \\ \vdots \\
+    (W')^{-1}_{n1}y_{t1} + (W')^{-1}_{n2}y_{t2} + \cdots +
+    (W')^{-1}_{nn}y_{tn}
+  \end{pmatrix}
+\end{align*}
+\pause
+This implies
+\begin{align*}
+  y_{t1}
+  &=
+  \qquad\quad
+  \qquad\quad
+  \quad
+  \,\;\;
+  W'_{11}
+  \cdot
+  e_1'\big[(W')^{-1}B(L)y_t + \zeta_t\big]
+  \\
+  y_{t2}
+  &=
+  -
+  \frac{(W')_{22}}{(W')_{21}}
+  y_{t1}
+  \quad
+  \;\;
+  +
+  W'_{22}
+  \cdot
+  e_2'\big[(W')^{-1}B(L)y_t + \zeta_t\big]
+  \\
+  & \;\;\vdots
+  \\
+  y_{tn}
+  &=
+  -
+  \sum_{i=1}^{n-1}
+  \frac{W'_{nn}}{(W')_{ni}}
+  y_{ti}
+  +
+  W'_{nn}\cdot e_n'\big[(W')^{-1}B(L)y_t + \zeta_t\big]
+\end{align*}
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Structural VARs: Under Cholesky Orthogonalization}
+From the above representation
+\begin{align*}
+  y_{t1}
+  &=
+  \qquad\quad
+  \qquad\quad
+  \quad
+  \,\;\;
+  W'_{11}
+  \cdot
+  e_1'\big[(W')^{-1}B(L)y_t + \zeta_t\big]
+  \\
+  y_{t2}
+  &=
+  -
+  \frac{(W')_{22}}{(W')_{21}}
+  y_{t1}
+  \quad
+  \;\;
+  +
+  W'_{22}
+  \cdot
+  e_2'\big[(W')^{-1}B(L)y_t + \zeta_t\big]
+  \\
+  & \;\;\vdots
+  \\
+  y_{tn}
+  &=
+  -
+  \sum_{i=1}^{n-1}
+  \frac{W'_{nn}}{(W')_{ni}}
+  y_{ti}
+  +
+  W'_{nn}\cdot e_n'\big[(W')^{-1}B(L)y_t + \zeta_t\big]
+\end{align*}
+Notice
+\begin{itemize}
+  \item Thus $y_{t1}$ \alert{moves first} and can influence all other
+    variables \alert{contemporaneously}, while $y_{t2}$ through $y_{tn}$
+    cannot influence $y_{t1}$ contemporaneously, only with lags, i.e. in
+    future periods.
+
+  \pause
+  \item A change in structural shock $\xi_{t1}$ can influence $y_{t1}$
+    at time $t$ and, because $y_{t1}$ moves first, \emph{all other}
+    variables.
+
+    Alternatively, a change in structural shock $\xi_{tn}$ can influence
+    $y_{tn}$ alone at time $t$.
+\end{itemize}
+\end{frame}
+}
+
+
+\subsection{Granger Causality}
+
+{\scriptsize
+\begin{frame}{Granger Causality}
+Given reduced form representation
+\begin{align*}
+  (I-B(L))y_t
+  &= \varepsilon_t
+  \;\;\;\qquad\text{where}\quad
+  \Var(\varepsilon_t)=\Sigma
+  \\
+  \iff\qquad
+  y_t
+  &= B(L)y_t + \varepsilon_t
+\end{align*}
+we say that $y_{ti}$ \alert{Granger causes} $y_{tj}$ if $B_{ij}(L)\neq
+0$.
+
+\pause
+Notice this is just a statement about whether \alert{lagged} $y_{tj}$
+(i.e. $y_{t-1,j},y_{t-2,j},\ldots$)
+influences $y_{ti}$ at $t$.
+This is not influenced by the structural VAR we employ, e.g. the
+Cholesky ordering we choose, because, recall
+\begin{align*}
+  y_{t1}
+  &=
+  \qquad\quad
+  \qquad\quad
+  \quad
+  \,\;\;
+  W'_{11}
+  \cdot
+  e_1'\big[(W')^{-1}B(L)y_t + \zeta_t\big]
+  \\
+  y_{t2}
+  &=
+  -
+  \frac{(W')_{22}}{(W')_{21}}
+  y_{t1}
+  \quad
+  \;\;
+  +
+  W'_{22}
+  \cdot
+  e_2'\big[(W')^{-1}B(L)y_t + \zeta_t\big]
+  \\
+  & \;\;\vdots
+  \\
+  y_{tn}
+  &=
+  -
+  \sum_{i=1}^{n-1}
+  \frac{W'_{nn}}{(W')_{ni}}
+  y_{ti}
+  +
+  W'_{nn}\cdot e_n'\big[(W')^{-1}B(L)y_t + \zeta_t\big]
+\end{align*}
+We haven't zeroed out $B(L)$ or anything like that.
+We've just restricted how $y_{tj}$ can \alert{contemporaneously} affect
+$y_{ti}$, \alert{not} how past $y_{tj}$ can influence $y_{ti}$.
+\pause
+
+And so simply inspect the IRFs.
+If the IRF for $y_{ti}$ is \alert{flat} with respect to a shock to the
+$j$th equation/variable, then $y_{tj}$ does not Granger Cause $y_{ti}$.
+\end{frame}
+}
+
+
+
+%{\footnotesize
+%\begin{frame}
+%Starting point
+%\begin{align*}
+  %x_t = B_1x_{t-1} + \cdots + B_kx_{t-k} + \varepsilon_t
+%\end{align*}
+%Stack
+%\begin{align*}
+  %\begin{pmatrix}
+    %x_t \\ x_{t-1} \\ \vdots \\ x_{t-k+2} \\ x_{t-k+1}
+  %\end{pmatrix}
+  %&=
+  %\begin{pmatrix}
+    %B_1 & B_2 & \cdots & B_{k-1} & B_k \\
+    %I_n & 0 & \cdots & 0 & 0 \\
+    %\vdots & \vdots & \ddots & \vdots & \vdots \\
+    %0 & 0 & \cdots & 0 & 0 \\
+    %0 & 0 & \cdots & I_n & 0 \\
+  %\end{pmatrix}
+  %\begin{pmatrix}
+    %x_{t-1} \\ x_{t-2} \\ \vdots \\ x_{t-k+1} \\ x_{t-k}
+  %\end{pmatrix}
+  %+
+  %\begin{pmatrix}
+    %\varepsilon_t \\ 0 \\ \vdots \\ 0 \\ 0
+  %\end{pmatrix}
+  %\\
+  %y_t &= \Gamma y_{t-1} + \eta_t
+%\end{align*}
+%Suppose we can diagonalize $\Gamma$ (which just means the Jordan
+%decomposition has all $1\times 1$ blocks)
+%\begin{align*}
+  %\Gamma = P \Lambda P^{-1}
+%\end{align*}
+%Can rewrite
+%\begin{align*}
+  %y_t &= \Gamma y_{t-1} + \eta_t \\
+  %y_t &= P \Lambda P^{-1} y_{t-1} + \eta_t \\
+  %P^{-1}y_t &= \Lambda P^{-1} y_{t-1} + P^{-1}\eta_t \\
+  %z_t &= \Lambda z_{t-1} + \eta_t \\
+%\end{align*}
+
+%\end{frame}
+%}
+
+
+
+\section{End Matter}
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
+
+
+
+
+
+% Sample code
+\pause to add breaks
+\textcolor{red}{text to show}.
+\vspace{20pt}
+
+\usebeamercolor{dull text}
+\alert<+>{Words that you want to alert}
+

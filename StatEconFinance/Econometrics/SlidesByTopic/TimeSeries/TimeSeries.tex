@@ -1,0 +1,2425 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usepackage{cmbright}
+%\usetheme{metropolis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis with Sidebar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[aspectratio=169, handout]{beamer}
+%\documentclass{beamer}
+\usepackage{cmbright}
+\usepackage{comment}
+
+\useoutertheme[right, width=0.20\paperwidth]{sidebar}
+\usecolortheme{metropolis}
+\useinnertheme[sectionpage=none]{metropolis}
+\usefonttheme{metropolis}
+
+\makeatletter
+\beamer@headheight=1.75\baselineskip     %controls the height of the headline, default is 2.5
+\makeatother
+
+\usepackage{etoolbox}
+\patchcmd\insertverticalnavigation{\dohead}{\vskip-35pt\dohead}{}{}
+
+%\setbeamertemplate{sidebar canvas right}{}
+%\setbeamertemplate{sidebar right}{BOB}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Simple Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usetheme{Boadilla}
+%\usepackage{lmodern}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sidebar Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass[serif]{beamer}  % For serif latex font
+%\usepackage{pxfonts}
+%\usepackage{eulervm}
+%\usepackage{mathpazo}
+
+%\usetheme{Goettingen}
+%\usecolortheme{lily}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Common Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[]{ECO-518: Precept 4 \\ Matt Cocci}
+\author[]{}
+\date{\today}
+
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+%\setbeamertemplate{section in toc}[square unnumbered]
+%\setbeamertemplate{subsection in toc}[square unnumbered]
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% For easier looping
+\usepackage{pgffor}
+
+\usepackage{pdfpages}
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\proj}{\operatorname{proj}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Rnk}{\mathbb{R}^{n\times k}}
+\newcommand{\Rkk}{\mathbb{R}^{k\times k}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Presentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Outline}
+\tableofcontents[hideallsubsections]
+%\tableofcontents
+\end{frame}
+
+
+
+\section{Time Series}
+
+\subsection{Covariance Stationary Processes}
+
+
+{\scriptsize
+\begin{frame}{Covariance Stationary Processes and ACGF}
+
+Discrete time series is study of discrete-time stochastic processes,
+written $\{y_t\}_{t=-\infty}^\infty$.
+\vspace{-2pt}
+Covariance Stationary Process
+(a.k.a.\ Weakly Stationary, 2nd-Order Stationary):
+\begin{itemize}
+  \item $\E[y_t]=\mu$ for some $\mu$ that does not depend upon $t$
+  \item $\gamma_k:=\Cov(y_t,y_{t-k})$ depends only upon $k$, not $t$.
+  \item This is an assumption on the first two moments of the
+    \alert{DGP}, but not a \alert{parametric}/\alert{modeling}
+    assumption in the sense that this specifies a likelihood.
+\end{itemize}
+Given stationarity process, can define
+\alert{Autocovariance Function} (ACF)
+and \alert{Autocovariance Generating Function} (ACGF)
+\begin{align*}
+  \gamma(k)
+  := \gamma_k
+  = \Cov(y_t,y_{t-k})
+  \qquad\quad
+  \lambda(z)
+  =
+  \sum_{k=-\infty}^\infty \gamma_k z^j
+\end{align*}
+Latter is useful summary of autocovariances of the process and
+of primary importance for heteroskedasticity-and-autocorrelation-robust
+(HAR/HAC) inference, where you see the Newey-West estimator, spectral
+density, etc.
+
+\vspace{-5pt}
+If $\{y_t\}$ \alert{Gaussian}, covariance stationarity means DGP
+fully pinned down.
+Otherwise, DGP restricted, but not totally pinned down, and so study of
+cov.\ stationary discrete time SPs is study of
+``What can we say given homogeneity assumptions on only 1st and 2nd
+moments?''
+\end{frame}
+}
+
+
+\subsection{Examples}
+
+{\scriptsize
+\begin{frame}{Example: AR(1)}
+Suppose we have the following process
+\begin{align*}
+  y_t = \rho y_{t-1} + \varepsilon_t
+  \qquad
+  \varepsilon_t\iid(0,\sigma^2_\varepsilon)
+\end{align*}
+Because $\rho\in(0,1)$, process is stationary, \& can compute variance and
+autocovariances by recursive substitution:
+\begin{align*}
+  \Var(y_t)
+  &=
+  \Var(\rho y_{t-1} + \varepsilon_t)
+  = \rho^2 \Var(y_{t-1}) + \Var(\varepsilon_t)
+  = \rho^2 \Var(y_{t}) + \Var(\varepsilon_t)
+  = \frac{\sigma^2_\varepsilon}{1-\rho^2}
+  \\
+  \Cov(y_{t-1},y_{t})
+  &=
+  \Cov(y_{t-1},\rho y_{t-1} + \varepsilon_t)
+  =
+  \rho\Cov(y_{t-1},y_{t-1})
+  +
+  \Cov(y_{t-1},\varepsilon_t)
+  =
+  \rho\Var(y_{t-1})
+  +
+  0
+  =
+  \rho
+  \frac{\sigma^2_\varepsilon}{1-\rho^2}
+  \\
+  \Cov(y_{t-k},y_{t})
+  &=
+  \rho^k
+  \frac{\sigma^2_\varepsilon}{1-\rho^2}
+\end{align*}
+Often useful rewrite processes by recursive substitution
+\begin{align*}
+  y_t
+  = \rho y_{t-1} + \varepsilon_t
+  = \rho \big( \rho y_{t-2} + \varepsilon_{t-1}\big) + \varepsilon_t
+  =
+  \cdots
+  =
+  \sum_{s=0}^K
+  \rho^{s}
+  \varepsilon_{t-s}
+\end{align*}
+Taking $K\ra\infty$, get MA($\infty$) rep of an AR(1) model
+that we get by inverting lag polynomials.
+\end{frame}
+}
+
+
+
+
+{\scriptsize
+\begin{frame}{Example: AR(2)}
+Suppose that
+\begin{align*}
+  y_t = \phi_1 y_{t-1} + \phi_2 y_{t-2} + \varepsilon_t
+  \qquad
+  \varepsilon_t\iid (0,\sigma^2_\varepsilon)
+\end{align*}
+Suppose $\phi_1,\phi_2$ such that the process is stationary.
+Subsequent slides characterize.
+
+Can compute autocovariances by recursive substitution.
+Take care with covariance terms.
+\begin{align*}
+  \Var(y_t)
+  &= \Var(\phi_1 y_{t-1} + \phi_2 y_{t-2} + \varepsilon_t)
+  \\
+  &=
+  \Var(\phi_1 y_{t-1} + \phi_2 y_{t-2}) + \Var(\varepsilon_t)
+  \\
+  &=
+  \Var(\phi_1 y_{t-1})
+  +
+  \Var(\phi_2 y_{t-2})
+  +
+  2\Cov(\phi_1 y_{t-1}, \phi_2 y_{t-2})
+  + \sigma^2_\varepsilon
+  \\
+  &=
+  (\phi_1^2 + \phi_2^2) \Var(y_{t})
+  + 2\phi_1\phi_2  \Cov(y_{t}, y_{t-1})
+  + \sigma^2_\varepsilon
+  \\
+  \Cov(y_{t-1},y_t)
+  &=
+  \Cov(y_{t-1},\phi_1 y_{t-1} + \phi_2 y_{t-2} + \varepsilon_t)
+  \\
+  &=
+  \phi_1 \Cov(y_{t-1},y_{t-1})
+  +
+  \phi_2 \Cov(y_{t-1},y_{t-2})
+  +
+  \Cov(y_{t-1},\varepsilon_t)
+  \\
+  &=
+  \phi_1 \Var(y_{t})
+  +
+  \phi_2 \Cov(y_{t},y_{t-1})
+\end{align*}
+Two equations in two unknowns $\Var(y_t)$ and $\Cov(y_t,y_{t-1})$ that
+we can solve.
+
+Higher order autocovariances will be functions of these unknowns, e.g.
+\begin{align*}
+  \Cov(y_{t-2},y_t)
+  &=
+  \Cov(y_{t-2},\phi_1 y_{t-1} + \phi_2 y_{t-2} + \varepsilon_t)
+  %=
+  %\phi_1 \Cov(y_{t-2},y_{t-1})
+  %+
+  %\phi_2 \Cov(y_{t-2},y_{t-2})
+  %+
+  %\Cov(y_{t-2},\varepsilon_t)
+  =
+  \phi_1 \Cov(y_{t-1},y_{t})
+  +
+  \phi_2 \Var(y_{t})
+\end{align*}
+
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Example: MA(2)}
+Model
+\begin{align*}
+  y_t = \varepsilon_t + 0.5 \varepsilon_{t-1}
+  \qquad
+  \varepsilon_t\iid(0,\sigma^2_\varepsilon)
+\end{align*}
+Compute
+\begin{align*}
+  \Var(y_t)
+  &= \Var(\varepsilon_t + 0.5 \varepsilon_{t-1})
+  = \Var(\varepsilon_t) + 0.5^2 \Var(\varepsilon_{t-1})
+  = (1+0.5^2) \sigma^2_\varepsilon
+  = 1.25 \sigma^2_\varepsilon
+  \\
+  \Cov(y_{t-1},y_{t})
+  &=
+  \Cov(\varepsilon_{t-1} + 0.5 \varepsilon_{t-2}, \varepsilon_t + 0.5 \varepsilon_{t-1})
+  \\
+  &=
+  \Cov(\varepsilon_{t-1}, \varepsilon_t)
+  + 0.5 \Cov(\varepsilon_{t-1}, \varepsilon_{t-1})
+  + \Cov(0.5 \varepsilon_{t-2}, \varepsilon_t)
+  + \Cov(0.5 \varepsilon_{t-2}, 0.5\varepsilon_{t-1})
+  \\
+  &=
+  0
+  + 0.5 \Var(\varepsilon_{t-1})
+  + 0
+  + 0
+  \\
+  &=
+  0.5 \sigma^2_\varepsilon
+\end{align*}
+Higher order autocovariances all zero.
+
+Similarly, suppose
+\begin{align*}
+  y_t = \eta_t + 2\eta_{t-1}
+  \qquad
+  \varepsilon_t\iid(0,0.25\sigma^2_\varepsilon)
+\end{align*}
+Then get the following, which suggests an observational
+equivalence problem in MA models, and will connect to notion of
+``fundamentalness'' and Wold's Theorem.
+\begin{align*}
+  \Var(y_t)
+  &= (1+2^2) 0.25\sigma^2_\varepsilon
+  = 1.25\sigma^2_\varepsilon
+  \\
+  \Cov(y_{t-1},y_{t})
+  &=
+  2 \cdot 0.25 \cdot \sigma^2_\varepsilon
+  = 0.5 \sigma^2_\varepsilon
+\end{align*}
+\end{frame}
+}
+
+
+
+{\scriptsize
+\begin{frame}{Examples: Higher Order Autocovs}
+\alert{Want}:
+$\Cov(X_t,X_{t-5})$
+for DGP
+\begin{align*}
+  X_t
+  &=
+  2 + 1.3 X_{t-1} - 0.5 X_{t-2} + \varepsilon_t
+  \qquad
+  \varepsilon_t \iid (0,4)
+\end{align*}
+Two approaches:
+\begin{itemize}
+  \item Set up equations systematically as in AR(2) example, solve
+  \item Write into VAR(1) companion form, augmenting state vector, use
+    general formulas:
+    \begin{align*}
+      \underbrace{%
+        \begin{pmatrix}
+          X_t \\
+          X_{t-1} \\
+          X_{t-2} \\
+          X_{t-3} \\
+          X_{t-4} \\
+          X_{t-5}
+        \end{pmatrix}
+      }_{\tilde{X}_{t}}
+      &=
+      \underbrace{%
+        \begin{pmatrix}
+          2 \\
+          0 \\
+          0 \\
+          0 \\
+          0 \\
+          0 \\
+        \end{pmatrix}
+      }_{C}
+      +
+      \underbrace{%
+        \begin{pmatrix}
+          1.3 & -0.5 & 0 & 0 & 0 & 0 \\
+          1 & 0 & 0 & 0 & 0 & 0 \\
+          0 & 1 & 0 & 0 & 0 & 0 \\
+          0 & 0 & 1 & 0 & 0 & 0 \\
+          0 & 0 & 0 & 1 & 0 & 0 \\
+          0 & 0 & 0 & 0 & 1 & 0 \\
+        \end{pmatrix}
+      }_{\Phi}
+      \underbrace{%
+        \begin{pmatrix}
+          X_{t-1} \\
+          X_{t-2} \\
+          X_{t-3} \\
+          X_{t-4} \\
+          X_{t-5} \\
+          X_{t-6} \\
+        \end{pmatrix}
+      }_{\tilde{X}_{t-1}}
+      +
+      \underbrace{%
+        \begin{pmatrix}
+          \varepsilon_t \\
+          0 \\
+          0 \\
+          0 \\
+          0 \\
+          0 \\
+        \end{pmatrix}
+      }_{\tilde{\varepsilon_t}}
+    \end{align*}
+    From there, similar to what we saw in class,
+    \begin{align*}
+      \Var(\tilde{X}_t)
+      &=
+      \Var(C + \Phi \tilde{X}_{t-1}+ \tilde{\varepsilon}_t)
+      =
+      \Phi \Var(\tilde{X}_{t-1})\Phi'
+      +
+      \Var(\tilde{\varepsilon}_t)
+      =
+      \Phi \Var(\tilde{X}_{t})\Phi'
+      + \Sigma
+      \\
+      \implies\quad
+      \vc(\Var(\tilde{X}_t))
+      &=
+      [I-(\Phi\otimes\Phi)]^{-1}
+      \vc(\Sigma)
+    \end{align*}
+\end{itemize}
+\end{frame}
+}
+
+
+
+\subsection{Lag Polynomials}
+
+\subsubsection{Definition}
+
+{\footnotesize
+\begin{frame}{Lag Polynomials}
+Lag polynomials provide a terse way to express ARMA($p$,$q$) models,
+which are the general class of linear time series models that we
+consider:
+\begin{align*}
+  y_t &=
+  \phi_1 y_{t-1} + \cdots + \phi_py_{t-p}
+  + \varepsilon_{t}
+  + \theta_1\varepsilon_{t-1}
+  + \cdots + \theta_p\varepsilon_{t-q}
+  \qquad
+  \varepsilon_t
+  \iid (0,\sigma^2_\varepsilon)
+\end{align*}
+Can rearrange
+\begin{align*}
+  y_t - \phi_1 y_{t-1} - \cdots - \phi_py_{t-p}
+  &=
+  \varepsilon_{t}
+  + \theta_1\varepsilon_{t-1}
+  + \cdots + \theta_p\varepsilon_{t-q}
+  \\
+  (1 - \phi_1 L - \cdots - \phi_p L^p)y_t
+  &=
+  (1 + \theta_1L + \cdots + \theta_p L^p)  \varepsilon_{t}
+\end{align*}
+Write compactly in terms of lag polynomials
+\begin{align*}
+  \phi(L)
+  y_t
+  &=
+  \theta(L)
+  \varepsilon_{t}
+  \\
+  \qquad\text{where}\quad
+  \phi(z)
+  &=
+  1 - \phi_1 z - \cdots - \phi_p z^p
+  \\
+  \theta(z)
+  &=
+  1 + \theta_1z + \cdots + \theta_p z^p
+\end{align*}
+Notice that $\phi(z)$ and $\theta(z)$ are \alert{polynomials}.
+Can study their algebraic properties to learn about the processes.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Lag Polynomials}
+
+Special cases and perspectives
+\begin{itemize}
+  \item AR($p$) model:
+    $\varepsilon_t$ written in terms of current and lagged $y_t$.
+    \begin{align*}
+      \phi(L)y_t = \varepsilon_t
+    \end{align*}
+
+
+  \item MA($q$) model:
+    $y_t$ written in terms of current and lagged $\varepsilon_t$
+    \begin{align*}
+      y_t = \theta(L)\varepsilon_t
+    \end{align*}
+
+  \item
+    ARMA model can be rewritten as an AR or MA model, provided
+    \alert{inverses} of the lag polynomials are well-defined
+    \begin{align*}
+      \phi(L)
+      y_t
+      &=
+      \theta(L)
+      \varepsilon_{t}
+      \\
+      \theta(L)^{-1}
+      \phi(L)
+      y_t
+      &=
+      \varepsilon_{t}
+      \\
+      y_t
+      &=
+      \phi(L)^{-1}
+      \theta(L)
+      \varepsilon_{t}
+    \end{align*}
+    Note that final expression is generally an \alert{MA($\infty$)}.
+    This is a very useful \alert{canonical} representation of any linear
+    time series process (provided the inverses exist and are
+    well-defined, which we discuss below).
+\end{itemize}
+\end{frame}
+}
+
+
+
+\subsubsection{Inverses}
+
+{\footnotesize
+\begin{frame}{Inverses of Lag Polynomials: First Order}
+
+If we take as given that we would like to invert lag polynomials, we
+then ask how to do so.
+Recall the following result for a geometric series:
+\begin{align*}
+  \sum_{i=0}^\infty
+  x^i
+  &=
+  1 + x + x^2 + x^3 + \cdots
+  =
+  \frac{1}{1-x}
+  \qquad
+  \text{If $|x|<1$}
+\end{align*}
+Taking our cue from this result
+\begin{align*}
+  (1-\phi L)^{-1}
+  &=
+  1 + \phi L + \phi^2 L^2 + \cdots
+  \qquad
+  \qquad
+  \qquad
+  \qquad
+  \quad
+  |\phi|<1
+  \\
+  (1-\phi L)^{-1}
+  &=
+  (\phi L[\phi^{-1} L^{-1}-1])^{-1}
+  \qquad
+  \qquad
+  \qquad
+  \qquad
+  \quad
+  \,
+  |\phi|>1
+  \\
+  &=
+  -(\phi L)^{-1}(1-\phi^{-1} L^{-1})^{-1}
+  \\
+  &=
+  -
+  \phi^{-1}L^{-1}
+  (1+ \phi^{-1}L^{-1} + \phi^{-2}L^{-2} + \cdots)
+  \\
+  &=
+  -
+  \phi^{-1}L^{-1} - \phi^{-2}L^{-2} - \phi^{-3}L^{-3} - \cdots
+\end{align*}
+If $\phi=1$, this is a so called \alert{unit root}, and we cannot
+take advantage of the geometric series formula and cannot invert the lag
+polynomial.
+
+See subsequent slide for higher order lag polynomials.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Inverses of Lag Polynomials}
+Example: Simple AR(1)
+\begin{align*}
+  y_t
+  &= \rho y_{t-1} + \varepsilon_t
+  \\
+  (1-\rho L) y_t
+  &= \varepsilon_t
+  \\
+  y_t
+  &= (1-\rho L)^{-1}\varepsilon_t
+\end{align*}
+If $|\rho|<1$, then we invert in \alert{positive} powers of $L$:
+\begin{align*}
+  y_t
+  &=
+  \big[
+    1 + \rho L + \rho^2L^2 + \cdots
+  \big]
+  \varepsilon_t
+  \\
+  &=
+  \varepsilon_t
+  + \rho \varepsilon_{t-1}
+  + \rho^2 \varepsilon_{t-2}
+  + \cdots
+\end{align*}
+If $|\rho|>1$, then we invert in \alert{negative} powers of $L$:
+\begin{align*}
+  y_t
+  &=
+  \big[
+    \rho^{-1}L^{-1}
+    + \rho^{-2}L^{-2}
+    + \rho^{-3}L^{-3}
+    + \cdots
+  \big]
+  \varepsilon_t
+  \\
+  &=
+  \frac{1}{\rho}\varepsilon_{t+1}
+  + \frac{1}{\rho^2}\varepsilon_{t+2}
+  + \frac{1}{\rho^3}\varepsilon_{t+3}
+  + \cdots
+\end{align*}
+\end{frame}
+}
+
+
+%{\footnotesize
+%\begin{frame}{Inverses of Lag Polynomials: Justification}
+
+%What justifies these manipulations using geometric series?
+
+%Many results in linear time series analysis:
+%Given
+%\begin{align*}
+  %y_t
+  %=
+  %\sum_{s=0}^\infty
+  %\psi_{s}\varepsilon_{t-s}
+  %\qquad \text{where}\quad
+  %\sum_{s=0}^\infty
+  %|\psi_{s}|
+  %<\infty
+%\end{align*}
+%i.e. an MA($\infty$) process with \alert{square summable} coefficients,
+%which ensures that past shocks die out quickly enough.
+
+%Suppose
+%\begin{align*}
+  %y_t
+  %= (1-\rho L)^{-1}\varepsilon_t
+  %&= \sum_{s=0}^\infty \rho^s \varepsilon_t
+%\end{align*}
+%Notice
+%\begin{itemize}
+  %\item If $|\rho|<1$, coefficients on the MA($\infty$) rep will be
+    %square summable
+  %\item Equivalenty, if root of $\phi(z)=(1-\rho z)$ \alert{greater}
+    %than 1 in abs.\ value, then $|\rho|<1$
+
+  %\item Powers on the lag operator and the presence of the lag operator
+    %do not influence whether or not the coefficients are square
+    %summable.
+
+  %%\item
+    %%Filtering perspective:
+    %%$\{y_t\}$ and $\{\varepsilon_t\}$ are related, and they are related
+    %%at potentially all leads and lags.
+    %%If we would like to write one in terms of the other, we will
+    %%generally need infinitely many because shocks have persistent
+    %%effects to solve for one in terms of the other.
+    %% Think of infinitely many equations and infinitely many unkonwns
+    %% Therefore we need some kind of decay to ensure that sums converge
+    %%\item $|\phi|<1$: Past shocks decay.
+    %%\item $|\phi|>1$: Process explodes so for the process to be finite
+      %%today, must be that future shocks small and decaying
+
+%\end{itemize}
+%\end{frame}
+%}
+
+
+
+
+{\footnotesize
+\begin{frame}{Inverses of Lag Polynomials: Higher Order Order}
+How can we invert multi-order lag polynomials?
+\begin{align*}
+  A(L)
+  &=
+  (1-a_1L - a_2L^2 - \cdots - a_3L^p)
+  \\
+  A(L)^{-1}
+  &=
+  (1-a_1L - a_2L^2 - \cdots - a_pL^p)^{-1}
+\end{align*}
+\alert{Factor} the higher-order polynomial into a product of first-order
+polynomials:
+\begin{align*}
+  A(L)
+  &=
+  (1-b_1L)
+  \cdots
+  (1-b_pL)
+  \\
+  A(L)^{-1}
+  &=
+  (1-b_1L)^{-1}
+  \cdots
+  (1-b_pL)^{-1}
+\end{align*}
+Can invert each first order polynomial individually using geometric
+series formula.
+
+Note:
+Some first order polynomials might require inversion in \alert{positive}
+powers of $L$, others in \alert{negative}.
+Can do that, multiply everything together, collect terms to get, in
+general, an expression of the form
+\begin{align*}
+  A(L)^{-1}
+  &=
+  c_0 + c_1 L + c_{-1}L^{-1} + c_2 L^2 + c_{-2} L^{-2} + \cdots
+\end{align*}
+
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Lag Polynomial Inverses: Multiple Order}
+Example I:
+\begin{align*}
+  x_t
+  &=
+  \frac{3}{4}x_{t-1} - \frac{1}{8}x_{t-2}
+  +
+  \varepsilon_t
+\end{align*}
+\pause
+Form lag polynomial:
+\begin{align*}
+  \phi(z)
+  &=
+  1 - \frac{3}{4}z + \frac{1}{8}z^2
+\end{align*}
+\pause
+Factor
+\begin{align*}
+  \phi(z)
+  &=
+  \left(
+    1-\frac{1}{2}z
+  \right)
+  \left(
+    1-\frac{1}{4}z
+  \right)
+\end{align*}
+\pause
+Invert each one at a time
+\begin{align*}
+  \phi(L)^{-1}
+  &=
+  \left(
+    1-\frac{1}{2}L
+  \right)^{-1}
+  \left(
+    1-\frac{1}{4}L
+  \right)
+  \\
+  &=
+  \left(
+    1
+    +\frac{1}{2}L
+    +\frac{1}{4}L^2
+    +\frac{1}{8}L^8
+    +\cdots
+  \right)
+  \left(
+    1
+    +\frac{1}{4}L
+    +\frac{1}{16}L^2
+    +\cdots
+  \right)
+  \\
+  &=
+  1
+  +
+  \left[
+    \frac{1}{2}
+    +
+    \frac{1}{4}
+  \right]
+  L
+  +
+  \left[
+    \frac{1}{4}
+    +
+    \frac{1}{8}
+    +
+    \frac{1}{2}
+    \cdot
+    \frac{1}{4}
+  \right]
+  L^2
+  +
+  \cdots
+\end{align*}
+\end{frame}
+}
+
+
+
+{\footnotesize
+\begin{frame}{Lag Polynomial Inverses: Multiple Order}
+Example II:
+\begin{align*}
+  x_t
+  &= 0.5x_{t-1} + 0.5x_{t-2} + \varepsilon_t
+\end{align*}
+Form the lag polynomial
+\begin{align*}
+  \phi(z)
+  &= 1 - 0.5z -0.5z^2
+\end{align*}
+\pause
+Factor
+\begin{align*}
+  \phi(z)
+  &= (1-z)(1+0.5z)
+\end{align*}
+Notice there is a unit root.
+
+\pause
+Of course, you can always invert certain pieces, if not the whole thing:
+\begin{align*}
+  \phi(L)x_t
+  =
+  (1-L)(1+0.5L)
+  x_t
+  &=
+  \varepsilon_t
+  \\
+  (1-L)x_t &= (1+0.5L)^{-1}\varepsilon_t
+  \\
+  x_t &= x_{t-1} + (1+0.5L)^{-1}\varepsilon_t
+\end{align*}
+\alert{General Note}:
+You quickly check for unit roots in lag polynomials by summing the
+coefficients. Equivalently, make sure $\phi(1)\neq 0$.
+\end{frame}
+}
+
+
+
+
+
+{\footnotesize
+\begin{frame}{Lag Polynomial Inverse: General Definition \& Comments}
+
+\alert{General Definition}:
+Given an arbitrary lag polynomial $h(z)$, its inverse satisfies
+\begin{align*}
+  h(z)^{-1}h(z) = 1
+\end{align*}
+For the inverse to exist, we need \alert{no unit roots}.
+\begin{itemize}
+  \item By definition, a unit root means that the polynomial $h(z)$
+    equals zero at $z=1$, i.e.\ $h(1)=0$
+
+  \item We saw this in that we factor higher order polynomials into the
+    product of first order polynomials.
+    A unit root means there will be (at least) one first order
+    polynomial that we cannot invert.
+
+  \item If $h(1)\neq 0$, then the inverse exists, but we don't know
+    whether it will contain positive or negative powers of the lag
+    operator.
+
+  \item Compute roots of $h(z)$, and check them to determine
+    stationarity and fundamentalness.
+\end{itemize}
+\end{frame}
+}
+
+
+
+\subsubsection{Relation to Stationarity, Fundamentalness}
+
+{\scriptsize
+\begin{frame}{Lag Polynomials, Stationarity, Fundamentalness}
+
+Suppose we have an AR($p$) model
+\begin{align*}
+  y_t &= \phi_1 y_t + \cdots + \phi_p y_{t-p} + \varepsilon_t
+  \\
+  (1-\phi_1 L - \cdots - \phi_pL^p)y_t &= \varepsilon_t
+  \\
+  \phi(L)y_t &= \varepsilon_t
+\end{align*}
+Cases
+\begin{itemize}
+  \item \alert{Stationary} if all roots of $\phi(z)$ outside unit
+    circle. Nonstationary otherwise.
+  %\item Has a unit root if $\phi(1)=0$
+  \item No question of fundamentalness because we can see from the final
+    line that $\varepsilon_t$ can be written in terms of current and
+    lagged values of $y_t$.
+    Hence, fundamental representation.
+\end{itemize}
+Suppose we have an MA($q$) model
+\begin{align*}
+  y_t &= \varepsilon_t + \theta_1\varepsilon_{t-1} + \cdots + \theta_q
+  \varepsilon_{t-q} + \varepsilon_t
+  = \theta(L)\varepsilon_t
+\end{align*}
+Note
+\begin{itemize}
+  \item Always stationary
+  \item Question is whether fundamental or not.
+  \item So this is exactly the opposite case of the AR model, but all
+    stemming from the same place: Roots of lags polynomial.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Fundamentalness Take 1}
+As we saw, MA problems have an observational equivalence problem.
+For example, the following models generate the same autocovariance
+properties
+\begin{align*}
+  y_t &= \varepsilon_t + 0.5 \varepsilon_{t-1}
+  \qquad
+  \varepsilon_t\iid(0,\sigma^2_\varepsilon)
+  \\
+  \tilde{y}_t &= \eta_t + 2\eta_{t-1}
+  \qquad
+  \varepsilon_t\iid(0,0.25\sigma^2_\varepsilon)
+\end{align*}
+Notice that they have different implications for the shocks:
+\begin{align*}
+  \varepsilon_t
+  &=
+  (1+0.5L)^{-1}y_t
+  =
+  y_t-0.5 y_{t-1} + 0.5^2 y_{t-2} + \cdots
+  \\
+  \eta_t
+  &=
+  (1+2L)^{-1}y_t
+  =
+  0.5 \tilde{y}_{t+1} - 0.25 \tilde{y}_{t+2} + \cdots
+\end{align*}
+Note
+\begin{itemize}
+  \item Former is invertible in \alert{positive} powers of $L$.
+  \item In former case, $\varepsilon_t$ expressed in terms of
+    \alert{current and lagged} $y_t$, and called
+    \alert{fundamental}, can be estimated as an AR model, can be
+    used for forecasting.
+
+  \item The latter invertible in \alert{negative} powers of $L$.
+
+  \item In the latter case, \alert{future} $\tilde{y}_t$, and it is
+    called non-fundamental, cannot be estimated as an AR model, and
+    cannot be used for forecasting.
+\end{itemize}
+\end{frame}
+}
+
+
+
+\subsubsection{Constants}
+
+{\scriptsize
+\begin{frame}{Lag Polynomials and Constants}
+
+Throughout, I've omitted constants and all stationary processes
+presented here have been mean-zero.
+How to easily represent a stationary process with non-zero
+mean?
+
+Define a zero mean process, shift the zero mean process by a constant.
+\begin{align*}
+  \phi(L)u_t &=
+  \theta(L)\varepsilon_t
+  \\
+  x_t
+  &= \mu_x + u_t
+\end{align*}
+Can then deduce dynamics of the shifted process.
+Example:
+\begin{align*}
+  u_t
+  &=
+  \phi_1 u_{t-1}
+  +
+  \cdots
+  +
+  \phi_p u_{t-p}
+  + \varepsilon_t
+  \\
+  x_t
+  &= \mu_x + u_t
+  \\
+  &= \mu_x
+  +
+  \left(
+  \phi_1 u_{t-1}
+  +
+  \cdots
+  +
+  \phi_p u_{t-p}
+  + \varepsilon_t
+  \right)
+  \\
+  &=
+  \mu_x
+  +
+  \phi_1 (x_{t-1}-\mu_x)
+  +
+  \cdots
+  +
+  \phi_p (x_{t-p}-\mu_x)
+  + \varepsilon_t
+  \\
+  &=
+  (1-\phi_1-\cdots-\phi_p)\mu_x
+  + \phi_1 x_{t-1}
+  + \cdots
+  + \phi_p x_{t-p}
+  + \varepsilon_t
+  \\
+  &=
+  \phi(1)\mu_x
+  + \phi_1 x_{t-1}
+  + \cdots
+  + \phi_p x_{t-p}
+  + \varepsilon_t
+\end{align*}
+Notice that the coefficients on the lags are \alert{identical}.
+There is also a constant term that we have identified as $\phi(1)\mu_x$.
+\end{frame}
+}
+
+
+
+{\scriptsize
+\begin{frame}{Lag Polynomials Ignore Constants}
+
+Does a constant change the lag polynomial, its
+roots, stationarity properties, etc.?
+
+From the previous slide,
+\begin{align*}
+  \phi(L)x_t
+  =
+  \phi(1)\mu_x + \varepsilon_t
+\end{align*}
+Can take out the mean
+\begin{align*}
+  \phi(L)(x_t-\mu_x+\mu_x)
+  &=
+  \phi(1)\mu_x + \varepsilon_t
+  \\
+  \phi(L)(x_t-\mu_x)+\phi(L)\mu_x
+  &=
+  \phi(1)\mu_x + \varepsilon_t
+  \\
+  \phi(L)(x_t-\mu_x)+\phi(1)\mu_x
+  &=
+  \phi(1)\mu_x + \varepsilon_t
+  \qquad
+  \text{$Lc=c$ for any $c$}
+  \\
+  \phi(L)(x_t-\mu_x)
+  &=
+  \varepsilon_t
+  \\
+  \phi(L)\tilde{x}_t
+  &=
+  \varepsilon_t
+\end{align*}
+Observations:
+\begin{itemize}
+  \item $\tilde{x}_t=x_t-\mu_x$ is zero mean.
+  \item $\phi(z)$ governs stationarity of zero-mean
+    $\tilde{x}_t$.
+  \item If $\tilde{x}_t$ stationary, adding a \alert{constant}
+    to get $\tilde{x}_t+\mu_x=x_t$ yields stationary process $x_t$.
+  \item Conclusion: Use the same lag polynomial.
+    Nothing really changes.
+\end{itemize}
+\end{frame}
+}
+
+
+
+\subsection{Filtering Perspective}
+
+\subsubsection{Intuition}
+
+{\scriptsize
+\begin{frame}{Filtering Perspective: Motivation}
+Now that we're comfortable with lag operators, their inverses, their
+implications for and relation to stationarity, can say even more about
+why they are useful.
+
+Lag polynomials encourage a \alert{filtering} perspective of linear time
+series:
+Create output process $\{y_t\}$ by applying a linear filter to input
+process $\{x_t\}$.
+%Taking inverses is crucial to reap the benefits of that
+%perspective.
+\begin{itemize}
+  \item MA process creates $\{y_t\}$ by filtering white
+    noise
+    \begin{align*}
+      \{\varepsilon_t\} &\ra \{y_t\}
+      \quad\text{s.t.}\quad
+      y_t
+      =
+      \theta(L)\varepsilon_t
+    \end{align*}
+
+  \pause
+  \item
+    Can filter one time series process to get another:
+    \begin{align*}
+      x_t &= \theta_x(L)\varepsilon_t
+      \\
+      y_t &= \theta_y(L)x_t
+      = \theta_y(L)\theta_x(L)\varepsilon_t
+      = \tilde{\theta}_y(L)\varepsilon_t
+    \end{align*}
+
+  \pause
+  \item
+    ARMA model: By inverting,
+    we get back to filtered white noise.
+    \begin{align*}
+      \phi(L)y_t &= \theta(L)\varepsilon_t
+      \quad\implies\quad
+      y_t = \phi(L)^{-1}\theta(L)\varepsilon_t
+    \end{align*}
+\end{itemize}
+Filtering is a \alert{unifying} theme that simplifies analysis.
+If we understand the input process and the filter, then we understand
+the output process.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Filtering Perspective: Punchline}
+
+Given any stationary ARMA model
+\begin{align*}
+  \phi(L)y_t &= \theta(L)\varepsilon_t
+\end{align*}
+provided that the inverse $\phi(L)^{-1}$ exists, we can think of that
+process as an \alert{MA($\infty$)}:
+\begin{align*}
+  \quad\implies\quad
+  y_t = \phi(L)^{-1}\theta(L)\varepsilon_t
+\end{align*}
+which is just filtered white noise.
+
+Comments
+\begin{itemize}
+  \item White noise $\varepsilon_t$ is a very simple \alert{random}
+    object.
+  \item Lag polynomials and their inverses are simple
+    \alert{deterministic, algebraic} objects.
+  \item An MA($\infty$) is therefore a relatively simple object and, as
+    we just argued, a canonical representation of a stationary ARMA
+    model.
+  \item \alert{Note}: Many results in Hamilton are stated ``Given an
+    MA($\infty$)process'' where ``the filter is absolutely summable'' or
+    ``square summable.''
+  \item
+    To prove and derive results for stationary processes, treat
+    \alert{all} processes as filtered white noise and deduce/place
+    conditions on filters.
+\end{itemize}
+\end{frame}
+}
+
+
+\subsubsection{Revisiting the ACGF}
+
+{\footnotesize
+\begin{frame}{Filtering Perspective and ACGFs}
+Suppose
+\begin{itemize}
+  \item Input series $\{x_t\}$ has ACGF
+    $\lambda_x(z)=\sum_{k=-\infty}^\infty \gamma_{k,x} z^j$
+  \item Output series $\{y_t\}$ is constructed
+    \begin{align*}
+      y_t = h(L)x_t
+    \end{align*}
+\end{itemize}
+Then the ACGF of $\{y_t\}$ is
+\begin{align*}
+  \lambda_y(z) = h(z)h(z^{-1})\lambda_x(z)
+\end{align*}
+\alert{Punchline}:
+\begin{itemize}
+  \item If we can write $\{y_t\}$ as filtered white noise or the
+    filtering of another process with known ACGF, we can easily deduce
+    the ACGF of $y_t$ and thus its covariance properties.
+
+  \item Might need to take inverses (and verify existence of the
+    inverses) to get there.
+
+  \item ACGF is central key for HAC/HAR inference.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Filtering Perspective and ACGFs}
+\alert{Application}:
+Suppose that $y_t$ is an MA process,i.e. filtered white noise
+\begin{align*}
+  y_t = \theta(L)\varepsilon_t
+  \qquad
+  \varepsilon_t
+  \iid
+  (0,\sigma^2)
+\end{align*}
+The ACGF of white noise process $\{\varepsilon_t\}$ is simply
+\begin{align*}
+  \lambda_\varepsilon(z) = \sigma^2
+\end{align*}
+By the above result,
+\begin{align*}
+  \lambda_y(z) = \sigma^2 \theta(z)\theta(z^{-1})
+\end{align*}
+\pause
+\alert{Application}:
+ARMA model
+\begin{align*}
+  \phi(L)y_t
+  &=
+  \theta(L)\varepsilon_t
+  \\
+  y_t
+  &=
+  \phi(L)^{-1}\theta(L)\varepsilon_t
+\end{align*}
+Hence, provided $\phi(L)$ was invertible, ACGF given by
+\begin{align*}
+  \lambda_y(z)
+  =
+  \sigma^2
+  \phi(z)^{-1}\theta(z)
+  \phi(z^{-1})^{-1}\theta(z^{-1})
+\end{align*}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{A Central Limit Theorem for Stationary Processes}
+Suppose we have a linear process (fixed mean plus a stationary
+MA($\infty$) process)
+\begin{align*}
+  y_t
+  = \mu + \psi(L)\varepsilon_t
+  = \mu + \sum_{j=0}^\infty \psi_j \varepsilon_{t-j}
+  \qquad\text{where}\quad
+  \varepsilon_t
+  \iid
+  (0,\sigma^2)
+  \quad
+  \sum_{j=0}^\infty j^2 \psi_j^2<\infty
+\end{align*}
+The latter condition on the coefficients $\{\psi_j\}$ ensures that the
+influence of past shocks decays ``fast enough.''
+Then we have a CLT
+\begin{align*}
+  \sqrt{T}(\bar{y}-\mu)
+  \quad\dto\quad
+  \calN(0,\sigma^2\psi(1)^2)
+\end{align*}
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{A CLT for Stationary Processes, Restated}
+We can also relate the asymptotic variance term to the ACGF.
+Notice that the ACGF of $\{y_t\}$ satisfies
+\begin{align*}
+  \lambda(z)
+  &= \sigma^2 \psi(z) \psi(z^{-1})
+  \quad\implies\quad
+  \lambda(1)
+  =
+  \sigma^2\psi(1)^2
+  =
+  \text{Avar}(\sqrt{T}(\overline{y}-\mu))
+\end{align*}
+Recall also the definition of the ACGF
+\begin{align*}
+  \lambda(z)
+  =
+  \sum_{k=-\infty}^\infty \gamma_k z^k
+\end{align*}
+Therefore, we can use the ACGF and its definition to restate the above
+CLT as
+\begin{align*}
+  \sqrt{T}(\bar{y}-\mu)
+  \quad\dto\quad
+  \calN\bigg(
+    0,
+    \underbrace{%
+    \sum_{k=-\infty}^\infty \gamma_k
+    }_{=\lambda(1)=\sigma^2\psi(1)^2}
+  \bigg)
+\end{align*}
+i.e the asymptotic variance is the sum of all autocovariances.
+\end{frame}
+}
+
+{\scriptsize
+\begin{frame}{CLT for Stationary Processes, Comments}
+\begin{itemize}
+  \item If the data is iid, $\gamma_k=0$ for all $k\neq 0$.
+    Recalling that $\gamma_0=\Var(y_t)$, the above CLT \alert{reduces}
+    to the familiar \alert{Lindeberg-Levy} CLT for iid observations.
+  \item Useful in \alert{regression} contexts where we have time series
+    data and estimate
+    \begin{align*}
+      \sqrt{T}(\hat{\beta}-\beta)
+      =
+      \left[
+        \frac{1}{T}
+        \sumtT
+        x_tx_t'
+      \right]
+      \left[
+        \frac{1}{\sqrt{T}}
+        \sumtT
+        x_t\varepsilon_t
+      \right]
+    \end{align*}
+    If $x_t\varepsilon_t$ stationary, can apply above CLT to the second
+    bracketed term to derive asymptotic normal distribution with
+    standard errors that correctly \alert{account for autocorrelation}.
+
+  \item You might correctly guess that there are lots of \alert{issues}
+    estimating the infinite sum $\sum_{k=-\infty}^\infty \gamma_k$.
+    Time series econometrics has dealt with many methods for estimating
+    this important component of conducting inference under
+    autocorrelation.
+
+  \item \alert{Newey-West} is the most well-known, but also not the
+    cutting edge or recommended in practice.
+    Consult a friendly econometrician for advice.
+
+  \item This doesn't begin to cover that vast literature, but you now
+    have a sense of what the econometrics problem is here.
+    We need to estimate a mean (or regression coefficient or parameter
+    that can be written as some scaled mean of iid observations, i.e.
+    most estimators of interest) in the presence of non-iid,
+    autocorrelated observations.
+    To adjust our standard errors appropriately, we need to account for
+    autocovariances.
+\end{itemize}
+\end{frame}
+}
+
+
+%\begin{frame}[shrink]
+%Linear Time Series and Filtering
+%- Examples
+  %- Moving average, the way most people outside of time series use it
+  %- HP Filter
+%- When we do inference, one object that will matter is spectral density,
+  %which is related to the long run variance, which we'll need for
+  %inference. Both of them are a direct derivative of the ACGF, which is
+  %built from the filter.
+
+%- One sided vs. two-sided filters
+%- Conditions on infinite length filters: square and absolute summability
+%- Absoltely summable implies square summable
+%\end{frame}
+
+
+
+\subsection{Observationally Equivalent MA Processes}
+
+{\scriptsize
+\begin{frame}{Observationally Equivalent MA Processes}
+There is a problem with MA models.
+\begin{itemize}
+  \item As discussed, linear time series models are restrictions on the
+    first and second moments of the DGP
+  \item There might be multiple DGPs that can generate the same second
+    order properties and are therefore
+    \alert{observationally equivalent}.
+  \item Saw an example of this before:
+    \begin{align*}
+      \varepsilon_t
+      &=
+      (1+0.5L)^{-1}y_t
+      =
+      y_t-0.5 y_{t-1} + 0.5^2 y_{t-2} + \cdots
+      \\
+      \eta_t
+      &=
+      (1+2L)^{-1}y_t
+      =
+      0.5 \tilde{y}_{t+1} - 0.25 \tilde{y}_{t+2} + \cdots
+    \end{align*}
+
+  \item Next slides show how we can easily generate observationally
+    equivalent processes given an MA process.
+    This can be used to go from a non-fundamental MA process to a
+    fundamental MA process.
+    This involves the ACGF of a process which, recall is quite simply
+    for an MA process (which we saw by taking the ``filtering
+    perspective''):
+    \begin{align*}
+      y_t &= \theta(L)\varepsilon_t
+      \qquad
+      \qquad
+      \qquad
+      \varepsilon_t
+      \iid
+      (0,\sigma^2)
+      \\
+      \text{ACGF}:
+      \qquad
+      \lambda_y(z) &= \sigma^2 \theta(z)\theta(z^{-1})
+    \end{align*}
+
+\end{itemize}
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Observationally Equivalent Processes}
+Given MA form for a process
+\begin{align*}
+  X_t = \theta_0(L)\varepsilon_t
+  \qquad
+  \varepsilon_t
+  \iid
+  (0,\sigma^2_0)
+\end{align*}
+To easily generate observationally equivalent processes,
+\begin{itemize}
+  \item Factor original lag polynomial $\theta_0(z)$
+    \begin{align*}
+      \theta_0(z) = (1-\gamma_1 z)\cdots(1-\gamma_q z)
+    \end{align*}
+  \item
+    Flip root and call it a new lag polynomial $\theta_1(z)$
+    \begin{align*}
+      \theta_1(z) = (1-\gamma_1^{-1} z)\cdots(1-\gamma_q z)
+    \end{align*}
+  \item
+    Choose $\sigma_1^2$ to match ACGFs
+    \begin{align*}
+      \lambda_0(z)
+      &= \sigma^2_0\theta_0(z)\theta_0(z^{-1})
+      \\
+      &=
+      \sigma^2_0
+      (1-\gamma_1 z)\cdots(1-\gamma_q z)
+      (1-\gamma_1 z^{-1})\cdots(1-\gamma_q z^{-1})
+      \\
+      &=
+      \sigma^2_0
+      \gamma_1 z \gamma_1z^{-1}
+      (1-\gamma_1^{-1} z)\cdots(1-\gamma_q z)
+      (1-\gamma_1^{-1} z^{-1})\cdots(1-\gamma_q z^{-1})
+      \\
+      &=
+      [\sigma^2_0 \gamma_1^2]
+      \theta_1(z)\theta_1(z^{-1})
+      =
+      \lambda_1(z)
+    \end{align*}
+\end{itemize}
+Much easier (especially for higher order processes)
+than computing and matching covariances directly.
+Just work with ACGF since all in there already.
+\end{frame}
+}
+
+
+
+
+%\begin{frame}[shrink]{ARMA Practice}
+%Suppose we have process $\{y_t\}$ that is the sum of an AR(1) and white
+%noise
+%\begin{align*}
+  %y_t &= x_t + u_t\\
+  %x_t &=\phi x_{t-1} + \varepsilon_t
+%\end{align*}
+%$\varepsilon_t\perp u_t$.
+%Want to show can write an observationally equivalent ARMA(1,1) process
+%\begin{align*}
+  %(1-\phi L)X_t &= (1-\theta L)e_t
+%\end{align*}
+%First, write $x_t$ out of the original process:
+%\begin{align*}
+  %(1-\phi L)y_t &= \varepsilon_t + (1-\phi L)u_t
+%\end{align*}
+%From there, match autocovariances of
+%\begin{align*}
+  %\varepsilon_t+u_t-\phi u_{t-1}
+  %\quad\text{and}\quad
+  %e_t - \theta e_{t-1}
+%\end{align*}
+%\end{frame}
+
+
+%\begin{frame}[shrink]{ARMA Practice}
+%Compute
+%\begin{align*}
+  %\Var(\varepsilon_t+u_t-\phi u_{t-1})
+  %&=
+  %\sigma^2_\varepsilon
+  %+
+  %(1+\phi^2)
+  %\sigma^2_u
+  %\\
+  %\Cov(
+    %\varepsilon_t+u_t-\phi u_{t-1}
+    %,
+    %\varepsilon_{t-1}+u_{t-1}-\phi u_{t-2}
+  %)
+  %&=
+  %-\phi \sigma^2_u
+%\end{align*}
+%and
+%\begin{align*}
+  %\Var(e_t - \theta e_{t-1})
+  %&=
+  %\sigma^2_e
+  %(1+\theta^2)
+  %\\
+  %\Cov(
+    %e_t - \theta e_{t-1},
+    %e_{t-1} - \theta e_{t-2}
+  %)
+  %&=
+  %-
+  %\theta
+  %\sigma^2_e
+%\end{align*}
+%Given $(\sigma^2_\varepsilon,\sigma^2_u,\phi)$, choose
+%$(\sigma^2_e,\theta)$ to match
+%\begin{align*}
+  %\sigma^2_\varepsilon
+  %+
+  %(1+\phi^2)
+  %\sigma^2_u
+  %&=
+  %\sigma^2_e
+  %(1+\theta^2)
+  %\\
+  %-\phi \sigma^2_u
+  %&=
+  %-
+  %\theta
+  %\sigma^2_e
+%\end{align*}
+%Need to check for existence of a solution to this system.
+%\end{frame}
+
+
+%\begin{frame}[shrink]{ARMA Practice}
+
+%Rewrite
+%\begin{align*}
+  %\sigma^2_\varepsilon
+  %+
+  %(1+\phi^2)
+  %\sigma^2_u
+  %&=
+  %\sigma^2_e
+  %(1+\theta^2)
+  %\\
+  %\phi \sigma^2_u
+  %&=
+  %\theta
+  %\sigma^2_e
+%\end{align*}
+%Then
+%\begin{align*}
+  %\sigma^2_\varepsilon
+  %+
+  %(1+\phi^2)
+  %\sigma^2_u
+  %&=
+  %\left(
+    %\frac{\sigma^4_e+\phi^2 \sigma^4_u}{\sigma^2_e}
+  %\right)
+%\end{align*}
+%Then
+%\begin{align*}
+  %\frac{1+\theta^2}{\theta}
+  %&=
+  %\frac{\sigma^2_\varepsilon}{\phi \sigma^2_u}
+  %+
+  %\frac{1+\phi^2}{\phi\sigma^2_u}
+%\end{align*}
+%Suppose don't observe $x_t$ or $u_t$.
+%How to forecast $y_{T+4}$
+
+%Now suppose you did observe $x_t$ and $u_t$.
+
+%\end{frame}
+
+
+
+
+\subsection{Wold's Theorem}
+
+{\footnotesize
+\begin{frame}{Wold's Theorem: Motivation}
+Suppose we write down ARMA models, e.g.
+\begin{align*}
+  y_{t+1} &= \phi_1 y_{t} + \phi_2 y_{t-1} + \varepsilon_{t+1}
+  \qquad
+  \varepsilon_{t+1} \sim (0,\sigma^2_y)
+  \\
+  x_{t+1} &= \varepsilon_{t+1} + \theta_1\varepsilon_{t}
+  \qquad\qquad\qquad
+  \varepsilon_{t+1} \sim (0,\sigma^2_x)
+\end{align*}
+Two perspectives on such a linear time series equations, which mirror
+the two perspectives of regression (see Precept 1):
+\begin{itemize}
+  \item \alert{Data Generating Process (DGP)}:
+    Above expressions specify how sequences $\{x_t\}$ or $\{y_t\}$
+    produced from inputs (shocks, initial condition), i.e.
+    DGP for $\{y_t\}$.
+
+    \alert{Problem}: Sometimes $\exists$ observationally equivalent DGPs
+    up to 2nd order.
+
+    %Note: Specified DGP can be nonstationary or noninvertible.
+    %We now have tools to check.
+    %Other DGPs might also lead to the same 2nd order properties.
+
+  \pause
+  \item \alert{Linear Representation}:
+    Given stationary process with \alert{some DGP} (unknown to us),
+    $\alert{\exists}$ (by Wold's Theorem) a linear time series
+    process/DGP with \alert{identical} 2nd-order properties as
+    \alert{original} process with \alert{arbitrary} cov.\
+    stationary DGP.
+    %And in particular, the linear time series DGP will be unique, i.e.
+    %it selects one DGP from among the observationally equivalent DGPs,
+    %namely the \alert{fundamental} one.
+
+    Thus there exists a linear time series \alert{representation} of
+    that process, or interpretation of the above equations and
+    coefficients.
+\end{itemize}
+\end{frame}
+}
+
+
+%\begin{frame}[shrink]{Linear Time Series Models}
+%Linear time series models amount to \alert{specification} of the data
+%generating process (\alert{DGP}).
+%So when we write down an AR($p$), MA($q$), etc.
+%In so doing, we also specify \alert{conditional moments}, e.g.
+%\begin{align*}
+  %\E_{t}[y_{t+1}]
+  %&=
+  %\phi_1 y_{t} + \phi_2 y_{t-1}
+  %\\
+  %\Var_t(y_{t+1}) &=
+  %\sigma^2
+%\end{align*}
+%This is one justification for focusing on linear time series models:
+%Simple specification of the DGP for stochastic processes.
+%Wold's Theorem provides another justification.
+%\end{frame}
+
+
+
+%\begin{frame}[shrink]
+%Picture to Have in Mind for Linear Time Series
+%- Sample draw looks like an entire path
+%- A data series looks like a slice
+%- A forecast is standing at a point, looking forward.
+%- Dynamics specify that
+%- The conditional mean, the conditional variance
+%- The unconditional mean and variance are an average over many paths
+%- A persistent process makes it.
+%\end{frame}
+
+
+%Linear time series models
+%- AR process: Errors in statinary AR process are already constructed from current and past values of the errors
+%- Connection to Wold errors is what we're testing in the homework
+
+%Big questions in Linear Time Series Models
+
+%\begin{frame}[shrink]{Linear Time Series Models}
+
+%Important Questions
+%\begin{itemize}
+  %\item What can we say about \alert{unconditional} moments?
+    %Is the model \alert{stationary}?
+%\end{itemize}
+%- AR models: Is it stationary?
+  %- Does the series explode or settle down?
+  %- Are initial conditions important, or does their affect die out?
+  %- Are shocks termporary or permanent?
+%- MA models: Is it invertible?
+  %- Don't have stationarity problems, always stationary
+  %- "Can we construct epsilons from past y"
+  %- Requres roots of polynomial greater than 1 in modulus
+  %- Implies a unique choice of MA rep, among several that are always there
+  %- Other MA reps of the same process, any MA process
+  %- Invertibility implies a choice
+%\end{frame}
+
+
+{\footnotesize
+\begin{frame}[shrink]{Wold's Theorem: Motivation}
+Suppose we're \alert{given}
+\alert{covariance stationary stochastic processes} $\{x_t\}_{t=1}^T$.
+\begin{itemize}
+  \item Covariance stationarity is \alert{only} restriction placed on
+    DGP; otherwise unspecified.
+  \item Nonetheless, that assumption of covariance stationarity is quite
+    powerful and might let us say a lot.
+\end{itemize}
+Questions
+\begin{itemize}
+  \item What can we say given only the assumption of covariance stationarity?
+  \item How should we \alert{represent} covariance stationary processes?
+    Why do we see always linear processes like AR($p$)'s and MA($q$)'s?
+    Why is that the dominant way of thinking about covariance stationary
+    processes?
+\end{itemize}
+\alert{Answer}: Wold's Theorem
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Wold's Theorem}
+If a stochastic process $\{x_t\}$ is \alert{cov.\ stationary},
+\begin{itemize}
+  \item
+    \alert{$\exists$} an \alert{MA($\infty$)} (filtered white noise)
+    \alert{representation}/\alert{process}
+    \begin{align*}
+      \tilde{x}_t = \sum_{s=0}^\infty \theta_s\varepsilon_{t-s}
+      \qquad
+      \varepsilon_t
+      \iid (0,\sigma^2_\varepsilon)
+    \end{align*}
+
+  \item The shocks $\{\varepsilon_t\}$ in the above definition can
+    be written in terms of current and lagged values of
+    $\{x_t\}$, e.g. we can write
+    \begin{align*}
+      \varepsilon_t = \tilde{x}_t - c_1\tilde{x}_{t-1} -
+      c_2\tilde{x}_{t-2}-\cdots
+    \end{align*}
+    for all $t$ and for some fixed coefficients $c_i$.
+    Hence these shocks are \alert{fundamental}.
+
+  \item The quantity
+    \begin{align*}
+      \sum_{s=1}^\infty
+      c_s x_{t-s}
+      =
+      c_1{x}_{t-1}
+      + c_2{x}_{t-2}
+      + \cdots
+    \end{align*}
+    will be the \alert{best linear predictor} of $x_t$ based on lagged
+    values $x_{t-1},x_{t-2},\cdots$.
+    (Naturally, a similar statement holds replacing $x$ with
+    $\tilde{x}$.)
+
+  \item The second order properties of $\{\tilde{x}_t\}$ are identical
+    to the second order properties of the original $\{x_t\}$
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Wold's Theorem: Implications}
+Implications
+\begin{itemize}
+  \item A covariance stationary process always has an MA($\infty$)
+    representation.
+  \item Moreover it always has a \alert{unique fundamental}
+    MA($\infty$) representation.
+  \item In addition to being simple convenient ways to specify DGPs for
+    discrete time series data, this class of linear time series models
+    can be viewed as a \alert{workhorse representation}
+    for covariance stationary processes.
+  \item If we're working with covariance stationary processes,
+    restricting to linear MA($\infty$) process ``good/rich enough'' for
+    capturing features of covariance stationary processes.
+
+    This comes with uniqueness issues, but by restricting to fundamental
+    representation, we settle on a unique representation for all such
+    covariance stationary processes.
+  %\item Because we've only specified covariance stationarity and
+    %haven't \emph{fully} specified the distribution, there are
+    %uniqueness issues and equivalent representations (e.g. flipping
+    %roots, AR, MA)
+\end{itemize}
+\end{frame}
+}
+
+
+
+{\scriptsize
+\begin{frame}{Wold's Theorems: Questions}
+Prompts questions:
+\begin{itemize}
+  \item Why bother with AR, ARMA, MA($q$) (i.e. other linear time
+    series) models when Wold's Theorem delivers an MA($\infty$) rep?
+    \begin{itemize}
+      {\scriptsize
+      \item Theorem needs an MA($\infty$) to work for \emph{all}
+        covariance stationary processes generally.  But might be simpler
+        representations for given process.
+
+      \item The covariance stationary \alert{process} $\{x_t\}$ itself
+        and its \alert{DGP} are \emph{distinct} from a linear time
+        series \alert{representation} of the process.
+        That's why we can have multiple representations and uniqueness
+        issues, i.e. different representations that have that the same
+        distributional implications.
+
+      \item Some representations are more convenient, e.g. an
+        MA($\infty$) might simplify to an AR(1).
+
+      \item The set of MA($q$) and AR($p$) processes are ``dense'' in
+        the set of covariance stationary processes, so if we take large
+        enough $q$ or $p$, we can get arbitrarily close to the truth.
+      }
+    \end{itemize}
+
+  \item Relationship between Wold shocks and other shocks/innovations we
+    write in our MA, AR, ARMA models?
+\end{itemize}
+\end{frame}
+}
+
+
+
+\begin{frame}[shrink]{Wold's Theorem: The Shocks}
+
+When we write down an MA or ARMA DGP, the shocks we write down
+\alert{may or may not} coincide with the Wold shocks.
+
+If you have an arbitrary MA or ARMA DGP, think of the Wold shocks as
+existing ``somewhere out there'', and then inspect your model to
+determine whether the innovations in your DGP are the Wold shocks or
+not.
+
+If you wrote down an AR DGP, the shocks are immediately fundamental/Wold
+shocks.
+
+If you wrote down an MA that's fundamental (i.e. roots of the lag
+polynomial outside the unit circle), those are fundamental/Wold shocks.
+Else need to derive equivalent rep that has the Wold shocks.
+
+% Wold
+%
+%- The Wold errors exist out there for any stationary process, they may
+%  or may not match the errors/shocks that you have in your
+%  specification of the model. The task, and the point of one question
+%  of this homework, is to get you to identify when they do match or
+%  might not match.
+%
+%- What about the reverse: Is a linear time series process necessarily
+%  stationary or connected to the Wold rep? No, and we have to study.
+%
+\end{frame}
+
+
+\begin{frame}[shrink]{Wold Shocks: Example}
+
+Processes
+\begin{align*}
+  X_t &= e_t - 0.5 e_{t-1}
+  \\
+  X_t &= e_t - 2 e_{t-1}
+\end{align*}
+Note
+\begin{itemize}
+  \item Process 1 is \alert{invertible}, i.e. can recover $e_t$ from
+    current and past $X_t$:
+    \begin{align*}
+      e_t &= (1-0.5L)^{-1}X_t
+    \end{align*}
+    Because root $>1$, lag operator inverse is in positive power of $L$,
+    i.e. $e_t$ built from lags of $X_t$.
+
+    Note also: Wold's theorem gives \alert{unique} representation.
+    Hence $e_t$ are the Wold Shock.
+
+  \item
+    Process 2 is \alert{not} invertible.
+    Can only build $e_t$ from future values of the process.
+    Need to flip root to get the Wold representation and shocks.
+
+\end{itemize}
+
+\end{frame}
+
+
+
+
+
+
+\end{document}
+
+
+
+{\footnotesize
+\begin{frame}{Types of Uncertainty}
+Two Main Types and Considerations
+\begin{itemize}
+  \item Population versus sample and associated
+    \alert{sampling uncertainty}.
+
+    We would like to extrapolate from the sample to the population,
+    and we need \alert{sampling assumptions} to deliver external
+    validity in order to do so.
+
+  \item \alert{Random assignment}, which gives rise to non-trivial
+    inference problem \emph{even if} we have the full population.
+
+    Fisher randomization inference considers exclusively this.
+\end{itemize}
+Note
+\begin{itemize}
+  \item We often do OLS, but the type of uncertainty we allow for
+    affects \alert{standard errors} and hence our inference
+  \item Often both types of uncertainty play a role
+\end{itemize}
+We will study these in the context of causal inference.
+\end{frame}
+}
+
+
+
+{\footnotesize
+\begin{frame}{Causal Inference: Outcomes}
+\alert{Potential Outcomes}
+\begin{itemize}
+  \item Under binary treatment, this is a pair $(Y(0),Y(1))$
+    giving the outcome under control status versus treatment,
+    respectively
+  \item Under multivalued treatment, this is a set
+    $\{Y_i(d)\}_{d\in \calD}$
+  \item \alert{Stable Unit Treatment Value Assumption (SUTVA)}:
+    Implicit in the above notation for potential outcomes, we assume
+    potential outcomes for a given unit only depends upon treatment status
+    \alert{for that unit}, not other units.
+    No spillovers.
+\end{itemize}
+\alert{Observed Outcomes}
+\begin{itemize}
+  \item Letting $D$ denote treatment status, we then observe
+    \begin{align*}
+      Y
+      = Y(D)
+      =
+      Y(0)(1-D)
+      +
+      Y(1)D
+    \end{align*}
+  \item Inherently a \alert{missing data problem} in that we only
+    observe one potential outcome, $Y(0)$ or $Y(1)$.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Causal Inference: Dealing with Missing Data Problem}
+Two approaches to dealing with missing data problem:
+\begin{itemize}
+  \item \alert{Modeling/Parametric Assumptions}
+    \begin{itemize}
+      \item Impose assumptions on the DGP that let us deduce missing
+        observation, e.g.
+        \begin{align*}
+          Y(1)=Y(0)+c
+        \end{align*}
+        and we can estimate $c$
+
+      \item Macro: Whole DSGE Model
+    \end{itemize}
+
+  \item \alert{Assumptions on Assignment Mechanism}
+    \begin{itemize}
+      \item Given assumptions on the assignment mechanism, we can
+        estimate average effects
+    \end{itemize}
+\end{itemize}
+\end{frame}
+}
+
+
+
+{\footnotesize
+\begin{frame}{Causal Inference: Assignment Mechanism}
+\alert{Assignment Mechanism}
+\begin{itemize}
+  \item Assumption on how treatment is assigned, given potential
+    outcomes and/or covariates.
+
+  \item Formally, it's a probability distribution over the joint
+    treatment vector $(D_1,\ldots,D_n)$ for all units which, in general,
+    depends upon potential outcomes and covariates
+    \begin{align*}
+      P[D_1,\ldots,D_n|Y(0),Y(1),X]
+    \end{align*}
+  \item Random Treatment:
+    $D$ independent of potential outcomes and covariates
+  \item Stratified Treatment:
+    Partition sample into subgroups (e.g. based on gender), random
+    assignment within subgroups.
+    Ensures all treated units aren't of same gender.
+  \item Selection on Observables
+\end{itemize}
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Sources of Randomness}
+Two sources of randomness when doing causal inference:
+\begin{itemize}
+  \item \alert{Design}-Based Uncertainty:
+    Assignment was random and we don't observe the full set of potential
+    outcomes, though we're generally interested in the difference of
+    average outcomes if \alert{everyone} assigned to treatment or not.
+  \item \alert{Sampling} Uncertainty:
+    Sometimes we only observe a subset of the population of interest and
+    we would like to extrapolate.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Example: Finite Sample Inference}
+Suppose the sample at hand is my population of interest.
+\begin{itemize}
+  \item Example: States in a panel study. There aren't more than 50
+    states. Uncertainty is when timing hits.
+  \item Potential outcomes fixed
+  \item Only uncertainty is over the treatment assignment
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Randomization Inference}
+Implicitly takes this finite sample perspective.
+Only uncertainty is over treatment assignment.
+Only uncertainty is that I didn't observe the other missing outcome.
+What makes it work is the sharp null, which fully specifies missing
+outcomes.
+Mechanics.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Inference on the Superpopulation}
+Sample is a draw from superpopulation
+\begin{itemize}
+  \item Example: Individuals within states, states adopt policies, want
+    to estimate average effect of earnings.
+  \item Induces distribution on potential outcomes
+  \item We make assumptions on the assignment mechanism
+\end{itemize}
+\end{frame}
+}
+
+
+%Working it Out
+%- Regression estimand under sampling + design, vs. design uncertainty
+%- We showed last time that we estimate the average treatment effect
+%- Suppose we take simple difference in means
+%- Two perspectives
+
+
+\end{document}
+
+
+
+Placebo Tests
+- Usually done to assess plausibility of procedure
+- You know the potential outcomes are the same
+- You want to estimate zero effect
+- You take estimation of zero effect as encouraging
+- Prob[zero effect | known zero effect] the means that P[some effect | zero effect] is zero
+
+
+Normal model, conjugacy all over the place
+
+
+
+
+
+% Sample code
+\pause to add breaks
+\textcolor{red}{text to show}.
+\vspace{20pt}
+
+\usebeamercolor{dull text}
+\alert<+>{Words that you want to alert}
+

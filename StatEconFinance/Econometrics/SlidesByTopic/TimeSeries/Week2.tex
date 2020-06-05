@@ -1,0 +1,1438 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usepackage{cmbright}
+%\usetheme{metropolis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis with Sidebar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[handout]{beamer}
+%\documentclass{beamer}
+\usepackage{cmbright}
+
+\useoutertheme[right, width=0.20\paperwidth]{sidebar}
+\usecolortheme{metropolis}
+\useinnertheme[sectionpage=none]{metropolis}
+\usefonttheme{metropolis}
+
+\makeatletter
+\beamer@headheight=1.75\baselineskip     %controls the height of the headline, default is 2.5
+\makeatother
+
+%\setbeamertemplate{sidebar canvas right}{}
+%\setbeamertemplate{sidebar right}{BOB}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Simple Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usetheme{Boadilla}
+%\usepackage{lmodern}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sidebar Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass[serif]{beamer}  % For serif latex font
+%\usepackage{pxfonts}
+%\usepackage{eulervm}
+%\usepackage{mathpazo}
+
+%\usetheme{Goettingen}
+%\usecolortheme{lily}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Common Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[]{ECO-466/FIN-521: Precept, Week 2 \\ Matt Cocci}
+\author[]{}
+\date{\today}
+
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+%\setbeamertemplate{section in toc}[square unnumbered]
+%\setbeamertemplate{subsection in toc}[square unnumbered]
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% For easier looping
+\usepackage{pgffor}
+
+\usepackage{pdfpages}
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\proj}{\operatorname{proj}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Rnk}{\mathbb{R}^{n\times k}}
+\newcommand{\Rkk}{\mathbb{R}^{k\times k}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Presentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Outline}
+\tableofcontents[hideallsubsections]
+%\tableofcontents
+\end{frame}
+
+
+\section{Exercise 1}
+
+\subsection{Problem 1}
+
+\begin{frame}[shrink]{Problem 1: Higher Order Autocovs}
+\alert{Want}:
+$\Cov(X_t,X_{t-5})$
+for DGP
+\begin{align*}
+  X_t
+  &=
+  2 + 1.3 X_{t-1} - 0.5 X_{t-2} + \varepsilon_t
+  \qquad
+  \varepsilon_t \iid (0,4)
+\end{align*}
+Two approaches:
+\begin{itemize}
+  \item Systematic
+  \item
+    Write as VAR(1), augmenting state vector, use general formulas:
+    \begin{align*}
+      \underbrace{%
+        \begin{pmatrix}
+          X_t \\
+          X_{t-1} \\
+          X_{t-2} \\
+          X_{t-3} \\
+          X_{t-4} \\
+          X_{t-5}
+        \end{pmatrix}
+      }_{\tilde{X}_{t}}
+      &=
+      \underbrace{%
+        \begin{pmatrix}
+          2 \\
+          0 \\
+          0 \\
+          0 \\
+          0 \\
+          0 \\
+        \end{pmatrix}
+      }_{C}
+      +
+      \underbrace{%
+        \begin{pmatrix}
+          1.3 & -0.5 & 0 & 0 & 0 & 0 \\
+          1 & 0 & 0 & 0 & 0 & 0 \\
+          0 & 1 & 0 & 0 & 0 & 0 \\
+          0 & 0 & 1 & 0 & 0 & 0 \\
+          0 & 0 & 0 & 1 & 0 & 0 \\
+          0 & 0 & 0 & 0 & 1 & 0 \\
+        \end{pmatrix}
+      }_{\Phi}
+      \underbrace{%
+        \begin{pmatrix}
+          X_{t-1} \\
+          X_{t-2} \\
+          X_{t-3} \\
+          X_{t-4} \\
+          X_{t-5} \\
+          X_{t-6} \\
+        \end{pmatrix}
+      }_{\tilde{X}_{t-1}}
+      +
+      \underbrace{%
+        \begin{pmatrix}
+          \varepsilon_t \\
+          0 \\
+          0 \\
+          0 \\
+          0 \\
+          0 \\
+        \end{pmatrix}
+      }_{\tilde{\varepsilon_t}}
+    \end{align*}
+    From there, similar to what we saw in class,
+    \begin{align*}
+      \Var(\tilde{X}_t)
+      &=
+      \Var(C + \Phi \tilde{X}_{t-1}+ \tilde{\varepsilon}_t)
+      =
+      \Phi \Var(\tilde{X}_{t-1})\Phi'
+      +
+      \Var(\tilde{\varepsilon}_t)
+      =
+      \Phi \Var(\tilde{X}_{t})\Phi'
+      + \Sigma
+      \\
+      \implies\quad
+      \vc(\Var(\tilde{X}_t))
+      &=
+      [I-(\Phi\otimes\Phi)]^{-1}
+      \vc(\Sigma)
+    \end{align*}
+\end{itemize}
+\end{frame}
+
+
+\subsection{Problem 2}
+
+\begin{frame}[shrink]{Problem 2b: Obs. Equivalent Processes}
+
+Given MA form for a process
+\begin{align*}
+  X_t = \theta_0(L)\varepsilon_t
+  \qquad
+  \varepsilon_t
+  \iid
+  (0,\sigma^2_0)
+\end{align*}
+To easily generate observationally equivalent processes,
+\begin{itemize}
+  \item Factor
+    \begin{align*}
+      \theta_1(z) = (1-\gamma_1 z)\cdots(1-\gamma_q z)
+    \end{align*}
+  \item
+    Flip root
+    \begin{align*}
+      \theta_1(z) = (1-\gamma_1^{-1} z)\cdots(1-\gamma_q z)
+    \end{align*}
+  \item
+    Choose $\sigma_1^2$ to match ACGFs
+    \begin{align*}
+      \lambda_0(z)
+      &= \sigma^2_0\theta_0(z)\theta_0(z^{-1})
+      \\
+      &=
+      \sigma^2_0
+      (1-\gamma_1 z)\cdots(1-\gamma_q z)
+      (1-\gamma_1 z^{-1})\cdots(1-\gamma_q z^{-1})
+      \\
+      &=
+      \sigma^2_0
+      \gamma_1 z \gamma_1z^{-1}
+      (1-\gamma_1^{-1} z)\cdots(1-\gamma_q z)
+      (1-\gamma_1^{-1} z^{-1})\cdots(1-\gamma_q z^{-1})
+      \\
+      &=
+      [\sigma^2_0 \gamma_1^2]
+      \theta_1(z)\theta_1(z^{-1})
+      =
+      \lambda_1(z)
+    \end{align*}
+\end{itemize}
+Much easier (especially for higher order processes)
+than computing and matching covariances directly.
+Just work with ACGF since all in there already.
+\end{frame}
+
+
+
+\subsection{Problem 3}
+
+
+\begin{frame}[shrink]{Problem 3: Wold Shocks}
+
+Processes
+\begin{align*}
+  X_t &= e_t - 0.5 e_{t-1}
+  X_t &= e_t - 2 e_{t-1}
+\end{align*}
+Note
+\begin{itemize}
+  \item Process 1 is \alert{invertible}, i.e. can recover $e_t$ from
+    current and past $X_t$:
+    \begin{align*}
+      e_t &= (1-0.5L)^{-1}X_t
+    \end{align*}
+    Because root $>1$, lag operator inverse is in positive power of $L$,
+    i.e. $e_t$ built from lags of $X_t$.
+
+    Note also: Wold's theorem gives \alert{unique} representation.
+    Hence $e_t$ are the Wold Shock.
+
+  \item
+    Process 2 is \alert{not} invertible.
+    Can only build $e_t$ from future values of the process.
+    Need to flip root to get the Wold representation and shocks.
+
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}[shrink]
+Equivalent representations, might differ omega-wise, but match in
+moments.
+
+This is what we mean in the Wold theorem.
+\end{frame}
+
+
+
+
+\section{ARMA Practice}
+
+
+\begin{frame}[shrink]{ARMA Practice}
+Suppose we have process $\{y_t\}$ that is the sum of an AR(1) and white
+noise
+\begin{align*}
+  y_t &= x_t + u_t\\
+  x_t &=\phi x_{t-1} + \varepsilon_t
+\end{align*}
+$\varepsilon_t\perp u_t$.
+Want to show can write an observationally equivalent ARMA(1,1) process
+\begin{align*}
+  (1-\phi L)X_t &= (1-\theta L)e_t
+\end{align*}
+First, write $x_t$ out of the original process:
+\begin{align*}
+  (1-\phi L)y_t &= \varepsilon_t + (1-\phi L)u_t
+\end{align*}
+From there, match autocovariances of
+\begin{align*}
+  \varepsilon_t+u_t-\phi u_{t-1}
+  \quad\text{and}\quad
+  e_t - \theta e_{t-1}
+\end{align*}
+\end{frame}
+
+
+\begin{frame}[shrink]{ARMA Practice}
+Compute
+\begin{align*}
+  \Var(\varepsilon_t+u_t-\phi u_{t-1})
+  &=
+  \sigma^2_\varepsilon
+  +
+  (1+\phi^2)
+  \sigma^2_u
+  \\
+  \Cov(
+    \varepsilon_t+u_t-\phi u_{t-1}
+    ,
+    \varepsilon_{t-1}+u_{t-1}-\phi u_{t-2}
+  )
+  &=
+  -\phi \sigma^2_u
+\end{align*}
+and
+\begin{align*}
+  \Var(e_t - \theta e_{t-1})
+  &=
+  \sigma^2_e
+  (1+\theta^2)
+  \\
+  \Cov(
+    e_t - \theta e_{t-1},
+    e_{t-1} - \theta e_{t-2}
+  )
+  &=
+  -
+  \theta
+  \sigma^2_e
+\end{align*}
+Given $(\sigma^2_\varepsilon,\sigma^2_u,\phi)$, choose
+$(\sigma^2_e,\theta)$ to match
+\begin{align*}
+  \sigma^2_\varepsilon
+  +
+  (1+\phi^2)
+  \sigma^2_u
+  &=
+  \sigma^2_e
+  (1+\theta^2)
+  \\
+  -\phi \sigma^2_u
+  &=
+  -
+  \theta
+  \sigma^2_e
+\end{align*}
+Need to check for existence of a solution to this system.
+\end{frame}
+
+
+\begin{frame}[shrink]{ARMA Practice}
+
+Rewrite
+\begin{align*}
+  \sigma^2_\varepsilon
+  +
+  (1+\phi^2)
+  \sigma^2_u
+  &=
+  \sigma^2_e
+  (1+\theta^2)
+  \\
+  \phi \sigma^2_u
+  &=
+  \theta
+  \sigma^2_e
+\end{align*}
+Then
+\begin{align*}
+  \sigma^2_\varepsilon
+  +
+  (1+\phi^2)
+  \sigma^2_u
+  &=
+  \left(
+    \frac{\sigma^4_e+\phi^2 \sigma^4_u}{\sigma^2_e}
+  \right)
+\end{align*}
+Then
+\begin{align*}
+  \frac{1+\theta^2}{\theta}
+  &=
+  \frac{\sigma^2_\varepsilon}{\phi \sigma^2_u}
+  +
+  \frac{1+\phi^2}{\phi\sigma^2_u}
+\end{align*}
+Suppose don't observe $x_t$ or $u_t$.
+How to forecast $y_{T+4}$
+
+Now suppose you did observe $x_t$ and $u_t$.
+
+\end{frame}
+
+
+
+
+
+\section{Deriving Asymptotic Distribution Example}
+
+
+\begin{frame}[shrink]{Motivation}
+Model
+\begin{align*}
+  y_t &= x_t \beta + u_t
+\end{align*}
+OLS estimator
+\begin{align*}
+  \hat{\beta}
+  &=
+  \beta
+  +
+  \left(
+  \sumtT x_t^2
+  \right)^{-1}
+  \sumtT x_tu_t
+\end{align*}
+In class, we defined $g_t=x_tu_t$, argued that
+\begin{align*}
+  \frac{1}{\sqrt{T}}
+  \sumtT x_tu_t
+  &=
+  \calN\bigg(
+  0,
+  \underbrace{%
+    \sum_{j=-\infty}^\infty
+    \lambda_j
+  }_{\Omega}
+  \bigg)
+  \qquad\text{where}\quad
+  \lambda_j
+  =
+  \E[g_tg_{t+j}']
+\end{align*}
+We're now moving into the part of the course where we're trying to
+estimate $\Omega$.
+\end{frame}
+
+
+\begin{frame}[shrink]{Overview of HAC and HAR}
+
+Goal: Estimating $\Omega$.
+
+Many options for constructing a consistent estimator $\hat{\Omega}$ of
+$\Omega$.
+Most are bad.
+Some HAC options:
+\begin{itemize}
+  \item Naive sample counterpart:
+    $\sum_{j=-k}^k \hat{\lambda}_j$
+
+    \alert{Issue}: Sometimes negative.
+
+  \item \alert{Newey-West}:
+    $\sum_{j=-k}^k w_j \hat{\lambda}_j$
+
+    \alert{Improvement}: Weights ensure nonnegative.
+
+  \item
+    \alert{Parametric}:
+    Assume process for $g_t$. Gives $\lambda_j$ in closed form as
+    a function of parameters, estimate parameters, plug into parametric
+    form for $\hat{\lambda}_j$'s.
+
+  \item
+    \alert{Spectral}:
+    Take Fourier transform of autocovariance function to get spectral
+    density, which has a tight link with the ACGF.
+    Take Fourier transform of the data and use the transformed data to
+    estimate the spectral density, i.e. ``work in the frequency
+    domain.'' Then map back to an estimate for the ACGF and $\Omega$.
+\end{itemize}
+HAR: State of the art now.
+Acknowledge the difficulty of consistently estimating $V$, e.g.
+do inference on the $t$-stat that allows for sampling variability in
+\alert{both} numerator and denominator.
+\end{frame}
+
+
+
+\begin{frame}[shrink]{Broader Point about Asymptotics}
+
+\alert{Asymptotics} is just a systematic approach/device for deriving
+approximations.
+
+We don't have bounds on the approximation error.
+We just know that \alert{eventually}, we'll get the right answer.
+%The usual ``how big should $n$ or $T$ be?'' question.
+
+Often, this works well enough, and when deriving asymptotic
+distributions for the purposes of approximation like 
+\begin{align*}
+  \sqrt{T}(\hat{\beta}-\beta)
+  \quad\dto\quad
+  \calN(0,V)
+\end{align*}
+we're comfortable forming statistics like
+\begin{align*}
+  T(\hat{\beta}-\beta)\hat{V}(\hat{\beta}-\beta)
+\end{align*}
+and just acting like $\hat{V}$ is $V$.
+
+HAC was an example where this kind of approximation didn't work so well,
+so we had to derive new approximations.
+
+Much new research in econometrics now is doing \alert{alternative} or
+\alert{nonstandard asymptotics} to derive different, better
+approximations.
+\end{frame}
+
+
+\begin{frame}[shrink]{Deriving Asymptotic Distribution}
+Suppose we have
+\begin{align*}
+  y_t &= x_t \beta + u_t
+  \\
+  x_t &= \rho x_{t-1} + \varepsilon_t
+  \qquad
+  \varepsilon_t\iid (0,1)
+  \\
+  u_t &= \phi u_{t-1} + \eta_t
+  \qquad
+  \eta_t\iid(0,1)
+\end{align*}
+Want to show that OLS estimator satisfies
+\begin{align*}
+  \sqrt{T}(\hat{\beta}-\beta)
+  \dto
+  \calN(0,V)
+\end{align*}
+and find $V$ as a function of
+$(\rho,\sigma^2_\varepsilon,\phi,\sigma^2_\eta)$.
+
+This puts parametric structure on $g_t=x_tu_t$ that will let us derive a
+$\Omega$ (and then $V$) as a function of the parameters.
+\end{frame}
+
+
+
+
+\begin{frame}[shrink]{Deriving Asymptotic Distribution}
+Want asymptotic distribution.
+\begin{itemize}
+  \item First, because $u_t$ and $x_t$ are independent zero-mean
+    processes, $g_t=x_tu_t$ is zero-mean.
+
+  \item By CLT for stationary and ergodic processes,
+    \begin{align*}
+      \frac{1}{\sqrt{T}}
+      \sumtT
+      x_tu_t
+      =
+      \frac{1}{\sqrt{T}}
+      \sumtT
+      g_t
+      \dto
+      \calN\left(
+      0,
+      \sum_{j=-\infty}^\infty
+      \lambda_j
+      \right)
+    \end{align*}
+
+  \item Let's derive
+    \begin{align*}
+      \lambda_j
+      =
+      \E[g_tg_{t-j}]
+      =
+      \E[x_tu_t x_{t-j}u_{t-j}]
+      =
+      \E[x_tx_{t-j}]
+      \E[u_tu_{t-j}]
+      =
+      \lambda_{j,u}
+      \lambda_{j,x}
+    \end{align*}
+
+  \item
+    Recall
+    \begin{align*}
+      \lambda_{j,u}
+      =
+      \frac{\phi^j}{1-\phi^2}
+      \quad
+      \lambda_{j,x}
+      =
+      \frac{\rho^j}{1-\rho^2}
+    \end{align*}
+  \item Then
+    \begin{align*}
+      \sum_{j=-\infty}^\infty
+      \lambda_j
+      =
+      \lambda_0
+      + 2
+      \sum_{j=1}^\infty
+      \lambda_j
+      &=
+      \lambda_{0,u}
+      \lambda_{0,x}
+      +
+      2
+      \sum_{j=1}^\infty
+      \lambda_{j,u}
+      \lambda_{j,x}
+      \\
+      &=
+      \frac{1}{1-\phi^2}
+      \frac{1}{1-\rho^2}
+      \left(
+      1
+      +
+      2
+      \sum_{j=1}^\infty
+      (\rho\phi)^j
+      \right)
+      \\
+      &=
+      \frac{1}{1-\phi^2}
+      \frac{1}{1-\rho^2}
+      \frac{1+\phi\rho}{1-\phi\rho}
+    \end{align*}
+  \item
+    Lastly,
+    \begin{align*}
+      \left(
+      \sumtT x_t^2
+      \right)^{-1}
+      \pto
+      \E[x_t^2]^{-1}
+      =
+      \Var(x_t)^{-1}
+      =
+      (1-\rho^2)
+    \end{align*}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[shrink]{Reconciling CLTs}
+
+Recall that for an MDS
+\begin{align*}
+  \frac{1}{\sqrt{T}}
+  \sumtT
+  g_t
+  \quad\dto\quad
+  \calN(0,\Var(g_t))
+\end{align*}
+In time series,
+\begin{align*}
+  \frac{1}{\sqrt{T}}
+  \sumtT
+  g_t
+  \quad\dto\quad
+  \calN\left(
+  0,
+  \sum_{j=-\infty}^\infty
+  \lambda_j
+  \right)
+\end{align*}
+Note that if $g_t$ is an MDS,
+\begin{align*}
+  \lambda_j
+  =
+  \E[g_tg_{t-j}]
+  =
+  \E\big[
+    \E[
+      g_tg_{t-j}|g_{t-j}
+    ]
+  \big]
+  =
+  \E\big[
+    \E[
+      g_t|g_{t-j}
+    ]g_{t-j}
+  \big]
+  =
+  \E\big[
+    0
+    \cdot
+    g_{t-j}
+  \big]
+  =
+  0
+\end{align*}
+\end{frame}
+
+
+
+%\begin{frame}[shrink]
+%Triangular asymptotics.
+
+%Suppose
+%\begin{align*}
+  %y_{T,t} &= \varepsilon_t
+  %\qquad
+  %t = 1,\ldots,T/2
+  %\\
+  %y_{T,t}
+  %&=
+  %\varepsilon_t
+  %-
+  %\theta_1
+  %\varepsilon_{t-1}
+  %\qquad
+  %t = T/2+1,\ldots,T
+%\end{align*}
+%so $y_{T,t}$ is iid in the first half of the sample, MA(1) in teh second
+%half.
+
+%Value
+%\begin{align*}
+  %\omega^2
+  %&= \limT \Var\big(\frac{1}{\sqrt{T}}\sumtT y_{T,t}\big)
+%\end{align*}
+%Is the following consistent for $\omega^2$?
+%\begin{align*}
+  %\hat{\omega}^2
+  %&=
+  %\hat{\gamma}(0)
+  %+
+  %2\hat{\gamma}(1)
+  %\\
+  %\hat{\gamma}(j)
+  %&=
+  %\frac{1}{T}\sum_{t=1+j}^T y_{T,t}y_{T,t-j}
+%\end{align*}
+
+
+%\end{frame}
+
+
+
+
+%\begin{frame}[shrink]{Bayes Rule}
+%Recall
+%\begin{align*}
+  %p(\theta|y_{1:T})
+  %&=
+  %\frac{%
+    %p(y_{1:T}|\theta)\pi(\theta)
+  %}{%
+    %p(y_{1:T})
+  %}
+  %\propto
+  %p(y_{1:T}|\theta)\pi(\theta)
+%\end{align*}
+%Note
+%\begin{itemize}
+  %\item $p(\theta|y_{1:T})$ is a function of $\theta$ with the data
+    %$y_{1:T}$ fixed
+  %\item Don't need to compute denominator because that's a constant that
+    %doesn't depend upon $\theta$, the argument of $p(\theta|y_{1:T})$.
+    %Can just renormalize.
+  %\item If we want to compute $p(y_{1:T})$, the marginal likelihood,
+    %then
+    %\begin{align*}
+      %p(y_{1:T})
+      %=
+      %\int p(y_{1:T},\theta)\;d\theta
+      %=
+      %\int p(y_{1:T}|\theta)p(\theta)\;d\theta
+    %\end{align*}
+    %Note can compute this before observing the data to get a function of
+    %$y_{1:T}$. Can fix $y_{1:T}$ to get a number.
+    %This is pinned down by the model/likelihood and the prior over
+    %parameters.
+  %\item All of these expressions in terms of densities have a sum
+    %analog.
+    %Hence the discrete probability distribution in the homework.
+  %\item What happens when we have many parameters?
+    %Analytical solutions.
+    %Curse of dimensionality, have to do MCMC to sample from posterior.
+%\end{itemize}
+%\end{frame}
+
+
+\section{Initial Conditions}
+
+\begin{frame}[shrink]{Initial Conditions}
+Likelihood function
+\begin{align*}
+  f(y_{1:T})
+  =
+  \prod_{t=2}^T
+  f(y_t|y_{1:t-1})
+  f(y_1)
+\end{align*}
+Need $f(y_1)$.
+Different approaches
+\begin{itemize}
+  \item Solve stationary distribution, e.g.
+    \begin{align*}
+      y_t &= \phi y_{t-1} + \varepsilon_t
+      \quad
+      \varepsilon_t
+      \iid
+      \calN(0,\sigma^2)
+      \\
+      y_1
+      &\sim
+      \calN\left(0,\;
+      \frac{\sigma^2}{1-\phi^2}
+      \right)
+      \quad\implies\quad
+      f(y_1)
+      =
+      \frac{1}{\sqrt{2\pi\sigma^2/(1-\phi^2)}}
+      e^{-\frac{1}{2\sigma^2/(1-\phi^2)}y_1^2}
+    \end{align*}
+
+  \item
+    Drop initial observation from likelihood, effectively condition on
+    it so that we're
+    \begin{align*}
+      f(y_{1:T}|y_1)
+      =
+      \prod_{t=2}^T
+      f(y_t|y_{1:t-1})
+    \end{align*}
+    But potentially throws out information that's informative about the
+    parameters.
+
+  \item
+    Assume a distribution $f(y_1)$ for $y_1$.
+
+  \item
+    Bayesian perspective:
+    When computing posterior
+    \begin{align*}
+      p(\theta|y_{1:T})
+      &\propto
+      \left(
+      \prod_{t=2}^T
+      f(y_t|y_{1:t-1})
+      f(y_1)
+      \right)
+      \pi(\theta)
+      =
+      \left(
+      \prod_{t=2}^T
+      f(y_t|y_{1:t-1})
+      \right)
+      \big(
+      f(y_1)
+      \pi(\theta)
+      \big)
+    \end{align*}
+    Treat $y_1$ as parameter, treat $f(y_1)$ as a prior on it that
+    you get to pick, estimate, get posterior for $y_1$.
+
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[shrink]{%
+    Initial Conditions from Unconditional Distribution
+}
+
+
+For the Kalman filter, recall
+\begin{align*}
+  \xi_t
+  &=
+  F\xi_{t-1} + v_t
+  \qquad
+  \E[v_tv_t']=Q
+\end{align*}
+Deduce unconditional Gaussian distribution, then use the mean and
+variance of that as $\xi_{0|0}, P_{0|0}$, which implies $f(y_1)$.
+
+Homework:
+$s_t$ follows a Markov chain defined by
+\begin{align*}
+  p(s_t=1|s_{t-1}=0)
+  &=
+  p_0 \\
+  p(s_t=1|s_{t-1}=1)
+  &=
+  p_1
+\end{align*}
+Can deduce unconditional/stationary distribution, use for initial
+observation.
+
+
+\end{frame}
+
+
+
+
+
+\section{Kalman Filter \& Smoother Review}
+
+
+\begin{frame}[shrink]{Kalman Filter}
+
+What is it?
+\begin{itemize}
+  \item Formulas to determine and pin down the evolution of the
+    conditional distribution for the unobserved state $\xi_t|y_{1:t}$
+    for $t=1,\ldots,T$
+  \item Implies likelihood
+\end{itemize}
+Three parts
+\begin{itemize}
+  \item Cast model into general canonical form
+    \begin{align*}
+      y_t
+      &=
+      A'x_t
+      + H'\xi_t
+      + w_t
+      \qquad
+      \E[w_tw_t'] = R
+      \\
+      \xi_t
+      &=
+      F
+      \xi_{t-1}
+      + v_t
+      \qquad
+      \qquad
+      \quad
+      \E[v_tv_t'] = Q
+      \qquad
+      \E[w_tv_t']=G
+    \end{align*}
+
+  \item
+    Fill in the joint distribution of $y_t$ and $\xi_t$ conditional
+    on $y_{1:t-1}$, taking as given
+    $\E[\xi_t|y_{1:t-1},x_t]$ and $\Var(\xi_t|y_{1:t-1},x_t)$.
+    \begin{align*}
+      \begin{pmatrix}
+        \xi_t \\
+        y_t
+      \end{pmatrix}
+      \;\bigg|
+      y_{1:t-1},x_t
+      \sim
+      \calN\left(
+      \begin{pmatrix}
+        \E[\xi_t| y_{1:t-1},x_t]
+        \\
+        \E[y_t| y_{1:t-1},x_t]
+      \end{pmatrix}
+      ,
+      \begin{pmatrix}
+        \Var(\xi_t| y_{1:t-1},x_t) & \Cov(\xi_t,y_t| y_{1:t-1},x_t) \\
+        \Cov(y_t,\xi_t| y_{1:t-1},x_t) & \Var(y_t|y_{1:t-1},x_t) \\
+      \end{pmatrix}
+      \right)
+    \end{align*}
+
+  \item Compute conditional distribution of $\xi_t|y_t,y_{1:t-1}$.
+    \begin{align*}
+      \begin{pmatrix}
+        z_1 \\ z_2
+      \end{pmatrix}
+      &\sim
+      \calN\left(
+      \begin{pmatrix}
+        \mu_1 \\ \mu_2
+      \end{pmatrix}
+      ,\;
+      \begin{pmatrix}
+        \Sigma_{11} & \Sigma_{12} \\
+        \Sigma_{21} & \Sigma_{22}
+      \end{pmatrix}
+      \right)
+      \\
+      \E[z_1|z_2]
+      &=
+      \mu_1
+      +
+      \Sigma_{12}
+      \Sigma_{22}^{-1}
+      (z_2-\mu_2)
+      \\
+      \Var(z_1|z_2)
+      &=
+      \Sigma_{11}
+      -
+      \Sigma_{12}
+      \Sigma_{22}^{-1}
+      \Sigma_{21}
+    \end{align*}
+
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[shrink]{Kalman Smoother}
+
+Two steps
+\begin{itemize}
+  \item Set up the following joint distribution, taking as given
+    $(\xi_{t|t},\xi_{t+1|t},P_{t|t},P_{t+1|t})$.
+    \begin{align*}
+      \begin{pmatrix}
+        \xi_{t} \\
+        \xi_{t+1}
+      \end{pmatrix}
+      \bigg|
+      y_{1:t}
+      \sim
+      \calN\left(
+      \begin{pmatrix}
+        \xi_{t|t}
+        \\
+        \xi_{t+1|t}
+      \end{pmatrix}
+      ,
+      \begin{pmatrix}
+        P_{t|t} & \text{Something}
+        \\
+        & P_{t+1|t}
+      \end{pmatrix}
+      \right)
+    \end{align*}
+  \item
+    Condition as if we knew $\xi_{t+1}$:
+    \begin{align*}
+      \xi_{t} | \xi_{t+1},y_{1:t}
+    \end{align*}
+    Can deduce this conditional distribution.
+
+  \item
+    Condition on more detailed information set $y_{1:T}$ and simplify.
+
+\end{itemize}
+Useful: For some info set $\calF$, law of total variance:
+\begin{align*}
+  \Var(X)
+  =
+  \Var(\E[X|\calF])
+  +
+  \E\big[\Var(X|\calF)\big]
+\end{align*}
+Tip: Write out conditioning very explicitly, rather than collapse to
+ojbects like $\xi_{t|T}$ and $\xi_{t|t}$.
+\end{frame}
+
+
+
+\begin{frame}[shrink]
+Model
+\begin{align*}
+  y_t &= A'x_t + H'\xi_t + w_t
+  \qquad \E[w_tw_t'] = R \\
+  \xi_t &= C + F\xi_{t-1} + v_t
+  \qquad
+  \E[v_tv_t']=Q
+\end{align*}
+Updating expressions
+\begin{align*}
+  \xi_{t|t-1}
+  &=
+  C + F \xi_{t-1|t-1}
+  \\
+  y_{t|t-1}
+  &=
+  A'x_t + H'\xi_{t|t-1}
+  \\
+  P_{t|t-1}
+  &=
+  FP_{t-1|t-1}F'
+  + Q
+  \\
+  h_t
+  &=
+  H'P_{t|t-1}H
+  + R
+  \\
+  K_t
+  &=
+  P_{t|t-1} H h_t^{-1}
+  \\
+  \eta_t
+  &=
+  y_t - y_{t|t-1}
+  \\
+  \xi_{t|t}
+  &=
+  \xi_{t|t-1}
+  +
+  K_t\eta_t
+  \\
+  P_{t|t}
+  &=
+  P_{t|t-1}
+  - K_t H'P_{t|t-1}
+\end{align*}
+\end{frame}
+
+
+
+\end{document}
+
+
+
+Asymptotics
+- Device
+- Propose stats, derive dist
+- Optimality?
+- HAC and hetero to robustify
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Bayes estimation and Bayes Estimation
+
+
+- Checking lag polynomial for stationarity works because
+  - In companion form, the eigenvalues matter
+  - The eigenvalues are reciprocals of what's in the lag polynomial
+- Side tip
+  - Eigenvalue decomposition
+    - Can always do it with a covariance matrix
+    - PCA
+  - Singular value decomposition
+    - Always exist
+  - Useful for terms where need easy inverses, iterations, multiplying the same thing against transposes of itself like projection matrix
+
+
+
+
+
+
+
+
+
+% Sample code
+\pause to add breaks
+\textcolor{red}{text to show}.
+\vspace{20pt}
+
+\usebeamercolor{dull text}
+\alert<+>{Words that you want to alert}
+

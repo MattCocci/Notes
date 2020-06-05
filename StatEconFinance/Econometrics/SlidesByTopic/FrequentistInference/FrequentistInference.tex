@@ -1,0 +1,2026 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usepackage{cmbright}
+%\usetheme{metropolis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis with Sidebar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[aspectratio=169, handout]{beamer}
+%\documentclass{beamer}
+\usepackage{cmbright}
+\usepackage{comment}
+
+\useoutertheme[right, width=0.20\paperwidth]{sidebar}
+\usecolortheme{metropolis}
+\useinnertheme[sectionpage=none]{metropolis}
+\usefonttheme{metropolis}
+
+\makeatletter
+\beamer@headheight=1.75\baselineskip     %controls the height of the headline, default is 2.5
+\makeatother
+
+%\setbeamertemplate{sidebar canvas right}{}
+%\setbeamertemplate{sidebar right}{BOB}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Simple Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usetheme{Boadilla}
+%\usepackage{lmodern}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sidebar Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass[serif]{beamer}  % For serif latex font
+%\usepackage{pxfonts}
+%\usepackage{eulervm}
+%\usepackage{mathpazo}
+
+%\usetheme{Goettingen}
+%\usecolortheme{lily}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Common Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[]{Frequentist Inference \\ Matt Cocci}
+\author[]{}
+\date{\today}
+
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+%\setbeamertemplate{section in toc}[square unnumbered]
+%\setbeamertemplate{subsection in toc}[square unnumbered]
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% For easier looping
+\usepackage{pgffor}
+
+\usepackage{pdfpages}
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\proj}{\operatorname{proj}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Rnk}{\mathbb{R}^{n\times k}}
+\newcommand{\Rkk}{\mathbb{R}^{k\times k}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Presentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+\tableofcontents[hideallsubsections]
+%\tableofcontents
+\end{frame}
+
+\section{Statistical Models}
+
+\subsection{Definition}
+
+{\footnotesize
+\begin{frame}{Definition of Statistical Models}
+\alert{Statistical Model}
+\begin{itemize}
+  \item Observe random element $Y$ which could be
+    \begin{itemize}
+      {\footnotesize
+      \item Single scalar observation
+      \item Single vector observation of outcomes and covariates
+      \item $n$ iid copies of some RV, e.g. entire random sample
+        $Y=(Y_1,\ldots,Y_n)$.
+      }
+    \end{itemize}
+  \pause
+  \item \alert{Model} is collection $\calP$ of
+    \alert{possible distributions} for $Y$.
+  \pause
+  \item Restriction from set of \emph{all possible} distributions to
+    some smaller class.
+  \item There in the background, even if not explicitly, e.g.
+    almost always implicitly assuming ``Set of distributions with finite
+    second moments.''
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Running Example: Parametric Normal Model}
+We observe $Y=(Y_1,\ldots,Y_n)$ where
+\begin{align*}
+  Y_i \iid \calN(\mu,1)
+\end{align*}
+Model is collection of $n$-fold product of the above
+\begin{align*}
+  \calP = \{P_\mu^n\}_{\mu\in \R}
+  \qquad\text{where}\quad
+  P_\mu = \calN(\mu,1)
+\end{align*}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Types of Statistical Models}
+Types of Models
+\begin{itemize}
+  \item \alert{Parametric} models:
+    $\calP=\{P_{\theta}\}_{\theta\in\Theta}$ fully characterized by
+    finite-dimensional Euclidean parameter $\theta\in\R^k$
+
+  \pause
+  \item \alert{Nonparametric}:
+    $\calP=\{P_\eta\}$ indexed by unknown
+    nonparametric (infinite-dimensional) component $\eta$
+    running through infinite-dimensional space (i.e. cannot be
+    spanned by a finite number of elements of that space).
+
+    \pause
+    \alert{Examples}: Set of all distributions with finite second
+    moments, set of all distributions with twice continuously
+    differentiable densities.
+
+  \pause
+  \item \alert{Semiparametric}:
+    Parametric and nonparametric components.
+
+    \pause
+    \alert{Examples}:
+    Two step estimators, e.g. estimating propensity score first then
+    using propensity score weighting to estimate an average
+    treatment effect.
+    %GMM,
+    %OLS with regression coefficient and only finite moment
+    %distributional assumptions
+\end{itemize}
+\end{frame}
+}
+
+
+
+\subsection{Data Generating Process}
+
+
+{\footnotesize
+\begin{frame}{The Data Generating Process (DGP)}
+Data Generating Process
+\begin{itemize}
+  \item
+    Single \alert{true} unknown distribution $P_0$ that
+    \alert{generated} the random element $Y$, i.e.
+    \begin{align*}
+      Y\sim P_0
+    \end{align*}
+
+  \pause
+
+  \item Model is set of candidate DGPs.
+    We're trying to figure out \emph{which} one is the DGP or estimate
+    some functional of this unknown DGP.
+
+  \pause
+  \item \alert{Misspecified} model if $P_0\not\in\calP$
+  %\item Example: Can do OLS without assuming a linear model. There is
+    %some DGP, when we write a reg equation, the question is what is that
+    %guy?
+
+  \item Thinking about the DGP is of \alert{crucial importance}.
+
+\end{itemize}
+Robustness
+\begin{itemize}
+  \item
+    Estimator or conclusions not very sensitive to model
+    misspecification; \alert{stable} in ``larger'' model (set of DGPs)
+
+  \pause
+
+  \item Trend: Procedures using \alert{weakest possible}
+    assumptions on DGP
+
+  \pause
+  \item
+    Examples:
+    Heteroskedasticity-robust standard errors,
+    treatment effect heterogeneity in potential outcomes framework,
+    ``sufficient statistics'' in macro
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Running Example: Parametric Normal Model}
+
+If our model for the data $Y=(Y_1,\ldots,Y_n)$ is
+\begin{align*}
+  \calP = \{P_\mu^n\}_{\mu\in \R}
+  \qquad\text{where}\quad
+  P_\mu = \calN(\mu,1)
+\end{align*}
+then (assuming correct specification), the DGP is $\calN(\mu_0,1)$ for
+some $\mu_0\in\R$.
+
+\pause
+Model is misspecificed if $Y_i$ \emph{non-normal} or of non-unit
+variance.
+
+\end{frame}
+}
+
+
+
+
+
+\subsection{Estimands}
+
+{\footnotesize
+\begin{frame}{Estimands}
+Want to estimate some known functional of the DGP $P_0$ called the
+\alert{estimand}:
+\begin{align*}
+  \psi(P_0)
+\end{align*}
+\pause
+Examples:
+\begin{itemize}
+  \item \alert{Parametric} Model, $\calP =
+    \{P_{\theta}\}_{\theta\in\Theta}$:
+    Because $\theta$ fully characterizes the distributions in $\calP$,
+    equivalently want to estimate likelihood parameter
+    \begin{align*}
+      \psi(P_0)=\psi(P_{\theta_0})
+      \qquad
+      \text{or}
+      \qquad
+      {\psi}(\theta_0)
+    \end{align*}
+    in a slight abuse of notation.
+
+  \pause
+  \item \alert{Nonparametric} Model, $\calP$:
+    Suppose $(Y,X)\sim P_0$.
+    Might estimate the following functionals of $P_0$:
+    \begin{itemize}
+    {\footnotesize
+      \item Mean: $\E_{P_0}[Y]=\int X \, dP_0$
+      \item Density $f_0(y)$ of $Y$ (RN derivative of $P_0$
+        w.r.t.\ the Lebesgue measure)
+      \item CEF $\E_{P_0}[Y|X]$
+    }
+    \end{itemize}
+
+  %\item \alert{Semiparametric Model}
+
+\end{itemize}
+\end{frame}
+}
+
+
+
+\subsection{Estimators}
+
+{\footnotesize
+\begin{frame}{Estimators}
+%Suppose that $X\sim P_0$ and we wish to estimate the estimand
+%\begin{align*}
+  %\psi(P_0)
+%\end{align*}
+An \alert{estimator} is a \alert{mapping} from the observed random
+element $Y$ to some number that is (hopefully) close to target estimand
+$\psi(P_0)$, and is denoted
+\begin{align*}
+  {T}(Y)
+\end{align*}
+\pause
+Properties of estimators
+\begin{itemize}
+  \item Unbiased $\E[T(Y)]=\psi(P_0)$
+  \item Consistent $T(Y_n)\pto \psi(P_0)$
+  \item Frequentist risk (expected loss)
+  \item Minimax risk
+  \item Bayesian (weighted average) Risk
+  \item (Asymptotic) Variance
+  \item MSE
+\end{itemize}
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Running Example: Parametric Normal Model}
+Suppose that $Y=(Y_1,\ldots,Y_n)$ generated from some DGP in the model
+\begin{align*}
+  \calP = \{P_\mu^n\}_{\mu\in \R}
+  \qquad\text{where}\quad
+  P_\mu = \calN(\mu,1)
+\end{align*}
+\pause
+\alert{Example 1}:
+The following estimator is \alert{unbiased} and \alert{consistent}
+regardless of the value of $\mu_0$
+\begin{align*}
+  \hat{Y}_n
+  =
+  \frac{1}{n}
+  \sumin
+  Y_i
+\end{align*}
+\pause
+Moreover, even if the data non-normal, this estimator is \alert{robust} in the
+sense that it is unbiased and consistent under iid sampling for
+\alert{any} well-behaved DGP.
+\pause
+
+\alert{Example 2}:
+If our goal is to estimate the $q$th quantile of $Y_i$, can
+compute the $q$th quantile of $\calN(\hat{\mu},1)$.
+This will be consistent, but relies heavily on the normality assumption.
+\alert{Not robust} to departures from normality.
+
+\pause
+Alternative: Estimate empirical CDF and recover $q$th quantile from this
+estimate,
+\begin{align*}
+  \hat{F}(y)
+  =
+  \frac{1}{n}
+  \sumin
+  {1}\{Y_i\leq y\}
+\end{align*}
+\end{frame}
+}
+
+
+
+\section{Inference}
+
+\subsection{Hypotheses}
+
+{\footnotesize
+\begin{frame}{Hypotheses}
+
+\alert{Hypothesis}:
+Statement about unknown DGP $P_0$ or some functional $\psi(P_0)$
+thereof.
+
+\pause
+\alert{Parametric Model}
+\begin{itemize}
+  \item Because parameter fully characterizes distribution,
+    can state hypothesis in terms of the likelihood parameter
+    \begin{align*}
+      H: \theta_0 \in \Theta\subset\R^k
+    \end{align*}
+    In words, ``$\theta$ lies in some restricted set $\Theta$,''
+    e.g. ``Poisson intensity $\lambda\in (5,10)$.''
+
+  \pause
+  \item Can also state in terms of the distributions directly
+    \begin{align*}
+      H:P_0 \in \{P_\theta\}_{\theta \in \Theta}
+    \end{align*}
+    ``The DGP belongs to some restricted set
+    $\{P_\theta\}_{\theta\in\Theta}$,''
+    e.g. ``$X$ generated by $\calN(\mu,1)$ where $\mu\geq 0$.''
+\end{itemize}
+
+\pause
+\alert{Non-Parametric Model}:
+Typically test hypotheses about functional $\psi(P_0)$, e.g.
+\begin{align*}
+  H: \psi(P_0)=\psi_0
+\end{align*}
+e.g. ``Regression coefficient equals 0'' or ``2SLS coefficient is
+positive.''
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Hypotheses: Classifying Hypotheses}
+Sometimes, we have a \alert{simple hypothesis} that \emph{fully}
+specifies the distribution of the data, e.g.
+\begin{itemize}
+  \item $H: P_0 \sim \calN(\mu_0,1)$ for $\mu_0=0$
+  \item $H:\lambda_0=2$ where $\lambda_0$ is the parameter in a Poisson
+    model.
+\end{itemize}
+\pause
+This is nice because we can appeal to Neyman-Pearson to derive
+an \alert{optimal} test.
+\pause
+
+More often, we have a \alert{composite hypothesis} that does not fully
+specify the distribution of the data, e.g.
+\begin{itemize}
+  \item $H: P_0 \sim \calN(\mu_0,\sigma)$ for $\mu_0=0$ but $\sigma>0$
+    unknown
+  \pause
+  \item $H: \psi(P_0)=\E_{P_0}[X]=0$, but the distribution is otherwise
+    unspecified.
+\end{itemize}
+\end{frame}
+}
+
+
+\subsection{Test of Hypothesis}
+
+{\scriptsize
+\begin{frame}{Statistical Test of Hypothesis}
+A \alert{statistical test} of hypothesis $H$ is a decision rule that says
+whether to reject some $H$ after observing a particular realization
+$Y=y$.
+It is a function/mapping
+\begin{align}
+  \varphi(y)
+  =
+  \begin{cases}
+    1 & \implies \text{Reject $H$} \\
+    q\in(0,1) & \implies \text{Reject $H$ with prob. $q$} \\
+    0 & \implies \text{Fail to Reject $H$}
+  \end{cases}
+  \label{stattest}
+\end{align}
+\vspace{-10pt}
+\pause
+Remarks
+\begin{itemize}
+  \item Because the test depends upon the particular hypothesis $H$
+    being tested, I could subscript $\varphi_H$ or add $H$ as another
+    argument to denote this.
+    But this is more cumbersome and not as illuminating, so I leave it
+    implicit.
+
+  \item
+    Because data $Y$ is \emph{random}, test outcome $\varphi(Y)$
+    \emph{also} a RV.
+
+  \item Can compute the mean of $\varphi(Y)$ under any given DGP $P$ for
+    $Y$:
+    \begin{align*}
+        \int \varphi(Y)\,dP(Y)
+        =
+        \E_P[\varphi(Y)]
+        =
+        P[\text{Reject $H$}]
+    \end{align*}
+  \pause
+  \vspace{-10pt}
+
+  \item Can always define test of $H$ \emph{without} reference to
+    competing alternative.
+    \emph{But}, to determine whether it's a \emph{good} (possibly even
+    \emph{optimal}) test, we should think about plausible competing
+    alternative hypotheses that we wish to have power against.
+
+\end{itemize}
+\end{frame}
+}
+
+
+
+{\footnotesize
+\begin{frame}{Null and Alternative Testing Framework}
+To properly evaluate tests and discuss optimality, we need to be
+explicit about the \alert{alternative} hypothesis that we think are
+reasonable if the null is false.
+
+Specify baseline \alert{null hypothesis} $H_0$ and competing
+\alert{alternative hypothesis} $H_1$ for the DGP $P_0$
+\begin{align}
+  H_0: P_0\in\{P_{\theta}\}_{\theta\in\Theta_0}
+  \qquad \text{vs.}\qquad
+  H_1: P_0\in\{P_{\theta}\}_{\theta\in\Theta_1}
+  \label{nullalt}
+\end{align}
+or for functionals of the DGP
+\begin{align*}
+  H_0: \psi(P_0)\in \Psi_0
+  \qquad \text{vs.}\qquad
+  H_1: \psi(P_0)\in \Psi_1
+\end{align*}
+A statistical test $\varphi(Y)$ within this framework is then a test of
+$H_0$.
+%Note
+%\begin{itemize}
+  %\item The sets must be mutually exclusive, so that \emph{either} the
+    %null or alternative is true
+    %\begin{align*}
+      %\Theta_0\cap \Theta_1=\emptyset
+      %\qquad\text{or}\qquad
+      %\Psi_0\cap \Psi_1=\emptyset
+    %\end{align*}
+
+  %\item
+
+%\end{itemize}
+\end{frame}
+}
+
+
+
+{\footnotesize
+\begin{frame}{Size/Level and Power}
+For simple definitions, suppose we have a parametric model.
+\pause
+
+The \alert{size} of a test is the maximum rejection probability (Type I
+error rate) over all null distributions for $Y$ or, equivalently, over
+all $\theta\in\Theta_0$:
+\begin{align*}
+  \alpha
+  :=
+  \sup_{\theta\in \Theta_0}
+  \E_{P_{\theta}}[\varphi(Y)]
+  =
+  \sup_{\theta\in \Theta_0}
+  P_\theta[\text{Reject $H_0$}]
+  %:=
+  %\sup_{P \; \text{$H_0$-Compatible}}
+  %\E_P[\varphi(Y)]
+  %=
+  %\sup_{P \; \text{$H_0$-Compatible}}
+  %P[\text{Reject $H_0$}]
+\end{align*}
+\pause
+The \alert{power} at a particular alternative parameter value
+$\theta\in\Theta_1$ is the rejection probability supposing that the DGP
+is truly $P_{\theta}$:
+\begin{align}
+  \text{Power}(\theta)
+  &:=
+  \E_{P_\theta}[\varphi(Y)]
+  = P_\theta[\text{Reject $H_0$}]
+  \label{power}
+  \qquad \text{for}\quad
+  \theta\in\Theta_1
+\end{align}
+\vspace{-10pt}
+\pause
+Note
+\begin{itemize}
+  \item This is a \alert{single number} at $\theta\in\Theta_1$.  If
+    $\Theta_1$ contains more than one element, we get a \alert{power
+    curve} or \alert{surface} over distinct values in $\Theta_1$.
+  \item Power equals one minus the probability of Type II error rate.
+  \item The test $\varphi(Y)$ is still a test of the null $H_0$.
+    Power examines the behavior of this test of $H_0$, but under the
+    assumption that the DGP belongs to a particular alternative.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Test Statistic and Critical Region}
+
+Statistical Tests are most often constructed via
+\alert{test statistics}, which are statistics that \alert{vary} with the
+estimand of interest and, therefore, are presumably good candidates to
+test hypotheses about the estimand. (The \emph{power} properties of
+tests built from competing test statistics can be used to rank which
+test statistics are better for testing a particular hypothesis.)
+\pause
+
+Given simple null hypothesis $H_0:P_0=P_{\theta}$ and some test
+statistic $T(y)$, we can define the following statistical test of $H_0$:
+\begin{align*}
+  \varphi(y)
+  = {1}\{T(y)\in C_\theta\}
+\end{align*}
+for some subset $C_\theta\subseteq\text{Range}(T(y))$ called the
+\alert{critical region}
+\pause
+which is some a priori \alert{fixed} region specific to the null
+$H_0:P_0=P_\theta$ and chosen to ensure a given level/size of the test,
+i.e. chosen to satisfy
+\begin{align}
+  \alpha
+  = \E_\theta[\varphi(Y)]
+  = P_\theta[T(Y)\in C_{\theta}]
+\end{align}
+where $\alpha$ is the desired $\alpha$-level for the test.
+%More to come on how to choose $T(y)$ and $C$.
+\end{frame}
+}
+
+
+\subsection{Testing via Test Statistics}
+
+{\footnotesize
+\begin{frame}{Running Example: Parametric Normal Model}
+Suppose we observe $Y_i\iid \calN(\mu,1)$ for some $\mu\in\R$.
+As we know, we have an estimator of $\mu$ with the following
+distribution under any $\mu\in\R$
+\begin{align*}
+  \hat{Y}_n
+  =
+  \frac{1}{n}
+  \sumin
+  Y_i
+  \sim
+  \calN(\mu,1/n)
+\end{align*}
+\pause
+Because the distribution of $\hat{Y}_n$ varies with $\mu$,
+this statistic can be used to test
+\begin{align*}
+  H_0: \mu=\mu_0
+  \qquad
+  H_1: \mu\neq \mu_0
+\end{align*}
+\pause
+In particular, under the null, $\mu=\mu_0$, and so we can derive the
+following \alert{pivotal} statistic (i.e. statistic whose distribution
+does not depend upon unknown parameters):
+\begin{align*}
+  \sqrt{n}(\hat{Y}_n - \mu_0)
+  \underset{H_0:\mu=\mu_0}{\sim}
+  \calN(0,1)\sim Z
+\end{align*}
+\pause
+One test of $H_0:\mu=\mu_0$ is therefore to reject when $\hat{Y}_n$ is
+far from $\mu_0$:
+\begin{align*}
+  \varphi(Y)
+  =
+  {1}\{\sqrt{n}|\hat{Y}_n-\mu_0|\geq c\}
+\end{align*}
+for some threshold $c$ we will choose to set the level.
+The \alert{critical region} is thus in the tails of a normal
+distribution centered at $\mu_0$.
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Running Example: Parametric Normal Model}
+First, \alert{size}.
+Under the null, $\mu=\mu_0$ and so
+\begin{align*}
+  \sqrt{n}(\hat{Y}_n - \mu_0)
+  \underset{H_0:\mu=\mu_0}{\sim}
+  \calN(0,1)\sim Z
+\end{align*}
+\pause
+Therefore, we can compute the probability of rejection under the
+assumption that the null is true:
+\begin{align*}
+  P_{\mu_0}[\text{Reject $H_0$}]
+  &=
+  \E_{\mu_0}[\varphi(Y)]
+  \\
+  &=
+  \E_{\mu_0}[{1}\{\sqrt{n}|\hat{Y}_n-\mu_0|\geq c\}]
+  \\
+  &=
+  P_{\mu_0}[\sqrt{n}|\hat{Y}_n-\mu_0|\geq c]
+  \\
+  &=
+  P[|Z|\geq c]
+  \\
+  &=
+  P[\{Z<-c\} \cup \{Z>c\}]
+  \\
+  &=
+  \Phi(-c)
+  +
+  1-\Phi(c)
+\end{align*}
+\pause
+To solve for the cutoff, solve the following for $c$:
+\begin{align*}
+  \alpha
+  =
+  P[\text{Reject $H_0$}|\text{$H_0$ true}]
+  =
+  \Phi(-c)
+  +
+  1-\Phi(c)
+\end{align*}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Running Example: Parametric Normal Model}
+Next, \alert{power}.
+Under the alternative, $\mu=\mu_1$, we instead have
+\begin{align*}
+  \sqrt{n}(\hat{Y}_n - \mu_1)
+  \underset{\mu=\mu_1}{\sim}
+  \calN(0,1)\sim Z
+\end{align*}
+\pause
+Can compute power of the test
+$\varphi(Y)={1}\{\sqrt{n}|\hat{Y}_n-\mu_0|\geq c\}$
+of $H_0:\mu=\mu_0$ against
+particular alternative $\mu=\mu_1$:
+\begin{align*}
+  \text{Power}(\mu_1)
+  &=
+  P_{\alert{\mu_1}}[\text{Reject $H_0$}]
+  =
+  \E_{{\mu_1}}[\varphi(Y)]
+  \\
+  &=
+  \E_{\mu_1}[{1}\{\sqrt{n}|\hat{Y}_n-\mu_0|\geq 1.96\}]
+  \\
+  &=
+  P_{\mu_1}[\sqrt{n}|\hat{Y}_n-\mu_0|\geq 1.96]
+  \\
+  &=
+  P_{\mu_1}[
+    \{
+    \sqrt{n}(\hat{Y}_n-\mu_0)\geq 1.96
+    \}
+    \cup
+    \{
+    \sqrt{n}(\hat{Y}_n-\mu_0)\leq -1.96
+    \}
+  ]
+\end{align*}
+\pause
+Compute the first component.
+The second is analogous.
+\begin{align*}
+  P_{\mu_1}[
+    \sqrt{n}(\hat{Y}_n-\mu_0)\geq 1.96
+  ]
+  &=
+  P_{\mu_1}[
+    \sqrt{n}(\hat{Y}_n-\mu_1+\mu_1-\mu_0)\geq 1.96
+  ]
+  \\
+  &=
+  P_{\mu_1}[
+    Z+\sqrt{n}(\mu_1-\mu_0)\geq 1.96
+  ]
+  \\
+  &=
+  P_{\mu_1}[
+    Z\geq 1.96-\sqrt{n}(\mu_1-\mu_0)
+  ]
+  \\
+  &=
+  1-\Phi\left(
+    1.96-\sqrt{n}(\mu_1-\mu_0)
+  \right)
+\end{align*}
+\end{frame}
+}
+
+
+%{\footnotesize
+%\begin{frame}{Pivotal Quantities}
+%In the homework, we have pivotal quantities
+%\begin{align*}
+  %\frac{%
+    %\frac{1}{n}\sumin X_i
+  %}{%
+    %\mu
+  %}
+  %\sim
+  %\calN(1,1/\sqrt{n})
+  %\qquad
+  %\quad
+  %\sumin
+  %\left(
+  %\frac{X_i}{\mu}
+  %-1
+  %\right)^2
+  %\sim
+  %\chi^2(n)
+%\end{align*}
+%Convenient to work with because then we make substitutions as follws
+%when deriving
+
+%\end{frame}
+%}
+
+
+\subsection{Neyman-Pearson}
+
+{\footnotesize
+\begin{frame}{Neyman-Pearson}
+Suppose we want to test the following simple null and alternative
+hypotheses about the unknown DGP (expressed in terms of a density) that
+generates $Y$
+\begin{align*}
+  H_0: p_0
+  \qquad\qquad
+  H_1: p_1
+\end{align*}
+Then the most powerful level-$\alpha$ test $\varphi^*(y)$ uses the
+likelihood ratio as a test statistic:
+\begin{align}
+  \varphi^*(y)
+  =
+  \begin{cases}
+    1 & LR(y) > \lambda \\
+    q & LR(y) = \lambda \\
+    0 & LR(y) < \lambda
+  \end{cases}
+  \qquad \text{where}\quad
+  LR(y) := \frac{p_1(y)}{p_0(y)}
+  \label{neymantest}
+\end{align}
+\pause
+where $\lambda,q$ are constants chosen to hit the $\alpha$-level, i.e.
+defined implicitly by $\alpha$-level constraint
+\begin{align}
+  \alpha
+  = \E_0[\varphi^*(y)]
+  = \int \varphi^*(y) p_0(y)\; dy
+  \label{neymanalpha}
+\end{align}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Running Example: Normal Model}
+Form likelihood ratio based on the likelihood for
+$Y=(Y_1,\ldots,Y_n)$:
+\begin{align*}
+  \frac{%
+    p(Y_1,\ldots,Y_n|\mu_1)
+  }{%
+    p(Y_1,\ldots,Y_n|\mu_0)
+  }
+  &=
+  \frac{%
+    \frac{1}{(2\pi)^{\frac{n}{2}}}
+    \exp\{
+      -\frac{1}{2}
+      \sumin (Y_i-\mu_1)^2
+    \}
+  }{%
+    \frac{1}{(2\pi)^{\frac{n}{2}}}
+    \exp\{
+      -\frac{1}{2}
+      \sumin (Y_i-\mu_0)^2
+    \}
+  }
+  \\
+  &=
+  \exp\left\{
+    \frac{1}{2}
+    \left[
+    (\mu_1-\mu_0)\sumin Y_i
+    -
+    n(\mu_1^2 - \mu_0^2)
+    \right]
+  \right\}
+\end{align*}
+Likelihood ratio is large if the following quantity is large.
+So optimal test can be based upon
+\begin{align*}
+  \hat{Y}_n
+  =
+  \frac{1}{n}
+  \sumin
+  Y_i
+\end{align*}
+We choose the cutoff to control size, as we've already done previously.
+Thus the test we proposed previously for the normal model is
+\alert{optimal} according to Neyman-Pearson.
+\end{frame}
+}
+
+
+
+\subsection{Confidence Regions}
+
+
+{\footnotesize
+\begin{frame}{Confidence Region}
+Again, suppose we have a parametric model.
+A level $1-\alpha$ \alert{confidence region} for unknown estimand
+$\theta$ is a random mapping  from the random element $Y$ to a set
+$A(Y)$ that covers the true value $\theta$ at least
+$(1-\alpha)$\% of the time across repeated samples, for each possible
+value of $\theta$:
+\begin{align*}
+  P_{\theta}\big[\theta \in A(Y)\big]
+  =
+  1-\alpha
+  \qquad
+  \forall \theta
+\end{align*}
+\pause
+Given a confidence region, we can then construct a test of the
+null hypothesis
+\begin{align*}
+  H: P_0 = P_\theta
+\end{align*}
+by taking
+\begin{align*}
+  \varphi(y)
+  = {1}\big\{\theta\not\in A(y)\big\}
+\end{align*}
+i.e. reject null if estimand is not in the confidence region.
+\pause
+Clearly,
+\begin{align*}
+  \E_{\theta}[\varphi(Y)]
+  =
+  P_{\theta}[\theta\not\in A(Y)]
+  =
+  1-
+  P_{\theta}[\theta\in A(Y)]
+  =
+  \alpha
+\end{align*}
+We now show how to \alert{construct} confidence regions by inverting
+level $\alpha$ tests.
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Confidence Intervals from Test Inversion}
+\begin{itemize}
+  \item
+    Suppose we use some test statistic $T(Y)$ to construct a
+    \alert{family of tests} that are all level-$\alpha$ for any
+    $\theta$:
+    \vspace{-10pt}
+    \begin{align*}
+      \varphi(Y)
+      = {1}\{T(Y)\in C_\theta\}
+    \end{align*}
+    It is a family in the sense that this is a collection of tests, one
+    for each $\theta$, and all of them are level $\alpha$ under
+    corresponding DGP $P_\theta$.
+
+  \pause
+  \item
+    By construction (choice of $C_\theta$), each test is level $\alpha$
+    under corresponding DGP $P_{\theta}$,
+    \begin{align*}
+      \E_\theta[\varphi(Y)]
+      = \E_\theta[{1}\{T(Y)\in C_\theta\}]
+      = P_\theta[T(Y)\in C_\theta]
+      = \alpha
+      \qquad
+      \forall\theta
+    \end{align*}
+    This naturally implies
+    \vspace{-10pt}
+    \begin{align*}
+      P_\theta[T(Y)\not\in C(\theta)]
+      = 1-\alpha
+      \qquad
+      \forall \theta
+    \end{align*}
+
+  \item
+    Given realization $Y=y$, form confidence region
+    $A(y)$ as follows:
+    \begin{align*}
+      A(y)
+      :=
+      \{\theta\,:\,T(y)\not\in C_\theta\}
+    \end{align*}
+    i.e. the set of all $\theta$ such that we fail to reject because
+    $T(y)$ is not in the critical region $C_\theta$ corresponding to
+    that particular possible DGP $P_\theta$.
+
+  \item
+    Because $A(y)$ depends upon the realization $Y=y$, $A(Y)$ is random
+    set whose $(1-\alpha)\%$ coverage under any $\theta$
+    we can verify:
+    \begin{align*}
+      P_\theta[\theta\in A(Y)]
+      =
+      P_\theta[T(Y)\not\in C_\theta]
+      =
+      1-\alpha
+    \end{align*}
+
+
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Running Example: Parametric Normal Model}
+
+For any value of $\mu$, recall that we had test statistic and test
+of hypothesis $H_0:P_0=P_\mu$
+\begin{align*}
+  \sqrt{n}(\hat{Y}_n-\mu_0)
+  &\underset{\mu}{\sim}
+  \calN(0,1)
+  \\
+  \varphi(Y)
+  &=
+  {1}\{
+    \sqrt{n}|\hat{Y}_n-\mu|\geq 1.96
+  \}
+\end{align*}
+By construction (choice of critical region), for any $\mu$,
+\begin{align*}
+  \alpha
+  &=
+  \E_{\mu}\big[
+  \varphi(Y)
+  \big]
+  =
+  P_{\mu}\big[
+    \sqrt{n}|\hat{Y}_n-\mu|\geq 1.96
+  \big]
+\end{align*}
+which implies, for any $\mu$,
+\begin{align*}
+  1-\alpha
+  &=
+  P_{\mu}\big[
+    \sqrt{n}|\hat{Y}_n-\mu|< 1.96
+  \big]
+  \\
+  &=
+  P_{\mu}\big[
+    - 1.96
+    <
+    \sqrt{n}(\hat{Y}_n-\mu)
+    <
+    1.96
+  \big]
+  \\
+  &=
+  P_{\mu}\big[
+    \mu
+    \in
+    (
+    \hat{Y}_n
+    -
+    1.96/\sqrt{n}
+    ,\,
+    \hat{Y}_n
+    + 1.96/\sqrt{n}
+    )
+  \big]
+\end{align*}
+Since $\mu$ was arbitrary, we have a valid confidence region for all
+possible $\mu$:
+\begin{align*}
+  A(Y)
+  =
+  (
+  \hat{Y}_n
+  -
+  1.96/\sqrt{n}
+  ,\,
+  \hat{Y}_n
+  + 1.96/\sqrt{n}
+  )
+\end{align*}
+
+\end{frame}
+}
+
+
+\subsection{Trinity of Tests}
+
+{\footnotesize
+\begin{frame}{Trinity of Tests: Setup}
+Suppose we have an extremum estimator
+(which includes GMM estimators \& MLEs)
+\begin{align*}
+  \hat{\theta}
+  &=
+  \argmin_{\theta\in\Theta}
+  \hat{Q}(\theta)
+\end{align*}
+which has associated asymptotic distribution
+\begin{align*}
+  \sqrt{n}(\hat{\theta}-\theta)
+  \quad\dto\quad
+  \calN(0,V)
+\end{align*}
+We wish to test the hypotheses
+\begin{align*}
+  H_0: a(\theta)=0
+  \qquad\quad
+  H_1: a(\theta)\neq 0
+\end{align*}
+In order to do this, define the \alert{restricted estimator}, which
+results from imposing the null that we wish to test:
+\begin{align*}
+  \tilde{\theta}
+  &=
+  \argmin_{\theta\in\Theta}
+  \hat{Q}(\theta)
+  \qquad\text{s.t.}\quad
+  a(\theta)=0
+\end{align*}
+Given all of this, there are three tests of $H_0$:
+\vspace{-7pt}
+\begin{enumerate}
+  \item Wald
+  \item Distance Metric Test (a.k.a. Likelihood Ratio test
+    $Q=-\text{log-likelihood}$
+  \item Lagrange Multiplier (LM)
+\end{enumerate}
+\end{frame}
+}
+
+\subsubsection{Wald Statistic}
+
+\begin{frame}[shrink]{Wald Statistic}
+Given
+\begin{align*}
+  \sqrt{n}
+  (
+  \hat{\theta}-\theta_0
+  )
+  \quad\dto\quad
+  \calN(0,V)
+\end{align*}
+by the delta method
+\begin{align*}
+  \sqrt{N}
+  (
+  a(\hat{\theta})
+  -
+  \underbrace{%
+    a(\theta_0)
+  }_0
+  )
+  \quad\dto\quad
+  \calN\left(
+  0,
+  \frac{\partial a(\theta_0)}{\partial \theta'}
+  V
+  \frac{\partial a(\theta_0)'}{\partial \theta}
+  \right)
+\end{align*}
+And so we form the \alert{Wald Statistic}
+\begin{align*}
+  W
+  =
+  Na(\hat{\theta})'
+  \left[
+  \frac{\partial a(\theta_0)}{\partial \theta'}
+  V
+  \frac{\partial a(\theta_0)'}{\partial \theta}
+  \right]
+  a(\hat{\theta})
+  \quad
+  \dto
+  \quad
+  \chi^2_{k-q}
+\end{align*}
+where $q$ is the number of restrictions.
+\end{frame}
+
+
+\subsubsection{Distance Metric/Likelihood Ratio Test}
+
+{\footnotesize
+\begin{frame}{Likelihood Ratio/Distance Metric Test}
+Likelihood ratio test based on
+\begin{align*}
+  LR
+  =
+  2[
+    \log \hat{\calL}(\hat{\theta})
+    -\log \hat{\calL}(\tilde{\theta})
+  ]
+\end{align*}
+Distance metric test for GMM based on
+\begin{align*}
+  DM
+  &=
+  2N\big(
+  \hat{Q}(\hat{\theta})
+  -\hat{Q}(\tilde{\theta})
+  \big)
+  \qquad\text{where}\quad
+  \hat{Q}(\theta)
+  =
+  -\left(
+  \frac{1}{N}
+  \sumiN
+  g(Z_i,\theta)
+  \right)'
+  \hat{\Omega}^{-1}
+  \left(
+  \frac{1}{N}
+  \sumiN
+  g(Z_i,\theta)
+  \right)
+\end{align*}
+From here
+\begin{itemize}
+  \item Focus on derivation for likelihood ratio test.
+    Distance metric test entirely analogous.
+  \item
+    For simplicity, assume throughout that we fully restrict the
+    parameter, i.e. $\tilde{\theta}=\theta_0$ for some fixed vector
+    $\theta_0$.
+    That will make the calculations easier.
+
+    Just want to highlight that the derivation of the asymptotic
+    distribution of the LR stat is driven by a straightforward Taylor
+    expansion of the log likelihoods.
+\end{itemize}
+\end{frame}
+}
+
+
+\begin{frame}{LR Test}
+Start with Taylor expansion of the log-likelihood
+%at the restricted estimator $\log \hat{\calL}(\tilde{\theta})$ about
+at the restricted estimator $\log \hat{\calL}(\theta_0)$ about
+the unrestricted estimator $\hat{\theta}$:
+\begin{align*}
+  \log \hat{\calL}(\theta_0)
+  \approx
+  \log \hat{\calL}(\hat{\theta})
+  +
+  &\left[
+  \frac{%
+    \partial\log \hat{\calL}(\theta)
+  }{%
+    \partial \theta'
+  }
+  \right]_{\theta=\hat{\theta}}
+  (\theta_0-\hat{\theta})
+  %(\tilde{\theta}-\hat{\theta})
+  +
+  \frac{1}{2}
+  %(\tilde{\theta}-\hat{\theta})'
+  (\hat{\theta}-\theta_0)'
+  \left[
+  \frac{%
+    \partial^2\log \hat{\calL}(\theta)
+  }{%
+    \partial \theta
+    \partial \theta'
+  }
+  \right]_{\theta=\hat{\theta}}
+  (\hat{\theta}-\theta_0)
+  %(\tilde{\theta}-\hat{\theta})
+  \\
+  =
+  \log \hat{\calL}(\hat{\theta})
+  +
+  &\frac{1}{2}
+  %(\tilde{\theta}-\hat{\theta})'
+  (\hat{\theta}-\theta_0)'
+  \frac{%
+    \partial^2\log \hat{\calL}(\hat{\theta})
+  }{%
+    \partial \theta
+    \partial \theta'
+  }
+  (\hat{\theta}-\theta_0)
+  %(\tilde{\theta}-\hat{\theta})
+\end{align*}
+where the simplification to the last line followed because
+$\hat{\theta}$ maximizes the likelihood, i.e.
+\begin{align*}
+  \frac{%
+    \partial\log \hat{\calL}(\hat{\theta})
+  }{%
+    \partial \theta'
+  }
+  =
+  0
+\end{align*}
+Form the LR stat, using the above expansion:
+\begin{align*}
+  LR
+  =
+  2[
+    \log \hat{\calL}(\hat{\theta})
+    -\log \hat{\calL}(\theta_0)
+    %-\log \hat{\calL}(\tilde{\theta})
+  ]
+  &\approx
+  -
+  %(\tilde{\theta}-\hat{\theta})'
+  (\hat{\theta}-\theta_0)'
+  \frac{%
+    \partial^2\log \hat{\calL}(\hat{\theta})
+  }{%
+    \partial \theta
+    \partial \theta'
+  }
+  (\hat{\theta}-\theta_0)
+  %(\tilde{\theta}-\hat{\theta})
+\end{align*}
+\end{frame}
+
+
+\begin{frame}[shrink]{LR Test}
+Rewrite the approximate LR stat above
+\begin{align*}
+  LR
+  &=
+  -
+  \sqrt{N}
+  %(\tilde{\theta}-\hat{\theta})'
+  (\hat{\theta}-\theta_0)'
+  \left[
+  \frac{1}{N}
+  \frac{%
+    \partial^2\log \hat{\calL}(\hat{\theta})
+  }{%
+    \partial \theta
+    \partial \theta'
+  }
+  \right]
+  \sqrt{N}
+  %(\tilde{\theta}-\hat{\theta})
+  (\hat{\theta}-\theta_0)
+\end{align*}
+Under the null, and assuming the model is not misspecified
+\begin{align*}
+  %\sqrt{N}(\tilde{\theta}-\theta_0)
+  %\quad&\dto\quad
+  %\calN(0,V)
+  %\\
+  \sqrt{N}(\hat{\theta}-\theta_0)
+  \quad&\dto\quad
+  \calN(0,V)
+  \\
+  \qquad\text{where}\quad
+  V
+  &=
+  H^{-1}
+  =
+  \Omega^{-1}
+\end{align*}
+where $H$ is the expected Hessian matrix and
+$\Omega$ is the Fisher information matrix (outer product of scores).
+Because the term in the middle converges to $H$ in probability
+\begin{align*}
+  LR
+  &=
+  -
+  %\sqrt{N}(\tilde{\theta}-\hat{\theta})'
+  \sqrt{N}(\hat{\theta}-\theta_0)'
+  H
+  \sqrt{N}(\hat{\theta}-\theta_0)
+  %\sqrt{N}(\tilde{\theta}-\hat{\theta})
+  +
+  o_p(1)
+  \quad\dto\quad
+  \Chi^2_k
+\end{align*}
+\end{frame}
+
+
+%\begin{frame}[shrink]{DM Test}
+%DM test analogous, where DM stat is defined
+%\begin{align*}
+  %DM
+  %&=
+  %2N\big(
+  %\hat{Q}(\hat{\theta})
+  %-\hat{Q}(\tilde{\theta})
+  %\big)
+%\end{align*}
+%Start with Taylor expansion of the objective function
+%$\hat{Q}(\tilde{\theta})$ about $\hat{\theta}$
+%\begin{align*}
+  %\hat{Q}(\tilde{\theta})
+  %&\approx
+  %\hat{Q}(\hat{\theta})
+  %+
+  %\frac{\partial\hat{Q}(\hat{\theta})}{\partial\theta'}
+  %(\tilde{\theta}-\hat{\theta})
+  %+
+  %\frac{1}{2}
+  %(\tilde{\theta}-\hat{\theta})'
+  %\frac{\partial^2\hat{Q}(\hat{\theta})}{\partial\theta\partial\theta'}
+  %(\tilde{\theta}-\hat{\theta})
+  %\\
+  %&=
+  %\hat{Q}(\hat{\theta})
+  %+
+  %\frac{1}{2}
+  %(\tilde{\theta}-\hat{\theta})'
+  %\frac{\partial^2\hat{Q}(\hat{\theta})}{\partial\theta\partial\theta'}
+  %(\tilde{\theta}-\hat{\theta})
+%\end{align*}
+%where the simplification to the last line followed because
+%$\hat{\theta}$ minimizes the objective function.
+
+%Form the DM stat, using the above expansion:
+%\begin{align*}
+  %DM
+  %=
+  %2N\big(
+  %\hat{Q}(\hat{\theta})
+  %-\hat{Q}(\tilde{\theta})
+  %\big)
+  %&\approx
+  %-
+  %N
+  %(\tilde{\theta}-\hat{\theta})'
+  %\frac{\partial^2\hat{Q}(\hat{\theta})}{\partial\theta\partial\theta'}
+  %(\tilde{\theta}-\hat{\theta})
+%\end{align*}
+%Recall
+%\begin{align*}
+  %\hat{Q}(\theta)
+  %&=
+  %-\left(
+  %\frac{1}{N}
+  %\sumiN
+  %g(Z_i,\theta)
+  %\right)'
+  %\hat{\Omega}^{-1}
+  %\left(
+  %\frac{1}{N}
+  %\sumiN
+  %g(Z_i,\theta)
+  %\right)
+%\end{align*}
+%\end{frame}
+
+
+\subsubsection{LM Test}
+
+\begin{frame}{Lagrange Multiplier (LM) Test}
+Suppose more generally that rather than fully restrict the parameter, we
+just specify that $a(\tilde{\theta})=0$, i.e. the restricted estimator
+satisfies $r$ constraints, as in class.
+The restricted estimator is then the solution to the FOCs
+that arise from the Lagrangian:
+\begin{align*}
+  \Lambda(\theta)
+  =
+  \hat{\calL}(\theta)
+  -
+  a(\theta)'
+  \lambda
+\end{align*}
+First order conditions, which are satisfied by the restricted estimator
+$\tilde{\theta}$:
+\begin{align*}
+  0
+  &=
+  \frac{%
+    \partial \log \hat{\calL}(\tilde{\theta})
+  }{%
+    \partial\theta
+  }
+  -
+  \frac{\partial a(\tilde{\theta})'}{\partial \theta}
+  \lambda
+\end{align*}
+Rearrange, the do a Taylor expansion of the score about $\hat{\theta}$,
+the unrestricted estimator:
+\begin{align*}
+  \frac{\partial a(\tilde{\theta})'}{\partial \theta}
+  \lambda
+  =
+  \frac{%
+    \partial \log \hat{\calL}(\tilde{\theta})
+  }{%
+    \partial\theta
+  }
+  &=
+  \underbrace{%
+    \frac{%
+      \partial \log \hat{\calL}(\hat{\theta})
+    }{%
+      \partial\theta
+    }
+  }_0
+  +
+  \frac{%
+    \partial^2 \log \hat{\calL}(\hat{\theta})
+  }{%
+    \partial \theta
+    \partial\theta'
+  }
+  (\tilde{\theta}-\hat{\theta})
+\end{align*}
+
+
+%Log likelihood
+%\begin{align*}
+  %%0
+  %%=
+  %%\frac{%
+    %%\partial \log \hat{\calL}(\hat{\theta})
+  %%}{%
+    %%\partial\theta
+  %%}
+  %%&=
+  %%\frac{%
+    %%\partial \log \hat{\calL}(\theta_0)
+  %%}{%
+    %%\partial\theta
+  %%}
+  %%+
+  %%\frac{%
+    %%\partial^2 \log \hat{\calL}(\theta_0)
+  %%}{%
+    %%\partial \theta
+    %%\partial\theta'
+  %%}
+  %%(\hat{\theta}-\theta_0)
+  %%\\
+  %%\frac{%
+    %%\partial \log \hat{\calL}(\tilde{\theta})
+  %%}{%
+    %%\partial\theta
+  %%}
+  %%&=
+  %%\frac{%
+    %%\partial \log \hat{\calL}(\theta_0)
+  %%}{%
+    %%\partial\theta
+  %%}
+  %%+
+  %%\frac{%
+    %%\partial^2 \log \hat{\calL}(\theta_0)
+  %%}{%
+    %%\partial \theta
+    %%\partial\theta'
+  %%}
+  %%(\tilde{\theta}-\theta_0)
+  %%\\
+  %\\
+  %\implies\quad
+  %(\tilde{\theta}-\hat{\theta})
+  %&=
+  %\left[
+  %\frac{%
+    %\partial^2 \log \hat{\calL}(\hat{\theta})
+  %}{%
+    %\partial \theta
+    %\partial\theta'
+  %}
+  %\right]^{-1}
+  %\frac{%
+    %\partial \log \hat{\calL}(\tilde{\theta})
+  %}{%
+    %\partial\theta
+  %}
+%\end{align*}
+%Constraint function
+%\begin{align*}
+  %%a(\hat{\theta})
+  %%&=
+  %%a(\theta_0)
+  %%+
+  %%\frac{%
+    %%\partial a(\theta_0)
+  %%}{%
+    %%\partial \theta
+  %%}
+  %%(\hat{\theta}-\theta_0)
+  %%\\
+  %%0
+  %%=
+  %%a(\tilde{\theta})
+  %%&=
+  %%a(\theta_0)
+  %%+
+  %%\frac{%
+    %%\partial a(\theta_0)
+  %%}{%
+    %%\partial \theta'
+  %%}
+  %%(\tilde{\theta}-\theta_0)
+  %a(\hat{\theta})
+  %&=
+  %\underbrace{%
+    %a(\tilde{\theta})
+  %}_0
+  %+
+  %\frac{%
+    %\partial a(\tilde{\theta})
+  %}{%
+    %\partial \theta
+  %}
+  %(\hat{\theta}-\tilde{\theta})
+%\end{align*}
+%Subtract
+%\begin{align*}
+  %a(\hat{\theta})
+  %=
+  %\frac{%
+    %\partial a(\theta_0)
+  %}{%
+    %\partial \theta'
+  %}
+  %(\hat{\theta}-\tilde{\theta})
+%\end{align*}
+\end{frame}
+
+
+
+\begin{frame}[shrink]{Lagrange Multiplier (LM) Test)}
+%Under the null, the constraint is satisfied hence both
+%\begin{align*}
+  %\sqrt{N}(\tilde{\theta}-\theta_0)
+  %\quad&\dto\quad
+  %\calN(0,V)
+  %\\
+  %\sqrt{N}(\hat{\theta}-\theta_0)
+  %\quad&\dto\quad
+  %\calN(0,V)
+%\end{align*}
+%where $V=\Omega^{-1}=H^{-1}$.
+Can rewrite
+\begin{align*}
+  \frac{1}{\sqrt{N}}
+  \frac{\partial a(\tilde{\theta})'}{\partial \theta}
+  \lambda
+  =
+  \frac{1}{\sqrt{N}}
+  \frac{%
+    \partial \log \hat{\calL}(\tilde{\theta})
+  }{%
+    \partial\theta
+  }
+  &=
+  \frac{1}{N}
+  \frac{%
+    \partial^2 \log \hat{\calL}(\hat{\theta})
+  }{%
+    \partial \theta
+    \partial\theta'
+  }
+  \sqrt{N}(\tilde{\theta}-\hat{\theta})
+  %\\
+  %&\dto
+  %H
+  %\calN(0,H^{-1})
+  %%\sim \calN(0,H)
+\end{align*}
+From there, possible to derive asymptotic distribution of the above
+display, which we can use to derive the asymptotic distribution of the
+quadratic form:
+\begin{align*}
+  \frac{1}{N}
+  \left[
+  \lambda'
+  \frac{\partial a(\tilde{\theta})}{\partial \theta'}
+  \right]
+  \hat{H}^{-1}
+  \left[
+  \frac{\partial a(\tilde{\theta})'}{\partial \theta}
+  \lambda
+  \right]
+  =
+  \frac{1}{N}
+  \left[
+  \frac{%
+    \partial \log \hat{\calL}(\tilde{\theta})
+  }{%
+    \partial\theta'
+  }
+  \right]
+  \hat{H}^{-1}
+  \left[
+  \frac{%
+    \partial \log \hat{\calL}(\tilde{\theta})
+  }{%
+    \partial\theta
+  }
+  \right]
+  %\quad\dto\quad
+  %\Chi^2_r
+\end{align*}
+The detailed derivation isn't as important. See Newey \& McFadden if
+interested.
+This is just meant to establish a connected connection between the LM
+test statistic and an associated ``Lagrange multiplier'' connected to
+the imposed constraints.
+\end{frame}
+
+
+\subsection{Pre-Testing}
+
+
+{\footnotesize
+\begin{frame}{Pre-Testing Example}
+Example
+\href{https://davegiles.blogspot.com/2016/05/a-quick-illustration-of-pre-testing-bias.html}{link}
+\end{frame}
+}
+
+
+
+\end{document}
+
+TO ADD
+- p-values
+- p-values and translating into Bayesian confidence sets
+
+
+
+%Frequentist Inference in Semi-Parametric Models
+%- Example: Simple normal model, regression coefficients
+%- If you have a good estimator, will have short confidence intervals
+
+
+
+
+
+
+
+
+
+
+% Sample code
+\pause to add breaks
+\textcolor{red}{text to show}.
+\vspace{20pt}
+
+\usebeamercolor{dull text}
+\alert<+>{Words that you want to alert}
+

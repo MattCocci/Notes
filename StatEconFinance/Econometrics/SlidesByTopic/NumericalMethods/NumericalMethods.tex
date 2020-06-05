@@ -1,0 +1,1097 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usepackage{cmbright}
+%\usetheme{metropolis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Metropolis with Sidebar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[aspectratio=169, handout]{beamer}
+%\documentclass{beamer}
+\usepackage{cmbright}
+\usepackage{comment}
+
+\useoutertheme[right, width=0.20\paperwidth]{sidebar}
+\usecolortheme{metropolis}
+\useinnertheme[sectionpage=none]{metropolis}
+\usefonttheme{metropolis}
+
+\makeatletter
+\beamer@headheight=1.75\baselineskip     %controls the height of the headline, default is 2.5
+\makeatother
+
+\usepackage{etoolbox}
+\patchcmd\insertverticalnavigation{\dohead}{\vskip-0pt\dohead}{}{}
+
+%\setbeamertemplate{sidebar canvas right}{}
+%\setbeamertemplate{sidebar right}{BOB}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Simple Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass{beamer}
+%\usetheme{Boadilla}
+%\usepackage{lmodern}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sidebar Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass[serif]{beamer}  % For serif latex font
+%\usepackage{pxfonts}
+%\usepackage{eulervm}
+%\usepackage{mathpazo}
+
+%\usetheme{Goettingen}
+%\usecolortheme{lily}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Common Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[]{Numerical Methods \\ Matt Cocci}
+\author[]{}
+\date{\today}
+
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+%\setbeamertemplate{section in toc}[square unnumbered]
+%\setbeamertemplate{subsection in toc}[square unnumbered]
+
+%% Mathematics Related %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{amsthm} %allows for labeling of theorems
+%\numberwithin{equation}{section} % Number equations by section
+\usepackage{bbm} % For bold numbers
+
+%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+\usepackage{graphicx}
+\usepackage{subfigure}
+    %   For plotting multiple figures at once
+%\graphicspath{ {Directory/} }
+    %   Set a directory for where to look for figures
+
+%% Misc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% For easier looping
+\usepackage{pgffor}
+
+\usepackage{pdfpages}
+
+%% User Defined %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\nameofcmd}{Text to display}
+\newcommand*{\Chi}{\mbox{\large$\chi$}} %big chi
+    %   Bigger Chi
+
+% In math mode, Use this instead of \munderbar, since that changes the
+% font from math to regular
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+% Misc Math
+\newcommand{\ra}{\rightarrow}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\proj}{\operatorname{proj}}
+\newcommand{\ch}{\text{ch}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\one}[1]{\mathbf{1}_{#1}}
+
+
+% Command to generate new math commands:
+% - Suppose you want to refer to \boldsymbol{x} as just \bsx, where 'x'
+%   is any letter. This commands lets you generate \bsa, \bsb, etc.
+%   without copy pasting \newcommand{\bsa}{\boldsymbol{a}} for each
+%   letter individually. Instead, just include
+%
+%     \generate{bs}{\boldsymbol}{a,...,z}
+%
+% - Uses pgffor package to loop
+% - Example with optional argument. Will generate \bshatx to represent
+%   \boldsymbol{\hat{x}} for all letters x
+%
+%     \generate[\hat]{bshat}{\boldsymbol}{a,...,z}
+
+\newcommand{\generate}[4][]{%
+  % Takes 3 arguments (maybe four):
+  % - 1   wrapcmd (optional, defaults to nothing)
+  % - 2   newname
+  % - 3   mathmacro
+  % - 4   Names to loop over
+  %
+  % Will produce
+  %
+  %   \newcommand{\newnameX}{mathmacro{wrapcmd{X}}}
+  %
+  % for each X in argument 4
+
+  \foreach \x in {#4}{%
+    \expandafter\xdef\csname%
+      #2\x%
+    \endcsname%
+    {\noexpand\ensuremath{\noexpand#3{\noexpand#1{\x}}}}
+  }
+}
+
+
+% MATHSCR: Gen \sX to stand for \mathscr{X} for all upper case letters
+\generate{s}{\mathscr}{A,...,Z}
+
+
+% BOLDSYMBOL: Generate \bsX to stand for \boldsymbol{X}, all upper and
+% lower case.
+%
+% Letters and greek letters
+\generate{bs}{\boldsymbol}{a,...,z}
+\generate{bs}{\boldsymbol}{A,...,Z}
+\newcommand{\bstheta}{\boldsymbol{\theta}}
+\newcommand{\bsmu}{\boldsymbol{\mu}}
+\newcommand{\bsSigma}{\boldsymbol{\Sigma}}
+\newcommand{\bsvarepsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\bsalpha}{\boldsymbol{\alpha}}
+\newcommand{\bsbeta}{\boldsymbol{\beta}}
+\newcommand{\bsOmega}{\boldsymbol{\Omega}}
+\newcommand{\bshatOmega}{\boldsymbol{\hat{\Omega}}}
+\newcommand{\bshatG}{\boldsymbol{\hat{G}}}
+\newcommand{\bsgamma}{\boldsymbol{\gamma}}
+\newcommand{\bslambda}{\boldsymbol{\lambda}}
+
+% Special cases like \bshatb for \boldsymbol{\hat{b}}
+\generate[\hat]{bshat}{\boldsymbol}{b,y,x,X,V,S,W}
+\newcommand{\bshatbeta}{\boldsymbol{\hat{\beta}}}
+\newcommand{\bshatmu}{\boldsymbol{\hat{\mu}}}
+\newcommand{\bshattheta}{\boldsymbol{\hat{\theta}}}
+\newcommand{\bshatSigma}{\boldsymbol{\hat{\Sigma}}}
+\newcommand{\bstildebeta}{\boldsymbol{\tilde{\beta}}}
+\newcommand{\bstildetheta}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\bsbarbeta}{\boldsymbol{\overline{\beta}}}
+\newcommand{\bsbarg}{\boldsymbol{\overline{g}}}
+
+% Redefine \bso to be the zero vector
+\renewcommand{\bso}{\boldsymbol{0}}
+
+% Transposes of all the boldsymbol shit
+\newcommand{\bsbp}{\boldsymbol{b'}}
+\newcommand{\bshatbp}{\boldsymbol{\hat{b'}}}
+\newcommand{\bsdp}{\boldsymbol{d'}}
+\newcommand{\bsgp}{\boldsymbol{g'}}
+\newcommand{\bsGp}{\boldsymbol{G'}}
+\newcommand{\bshp}{\boldsymbol{h'}}
+\newcommand{\bsSp}{\boldsymbol{S'}}
+\newcommand{\bsup}{\boldsymbol{u'}}
+\newcommand{\bsxp}{\boldsymbol{x'}}
+\newcommand{\bsyp}{\boldsymbol{y'}}
+\newcommand{\bsthetap}{\boldsymbol{\theta'}}
+\newcommand{\bsmup}{\boldsymbol{\mu'}}
+\newcommand{\bsSigmap}{\boldsymbol{\Sigma'}}
+\newcommand{\bshatmup}{\boldsymbol{\hat{\mu'}}}
+\newcommand{\bshatSigmap}{\boldsymbol{\hat{\Sigma'}}}
+
+% MATHCAL: Gen \calX to stand for \mathcal{X}, all upper case
+\generate{cal}{\mathcal}{A,...,Z}
+
+% MATHBB: Gen \X to stand for \mathbb{X} for some upper case
+\generate{}{\mathbb}{R,Q,C,Z,N,Z,E}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\RN}{\mathbb{R}^N}
+\newcommand{\Rk}{\mathbb{R}^k}
+\newcommand{\RK}{\mathbb{R}^K}
+\newcommand{\RL}{\mathbb{R}^L}
+\newcommand{\Rl}{\mathbb{R}^\ell}
+\newcommand{\Rm}{\mathbb{R}^m}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rmn}{\mathbb{R}^{m\times n}}
+\newcommand{\Rnm}{\mathbb{R}^{n\times m}}
+\newcommand{\Rkn}{\mathbb{R}^{k\times n}}
+\newcommand{\Rnk}{\mathbb{R}^{n\times k}}
+\newcommand{\Rkk}{\mathbb{R}^{k\times k}}
+\newcommand{\Cn}{\mathbb{C}^n}
+\newcommand{\Cnn}{\mathbb{C}^{n\times n}}
+
+% Dot over
+\newcommand{\dx}{\dot{x}}
+\newcommand{\ddx}{\ddot{x}}
+\newcommand{\dy}{\dot{y}}
+\newcommand{\ddy}{\ddot{y}}
+
+% First derivatives
+\newcommand{\dydx}{\frac{dy}{dx}}
+\newcommand{\dfdx}{\frac{df}{dx}}
+\newcommand{\dfdy}{\frac{df}{dy}}
+\newcommand{\dfdz}{\frac{df}{dz}}
+
+% Second derivatives
+\newcommand{\ddyddx}{\frac{d^2y}{dx^2}}
+\newcommand{\ddydxdy}{\frac{d^2y}{dx dy}}
+\newcommand{\ddydydx}{\frac{d^2y}{dy dx}}
+\newcommand{\ddfddx}{\frac{d^2f}{dx^2}}
+\newcommand{\ddfddy}{\frac{d^2f}{dy^2}}
+\newcommand{\ddfddz}{\frac{d^2f}{dz^2}}
+\newcommand{\ddfdxdy}{\frac{d^2f}{dx dy}}
+\newcommand{\ddfdydx}{\frac{d^2f}{dy dx}}
+
+
+% First Partial Derivatives
+\newcommand{\pypx}{\frac{\partial y}{\partial x}}
+\newcommand{\pfpx}{\frac{\partial f}{\partial x}}
+\newcommand{\pfpy}{\frac{\partial f}{\partial y}}
+\newcommand{\pfpz}{\frac{\partial f}{\partial z}}
+
+
+% argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\;min}
+\DeclareMathOperator*{\argmax}{arg\;max}
+
+
+% Various probability and statistics commands
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\vc}{\operatorname{vec}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\asto}{\xrightarrow{a.s.}}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\msto}{\xrightarrow{m.s.}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\Lpto}{\xrightarrow{L_p}}
+\newcommand{\Lqto}[1]{\xrightarrow{L_{#1}}}
+\newcommand{\plim}{\text{plim}_{n\rightarrow\infty}}
+
+
+% Redefine real and imaginary from fraktur to plain text
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+% Shorter sums: ``Sum from X to Y''
+% - sumXY  is equivalent to \sum^Y_{X=1}
+% - sumXYz is equivalent to \sum^Y_{X=0}
+\newcommand{\sumnN}{\sum^N_{n=1}}
+\newcommand{\sumin}{\sum^n_{i=1}}
+\newcommand{\sumjn}{\sum^n_{j=1}}
+\newcommand{\sumim}{\sum^m_{i=1}}
+\newcommand{\sumik}{\sum^k_{i=1}}
+\newcommand{\sumiN}{\sum^N_{i=1}}
+\newcommand{\sumkn}{\sum^n_{k=1}}
+\newcommand{\sumtT}{\sum^T_{t=1}}
+\newcommand{\sumninf}{\sum^\infty_{n=1}}
+\newcommand{\sumtinf}{\sum^\infty_{t=1}}
+\newcommand{\sumnNz}{\sum^N_{n=0}}
+\newcommand{\suminz}{\sum^n_{i=0}}
+\newcommand{\sumknz}{\sum^n_{k=0}}
+\newcommand{\sumtTz}{\sum^T_{t=0}}
+\newcommand{\sumninfz}{\sum^\infty_{n=0}}
+\newcommand{\sumtinfz}{\sum^\infty_{t=0}}
+
+\newcommand{\prodnN}{\prod^N_{n=1}}
+\newcommand{\prodin}{\prod^n_{i=1}}
+\newcommand{\prodiN}{\prod^N_{i=1}}
+\newcommand{\prodkn}{\prod^n_{k=1}}
+\newcommand{\prodtT}{\prod^T_{t=1}}
+\newcommand{\prodnNz}{\prod^N_{n=0}}
+\newcommand{\prodinz}{\prod^n_{i=0}}
+\newcommand{\prodknz}{\prod^n_{k=0}}
+\newcommand{\prodtTz}{\prod^T_{t=0}}
+
+% Bounds
+\newcommand{\atob}{_a^b}
+\newcommand{\ztoinf}{_0^\infty}
+\newcommand{\kinf}{_{k=1}^\infty}
+\newcommand{\ninf}{_{n=1}^\infty}
+\newcommand{\minf}{_{m=1}^\infty}
+\newcommand{\tinf}{_{t=1}^\infty}
+\newcommand{\nN}{_{n=1}^N}
+\newcommand{\tT}{_{t=1}^T}
+\newcommand{\kinfz}{_{k=0}^\infty}
+\newcommand{\ninfz}{_{n=0}^\infty}
+\newcommand{\minfz}{_{m=0}^\infty}
+\newcommand{\tinfz}{_{t=0}^\infty}
+\newcommand{\nNz}{_{n=0}^N}
+
+% Limits
+\newcommand{\limN}{\lim_{N\rightarrow\infty}}
+\newcommand{\limn}{\lim_{n\rightarrow\infty}}
+\newcommand{\limk}{\lim_{k\rightarrow\infty}}
+\newcommand{\limt}{\lim_{t\rightarrow\infty}}
+\newcommand{\limT}{\lim_{T\rightarrow\infty}}
+\newcommand{\limhz}{\lim_{h\rightarrow 0}}
+
+% Shorter integrals: ``Integral from X to Y''
+% - intXY is equivalent to \int^Y_X
+\newcommand{\intab}{\int_a^b}
+\newcommand{\intzN}{\int_0^N}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Presentation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Outline}
+\tableofcontents[hideallsubsections]
+%\tableofcontents
+\end{frame}
+
+
+\section{Monte Carlo Computation of Means}
+
+
+{\footnotesize
+\begin{frame}{Monte Carlo}
+Suppose we have a random variable $X\sim F$ and we can generate many
+iid \alert{draws} $\{X_m\}_{m=1}^M$ from $F$.
+Then we can compute
+\begin{align*}
+  \E[g(X)]
+  =
+  \int g(x)\,dF(x)
+  \approx
+  \frac{1}{M}
+  \sum_{m=1}^M
+  X_m
+\end{align*}
+with the approximation arbitrarily close as $M\ra\infty$ by the LLN.
+
+
+This includes taking $g(x)$ to be an indicator function, which allows us
+to compute probabilities:
+\begin{align*}
+  P[X\in A]
+  =
+  \E[1\{X\in A\}]
+  \approx
+  \frac{1}{M}
+  \sum_{m=1}^M
+  1\{X_m\in A\}
+\end{align*}
+\alert{Punchline}:
+Being able to draw RV $X\sim F$ means being able to compute arbitrary
+moments and probabilities involving $X$.
+\end{frame}
+}
+
+
+{\scriptsize
+\begin{frame}{Importance Sampling}
+Suppose we have two RVs $X\sim f_X$ and $X^*\sim f_{X^*}$.
+An identity:
+\begin{align*}
+  \E^*[g(X^*)]
+  &= \int g(u) \, f_{X^*}(u) \, du
+  = \int g(u)  \frac{f_{X^*}(u)}{f_X(u)} f_X(u)\;du
+  = \E\bigg[g(X)\underbrace{\frac{f_{X^*}(X)}{f_X(X)}}_{=:M(X)}\bigg]
+\end{align*}
+\alert{Importance Sampling}
+\begin{itemize}
+  \item \alert{Goal}: Want to compute mean of $g(X^*)$
+  \item \alert{Setting}: Can't draw $X^*\sim f_{X^*}$; can draw $X\sim f_X$
+  \item \alert{Result}:
+    $\E^*$ of $g(X^*)$ equivalent to $\E$ of $g(X)$ after
+    \alert{adjustment} by $f_{X^*}/f_X$
+  \item \alert{Change of measure} making use of the
+    Radon-Nikodym deriv (likelihood ratio) $f_{X^*}/f_X$.
+  \item Need densities to be \alert{abs.\ continuous} (each
+    density nonzero whenever the other is) and not too different
+    (so ratio $f_{X^*}/f_X$ is well-behaved for feasible number of
+    draws).
+\end{itemize}
+\vspace{-8pt}
+Steps
+\vspace{-8pt}
+\begin{itemize}
+  \item Draw $X_m \sim f_X$
+    for $m=1,\ldots,M$
+  \item Compute
+    $\frac{1}{M}\sum_{m=1}^M g(X_m)
+    \frac{f_{X^*}(X_m)}{f_X(X_m)}\approx \E^*[g(X^*)]$
+\end{itemize}
+Sufficient for \alert{mean}, but we'll want to generate \alert{draws}
+from distribution.
+\end{frame}
+}
+
+
+\section{Drawing from Distributions}
+
+\subsection{Motivation}
+
+{\footnotesize
+\begin{frame}{Motivation: Posterior Probabilities and Predictions}
+Bayesian analysis and inference is organized around the
+idea that the parameters $\theta$ have some
+\alert{posterior distribution}
+\begin{align*}
+  p(\theta|y)
+  \propto
+  p(y|\theta)
+  p(\theta)
+\end{align*}
+where $y=(y_1,\ldots,y_n)$ is the full vector of observations.
+Framework allows
+\begin{itemize}
+  \item \alert{Posterior probability statements} about parameters having
+    updated our prior beliefs given the observed data, e.g.
+    \begin{align*}
+      P[\theta_1>c|y]
+      =
+      \int_c^\infty
+      \int_{-\infty}^\infty
+      \cdots
+      \int_{-\infty}^\infty
+      p(\theta_1,\theta_2,\ldots,\theta_k|y)
+      \;
+      d\theta_1\,
+      d\theta_2\,
+      \cdots
+      d\theta_k
+    \end{align*}
+    In other words, we wish to conduct \alert{posterior inference}.
+
+  \item \alert{Posterior predictive statements} about new obs.\
+    $\tilde{y}$ generated by the model, e.g.
+    \begin{align*}
+      \E[\tilde{y}\,|\,y]
+      =
+      \int
+      \tilde{y}
+      p(\tilde{y}|y)
+      \;d\tilde{y}
+      =
+      \int
+      \int
+      \tilde{y}
+      p(\tilde{y},\theta|y)
+      \;d\tilde{y}
+      \,d\theta
+      =
+      \int
+      \int
+      \tilde{y}
+      p(\tilde{y}|\theta)
+      p(\theta|y)
+      \;d\tilde{y}
+      \,d\theta
+    \end{align*}
+    Especially relevant for \alert{forecasting} future values from some
+    times series or dynamic model.
+    %e.g GDP tomorrow given value today
+    %and posterior for its AR(1) coefficient.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Motivation: Posterior Uncertainty}
+Note
+\begin{itemize}
+  \item Previous slide showed several functionals of the posterior that
+    reduced the entire posterior density function to a
+    \alert{single number}, e.g. a posterior probability or posterior
+    prediction.
+
+  \item More often, want to show \alert{distributions} fully
+    reflecting posterior uncertainty, e.g.
+    \begin{itemize}
+      {\footnotesize
+      \item Full marginal posterior distribution of $\theta_1$
+      \item Full posterior predictive distribution of hypothetical new
+        observation $\tilde{y}$
+        }
+    \end{itemize}
+
+  \item This generally requires \alert{draws} from the posterior
+    distribution.
+
+  \item These draws can also be used to compute those functionals
+    displayed on the previous slide.
+    So draws useful for all tasks.
+\end{itemize}
+\end{frame}
+}
+
+
+
+{\footnotesize
+\begin{frame}{Motivation: Posterior Draws}
+All goals can be accomplished with \alert{draws}
+$\{\theta^{(m)}\}_{m=1}^M$ from posterior dist.
+$p(\theta|y)$.
+\begin{itemize}
+  \item From our bootstrap discussion, recall the associated
+    empirical distribution of iid draws $\{\theta^{(m)}\}_{m=1}^M$ from
+    the posterior $p(\theta|y)$ will \alert{converge} to the associated
+    CDF.
+
+  \item
+    So if we compute means and probabilities with respect to the
+    empirical distribution associated with  iid draws
+    $\{\theta^{(m)}\}_{m=1}^M$ from the posterior $p(\theta|y)$,
+    we're computing means and probabilities with respect to
+    the true posterior $p(\theta|y)$ (or at least we can get arbitrarily
+    close for large enough $M$).
+
+  \item
+    Histograms and empirical CDFs approximate true
+    posterior pdfs and cdfs, e.g.
+    \begin{align*}
+      \frac{1}{M}
+      \sum_{m=1}^M
+      1\{\theta_1^{(m)}>c\}
+      \quad
+      \pto
+      \quad
+      P[\theta_1>c|y]
+    \end{align*}
+
+  \vspace{-7pt}
+
+  \item \alert{Sample averages} built from the posterior
+    draws $\{\theta^{(m)}\}_{m=1}^M$ will converge to
+    \alert{means} computed with the posterior, e.g.
+    if $\theta^{(m)}\sim p(\theta|y)$ and
+    if $\tilde{y}^{(m)}\sim p(\tilde{y}|\theta^{(m)})$,
+    then $(\tilde{y}^{(m)},\theta^{(m)})$ is a draw from the joint
+    $p(\tilde{y},\theta|y)$ and
+    \begin{align*}
+      \frac{1}{M}
+      \sum_{m=1}^M
+      \tilde{y}^{(m)}
+      \quad\pto\quad
+      \E[\tilde{y}|y]
+    \end{align*}
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Motivation Posterior Draws}
+Task is now \alert{how to obtain draws}?
+\begin{itemize}
+  \item Standard Distributions:
+    Call Matlab built-in command to get iid draws.
+  \item Low-dimensional Distributions:
+    Inverse transform, grid method to get iid draws
+  \item High-dimensional distributions: MCMC to get sequence of
+    draws
+\end{itemize}
+The latter two are needed because while we can often characterize the
+\alert{functional form} of the posterior by simply writing out
+\begin{align*}
+  p(\theta|y)\propto p(y|\theta)p(\theta)
+\end{align*}
+But resulting expression often a \alert{nonstandard} density that we
+can't draw directly from, even if we can \alert{write down} and
+\alert{evaluate} the posterior density, if not draw from it.
+
+MCMC methods
+\begin{itemize}
+  \item Set of algorithms that produce draws $\{\theta^{(m)}\}_{m=1}^M$
+    from nonstandard densities
+  \item ``Markov Chain'' methods in that $\{\theta^{(m)}\}_{m=1}^M$ is a
+    \alert{sequence} exhibiting dependence, rather than a set of
+    iid draws.
+\end{itemize}
+\end{frame}
+}
+
+
+\subsection{Inverse Transform Method}
+
+{\footnotesize
+\begin{frame}{Sampling by Inverse Transform}
+Suppose we have a continuous RV $X\sim F_X(x)$ with a monotonically
+increasing CDF. Suppose we do the following
+\begin{enumerate}
+  \item Draw $U\sim \text{Unif}(0,1)$.
+    Recall that $F_U(u)=u$ for $u\in[0,1]$.
+  \item Compute $\tilde{X}\sim F^{-1}_X(U)$
+\end{enumerate}
+Check the CDF of $\tilde{X}$:
+\begin{align*}
+  P[\tilde{X}\leq x]
+  =
+  P[F^{-1}(U)_X\leq x]
+  =
+  P[U\leq F_X(x)]
+  =
+  F_U(F_X(x))
+  =
+  F_X(x)
+\end{align*}
+Because the CDF of $\tilde{X}$ and $X$ coincide,
+$\tilde{X}\sim X$.
+\end{frame}
+}
+
+
+\subsection{Grid Method}
+
+{\footnotesize
+\begin{frame}{Grid Method}
+
+Steps
+\begin{enumerate}
+  \item
+    Discretize support of $\theta$ to get a discrete set of values.
+    Can always do this, even if $\theta$ multidimensional.
+    \begin{align*}
+      \{\theta_{i}\}_{i=1}^I
+    \end{align*}
+
+  \item
+    Compute posterior at each grid point, divided by the sum
+    over all grid points:
+    \begin{align*}
+      g(\theta_{i})
+      :=
+      \frac{p(\theta_{i}|y)}{\sum_{i=1}^Ip(\theta_{i}|y)}
+    \end{align*}
+    Again, it's generally easy to \alert{compute} the posterior.
+    Notice $\sum_{i=1}^I g(\theta_i)=1$.
+
+  \item
+    Draw sample $\{\theta^{(m)}\}_{m=1}^M$ (with replacement) from
+    the set $\{\theta_{i}\}_{i=1}^I$ in proportion to draw
+    probabilities $\{g(\theta_{i})\}_{i=1}^I$.
+\end{enumerate}
+\vspace{-8pt}
+Note
+\vspace{-8pt}
+\begin{itemize}
+  \item
+    Really only feasible when $\text{dim}(\theta)=K$ is very low,
+    e.g. $K\leq 3$.
+  \item Then again, if most parameters are nuisance parameters, can
+    marginalize analytically or numerically, leaving one or two
+    parameters of interest, and apply.
+\end{itemize}
+\end{frame}
+}
+
+
+\subsection{Rejection Sampling}
+
+{\footnotesize
+\begin{frame}{Rejection Sampling}
+Setup
+\begin{itemize}
+  \item Target density $f(x)$ we wish to draw from
+  \item Density $g(x)$ that we \emph{can} draw from satisfying
+    \begin{itemize}
+      \item Support of $g(x)$ contains support of $f(x)$
+      \item We can find a known constant $M$ such that
+        $f(x)\leq Mg(x)$ for all $x$ in the support of $f(x)$.
+    \end{itemize}
+\end{itemize}
+\vspace{-8pt}
+Steps
+\vspace{-8pt}
+\begin{enumerate}
+  \item Draw $X\sim g(x)$
+  \item Compute ratio
+    \begin{align*}
+      \rho = \frac{f(x)}{Mg(x)}
+    \end{align*}
+  \item Draw $u\sim U[0,1]$ and accept the draw if $u\leq \rho$.
+\end{enumerate}
+Notice: If we can draw from $f(x)$, set $g(x)=f(x)$ $\implies$ $\rho=1$
+\& accept every draw.
+%Proof:
+%Let $\tilde{X}$ denote a random variable that has the distribution
+%induced by this procedure. Compute
+%\begin{align*}
+  %\E[g(\tilde{X})]
+  %=
+%\end{align*}
+\end{frame}
+}
+
+%{\footnotesize
+%\begin{frame}{Rejection Sampling: Proof}
+%Let
+%\begin{itemize}
+  %\item $Y\sim g(x)$
+  %\item $A|Y\sim \text{Bernoulli}(f(y)/g(y))$ denote acceptance
+  %\item $\tilde{X}$ denote the random variable which has distribution
+    %induced by the rejection sampling procedure
+%\end{itemize}
+%Then the distribution of $\tilde{X}$ is inherently a \alert{conditional}
+%distribution, conditional on acceptance:
+%\begin{align*}
+  %P[\tilde{X}\in B]
+  %=
+  %P[Y\in B\;|\; A=1]
+%\end{align*}
+%Then we can compute
+%\begin{align*}
+  %P[\tilde{X}\in B]
+  %=
+  %P[Y\in B\;|\; A=1]
+  %=
+  %\frac{%
+    %P[Y\in B, A=1]
+  %}{%
+    %P[A=1]
+  %}
+  %=
+  %\frac{%
+    %\int_B
+    %P[Y\in B, A=1]
+  %}{%
+    %P[A=1]
+  %}
+%\end{align*}
+%\end{frame}
+%}
+
+
+\subsection{MCMC Methods}
+
+
+{\footnotesize
+\begin{frame}{Setup}
+\alert{Goal}: Draw from some density (posterior density) denoted
+\begin{align*}
+  g(\theta)
+\end{align*}
+This is an \alert{arbitrary input}.
+
+\alert{Proposal Density}:
+\begin{itemize}
+  \item Definition:
+    Standard density $q(\theta'|\theta)$ from which we can easily draw
+    $\theta'$ conditional on $\theta$.
+
+  \item \alert{Symmetric} if $q(\theta'|\theta)=q(\theta|\theta')$.
+
+  \item Most common example:
+    \begin{align*}
+      q(\theta'|\theta)
+      \sim
+      \calN\left(
+      \theta,\Sigma
+      \right)
+    \end{align*}
+    When $g(\theta)$ is the posterior density, often take $\Sigma$ as
+    the (scaled) inverse Hessian
+    \begin{align*}
+      \Sigma
+      =
+      -
+      k
+      \left(
+        \frac{\partial^2 \log p(\theta_*|y)}{\partial \theta\partial \theta'}
+      \right)^{-1}
+    \end{align*}
+    where $\theta_*$ is posterior max.
+    Can compute numerically by finite difference routine.
+\end{itemize}
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Setup: Intuition for $\Sigma$}
+
+How we typically do Bayesian analysis:
+\begin{itemize}
+  \vspace{-10pt}
+  \item Specify model/likelihood $p(y|\theta)$
+    and prior $p(\theta)$
+  \item Multiply to get posterior,
+    \vspace{-8pt}
+    \begin{align*}
+      p(\theta|y)\propto p(y|\theta)p(\theta)
+    \end{align*}
+    and code up this function mapping parameters into values;
+    data $y$ fixed.
+  \item
+    Function $p(\theta|y)$ can be passed to an
+    \alert{optimization routine} to find
+    \begin{align*}
+      \theta_*
+      =\argmax_\theta p(\theta|y)
+    \end{align*}
+    Can compute Hessian at $\theta_*$ by finite difference routine.
+
+  \item By Bernstein-von Mises, we have this intuition that
+    \begin{itemize}
+      {\footnotesize
+      \item Posterior and the likelihood eventually coincide,
+        $p(\theta|y)\approx p(y|\theta)$
+      \item Posterior max is the MLE which converges to the truth,
+        $\theta_*\approx \hat{\theta}_{MLE}\approx \theta_0$
+      \item Posterior is normal distribution centered at posterior
+        max/MLE with variance equal to the inverse Fisher information
+        matrix
+        \begin{align*}
+          I_{\theta_0}
+          &=
+          \E_{\theta_0}\left[
+            \left(
+            \frac{\partial^2 \log p(y|\theta_0)}{\partial \theta\partial \theta'}
+            \right)^2
+          \right]
+        \end{align*}
+      }
+    \end{itemize}
+\end{itemize}
+\end{frame}
+}
+
+
+\subsubsection{Metropolis-Hastings}
+
+{\footnotesize
+\begin{frame}{Metropolis-Hastings}
+Given arbitrary density function $g(\theta)$ that we wish to draw from
+and Markov proposal density $q(\theta'|\theta)$, construct a chain
+as follows:
+\begin{enumerate}
+  \item Starting point $\theta^{(0)}$
+  \item Given starting $\theta^{(j)}$, draw proposed value
+    $\tilde{\theta}$ from $q(\theta'|\theta^{(j)})$
+  \item Compute the ratio of densities
+    \begin{align*}
+      \rho =
+      \frac{%
+        g(\tilde{\theta})
+      }{%
+        g({\theta}^{(j)})
+      }
+      \cdot
+      \frac{%
+        q(\theta^{(j)}|\tilde{\theta})
+      }{%
+        q(\tilde{\theta}|\theta^{(j)})
+      }
+    \end{align*}
+  \item Draw $u\sim \text{U}[0,1]$ and based on $\rho$, set
+    \begin{align*}
+      \theta^{j+1}
+      &=
+      \begin{cases}
+        \tilde{\theta} & \rho \geq u \\
+        \theta^{(j)} & \text{otherwise}
+      \end{cases}
+    \end{align*}
+\end{enumerate}
+This generates draws $\{\theta^{(j)}\}_{j=1}^M$ for some large value $M$
+such that the empirical CDF associated with these draws matches the true
+CDF associated with the density $g(\theta)$.
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Metropolis-Hastings Algorithm: Remark}
+
+Suppose we could draw directly from $g(\theta)$.
+\begin{itemize}
+  \item Then we could use it as a proposal density
+    $q(\theta'|\theta)=g(\theta')$.
+
+  \item Notice that
+    \begin{align*}
+      \rho =
+      \frac{%
+        g(\tilde{\theta})
+      }{%
+        g({\theta}^{(j)})
+      }
+      \frac{%
+        g(\theta^{(j)})
+      }{%
+        g(\tilde{\theta})
+      }
+      =
+      1
+    \end{align*}
+
+  \item Hence we always accept.
+
+  \item Thus Metropolis-Hastings nests the easy, but generally
+    infeasible case where we can draw directly from the density.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Metropolis Algorithm}
+
+
+Notice
+\begin{itemize}
+  \item Special case of Metropolis-Hastings when proposal density is
+    symmetric $q(\theta'|\theta)=q(\theta|\theta')$.
+
+  \item Step 3 in MH algorithm reduces to
+    \begin{align*}
+      \rho =
+      \frac{%
+        g(\tilde{\theta})
+      }{%
+        g({\theta}^{(j)})
+      }
+    \end{align*}
+    Everything else is \alert{the same}.
+
+  \item \alert{Advantage}: Avoid having to evaluate the proposal
+    density.
+
+  \item \alert{Useful} because often use normal proposal distribution,
+    which is symmetric.
+\end{itemize}
+Intuition we can derive from Metropolis Algorithm:
+\begin{itemize}
+  \item If proposed $\tilde{\theta}$ has higher density, i.e.
+    $\rho = \frac{g(\tilde{\theta}) }{ g({\theta}^{(j)}) }>1$,
+    \alert{automatically} accepted
+  \item If proposed $\tilde{\theta}$ has lower density, accepted with
+    \alert{some probability} for the purpose of exploring the full
+    support.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Gibbs Sampling}
+Suppose $\theta\in\R^K$ can be partitioned into $B\leq K$
+blocks
+\begin{align*}
+  \theta=(\theta_1,\ldots,\theta_B)
+\end{align*}
+such that for each block $b\in\{1,\ldots,B\}$, the \alert{conditional}
+distribution $g(\theta_b|\theta_{-b})$
+\begin{align}
+  g(\theta_b|\theta_{-b})
+  %:= \frac{g(\theta_b,\theta_{-b})}{\int g(\theta_b,\theta_{-b})\;d\theta_b}
+  = \frac{g(\theta)}{\int g(\theta_b,\theta_{-b})\;d\theta_b}
+  \label{gibbscond}
+\end{align}
+is proportional to a standard distribution that's easy to draw
+from.
+\begin{itemize}
+  \item $\theta_b$ refers not to the $b$th element of $\theta$, but the
+    collection of parameters in block $b$ of partitioned $\theta$.
+
+  \item $g(\theta_b|\theta_{-b})$ is \emph{only} a function of
+    $\theta_b$, up to a constant of proportionality.
+    In practice, to ``compute'' $g(\theta_b|\theta_{-b})$, just drop all
+    constants/expressions involving parameters in $\theta_{-b}$
+    to get an expression that's $\propto g(\theta_b|\theta_{-b})$.
+\end{itemize}
+\end{frame}
+}
+
+
+{\footnotesize
+\begin{frame}{Gibbs Sampling}
+Suppose $\theta\in\R^K$ can be partitioned into $B\leq K$
+blocks
+\begin{align*}
+  \theta=(\theta_1,\ldots,\theta_B)
+\end{align*}
+such that for each block $b\in\{1,\ldots,B\}$, the \alert{conditional}
+distribution $g(\theta_b|\theta_{-b})$ is standard and easy to draw
+from.
+
+Then to draw sample $\{\theta^{(j)}\}_{j=1}^J$,
+proceed as follows
+\vspace{-10pt}
+\begin{enumerate}
+  \item Initialize $\theta^{(0)}$ to some value
+  \item Given $\theta^{(j)}$, draw $\theta^{(j+1)}$
+    block by block using conditional distributions.
+
+    In particular, since each $g(\theta_b|\theta_{-b})$ is proportional
+    to a standard distribution by assumption, iterate through
+    $b=1,\ldots,B$, directly drawing
+    \begin{align*}
+      \theta_1^{(j+1)}
+      &\sim g(\theta_{1}'|\theta^{(j)}_{2},\theta^{(j)}_{3},\ldots,\theta^{(j)}_{B})
+      \\
+      \theta_2^{(j+1)}
+      &\sim
+      g(\theta_2'|\theta^{(j+1)}_{1},\theta^{(j)}_{3},\;\ldots,\;\theta^{(j)}_{B})
+      \\
+      &\;\vdots
+      \\
+      \theta_B^{(j+1)}
+      &\sim
+      g(\theta_B'|\theta^{(j+1)}_{1},\theta^{(j+1)}_{2},\;\ldots,\;\theta^{(j+1)}_B)
+    \end{align*}
+\end{enumerate}
+\end{frame}
+}
+
+{\footnotesize
+\begin{frame}{Gibbs Sampling as Metropolis-Hastings}
+Because, by conditioning, we can draw directly from the posterior
+distribution, we're back in that special case of Metropolis-Hastings
+where we can draw \alert{directly} from the target distribution,
+implying that we accept all draws.
+
+This can be viewed as a special case of Metropolis-Hastings with the
+proposal distribution $q(\theta'|\theta)$ built up
+sequentially block-by-block
+\begin{align*}
+  q(\theta'|\theta)
+  %=
+  %\prod_{b=1}^B
+  %g(\theta'_b|\theta_{k<b}',\theta_{k>b})
+  =
+  g(\theta_1'|\theta_2,\theta_3,\ldots,\theta_B)
+  g(\theta_2'|\theta_1',\theta_3,\ldots,\theta_B)
+  \cdots
+  g(\theta_B'|\theta_1',\theta_2',\ldots,\theta_{B-1}')
+\end{align*}
+\end{frame}
+}
+
+
+
+
+\end{document}
+
+
+
+
+
+
+% Sample code
+\pause to add breaks
+\textcolor{red}{text to show}.
+\vspace{20pt}
+
+\usebeamercolor{dull text}
+\alert<+>{Words that you want to alert}
+
