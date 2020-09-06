@@ -504,78 +504,188 @@
 \tableofcontents
 
 \clearpage
-\section{Computer Architecture}
+\section{General Computing and Programming}
 
-\subsection{Overview}
+\subsection{Computer \& Cluster Architecture}
 
 
-Von Neumann or Princeton Architecture:
-Abstract model of a computer that consists of
-\begin{itemize}
-  \item Central Processing Unit
+\paragraph{Von Neumann or Princeton Architecture}
+Abstract model of a computer consisting of
+\begin{enumerate}
+  \item (\emph{Central Processing Unit}):
+    Performs and coordinates operations.
+
+    Each CPU is a collection of processor \emph{cores} (usually
+    physical), consisting of
     \begin{itemize}
-      \item Arithmetic Logic Unit (ALU): Performs simple operations like
-        plus, minus, times, division, and logical operations.
-      \item Control Unit: Coordinates the operation and sequence of data
-        movements between the other parts of the Architecture.
+      \item (\emph{Arithmetic Logic Unit or ALU}): Performs simple
+        operations like plus, minus, times, division, and logical
+        operations.
+      \item (\emph{Control Unit}): Coordinates the operation and
+        sequence of data movements between the other parts of the
+        Architecture.
     \end{itemize}
-  \item Memory:
-    Stores data and programs.
+    A single node/server/computer often has multiple CPUs, which we refer to
+    as \emph{sockets}.
+
+  \item (\emph{Memory}):
+    Hardware involved in storing data and programs.
+    Two flavors:
+    \begin{itemize}
+      \item (\emph{Random Access Memory or RAM}):
+        Temporary memory, quick and easy to acess, used to execute
+        programs. Also called volatile memory.
+      \item (\emph{Lasting memory}):
+        Non-volatile memory storage, e.g. hard drives.
+    \end{itemize}
+    Memory is managed by the operating system, which is one of its
+    primary roles.
   \item Input \& Output
+\end{enumerate}
+\paragraph{Clusters}
+\begin{itemize}
+  \item Group of inter-connected computers that work together to perform
+    computationally-intensive tasks.
+  \item Each computer is a \emph{node}, so a cluster is a collection of
+    nodes.
+  \item Server (host) address is what we use to identify server we
+    want to connect to using ssh
+  \item
+    Head Node(s)
+    \begin{itemize}
+      \item Server(s) that connects a cluster to an outside network (like
+        the internet or a company's internal network).
+      \item Handles login, script editing, code compilation, job submission.
+      \item Generally don't want to run stuff here.
+    \end{itemize}
+  \item
+    Compute Node
+    \begin{itemize}
+    \item Server used for computing, sometimes managed by a scheduler.
+    \item Compute nodes \emph{always} contain RAM and one or more CPUs
+      (usually two), each with multiple processor cores, on which
+      computation may take place.
+
+      If that's all they contain, they are a CPU (only) node.
+      If they additionally have GPUs for carrying out computation, they
+      are typically referred to as GPU nodes.
+    \end{itemize}
+  \item Schedulers help divide up the resources of a cluster and handle
+    submission of jobs to the compute nodes.
 \end{itemize}
 
 
-\subsection{CPU}
+\clearpage
+\subsection{Types and Features of Computing Languages}
 
-CPU \& Cores:
-Each CPU is a collection of processor cores (usually physical).
+Compiled vs. Interpreted Paradigm
+\begin{itemize}
+  \item Compiler translates source code into machine code, or
+    in Java's case, low level \emph{virtual} machine code called JVM
+    code that is later translated into actual machine code.
+  \item An interpreter simulates the operation of a (virtual) machine
+    running your code.
+    It evaluates code one line at a time.
 
-A single node/server/computer often has multiple CPUs, which we refer to
-as sockets.
+    Python doesn't type check at compile time, only at run time.
+\end{itemize}
+Type Checking
+\begin{itemize}
+  \item Static (compile time) type checking, e.g. Java:
+    All variables have declared types, and system checks for type
+    errors at compile time
+  \item Dynamic (run time) type checking, e.g. Python:
+    Values, not variables, have defined types, and system checks for
+    type errors at run time
+\end{itemize}
+Programming \& Language Styles
+\begin{itemize}
+  \item Procedural: Compiled language, source code describes execution
+    of one instruction after another.
+    C is the best example.
+  \item Scripted:
+    Interpreted language, commands that specify execution of one command
+    after another.
+  \item Special-Purpose:
+    Optimized around certain datatypes
+  \item Object Oriented:
+    \begin{itemize}
+      \item Distinct from procedural style
+      \item Focus on objects that do things.
+      \item Encapsulation:
+        Hide information to make programs robust
+      \item Type checking to avoid and find errors
+      \item Libraries to reuse code
+      \item Immutability to guarantee stability of program data
+    \end{itemize}
+    Examples: C++, Java
+  \item Functional:
+    \begin{itemize}
+      \item Treat computation as the evaluation of functions
+      \item Completely avoids side effects and mutable types
+      \item Functions are first-class entities, can be arguments and return
+        values
+      \item Map: Take function and apply to all elements in sequence
+      \item Reduce:
+        Given function \texttt{f} and a list/sequence \texttt{L}, the
+        command
+        \begin{lstlisting}
+          REDUCE(f, L)
+        \end{lstlisting}
+        returns
+        \begin{lstlisting}
+          f(L[0], REDUCE(f, L[1:end]))
+        \end{lstlisting}
+        and keeps going until there's no elements left in the list.
+
+    \end{itemize}
+    Examples: Haskell, OCaml
+\end{itemize}
+
+
 
 
 \clearpage
 \subsection{Memory}
 
-Memory \& Memory Representation
+\subsubsection{Machine Level}
+
+
+At the lowest level, computers work in \emph{bits}, which are 0's and
+1's. From there, build up to
 \begin{itemize}
-  \item Operating system manages memory.
-    It's one of its roles
-  \item Hardware involved in storing information.
-  \item Two flavors of memory.
-    \begin{itemize}
-      \item Random Access Memory (RAM):
-        Temporary memory, quick and easy to acess, used to execute
-        programs. Also called volatile memory.
-      \item Lasting memory, e.g. hard drives.
-        Non-volatile memory storage.
-    \end{itemize}
-  \item RAM
-    \begin{itemize}
-      \item Represent as a sequence of binary memory cells, bits.
-      \item Groupings of several bits together is a word, which is the
-        fundamental unit of data that can be moved between
-        RAM and the processor.
-        Typical sizes are 8, 16, 32, and 64 bit.
-      \item Grouping of bits into words allows for addressing of memory.
-      \item Each word has an address, which is the location of the word
-        in the computer's memory.
-      \item By working with addresses, we can have low-level access to
-        the computer by allowing direct access to the memory.
-        We know where things are.
-      \item One can literally move through the computer's memory from
-        word to word.
-      \item Memory is composed of bits that are organized into words.
-    \end{itemize}
+  \item One byte is eight bits.
+  \item A byte has $2^8=2^4\times 2^4 = 16\times 16$ possible
+    configurations/values.
+\end{itemize}
+Each of the $16\times 16$ possible values of a byte can be represented
+by two hexadecimal numbers.
+\begin{itemize}
   \item Hexadecimal uses $0-9$ to represent the first ten digits, then
     adds on $A,B,C,D,E,F$ for 10, 11, 12, 13, 14, 15.
-  \item One byte is eight bits.
-    A byte has $2^8=2^4\times 2^4 = 16\times 16$ possible
-    configurations/values.
-    Two hexadecimal numbers can encode
-    $16\times 16$ values.
-    Therefore, each value/configuration for a byte can be mapped into a
-    two-digit hexadecimal number.
+  \item Two hexadecimal numbers can encode $16\times 16$ values.
+  \item Therefore, each value/configuration for a byte can be mapped
+    into a two-digit hexadecimal number.
+\end{itemize}
+RAM
+\begin{itemize}
+  \item Objects in RAM are represented as a sequence of binary
+    memory cells, \emph{bits}, which are organized into \emph{words}
+    (groupings of several bits),
+    which are the fundamental unit of data that can be moved between RAM
+    and the processor.
+    Typical sizes are 8, 16, 32, and 64 bit.
+
+  \item The fact that bits are grouped into words allows for
+    \emph{addressing} of memory.
+    Each word has an address, which is the location of the word in the
+    computer's memory.
+    By working with addresses, we can have low-level access to
+    the computer by allowing direct access to the memory.
+    We know where things are.
+    One can literally move through the computer's memory from word to
+    word.
+
   \item The stack is the pile of variables in memory, one after the
     other.
     As we create variables, we ``stack'' them on top of each other in
@@ -584,145 +694,417 @@ Memory \& Memory Representation
 
 
 \clearpage
-\subsection{Input/Output}
+\subsubsection{Data Structures in Programming Languages}
 
-Want to discuss input/output abstractions for delivering to or receiving
-output from programs.
-These abstractions let us focus on complying/interfacing with the
-system, without having to worry about how the system ultimately
-represents, outputs, gathers, etc. the text.
-
-Linux Standard Streams
+Having described how information is stored in memory at the computer
+level, we can start to describe how a programming language conceives of
+memory.
 \begin{itemize}
-  \item A stream is something that can transfer data, including (and
-    especially) text.
-  \item Whenver a command is executed, three standard streams are
-    created:
-    \texttt{stdin},
-    \texttt{stdout},
-    \texttt{stderr}
+  \item (\emph{Machine Representation of a Value}):
+    A particular arrangement/representation/configuration of memory
+    (bits) to reflect the notion of a ``value.''
 
-  \item Standard Input Stream:
-    An abstraction for an infinite input sequence or a file containing
-    infinite text.
-    Takes text input and has the capacity to transfer that information
-    to programs for execution.
+  \item (\emph{Value}):
+    Abstraction of the machine representation of a value.
+    There are multiple ways we might encode the same value.
+    By referring to a ``value'', we ignore this complication.
 
-    Reading from the standard input stream involves consuming and
-    processing the text there.
-    Note that the collection of pieces of text separated by
-    whitespace are referred to as \emph{tokens}.
+    For example, the number 3 is a well-defined ``value'' that
+    exists separately from how we represent that in machine code.
 
-  \item Standard Output Stream:
-    An abstraction for an infinite output sequence or a file containing
-    infinite text.
-    Has the capacity to transfer output from programs elsewehere, like
-    other programs via pips or the terminal (where it is sent by
-    default).
+  \item (\emph{Literal}):
+    Programming language representation of a
+    value, e.g. in the statement \texttt{int a = 1234;}, \texttt{1234}
+    is the literal.
+    This is distinct from both the machine code representation (a bunch
+    of 1's and 0's) and from the more abstract notion of a value (the
+    number 1234).
 
-  \item Pipes connected standard output of one program to standard input
-    of another.
+  \item (\emph{Data type}): Set of permissable values \& methods
+    (functions) operating on those values.
+
+  \item (\emph{Primitive Data Types}):
+    Built in.
+    Efficient in sense that their values and methods map immediately to a
+    machine representation and instructions.
+    This is in contrast to ADTs, whose values need to be ``resolved'' to
+    primitive data types.
+
+    Primitive data types and their memory requirements, in Java:
+    \begin{table}[htpb!]
+    \centering
+    \begin{tabular}{l|l}
+      Primitive Data Type & Memory Usage \\\hline\hline
+      \texttt{boolean}
+        & 1 byte (even though we technically only need 1 bit)
+        \\
+      \texttt{char}   & 2 bytes
+        \\
+      \texttt{short}  & 2 bytes
+        \\
+      \texttt{int}    & 4 bytes
+        \\
+      \texttt{float}  & 4 bytes
+        \\
+      \texttt{long}   & 8 bytes
+        \\
+      \texttt{double} & 8 bytes
+    \end{tabular}
+    \end{table}
 
   \item
-    Java and other programming languages also have standard drawing and
-    audio, much like standard input and ouptut.
+    (\emph{Abstract data types} or \emph{ADTs} aka \emph{Reference Types}):
+    ``Higher-level'' data types whose representation is hidden from
+    client (caller).
+    Lets users use ADTs without knowing implementation details.
+    Generally includes both built-in (e.g. \texttt{String} or arrays)
+    and user-defined instances.
+    Java refers to these as \emph{Reference Types}.
+
+    We can see why primitive data types are more efficient than
+    abstract/reference data types types.
+    The latter are ultimately stored/encoded via primitive data
+    types. So to get the value of an abstract/reference type, we need to
+    translate/resolve it to the level of primitive data types.
+    There's an extra step.
+
+
+  \item (\emph{Data Structure}): Arrangement of data enabling
+    efficient processing by a program.
 \end{itemize}
-Shells and Terminals
+Object-Oriented Framework:
+In this framework, users create their own new ADTs and manipulate them.
+Key concepts include
 \begin{itemize}
-  \item Shell
-    \begin{itemize}
-      \item A user interface for interacting with an operating system (via
-        text commands which must conform to a certain standard/syntax) and
-        carrying out low-level machine commands.
-      \item Can use either a CLI (command line interface) or GUI (graphical
-        user interface).
-      \item It is the outermost layer around OS kernel.
-      \item Windows computers use DOS shell prompts to interact with the
-        system. Unix computers use BASH prompts.
-    \end{itemize}
+  \item (\emph{Object}):
+    A \emph{container} for values of a particular data type.
+    It's distinct from the value itself because the value within the
+    container/object can change through the application of various
+    methods that operate on that value.
 
-  \item Terminal
-    \begin{itemize}
-      \item An abstraction for providing input to and getting output from a
-        program.
-      \item More speficially, a terminal is a stream of text that sends
-        input and output to two basic ``pipes,'' \texttt{stdin} and
-        \texttt{stdout}.
-      \item Terminals run shells, which is how the commands are carried
-        out.
-      \item
-        The model/sequence is as follows.
-        Type a text command, the terminal sends that text input to
-        \texttt{stdin}.
-        The shell its running transfers the data in \texttt{stdin} to
-        given program which then executes low-level machine commands
-        (like ``do these things'', ``run this program'', ``read this
-        file'', etc.).
-        After completion, the program sends data to the \texttt{stdout}
-        stream, which by default, is directed to the terminal which then
-        displays text.
-        It's a way of working with files that are often nothing more than a
-        stream of text.
-      \item Hence terminals generally display \texttt{stdout} whenever
-        you run a command.
-    \end{itemize}
+  \item (\emph{Object Reference}):
+    An address/arrow \emph{referring} to some object.
+    It is distinct from the object itself, from the value contained in
+    the object, and from any name we might attach to the reference.
+    We can pass it to or return it from a method.
+    That way, we can just pass an address or ``way to find the
+    value'' from program to program, which is much cheaper that passing
+    around in memory an entire object or value.
 
-  \item Command line input:
-    An abstraction for providing arguments (strings) to a program.
-\end{itemize}
-Redirection and Pipes
-\begin{itemize}
+    Java programs manipulate references to objects.
 
-  \item \texttt{>} and \texttt{>>}: Lets you redirect \texttt{stdout}
-    (i.e. the text therein) that's produced by a program to any file.
-    The former overwrites, the latter appends.
+  \item (\emph{Variable}):
+    Name to which we can attach/assign an object reference.
+    This is distinct from the object reference itself (the arrow),
+    the object, and the value contained in the object because,
+    through reassignment, a given variable/name can have
+    multiple/different object references associated with it.
 
-    Note that we can discard output entirely by sending output to the
-    null device as follows:
-    \lstset{style=bash}
+  \item (\emph{Variable Declaration}):
+    Associates variable (the name) with a data type (primitive or
+    abstract).
+    Must always declare a variable's name and type, e.g.
+    in Java
     \begin{lstlisting}
-    cmd > /dev/null 2>&1
+      int a;
+      String s;
+      double[] x;
+      SomeType varname;
     \end{lstlisting}
-    where 2 is an alias for \texttt{stderr} and 1 for \texttt{stdout}.
+    This restricts the types of objects that a variable can refer to,
+    i.e. restricts the types of object references (arrows) that we can
+    attach to the name.
 
-  \item \texttt{<}: Redirects input from file into a program.
-    Not used a lot since many commands take file arguments already.
+    Technically declaration and assignment can happen in one line, but
+    there is an order to what happens that corresponds to how we would
+    break things up.
+
+    For primitive types, the variable refers directly to a value, i.e. a
+    machine code representation of the value is directly attached to the
+    variable name.
+    For ADTs, the variable is attached to a reference to a value, i.e. an
+    object reference is attached to the variable name.
+    % Check this
 
   \item
-    \texttt{cmd1 | cmd2}:	Pipes standard output from \texttt{cmd1} to
-    standard input of \texttt{cmd2}.
+    (\emph{Memory Allocation and Creating New Instances for ADTs}):
+    For ADTs, after variable declaration (which merely associates the
+    variable/name with a particular type), we must create an
+    object of that type (i.e. allocate memory) via a constructor and
+    associate the variable with that object by establishing an object
+    reference.
+
+    In Java, this requires using the \texttt{new} keyword followed by a
+    call to a constructor for that reference type, e.g.
+    \begin{lstlisting}
+    x = new SomeType(args);
+    \end{lstlisting}
+    The constructor always shares the name of the type.
+
+    After memory allocation, we can initialize the values.
+    Memory allocation and initialization often happen in one step.
+    Even more, declaration, memory allocation, and initialization can
+    sometimes be done in one step, e.g. for an array,
+    \begin{lstlisting}
+    double[] x = new double[n];
+    \end{lstlisting}
+
+  \item (\emph{Assignment}):
+    Associates a value with a variable.
+    For primitive data types, assignment can happen right after or at
+    the same time as type declaration.
+    For reference types, assignment can happen right after declaration
+    and memory allocation, or at the same time as both.
+
+  \item
+    (\emph{Invoking Instance Methods}):
+    We can invoke instance methods that operate on the object's value,
+    \begin{lstlisting}
+    x = varname.methodname(args);
+    \end{lstlisting}
+
+
+  \item (\emph{Creating New Data Types}):
+    Data type implementation is known as a \emph{class}.
+    The code for a new datatype is stored in a \texttt{.java} file with
+    the same name of the class.
+    The code will have blocks/sections corresponding to the following.
+    \begin{itemize}
+      \item (\emph{Instance Variables}):
+        These define the data type's values.
+        It's the bundle/set of values that form ``the set of values that
+        the object can take on.''
+        In this section of the class definition, we declare those
+        variables and associate them with a type.
+
+        Declaration of these sometimes includes modifiers like
+        \begin{itemize}
+          \item \texttt{private}: Denies clients access to the variable
+            and therefore makes the data type abstract.
+          \item \texttt{final}: Disallows any change in the value after
+            constructed and documents that the data type is immutable.
+        \end{itemize}
+
+      \item (\emph{Constructors}):
+        Special method that necessarily has the same name as the
+        class/ADT.
+        It (potentially) takes arguments uses them to create a new
+        object/instance, setting the instance variables in the process.
+        Because the instance variables already had their types declared,
+        no need to declare type of these within this method (unlike
+        static methods).
+
+        No return type declaration in the method signature because it
+        always returns a \emph{reference} to the new object of the data
+        type.
+
+        When using/calling, must always use the keyword \texttt{new} to
+        use a constructor and signify that we're creating a new
+        object/instance of a given data type.
+
+      \item (\emph{Instance Methods}): Like static methods, but distinct
+        from them.
+        They define data-type operations (implement APIs, work on the
+        datatype values).
+        They can refer to and operate on the instance variables.
+
+      \item (\emph{Test Client}): Not strictly necessary, but good
+        practice.
+        This is the \texttt{main} function, which should call the
+        constructor and run the methods to test them all out.
+
+      \item (\emph{Other Static Methods}):
+        In addition to the methods defined above, we can include static
+        methods in the class definition.
+        Unlike the other methods, they cannot refer to and operate on
+        instance variables.
+    \end{itemize}
+    Example class that would be stored in \texttt{Charge.java}:
+    \begin{lstlisting}
+    public class Charge
+    {
+      // Instance variables
+      private final double rx, ry;    // Position
+      private final double q;         // Charge value
+
+      // Constructor
+      public Charge(double x0, double y0, double q0)
+      {
+        rx = x0;
+        ry = y0;
+        q  = q0;
+      }
+
+      // Methods
+      public double potentialAt(double x, double y)
+      {
+        double k  = 8.99e09;
+        double dx = x - rx;
+        double dy = y - ry;
+        return k * q / Math.sqrt(dx*dx + dy*dy);
+      }
+
+      public String toString()
+      {
+        return q + " at " + "(" + rx + ", " + ry + ")";
+      }
+
+      // Test client
+      public static void main(String[] args)
+      {
+        Charge c = new Charge(.72, .31, 21.3);
+        StdOut.println(c);
+        StdOut.printf("%6.2e\n", c.potentialAt(.42, .71));
+      }
+    }
+    \end{lstlisting}
+
+
+
+  \item
+    (\emph{Aliasing for Reference Types}):
+    When we put a reference type on the RHS of an assignment statement,
+    the variable on the LHS points to the same point in memory.
+    We do not create a new object with the same values as the original
+    on the RHS.
+    Rather, we simply have a new reference to the same point in memory.
+    Subsequent operations involving either the LHS or RHS of the
+    assignment statement will operate on the same object in memory.
+
+  \item Pass by value:
+    When passing arguments to function, it's like we have a usual
+    assignment statement, and thus there is aliasing for reference
+    types.
+    If the argument value is a primitive type, this means Java passes a
+    copy of the value.
+    If the argument value is a reference type, this means Java passes a
+    copy of the object reference.
+
+  \item An orphaned object is one that was created and had some
+    reference pointing to it, but no longer.
+    Java garbage collects, ensuring orphaned objects are
+    cleared from memory.
+
+
 \end{itemize}
+
+
 
 
 \clearpage
-\subsection{High-Performance Computing Clusters}
+\subsection{Input/Output}
 
-A cluster is a group of inter-connected computers that work together to
-perform computationally-intensive tasks.
-Each computer is a node, so a cluster is a collection of nodes.
+Overview:
+Terminals run shells. Shells can run/execute programs by
+taking some inputs provided through an input stream (the terminal by
+default) and then producing output that is then carried through an
+output stream (which is directed to the terminal by default).
 
-Head Node(s)
+We now define these important input/output abstractions for delivering
+to or receiving output from programs in more detail.
+These abstractions let us focus on complying/interfacing with the
+system, without having to worry about how the system ultimately
+represents, outputs, gathers, etc. the text.
 \begin{itemize}
-  \item Server(s) that connects a cluster to an outside network (like
-    the internet or a company's internal network).
-  \item Handles login, script editing, code compilation, job submission.
-  \item Generally don't want to run stuff here.
-\end{itemize}
-Compute Node
-\begin{itemize}
-\item Server used for computing, sometimes managed by a scheduler.
-\item Compute nodes always contain RAM and one or more CPUs (usually
-  two), each with multiple processor cores, on which computation may
-  take place.
-\item CPU (only) nodes stop there
-\item GPU nodes are nodes/servers that, in addition, have GPUs for
-  carrying out computation.
-\end{itemize}
-Schedulers help divide up the resources of a cluster and handle
-submission of jobs to the compute nodes.
+  \item A stream is an abstraction for something that can transfer data,
+    including (and especially) text.
+    It is not the data itself, but rather the channel and ``ability to
+    transfer.''
+    So we can ``send data to a stream'' and the program or operating
+    system will take care of the implementation details.
 
-Server (host) address is what we use to identify the server we want to
-connect to using ssh
+  \item In Linux, whenever a program/command is executed, three standard
+    streams are created that data can pass through:
+    \begin{itemize}
+      \item \texttt{stdin}, Standard Input Stream:
+        An abstraction for an infinite input sequence or a file
+        containing infinite text.
+        Takes text input and has the capacity to transfer that
+        information to programs for execution.
+
+        Reading from the standard input stream involves consuming and
+        processing the text there.
+        Note that the collection of pieces of text separated by
+        whitespace are referred to as \emph{tokens}.
+
+      \item \texttt{stdout}, Standard Output Stream:
+        An abstraction for an infinite output sequence or a file
+        containing infinite text.
+        Has the capacity to transfer output from programs elsewehere,
+        like other programs via pipes or the terminal (where it is sent
+        by default).
+
+      \item \texttt{stderr}:
+        Errors
+    \end{itemize}
+    Java and other programming languages also have standard drawing and
+    audio, much like standard input and ouptut.
+
+  \item Command line input:
+    An abstraction for providing arguments (strings) to a program.
+
+  \item
+    \emph{Terminal}:
+    An \emph{abstraction} for providing input to and getting output from
+    a program via the \texttt{stdin} and \texttt{stdout} streams by
+    running a shell that can execute programs/commands.
+
+    It works as follows.
+    Type a text command, the terminal sends that text input to
+    \texttt{stdin}.
+    The shell the terminal is running transfers the data in
+    \texttt{stdin} to given program which then executes low-level
+    machine commands (like ``do these things'', ``run this program'',
+    ``read this file'', etc.).
+    After completion, the program sends data to the \texttt{stdout}
+    stream, which by default, is directed to the terminal which then
+    displays text, although it can be piped elsewhere.
+    It's a way of working with files that are often nothing more than a
+    stream of text.
+\end{itemize}
+Shells
+\begin{itemize}
+  \item A user interface for interacting with an operating system (via
+    text commands which must conform to a certain standard/syntax) and
+    carrying out low-level machine commands.
+  \item Can use either a CLI (command line interface) or GUI (graphical
+    user interface).
+  \item It is the outermost layer around OS kernel.
+  \item Windows computers use DOS shell prompts to interact with the
+    system. Unix computers use BASH prompts.
+  \item
+    Redirection and Pipes:
+    The shell gives the ability to redirect standard output of one
+    program to standard input of another, i.e.\ change where the streams
+    \texttt{stdin} and \texttt{stdout} are pointed (given that the
+    default is the terminal).
+    \begin{itemize}
+      \item \texttt{>} and \texttt{>>}: Lets you redirect \texttt{stdout}
+        (i.e. the text therein) that's produced by a program to any file.
+        The former overwrites, the latter appends.
+
+        Note that we can discard output entirely by sending output to the
+        null device as follows:
+        \lstset{style=bash}
+        \begin{lstlisting}
+        cmd > /dev/null 2>&1
+        \end{lstlisting}
+        where 2 is an alias for \texttt{stderr} and 1 for \texttt{stdout}.
+
+      \item \texttt{<}: Redirects input from file into a program.
+        Not used a lot since many commands take file arguments already.
+
+      \item
+        \texttt{cmd1 | cmd2}:	Pipes standard output from \texttt{cmd1} to
+        standard input of \texttt{cmd2}.
+    \end{itemize}
+  \item Pipes are enormously useful because they allow programs to
+    interact purely through the input and output streams.
+    No two programs have to know about each other to be able to be wired
+    together via pipe.
+\end{itemize}
+
+
 
 
 \clearpage
@@ -824,7 +1206,6 @@ Define
 
 
 
-
 \clearpage
 \section{UNIX Operating System}
 
@@ -837,7 +1218,7 @@ files:
   \item Binary: For computer use/consumption
 \end{itemize}
 
-\subsection{Directory Structure}
+\subsection{Directory Structure and Management}
 
 Files are organized into a heirarchy under the the root directory
 \texttt{/}, owned/managed by a single root user who can edit everything
@@ -845,7 +1226,7 @@ under this directory.
 Under this root directory, we have
 \begin{itemize}
   \item \texttt{/bin}: \emph{Essential} binary executables.
-    Important system programs and utilities like the bash shell are
+    Important system programs and utilities like bash are
     here.
     These are the crucial absolutely necessary things that are
     guaranteed to be mounted whenever \texttt{/} is mounted,
@@ -936,11 +1317,16 @@ Under this root directory, we have
     For example, the application ``application'' might just dumb all
     its files into \texttt{/opt/application/} rather than scatter it's
     files around in the various system directories as is standard.
+
+  \item \texttt{/sys}:
+    This directory has kernel parameters, exposed as files for the user
+    to view, modify, and interact with like it's they are typical files.
+    This has all the knobs for your computer.
 \end{itemize}
 
 
 \clearpage
-\subsection{\texttt{chmod}}
+\subsubsection{\texttt{chmod}}
 
 The syntax is roughly
 \begin{lstlisting}
@@ -958,7 +1344,7 @@ Note
 \clearpage
 \subsection{BASH}
 
- By default, Linux uses the BASH shell.
+ By default, Linux uses BASH.
 
 
 \subsubsection{Environment}
@@ -1492,6 +1878,979 @@ scripts and the module will be loaded when the job is run.
 
 
 
+
+\clearpage
+\section{SQL (Structured Query Language)}
+
+\subsection{Introduction}
+
+
+
+Data Modeling:
+Consists of the following steps.
+\begin{itemize}
+  \item Define \emph{entities}/\emph{concepts} that we want to capture
+    data about, e.g.  persons, employees, customers, producers, etc.
+    There will be a table associated with each entity/concept
+  \item Determine \emph{attributes} of each entity/concept.
+    These will be the columns in the table associated with each
+    entity/concept.
+  \item Determine \emph{relationships} between entities/concepts, e.g.
+    customers \emph{buy from} producers.
+  \item Determine \emph{cardinality}/\emph{multiplicity} of the
+    relationship: 1:1, 1:M, M:M
+\end{itemize}
+Data modeling is typically done with \emph{ER Diagrams}.
+The diagrams have a box for each entity, a line for each relationship,
+and specific notation for the cardinality.
+There are a few choices for that notation.
+\begin{itemize}
+  \item Chen Notation:
+    Use 1:M, M:N, 1:1 for one-to-many, many-to-many, and
+    one-to-one.
+  \item Crow's Foot Notation:
+    Train tracks and crow's foot to represent one and many.
+  \item UML Class Diagram Notation:
+    1.1 and 1.* to represent one and many.
+\end{itemize}
+The process of data modeling is an abstract task distinct from the
+question of how we might collect, store, and represent the data.
+We often store data in \emph{databases}, which are containers (file or
+set of files) to store organized data, a set of related information.
+Our database often consists of \emph{tables}, which are structured list
+of data or a specific type.
+They consist of of \emph{columns} (single fields in a table) and
+\emph{rows} (records in a table).
+
+Relational database model
+\begin{itemize}
+  \item This is one implementation for a given data model
+    that is specifically designed for querying.
+  \item Each entity has a table, attributes of an entity are stored in
+    columns.
+  \item Primary Key:
+    Column or set of columns whose values unique identify every row in a
+    table.
+    Lets us use these to join to another table.
+  \item Foreign Key:
+    One or more columns that can be used together to identify a single
+    row in another table.
+\end{itemize}
+NoSql (Not Only SQL)
+\begin{itemize}
+  \item Relational data model
+  \item Mechanism for storage and retrieval of unstructured
+    data model by means \emph{other than} tabular relations in
+    relational databases.
+\end{itemize}
+
+%Transactional database model:
+%Operational database.
+%Not specifically designed for querying
+
+
+\clearpage
+\subsection{Basic Syntax}
+\begin{itemize}
+  \item Terminate commands with semicolon
+
+  \item Comments:
+    \begin{lstlisting}
+    - - To comment out a single line
+
+    /*
+    To comment out
+    multiple lines
+    */
+    \end{lstlisting}
+
+  \item \texttt{NULL} is special entry.
+    Null values are distinct from just ``empty string.''
+    They really are ``nothing there.''
+
+\end{itemize}
+
+
+\subsection{Select Statements}
+
+Select statements are the core of SQL.
+They are how we retreive data.
+The most basic select statement retrieves specific columns from a table.
+\begin{lstlisting}
+SELECT col1,
+       col2
+FROM tableName;
+\end{lstlisting}
+Can use $*$ as wildcard to retrieve all columns in the table.
+\\
+\\
+At its most complex, we can augment the select statement with many
+modifiers that refine the select statement.
+\begin{lstlisting}
+- - Selects columns to be returned
+SELECT col1, col2
+
+- - Specifies table where columns are
+FROM tableName
+
+- - Row-level filter (prior to any grouping)
+WHERE
+
+- - Group specification if we have an aggregate function in select statement
+GROUP BY
+
+- - Group-level filter
+HAVING
+
+- - Output sort order
+ORDER BY
+\end{lstlisting}
+
+
+
+\clearpage
+\subsubsection{Row-wise Operations}
+
+For numeric data, can use simple math operations in select statement:
+\begin{lstlisting}
+SELECT col1,
+       col2,
+       col1 * col2 AS newName
+FROM tableName;
+\end{lstlisting}
+For string data, can use string functions in select statements
+\begin{itemize}
+  \item
+    Concatenate with \texttt{||}, which is like using + in Python for
+    strings.
+    \begin{lstlisting}
+    SELECT CompanyName,
+           ContactName,
+           Company Name || ',' || ContactName
+    FROM Customers;
+    \end{lstlisting}
+
+  \item
+    Trim with \texttt{TRIM}, \texttt{LTRIM}, \texttt{RTRIM}.
+    This removes leading or trailing whitespace.
+    \begin{lstlisting}
+    SELECT TRIM(CompanyName) AS TrimmedName
+    FROM Customers;
+    \end{lstlisting}
+
+  \item
+    Use \texttt{SUBSTR} return specified number of characters from a
+    particular position of a given string.
+    Arguments are string name, starting position in string, number of
+    characters to be returned.
+    \begin{lstlisting}
+    SELECT first_name, SUBSTR(first_name, 2, 3)
+    FROM employees;
+    \end{lstlisting}
+
+  \item
+    Use \texttt{UPPER}, \texttt{LOWER}, \texttt{UCASE} to change case.
+    \begin{lstlisting}
+    SELECT UPPER(column_name)
+    FROM table_name;
+    \end{lstlisting}
+\end{itemize}
+For strings that are specifically dates and/or times, there are
+additional date-time functions.
+\begin{itemize}
+  \item
+    Standard formats:
+    All are encoded as strings.
+    \begin{itemize}
+      \item \texttt{DATE}: YYYY-MM-DD
+      \item \texttt{DATETIME}: YYYY-MM-DD HH:MI:SS
+      \item \texttt{TIMESTAMP}: YYYY-MM-DD HH:MI:SS
+    \end{itemize}
+
+  \item
+    For converting birthdate to a year, month, day, time etc.:
+    \begin{lstlisting}
+    SELECT Birthdate,
+           STRFTIME('%Y', Birthdate) AS Year,
+           STRFTIME('%m', Birthdate) AS Month,
+           STRFTIME('%d', Birthdate) AS Day
+    FROM Employees
+    \end{lstlisting}
+    Compute current date and derivatives thereof
+    by using \texttt{'now'}.
+    \begin{lstlisting}
+    SELECT DATE('now')
+
+    SELECT STRFTIME('%Y %m %d', 'now')
+    \end{lstlisting}
+\end{itemize}
+Case Statements:
+Mimics if-then-else.
+Produce a new column where each record/row is built from an if
+statement based on the values in the other columns for that row.
+\begin{lstlisting}
+SELECT col1,
+       col2,
+       col3,
+       NewColName
+CASE col1
+  WHEN 'SomeVal1' THEN 'SetToWhen1'
+  WHEN 'SomeVal2' THEN 'SetToWhen2'
+  ELSE                 'SetToOther'
+END NewColName
+FROM TableName;
+\end{lstlisting}
+Alternatively
+\begin{lstlisting}
+SELECT col1,
+       col2,
+       col3,
+       NewColName
+CASE
+  WHEN col1='SomeVal1' THEN 'SetToWhen1'
+  WHEN col1='SomeVal2' THEN 'SetToWhen2'
+  ELSE                      'SetToOther'
+END NewColName
+FROM TableName;
+\end{lstlisting}
+Note, what comes after \texttt{THEN} doesn't always have to be a
+word or a number, can be a field from another column.
+
+
+
+\clearpage
+\subsubsection{Filtering with \texttt{WHERE}}
+
+Filtering reduces the amount of rows that are pulled according based
+on certain rules and logical conditions.
+We do so by adding a \texttt{WHERE} line to the select statement.
+\begin{lstlisting}
+SELECT col1,
+       col2
+FROM tableName
+WHERE logical-condition;
+\end{lstlisting}
+This pulls those rows for which the logical condition is satisfied.
+The logical condition can be built using any of the following
+approaches or keywords.
+\begin{itemize}
+  \item Comparisons:
+    The logical condition might be phrased
+    \begin{lstlisting}
+    colName someOperator someValue
+    \end{lstlisting}
+    Ooperators include:
+    \texttt{=},
+    \texttt{!=},
+    \texttt{>},
+    \texttt{<},
+    \texttt{BETWEEN} (beteween an inclusive range),
+    \texttt{IS NULL}.
+
+  \item \texttt{IN}:
+    Restrict to those rows where a given column is in some set.
+    \begin{lstlisting}
+    SELECT col1,
+            col2
+    FROM tableName
+    WHERE colName IN (val1, val2, val3);
+    \end{lstlisting}
+
+  \item \texttt{OR}:
+    Non-inclusive matching.
+    This is like \texttt{IN} but with precedence.
+    \begin{lstlisting}
+    SELECT col1,
+            col2
+    FROM tableName
+    WHERE colName = val1 OR val2;
+    \end{lstlisting}
+    If there are some rows matching \texttt{val1}, it will return
+    those rows and \emph{will not} retreive rows matching
+    \texttt{val2}.
+    If there are no rows matching \texttt{val1}, it will try to
+    match \texttt{val2} and return rows matching that.
+    So order matters; it specifies precedence.
+
+    Use parentheses when working with \texttt{AND} because of order
+    of operations.
+
+  \item \texttt{AND}:
+    Works like you think.
+    Use parentheses when used with \texttt{OR} to be safe.
+
+  \item \texttt{NOT}:
+    Place in front of condition to return rows not matching that
+    condition, e.g.
+    \begin{lstlisting}
+    SELECT col1,
+            col2
+    FROM tableName
+    WHERE NOT colName = val1;
+    \end{lstlisting}
+
+  \item
+    \texttt{LIKE}:
+    Allows use of wildcards for matching text data.
+    \begin{lstlisting}
+    SELECT col1,
+            col2
+    FROM tableName
+    WHERE colName LIKE '%partofstring';
+    \end{lstlisting}
+    Use \texttt{\%} anywhere in the string to match any number of
+    characters.
+    Use \texttt{\_} to match a single character.
+
+    NOTE: These are slower. Other operators are preferred.
+\end{itemize}
+
+
+
+\subsubsection{%
+  Grouping/Aggregating with \texttt{GROUP BY} and \texttt{HAVING}
+}
+
+\begin{itemize}
+  \item Aggregate Functions:
+    Built in functions used to summarize data.
+    Includes
+    \texttt{AVG()},
+    \texttt{COUNT()},
+    \texttt{MIN()},
+    \texttt{MAX()},
+    \texttt{SUM()}.
+    Not that \texttt{NULL} values are ignored.
+
+    We use a select statement with an \texttt{AS} to give the returned
+    column/info a name:
+    \begin{lstlisting}
+    SELECT AVG(col1) as newName
+    FROM tableName;
+    \end{lstlisting}
+    Note, can also use math expressions in place of a single column:
+    \begin{lstlisting}
+    SELECT AVG(col1*col2) as newName
+    FROM tableName;
+    \end{lstlisting}
+    Use \texttt{DISTINCT} if we just want to use distinct entries of a
+    column (non-duplicates).
+
+  \item Grouping:
+    \begin{lstlisting}
+    SELECT col1,
+           COUNT(col2) as newName
+    FROM tableName
+    GROUP BY col1;
+    \end{lstlisting}
+    \emph{Every} column in select statement must then be present in a
+    \texttt{GROUP BY} clause, except for those columns that are purely
+    arguments to aggregate functions (and so are, by definition,
+    aggregated by group).
+    So it's clear \texttt{GROUP BY} can contain multiple columns.
+
+  \item
+    Filtering after Grouping:
+    \texttt{WHERE} does not work for groups because it filters on rows
+    of the table (i.e. prior to group), not on grouped data (i.e. after
+    grouping).  Instead, use \texttt{HAVING} to filter the grouped data.
+    \begin{lstlisting}
+    SELECT CustomerID,
+           COUNT(*) as orders
+    FROM OrderTable
+    GROUP BY CustomerID
+    HAVING COUNT (*) >=2;
+    \end{lstlisting}
+    This groups by CustomerID, counts the number of orders, and retains
+    only those CustomerID with more than two orders.
+
+    Can use both \texttt{WHERE} and \texttt{HAVING} to filter before
+    grouping, and then filter after grouping.
+    Note: rows eliminated by the \texttt{WHERE} clause will not be
+    included in the group.
+
+\end{itemize}
+
+
+\subsubsection{Sorting with \texttt{ORDER BY}}
+
+Sort returned data by sorting on (potentially multiple) columns.
+We do so by adding lines to a select statement.
+It must always be the last clause in the select statement.
+Note that we can even sort on columns not selected for returning.
+\begin{lstlisting}
+SELECT col1,
+        col2
+FROM tableName
+ORDER BY colX, colY, colZ
+;
+\end{lstlisting}
+Can also add \texttt{ASC} or \texttt{DESC} before a particular
+column name to specify ascending or descending order for the sort.
+
+
+
+
+\clearpage
+\subsection{Joins and Unions}
+
+
+Joins retrieve data from multiple tables in one query.
+Doesn't store joined information or have a phsyical effect;
+join persists only for the duration of the query execution.
+
+\begin{table}[htbp!]
+\scriptsize
+\centering
+\begin{tabular}{|ccc|ccc|c|c|c|c|}
+  \hline
+  \multicolumn{3}{|c|}{Table 1}
+  &
+  \multicolumn{3}{|c|}{Table 2}
+  &
+  \multicolumn{4}{|c|}{Join Type}
+  \\
+  \hline
+  \texttt{id} & \texttt{x1} & $\cdots$ &
+  \texttt{id} & \texttt{y1} & $\cdots$
+  & Inner
+  & Left
+  & Right
+  & Outer
+  \\
+  \hline
+  1 & & &
+  1 & & &
+  $\checkmark$ & $\checkmark$
+  & $\checkmark$
+  & $\checkmark$
+  \\
+  2 & & &
+  2 & & &
+  $\checkmark$ & $\checkmark$
+  & $\checkmark$
+  & $\checkmark$
+  \\
+  3 & & &
+    & & &
+    & $\checkmark$ &
+  & $\checkmark$
+  \\
+  4 & & &
+    & & &
+    & $\checkmark$ &
+  & $\checkmark$
+  \\
+    & & &
+  5 & & &
+    & &
+    $\checkmark$
+  & $\checkmark$
+  \\
+    & & &
+  6 & & &
+    & &
+    $\checkmark$
+  & $\checkmark$
+  \\
+  \hline
+\end{tabular}
+\end{table}
+
+
+\subsubsection{Aliasing and Prequalifying}
+
+Instead of writing out the table names all the times, we can create
+aliases that we use elsewhere in the query.
+\begin{lstlisting}
+SELECT vendor_name,
+       product_name,
+       product_price
+FROM Vendors v, Products p
+WHERE v.vendor_id = p.vendor_id;
+\end{lstlisting}
+When performing joins, we will often ``qualify'' by
+prepending to a given column name either the full table name (e.g.
+\texttt{TableName.}) or that table's alias (e.g. \texttt{T1.}) if we
+defined an alias for that table.
+This is always allowed, and is good practice and/or necessary if two
+tables that we're merging have columns with the same name or if
+we're doing a self join.
+
+
+\subsubsection{Inner Join}
+
+Match on a key (unique identifier in both tables) and throw out any
+unmatched records/rows in either table; the key needs to be in both.
+We specify the columns we want from the two tables, the two tables
+to join, and the key that is used to establish a match.
+Only returns those records for which the key is found in \emph{both}
+tables.
+\begin{lstlisting}
+SELECT Suppliers.CompanyName,
+        ProductName,
+        UnitPrice
+FROM Suppliers INNER JOIN Products
+  ON Suppliers.supplierid = Products.supplierid;
+\end{lstlisting}
+
+
+\subsubsection{Left and Right Joins}
+
+Left Join:
+Returns \emph{all} records from left table and the matched records
+from the right table.
+The key only needs to be in the left table.
+Result is \texttt{NULL} if no match, rather
+than throwing out as for an inner join.
+\begin{lstlisting}
+SELECT C.CompanyName,
+        O.OrderID
+FROM Customers C LEFT JOIN Orders O
+  ON C.CustomerID = O.CustomerID;
+\end{lstlisting}
+Right Join: Similar to left join, just flipped.
+The key only needs to be in the right table.
+Given the abilitity to produce left joins, this type of join is
+redundant since we can always just switch the order of the tables in the
+join statement.
+
+\subsubsection{Full Outer Join}
+
+Return all records when there is a match in either the left
+\emph{or} the right table records. ``Give me everything.''
+The key only needs to be in one of the tables.
+\begin{lstlisting}
+SELECT Customers.CustomerName,
+       Orders.OrderID
+FROM Customers FULL OUTER JOIN Orders
+  ON Customers.CustomerID = Orders.CustomerID;
+\end{lstlisting}
+
+
+
+\subsubsection{Cartesian (Cross Joins)}
+
+Each row from first table joins with all the rows of another table.
+So if Table 1 has $N_1$ rows and Table 2 has $N_2$ rows, result will
+have $N_1\times N_2$ rows.
+Specify all columns that you want from either table, and use
+\texttt{CROSS JOIN} to list the two tables containing those columns.
+Doesn't match on anything; just weirdly mashes together the two
+datasets. Unclear  why you'd ever want to do this.
+\begin{lstlisting}
+SELECT product_name,
+       unit_price,
+       company_name
+FROM suppliers CROSS JOIN products;
+\end{lstlisting}
+
+
+\subsubsection{Self Joins}
+
+Join table to itself. Requires using aliases.
+\begin{lstlisting}
+SELECT A.CustomerName AS CustomerName1,
+       B.CustomerName AS CustomerName2,
+       A.City
+FROM Customers A, Customers B
+WHERE A.CustomerID = B.CustomerID
+  AND A.City = B.City
+ORDER BY A.City;
+\end{lstlisting}
+Alias the single table \texttt{Customers} by \texttt{A} and
+\texttt{B}, effectively treating as two separate tables.
+Not clear what this does or why you'd ever want to do this.
+
+
+\subsubsection{Unions}
+
+Combine the result-set of two or more select statements.
+Essentially just stack one on top of the other.
+Need to ensure the same number of columns and data types in each
+column.
+\begin{lstlisting}
+SELECT colnames
+FROM Table1
+
+UNION
+
+SELECT colnames
+FROM Table2;
+\end{lstlisting}
+
+
+\clearpage
+\subsection{Subqueries, i.e. Nesting Select Statements}
+
+Subqueries are queries embedded in other queries; no limit to amount of
+nesting.
+Allows merging and filtering of entries in one table using
+information in another table.
+Notion of ``query expansion'' where innermost query evaluated and
+work to outer query.
+\begin{lstlisting}
+SELECT customerID,
+        companyName,
+        Region
+FROM CustomerTable
+WHERE customerID IN (
+                      SELECT customerID
+                      FROM OrdersTable
+                      WHERE Freight > 100
+                    )
+;
+\end{lstlisting}
+Another example that does a ``calculated fill'' (calculates and
+fills).
+\begin{lstlisting}
+SELECT customer_name,
+        customer_state
+        (
+        SELECT COUNT (*) AS orders
+        FROM OrdersTable
+        WHERE OrdersTable.customer_id = CustomersTable.customer_id
+        ) AS orders
+FROM CustomersTable
+ORDER BY Customer_name
+;
+\end{lstlisting}
+From \texttt{OrdersTable}, count the number of entries with a
+\texttt{customer\_id} that is also in \texttt{CustomersTable};
+this counts the number of orders for each customer in
+\texttt{CustomersTable}.
+Save the column as \texttt{orders}.
+
+
+
+
+
+
+\clearpage
+\subsection{Creating Tables and Views}
+
+\begin{itemize}
+  \item
+    \texttt{CREATE TABLE}:
+    Specify the table name, the column names,
+    the data types, which column is a primary key, and
+    whether we allow null values.
+    \begin{lstlisting}
+    CREATE TABLE TableName
+    ( Id      char(10)        PRIMARY KEY,
+      Col1    char(250)       NOT NULL,
+      Col2    decimal(8,2)    NOT NULL,
+      Col3    Varchar(750)    NULL );
+    \end{lstlisting}
+
+  \item \texttt{DROP TABLE}:
+    Delete tables that are no longer needed
+    \begin{lstlisting}
+    DROP TABLE TableName;
+    \end{lstlisting}
+
+
+  \item
+    \texttt{INSERT INTO}:
+    To add a row/record into various columns of the table,
+    \begin{lstlisting}
+    INSERT INTO TableName
+    ( '143423',
+      'Matthew',
+      '3.14',
+      NULL );
+    \end{lstlisting}
+    Better is to specify specifically the columns that the data is
+    intended for:
+    \begin{lstlisting}
+    INSERT INTO TableName
+    ( Id,
+      Col1,
+      Col2,
+      Col3 )
+    VALUES
+    ( '143423',
+      'Matthew',
+      '3.14',
+      NULL );
+    \end{lstlisting}
+
+  \item
+    \texttt{UPDATE}:
+    Modify the rows in a table,
+    \begin{lstlisting}
+    UPDATE PhoneBook
+    ( phone,
+      firstname,
+      lastname,
+      address )
+    VALUES
+    ( '+1 610 582 7884',
+      'Matthew',
+      'Cocci',
+      '333 Maple Street' )
+    WHERE firstname = 'Matthew'
+      AND lastname  = 'Cocci';
+    \end{lstlisting}
+
+  \item \texttt{DELETE FROM}:
+    Delete the rows in a table,
+    \begin{lstlisting}
+    DELETE FROM PhoneBook
+    WHERE firstname = 'Matthew'
+      AND lastname  = 'Cocci';
+    \end{lstlisting}
+
+  \item
+    \texttt{CREATE TEMPORARY TABLE}:
+    Retrieve data and create a tempororary table (faster than creating a
+    regular table). It stays around for the duration of the client
+    session, and is then deleted.
+    \begin{lstlisting}
+    CREATE TEMPORARY TABLE NewTempTableName AS
+    (
+      select-statement
+    )
+    \end{lstlisting}
+
+  \item Views:
+    Essentially a stored query, but it will be removed after database
+    connection has ended. You're not actually reading or writing to
+    database; you're just simulating it.
+
+    Basic syntax:
+    \begin{lstlisting}
+    CREATE [TEMP] VIEW [IF NOT EXISTS] ViewName[column_name_list]
+    AS
+    select-statement;
+    \end{lstlisting}
+    \texttt{TEMP} is optional specification of whether a view is
+    temporary or not. \texttt{IF NOT EXISTS} is an optional
+    specification of what to do if the view doesn't exist.
+
+    After creating a view, we can use the view name as a table name in
+    select statements, and proceed as if the view really were a table.
+
+    To drop the view after we're done,
+    \begin{lstlisting}
+    DROP VIEW ViewName;
+    \end{lstlisting}
+
+\end{itemize}
+
+
+
+\subsection{Miscellaneous}
+
+\texttt{LIMIT}:
+To limit the amount of rows pulled to obtain a sample.
+\begin{lstlisting}
+SELECT col1,
+      col2
+FROM tableName
+LIMIT 5
+;
+\end{lstlisting}
+
+
+
+
+\section{Algorithms}
+
+\subsection{Guiding Principles}
+
+We adopt the following guiding principles for analyzing
+algorithms:
+\begin{enumerate}
+    \item \emph{Worst case analysis}: We analyze the worst
+	case running time of an algorithm given the most
+	difficult input the algorithm will half to handle. 
+	It makes \textbf{no} assumptions about the input.
+	This is in contrast to \emph{average case analysis},
+	which considers the running time for the ``average''
+	case, taking account of the relative frequencies of 
+	certain inputs.
+    \item Don't pay attention to constant factors and
+	lower order terms. Different programming languages
+	and compiling schemes will lead varying constant
+	factors by a small amount. It's just inappropriate
+	to worry about it unless the code is crucial to
+	your task.
+    \item Asymptotic Analysis: Focus on running time for 
+	large input sizes $n$.
+\end{enumerate}
+Putting these three guiding principles together, we can
+define a ``fast'' algorithm as one whose worst-case 
+running time grows slowly with the input size,
+where ``slowly'' in the best case scenario is typically
+\emph{linear} growth in running time with increasing size, $n$.
+In effect, that's the Holy Grail---the best-case running time
+that we'll shoot for.
+
+
+\subsection{Divide and Conquer Algorithms}
+
+Divide the problem into smaller sub-problems, solve recursively,
+where a \emph{recursive algorithm} is an algorithm that calls itself.
+
+
+\subsubsection{Merge Sort}
+
+Merge sort solves the \emph{sort problem}, where you want to 
+order a unsorted list, by a divide-and-conquer, recursive
+approach.
+
+\paragraph{Pseudo-Code}
+Merge Sort works as follows:
+\begin{enumerate}
+    \item Split the list in half into two sub-lists.
+    \item Recursively sort the first half. Then, 
+	recursively sort the second half.
+    \item Merge/recombine the smaller sorted lists.
+	\begin{enumerate}
+	    \item You step through the output array, 
+        populating it with the minimum 
+        number from the two sorted sublists you're
+        trying to recombine.
+	    \item Implicit in the process, the minimum 
+		element of each sublist is at the
+		beginning of each sublist, so you don't
+		have to waste time searching through them.
+	\end{enumerate}
+\end{enumerate}
+Why is this better? Well, it runs with an upper bound
+of 
+    \[ \text{operations} \leq 6n \log_2 n + 6n \]
+while Insertion Sort, Bubble Sort, selection sort, and 
+other's require $n^2$ operations. We'll see where this comes 
+from later, but for now, just note this running time
+is pretty good, even though it's not quite linear since at $6n \log_2 n$.
+
+
+\paragraph{Runtime Analysis}
+{\sl Simplifying Assumptions}:
+    Suppose we have a list of length
+    $n$ where, for simplicity, we assume $n$ is a
+    power of 2 such that $j = \log_2 n$. 
+    \\
+    \\
+{\sl Recursive Structure Tree}:
+    We will make $\log_2 n = j$ divisions of 
+    the original list into sub-lists: dividing the original
+    list in half, dividing the first level of two sublists in
+    half again for a total of four sublists at the second
+    level, etc. This will generate a tree with $j$ levels.
+    \\
+    \\
+    Within our tree, at each specific level, $k$, we have 
+    $2^k$ sub-problems, with each problem of size
+    $n/2^k$.  There are $2^k$ sub-problems because
+    we divide by two at each step down the tree.
+    On top of that, the sub-problems are
+    of size $n/2^k$ because with each division of a 
+    parent problem, we reduce the size of the problem 
+    by one half.
+    \\
+    \\
+{\sl Merging Sublists}:
+    Now, when the Merge Sort has to merge two sub-lists 
+    to form a list of size $m$, it will use at most
+    $6m$ steps (by a rough approximation that you
+    can figure out by looking at the code or pseudocode
+    for merging).
+    \\
+    \\
+{\sl Operations at Level $j$}:
+    Combining previous results, we see that the number of 
+    steps at level $j$ turns out to be:
+    \[ \text{operations at level $j$} \leq 
+	\underbrace{2^j}_{\text{No. of level $j$ sub-probs}} 
+	\times \underbrace{6}_{\text{Merge steps}}
+	\underbrace{\left(n/2^j\right)}_{\text{Sub-prob size
+	at level $j$}} = 6n \]
+    This is awesome because the number of operations
+    required at level $j$ is \emph{independent} of the level!
+    \\
+    \\
+{\sl Total Runtime}:
+    This means that we take the work per level just computed
+    $6n$, times the number of levels:
+    \[ \text{total operations} \leq \underbrace{6n}_{\text{work per level}}
+	\times \underbrace{\left( \log_2 n +1\right)}_{\text{number of levels}}
+	\]
+
+
+
+\clearpage
+\subsection{Dynamic Connectivity Problem}
+
+Dynamic Connectivity Problem
+\begin{itemize}
+  \item Setup
+    \begin{itemize}
+      \item $N$ objects possibly connected
+      \item ``Is connected to'' is an equivalence relation.
+      \item Connected Components:
+        We can partition the set of all objects based on the equivalence
+        relation into ``connected components'', i.e. maximal subsets that
+        are mutually connected.
+      \item Find/connected query: Is there a path connecting the two
+        objects?
+      \item Union command: Connects two objects.
+        If those objects are components, replace the components with
+        their union.
+    \end{itemize}
+  \item Quick-Find, which is an eager approach
+    \begin{itemize}
+      \item Have an id array of size $N$.
+        $p$ and $q$ connected if they share an id.
+      \item Find: Check if they have the same id
+      \item Union: To merge components containing $p$ and $q$, change
+        all entries with $id(p)$ to $id(q)$.
+      \item Problem: For loop to change the ids, so lots of looping.
+        Maximum number of accesses during union operation scales with
+        $N^2$
+    \end{itemize}
+  \item Quick-Union, which is a lazy approach (try to avoid work until
+    we have to)
+    \begin{itemize}
+      \item Have an id array of size $N$.
+        $id(i)$ is the parent of $i$.
+        Can recursively access to get to the ``root.''
+        Picture trees.
+      \item Find: Check if $p$ and $q$ have the same root.
+      \item Union: To merge components containing $p$ and $q$,
+        set $p$'s root to the id of $q$'s root.
+      \item Problem: Too tall trees since you need to recurse all the
+        way back to the root.
+        Maximum number of accesses during find scales with $N$.
+
+      \item Improvement:
+        Modify to avoid tall trees.
+
+        Track size of trees and always link root of smaller tree to root
+        of larger tree, not vice versa.
+        Depth of any node of $x$ is at most $\log_2 N$, which scales
+        nicely.
+
+        Can also, as you work up the tree on a find, rebind each node in
+        a tree to the root, rather than leave bound to parent.
+        This ``flattens'' the tree.
+
+    \end{itemize}
+  \item Can be proved that it is very nearly linear time, but there is
+    no exactly linear time algorithm.
+\end{itemize}
+Percolation
+\begin{itemize}
+  \item $N\times N$ grid of sites that are either open with probability
+    $p$ or blocked with probability $1-p$.
+  \item A system \emph{percolates} if and only if top and bottom are
+    connected by open sites.
+\end{itemize}
+
+
+
 \clearpage
 \appendix
 \section{Princeton Clusters}
@@ -1556,16 +2915,418 @@ To install packages to a given module,
   pip install --user <package>
 
 which installs to ~/.local/lib/python<version>/site-packages
-
-
-
-
-
 \end{lstlisting}
 
 
 
-\end{document}
+
+\section{Java Cheatsheet}
+
+Terminology, Jargon, and Key Definitions
+\begin{itemize}
+  \item Static method: ``Static method'' is the Java name for a
+    function. Takes zero or more input arguments, returns zero or one
+    output value, and perhapse causes some side effects (which is what
+    makes Java functions more general than mathematical functions).
+
+  \item Class: Set of static methods that we want to group together.
+    Always has a \texttt{main()} function. See work flow below for
+    its role.
+
+  \item Module: All of the source code that's kept in a single file
+    forms a module; the module is the file (contents).
+    By convention, each module consists of one single class, and the
+    name of this file is the name of this class, plus a
+    \texttt{.java} extension.
+
+    Later on, modules implement data types.
+
+  \item Library: Module whose methods/functions are primarily intended
+    for use by many other programs.
+    It is a set of functions.
+
+  \item Client: Program that calls a given library method.
+
+  \item API: Clear and concrete specification of the methods
+    in module/library---what's available and what they do.
+    At its most basic, it's just a listing of all methods, the
+    arguments and argument types those methods take, and the type of
+    output they return.
+
+  \item Implementation: The Java code that implements the methods in
+    an API.
+\end{itemize}
+Work Flow
+\begin{itemize}
+  \item Source code for a given module all saved in a single
+    \texttt{.java} file.
+    This module defines a class, say \texttt{myprogram}, in which
+    case we typically name the source code file
+    \texttt{myprogram.java}.
+    The contents of the file will look like
+    \lstset{style=log}
+    \begin{lstlisting}
+    public class myprogram
+    {
+      public static void main(String[] args)
+      {
+        // Comments
+        StdOut.println("Hello, World");
+      }
+    }
+    \end{lstlisting}
+  \item Compile the module/class via \texttt{javac myprogram.java},
+    which creates the Java bytecode file \texttt{myprogram.class}.
+  \item Execute or run with \texttt{java myprogram}.
+    Here Java transfers control to the machine code corresponding to
+    the \texttt{main()} method defined in the \texttt{myprogram.java}
+    file/module that was compiled into the binary
+    \texttt{myprogram.class}.
+\end{itemize}
+
+\clearpage
+
+
+
+\clearpage
+Arrays (a type of data structure)
+\begin{itemize}
+  \item Sequence of values all of the same type
+  \item Arrays store information in a blocked portion of memory, using
+    the data types to determine how much memory to allocate.
+  \item Accessing elements of array are very efficient because you go to
+    the first location in memory, then increment by \texttt{i} times the
+    size of the primitive data type to get to the memory location of
+    element \texttt{i}.
+  \item Array Declaration
+    \begin{lstlisting}
+      double[] a;
+    \end{lstlisting}
+    The brackets make clear that \texttt{a} is a double \emph{array},
+    not just a scalar.
+  \item Array creation/Memory Allocation and Assignment/Initialization:
+    \begin{lstlisting}
+      a = new double[10];
+    \end{lstlisting}
+    Default initialization to zero.
+  \item Can declare, create, initialize in one step:
+    \begin{lstlisting}
+    double[] a = new double[10];
+    \end{lstlisting}
+    Can also initialize to literal values rather than default via
+    \begin{lstlisting}
+    double[] a = {0.3, 0.6, 0.1};
+    \end{lstlisting}
+  \item Two dimensional arrays (in row-major order)
+    \begin{itemize}
+      \item Doubly indexed sequence of values. First index is the
+        ``row'' (the array within the big array) while second index the
+        ``column''
+      \item They are represented as arrays of arrays.
+      \item Hence each row can have a different number of elements
+      \item Hence also easy to extract a row since it just pulls the
+        $r$th array, but no easy way to access a given column since
+        elements of a column are spread across arrays.
+    \end{itemize}
+\end{itemize}
+
+
+\clearpage
+\subsection{Input/Output}
+Input/Output
+\begin{itemize}
+  \item Command line input: An abstraction for providing arguments
+    (strings) to a program.
+
+    Every module/class has a \texttt{main()} method (invoked
+    automatically when a program is run by the \texttt{java}
+    command), which takes a string array \texttt{args[]} as
+    argument, which corresponds to the commands we type to invoke
+    the program.  Need to use \texttt{Integer.parseInt()} to convert
+    strings to numbers if we wish to use them as numbers.
+
+  \item Standard Output Stream:
+    An abstraction for an infinite output sequence.
+    Sent to terminal application by default.
+
+    We can add strings to the end of the standard output stream with
+    \begin{itemize}
+      \item \texttt{System.out.print(String s)}
+      \item \texttt{System.out.println(String s)}
+      \item \texttt{System.out.println()}
+      \item \texttt{System.out.printf(String format, \dots)}
+    \end{itemize}
+    Alternatively, we can use the \texttt{StdOut} library developed for
+    the course, which implements abstractions developed for Unix and
+    which has methods
+    \begin{itemize}
+      \item \texttt{StdOut.print(String s)}
+      \item \texttt{StdOut.println(String s)}
+      \item \texttt{StdOut.println()}
+      \item \texttt{StdOut.printf(String format, \dots)}
+    \end{itemize}
+    These methods are the same as using \texttt{System.out}, but more
+    convenient because they gather all I/O abstractions in one place
+    and in a way that's more system, language, locale independent.
+
+  \item
+    Standard Input Stream:
+    An abstraction for an infinite input sequence.
+
+    We can use the \texttt{StdIn} library developed for the course,
+    which implements abstractions developed for Unix.
+    Takes data from standard input stream, which contains a sequence
+    of values separated by whitespace.
+    Reading from the standard input stream involves consuming and
+    processing the text there.
+    Note that the collection of pieces of text separated by
+    whitespace are referred to as \emph{tokens}.
+
+    There are methods for reading the entirety of the standard input
+    stream
+    \begin{itemize}
+      \item \texttt{String readAll()}: Read all input and return as
+        string.
+      \item
+        \texttt{String readAllLines()}: Read all remaining lines and
+        return as string array.
+      \item
+        \texttt{int[] readAllInts()},
+        \texttt{double[] readAllDoubles()},
+        and so on
+        will read the remaining tokens and attempt to return them
+        as an \texttt{int} , \texttt{double}, etc. array.
+    \end{itemize}
+    There are also methods for reading single lines,
+    \begin{itemize}
+      \item \texttt{boolean hasNextLine()}
+      \item \texttt{String readLine()}
+    \end{itemize}
+    Reading single characters,
+    \begin{itemize}
+      \item \texttt{boolean hasNextChar()}
+      \item \texttt{String readChar()}
+    \end{itemize}
+    Reading individual tokens (portions separated by whitespace from
+    other tokens)
+    \begin{itemize}
+      \item \texttt{boolean isEmpty()}:
+        Is standard input empty or only whitespace
+      \item
+        \texttt{int readInt()},
+        \texttt{double readDouble()}, etc.:
+        Read next token, convert to int, double, etc., and return
+        it.
+    \end{itemize}
+
+  \item
+    Java also has standard drawing and audio, much like standard input
+    and ouptut.
+    More info
+    \href{https://introcs.cs.princeton.edu/java/10elements/}{here}.
+\end{itemize}
+
+
+
+
+
+
+
+
+
+\clearpage
+Fuctions/Methods
+\begin{itemize}
+  \item Flow control for a function call
+    \begin{enumerate}
+      \item Control transers to the function code
+      \item Argument variables are declared and initialized with the
+        given values
+      \item Function code executed
+      \item
+        Pass-by-Value:
+        Control transfers back to calling code, with return value
+        assigned in place of the function name in the calling code.
+    \end{enumerate}
+  \item The signature (first line of a static function definition)
+    has the following features
+    \begin{itemize}
+      \item Either \texttt{public} or \texttt{private} to mark the
+        class or method as available for use by another program.
+      \item \texttt{static}
+      \item Return Type:
+        \texttt{void} (if it returns nothing),
+        \texttt{double} (if it returns a value of type
+        \texttt{double}),
+        etc.
+        We must specify the return type.
+      \item Function Name
+      \item Arguments/Parameter Variables:
+        Note that we must declare the types of the parameter
+        variables.
+    \end{itemize}
+
+  \item
+    Scope:
+    The scope of a variable is teh code that can refer to a variable by
+    name.
+    Variables declared/created within a static function are local to
+    that static function.
+    Keep scope tight.
+
+  \item Overloading:
+    Static methods with different signatures are different static
+    methods. In other words, Java allows overloading, i.e. the
+    same function name can have different behavior depending upon
+    the number and types of arguments passed to that function name.
+
+  \item Pass-by-Value:
+    Static functions in Java are pass by value.
+
+  \item
+    Within a module, we can refer to methods in the same class using
+    simply the method name.  We can refer to methods in \emph{other}
+    classes/libraries by prepending the class name, i.e.
+    \texttt{OtherClass.someMethod()}.
+\end{itemize}
+
+
+
+
+
+\clearpage
+\subsection{Asymptotic Notation}
+
+\subsubsection{Performance}
+
+Performance
+\begin{itemize}
+  \item
+    Tilde Notation:
+    Use only the fasted growing terms; ignore slower growing terms.
+    \begin{align*}
+      f(N)\sim g(N)
+      \quad\iff\quad
+      \limN
+      \frac{f(N)}{g(N)}
+      = 1
+    \end{align*}
+
+  \item
+    Order of Growth:
+    Like tilde notation, but drop constants, i.e. don't require that the
+    ratio converges to 1, just to some constant.
+
+  \item Power law:
+    Something like $aN^b$.
+    Most programs satisfy something like this.
+
+  \item
+    If your program satisfies a power law $aN^b$, we can quickly compute
+    $b$.
+    First run the program for some size to get some time $T_0$; then
+    double it, rerun, and record the time to get $T_1$.
+    Take ratio $T_1/T_0 =2^b$, solve for $b$.
+
+  \item
+    Order of growth categories
+    \begin{itemize}
+      \item Linear $N$: If you have a for loop
+      \item Quadratic $N^2$: Two forloops (nested)
+      \item Cubic $N^3$: Three forloops (nested)
+      \item Logarithmic $\log N$: When you split up the problem, solve
+        half, split up, solve half of that
+      \item Linearithmic $N\log N$: When you split up the problem, solve
+        half, split up, solve half of that with a for loop in there.
+    \end{itemize}
+
+  \item
+    Can't afford to use a quadratic or worse algorithm to address a
+    problem with increasing size $N$ because they fall behind as the
+    problem size increases.
+\end{itemize}
+
+
+
+
+
+
+
+
+\subsubsection{Big-Oh Notation}
+
+This is a type of asymptotic notation concerning functions
+defined on the positive integers. In particular, 
+we'll consider a function $T(n)$, $n=1,2,\ldots$.
+\\
+\\
+{\sl Definition}: A function $T(n) = O(f(n))$ if
+and only if
+\begin{equation} 
+    \exists \; c, n_0 >0 \quad \text{s.t.} \quad 
+    T(n) \leq c \; f(n) \quad \forall n \geq n_0
+\end{equation} 
+In words, $T(n)$ is $O(f(n))$ if $T(n)$ is 
+bounded by a constant multiple of $f(n)$ 
+for sufficiently large $n$.
+
+\paragraph{Polynomial Functions}
+
+We want to prove that Big-Oh notation really does
+supress constant and lower order terms:
+\begin{align}
+    \text{if} \quad T(n) &= a_k n^k + \cdots + a_1 n + a_0 \notag\\
+    \Rightarrow \quad T(n) &= O(n^k) \label{polynom}
+\end{align}
+
+\begin{proof} To prove, we need to find a $c$ and $n_0$
+so that Equation \ref{polynom} satisfies the definition. 
+So let's go.
+\begin{align*}
+    T(n) &= a_k n^k + \cdots + a_1 n + a_0 \\
+    &\leq |a_k| n^k + \cdots + |a_1 | n + |a_0| \\
+    &\leq |a_k| n^k + \cdots + |a_1 | n^k + |a_0|n^k \\
+    &\leq \sum_{i=0}^k |a_i| n^k \\
+    \Rightarrow \quad n_0=1 \quad & \quad c = \sum_{i=0}^k |a_i| 
+\end{align*}
+This satisfies the definition for $T(n)=O(n^k)$.
+\end{proof}
+
+\subsubsection{Omega Notation}
+
+{\sl Definition}: We say that $T(n)=\Omega(f(n))$ if 
+and only if there exist constants $c$ and $n_0$
+such that 
+    \[ T(n) \geq c\cdot f(n) \quad \forall n\geq n_0 \]
+
+\subsubsection{Theta Notation}
+
+{\sl Definition}: We say that $T(n) =\Theta(f(n))$ if
+and only if $T(n)=O(f(n))$ AND $T(n) = \Omega(f(n))$.
+Visually, this means $T(n)$ is ``sandwiched''
+between two different constant multiples of $f(n)$.
+\\
+\\
+Equivalently, $T(n) =\Theta(f(n))$ if and only if
+\[ \exists c_1, c_2, n_0 \quad \text{s.t.}
+    \quad c_1 \cdot f(n) \leq T(n) \leq c_2 \cdot f(n)
+    \qquad \forall n\geq n_0 \]
+Although, we typically only care about Big-Oh notation,
+since we care abot upper bounds.
+
+\subsubsection{Little-Oh Notation}
+
+Similar to Big-Oh, but a little bit stronger. 
+Formally, $T(n) = o(f(n))$ if and only
+if for \emph{all} constants $c>0$, there exists 
+a constant $n_0$ such that
+    \[ T(n) \leq c\cdot f(n) \qquad \forall n \geq n_0 \]
+
+
+
+
+
+
 
 
 

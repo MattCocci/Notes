@@ -4,13 +4,47 @@
 -------- Simple Terminal Stuff ---------------------------------
 ----------------------------------------------------------------
 
+	----- Various Useful Terminal Tidbits -----------------------
 
-	----- Basics ------------------------------------------------
+	ls -l				give a detailed list of files
+	ls -a				show all files, even hidden files
+  tree        List out a directory tree
+  broot       Searchable directory tree
+	echo				repeats whatever comes after
+	which prgm 	Finds where a program (like prgm) lives on a
+							filesystem
+  tee file    Write both to a file and to stdout
+	su					enter sudo mode, get a terminal as the superuser
+	alias				example: ..="cd .." will make .. execute cd ..;
+							Can put alias statements in the .bashrc in
+							the home directory to make aliasing happen
+							automatically
+  xdg-open f  Open file f with appropriate program
+	jobs
+  man cmd     Get manual/documentation for cmd
+  tldr cmd    Get shorter documentation
 
-	ctrl-z 	stops foreground process
-	ctrl-c 	kills foreground process
-	; 			allows multiple commands on the same line
-	*			wildcard; expands into all the filenames in
+
+
+  find . -name nameof -type d
+
+    # Starting in current directory ., find files of type d
+    # (directories) with name equal to nameof. Can use wildcards.
+
+  find . -path 'some/path' -type f
+
+    # Find if there's a file of type f (a regular file) at some/path
+    # relative to current directory .
+
+  locate
+
+    # Like find, but works with a database that has been compiled
+    # listing all files in the system, so much quicker.
+
+
+
+  !!      wildcard; Replaced with the text from last issued command
+	*			  wildcard; expands into all the filenames in
 					directory, when used alone can also be used
 					within path names	when used with other
 					characters, it will expand * into all files
@@ -20,6 +54,16 @@
 					into EXACTLY one char
 
 
+	fg			bring ctrl + z'd jobs back to foreground
+	bg
+	ctrl-z 	stops foreground process
+	ctrl-c 	kills foreground process
+	ps			displays which processes are currently running
+  history Display history of commands
+  ctrl+r  Do backward search so that we can reexecute
+
+
+
 	----- Input, Output, Pipes ----------------------------------
 
 	< 		redirects input from file into a program
@@ -27,26 +71,21 @@
 	>>		redirects output from a program and append on to the
 				end of a file
 
-	cmd1 | cmd2		pipes output from cmd1 as input to cmd2
+	cmd1 | cmd2		Pipes output from cmd1 as input to cmd2
 
 
-	----- Various Useful Terminal Commands ----------------------
+  If cmd2 needs root permission to run, cannot do
 
-	echo				repeats whatever comes after
-	jobs
-	fg					bring ctrl + z'd jobs back to foreground
-	bg
-	chmod
-	su					enter sudo mode
-	which prgm 		finds where a program (like prgm) lives on a
-							filesystem
-	alias				example: ..="cd .." will make .. execute cd ..;
-							Can put alias statements in the .bashrc in
-							the home directory to make aliasing happen
-							automatically
-	ls -l				give a detailed list of files
-	ls -a				show all files, even hidden files
-	ps					displays which processes are currently running
+    sudo cmd1 | cmd2
+
+  Need to do
+
+    cmd1 | sudo cmd2
+
+
+  Note that /dev/null is place you can write or pipe output to and it
+  will be discarded. Useful if you just want a command to run and check
+  if it did so successfully, but don't want its output.
 
 
 
@@ -72,13 +111,23 @@
 		extract:			tar -xvf archive.tar
 		list contents:	tar -tvf archive.tar
 
+    Creation and compression in one step
+    tar -czvf zipped.tar.gz folder/
+    tar -cjvf zipped.tar.bz2 folder/
+
 	Compression
 		gzip
 		bzip2
 		7z
 
-	Compression Example
+	Compression Example with 7z (the highest compression).
+  This creates a compressed archive, so can skip tar altogether.
+
 		7z a archive.7z files
+
+
+  Can do in one step with tar
+
 
 
 
@@ -87,47 +136,67 @@
 -------- Shell Scripting ---------------------------------------
 ----------------------------------------------------------------
 
-	To run a script:
+  Key idea: Shell works entirely in text. Everything is text
+  manipulation and comparison to get commands going that you want to
+  run.
+
+	To run a script: Any of the following
+
 		sh script.sh
+
 		source script.sh
+
 		sript.sh
 			--after changing file permission to x w/ chmod
 
 
-	The Script Header:
-	#!/bin/sh		or
-	#!/bin/bash		#! must start each shell script file to
-							signify that it is a script file; the
-							/bin/sh or /bin/bash specifies the way to
-							the interpreter for the script; use sh for
-							generic script; bash for bash-specific
-							scripts; we could use #!/bin/perl for perl
-							scripts
 
-	#					the comment symbol
-	strings			the basic unit for shell scripting
-	read input		when used in a script, prompts the user for
-							input that can then be referenced as a
-							variable later
+  Comments with #
+
+
+
+  Script Headers: #! must start each shell script file to signify that
+  it is a script file; the /bin/sh or /bin/bash specifies the way to the
+  interpreter for the script. Examples:
+
+	#!/bin/sh           Marks as a shell script
+  #!/bin/bash         Marks as a BASH script, which has a little more
+                      functionality and additional syntax.
+  #!/bin/zsh          Marks as a ZShell script. Again, add'l syntax
+  #!/bin/python       Marks the script as a python script and makes it
+                      so that we can run the script with ./script.py
+                      rather than python script.py
+  #!/bin/env python   Marks the script as a script to be run with
+                      whatever program is called when we run "python" at
+                      the command line, i.e. whatever the environment
+                      variable is set to.
+
+  read input		      When used in a script, prompts the user for input
+                      that can then be referenced as a variable later
+
+
+  exit                Exits script. Commonly used in lines like
+                      "cmd || exit" so that if cmd doesn't execute
+                      sucessfully, script stops.
 
 
 
 	----- Variables and Assignment ------------------------------
-	=		assignment operator
-	$varname	after assignment of a string to varname, this
-			    outputs the value assigned to variable
-	Single quotes	prevents the shell from performing variable
-			    substitution (which you'll need for $ signs
-			    because $var for unassigned variable, var,
-			    will output the empty string, while '$var'
-			    outputs $var)
-	Double quotes	still allows variable substitution, and allows
-			    spaces to be used in variable assignment
-	$()		put commands inside the () and the shell will
-			    replace that with the text output of the
-			    commands; works inside double quotes, not
-			    single quotes
-
+	=		            assignment operator. No spaces
+  $varname	      after assignment of a string to varname, this outputs
+                  the value assigned to variable
+	Single quotes	  Prevents the shell from performing variable
+                  substitution (which you'll need for $ signs because
+                  $var for unassigned variable, var, will output the
+                  empty string, while '$var' outputs $var).
+                  This is because single quotes is for string literals;
+                  it will be literally what's typed.
+	Double quotes	  Still allows variable substitution, and allows
+			            spaces to be used in variable assignment
+	$()		          Put commands inside the () and the shell will
+                  replace that with the text output of the commands;
+                  works inside double quotes, not single quotes.
+                  This is called command substitution.
 
 
 
@@ -140,19 +209,28 @@
 	$0		used to reference the name of the script
 	$n		where n=1,...,9 references the first nine arguments;
 				use ${m} where m>=10
-	$* 	gives one string with all arguments passed to script
-	$# 	gives the number of arguments passed to the script
+	$* 	  Gives one string with all arguments passed to script
+  $@    Another way to get all arguments passed to script
+	$# 	  Gives the number of arguments passed to the script
+  $?    Error code from previous command
+  $_    Argument from last command
 
 
 
 
 	----- Functions ---------------------------------------------
+
 	Heavy duty version of alias; two ways to do it:
+
 		fun_name (){ body }
+
+  or
+
 		function fun_name { body }
 
 	$*, $n, ${m} 	used within body to access function argments,
 			    just like references within scripts
+
 	local loc_var	placed within body; makes loc_var a local
 			    variable within the fn
 
@@ -193,6 +271,19 @@
 		fi
 
 
+  Also exist for commands
+
+    cmd1 || cmd2
+
+  If cmd1 executes successfully with error code 0, stop (short circuit).
+  If cmd1 fails with error code =/= 0, do cmd2
+
+  Similarly
+
+    cmd1 && cmd2
+
+  If cmd1 executes successfully with error code 0, cmd2 executed
+
 
 	----- Condition Tests ---------------------------------------
 	Basic Form: 	[ condtion ]
@@ -204,6 +295,7 @@
 	[ -n str ]		tests whether the string is non-null
 	[ str1 \< str2 ]	tests (alphabetically) if str1 < str2
 				    where the \ is an escape character
+
 
 
 
@@ -321,6 +413,7 @@
 					that contain a specific string
 	egrep		equivalent to grep -E, which provides extended
 					regex support for grep
+  ripgrep Color coding and updated grep.
 
 
 	Basic form: egrep -x 'expression' directory
