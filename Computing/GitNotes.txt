@@ -9,7 +9,7 @@
 Notes based on: www.atlassian.com/git/tutorial/
 
 
--- Overview --
+-- Creating Git Repos --
 
   git init                    Adds a .git folder to the current directory
                               transforming that directory into a git
@@ -17,8 +17,14 @@ Notes based on: www.atlassian.com/git/tutorial/
   git init dir                Adds a .git folder to the directory "dir",
   git clone <repoloc>         Clones the repo located at repoloc to your local
                               machine; the remote you clone from is named
-                              "origin" by default
-  git clone <repoloc> <dir>   Clone the repo at repoloc to the directory "dir"
+                              "origin" by default, i.e. you use the
+                              shorthand name origin within git commands
+                              to refer to this repo
+
+-- Basics --
+
+  git status                  Lists which files are staged, unstaged, and
+                              untracked
   git add <file>              Stages file for next commit, new or old files
   git add <dir>               Stages all files in <dir> for the next commit
 
@@ -36,6 +42,14 @@ Notes based on: www.atlassian.com/git/tutorial/
 
 
 
+  git diff                If run with no args after any file has changed, this
+                          will show the changes you've made since last commit
+                          or since last staging (whichever is more recent).
+                          Note, if all changes staged, then no output
+                          returned.
+  git diff --cached       What changes have been staged for commit.
+
+
   git commit -m "msg"     Commits staged snapshot to local project repo
                           and history with a message. Git will never change
                           them unless you ask.
@@ -43,16 +57,16 @@ Notes based on: www.atlassian.com/git/tutorial/
                           directory that are tracked (so have been added with
                           git add at some point), even if those files aren't
                           currently staged
+
   git rm file             Removes file from Git tracking and from current
                           directory
   git rm --cached <file>  Remove file from Git tracking, but don't remove
                           from disk; mostly used when you forgot to add
                           something to .gitignore & accidentally committed it
-  git status              Lists which files are staged, unstaged, and
-                          untracked
   .gitignore              Plaintext file that lists files git should NOT
                           show in a call of git status; wildcards allowed,
                           each file on separate line
+
   git log                 Display entire commit history
   git log -n <limit>      Displays only <limit> commits
   git log --oneline       Condense each commit to single line
@@ -66,12 +80,6 @@ Notes based on: www.atlassian.com/git/tutorial/
   git log --grep="<x>"    Search for a commit message that includes a
                           string/regex
   git log <file>          Only display commits including specified file
-  git diff                If run with no args after any file has changed, this
-                          will show the changes you've made since last commit
-                          or since last staging (whichever is more recent).
-                          Note, if all changes staged, then no output
-                          returned.
-  git diff --cached       What changes have been staged for commit.
 
 
 
@@ -82,31 +90,53 @@ Notes based on: www.atlassian.com/git/tutorial/
 
 -- Remotes: Origin, Fetching, Pulling, Pushing, etc. --
 
-  Remotes are versions of your project that exist elsewhere or on the network.
-  Git is designed to be able to interact with these remotes---whether that's
-  grabbing versions or development branches from these remotes (either to
-  review or merge into your code) or to push changes for others to view.
-
-  If you clone a repo, the remote from which you cloned is, by default, called
-  "origin." Then, you can fetch, pull, and push by referring to "origin"
-  rather than the full network name and path.
+  - In git, you have an entire self-contained development project, but
+    might want to link up with other repositories so that you can push
+    and pull changes.
+  - These are "remotes": versions of your project that exist elsewhere
+    or on the network.
+  - You can create a list of these (stored within the .git/config file)
+    using the following commands.
+  - Essentially, you will create a list of remote repo addresses (pointers
+    to them) and shorthand names for these remote repos so you can
+    easily reference in the commands below without giving the full url
+    or network address.
+  - If you've create a repo by cloning, you've already interacted with
+    remotes. Specifically, by cloning, you've create a remote which is,
+    by defuault, called "origin."
+  - If other people have cloned from the same origin and are working on
+    the project too and you would like to interact with them directly
+    (without going through the origin remote as in a centralized repo
+    structure), you can add them as distinct remotes using "git add".
+  - All of this info is stored in the .git/config file so think of these
+    commands as just helper commands to modify that
 
   git remote                      Show the shorthand names of remote repos; if
-                                  you've cloned, you should at least see
-                                  origin
-  git remote add <nm> <address>   Add a remote at address <address> with
-                                  shorthand name <nm>
+                                  your repo was created as a clone of
+                                  some original repo, you should at
+                                  least see "origin."
+  git remote add <nm> <loc>       Add a remote at address <loc> with
+                                  shorthand name <nm>, which you will
+                                  use to refer to it
+  git remote rm <nm>              To remove a remote because it moved or
+                                  been deprecated
+  git remote rename <old> <new>   Rename the remote.
+  git remote show <nm>            Show information about remote <nm>,
+                                  like url/address and branches.
+
+
+
+  git fetch <nm>                  Fetch the changes from remote <nm>,
+                                  but don't merge in those changes yet. This is
+                                  "safe" in that it doesn't force
+                                  changes like pull. Basically see what
+                                  everyone is working on.
   git pull <nm>                   Fetch and merge in changes from remote <nm>;
                                   if no name passed, fetch from origin's
                                   master branch and merge in
-  git fetch <nm>                  Fetch changes from remote <nm>, but don't
-                                  merge in those changes yet.
   git push <nm> <br>              Push changes to branch <br> of remote <nm>
-  git remote show <nm>            Show information about remote <nm>; <nm> is
-                                  also optional, you can get information about
-                                  all remotes by not using one
-  git remote rm <nm>              To remove a remote because it moved or
-                                  something
+
+
 
 -- Bare Repos --
 
@@ -152,6 +182,10 @@ Notes based on: www.atlassian.com/git/tutorial/
     git branch              List all branches in your repo; the branch
                             with a * is your currently active branch,
                             i.e.  the branch HEAD points to
+    git branch -r           List all branches in remote repos.
+    git branch -a           List all branches in your repo and, if
+                            you have remotes added, will show the
+                            branches that those remote repos as well.
     git branch --merged     List branches that have been merged to the
                             branch you are currently on; usually, the
                             branches that show up are safe to delete
@@ -170,7 +204,10 @@ Notes based on: www.atlassian.com/git/tutorial/
                             that branch <br> points to
     git checkout -b <br>    Create and checkout <br>; shorthand for the
                             command "git branch <br>" followed by "git
-                            checkout <br>"
+                            checkout <br>".
+                            Most useful if a branch has been created on
+                            a remote repo and you want it too. This will
+                            get you a local copy.
     git merge <br>          Merge changes from branch <br> into you
                             current branch (i.e. whatever HEAD) is
                             pointing to when you run this command
@@ -182,6 +219,9 @@ Notes based on: www.atlassian.com/git/tutorial/
     git branch -D <br>      Force delete branch even if unmerged
                             changes; probably don't do this
     git branch -m <br>      Rename the current branch as <branch>
+
+    get branch --set-upstream-to=origin/<nm1> <nm2>   Will set the upstream branch.
+
 
 
     -- Merging Particulars --
@@ -531,6 +571,7 @@ Notes based on: www.atlassian.com/git/tutorial/
       rm $dir
 
     done
+
 
 
 
